@@ -1,0 +1,125 @@
+<project name="Lambda" default="build">
+	<!-- source directories -->
+	<property name="src.dir" value="src" />
+	<property name="gen.dir" value="gen" />
+	<property name="test.dir" value="test" />
+
+	<!-- binary directories -->
+	<property name="lib.dir" value="../../lib" />
+	<property name="ant.bin.dir" value="bin-ant" />
+	<property name="eclipse.bin.dir" value="../../bin" />
+
+	<!-- other properties -->
+	<property name="ast.pkg" value="ast" />
+
+	<!-- useful paths -->
+	<path id="jflex.jar.path" path="${lib.dir}/jflex-1.4.1/lib/JFlex.jar" />
+	<path id="beaver.jar.path" path="${lib.dir}/beaver-0.9.6.1/lib/beaver.jar" />
+	<path id="beaver.rt.jar.path" path="${lib.dir}/beaver-0.9.6.1/lib/beaver-rt.jar" />
+	<path id="jastadd.jar.path" path="${lib.dir}/jastadd2-R20080423/jastadd2.jar" />
+	<path id="junit.jar.path" path="${lib.dir}/junit-4.4/junit-4.4.jar" />
+
+	<!--=====================================================================-->
+	<!-- Private Targets                                                     -->
+	<!--=====================================================================-->
+
+	<!-- creates JFlex Ant task -->
+	<target name="def.jflex.task" unless="jflex.available">
+		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />
+		<property name="jflex.available" value="yes" />
+	</target>
+
+	<!-- creates Beaver Ant task -->
+	<target name="def.beaver.task" unless="beaver.available">
+		<taskdef name="beaver" classname="beaver.comp.run.AntTask" classpathref="beaver.jar.path" />
+		<property name="beaver.available" value="yes" />
+	</target>
+
+	<!-- creates JastAdd Ant task -->
+	<target name="def.jastadd.task" unless="jastadd.available">
+		<taskdef name="jastadd" classname="jastadd.JastAddTask" classpathref="jastadd.jar.path" />
+		<property name="jastadd.available" value="yes" />
+	</target>
+
+	<!-- generates Java files from JFlex scanner spec -->
+	<target name="jflex" depends="def.jflex.task">
+		<jflex file="${src.dir}/lambda.flex" destdir="gen" nobak="yes" />
+	</target>
+
+	<!-- generates Java files from Beaver parser spec -->
+	<target name="beaver" depends="def.beaver.task">
+		<beaver file="${src.dir}/lambda.grammar" destdir="gen" terminalNames="yes" compress="no" useSwitch="yes" />
+	</target>
+
+	<!-- generates Java files from JastAdd specs -->
+	<target name="jastadd" depends="def.jastadd.task">
+		<mkdir dir="${gen.dir}/${ast.pkg}" />
+		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${gen.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset>
+		</jastadd>
+	</target>
+
+	<!-- jflex, beaver, and jastadd -->
+	<target name="gen" depends="jflex, beaver, jastadd" />
+
+	<!-- command-line compilation -->
+	<target name="compile">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<src path="${test.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+	<!-- remove files created by gen -->
+	<target name="clean.gen">
+		<delete includeemptydirs="true">
+			<fileset dir="${gen.dir}" includes="**/*" />
+		</delete>
+	</target>
+
+	<!-- remove files created by compile -->
+	<target name="clean.compile">
+		<delete dir="${ant.bin.dir}" />
+	</target>
+
+	<!--=====================================================================-->
+	<!-- Public Targets                                                      -->
+	<!--=====================================================================-->
+
+	<!-- Command-line targets -->
+	<target name="build" depends="gen, compile" description="generate and build all files" />
+
+	<target name="clean" depends="clean.gen, clean.compile" description="deletes all files produced by build" />
+
+	<target name="test" depends="build" description="runs all JUnit tests">
+		<junit printsummary="true" fork="true" haltonerror="true">
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<classpath location="${ant.bin.dir}" />
+			<test name="AllTests" />
+		</junit>
+	</target>
+
+	<!-- Eclipse targets -->
+	<target name="eclipse.build" depends="gen" description="generate all files, let Eclipse build" />
+
+	<target name="eclipse.clean" depends="clean.gen" description="deletes all files produced by build.eclipse" />
+
+	<target name="eclipse.test" depends="gen" description="runs all JUnit tests, as built by Eclipse">
+		<junit printsummary="true" fork="true" haltonerror="true">
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<classpath location="${eclipse.bin.dir}" />
+			<test name="AllTests" />
+		</junit>
+	</target>
+</project>

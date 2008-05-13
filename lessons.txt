@@ -1,0 +1,18 @@
+Extend Parser.Events or Beaver will print to stderr every time something goes wrong.
+Can't import from the default package.
+There doesn't seem to be a way to use generics in .ast files - they get treated as string tokens.
+The List ASTNode does not implement the List interface.
+The List ASTNode causes a lot of name conflicts.
+It is good to provide a default implementation so you can add new nodes in the future.
+JastAdd seems to require a 'root'.  Don't know why.
+JFlex's JavaSymbol and Beaver's Symbol have similar arguments with different meanings.
+You have to use Beaver's enumeration of terminals - not your own.
+Beaver has default actions - some of which do the right thing.
+JastAdd error messages are hard to google.
+Spec files get copied to bin - this can cause duplicate definition problems.
+The JastAdd example disables Beaver's delegate mechanism in favour of switches.
+The Ant file has significant room for refinement.
+It might be nice to create a separate properties file - Ant probably supports this.
+
+The following tools now work nicely together:
+Eclipse, Ant, SVN, JUnit, JFlex, Beaver, JastAdd

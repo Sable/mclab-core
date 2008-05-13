@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="languages/Lambda/test"/>
+	<classpathentry kind="src" path="languages/Lambda/src"/>
+	<classpathentry kind="src" path="languages/Lambda/gen"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
+	<classpathentry kind="lib" path="lib/jastadd2-R20080423/jastadd2.jar"/>
+	<classpathentry kind="lib" path="lib/beaver-0.9.6.1/lib/beaver.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
