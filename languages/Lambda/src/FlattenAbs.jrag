@@ -2,7 +2,7 @@ aspect FlattenAbs {
     rewrite MultiAbs {
        to Abs {
           //NB: happens as if we are in MultiAbs
-          ast.List vars = getVars();
+          lambda.ast.List vars = getVars();
           Node curr = getBody();
           for(int i = vars.getNumChild() - 1; i >= 0; i--) {
               Var var = (Var) vars.getChild(i);

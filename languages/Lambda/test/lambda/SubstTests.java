@@ -1,10 +1,11 @@
+package lambda;
 import java.io.IOException;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
-import ast.Node;
-import ast.Root;
-import ast.Var;
+import lambda.ast.Node;
+import lambda.ast.Root;
+import lambda.ast.Var;
 import beaver.Parser.Exception;
 
 public class SubstTests extends TestCase {

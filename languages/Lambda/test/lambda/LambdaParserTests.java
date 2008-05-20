@@ -1,8 +1,9 @@
+package lambda;
 import java.io.IOException;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
-import ast.Root;
+import lambda.ast.Root;
 import beaver.Parser;
 import beaver.Scanner;
 import beaver.Symbol;

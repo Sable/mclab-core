@@ -9,7 +9,7 @@ aspect Subst {
         if(oldBoundVarName.equals(v.getName())) {
             return this;
         } else if(n.getFreeVars().contains(oldBoundVarName)) {
-            String newName = util.NameGenerator.makeName(n.getFreeVars());
+            String newName = lambda.NameGenerator.makeName(n.getFreeVars());
             Var newBoundVar = new Var(newName);
             Node newBody = oldBody;
             newBody = newBody.subst(newBoundVar, oldBoundVar);

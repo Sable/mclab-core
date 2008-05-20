@@ -1,4 +1,4 @@
-package util;
+package lambda;
 import java.util.Set;
 
 public class NameGenerator {

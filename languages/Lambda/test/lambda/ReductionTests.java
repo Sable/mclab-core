@@ -1,9 +1,10 @@
+package lambda;
 import java.io.IOException;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
-import ast.Node;
-import ast.Root;
+import lambda.ast.Node;
+import lambda.ast.Root;
 
 public class ReductionTests extends TestCase {
 	public void testReduction() throws IOException, Exception {

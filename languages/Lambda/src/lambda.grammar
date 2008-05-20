@@ -1,7 +1,9 @@
-%import "ast.*";
+%import "lambda.ast.*";
 %import "java.util.Collections";
 %import "java.util.Iterator";
 %import "java.util.List";
+
+%package "lambda";
 
 %class "LambdaParser";
 
@@ -55,7 +57,7 @@ App
 Abs
   = LAMBDA Var.vars+ ARG_BODY_SEP App.body {:
         //NB: could easily de-sugar here (as in App, but this lets us test rewriting)
-        ast.List<Var> allVars = new ast.List<Var>();
+        lambda.ast.List<Var> allVars = new lambda.ast.List<Var>();
         for(Var var : vars) {
             allVars.add(var);
         } 

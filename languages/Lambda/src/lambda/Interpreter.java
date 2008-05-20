@@ -1,10 +1,12 @@
+package lambda;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import ast.Node;
-import ast.Root;
+import lambda.ast.Node;
+import lambda.ast.Root;
 
 public class Interpreter {
 	private Interpreter() {}

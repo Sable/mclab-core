@@ -1,3 +1,5 @@
+package lambda;
+
 import beaver.Symbol;
 import beaver.Scanner;
 
