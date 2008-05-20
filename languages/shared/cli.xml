@@ -11,7 +11,8 @@
 	<target name="clean" depends="clean.gen, clean.compile" description="deletes all files produced by build" />
 
 	<target name="test" depends="build" description="runs all JUnit tests">
-		<junit printsummary="true" fork="true" haltonerror="true">
+		<junit fork="true" haltonerror="true">
+			<formatter type="plain" usefile="false" />
 			<classpath refid="junit.jar.path" />
 			<classpath refid="beaver.rt.jar.path" />
 			<classpath location="${ant.bin.dir}" />
