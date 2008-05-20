@@ -1,0 +1,19 @@
+<project name="Compile">
+    <!-- command-line compilation -->
+    <target name="compile">
+        <mkdir dir="${ant.bin.dir}" />
+        <javac destdir="${ant.bin.dir}">
+            <classpath refid="junit.jar.path" />
+            <classpath refid="beaver.rt.jar.path" />
+            <src path="${src.dir}" />
+            <src path="${gen.dir}" />
+            <src path="${test.dir}" />
+            <include name="**/*.java" />
+        </javac>
+    </target>
+
+    <!-- remove files created by compile -->
+    <target name="clean.compile">
+        <delete dir="${ant.bin.dir}" />
+    </target>
+</project>

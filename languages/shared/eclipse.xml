@@ -1,0 +1,15 @@
+<project name="Eclipse">
+    <!-- Eclipse targets -->
+    <target name="eclipse.build" depends="gen" description="generate all files, let Eclipse build" />
+
+    <target name="eclipse.clean" depends="clean.gen" description="deletes all files produced by build.eclipse" />
+
+    <target name="eclipse.test" depends="gen" description="runs all JUnit tests, as built by Eclipse">
+        <junit printsummary="true" fork="true" haltonerror="true">
+            <classpath refid="junit.jar.path" />
+            <classpath refid="beaver.rt.jar.path" />
+            <classpath location="${eclipse.bin.dir}" />
+            <test name="${test.suite.name}" />
+        </junit>
+    </target>
+</project>

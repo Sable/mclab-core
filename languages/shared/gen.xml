@@ -1,0 +1,33 @@
+<project name="Gen">
+    <!-- generates Java files from JFlex scanner spec -->
+    <target name="jflex" depends="def.jflex.task">
+        <jflex file="${src.dir}/${lexer.spec}" destdir="gen" nobak="yes" />
+    </target>
+
+    <!-- generates Java files from Beaver parser spec -->
+    <target name="beaver" depends="def.beaver.task">
+        <beaver file="${src.dir}/${parser.spec}" destdir="gen" terminalNames="yes" compress="no" useSwitch="yes" />
+    </target>
+
+    <!-- generates Java files from JastAdd specs -->
+    <target name="jastadd" depends="def.jastadd.task">
+        <mkdir dir="${gen.dir}/${ast.pkg}" />
+        <jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${gen.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.ast" />
+                <include name="**/*.jadd" />
+                <include name="**/*.jrag" />
+            </fileset>
+        </jastadd>
+    </target>
+
+    <!-- jflex, beaver, and jastadd -->
+    <target name="gen" depends="jflex, beaver, jastadd" />
+
+    <!-- remove files created by gen -->
+    <target name="clean.gen">
+        <delete includeemptydirs="true">
+            <fileset dir="${gen.dir}" includes="**/*" />
+        </delete>
+    </target>
+</project>
