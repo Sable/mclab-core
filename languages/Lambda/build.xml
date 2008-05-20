@@ -1,23 +1,13 @@
 <project name="Lambda" default="build">
-	<!-- source directories -->
-	<property name="src.dir" value="src" />
-	<property name="gen.dir" value="gen" />
-	<property name="test.dir" value="test" />
-
-	<!-- binary directories -->
-	<property name="lib.dir" value="../../lib" />
-	<property name="ant.bin.dir" value="bin-ant" />
-	<property name="eclipse.bin.dir" value="../../bin" />
-
-	<!-- other properties -->
-	<property name="ast.pkg" value="ast" />
+	<!-- load properties -->
+	<property file="lambda.properties" />
 
 	<!-- useful paths -->
-	<path id="jflex.jar.path" path="${lib.dir}/jflex-1.4.1/lib/JFlex.jar" />
-	<path id="beaver.jar.path" path="${lib.dir}/beaver-0.9.6.1/lib/beaver.jar" />
-	<path id="beaver.rt.jar.path" path="${lib.dir}/beaver-0.9.6.1/lib/beaver-rt.jar" />
-	<path id="jastadd.jar.path" path="${lib.dir}/jastadd2-R20080423/jastadd2.jar" />
-	<path id="junit.jar.path" path="${lib.dir}/junit-4.4/junit-4.4.jar" />
+	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
+	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
+	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
+	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
 
 	<!--=====================================================================-->
 	<!-- Private Targets                                                     -->
