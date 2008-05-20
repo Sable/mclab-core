@@ -1,0 +1,26 @@
+<project name="Natlab" default="build">
+	<!-- load properties -->
+	<property file="lambda.properties" />
+
+	<!-- useful paths -->
+	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
+	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
+	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
+	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+
+	<!--=====================================================================-->
+	<!-- Private Targets                                                     -->
+	<!--=====================================================================-->
+
+	<import file="../shared/taskdef.xml" />
+	<import file="../shared/gen.xml" />
+	<import file="../shared/compile.xml" />
+
+	<!--=====================================================================-->
+	<!-- Public Targets                                                      -->
+	<!--=====================================================================-->
+
+	<import file="../shared/cli.xml" />
+	<import file="../shared/eclipse.xml" />
+</project>

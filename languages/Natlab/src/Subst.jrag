@@ -1,0 +1,24 @@
+aspect Subst {
+    syn Node Node.subst(Var v, Node n) { throw new UnsupportedOperationException(); }
+    eq Var.subst(Var v, Node n) = getName().equals(v.getName()) ? n : this;
+    eq App.subst(Var v, Node n) = new App(getRator().subst(v, n), getRand().subst(v, n));
+    eq Abs.subst(Var v, Node n) {
+        Var oldBoundVar = getVar();
+        String oldBoundVarName = oldBoundVar.getName();
+        Node oldBody = getBody();
+        if(oldBoundVarName.equals(v.getName())) {
+            return this;
+        } else if(n.getFreeVars().contains(oldBoundVarName)) {
+            String newName = lambda.NameGenerator.makeName(n.getFreeVars());
+            Var newBoundVar = new Var(newName);
+            Node newBody = oldBody;
+            newBody = newBody.subst(newBoundVar, oldBoundVar);
+            newBody = newBody.subst(v, n);
+            return new Abs(newBoundVar, newBody);
+        } else {
+            return new Abs(oldBoundVar, oldBody.subst(v, n));
+        }
+    }
+
+    syn Node Root.subst(Var v, Node n) = getNode().subst(v, n);
+}
