@@ -1,4 +1,4 @@
-%import "lambda.ast.*";
+%import "natlab.ast.*";
 %import "java.util.Collections";
 %import "java.util.Iterator";
 %import "java.util.List";
@@ -57,7 +57,7 @@ App
 Abs
   = LAMBDA Var.vars+ ARG_BODY_SEP App.body {:
         //NB: could easily de-sugar here (as in App, but this lets us test rewriting)
-        lambda.ast.List<Var> allVars = new lambda.ast.List<Var>();
+        natlab.ast.List<Var> allVars = new natlab.ast.List<Var>();
         for(Var var : vars) {
             allVars.add(var);
         } 
