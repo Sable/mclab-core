@@ -95,7 +95,7 @@
 			<classpath refid="junit.jar.path" />
 			<classpath refid="beaver.rt.jar.path" />
 			<classpath location="${ant.bin.dir}" />
-			<test name="AllTests" />
+			<test name="${test.suite.name}" />
 		</junit>
 	</target>
 
@@ -109,7 +109,7 @@
 			<classpath refid="junit.jar.path" />
 			<classpath refid="beaver.rt.jar.path" />
 			<classpath location="${eclipse.bin.dir}" />
-			<test name="AllTests" />
+			<test name="${test.suite.name}" />
 		</junit>
 	</target>
 </project>
