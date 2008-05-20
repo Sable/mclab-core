@@ -3,9 +3,9 @@
 %import "java.util.Iterator";
 %import "java.util.List";
 
-%package "lambda";
+%package "natlab";
 
-%class "LambdaParser";
+%class "NatlabParser";
 
 %embed {:
     class Events extends Parser.Events {

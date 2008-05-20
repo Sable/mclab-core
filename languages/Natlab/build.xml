@@ -1,6 +1,6 @@
 <project name="Natlab" default="build">
 	<!-- load properties -->
-	<property file="lambda.properties" />
+	<property file="natlab.properties" />
 
 	<!-- useful paths -->
 	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />

@@ -1,4 +1,4 @@
-package lambda;
+package natlab;
 
 import beaver.Symbol;
 import beaver.Scanner;
@@ -7,7 +7,7 @@ import beaver.Scanner;
 
 %public
 %final
-%class LambdaScanner
+%class NatlabScanner
 %extends Scanner
 %unicode
 %function nextToken
@@ -36,13 +36,13 @@ Identifier = [:jletter:] [:jletterdigit:]*
 
 %%
 
-{Identifier}  { return symbol(LambdaParser.Terminals.IDENTIFIER, yytext()); }
-{BackSlash}   { return symbol(LambdaParser.Terminals.LAMBDA); }
-{Arrow}       { return symbol(LambdaParser.Terminals.ARG_BODY_SEP); }
-{LParen}      { return symbol(LambdaParser.Terminals.LPAREN); }
-{RParen}      { return symbol(LambdaParser.Terminals.RPAREN); }
+{Identifier}  { return symbol(NatlabParser.Terminals.IDENTIFIER, yytext()); }
+{BackSlash}   { return symbol(NatlabParser.Terminals.LAMBDA); }
+{Arrow}       { return symbol(NatlabParser.Terminals.ARG_BODY_SEP); }
+{LParen}      { return symbol(NatlabParser.Terminals.LPAREN); }
+{RParen}      { return symbol(NatlabParser.Terminals.RPAREN); }
 {WhiteSpace}  { /* ignore */ }
 
 /* error fallback */
 .|\n          { throw new Scanner.Exception("Illegal character <" + yytext() + ">"); }
-<<EOF>>       { return symbol(LambdaParser.Terminals.EOF); }
+<<EOF>>       { return symbol(NatlabParser.Terminals.EOF); }
