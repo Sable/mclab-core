@@ -1,19 +1,25 @@
+<!--
+    Requires:
+        Properties: n/a
+        Paths: jflex.jar.path, beaver.jar.path, jastadd.jar.path
+        Targets: n/a
+-->
 <project name="TaskDef">
-    <!-- creates JFlex Ant task -->
-    <target name="def.jflex.task" unless="jflex.available">
-        <taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />
-        <property name="jflex.available" value="yes" />
-    </target>
+	<!-- creates JFlex Ant task -->
+	<target name="def.jflex.task" unless="jflex.available">
+		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />
+		<property name="jflex.available" value="yes" />
+	</target>
 
-    <!-- creates Beaver Ant task -->
-    <target name="def.beaver.task" unless="beaver.available">
-        <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpathref="beaver.jar.path" />
-        <property name="beaver.available" value="yes" />
-    </target>
+	<!-- creates Beaver Ant task -->
+	<target name="def.beaver.task" unless="beaver.available">
+		<taskdef name="beaver" classname="beaver.comp.run.AntTask" classpathref="beaver.jar.path" />
+		<property name="beaver.available" value="yes" />
+	</target>
 
-    <!-- creates JastAdd Ant task -->
-    <target name="def.jastadd.task" unless="jastadd.available">
-        <taskdef name="jastadd" classname="jastadd.JastAddTask" classpathref="jastadd.jar.path" />
-        <property name="jastadd.available" value="yes" />
-    </target>
+	<!-- creates JastAdd Ant task -->
+	<target name="def.jastadd.task" unless="jastadd.available">
+		<taskdef name="jastadd" classname="jastadd.JastAddTask" classpathref="jastadd.jar.path" />
+		<property name="jastadd.available" value="yes" />
+	</target>
 </project>
