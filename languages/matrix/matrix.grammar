@@ -1,0 +1,255 @@
+
+%class "MatrixParser";
+
+// %terminals BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE;
+// DOT, LBRACE, RBRACE, 
+// %terminals STATIC, GLOBAL, PERSISTENT, REPLOT; 
+// %terminals CLASSDEF;
+// %terminals FUNCTION; 
+//%terminals IF, ELSE, ELSEIF, SWITCH, CASE, OTHERWISE, 
+// DO, WHILE, FOR, BREAK, CONTINUE, RETURN, END, UNTIL;
+//%terminals TRY, CATCH;
+//%terminals POW, EPOW , TRANSPOSE;	//
+//%terminals UNWIND_PROTECT, UNWIND_PROTECT_CLEANUP, VARARGIN, VARARGOUT;
+
+
+%terminals LBRACK, RBRACK;
+%terminals SEMICOLON, COMMA, EQ, LPAREN, RPAREN, COLON;
+%terminals PLUSPLUS, MINUSMINUS, PLUS, MINUS, NOT, MULT, DIV, LEFTDIV;
+%terminals EPLUS, EMINUS, EMULT, EDIV, ELEFTDIV;
+%terminals LSHIFT, RSHIFT;
+%terminals LT, GT, LTEQ, GTEQ, EQEQ, NOTEQ;
+%terminals AND, OR, ANDAND, OROR;
+%terminals MULTEQ, DIVEQ, LEFTDIVEQ, PLUSEQ, MINUSEQ;	//, POWEQ
+%terminals EMULTEQ, EDIVEQ, ELEFTDIVEQ, EPLUSEQ, EMINUSEQ;	//, EPOWEQ;
+%terminals LSHIFTEQ, RSHIFTEQ;
+%terminals ANDEQ, OREQ;
+%terminals INTEGER_LITERAL, FLOATING_POINT_LITERAL, BOOLEAN_LITERAL, CHARACTER_LITERAL, STRING_LITERAL;
+%terminals NULL_LITERAL;
+%terminals IDENTIFIER;
+
+// Precedence and associativity.
+%left SEMICOLON, COMMA;
+%left OROR;
+%left OR;
+%left AND;
+%left EQEQ, NOTEQ;
+%left LT, GT, LTEQ, GTEQ;
+%left LSHIFT, RSHIFT;
+%left COLON;
+%left PLUS, MINUS, EPLUS, EMINUS;
+%left MULT, DIV, LEFTDIV, EMULT, EDIV, ELEFTDIV;
+%left PLUSPLUS, MINUSMINUS, NOT;
+%left LPAREN;	
+
+%typeof INTEGER_LITERAL, FLOATING_POINT_LITERAL = "Number";
+%typeof BOOLEAN_LITERAL = "Boolean";
+%typeof CHARACTER_LITERAL = "Character";
+%typeof STRING_LITERAL, IDENTIFIER = "String";
+
+%goal statement_list;
+
+// Currently, a .m file is treated as a list of statements.
+
+statement_list =	
+		statement
+	|	statement_list statement
+	;
+
+statement =	
+		empty_statement
+	|	expression_statement
+	;
+empty_statement =
+		SEMICOLON
+	;
+
+expression_statement =
+		expression SEMICOLON
+	;
+
+// Lexical Structure.
+literal =	INTEGER_LITERAL
+	|	FLOATING_POINT_LITERAL
+	|	BOOLEAN_LITERAL
+	|	CHARACTER_LITERAL
+	|	STRING_LITERAL
+	|	NULL_LITERAL
+	;
+
+//  Names
+name	=	simple_name
+	;
+simple_name =	IDENTIFIER
+	;
+
+// Matrix of MATLAB -JL
+matrix =
+		LBRACK maxtrix_rows SEMICOLON RBRACK
+	|	LBRACK maxtrix_rows RBRACK
+	|	LBRACK SEMICOLON RBRACK
+	|	LBRACK RBRACK
+	;
+	
+maxtrix_rows = 	
+		cell_or_matrix_row
+	|	maxtrix_rows SEMICOLON cell_or_matrix_row
+	;
+
+cell_or_matrix_row =
+		argument_list
+	|	argument_list COMMA 
+	;
+
+// Expressions
+primary =	primary_no_new_array
+	;
+
+// Don't need to add Matrix into the expression  -JL 
+// because in RHS, matrix_access ==  method_invocation
+primary_no_new_array =
+		literal
+	|	matrix
+	|	LPAREN expression RPAREN
+	|	method_invocation
+	;
+	
+// Adding ':' for compatible with MATLAB matrix-access
+argument_list =
+		expression
+	|	argument_list COMMA expression
+	|	COLON
+	|	argument_list COMMA COLON
+	;
+method_invocation =
+		name LPAREN RPAREN
+	|	name LPAREN argument_list RPAREN
+	;
+// Matrix of MATLAB -JL	
+matrix_access = 
+		name LPAREN argument_list RPAREN
+	;
+	
+postfix_expression =
+		primary
+	|	name
+	|	postincrement_expression
+	|	postdecrement_expression
+	;
+postincrement_expression =
+		postfix_expression PLUSPLUS
+	;
+postdecrement_expression =
+		postfix_expression MINUSMINUS
+	;
+unary_expression =
+		preincrement_expression
+	|	predecrement_expression
+	|	PLUS unary_expression
+	|	MINUS unary_expression
+	|	unary_expression_not_plus_minus
+	;
+preincrement_expression =
+		PLUSPLUS unary_expression
+	;
+predecrement_expression =
+		MINUSMINUS unary_expression
+	;
+unary_expression_not_plus_minus =
+		postfix_expression
+	|	NOT unary_expression
+	;
+multiplicative_expression =
+		unary_expression
+	|	multiplicative_expression MULT unary_expression
+	|	multiplicative_expression DIV unary_expression
+	|	multiplicative_expression EMULT unary_expression
+	|	multiplicative_expression EDIV unary_expression
+	|	multiplicative_expression LEFTDIV unary_expression
+	|	multiplicative_expression ELEFTDIV unary_expression
+	;
+additive_expression =
+		multiplicative_expression
+	|	additive_expression PLUS multiplicative_expression
+	|	additive_expression MINUS multiplicative_expression
+	|	additive_expression EPLUS multiplicative_expression
+	|	additive_expression EMINUS multiplicative_expression
+	;
+// Colon expression for MATLAB -JL
+colon_expression =	
+		additive_expression
+	|	colon_expression COLON additive_expression
+	;
+shift_expression =
+		colon_expression
+	|	shift_expression LSHIFT colon_expression
+	|	shift_expression RSHIFT colon_expression
+	;
+relational_expression =
+		shift_expression
+	|	relational_expression LT shift_expression
+	|	relational_expression GT shift_expression
+	|	relational_expression LTEQ shift_expression
+	|	relational_expression GTEQ shift_expression
+	;
+equality_expression =
+		relational_expression
+	|	equality_expression EQEQ relational_expression
+	|	equality_expression NOTEQ relational_expression
+	;
+and_expression =
+		equality_expression
+	|	and_expression AND equality_expression
+	;
+exclusive_or_expression =
+		and_expression
+	;
+inclusive_or_expression =
+		exclusive_or_expression
+	|	inclusive_or_expression OR exclusive_or_expression
+	;
+conditional_and_expression =
+		inclusive_or_expression
+	|	conditional_and_expression ANDAND inclusive_or_expression
+	;
+conditional_or_expression =
+		conditional_and_expression
+	|	conditional_or_expression OROR conditional_and_expression
+	;
+conditional_expression =
+		conditional_or_expression
+	;
+assignment_expression =
+		conditional_expression
+	|	assignment
+	;
+assignment = left_hand_side assignment_operator assignment_expression
+	;
+// Adding 	matrix_access -JL 
+left_hand_side =
+		name
+	|	matrix_access
+	;
+assignment_operator =
+		EQ
+	|	ANDEQ
+	|	OREQ
+	|	MULTEQ
+	|	DIVEQ
+	|	LEFTDIVEQ
+	|	PLUSEQ
+	|	MINUSEQ
+	|	EMULTEQ
+	|	EDIVEQ
+	|	ELEFTDIVEQ
+	|	EPLUSEQ
+	|	EMINUSEQ
+	|	LSHIFTEQ
+	|	RSHIFTEQ
+	;
+//	|	POWEQ
+//	|	EPOWEQ
+
+expression =
+	assignment_expression
+	;
