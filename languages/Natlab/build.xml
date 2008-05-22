@@ -17,10 +17,41 @@
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
 
+	<!-- Extend and override parts of gen.xml -->
+
+	<target name="compile.test.generators">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<src path="${test.dir}" />
+			<include name="natlab/ScannerTestGenerator.java" />
+		</javac>
+	</target>
+
+	<target name="gen.scanner.tests">
+		<java classname="natlab.ScannerTestGenerator" classpath="${ant.bin.dir}" args="test/scanner.testlist ${gen.dir}" />
+	</target>
+
+	<target name="eclipse.gen.scanner.tests">
+		<java classname="natlab.ScannerTestGenerator" classpath="${eclipse.bin.dir}" args="test/scanner.testlist ${gen.dir}" />
+	</target>
+
+	<!-- jflex, beaver, jastadd, and tests -->
+	<target name="eclipse.gen" depends="Gen.gen, eclipse.gen.scanner.tests" />
+
+	<!-- jflex, beaver, jastadd, and tests -->
+	<!-- NB: overrides target from gen.xml -->
+	<target name="gen" depends="compile.test.generators, Gen.gen, gen.scanner.tests" />
+
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->
 
 	<import file="../shared/cli.xml" />
 	<import file="../shared/eclipse.xml" />
+
+	<!-- Override parts of eclipse.xml -->
+	<target name="eclipse.build" depends="eclipse.gen" description="generate all files, let Eclipse build" />
+
+	<!-- Override parts of cli.xml -->
+	<target name="build" depends="gen, compile" description="generate and build all files" />
 </project>
