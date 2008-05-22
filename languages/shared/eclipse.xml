@@ -10,7 +10,7 @@
 
 	<target name="eclipse.clean" depends="clean.gen" description="deletes all files produced by build.eclipse" />
 
-	<target name="eclipse.test" depends="gen" description="runs all JUnit tests, as built by Eclipse">
+	<target name="eclipse.test" depends="eclipse.build" description="runs all JUnit tests, as built by Eclipse">
 		<junit fork="true" haltonerror="true">
 			<formatter type="plain" usefile="false" />
 			<classpath refid="junit.jar.path" />
