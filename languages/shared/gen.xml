@@ -24,6 +24,11 @@
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
 			</fileset>
+			<fileset dir="${test.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset>
 		</jastadd>
 	</target>
 
