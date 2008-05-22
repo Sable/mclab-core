@@ -23,13 +23,13 @@
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
-			<include name="natlab/ScannerTestGenerator.java" />
+			<include name="${lexer.test.generator.file}" />
 		</javac>
 	</target>
 
 	<target name="gen.scanner.tests">
 		<echo message="Generating scanner tests" />
-		<java classname="natlab.ScannerTestGenerator" classpath="${ant.bin.dir}">
+		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
@@ -37,7 +37,7 @@
 
 	<target name="eclipse.gen.scanner.tests">
 		<echo message="Generating scanner tests" />
-		<java classname="natlab.ScannerTestGenerator" classpath="${eclipse.bin.dir}">
+		<java classname="${lexer.test.generator.class}" classpath="${eclipse.bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
