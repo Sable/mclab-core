@@ -59,7 +59,4 @@
 
 	<!-- Override parts of eclipse.xml -->
 	<target name="eclipse.build" depends="eclipse.gen" description="generate all files, let Eclipse build" />
-
-	<!-- Override parts of cli.xml -->
-	<target name="build" depends="gen, compile" description="generate and build all files" />
 </project>
