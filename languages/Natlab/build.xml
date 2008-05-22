@@ -28,11 +28,17 @@
 	</target>
 
 	<target name="gen.scanner.tests">
-		<java classname="natlab.ScannerTestGenerator" classpath="${ant.bin.dir}" args="test/scanner.testlist ${gen.dir}" />
+		<java classname="natlab.ScannerTestGenerator" classpath="${ant.bin.dir}">
+			<arg value="test/scanner.testlist" />
+			<arg value="${gen.dir}" />
+		</java>
 	</target>
 
 	<target name="eclipse.gen.scanner.tests">
-		<java classname="natlab.ScannerTestGenerator" classpath="${eclipse.bin.dir}" args="test/scanner.testlist ${gen.dir}" />
+		<java classname="natlab.ScannerTestGenerator" classpath="${eclipse.bin.dir}">
+			<arg value="test/scanner.testlist" />
+			<arg value="${gen.dir}" />
+		</java>
 	</target>
 
 	<!-- jflex, beaver, jastadd, and tests -->
