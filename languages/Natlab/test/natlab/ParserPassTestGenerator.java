@@ -1,52 +1,18 @@
 package natlab;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-//NB: only depends on stdlib
+import java.io.IOException;
+import java.io.PrintWriter;
 
-public class ParserPassTestGenerator {
-	private ParserPassTestGenerator() {}
+public class ParserPassTestGenerator extends TestGenerator {
+	private ParserPassTestGenerator() {
+		super("/natlab/NatlabParserPassTests.java");
+	}
 
 	public static void main(String[] args) throws IOException {
-		if(args.length != 2) {
-			System.err.println("Usage: java lambda.TestGenerator listFileName genDirName");
-			System.exit(1);
-		}
-
-		String listFileName = args[0];
-		String genDirName = args[1];
-
-		List<String> testNames = getTestNames(listFileName);
-
-		String testFileName = genDirName + "/natlab/NatlabParserPassTests.java";
-		PrintWriter testFileWriter = new PrintWriter(new FileWriter(testFileName));
-		printHeader(testFileWriter);
-		for(String testName : testNames) {
-			printMethod(testFileWriter, testName);
-		}
-		printFooter(testFileWriter);
-		testFileWriter.close();
+		new ParserPassTestGenerator().generate(args);
 	}
 
-	private static List<String> getTestNames(String listFileName) throws IOException {
-		List<String> testNames = new ArrayList<String>();
-		BufferedReader listFileReader = new BufferedReader(new FileReader(listFileName));
-		while(listFileReader.ready()) {
-			String line = listFileReader.readLine().trim();
-			if(!isCommentLine(line)) {
-				testNames.add(line);
-			}
-		}
-		listFileReader.close();
-		return testNames;
-	}
-
-	private static boolean isCommentLine(String line) {
-		return line.charAt(0) == '#';
-	}
-
-	private static void printHeader(PrintWriter testFileWriter) {
+	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package natlab;");
 		testFileWriter.println();
 		testFileWriter.println("import natlab.ast.Root;");
@@ -55,7 +21,7 @@ public class ParserPassTestGenerator {
 		testFileWriter.println("public class NatlabParserPassTests extends ParserPassTestBase {");
 	}
 
-	private static void printMethod(PrintWriter testFileWriter, String testName) {
+	protected void printMethod(PrintWriter testFileWriter, String testName) {
 		String methodName = "test_" + testName;
 		String inFileName = "test/" + testName + ".in";
 		String outFileName = "test/" + testName + ".out";
@@ -68,7 +34,7 @@ public class ParserPassTestGenerator {
 		testFileWriter.println("	}");
 	}
 
-	private static void printFooter(PrintWriter testFileWriter) {
+	protected void printFooter(PrintWriter testFileWriter) {
 		testFileWriter.println("}");
 		testFileWriter.println();
 	}
