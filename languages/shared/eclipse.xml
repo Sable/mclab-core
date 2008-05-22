@@ -11,7 +11,8 @@
 	<target name="eclipse.clean" depends="clean.gen" description="deletes all files produced by build.eclipse" />
 
 	<target name="eclipse.test" depends="gen" description="runs all JUnit tests, as built by Eclipse">
-		<junit printsummary="true" fork="true" haltonerror="true">
+		<junit fork="true" haltonerror="true">
+			<formatter type="plain" usefile="false" />
 			<classpath refid="junit.jar.path" />
 			<classpath refid="beaver.rt.jar.path" />
 			<classpath location="${eclipse.bin.dir}" />
