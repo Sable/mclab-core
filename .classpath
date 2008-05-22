@@ -9,7 +9,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
 	<classpathentry kind="lib" path="lib/jastadd2-R20080423/jastadd2.jar"/>
-	<classpathentry kind="lib" path="lib/beaver-0.9.6.1/lib/beaver.jar"/>
+	<classpathentry kind="lib" path="lib/beaver-0.9.6.1/lib/beaver.jar" sourcepath="lib/beaver-0.9.6.1/src"/>
 	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
