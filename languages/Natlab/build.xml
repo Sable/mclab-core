@@ -28,15 +28,17 @@
 	</target>
 
 	<target name="gen.scanner.tests">
+		<echo message="Generating scanner tests" />
 		<java classname="natlab.ScannerTestGenerator" classpath="${ant.bin.dir}">
-			<arg value="test/scanner.testlist" />
+			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
 	<target name="eclipse.gen.scanner.tests">
+		<echo message="Generating scanner tests" />
 		<java classname="natlab.ScannerTestGenerator" classpath="${eclipse.bin.dir}">
-			<arg value="test/scanner.testlist" />
+			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
