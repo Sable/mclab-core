@@ -2,7 +2,7 @@
     Requires:
         Properties: ant.bin.dir, test.suite.name
         Paths: junit.jar.path, beaver.rt.jar.path
-        Targets: gen, compile, clean.gen, clean.compile
+        Targets: eclipse.build, compile, eclipse.clean, clean.compile, eclipse.test
 -->
 <project name="CommandLineInterface">
 	<!-- Command-line targets -->
