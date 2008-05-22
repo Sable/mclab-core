@@ -9,6 +9,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite();
 		//$JUnit-BEGIN$
 		suite.addTestSuite(NatlabScannerTests.class);
+		suite.addTestSuite(NatlabParserPassTests.class);
 		//$JUnit-END$
 		return suite;
 	}

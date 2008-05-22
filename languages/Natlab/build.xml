@@ -24,6 +24,7 @@
 		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="${lexer.test.generator.file}" />
+			<include name="${parser.pass.test.generator.file}" />
 		</javac>
 	</target>
 
@@ -35,12 +36,22 @@
 		</java>
 	</target>
 
+	<target name="gen.parser.pass.tests">
+		<echo message="Generating parser pass tests" />
+		<java classname="${parser.pass.test.generator.class}" classpath="${ant.bin.dir}:${eclipse.bin.dir}">
+			<arg value="${parser.pass.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests" />
+
 	<!-- jflex, beaver, jastadd, and tests -->
-	<target name="eclipse.gen" depends="Gen.gen, gen.scanner.tests" />
+	<target name="eclipse.gen" depends="Gen.gen, gen.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.scanner.tests" />
+	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->

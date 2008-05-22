@@ -1,0 +1,19 @@
+aspect StructureString {
+    syn String Node.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
+    eq Var.getStructureString() = getName();
+    eq App.getStructureString() = "app(" + getRator().getStructureString() + ", " + getRand().getStructureString() + ")";
+    eq Abs.getStructureString() = "abs(" + getVar().getStructureString() + ", " + getBody().getStructureString() + ")";
+    eq MultiAbs.getStructureString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("multiabs(");
+        for(Object node : getVars()) {
+            buf.append(((Var) node).getStructureString());
+            buf.append(", ");
+        }
+        buf.append(getBody().getStructureString());
+        buf.append(")");
+        return buf.toString();
+    }
+
+    syn String Root.getStructureString() = getNode().getStructureString();
+}
