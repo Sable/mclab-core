@@ -6,17 +6,9 @@
 -->
 <project name="CommandLineInterface">
 	<!-- Command-line targets -->
-	<target name="build" depends="gen, compile" description="generate and build all files" />
+	<target name="build" depends="eclipse.build, compile" description="generate and build all files" />
 
-	<target name="clean" depends="clean.gen, clean.compile" description="deletes all files produced by build" />
+	<target name="clean" depends="eclipse.clean, clean.compile" description="deletes all files produced by build" />
 
-	<target name="test" depends="build" description="runs all JUnit tests">
-		<junit fork="true" haltonerror="true">
-			<formatter type="plain" usefile="false" />
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
-			<classpath location="${ant.bin.dir}" />
-			<test name="${test.suite.name}" />
-		</junit>
-	</target>
+	<target name="test" depends="build, eclipse.test" description="runs all JUnit tests" />
 </project>
