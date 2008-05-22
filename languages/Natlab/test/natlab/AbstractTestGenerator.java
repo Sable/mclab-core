@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 //NB: only depends on stdlib
 
-public abstract class TestGenerator {
+public abstract class AbstractTestGenerator {
 	private final String relativeFilename;
 
-	protected TestGenerator(String relativeFilename) {
+	protected AbstractTestGenerator(String relativeFilename) {
 		this.relativeFilename = relativeFilename;
 	}
 
