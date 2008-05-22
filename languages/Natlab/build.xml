@@ -29,22 +29,14 @@
 
 	<target name="gen.scanner.tests">
 		<echo message="Generating scanner tests" />
-		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}">
-			<arg value="${lexer.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="eclipse.gen.scanner.tests">
-		<echo message="Generating scanner tests" />
-		<java classname="${lexer.test.generator.class}" classpath="${eclipse.bin.dir}">
+		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}:${eclipse.bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
 	<!-- jflex, beaver, jastadd, and tests -->
-	<target name="eclipse.gen" depends="Gen.gen, eclipse.gen.scanner.tests" />
+	<target name="eclipse.gen" depends="Gen.gen, gen.scanner.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
