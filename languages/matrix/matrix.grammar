@@ -27,6 +27,7 @@
 %terminals INTEGER_LITERAL, FLOATING_POINT_LITERAL, BOOLEAN_LITERAL, CHARACTER_LITERAL, STRING_LITERAL;
 %terminals NULL_LITERAL;
 %terminals IDENTIFIER;
+%terminals COMMENT;
 
 // Precedence and associativity.
 %left SEMICOLON, COMMA;
@@ -85,6 +86,7 @@ statement =
 	;
 empty_statement =
 		SEMICOLON		
+	|	COMMENT
 	;
 
 expression_statement =

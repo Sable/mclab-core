@@ -184,7 +184,7 @@ SingleCharacter = [^\r\n\'\\]
   {DoubleLiteral}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, Double.valueOf(yytext())); }
 
   /* comments */
-  {Comment}                      { /* ignore */ }
+  {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext()); }
 
   /* whitespace */
   {WhiteSpace}                   { /* ignore */ }
