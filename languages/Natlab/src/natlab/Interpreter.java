@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
+import beaver.Parser;
+
 import natlab.ast.Root;
 
 public class Interpreter {
@@ -26,10 +28,18 @@ public class Interpreter {
 				NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				NatlabParser parser = new NatlabParser();
 				Root original = (Root) parser.parse(scanner);
-
-				System.out.println(original.getStructureString());
-			} catch(Exception e) {
-				System.out.println("Error:  " + e.getMessage());
+				
+				if(parser.hasError()) {
+					System.out.println("**ERROR**");
+					for(String error : parser.getErrors()) {
+						System.out.println(error);
+					}
+				} else {
+					System.out.println(original.getStructureString());
+				}
+			} catch(Parser.Exception e) {
+				System.out.println("**ERROR**");
+				System.out.println(e.getMessage());
 			}
 		}
 		System.out.println("Goodbye!");
