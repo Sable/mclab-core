@@ -13,7 +13,7 @@ public class Interpreter {
 	private Interpreter() {}
 
 	public static void main(String[] args) throws IOException {
-		System.out.println("Welcome to the Lambda Calculus Interpreter!");
+		System.out.println("Welcome to the Natlab Interpreter!");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		while(true) {
 			System.out.print("> ");
