@@ -10,6 +10,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(NatlabScannerTests.class);
 		suite.addTestSuite(NatlabParserPassTests.class);
+		suite.addTestSuite(NatlabParserFailTests.class);
 		//$JUnit-END$
 		return suite;
 	}
