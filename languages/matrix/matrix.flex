@@ -48,17 +48,17 @@ Space = [ \t]
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | {Space}
 
-Elipsis          = \.\.\.    
+Elipsis       = \.\.\.    
 Continuation  = {Elipsis} | \\
 Imaginaryunit = [iIjJ]
-CommentChar = [#%]
-Comment    = {CommentChar} .* {LineTerminator}
+CommentChar   = [#%]
+Comment       = {CommentChar} .* {LineTerminator}
 
 /* identifiers  Identifier = [:jletter:][:jletterdigit:]*  */
 Identifier = [_$A-Za-z][_$A-Za-z0-9]*
 
 /* integer literals */
-IntegerLiteral = 0 | [1-9][0-9]*
+IntegerLiteral    = 0 | [1-9][0-9]*
 
 HexIntegerLiteral = 0 [xX] [0-9a-fA-F]+
 

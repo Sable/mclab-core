@@ -1,0 +1,36 @@
+// AST for part of matrix g
+abstract Stmt;
+Program:List ::= Stmt*;
+ExprStmt:Stmt ::= Expr;
+
+abstract Expr;
+abstract Access:Expr;
+AssignExpr:Expr ::= LHS:Access <AssignOp:String> RHS:Expr;
+
+// LHS nodes
+abstract IdUse:Access ::= <Name:String>;
+Use:IdUse;
+MatrixAccess:Access ::= Name:IdUse Args:ArgList;
+
+// should be Expr+, or checking later on?
+ArgList:List ::= Expr*;	
+Colon:Expr ::= <Name:String>;
+
+// matrix consists of a set of row
+Matrix:Expr ::= CellMatrixRow*;
+CellMatrixRow:List ::= Args:ArgList;
+
+MethodInvocation:Expr ::= IdUse ArgList*;
+
+BinaryExpr:Expr ::= LHSExpr:Expr <Op:String> RHSExpr:Expr;
+
+UnaryExpr:Expr ::= <Op:String> Expr;
+PostfixExpr:Expr ::= Expr <Op:String>;
+
+ColonExpr:Expr ::= Base:Expr Incr:Expr Limit:Expr;
+
+IntegerLiteral:Expr ::= <Value:String>;
+FloatingLiteral:Expr ::= <Value:String>;
+BooleanLiteral:Expr ::= <Value:String>;
+CharLiteral:Expr ::= <Value:String>;
+StringLiteral:Expr ::= <Value:String>;
