@@ -1,4 +1,4 @@
-
+%import "ast.*";
 %class "MatrixParser";
 
 // %terminals BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE;
@@ -44,16 +44,39 @@
 
 %typeof INTEGER_LITERAL, FLOATING_POINT_LITERAL = "Number";
 %typeof BOOLEAN_LITERAL = "Boolean";
-%typeof CHARACTER_LITERAL = "Character";
+%typeof CHARACTER_LITERAL = "String";
 %typeof STRING_LITERAL, IDENTIFIER = "String";
 
-%goal statement_list;
+%typeof program = "Program";
+%typeof statement_list = "List";
+%typeof statement = "Stmt";
+%typeof expression_statement = "ExprStmt";
+%typeof expression = "Expr";
+%typeof matrix = "Matrix";
+%typeof name = "Access";
+%typeof argument_list = "List";
+%typeof colon_expression = "ColonExpr";
+%typeof method_invocation = "MethodInvocation";
+
+
+%goal program;
 
 // Currently, a .m file is treated as a list of statements.
 
+program = statement_list.stmtlist	{:  return new Program(stmtlist); :}
+	;
+
 statement_list =	
-		statement
-	|	statement_list statement
+		statement.stmt
+		{:  
+			List<Stmt> stmtList = new List<Stmt>();
+			stmtList.add(stmt);
+			return stmtList; 
+		:}
+	|	statement_list.list statement.stmt
+		{:  
+			return list.add(stmt); 
+		:}
 	;
 
 statement =	
@@ -61,17 +84,17 @@ statement =
 	|	expression_statement
 	;
 empty_statement =
-		SEMICOLON
+		SEMICOLON		
 	;
 
 expression_statement =
-		expression SEMICOLON
+		expression.expr SEMICOLON	{:  return new ExprStmt(expr); :}
 	;
 
 // Lexical Structure.
-literal =	INTEGER_LITERAL
+literal =	INTEGER_LITERAL.literal	
 	|	FLOATING_POINT_LITERAL
-	|	BOOLEAN_LITERAL
+	|	BOOLEAN_LITERAL.literal
 	|	CHARACTER_LITERAL
 	|	STRING_LITERAL
 	|	NULL_LITERAL
