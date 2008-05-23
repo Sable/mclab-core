@@ -23,8 +23,7 @@
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
-			<include name="${lexer.test.generator.file}" />
-			<include name="${parser.pass.test.generator.file}" />
+			<include name="**/*TestGenerator.java" />
 		</javac>
 	</target>
 
