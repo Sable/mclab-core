@@ -15,7 +15,6 @@
 	<path id="jastadd.jar.path" path="${lib.dir}/jastadd2-R20080423/jastadd2.jar" />
 	<path id="junit.jar.path" path="${lib.dir}/junit-4.4/junit-4.4.jar" />
 
-
 	<target name="jflextask" unless="jflex.available" description="creates JFlex Ant task">
 		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path"/>
 		<property name="jflex.available" value="yes"/>
@@ -26,6 +25,9 @@
 		<property name="beaver.available" value="yes"/>
 	</target>
 
+	<taskdef classname="jastadd.JastAddTask" name="jastadd" classpathref="jastadd.jar.path" />
+
+	
 	<target name="help" description="show help message">
 		<echo message="Ant build file for MATLAB Matrix Parser example. Useful targets:"/>
 		<echo message=""/>
@@ -42,7 +44,7 @@
 	</target>
 
 	<target name="compile" description="compile all classes">
-		<javac srcdir="." destdir="." includes="*.java" debug="${debug.info}">
+		<javac srcdir="." destdir="." includes="**/*.java" debug="${debug.info}">
 			<classpath>
 				<pathelement path="."/>
 			</classpath>
@@ -50,11 +52,23 @@
         </javac>
 	</target>
 
-	<target name="make" depends="clean,scanner,parser,compile" description="makes the example"/>
+	<target name="make" depends="clean,gen,scanner,parser,compile" description="makes the example"/>
+
+	<target name="gen"  description="generate ast classes">
+	    <mkdir dir="ast"/>
+		<jastadd package="ast" beaver="true" rewrite="true" outdir=".">
+	      <fileset dir=".">
+	        <include name="**/*.ast"/>
+	        <include name="**/*.jrag"/>
+	        <include name="**/*.jadd"/>
+	      </fileset>
+	    </jastadd>
+	</target>
 
 	<target name="clean" description="remove compiled files">
 		<delete>
-			<fileset dir="." includes="*.class,*.java,*.spec,*.*~" excludes="Test.java,Main.java"/>
+			<fileset dir="." includes="*.class,*.java,*.spec,*~" excludes="Test.java,Main.java"/>
+		    <fileset dir="ast"/>
 		</delete>
 	</target>
 	<target name="test" description="make">
