@@ -29,7 +29,7 @@
 
 	<target name="gen.scanner.tests">
 		<echo message="Generating scanner tests" />
-		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}:${eclipse.bin.dir}">
+		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
@@ -37,7 +37,7 @@
 
 	<target name="gen.parser.pass.tests">
 		<echo message="Generating parser pass tests" />
-		<java classname="${parser.pass.test.generator.class}" classpath="${ant.bin.dir}:${eclipse.bin.dir}">
+		<java classname="${parser.pass.test.generator.class}" classpath="${ant.bin.dir}">
 			<arg value="${parser.pass.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
@@ -45,7 +45,31 @@
 
 	<target name="gen.parser.fail.tests">
 		<echo message="Generating parser fail tests" />
-		<java classname="${parser.fail.test.generator.class}" classpath="${ant.bin.dir}:${eclipse.bin.dir}">
+		<java classname="${parser.fail.test.generator.class}" classpath="${ant.bin.dir}">
+			<arg value="${parser.fail.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="eclipse.gen.scanner.tests">
+		<echo message="Generating scanner tests" />
+		<java classname="${lexer.test.generator.class}" classpath="${eclipse.bin.dir}">
+			<arg value="${lexer.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="eclipse.gen.parser.pass.tests">
+		<echo message="Generating parser pass tests" />
+		<java classname="${parser.pass.test.generator.class}" classpath="${eclipse.bin.dir}">
+			<arg value="${parser.pass.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="eclipse.gen.parser.fail.tests">
+		<echo message="Generating parser fail tests" />
+		<java classname="${parser.fail.test.generator.class}" classpath="${eclipse.bin.dir}">
 			<arg value="${parser.fail.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
@@ -53,8 +77,10 @@
 
 	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
 
+	<target name="eclipse.gen.tests" depends="eclipse.gen.scanner.tests, eclipse.gen.parser.pass.tests, eclipse.gen.parser.fail.tests" />
+
 	<!-- jflex, beaver, jastadd, and tests -->
-	<target name="eclipse.gen" depends="Gen.gen, gen.tests" />
+	<target name="eclipse.gen" depends="Gen.gen, eclipse.gen.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
