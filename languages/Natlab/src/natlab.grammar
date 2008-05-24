@@ -47,8 +47,13 @@
     { report = new Events(); } // Use error handler in parser
 :};
 
-%terminals IDENTIFIER, LPAREN, RPAREN;
+%terminals IDENTIFIER;
+%terminals NUMBER;
+%terminals LPAREN, RPAREN, LSQUARE, RSQUARE, LCURLY, RCURLY;
+%terminals BREAK, CASE, CATCH, CONTINUE, DO, ELSE, ELSEIF, END, ENDFUNCTION, FOR, FUNCTION, GLOBAL, IF, OTHERWISE, RETURN, STATIC, SWITCH, TRY, UNTIL, VARARGIN, VARARGOUT, WHILE;
+
 %typeof IDENTIFIER = "String";
+%typeof NUMBER = "String";
 
 %goal Start;
 
@@ -58,6 +63,33 @@ Start
 
 NonTerm
   = IDENTIFIER
+  | NUMBER
   | LPAREN
   | RPAREN
+  | LSQUARE
+  | RSQUARE
+  | LCURLY
+  | RCURLY
+  | BREAK
+  | CASE
+  | CATCH
+  | CONTINUE
+  | DO
+  | ELSE
+  | ELSEIF
+  | END
+  | ENDFUNCTION
+  | FOR
+  | FUNCTION
+  | GLOBAL
+  | IF
+  | OTHERWISE
+  | RETURN
+  | STATIC
+  | SWITCH
+  | TRY
+  | UNTIL
+  | VARARGIN
+  | VARARGOUT
+  | WHILE
   ;
