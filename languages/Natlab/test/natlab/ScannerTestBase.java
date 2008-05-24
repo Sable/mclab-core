@@ -77,14 +77,43 @@ class ScannerTestBase extends TestCase {
 	}
 
 	public static void assertEquals(String msg, Symbol actual, Symbol expected) {
-		assertEquals(msg, actual.getId(), expected.getId());
-		assertEquals(msg, actual.getStart(), expected.getStart());
-		assertEquals(msg, actual.getEnd(), expected.getEnd());
-		assertEquals(msg, actual.value, expected.value);
+		final short expectedId = expected.getId();
+		final short actualId = actual.getId();
+		if(actualId != expectedId) {
+			fail(msg + ": incorrect token type - " +
+					"expected: " + expectedId + " (" + NatlabParser.Terminals.NAMES[expectedId] + ") " +
+					"but was: " + actualId + " (" + NatlabParser.Terminals.NAMES[actualId] + ")");
+		}
+		final Object expectedValue = expected.value;
+		final Object actualValue = actual.value;
+		if(((actualValue == null || expectedValue == null) && (actualValue != expectedValue)) || (actualValue != null && !actualValue.equals(expectedValue))) {
+			fail(msg + " - " + NatlabParser.Terminals.NAMES[actualId] + ": incorrect token value - " +
+					"expected: " + expectedValue + " " +
+					"but was: " + actualValue);
+			
+		}
+		final int expectedStart = expected.getStart();
+		final int actualStart = actual.getStart();
+		if(actualStart != expectedStart) {
+			fail(msg + " - " + getSymbolString(actual) + ": incorrect start position - " +
+					"expected: line " + Symbol.getLine(expectedStart) + " col " + Symbol.getColumn(expectedStart) + " " +
+					"but was: line " + Symbol.getLine(actualStart) + " col " + Symbol.getColumn(actualStart));
+		}
+		final int expectedEnd = expected.getEnd();
+		final int actualEnd = actual.getEnd();
+		if(actualEnd != expectedEnd) {
+			fail(msg + " - " + getSymbolString(actual) + ": incorrect end position - " +
+					"expected: line " + Symbol.getLine(expectedEnd) + " col " + Symbol.getColumn(expectedEnd) + " " +
+					"but was: line " + Symbol.getLine(actualEnd) + " col " + Symbol.getColumn(actualEnd));
+		}
 	}
 
 	public static void assertEquals(String msg, Scanner.Exception actual, Scanner.Exception expected) {
 		assertEquals(msg, actual.line, expected.line);
 		assertEquals(msg, actual.column, expected.column);
+	}
+
+	protected static String getSymbolString(Symbol symbol) {
+		return NatlabParser.Terminals.NAMES[symbol.getId()] + (symbol.value == null ? "" : "(" + symbol.value + ")");
 	}
 }
