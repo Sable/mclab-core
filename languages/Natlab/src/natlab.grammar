@@ -47,54 +47,17 @@
     { report = new Events(); } // Use error handler in parser
 :};
 
-%terminals IDENTIFIER, LAMBDA, ARG_BODY_SEP, LPAREN, RPAREN;
+%terminals IDENTIFIER, LPAREN, RPAREN;
 %typeof IDENTIFIER = "String";
-%typeof Abs = "MultiAbs";
-%typeof Var = "Var";
-%typeof App, Base, Parens = "Node";
 
 %goal Start;
 
 Start
-  = App.app {: return new Root(app); :}
+  = NonTerm+
   ;
 
-App
-  = Base.others+ Abs.abs? {:
-        List<Node> nodes = new ArrayList<Node>(_list_others);
-        if(abs != null) {
-            nodes.add(abs);
-        }
-        Iterator<Node> it = nodes.iterator();
-        Node curr = it.next();
-        while(it.hasNext()) {
-            curr = new App(curr, it.next());
-        }
-        return curr;
-    :}
-  | Abs //returns what the abs returns
-  ;
-
-Abs
-  = LAMBDA Var.vars+ ARG_BODY_SEP App.body {:
-        //NB: could easily de-sugar here (as in App, but this lets us test rewriting)
-        natlab.ast.List<Var> allVars = new natlab.ast.List<Var>();
-        for(Var var : vars) {
-            allVars.add(var);
-        } 
-        return new MultiAbs(allVars, body);
-    :}
-  ;
-
-Base
-  = Parens //returns what the parens returns
-  | Var    //returns what the var returns
-  ;
-
-Parens
-  = LPAREN App.app RPAREN //returns what the nested app returns
-  ;
-
-Var
-  = IDENTIFIER.var {: return new Var(var); :}
+NonTerm
+  = IDENTIFIER
+  | LPAREN
+  | RPAREN
   ;

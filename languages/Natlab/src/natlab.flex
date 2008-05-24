@@ -27,8 +27,6 @@ import beaver.Scanner;
 
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f]
-BackSlash      = \\
-Arrow          = ->
 LParen         = \(
 RParen         = \)
 
@@ -37,8 +35,6 @@ Identifier = [:jletter:] [:jletterdigit:]*
 %%
 
 {Identifier}  { return symbol(NatlabParser.Terminals.IDENTIFIER, yytext()); }
-{BackSlash}   { return symbol(NatlabParser.Terminals.LAMBDA); }
-{Arrow}       { return symbol(NatlabParser.Terminals.ARG_BODY_SEP); }
 {LParen}      { return symbol(NatlabParser.Terminals.LPAREN); }
 {RParen}      { return symbol(NatlabParser.Terminals.RPAREN); }
 {WhiteSpace}  { /* ignore */ }
