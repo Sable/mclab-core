@@ -93,6 +93,15 @@
 	<import file="../shared/cli.xml" />
 	<import file="../shared/eclipse.xml" />
 
+	<!-- public versions of cli.xml targets -->
+	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
+	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
+	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+
 	<!-- Override parts of eclipse.xml -->
 	<target name="eclipse.build" depends="eclipse.gen" description="generate all files, let Eclipse build" />
+
+	<!-- public versions of eclipse.xml targets -->
+	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
+	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
 </project>

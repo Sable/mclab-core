@@ -6,11 +6,11 @@
 -->
 <project name="Eclipse">
 	<!-- Eclipse targets -->
-	<target name="eclipse.build" depends="gen" description="generate all files, let Eclipse build" />
+	<target name="eclipse.build" depends="gen" />
 
-	<target name="eclipse.clean" depends="clean.gen" description="deletes all files produced by build.eclipse" />
+	<target name="eclipse.clean" depends="clean.gen" />
 
-	<target name="eclipse.test" depends="eclipse.build" description="runs all JUnit tests, as built by Eclipse">
+	<target name="eclipse.test" depends="eclipse.build">
 		<junit fork="true" haltonerror="true">
 			<formatter type="plain" usefile="false" />
 			<classpath refid="junit.jar.path" />
