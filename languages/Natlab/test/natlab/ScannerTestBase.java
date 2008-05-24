@@ -44,11 +44,11 @@ class ScannerTestBase extends TestCase {
 	}
 
 	private static boolean isExceptionLine(String line) {
-		return Character.isDigit(line.charAt(0));
+		return line.charAt(0) == '~';
 	}
 
 	private static Scanner.Exception parseException(String line) {
-		StringTokenizer tokenizer = new StringTokenizer(line);
+		StringTokenizer tokenizer = new StringTokenizer(line.substring(1));
 		assertEquals("Number of tokens in exception line: " + line, 2, tokenizer.countTokens());
 		int lineNum = Integer.parseInt(tokenizer.nextToken());
 		int colNum = Integer.parseInt(tokenizer.nextToken());
