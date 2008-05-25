@@ -55,21 +55,27 @@ Comment={CommentSymbol}.*
 {EscapedLineTerminator} { /* ignore */ }
 {OtherWhiteSpace} { /* ignore */ }
 
+{LineTerminator} {return symbol(LINE_TERMINATOR); }
+
+{Number} { return symbol(NUMBER, yytext()); }
+
+{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
+{Comment} { return symbol(COMMENT, yytext()); }
+
+\( { return symbol(LPAREN); }
+\) { return symbol(RPAREN); }
+\[ { return symbol(LSQUARE); }
+\] { return symbol(RSQUARE); }
+\{ { return symbol(LCURLY); }
+\} { return symbol(RCURLY); }
+
+, { return symbol(COMMA); }
+; { return symbol(SEMICOLON); }
+
+//NB: lower precedence than ellipsis
+\. { yybegin(FIELD_NAME); return symbol(DOT); }
+
 <YYINITIAL> {
-    {LineTerminator} {return symbol(LINE_TERMINATOR); }
-    
-    {Number} { return symbol(NUMBER, yytext()); }
-    
-    {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-    {Comment} { return symbol(COMMENT, yytext()); }
-    
-    \( { return symbol(LPAREN); }
-    \) { return symbol(RPAREN); }
-    \[ { return symbol(LSQUARE); }
-    \] { return symbol(RSQUARE); }
-    \{ { return symbol(LCURLY); }
-    \} { return symbol(RCURLY); }
-    
     break { return symbol(BREAK); }
     case { return symbol(CASE); }
     catch { return symbol(CATCH); }
@@ -95,16 +101,9 @@ Comment={CommentSymbol}.*
     
     //NB: lower precedence than keywords
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
-    
-    , { return symbol(COMMA); }
-    ; { return symbol(SEMICOLON); }
-    
-    //NB: lower precedence than ellipsis
-    \. { yybegin(FIELD_NAME); return symbol(DOT); }
 }
 
 <FIELD_NAME> {
-    //TODO-AC: be more forgiving here and let the parser provide an error message?
     {Identifier} {  yybegin(YYINITIAL); return symbol(IDENTIFIER, yytext()); }
 }
 
