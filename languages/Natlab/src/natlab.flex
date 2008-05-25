@@ -81,27 +81,23 @@ Comment={CommentSymbol}.*
 : { return symbol(COLON); }
 
 <YYINITIAL> {
+    //from matlab "iskeyword" function
     break { return symbol(BREAK); }
     case { return symbol(CASE); }
     catch { return symbol(CATCH); }
     continue { return symbol(CONTINUE); }
-    do { return symbol(DO); }
     else { return symbol(ELSE); }
     elseif { return symbol(ELSEIF); }
     end { return symbol(END); }
-    endfunction { return symbol(ENDFUNCTION); }
     for { return symbol(FOR); }
     function { return symbol(FUNCTION); }
     global { return symbol(GLOBAL); }
     if { return symbol(IF); }
     otherwise { return symbol(OTHERWISE); }
+    persistent { return symbol(PERSISTENT); }
     return { return symbol(RETURN); }
-    static { return symbol(STATIC); }
     switch { return symbol(SWITCH); }
     try { return symbol(TRY); }
-    until { return symbol(UNTIL); }
-    varargin { return symbol(VARARGIN); }
-    varargout { return symbol(VARARGOUT); }
     while { return symbol(WHILE); }
     
     //NB: lower precedence than keywords
