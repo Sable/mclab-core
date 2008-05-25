@@ -30,7 +30,13 @@ class ScannerTestBase extends TestCase {
 			}
 		}
 		try {
-			assertEquals(scanner.nextToken().getId(), NatlabParser.Terminals.EOF);
+			short actualId = scanner.nextToken().getId();
+			short expectedId = NatlabParser.Terminals.EOF;
+			if(actualId != expectedId) {
+				fail("Token #" + i + ": incorrect token type - " +
+						"expected: " + expectedId + " (" + NatlabParser.Terminals.NAMES[expectedId] + ") " +
+						"but was: " + actualId + " (" + NatlabParser.Terminals.NAMES[actualId] + ")");
+			}
 		} catch(Scanner.Exception e) {
 			assertEquals(e.getMessage(), e, exception);
 		}
