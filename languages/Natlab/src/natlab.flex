@@ -55,22 +55,22 @@ Comment={CommentSymbol}.*
 {EscapedLineTerminator} { /* ignore */ }
 {OtherWhiteSpace} { /* ignore */ }
 
-{LineTerminator} {return symbol(LINE_TERMINATOR); }
+{LineTerminator} { yybegin(YYINITIAL); return symbol(LINE_TERMINATOR); }
 
-{Number} { return symbol(NUMBER, yytext()); }
+{Number} { yybegin(YYINITIAL); return symbol(NUMBER, yytext()); }
 
-{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { return symbol(COMMENT, yytext()); }
+{HelpComment} { yybegin(YYINITIAL); return symbol(HELP_COMMENT, yytext()); }
+{Comment} { yybegin(YYINITIAL); return symbol(COMMENT, yytext()); }
 
-\( { return symbol(LPAREN); }
-\) { return symbol(RPAREN); }
-\[ { return symbol(LSQUARE); }
-\] { return symbol(RSQUARE); }
-\{ { return symbol(LCURLY); }
-\} { return symbol(RCURLY); }
+\( { yybegin(YYINITIAL); return symbol(LPAREN); }
+\) { yybegin(YYINITIAL); return symbol(RPAREN); }
+\[ { yybegin(YYINITIAL); return symbol(LSQUARE); }
+\] { yybegin(YYINITIAL); return symbol(RSQUARE); }
+\{ { yybegin(YYINITIAL); return symbol(LCURLY); }
+\} { yybegin(YYINITIAL); return symbol(RCURLY); }
 
-, { return symbol(COMMA); }
-; { return symbol(SEMICOLON); }
+, { yybegin(YYINITIAL); return symbol(COMMA); }
+; { yybegin(YYINITIAL); return symbol(SEMICOLON); }
 
 //NB: lower precedence than ellipsis
 \. { yybegin(FIELD_NAME); return symbol(DOT); }
