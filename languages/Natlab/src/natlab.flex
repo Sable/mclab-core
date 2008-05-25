@@ -72,8 +72,7 @@ Comment={CommentSymbol}.*
 , { yybegin(YYINITIAL); return symbol(COMMA); }
 ; { yybegin(YYINITIAL); return symbol(SEMICOLON); }
 
-//NB: lower precedence than ellipsis
-\. { yybegin(FIELD_NAME); return symbol(DOT); }
+
 
 <YYINITIAL> {
     break { return symbol(BREAK); }
@@ -101,10 +100,16 @@ Comment={CommentSymbol}.*
     
     //NB: lower precedence than keywords
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
+    
+    //NB: lower precedence than ellipsis
+    \. { yybegin(FIELD_NAME); return symbol(DOT); }
 }
 
 <FIELD_NAME> {
     {Identifier} {  yybegin(YYINITIAL); return symbol(IDENTIFIER, yytext()); }
+    
+    //NB: lower precedence than ellipsis
+    \. { yybegin(YYINITIAL); return symbol(DOT); }
 }
 
 /* error fallback */
