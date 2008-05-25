@@ -96,11 +96,15 @@ Comment={CommentSymbol}.*
     //NB: lower precedence than keywords
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
     
+    , { return symbol(COMMA); }
+    ; { return symbol(SEMICOLON); }
+    
     //NB: lower precedence than ellipsis
     \. { yybegin(FIELD_NAME); return symbol(DOT); }
 }
 
 <FIELD_NAME> {
+    //TODO-AC: be more forgiving here and let the parser provide an error message?
     {Identifier} {  yybegin(YYINITIAL); return symbol(IDENTIFIER, yytext()); }
 }
 
