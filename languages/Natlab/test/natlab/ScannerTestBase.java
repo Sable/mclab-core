@@ -1,14 +1,21 @@
 package natlab;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 import beaver.Scanner;
 import beaver.Symbol;
 
 class ScannerTestBase extends TestCase {
+	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s(.+))?$");
+	
 	static void checkScan(Scanner scanner, List<Symbol> symbols, Scanner.Exception exception) 
 			throws IOException, Scanner.Exception {
 		int i = 0;
@@ -62,23 +69,17 @@ class ScannerTestBase extends TestCase {
 
 	private static Symbol parseSymbol(String line) 
 			throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		StringTokenizer tokenizer = new StringTokenizer(line);
-		String value = null;
-		switch(tokenizer.countTokens()) {
-		case 5:
-			value = tokenizer.nextToken();
-			//NB: fall through
-		case 4:
-			String idString = tokenizer.nextToken();
-			short id = NatlabParser.Terminals.class.getField(idString).getShort(null); //null since the field is static
-			int lineNum = Integer.parseInt(tokenizer.nextToken());
-			int colNum = Integer.parseInt(tokenizer.nextToken());
-			int length = Integer.parseInt(tokenizer.nextToken());
-			return new Symbol(id, lineNum, colNum, length, value);
-		default:
-			fail("Number of tokens in symbol line: " + line);
-		return null; //won't actually be reached because of fail
+		Matcher matcher = SYMBOL_PATTERN.matcher(line);
+		if(!matcher.matches()) {
+			fail("Invalid line: " + line);
 		}
+		String idString = matcher.group(1);
+		short id = NatlabParser.Terminals.class.getField(idString).getShort(null); //null since the field is static
+		int lineNum = Integer.parseInt(matcher.group(2));
+		int colNum = Integer.parseInt(matcher.group(3));
+		int length = Integer.parseInt(matcher.group(4));
+		String value = matcher.group(5);
+		return new Symbol(id, lineNum, colNum, length, value);
 	}
 
 	public static void assertEquals(String msg, Symbol actual, Symbol expected) {
