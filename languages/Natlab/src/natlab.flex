@@ -79,6 +79,7 @@ Comment={CommentSymbol}.*
 ; { return symbol(SEMICOLON); }
 
 : { return symbol(COLON); }
+@ { return symbol(AT); }
 
 //from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/arithmeticoperators.html
 "+" { return symbol(PLUS); }
