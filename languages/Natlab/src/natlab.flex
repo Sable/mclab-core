@@ -33,15 +33,14 @@ OtherWhiteSpace = [ \t\f]
 Ellipsis = \.\.\.
 EscapedLineTerminator = {Ellipsis}{LineTerminator}
 
-Imaginary = [iIjJ]
-
 Letter = [a-zA-Z]
 Digit = [0-9]
 HexDigit = {Digit} | [a-fA-F]
 Identifier = ([_$] | {Letter}) ([_$] | {Letter} | {Digit})*
 SciExp = [Ee][+-]?{Digit}+
-DecimalNumber = ({Digit}+\.?{Digit}*{SciExp}?) | (\.?{Digit}+{SciExp}?)
-HexNumber = (0[xX]{HexDigit}+)
+Imaginary = [iIjJ]
+DecimalNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}?
+HexNumber = 0[xX]{HexDigit}+{Imaginary}?
 Number = {DecimalNumber} | {HexNumber}
 
 CommentSymbol = %
@@ -55,8 +54,6 @@ Comment={CommentSymbol}.*
 
 {LineTerminator} {return symbol(LINE_TERMINATOR); }
 
-{Identifier} { return symbol(IDENTIFIER, yytext()); }
-
 {Number} { return symbol(NUMBER, yytext()); }
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
@@ -68,6 +65,31 @@ Comment={CommentSymbol}.*
 \] { return symbol(RSQUARE); }
 \{ { return symbol(LCURLY); }
 \} { return symbol(RCURLY); }
+
+break { return symbol(BREAK); }
+case { return symbol(CASE); }
+catch { return symbol(CATCH); }
+continue { return symbol(CONTINUE); }
+do { return symbol(DO); }
+else { return symbol(ELSE); }
+elseif { return symbol(ELSEIF); }
+end { return symbol(END); }
+endfunction { return symbol(ENDFUNCTION); }
+for { return symbol(FOR); }
+function { return symbol(FUNCTION); }
+global { return symbol(GLOBAL); }
+if { return symbol(IF); }
+otherwise { return symbol(OTHERWISE); }
+return { return symbol(RETURN); }
+static { return symbol(STATIC); }
+switch { return symbol(SWITCH); }
+try { return symbol(TRY); }
+until { return symbol(UNTIL); }
+varargin { return symbol(VARARGIN); }
+varargout { return symbol(VARARGOUT); }
+while { return symbol(WHILE); }
+
+{Identifier} { return symbol(IDENTIFIER, yytext()); }
 
 /* error fallback */
 .|\n          { throw new Scanner.Exception("Illegal character '" + yytext() + "'"); }
