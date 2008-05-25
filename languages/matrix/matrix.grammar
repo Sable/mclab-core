@@ -1,4 +1,4 @@
-%import "ast.*";
+
 %class "MatrixParser";
 
 // %terminals BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE;
@@ -9,9 +9,9 @@
 //%terminals IF, ELSE, ELSEIF, SWITCH, CASE, OTHERWISE, 
 // DO, WHILE, FOR, BREAK, CONTINUE, RETURN, END, UNTIL;
 //%terminals TRY, CATCH;
-//%terminals POW, EPOW , TRANSPOSE;	//
 //%terminals UNWIND_PROTECT, UNWIND_PROTECT_CLEANUP, VARARGIN, VARARGOUT;
 
+%terminals POW, EPOW, TRANSPOSE;	
 
 %terminals LBRACK, RBRACK;
 %terminals SEMICOLON, COMMA, EQ, LPAREN, RPAREN, COLON;
@@ -20,11 +20,11 @@
 %terminals LSHIFT, RSHIFT;
 %terminals LT, GT, LTEQ, GTEQ, EQEQ, NOTEQ;
 %terminals AND, OR, ANDAND, OROR;
-%terminals MULTEQ, DIVEQ, LEFTDIVEQ, PLUSEQ, MINUSEQ;	//, POWEQ
-%terminals EMULTEQ, EDIVEQ, ELEFTDIVEQ, EPLUSEQ, EMINUSEQ;	//, EPOWEQ;
+%terminals MULTEQ, DIVEQ, LEFTDIVEQ, PLUSEQ, MINUSEQ, POWEQ;
+%terminals EMULTEQ, EDIVEQ, ELEFTDIVEQ, EPLUSEQ, EMINUSEQ, EPOWEQ;
 %terminals LSHIFTEQ, RSHIFTEQ;
 %terminals ANDEQ, OREQ;
-%terminals INTEGER_LITERAL, FLOATING_POINT_LITERAL, BOOLEAN_LITERAL, CHARACTER_LITERAL, STRING_LITERAL;
+%terminals INTEGER_LITERAL, FLOATING_POINT_LITERAL, BOOLEAN_LITERAL, SQ_STRING_LITERAL, DQ_STRING_LITERAL;
 %terminals NULL_LITERAL;
 %terminals IDENTIFIER;
 %terminals COMMENT;
@@ -32,6 +32,7 @@
 // Precedence and associativity.
 %left SEMICOLON, COMMA;
 %left OROR;
+%left ANDAND;
 %left OR;
 %left AND;
 %left EQEQ, NOTEQ;
@@ -41,43 +42,21 @@
 %left PLUS, MINUS, EPLUS, EMINUS;
 %left MULT, DIV, LEFTDIV, EMULT, EDIV, ELEFTDIV;
 %left PLUSPLUS, MINUSMINUS, NOT;
+%left POW, EPOW, TRANSPOSE;	
 %left LPAREN;	
 
 %typeof INTEGER_LITERAL, FLOATING_POINT_LITERAL = "Number";
 %typeof BOOLEAN_LITERAL = "Boolean";
-%typeof CHARACTER_LITERAL = "String";
-%typeof STRING_LITERAL, IDENTIFIER = "String";
+%typeof SQ_STRING_LITERAL = "String";
+%typeof DQ_STRING_LITERAL, IDENTIFIER = "String";
 
-%typeof program = "Program";
-%typeof statement_list = "List";
-%typeof statement = "Stmt";
-%typeof expression_statement = "ExprStmt";
-%typeof expression = "Expr";
-%typeof matrix = "Matrix";
-%typeof name = "Access";
-%typeof argument_list = "List";
-%typeof colon_expression = "ColonExpr";
-%typeof method_invocation = "MethodInvocation";
-
-
-%goal program;
+%goal statement_list;
 
 // Currently, a .m file is treated as a list of statements.
 
-program = statement_list.stmtlist	{:  return new Program(stmtlist); :}
-	;
-
 statement_list =	
-		statement.stmt
-		{:  
-			List<Stmt> stmtList = new List<Stmt>();
-			stmtList.add(stmt);
-			return stmtList; 
-		:}
-	|	statement_list.list statement.stmt
-		{:  
-			return list.add(stmt); 
-		:}
+		statement
+	|	statement_list statement
 	;
 
 statement =	
@@ -85,20 +64,20 @@ statement =
 	|	expression_statement
 	;
 empty_statement =
-		SEMICOLON		
+		SEMICOLON
 	|	COMMENT
 	;
 
 expression_statement =
-		expression.expr SEMICOLON	{:  return new ExprStmt(expr); :}
+		expression SEMICOLON
 	;
 
 // Lexical Structure.
-literal =	INTEGER_LITERAL.literal	
+literal =	INTEGER_LITERAL
 	|	FLOATING_POINT_LITERAL
-	|	BOOLEAN_LITERAL.literal
-	|	CHARACTER_LITERAL
-	|	STRING_LITERAL
+	|	BOOLEAN_LITERAL
+	|	SQ_STRING_LITERAL
+	|	DQ_STRING_LITERAL
 	|	NULL_LITERAL
 	;
 
@@ -158,94 +137,55 @@ matrix_access =
 postfix_expression =
 		primary
 	|	name
-	|	postincrement_expression
-	|	postdecrement_expression
+	|	postfix_expression PLUSPLUS
+	|	postfix_expression MINUSMINUS
+	|	postfix_expression TRANSPOSE
 	;
-postincrement_expression =
-		postfix_expression PLUSPLUS
-	;
-postdecrement_expression =
-		postfix_expression MINUSMINUS
-	;
-unary_expression =
-		preincrement_expression
-	|	predecrement_expression
-	|	PLUS unary_expression
-	|	MINUS unary_expression
-	|	unary_expression_not_plus_minus
-	;
-preincrement_expression =
-		PLUSPLUS unary_expression
-	;
-predecrement_expression =
-		MINUSMINUS unary_expression
-	;
-unary_expression_not_plus_minus =
+prefix_expression =
 		postfix_expression
-	|	NOT unary_expression
+	|	binary_expression
+	|	PLUSPLUS prefix_expression
+	|	MINUSMINUS prefix_expression
+	|	NOT prefix_expression
+	|	PLUS prefix_expression
+	|	MINUS prefix_expression
 	;
-multiplicative_expression =
-		unary_expression
-	|	multiplicative_expression MULT unary_expression
-	|	multiplicative_expression DIV unary_expression
-	|	multiplicative_expression EMULT unary_expression
-	|	multiplicative_expression EDIV unary_expression
-	|	multiplicative_expression LEFTDIV unary_expression
-	|	multiplicative_expression ELEFTDIV unary_expression
-	;
-additive_expression =
-		multiplicative_expression
-	|	additive_expression PLUS multiplicative_expression
-	|	additive_expression MINUS multiplicative_expression
-	|	additive_expression EPLUS multiplicative_expression
-	|	additive_expression EMINUS multiplicative_expression
+binary_expression =
+		prefix_expression POW prefix_expression
+	|	prefix_expression EPOW prefix_expression 
+	|	prefix_expression MULT prefix_expression
+	|	prefix_expression DIV prefix_expression
+	|	prefix_expression EMULT prefix_expression
+	|	prefix_expression EDIV prefix_expression
+	|	prefix_expression LEFTDIV prefix_expression
+	|	prefix_expression ELEFTDIV prefix_expression
+	|	prefix_expression PLUS prefix_expression
+	|	prefix_expression MINUS prefix_expression
+	|	prefix_expression EPLUS prefix_expression
+	|	prefix_expression EMINUS prefix_expression
 	;
 // Colon expression for MATLAB -JL
 colon_expression =	
-		additive_expression
-	|	colon_expression COLON additive_expression
+		prefix_expression
+	|	colon_expression COLON prefix_expression
 	;
-shift_expression =
+simple_expression =
 		colon_expression
-	|	shift_expression LSHIFT colon_expression
-	|	shift_expression RSHIFT colon_expression
-	;
-relational_expression =
-		shift_expression
-	|	relational_expression LT shift_expression
-	|	relational_expression GT shift_expression
-	|	relational_expression LTEQ shift_expression
-	|	relational_expression GTEQ shift_expression
-	;
-equality_expression =
-		relational_expression
-	|	equality_expression EQEQ relational_expression
-	|	equality_expression NOTEQ relational_expression
-	;
-and_expression =
-		equality_expression
-	|	and_expression AND equality_expression
-	;
-exclusive_or_expression =
-		and_expression
-	;
-inclusive_or_expression =
-		exclusive_or_expression
-	|	inclusive_or_expression OR exclusive_or_expression
-	;
-conditional_and_expression =
-		inclusive_or_expression
-	|	conditional_and_expression ANDAND inclusive_or_expression
-	;
-conditional_or_expression =
-		conditional_and_expression
-	|	conditional_or_expression OROR conditional_and_expression
-	;
-conditional_expression =
-		conditional_or_expression
+	|	simple_expression LSHIFT simple_expression
+	|	simple_expression RSHIFT simple_expression
+	|	simple_expression LT simple_expression
+	|	simple_expression GT simple_expression
+	|	simple_expression LTEQ simple_expression
+	|	simple_expression GTEQ simple_expression
+	|	simple_expression EQEQ simple_expression
+	|	simple_expression NOTEQ simple_expression
+	|	simple_expression AND simple_expression
+	|	simple_expression OR simple_expression
+	|	simple_expression ANDAND simple_expression
+	|	simple_expression OROR simple_expression
 	;
 assignment_expression =
-		conditional_expression
+		simple_expression
 	|	assignment
 	;
 assignment = left_hand_side assignment_operator assignment_expression
@@ -271,9 +211,9 @@ assignment_operator =
 	|	EMINUSEQ
 	|	LSHIFTEQ
 	|	RSHIFTEQ
+	|	POWEQ
+	|	EPOWEQ
 	;
-//	|	POWEQ
-//	|	EPOWEQ
 
 expression =
 	assignment_expression

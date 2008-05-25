@@ -48,17 +48,17 @@ Space = [ \t]
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | {Space}
 
-Elipsis       = \.\.\.    
+Elipsis          = \.\.\.    
 Continuation  = {Elipsis} | \\
 Imaginaryunit = [iIjJ]
-CommentChar   = [#%]
-Comment       = {CommentChar} .* {LineTerminator}
+CommentChar = [#%]
+Comment    = {CommentChar} .* {LineTerminator}
 
 /* identifiers  Identifier = [:jletter:][:jletterdigit:]*  */
 Identifier = [_$A-Za-z][_$A-Za-z0-9]*
 
 /* integer literals */
-IntegerLiteral    = 0 | [1-9][0-9]*
+IntegerLiteral = 0 | [1-9][0-9]*
 
 HexIntegerLiteral = 0 [xX] [0-9a-fA-F]+
 
@@ -74,7 +74,7 @@ Exponent = [eE] [+-]? [0-9]+
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
-%state STRING, CHARLITERAL, MATRIX_START
+%state DQ_STRING, SQ_STRING, MATRIX_START
 
 %%
 
@@ -91,7 +91,8 @@ SingleCharacter = [^\r\n\'\\]
   /* separators */
   "("                            { return token(MatrixParser.Terminals.LPAREN); }
   ")"                            { return token(MatrixParser.Terminals.RPAREN); }
-/*
+  
+/*	// following three symbols are used by cell/structure, 
   "{"                            { return token(MatrixParser.Terminals.LBRACE); }
   "}"                            { return token(MatrixParser.Terminals.RBRACE); }
   "."                            { return token(MatrixParser.Terminals.DOT); }
@@ -110,18 +111,18 @@ SingleCharacter = [^\r\n\'\\]
   "-"                            { return token(MatrixParser.Terminals.MINUS); }
   "*"                            { return token(MatrixParser.Terminals.MULT); }
   "/"                            { return token(MatrixParser.Terminals.DIV); }
-  "\\"                            { return token(MatrixParser.Terminals.LEFTDIV); }
-//  "^"                            { return token(MatrixParser.Terminals.POW); }
-//  "**"                           { return token(MatrixParser.Terminals.POW); }
+// "\\"                            { return token(MatrixParser.Terminals.LEFTDIV); }
+  "^"                            { return token(MatrixParser.Terminals.POW); }
+  "**"                           { return token(MatrixParser.Terminals.POW); }
   
-  ".+"                            { return token(MatrixParser.Terminals.EPLUS); }
-  ".-"                            { return token(MatrixParser.Terminals.EMINUS); }
-  ".*"                            { return token(MatrixParser.Terminals.EMULT); }
-  "./"                            { return token(MatrixParser.Terminals.EDIV); }
-  ".\\"                           { return token(MatrixParser.Terminals.ELEFTDIV); }
-//  ".^"                            { return token(MatrixParser.Terminals.EPOW); }
-//  ".**"                           { return token(MatrixParser.Terminals.EPOW); }
-//  ".'"                            { return token(MatrixParser.Terminals.TRANSPOSE); }
+  ".+"                           { return token(MatrixParser.Terminals.EPLUS); }
+  ".-"                           { return token(MatrixParser.Terminals.EMINUS); }
+  ".*"                           { return token(MatrixParser.Terminals.EMULT); }
+  "./"                           { return token(MatrixParser.Terminals.EDIV); }
+  ".\\"                          { return token(MatrixParser.Terminals.ELEFTDIV); }
+  ".^"                           { return token(MatrixParser.Terminals.EPOW); }
+  ".**"                          { return token(MatrixParser.Terminals.EPOW); }
+  ".'"                           { return token(MatrixParser.Terminals.TRANSPOSE); }
   
   "++"                           { return token(MatrixParser.Terminals.PLUSPLUS); }
   "--"                           { return token(MatrixParser.Terminals.MINUSMINUS); }
@@ -134,11 +135,11 @@ SingleCharacter = [^\r\n\'\\]
   "<="                           { return token(MatrixParser.Terminals.LTEQ); }
   ">="                           { return token(MatrixParser.Terminals.GTEQ); }
   "!="                           { return token(MatrixParser.Terminals.NOTEQ); }
-//  "~="                           { return token(MatrixParser.Terminals.NOTEQ); }
+  "~="                           { return token(MatrixParser.Terminals.NOTEQ); }
   
   /* Boolean/Logical Operators */
   "!"                            { return token(MatrixParser.Terminals.NOT); }
-//  "~"                            { return token(MatrixParser.Terminals.NOT); }
+  "~"                            { return token(MatrixParser.Terminals.NOT); }
   "&"                            { return token(MatrixParser.Terminals.AND); }
   "|"                            { return token(MatrixParser.Terminals.OR); }
   "&&"                           { return token(MatrixParser.Terminals.ANDAND); }
@@ -152,17 +153,17 @@ SingleCharacter = [^\r\n\'\\]
   "-="                           { return token(MatrixParser.Terminals.MINUSEQ); }
   "*="                           { return token(MatrixParser.Terminals.MULTEQ); }
   "/="                           { return token(MatrixParser.Terminals.DIVEQ); }
-  "\\="                          { return token(MatrixParser.Terminals.LEFTDIVEQ); }
-//  "^="                           { return token(MatrixParser.Terminals.POWEQ); }
-//  "**="                          { return token(MatrixParser.Terminals.POWEQ); }
+//  "\\="                          { return token(MatrixParser.Terminals.LEFTDIVEQ); }
+  "^="                           { return token(MatrixParser.Terminals.POWEQ); }
+  "**="                          { return token(MatrixParser.Terminals.POWEQ); }
 
   ".+="                          { return token(MatrixParser.Terminals.EPLUSEQ); }
   ".-="                          { return token(MatrixParser.Terminals.EMINUSEQ); }
   ".*="                          { return token(MatrixParser.Terminals.EMULTEQ); }
   "./="                          { return token(MatrixParser.Terminals.EDIVEQ); }
-  ".\\="                         { return token(MatrixParser.Terminals.ELEFTDIVEQ); }
-//  ".^="                          { return token(MatrixParser.Terminals.EPOWEQ); }
-//  ".**="                         { return token(MatrixParser.Terminals.EPOWEQ); }
+//  ".\\="                         { return token(MatrixParser.Terminals.ELEFTDIVEQ); }
+  ".^="                          { return token(MatrixParser.Terminals.EPOWEQ); }
+  ".**="                         { return token(MatrixParser.Terminals.EPOWEQ); }
 
   "&="                           { return token(MatrixParser.Terminals.ANDEQ); }
   "|="                           { return token(MatrixParser.Terminals.OREQ); }
@@ -170,21 +171,21 @@ SingleCharacter = [^\r\n\'\\]
   ">>="                          { return token(MatrixParser.Terminals.RSHIFTEQ); }
 
   /* string literal */
-  \"                             { yybegin(STRING); string.setLength(0); }
+  \"                             { yybegin(DQ_STRING); string.setLength(0); }
 
   /* character literal */
-  \'                             { yybegin(CHARLITERAL); string.setLength(0); }
+  \'                             { yybegin(SQ_STRING); string.setLength(0); }
 
   /* numeric literals */
 
-  {IntegerLiteral}            { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext())); }
+  {IntegerLiteral}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext())); }
 
   {HexIntegerLiteral}            { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext().substring(2),16)); }
 
   {DoubleLiteral}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, Double.valueOf(yytext())); }
 
   /* comments */
-  {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext()); }
+  {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext());  }
 
   /* whitespace */
   {WhiteSpace}                   { /* ignore */ }
@@ -193,8 +194,8 @@ SingleCharacter = [^\r\n\'\\]
   {Identifier}                   { return token(MatrixParser.Terminals.IDENTIFIER, yytext()); }
 }
 
-<STRING> {
-  \"                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.STRING_LITERAL, string.toString()); }
+<DQ_STRING> {
+  \"                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.DQ_STRING_LITERAL, string.toString()); }
 
   {StringCharacter}+             { string.append( yytext() ); }
 
@@ -216,8 +217,8 @@ SingleCharacter = [^\r\n\'\\]
   {LineTerminator}               { throw new Scanner.Exception(yyline + 1, yycolumn + 1, "Unterminated string at end of line"); }
 }
 
-<CHARLITERAL> {
-  \'                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.STRING_LITERAL, string.toString()); }
+<SQ_STRING> {
+  \'                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.SQ_STRING_LITERAL, string.toString()); }
 
   {SingleCharacter}+             { string.append( yytext() ); }
 
