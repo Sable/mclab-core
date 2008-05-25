@@ -20,9 +20,15 @@ import beaver.Scanner;
 
 %{
   private Symbol symbol(short type) {
+    if(yystate() == FIELD_NAME) {
+        yybegin(YYINITIAL);
+    }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength());
   }
   private Symbol symbol(short type, Object value) {
+    if(yystate() == FIELD_NAME) {
+        yybegin(YYINITIAL);
+    }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
 %}
@@ -55,24 +61,22 @@ Comment={CommentSymbol}.*
 {EscapedLineTerminator} { /* ignore */ }
 {OtherWhiteSpace} { /* ignore */ }
 
-{LineTerminator} { yybegin(YYINITIAL); return symbol(LINE_TERMINATOR); }
+{LineTerminator} { return symbol(LINE_TERMINATOR); }
 
-{Number} { yybegin(YYINITIAL); return symbol(NUMBER, yytext()); }
+{Number} { return symbol(NUMBER, yytext()); }
 
-{HelpComment} { yybegin(YYINITIAL); return symbol(HELP_COMMENT, yytext()); }
-{Comment} { yybegin(YYINITIAL); return symbol(COMMENT, yytext()); }
+{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
+{Comment} { return symbol(COMMENT, yytext()); }
 
-\( { yybegin(YYINITIAL); return symbol(LPAREN); }
-\) { yybegin(YYINITIAL); return symbol(RPAREN); }
-\[ { yybegin(YYINITIAL); return symbol(LSQUARE); }
-\] { yybegin(YYINITIAL); return symbol(RSQUARE); }
-\{ { yybegin(YYINITIAL); return symbol(LCURLY); }
-\} { yybegin(YYINITIAL); return symbol(RCURLY); }
+\( { return symbol(LPAREN); }
+\) { return symbol(RPAREN); }
+\[ { return symbol(LSQUARE); }
+\] { return symbol(RSQUARE); }
+\{ { return symbol(LCURLY); }
+\} { return symbol(RCURLY); }
 
-, { yybegin(YYINITIAL); return symbol(COMMA); }
-; { yybegin(YYINITIAL); return symbol(SEMICOLON); }
-
-
+, { return symbol(COMMA); }
+; { return symbol(SEMICOLON); }
 
 <YYINITIAL> {
     break { return symbol(BREAK); }
@@ -102,14 +106,19 @@ Comment={CommentSymbol}.*
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
     
     //NB: lower precedence than ellipsis
-    \. { yybegin(FIELD_NAME); return symbol(DOT); }
+    \. {
+            //NB: have to change the state AFTER calling symbol
+            Symbol result = symbol(DOT);
+            yybegin(FIELD_NAME);
+            return result;
+       }
 }
 
 <FIELD_NAME> {
-    {Identifier} {  yybegin(YYINITIAL); return symbol(IDENTIFIER, yytext()); }
+    {Identifier} { return symbol(IDENTIFIER, yytext()); }
     
     //NB: lower precedence than ellipsis
-    \. { yybegin(YYINITIAL); return symbol(DOT); }
+    \. { return symbol(DOT); }
 }
 
 /* error fallback */
