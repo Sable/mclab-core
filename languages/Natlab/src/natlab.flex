@@ -44,6 +44,10 @@ DecimalNumber = ({Digit}+\.?{Digit}*{SciExp}?) | (\.?{Digit}+{SciExp}?)
 HexNumber = (0[xX]{HexDigit}+)
 Number = {DecimalNumber} | {HexNumber}
 
+CommentSymbol = %
+HelpComment={CommentSymbol}{CommentSymbol}.*
+Comment={CommentSymbol}.*
+
 %%
 
 {OtherWhiteSpace} { /* ignore */ }
@@ -54,6 +58,9 @@ Number = {DecimalNumber} | {HexNumber}
 {Identifier} { return symbol(IDENTIFIER, yytext()); }
 
 {Number} { return symbol(NUMBER, yytext()); }
+
+{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
+{Comment} { return symbol(COMMENT, yytext()); }
 
 \( { return symbol(LPAREN); }
 \) { return symbol(RPAREN); }

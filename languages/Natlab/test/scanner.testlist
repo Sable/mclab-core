@@ -2,3 +2,4 @@ scanner_allsymbols
 scanner_numbers
 scanner_ellipsis
 scanner_failellipsis
+scanner_comment
