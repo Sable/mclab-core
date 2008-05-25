@@ -80,6 +80,35 @@ Comment={CommentSymbol}.*
 
 : { return symbol(COLON); }
 
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/arithmeticoperators.html
+"+" { return symbol(PLUS); }
+"-" { return symbol(MINUS); }
+"*" { return symbol(MTIMES); }
+".*" { return symbol(ETIMES); }
+"/" { return symbol(MDIV); }
+"./" { return symbol(EDIV); }
+"\\" { return symbol(MLDIV); }
+".\\" { return symbol(ELDIV); }
+"^" { return symbol(MPOW); }
+".^" { return symbol(EPOW); }
+"'" { return symbol(MTRANSPOSE); }
+".'" { return symbol(ARRAYTRANSPOSE); }
+
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/relationaloperators.html
+"<=" { return symbol(LE); }
+">=" { return symbol(GE); }
+"<" { return symbol(LT); }
+">" { return symbol(GT); }
+"==" { return symbol(EQ); }
+"~=" { return symbol(NE); }
+
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
+"&" { return symbol(AND); }
+"|" { return symbol(OR); }
+"~" { return symbol(NOT); }
+"&&" { return symbol(SHORTAND); }
+"||" { return symbol(SHORTOR); }
+
 <YYINITIAL> {
     //from matlab "iskeyword" function
     break { return symbol(BREAK); }

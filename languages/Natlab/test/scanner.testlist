@@ -3,4 +3,5 @@ scanner_numbers
 scanner_ellipsis
 scanner_comment
 scanner_keywords
+scanner_operators
 scanner_dot
