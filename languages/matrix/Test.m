@@ -75,7 +75,3 @@ matrixA(1, :) = a;
 # the precedence of this kind of statements need check more
 a = a=5;
 
-# Currently, the grammar doesn't support Left-Div series operators
-% a\b
-% c.\d
-% e .\= f
