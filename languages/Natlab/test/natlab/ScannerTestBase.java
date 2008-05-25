@@ -22,7 +22,11 @@ class ScannerTestBase extends TestCase {
 				return;
 			}
 		}
-		assertEquals(scanner.nextToken().getId(), NatlabParser.Terminals.EOF);
+		try {
+			assertEquals(scanner.nextToken().getId(), NatlabParser.Terminals.EOF);
+		} catch(Scanner.Exception e) {
+			assertEquals(e.getMessage(), e, exception);
+		}
 	}
 
 	static Scanner getScanner(String filename) throws FileNotFoundException {
@@ -52,7 +56,8 @@ class ScannerTestBase extends TestCase {
 		assertEquals("Number of tokens in exception line: " + line, 2, tokenizer.countTokens());
 		int lineNum = Integer.parseInt(tokenizer.nextToken());
 		int colNum = Integer.parseInt(tokenizer.nextToken());
-		return new Scanner.Exception(lineNum, colNum, null);
+		//subtract one because real exceptions are zero-indexed
+		return new Scanner.Exception(lineNum - 1, colNum - 1, null);
 	}
 
 	private static Symbol parseSymbol(String line) 
@@ -109,8 +114,8 @@ class ScannerTestBase extends TestCase {
 	}
 
 	public static void assertEquals(String msg, Scanner.Exception actual, Scanner.Exception expected) {
-		assertEquals(msg, actual.line, expected.line);
-		assertEquals(msg, actual.column, expected.column);
+		assertEquals(msg + " - exception line number", actual.line, expected.line);
+		assertEquals(msg + " - exception column number", actual.column, expected.column);
 	}
 
 	protected static String getSymbolString(Symbol symbol) {
