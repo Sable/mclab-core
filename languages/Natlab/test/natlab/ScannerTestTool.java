@@ -21,7 +21,17 @@ public class ScannerTestTool {
 			Scanner scanner = new NatlabScanner(in);
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			while(true) {
-				Symbol curr = scanner.nextToken();
+				Symbol curr = null;
+				try {
+					curr = scanner.nextToken();
+				} catch (Scanner.Exception e) {
+					out.print('~');
+					out.print(' ');
+					out.print(e.line + 1);
+					out.print(' ');
+					out.println(e.column + 1);
+					break;
+				}
 				if(curr.getId() == NatlabParser.Terminals.EOF) {
 					break;
 				}
@@ -43,7 +53,7 @@ public class ScannerTestTool {
 			out.close();
 			in.close();
 			System.exit(0);
-		} catch(Exception e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			System.exit(2);
 		}
