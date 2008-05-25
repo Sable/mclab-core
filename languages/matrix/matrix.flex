@@ -42,8 +42,8 @@ import beaver.Scanner;
 
 /* main character classes */
 
-Alpha = [_$A-Za-z]
-Digit = [0-9] 
+
+
 Space = [ \t]
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | {Space}
@@ -55,20 +55,27 @@ CommentChar = [#%]
 Comment    = {CommentChar} .* {LineTerminator}
 
 /* identifiers  Identifier = [:jletter:][:jletterdigit:]*  */
-Identifier = [_$A-Za-z][_$A-Za-z0-9]*
+Letter = [a-zA-Z]
+Digit = [0-9]
+Identifier = ([_$] | {Letter}) ([_$] | {Letter} | {Digit})*
+
+/* Number literals */
+DecimalNumber = {DecimalInteger} | {DecimalDouble}
+Number = {DecimalNumber} | {HexNumber}
 
 /* integer literals */
-IntegerLiteral = 0 | [1-9][0-9]*
+DecimalInteger = {Digit}+
 
-HexIntegerLiteral = 0 [xX] [0-9a-fA-F]+
+HexDigit = {Digit} | [a-fA-F]
+HexNumber = (0[xX]{HexDigit}+)
 
 /* floating point literals */
-DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+DecimalDouble = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
 
-FLit1    = [0-9]+ \. [0-9]*
-FLit2    = \. [0-9]+
-FLit3    = [0-9]+
-Exponent = [eE] [+-]? [0-9]+
+FLit1    = DecimalInteger \. {Digit}*
+FLit2    = \. {Digit}+
+FLit3    = DecimalInteger
+Exponent = [eE] [+-]? {Digit}+
 
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
@@ -178,11 +185,11 @@ SingleCharacter = [^\r\n\'\\]
 
   /* numeric literals */
 
-  {IntegerLiteral}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext())); }
+  {DecimalInteger}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext())); }
 
-  {HexIntegerLiteral}            { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext().substring(2),16)); }
+  {HexNumber}                    { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext().substring(2),16)); }
 
-  {DoubleLiteral}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, Double.valueOf(yytext())); }
+  {DecimalDouble}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, Double.valueOf(yytext())); }
 
   /* comments */
   {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext());  }
