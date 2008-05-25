@@ -78,6 +78,8 @@ Comment={CommentSymbol}.*
 , { return symbol(COMMA); }
 ; { return symbol(SEMICOLON); }
 
+: { return symbol(COLON); }
+
 <YYINITIAL> {
     break { return symbol(BREAK); }
     case { return symbol(CASE); }
