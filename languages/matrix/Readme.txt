@@ -12,7 +12,6 @@ that related to matrix.
  		
  - Current grammar doesn't support 
 		- cell, structure, object, ...
-  		- Left-Div series operators
   		- list of lhs variables, i.g.  [a, b]=foo();
  		
  - Grammar structure is changed for clarity.

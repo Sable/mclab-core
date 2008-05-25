@@ -48,8 +48,8 @@ Space = [ \t]
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | {Space}
 
-Elipsis          = \.\.\.    
-Continuation  = {Elipsis} | \\
+Elipsis       = \.\.\.    
+Continuation  = {Elipsis}  
 Imaginaryunit = [iIjJ]
 CommentChar = [#%]
 Comment    = {CommentChar} .* {LineTerminator}
@@ -118,7 +118,7 @@ SingleCharacter = [^\r\n\'\\]
   "-"                            { return token(MatrixParser.Terminals.MINUS); }
   "*"                            { return token(MatrixParser.Terminals.MULT); }
   "/"                            { return token(MatrixParser.Terminals.DIV); }
-// "\\"                            { return token(MatrixParser.Terminals.LEFTDIV); }
+  "\\"                           { return token(MatrixParser.Terminals.LEFTDIV); }
   "^"                            { return token(MatrixParser.Terminals.POW); }
   "**"                           { return token(MatrixParser.Terminals.POW); }
   
@@ -160,7 +160,7 @@ SingleCharacter = [^\r\n\'\\]
   "-="                           { return token(MatrixParser.Terminals.MINUSEQ); }
   "*="                           { return token(MatrixParser.Terminals.MULTEQ); }
   "/="                           { return token(MatrixParser.Terminals.DIVEQ); }
-//  "\\="                          { return token(MatrixParser.Terminals.LEFTDIVEQ); }
+  "\\="                          { return token(MatrixParser.Terminals.LEFTDIVEQ); }
   "^="                           { return token(MatrixParser.Terminals.POWEQ); }
   "**="                          { return token(MatrixParser.Terminals.POWEQ); }
 
@@ -168,7 +168,7 @@ SingleCharacter = [^\r\n\'\\]
   ".-="                          { return token(MatrixParser.Terminals.EMINUSEQ); }
   ".*="                          { return token(MatrixParser.Terminals.EMULTEQ); }
   "./="                          { return token(MatrixParser.Terminals.EDIVEQ); }
-//  ".\\="                         { return token(MatrixParser.Terminals.ELEFTDIVEQ); }
+  ".\\="                         { return token(MatrixParser.Terminals.ELEFTDIVEQ); }
   ".^="                          { return token(MatrixParser.Terminals.EPOWEQ); }
   ".**="                         { return token(MatrixParser.Terminals.EPOWEQ); }
 
@@ -199,6 +199,10 @@ SingleCharacter = [^\r\n\'\\]
 
   /* identifiers */
   {Identifier}                   { return token(MatrixParser.Terminals.IDENTIFIER, yytext()); }
+
+  /* continuation */
+  {Continuation}                 { /* ignore */ }
+  
 }
 
 <DQ_STRING> {

@@ -3,12 +3,23 @@
 # Notes 
 #  - Current grammar doesn't support 
 #		- cell, structure, object, ...
-#  		- Left-Div series operators
 #  		- list of lhs variables, i.g.  [a, b]=foo();
 #  - Another way to run the test : java Main Test.m >log.txt
 
 # following are some test cases
 ;
+% Continuation/ Elipsis
+a = ...
+  b;
+c =  a + ...   
+  d;
+% '/' left-div series operators
+a = a \ b;
+c =  a \    ... 
+  d;
+a = a .\ b;		
+a \= b;
+a .\= b;
 
 # some operators
 x = a**5;

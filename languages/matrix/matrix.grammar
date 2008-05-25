@@ -62,6 +62,17 @@ statement_list =
 statement =	
 		empty_statement
 	|	expression_statement
+/*
+	|	if_then_statement
+	|	if_then_else_statement
+	|	while_statement
+	|	for_statement
+	|	switch_statement
+	|	do_statement
+	|	break_statement
+	|	continue_statement
+	|	try_statement
+*/
 	;
 empty_statement =
 		SEMICOLON
