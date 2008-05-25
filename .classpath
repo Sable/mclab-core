@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="languages/Lambda/test"/>
-	<classpathentry kind="src" path="languages/Lambda/src"/>
-	<classpathentry kind="src" path="languages/Lambda/gen"/>
-	<classpathentry kind="src" path="languages/Natlab/gen"/>
-	<classpathentry kind="src" path="languages/Natlab/src"/>
-	<classpathentry kind="src" path="languages/Natlab/test"/>
+	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/test"/>
+	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/src"/>
+	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/gen"/>
+	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/gen"/>
+	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/src"/>
+	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
 	<classpathentry kind="lib" path="lib/jastadd2-R20080423/jastadd2.jar"/>
