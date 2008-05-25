@@ -16,10 +16,11 @@
 	<import file="../shared/taskdef.xml" />
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
 
-	<target name="compile.test.generators">
+	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
@@ -27,60 +28,31 @@
 		</javac>
 	</target>
 
-	<target name="gen.scanner.tests">
+	<target name="gen.scanner.tests" depends="set.bin.dir">
 		<echo message="Generating scanner tests" />
-		<java classname="${lexer.test.generator.class}" classpath="${ant.bin.dir}">
+		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
-	<target name="gen.parser.pass.tests">
+	<target name="gen.parser.pass.tests" depends="set.bin.dir">
 		<echo message="Generating parser pass tests" />
-		<java classname="${parser.pass.test.generator.class}" classpath="${ant.bin.dir}">
+		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.pass.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
-	<target name="gen.parser.fail.tests">
+	<target name="gen.parser.fail.tests" depends="set.bin.dir">
 		<echo message="Generating parser fail tests" />
-		<java classname="${parser.fail.test.generator.class}" classpath="${ant.bin.dir}">
-			<arg value="${parser.fail.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="eclipse.gen.scanner.tests">
-		<echo message="Generating scanner tests" />
-		<java classname="${lexer.test.generator.class}" classpath="${eclipse.bin.dir}">
-			<arg value="${lexer.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="eclipse.gen.parser.pass.tests">
-		<echo message="Generating parser pass tests" />
-		<java classname="${parser.pass.test.generator.class}" classpath="${eclipse.bin.dir}">
-			<arg value="${parser.pass.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="eclipse.gen.parser.fail.tests">
-		<echo message="Generating parser fail tests" />
-		<java classname="${parser.fail.test.generator.class}" classpath="${eclipse.bin.dir}">
+		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.fail.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
 	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
-
-	<target name="eclipse.gen.tests" depends="eclipse.gen.scanner.tests, eclipse.gen.parser.pass.tests, eclipse.gen.parser.fail.tests" />
-
-	<!-- jflex, beaver, jastadd, and tests -->
-	<target name="eclipse.gen" depends="Gen.gen, eclipse.gen.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
@@ -98,10 +70,8 @@
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 
-	<!-- Override parts of eclipse.xml -->
-	<target name="eclipse.build" depends="eclipse.gen" description="generate all files, let Eclipse build" />
-
 	<!-- public versions of eclipse.xml targets -->
+	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
 </project>

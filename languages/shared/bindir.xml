@@ -1,0 +1,18 @@
+<!--
+    Requires:
+        Properties: ant.bin.dir, eclipse.bin.dir
+        Paths:
+        Targets:
+-->
+<project name="BinDir">
+	<!-- Eclipse targets -->
+	<target name="set.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="bin.dir" value="${ant.bin.dir}" />
+	</target>
+
+	<target name="set.bin.dir.eclipse" if="inside.eclipse">
+		<property name="bin.dir" value="${eclipse.bin.dir}" />
+	</target>
+
+	<target name="set.bin.dir" depends="set.bin.dir.no.eclipse, set.bin.dir.eclipse" />
+</project>

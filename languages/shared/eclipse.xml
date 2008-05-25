@@ -1,22 +1,16 @@
 <!--
     Requires:
-        Properties: eclipse.bin.dir, test.suite.name
-        Paths: junit.jar.path, beaver.rt.jar.path
-        Targets: gen, clean.gen
+        Properties:
+        Paths:
+        Targets: build, clean, test
 -->
 <project name="Eclipse">
 	<!-- Eclipse targets -->
-	<target name="eclipse.build" depends="gen" />
-
-	<target name="eclipse.clean" depends="clean.gen" />
-
-	<target name="eclipse.test" depends="eclipse.build">
-		<junit fork="true" haltonerror="true">
-			<formatter type="plain" usefile="false" />
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
-			<classpath location="${eclipse.bin.dir}" />
-			<test name="${test.suite.name}" />
-		</junit>
+	<target name="set.eclipse">
+		<property name="inside.eclipse" value="true" />
 	</target>
+
+	<target name="eclipse.build" depends="set.eclipse, build" />
+	<target name="eclipse.clean" depends="set.eclipse, clean" />
+	<target name="eclipse.test" depends="set.eclipse, test" />
 </project>

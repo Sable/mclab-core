@@ -6,7 +6,7 @@
 -->
 <project name="Compile">
 	<!-- command-line compilation -->
-	<target name="compile">
+	<target name="compile" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
 			<classpath refid="junit.jar.path" />
@@ -19,7 +19,7 @@
 	</target>
 
 	<!-- remove files created by compile -->
-	<target name="clean.compile">
+	<target name="clean.compile" unless="inside.eclipse">
 		<delete dir="${ant.bin.dir}" />
 	</target>
 </project>

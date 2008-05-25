@@ -16,6 +16,7 @@
 	<import file="../shared/taskdef.xml" />
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
