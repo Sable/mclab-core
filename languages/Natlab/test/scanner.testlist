@@ -4,3 +4,4 @@ scanner_ellipsis
 scanner_failellipsis
 scanner_comment
 scanner_keywords
+scanner_dot
