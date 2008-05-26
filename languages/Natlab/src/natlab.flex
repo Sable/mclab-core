@@ -31,6 +31,8 @@ import beaver.Scanner;
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
+  
+  private final StringBuffer stringLitBuf = new StringBuffer();
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -55,6 +57,7 @@ HelpComment={CommentSymbol}{CommentSymbol}.*
 Comment={CommentSymbol}.*
 
 %state FIELD_NAME
+%xstate STRING_LITERAL
 
 %%
 
@@ -109,6 +112,13 @@ Comment={CommentSymbol}.*
 "~" { return symbol(NOT); }
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
+
+\" { stringLitBuf.setLength(0); stringLitBuf.append("\""); yybegin(STRING_LITERAL); }
+
+<STRING_LITERAL> {
+    \" { stringLitBuf.append(yytext()); yybegin(YYINITIAL); return symbol(STRING, stringLitBuf.toString()); }
+    . { stringLitBuf.append(yytext()); }
+}
 
 <YYINITIAL> {
     //from matlab "iskeyword" function

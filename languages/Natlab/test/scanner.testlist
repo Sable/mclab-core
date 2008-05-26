@@ -5,3 +5,4 @@ scanner_comment
 scanner_keywords
 scanner_operators
 scanner_dot
+scanner_string

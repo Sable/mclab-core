@@ -56,8 +56,9 @@
 %terminals LINE_TERMINATOR;
 %terminals DOT, COMMA, SEMICOLON;
 %terminals COLON, AT;
+%terminals STRING;
 
-%typeof IDENTIFIER, COMMENT, HELP_COMMENT = "String";
+%typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof NUMBER = "String";
 
 %goal Start;
@@ -123,4 +124,5 @@ NonTerm
   | SHORTAND
   | SHORTOR
   | AT
+  | STRING
   ;
