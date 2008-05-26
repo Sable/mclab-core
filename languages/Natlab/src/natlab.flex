@@ -44,7 +44,7 @@ OtherWhiteSpace = [ \t\f]
 
 Ellipsis = \.\.\.
 //NB: require preceding whitespace to prevent '....' case.
-EscapedLineTerminator = {OtherWhiteSpace}+{Ellipsis}{LineTerminator}
+EscapedLineTerminator = {OtherWhiteSpace}+{Ellipsis}.*{LineTerminator}
 
 Letter = [a-zA-Z]
 Digit = [0-9]
@@ -67,7 +67,7 @@ EscapeSequence = \\[bfnrt\"\\]
 
 %%
 
-{EscapedLineTerminator} { /* ignore */ }
+{EscapedLineTerminator} { return symbol(COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)); }
 {OtherWhiteSpace} { /* ignore */ }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
