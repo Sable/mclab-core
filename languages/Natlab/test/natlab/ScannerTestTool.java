@@ -27,9 +27,9 @@ public class ScannerTestTool {
 				} catch (Scanner.Exception e) {
 					out.print('~');
 					out.print(' ');
-					out.print(e.line + 1);
+					out.print(e.line);
 					out.print(' ');
-					out.println(e.column + 1);
+					out.println(e.column);
 					break;
 				}
 				if(curr.getId() == NatlabParser.Terminals.EOF) {

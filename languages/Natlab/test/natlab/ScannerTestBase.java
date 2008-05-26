@@ -69,8 +69,7 @@ class ScannerTestBase extends TestCase {
 		assertEquals("Number of tokens in exception line: " + line, 2, tokenizer.countTokens());
 		int lineNum = Integer.parseInt(tokenizer.nextToken());
 		int colNum = Integer.parseInt(tokenizer.nextToken());
-		//subtract one because real exceptions are zero-indexed
-		return new Scanner.Exception(lineNum - 1, colNum - 1, null);
+		return new Scanner.Exception(lineNum, colNum, null);
 	}
 
 	private static Symbol parseSymbol(String line) 

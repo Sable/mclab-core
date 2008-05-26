@@ -32,6 +32,10 @@ import beaver.Scanner;
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
   
+  private void error(String msg) throws Scanner.Exception {
+    throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
+  }
+  
   private final StringBuffer stringLitBuf = new StringBuffer();
 %}
 
@@ -55,6 +59,8 @@ Number = {DecimalNumber} | {HexNumber}
 CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
 Comment={CommentSymbol}.*
+
+EscapeSequence = \\[bfnrt\"\\]
 
 %state FIELD_NAME
 %xstate STRING_LITERAL
@@ -113,9 +119,11 @@ Comment={CommentSymbol}.*
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
 
-\" { stringLitBuf.setLength(0); stringLitBuf.append("\""); yybegin(STRING_LITERAL); }
+\" { stringLitBuf.setLength(0); stringLitBuf.append(yytext()); yybegin(STRING_LITERAL); }
 
 <STRING_LITERAL> {
+    {EscapeSequence} { stringLitBuf.append(yytext()); }
+    \\. { error(yytext() + " is not a valid escape sequence"); }
     \" { stringLitBuf.append(yytext()); yybegin(YYINITIAL); return symbol(STRING, stringLitBuf.toString()); }
     . { stringLitBuf.append(yytext()); }
 }
@@ -160,6 +168,6 @@ Comment={CommentSymbol}.*
 }
 
 /* error fallback */
-.|\n          { throw new Scanner.Exception("Illegal character '" + yytext() + "'"); }
+.|\n          { error("Illegal character '" + yytext() + "'"); }
 
 <<EOF>>       { return symbol(EOF); }
