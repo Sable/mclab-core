@@ -72,6 +72,33 @@ import beaver.Scanner;
     }
   }
   
+  private DecIntNumericLiteralValue parseDecInt(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new DecIntNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+  
+  private HexNumericLiteralValue parseHexInt(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new HexNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+  
+  private FPNumericLiteralValue parseFP(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new FPNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+  
   //number of '%}'s expected
   private int bracketCommentNestingDepth = 0;
   //bracket comment string consumed so far
@@ -120,12 +147,12 @@ String=[']([^'\r\n] | [']['])*[']
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
 
-{IntNumber} { return symbol(INT_NUMBER, new DecIntNumericLiteralValue(yytext())); }
-{FPNumber} { return symbol(FP_NUMBER, new FPNumericLiteralValue(yytext())); }
-{HexNumber} { return symbol(INT_NUMBER, new HexNumericLiteralValue(yytext())); }
-{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, new DecIntNumericLiteralValue(yytext(), true)); }
-{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, new FPNumericLiteralValue(yytext(), true)); }
-{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, new HexNumericLiteralValue(yytext(), true)); }
+{IntNumber} { return symbol(INT_NUMBER, parseDecInt(yytext(), false)); }
+{FPNumber} { return symbol(FP_NUMBER, parseFP(yytext(), false)); }
+{HexNumber} { return symbol(INT_NUMBER, parseHexInt(yytext(), false)); }
+{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); }
+{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); }
+{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); }
 
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 
