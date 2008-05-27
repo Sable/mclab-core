@@ -3,6 +3,7 @@ package natlab;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/** Generates natlab.NatlabParserFailTests from the provided list file. */
 public class ParserFailTestGenerator extends AbstractTestGenerator {
 	private ParserFailTestGenerator() {
 		super("/natlab/NatlabParserFailTests.java");

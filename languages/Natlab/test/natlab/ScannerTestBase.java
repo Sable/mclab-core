@@ -13,9 +13,14 @@ import junit.framework.TestCase;
 import beaver.Scanner;
 import beaver.Symbol;
 
+/** 
+ * Parent class of the generated NatlabScannerTests class.
+ * Provides helper methods to keep NatlabScannerTests short.
+ */
 class ScannerTestBase extends TestCase {
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s=(.*))?$");
-	
+
+	/* Compare the output of the scanner with a list of expected symbols and an optional exception. */
 	static void checkScan(Scanner scanner, List<Symbol> symbols, Scanner.Exception exception) 
 			throws IOException, Scanner.Exception {
 		int i = 0;
@@ -42,10 +47,15 @@ class ScannerTestBase extends TestCase {
 		}
 	}
 
+	/* Construct a scanner that will read from the specified file. */
 	static Scanner getScanner(String filename) throws FileNotFoundException {
 		return new NatlabScanner(new BufferedReader(new FileReader(filename)));
 	}
 
+	/* 
+	 * Read symbols from the .out file.
+	 * Returns an exception if there is an exception line and null otherwise.
+	 */
 	static Scanner.Exception parseSymbols(String filename, /*OUT*/ List<Symbol> symbols) 
 			throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 		BufferedReader in = new BufferedReader(new FileReader(filename));
@@ -60,10 +70,16 @@ class ScannerTestBase extends TestCase {
 		return null;
 	}
 
+	/* Returns true if the line should be treated as an exception line. */
 	private static boolean isExceptionLine(String line) {
 		return line.charAt(0) == '~';
 	}
 
+	/*
+	 * Constructs a Scanner.Exception from a line of text.
+	 * Format:
+	 *   ~ start_line start_col
+	 */
 	private static Scanner.Exception parseException(String line) {
 		StringTokenizer tokenizer = new StringTokenizer(line.substring(1));
 		assertEquals("Number of tokens in exception line: " + line, 2, tokenizer.countTokens());
@@ -72,6 +88,13 @@ class ScannerTestBase extends TestCase {
 		return new Scanner.Exception(lineNum, colNum, null);
 	}
 
+	/*
+	 * Constructs a Symbol from a line of text.
+	 * Format:
+	 *   TYPE start_line start_col length [=value]
+	 *   e.g. FOR 2 1 3
+	 *        IDENTIFIER 3 2 1 =x
+	 */
 	private static Symbol parseSymbol(String line) 
 			throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 		Matcher matcher = SYMBOL_PATTERN.matcher(line);
@@ -87,6 +110,7 @@ class ScannerTestBase extends TestCase {
 		return new Symbol(id, lineNum, colNum, length, value);
 	}
 
+	/* Checks deep equality of two Symbols (complexity comes from giving nice error messages). */
 	public static void assertEquals(String msg, Symbol actual, Symbol expected) {
 		final short expectedId = expected.getId();
 		final short actualId = actual.getId();
@@ -120,11 +144,13 @@ class ScannerTestBase extends TestCase {
 		}
 	}
 
+	/* Checks deep equality of two Scanner.Exceptions. */
 	public static void assertEquals(String msg, Scanner.Exception actual, Scanner.Exception expected) {
 		assertEquals(msg + " - exception line number", actual.line, expected.line);
 		assertEquals(msg + " - exception column number", actual.column, expected.column);
 	}
 
+	/* Returns a pretty-printed version of a Symbol. */
 	protected static String getSymbolString(Symbol symbol) {
 		return NatlabParser.Terminals.NAMES[symbol.getId()] + (symbol.value == null ? "" : "(" + symbol.value + ")");
 	}

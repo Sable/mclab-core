@@ -3,6 +3,7 @@ package natlab;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/** Generates natlab.NatlabParserPassTests from the provided list file. */
 public class ParserPassTestGenerator extends AbstractTestGenerator {
 	private ParserPassTestGenerator() {
 		super("/natlab/NatlabParserPassTests.java");

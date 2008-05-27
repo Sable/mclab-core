@@ -3,6 +3,7 @@ package natlab;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/** Top-level test suite.  Contains all tests. */
 public class AllTests {
 
 	public static Test suite() {

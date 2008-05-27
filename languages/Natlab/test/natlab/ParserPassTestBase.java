@@ -11,11 +11,24 @@ import natlab.ast.Root;
 import beaver.Scanner;
 import beaver.Symbol;
 
+/** 
+ * Parent class of the generated NatlabParserPassTests class.
+ * Provides helper methods to keep NatlabParserPassTests short.
+ */
 class ParserPassTestBase extends TestCase {
+
+	/* Construct a scanner that will read from the specified file. */
 	static Scanner getScanner(String filename) throws FileNotFoundException {
 		return new NatlabScanner(new BufferedReader(new FileReader(filename)));
 	}
 
+	/*
+	 * Returns a structure containing the contents of the .out file
+	 * Format:
+	 *   start_line start_col
+	 *   end_line end_col
+	 *   {string representation of AST - see StructureString.jrag}
+	 */
 	static Structure parseStructure(String filename) throws IOException {
 		StringBuffer structureBuf = new StringBuffer();
 		BufferedReader in = new BufferedReader(new FileReader(filename));
@@ -37,6 +50,7 @@ class ParserPassTestBase extends TestCase {
 		return new Structure(structureBuf.toString(), startLine, startCol, endLine, endCol);
 	}
 
+	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Root actual, Structure expected) {
 		assertEquals(expected.getStructureString(), actual.getStructureString());
 
@@ -53,6 +67,7 @@ class ParserPassTestBase extends TestCase {
 		assertEquals(expected.getEndCol(), actualEndCol);
 	}
 
+	/* struct for storing .out file contents. */
 	static class Structure {
 		private final String structureString;
 		private final int startLine;

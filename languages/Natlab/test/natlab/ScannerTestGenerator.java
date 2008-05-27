@@ -3,6 +3,7 @@ package natlab;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/** Generates natlab.NatlabScannerTests from the provided list file. */
 public class ScannerTestGenerator extends AbstractTestGenerator {
 	private ScannerTestGenerator() {
 		super("/natlab/NatlabScannerTests.java");
