@@ -20,13 +20,6 @@ a = a - b*c;
 a = a - b*c+d/7;
 a = a **5* b;
 
-% matrix
-e =[];
-e =[;];
-% a =[1,	%comment can't handle
-%	 2];
-a =[1, 2];
-a =[1, 2; 3 , 4];
 % java Main Test0.m >log.txt
 % Mini-set of grammar, including 
 # comments, lhs expr needs to be: (expr)
@@ -42,6 +35,14 @@ y = (z>=5);
  foo(1);
  foo(1, 5);
 a = foo(1);
+
+
+% matrix
+e =[];
+e =[;];
+
+a =[1, 2];
+a =[1, 2; 3 , 4];
 % Matrix access
 a(1)=5;
 a(:)=6;
@@ -77,7 +78,6 @@ a =!a == b;
 a = c != !d;
 a = e ~= ~f;
 
-
 a='string';
 b="DOUBLUE QU";
 a = 5;
@@ -86,25 +86,19 @@ a = 5;
 matrixA = [1, 2; 3, a=5; a, a+6];
 matrixA = [1, 2, 3, a=5];
 
-matrixC = 1:9;
-matrixD = 1:a+7;
-matrixC(1:5) = a+6;		
-
 matrixX = [];
 matrixY = [;];
+
 matrixZ = [1,];
 matrixA = [1, 2; 3, a=5; [a, a+6]];
 Mb = matrixA;
 Mc = matrixA(1);
 Mc = matrixA(1,:);
-Mc = matrixA();		% RHS, OK, matrix_access ==  method_invocation
-
+% Mc = matrixA();		% RHS, OK, matrix_access ==  method_invocation
 matrixA(1, 1) = a;
 matrixA(:) = [a, 9];
 matrixA(1, :) = a;
 
-%	 matrixA() = a;		% LHS, report error
-
-# the precedence of this kind of statements need check more
-a = (a=5);
-
+matrixC = 1:1:9;
+% matrixD = 1:a+7;
+% matrixC(1:5) = a+6;		
