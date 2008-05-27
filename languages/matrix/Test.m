@@ -4,7 +4,9 @@
 #  - Current grammar doesn't support 
 #		- cell, structure, object, ...
 #  		- list of lhs variables, i.g.  [a, b]=foo();
-#  - Another way to run the test : java Main Test.m >log.txt
+#  - Run it : 
+#     - ant test
+#     - java Main Test.m >log.txt
 
 # following are some test cases
 
@@ -30,11 +32,12 @@ c =  (5 ...
   );
 y = (z>=5);  
  a = (c >=(d!=5));
+ 
 % Method Access
- foo(0);
- foo(1);
- foo(1, 5);
-a = foo(1);
+ foo();
+ foo(a);
+ foo(7, 5, a+b);
+a = foo(x<=y);
 
 
 % matrix
@@ -98,7 +101,9 @@ Mc = matrixA(1,:);
 matrixA(1, 1) = a;
 matrixA(:) = [a, 9];
 matrixA(1, :) = a;
+matrixC(1:5) = a+6;		
 
 matrixC = 1:1:9;
-% matrixD = 1:a+7;
-% matrixC(1:5) = a+6;		
+matrixC = 1:1:a+7;
+matrixC = 3:9;
+matrixD = 1:a+7;

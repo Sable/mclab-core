@@ -52,7 +52,7 @@
         </javac>
 	</target>
 
-	<target name="make" depends="clean,gen,scanner,parser,compile" description="makes the example"/>
+	<target name="make" depends="clean,scanner,parser,gen,compile" description="makes the example"/>
 
 	<target name="gen"  description="generate ast classes">
 	    <mkdir dir="ast"/>
@@ -60,9 +60,9 @@
 	      <fileset dir=".">
 	        <include name="**/*.ast"/>
 	        <include name="**/*.jrag"/>
-	        <include name="**/*.jadd"/>
+	        <include name="**/*.jadd"/> 
 	      </fileset>
-	    </jastadd>
+	    </jastadd>  
 	</target>
 
 	<target name="clean" description="remove compiled files">

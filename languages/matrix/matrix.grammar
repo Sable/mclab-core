@@ -170,7 +170,7 @@ method_invocation =
      name.n LPAREN RPAREN     
      {: 
          ParseName pn = (ParseName)n;
-         return new MethodAccess(pn.getID(), null);
+         return new MethodAccess(pn.getID(), new List());
      :}
   |  name.n LPAREN argument_list.l RPAREN     
      {: 
@@ -220,9 +220,9 @@ binary_expression =
 // Colon expression for MATLAB -JL
 colon_expression =
      prefix_expression.e        {: return e; :}
-  |  prefix_expression.e1 COLON prefix_expression.e3   {: return new ColonExpr(e1, new Opt<Expr>(), e3); :}
+  |  prefix_expression.e1 COLON prefix_expression.e3   {: return new ColonExpr(e1, new Opt(), e3); :}
   |  prefix_expression.e1 COLON prefix_expression.e2 COLON prefix_expression.e3 
-  			{: return new ColonExpr(e1, new Opt<Expr>(e2), e3); :}
+  			{: return new ColonExpr(e1, new Opt(e2), e3); :}
   ;
 simple_expression =
      colon_expression

@@ -39,6 +39,9 @@ aspect PrettyPrint {
   public void List.toString(StringBuffer s) {
       s.append("-- in List --");
   }
+  public void Opt.toString(StringBuffer s) {
+      s.append("-- in Opt --");
+  }
 
   public void Program.toString(StringBuffer s) {
     for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
@@ -306,7 +309,7 @@ aspect PrettyPrint {
   public void ColonExpr.toString(StringBuffer s) {
     getBase().toString(s);
   	s.append(" : "); 
-  	if(getIncr()!=null) {
+  	if(hasIncr()) {
 	    getIncr().toString(s);
 	  	s.append(" : "); 
 	}
