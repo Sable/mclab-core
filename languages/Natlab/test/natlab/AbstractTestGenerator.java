@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Skeleton implementation for a test generator class.
  */
-public abstract class AbstractTestGenerator {
+abstract class AbstractTestGenerator {
 	private final String relativeFilename; //relative path to output file
 
 	protected AbstractTestGenerator(String relativeFilename) {
