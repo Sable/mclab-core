@@ -83,6 +83,8 @@ CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
 Comment={CommentSymbol}.*
 
+ShellCommand=[!].*
+
 String=[']([^'\r\n] | [']['])*[']
 
 %state FIELD_NAME
@@ -100,6 +102,8 @@ String=[']([^'\r\n] | [']['])*[']
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { return symbol(COMMENT, yytext()); }
+
+{ShellCommand} { return symbol(SHELL_COMMAND, yytext()); }
 
 \( { return symbol(LPAREN); }
 \) { return symbol(RPAREN); }
