@@ -121,7 +121,12 @@ String=[']([^'\r\n] | [']['])*[']
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
 
-{Number} { return symbol(NUMBER, yytext()); }
+{IntNumber} { return symbol(INT_NUMBER, yytext()); }
+{FPNumber} { return symbol(FP_NUMBER, yytext()); }
+{HexNumber} { return symbol(INT_NUMBER, yytext()); }
+{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, yytext()); }
+{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, yytext()); }
+{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, yytext()); }
 
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 
