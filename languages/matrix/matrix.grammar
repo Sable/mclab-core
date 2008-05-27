@@ -220,7 +220,9 @@ binary_expression =
 // Colon expression for MATLAB -JL
 colon_expression =
      prefix_expression.e        {: return e; :}
-//  |  colon_expression COLON prefix_expression
+  |  prefix_expression.e1 COLON prefix_expression.e3   {: return new ColonExpr(e1, new Opt<Expr>(), e3); :}
+  |  prefix_expression.e1 COLON prefix_expression.e2 COLON prefix_expression.e3 
+  			{: return new ColonExpr(e1, new Opt<Expr>(e2), e3); :}
   ;
 simple_expression =
      colon_expression
@@ -232,12 +234,12 @@ simple_expression =
   |  simple_expression.e1 GTEQ simple_expression.e2     {: return new GEExpr(e1, e2); :}
   |  simple_expression.e1 EQEQ simple_expression.e2     {: return new EQExpr(e1, e2); :}
   |  simple_expression.e1 NOTEQ simple_expression.e2    {: return new NEExpr(e1, e2); :}
-  |  simple_expression.e1 AND simple_expression.e2        {: return new AndLogicalExpr(e1, e2); :}
-  |  simple_expression.e1 OR simple_expression.e2        {: return new OrLogicalExpr(e1, e2); :}
-  |  simple_expression.e1 ANDAND simple_expression.e2    {: return new AndLogicalExpr(e1, e2); :}
-  |  simple_expression.e1 OROR simple_expression.e2        {: return new OrLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 AND simple_expression.e2      {: return new AndLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 OR simple_expression.e2       {: return new OrLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 ANDAND simple_expression.e2   {: return new AndLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 OROR simple_expression.e2     {: return new OrLogicalExpr(e1, e2); :}
   ;
-
+  
 assignment_expression =
      simple_expression.e     {: return e; :}
   |  assignment.a            {: return a; :}

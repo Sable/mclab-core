@@ -7,6 +7,46 @@
 #  - Another way to run the test : java Main Test.m >log.txt
 
 # following are some test cases
+
+% expressions
+a = 1 & 5;
+a = 1 && 5;
+a = 1 & 0;
+a = 1 && 0;
+
+a = b;
+a = a + b;
+a = a - b*c;
+a = a - b*c+d/7;
+a = a **5* b;
+
+% matrix
+e =[];
+e =[;];
+% a =[1,	%comment can't handle
+%	 2];
+a =[1, 2];
+a =[1, 2; 3 , 4];
+% java Main Test0.m >log.txt
+% Mini-set of grammar, including 
+# comments, lhs expr needs to be: (expr)
+
+;
+x = 5;
+c =  (5 ...   
+  );
+y = (z>=5);  
+ a = (c >=(d!=5));
+% Method Access
+ foo(0);
+ foo(1);
+ foo(1, 5);
+a = foo(1);
+% Matrix access
+a(1)=5;
+a(:)=6;
+a(2,:)=7;
+
 ;
 % Continuation/ Elipsis
 a = ...
@@ -18,33 +58,26 @@ a = a \ b;
 c =  a \    ... 
   d;
 a = a .\ b;		
-a \= b;
-a .\= b;
+
 
 # some operators
 x = a**5;
 y = b^6;
 
-x ^= 6;
-y **= 7;
 
-a > b;
-a < b;
-c == d;
-e <= f;
-g >= k;
-l != m;
-n ~= q;
+a= a > b;
+a = a < b;
+a = c == d;
+a = e <= f;
+a = g >= k;
+a= l != m;
+a = n ~= q;
 
-!a == b;
-c != !d;
-e ~= ~f;
+a =!a == b;
+a = c != !d;
+a = e ~= ~f;
 
-a .+= b;
-a ./= b;
-c .**= d;
-c .^= d;
-	
+
 a='string';
 b="DOUBLUE QU";
 a = 5;
@@ -73,5 +106,5 @@ matrixA(1, :) = a;
 %	 matrixA() = a;		% LHS, report error
 
 # the precedence of this kind of statements need check more
-a = a=5;
+a = (a=5);
 
