@@ -97,7 +97,6 @@ HexNumber = 0[xX]{HexDigit}+
 ImaginaryIntNumber = {Digit}+{Imaginary}
 ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
 ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
-Number = {IntNumber} | {FPNumber} | {HexNumber} | {ImaginaryIntNumber} | {ImaginaryFPNumber} | {ImaginaryHexNumber}
 
 CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
@@ -121,12 +120,12 @@ String=[']([^'\r\n] | [']['])*[']
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
 
-{IntNumber} { return symbol(INT_NUMBER, yytext()); }
-{FPNumber} { return symbol(FP_NUMBER, yytext()); }
-{HexNumber} { return symbol(INT_NUMBER, yytext()); }
-{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, yytext()); }
-{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, yytext()); }
-{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, yytext()); }
+{IntNumber} { return symbol(INT_NUMBER, new DecIntNumericLiteralValue(yytext())); }
+{FPNumber} { return symbol(FP_NUMBER, new FPNumericLiteralValue(yytext())); }
+{HexNumber} { return symbol(INT_NUMBER, new HexNumericLiteralValue(yytext())); }
+{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, new DecIntNumericLiteralValue(yytext(), true)); }
+{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, new FPNumericLiteralValue(yytext(), true)); }
+{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, new HexNumericLiteralValue(yytext(), true)); }
 
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 

@@ -59,7 +59,8 @@
 %terminals STRING;
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
-%typeof INT_NUMBER, FP_NUMBER, IM_INT_NUMBER, IM_FP_NUMBER = "String";
+%typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
+%typeof FP_NUMBER, IM_FP_NUMBER = "FPNumericLiteralValue";
 
 %goal Start;
 
