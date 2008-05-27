@@ -36,7 +36,30 @@ import beaver.Scanner;
     throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
   }
   
-  private final StringBuffer stringLitBuf = new StringBuffer();
+  private void error(String msg, int columnOffset) throws Scanner.Exception {
+    throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
+  }
+  
+  private void validateEscapeSequences(String str) throws Scanner.Exception {
+    boolean expectEscape = false;
+    int offset = 0;
+    for(char ch : str.toCharArray()) {
+        if(expectEscape) {
+            if("bfnrt\\\"".indexOf(ch) < 0) {
+                //NB: offset - 1 so that the preceding \ is flagged as the error
+                error("Invalid escape sequence '\\" + ch + "'", offset - 1);
+            }
+            expectEscape = false;
+        } else if(ch == '\\') {
+            expectEscape = true;
+        }
+        offset++;
+    }
+    if(expectEscape) {
+        //TODO-AC: better column number
+        error("Incomplete escape sequence '\\'", offset);
+    }
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -60,10 +83,9 @@ CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
 Comment={CommentSymbol}.*
 
-EscapeSequence = \\[bfnrt\"\\]
+String=[']([^'\r\n] | [']['])*[']
 
 %state FIELD_NAME
-%xstate STRING_LITERAL
 
 %%
 
@@ -73,6 +95,8 @@ EscapeSequence = \\[bfnrt\"\\]
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 
 {Number} { return symbol(NUMBER, yytext()); }
+
+{String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { return symbol(COMMENT, yytext()); }
@@ -118,15 +142,6 @@ EscapeSequence = \\[bfnrt\"\\]
 "~" { return symbol(NOT); }
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
-
-\" { stringLitBuf.setLength(0); stringLitBuf.append(yytext()); yybegin(STRING_LITERAL); }
-
-<STRING_LITERAL> {
-    {EscapeSequence} { stringLitBuf.append(yytext()); }
-    \\. { error(yytext() + " is not a valid escape sequence"); }
-    \" { stringLitBuf.append(yytext()); yybegin(YYINITIAL); return symbol(STRING, stringLitBuf.toString()); }
-    . { stringLitBuf.append(yytext()); }
-}
 
 <YYINITIAL> {
     //from matlab "iskeyword" function

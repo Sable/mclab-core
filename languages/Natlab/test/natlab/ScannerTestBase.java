@@ -14,7 +14,7 @@ import beaver.Scanner;
 import beaver.Symbol;
 
 class ScannerTestBase extends TestCase {
-	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s(.+))?$");
+	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s=(.*))?$");
 	
 	static void checkScan(Scanner scanner, List<Symbol> symbols, Scanner.Exception exception) 
 			throws IOException, Scanner.Exception {
