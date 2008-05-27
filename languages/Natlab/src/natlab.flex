@@ -91,9 +91,13 @@ HexDigit = {Digit} | [a-fA-F]
 Identifier = ([_$] | {Letter}) ([_$] | {Letter} | {Digit})*
 SciExp = [Ee][+-]?{Digit}+
 Imaginary = [iIjJ]
-DecimalNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}?
-HexNumber = 0[xX]{HexDigit}+{Imaginary}?
-Number = {DecimalNumber} | {HexNumber}
+IntNumber = {Digit}+
+FPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?
+HexNumber = 0[xX]{HexDigit}+
+ImaginaryIntNumber = {Digit}+{Imaginary}
+ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
+ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
+Number = {IntNumber} | {FPNumber} | {HexNumber} | {ImaginaryIntNumber} | {ImaginaryFPNumber} | {ImaginaryHexNumber}
 
 CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
