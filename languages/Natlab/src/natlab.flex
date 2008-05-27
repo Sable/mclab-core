@@ -184,6 +184,8 @@ String=[']([^'\r\n] | [']['])*[']
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
 
+"=" { return symbol(ASSIGN); }
+
 <YYINITIAL> {
     //from matlab "iskeyword" function
     break { return symbol(BREAK); }
