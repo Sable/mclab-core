@@ -93,11 +93,11 @@ ShellCommand=[!].*
 String=[']([^'\r\n] | [']['])*[']
 
 %state FIELD_NAME
-%xstate BRACKET_COMMENT
+%xstate COMMENT_NESTING
 
 %%
 
-{EscapedLineTerminator} { return symbol(COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)); }
+{EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)); }
 {OtherWhiteSpace} { /* ignore */ }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
@@ -109,9 +109,9 @@ String=[']([^'\r\n] | [']['])*[']
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { return symbol(COMMENT, yytext()); }
 
-{OpenBracketComment} { yybegin(BRACKET_COMMENT); bracketCommentNestingDepth++; bracketCommentBuf = new StringBuffer(yytext()); }
+{OpenBracketComment} { yybegin(COMMENT_NESTING); bracketCommentNestingDepth++; bracketCommentBuf = new StringBuffer(yytext()); }
 
-<BRACKET_COMMENT> {
+<COMMENT_NESTING> {
     [^%]+ { bracketCommentBuf.append(yytext()); }
     {CommentSymbol} { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
@@ -120,7 +120,7 @@ String=[']([^'\r\n] | [']['])*[']
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
             yybegin(YYINITIAL);
-            return symbol(COMMENT, bracketCommentBuf.toString());
+            return symbol(BRACKET_COMMENT, bracketCommentBuf.toString());
         }
     }
 }
