@@ -95,9 +95,10 @@ class ScannerTestBase extends TestCase {
 					"expected: " + expectedId + " (" + NatlabParser.Terminals.NAMES[expectedId] + ") " +
 					"but was: " + actualId + " (" + NatlabParser.Terminals.NAMES[actualId] + ")");
 		}
-		final Object expectedValue = expected.value;
-		final Object actualValue = actual.value;
-		if(((actualValue == null || expectedValue == null) && (actualValue != expectedValue)) || (actualValue != null && !actualValue.equals(expectedValue))) {
+		final String expectedValue = (String) expected.value;
+		final String actualValue = ScannerTestTool.stringifyValue(actual.value);
+		if(((actualValue == null || expectedValue == null) && (actualValue != expectedValue)) || 
+				(actualValue != null && !actualValue.equals(expectedValue))) {
 			fail(msg + " - " + NatlabParser.Terminals.NAMES[actualId] + ": incorrect token value - " +
 					"expected: " + expectedValue + " " +
 					"but was: " + actualValue);

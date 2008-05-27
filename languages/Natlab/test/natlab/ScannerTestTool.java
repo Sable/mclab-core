@@ -48,7 +48,7 @@ public class ScannerTestTool {
 				if(curr.value != null) {
 					out.print(' ');
 					out.print('=');
-					out.print(curr.value);
+					out.print(stringifyValue(curr.value));
 				}
 				out.println();
 			}
@@ -59,5 +59,12 @@ public class ScannerTestTool {
 			e.printStackTrace();
 			System.exit(2);
 		}
+	}
+	
+	public static String stringifyValue(Object value) {
+		if(value == null) {
+			return null;
+		}
+		return value.toString().replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
 	}
 }
