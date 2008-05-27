@@ -60,6 +60,9 @@ import beaver.Scanner;
         error("Incomplete escape sequence '\\'", offset);
     }
   }
+  
+  private int bracketCommentNestingDepth = 0;
+  private StringBuffer bracketCommentBuf = null;
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -81,13 +84,16 @@ Number = {DecimalNumber} | {HexNumber}
 
 CommentSymbol = %
 HelpComment={CommentSymbol}{CommentSymbol}.*
-Comment={CommentSymbol}.*
+Comment={CommentSymbol} | {CommentSymbol}[^{].*
+OpenBracketComment = %\{
+CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
 String=[']([^'\r\n] | [']['])*[']
 
 %state FIELD_NAME
+%xstate BRACKET_COMMENT
 
 %%
 
@@ -102,6 +108,22 @@ String=[']([^'\r\n] | [']['])*[']
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { return symbol(COMMENT, yytext()); }
+
+{OpenBracketComment} { yybegin(BRACKET_COMMENT); bracketCommentNestingDepth++; bracketCommentBuf = new StringBuffer(yytext()); }
+
+<BRACKET_COMMENT> {
+    [^%]+ { bracketCommentBuf.append(yytext()); }
+    {CommentSymbol} { bracketCommentBuf.append(yytext()); }
+    {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
+    {CloseBracketComment} { 
+        bracketCommentNestingDepth--;
+        bracketCommentBuf.append(yytext());
+        if(bracketCommentNestingDepth == 0) {
+            yybegin(YYINITIAL);
+            return symbol(COMMENT, bracketCommentBuf.toString());
+        }
+    }
+}
 
 {ShellCommand} { return symbol(SHELL_COMMAND, yytext()); }
 
@@ -187,6 +209,11 @@ String=[']([^'\r\n] | [']['])*[']
 }
 
 /* error fallback */
-.|\n          { error("Illegal character '" + yytext() + "'"); }
+.|\n { error("Illegal character '" + yytext() + "'"); }
 
-<<EOF>>       { return symbol(EOF); }
+<<EOF>> { 
+            if(bracketCommentNestingDepth != 0) {
+                error(bracketCommentNestingDepth + " levels of comments not closed");
+            }
+            return symbol(EOF);
+        }

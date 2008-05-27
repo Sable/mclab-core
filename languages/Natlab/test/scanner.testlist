@@ -8,3 +8,4 @@ scanner_dot
 scanner_string
 scanner_badescape
 scanner_shell
+scanner_badbracketcomment
