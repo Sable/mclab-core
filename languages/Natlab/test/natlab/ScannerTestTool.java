@@ -47,6 +47,7 @@ public class ScannerTestTool {
 				out.print(curr.getEnd() - start + 1);
 				if(curr.value != null) {
 					out.print(' ');
+					out.print('=');
 					out.print(curr.value);
 				}
 				out.println();
