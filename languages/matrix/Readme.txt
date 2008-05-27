@@ -15,6 +15,12 @@ that related to matrix.
   		- list of lhs variables, i.g.  [a, b]=foo();
  		
  - Grammar structure is changed for clarity.
-   Old AST classes are removed, corresponding AST is under developing... 
+   Old AST classes are removed.
    (JL 2008.05.25)
+
+ - AST node are finished on this grammar, 
+   Adding dumpTree() in PrettyPrint.jadd. 
+   The test case will print out the parsing tree. 
+   (JL 2008.05.26)
  
+ - Next step merging to Natlab project ...

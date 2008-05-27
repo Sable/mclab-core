@@ -104,16 +104,18 @@ SingleCharacter = [^\r\n\'\\]
   "}"                            { return token(MatrixParser.Terminals.RBRACE); }
   "."                            { return token(MatrixParser.Terminals.DOT); }
 */
+
   "["                            { return token(MatrixParser.Terminals.LBRACK); }
   "]"                            { return token(MatrixParser.Terminals.RBRACK); }
-  ";"                            { return token(MatrixParser.Terminals.SEMICOLON); }
   ","                            { return token(MatrixParser.Terminals.COMMA); }
-
-  /* operators */
+  ";"                            { return token(MatrixParser.Terminals.SEMICOLON); }
   ":"                            { return token(MatrixParser.Terminals.COLON); }
 
+  /* operators */
   "="                            { return token(MatrixParser.Terminals.EQ); }
   /* Arithmetic Operators */  
+/*************************************************************/
+  
   "+"                            { return token(MatrixParser.Terminals.PLUS); }
   "-"                            { return token(MatrixParser.Terminals.MINUS); }
   "*"                            { return token(MatrixParser.Terminals.MULT); }
@@ -131,11 +133,11 @@ SingleCharacter = [^\r\n\'\\]
   ".**"                          { return token(MatrixParser.Terminals.EPOW); }
   ".'"                           { return token(MatrixParser.Terminals.TRANSPOSE); }
   
-  "++"                           { return token(MatrixParser.Terminals.PLUSPLUS); }
-  "--"                           { return token(MatrixParser.Terminals.MINUSMINUS); }
+  // Matlab doesn't support ++, --
+//  "++"                           { return token(MatrixParser.Terminals.PLUSPLUS); }
+//  "--"                           { return token(MatrixParser.Terminals.MINUSMINUS); }
   
-
-  /* Comparision Operators */
+  // Comparision Operators 
   ">"                            { return token(MatrixParser.Terminals.GT); }
   "<"                            { return token(MatrixParser.Terminals.LT); }
   "=="                           { return token(MatrixParser.Terminals.EQEQ); }
@@ -144,18 +146,18 @@ SingleCharacter = [^\r\n\'\\]
   "!="                           { return token(MatrixParser.Terminals.NOTEQ); }
   "~="                           { return token(MatrixParser.Terminals.NOTEQ); }
   
-  /* Boolean/Logical Operators */
+  // Boolean/Logical Operators 
   "!"                            { return token(MatrixParser.Terminals.NOT); }
   "~"                            { return token(MatrixParser.Terminals.NOT); }
   "&"                            { return token(MatrixParser.Terminals.AND); }
   "|"                            { return token(MatrixParser.Terminals.OR); }
   "&&"                           { return token(MatrixParser.Terminals.ANDAND); }
   "||"                           { return token(MatrixParser.Terminals.OROR); }
-
   
   "<<"                           { return token(MatrixParser.Terminals.LSHIFT); }
   ">>"                           { return token(MatrixParser.Terminals.RSHIFT); }
-  
+
+/***************** Octave extension *********************************
   "+="                           { return token(MatrixParser.Terminals.PLUSEQ); }
   "-="                           { return token(MatrixParser.Terminals.MINUSEQ); }
   "*="                           { return token(MatrixParser.Terminals.MULTEQ); }
@@ -176,6 +178,7 @@ SingleCharacter = [^\r\n\'\\]
   "|="                           { return token(MatrixParser.Terminals.OREQ); }
   "<<="                          { return token(MatrixParser.Terminals.LSHIFTEQ); }
   ">>="                          { return token(MatrixParser.Terminals.RSHIFTEQ); }
+********************************************************************/
 
   /* string literal */
   \"                             { yybegin(DQ_STRING); string.setLength(0); }
@@ -185,11 +188,11 @@ SingleCharacter = [^\r\n\'\\]
 
   /* numeric literals */
 
-  {DecimalInteger}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext())); }
+  {DecimalInteger}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, yytext()); }
 
-  {HexNumber}                    { return token(MatrixParser.Terminals.INTEGER_LITERAL, Integer.valueOf(yytext().substring(2),16)); }
+  {HexNumber}                    { return token(MatrixParser.Terminals.INTEGER_LITERAL, (Integer.valueOf(yytext().substring(2),16)).toString()); }
 
-  {DecimalDouble}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, Double.valueOf(yytext())); }
+  {DecimalDouble}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, yytext()); }
 
   /* comments */
   {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext());  }

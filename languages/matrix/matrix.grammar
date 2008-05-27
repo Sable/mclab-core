@@ -1,4 +1,6 @@
 
+%import "ast.*";
+%import "java.util.Iterator";
 %class "MatrixParser";
 
 // %terminals BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE;
@@ -11,221 +13,266 @@
 //%terminals TRY, CATCH;
 //%terminals UNWIND_PROTECT, UNWIND_PROTECT_CLEANUP, VARARGIN, VARARGOUT;
 
-%terminals POW, EPOW, TRANSPOSE;	
 
+%terminals SEMICOLON, LPAREN, RPAREN;
+%terminals COMMA, COLON;
 %terminals LBRACK, RBRACK;
-%terminals SEMICOLON, COMMA, EQ, LPAREN, RPAREN, COLON;
-%terminals PLUSPLUS, MINUSMINUS, PLUS, MINUS, NOT, MULT, DIV, LEFTDIV;
-%terminals EPLUS, EMINUS, EMULT, EDIV, ELEFTDIV;
-%terminals LSHIFT, RSHIFT;
-%terminals LT, GT, LTEQ, GTEQ, EQEQ, NOTEQ;
-%terminals AND, OR, ANDAND, OROR;
+
+/***************** Octave extension *********************************
+%terminals PLUSPLUS, MINUSMINUS;
 %terminals MULTEQ, DIVEQ, LEFTDIVEQ, PLUSEQ, MINUSEQ, POWEQ;
 %terminals EMULTEQ, EDIVEQ, ELEFTDIVEQ, EPLUSEQ, EMINUSEQ, EPOWEQ;
-%terminals LSHIFTEQ, RSHIFTEQ;
-%terminals ANDEQ, OREQ;
+%terminals LSHIFTEQ, RSHIFTEQ, ANDEQ, OREQ;
+********************************************************************/
+
+%terminals EQ;
+%terminals POW, EPOW, TRANSPOSE;    
+%terminals PLUS, MINUS, NOT, MULT, DIV, LEFTDIV;
+%terminals EPLUS, EMINUS, EMULT, EDIV, ELEFTDIV;
+%terminals LSHIFT, RSHIFT;
+%terminals AND, OR, ANDAND, OROR;
+%terminals LT, GT, LTEQ, GTEQ, EQEQ, NOTEQ;
+
 %terminals INTEGER_LITERAL, FLOATING_POINT_LITERAL, BOOLEAN_LITERAL, SQ_STRING_LITERAL, DQ_STRING_LITERAL;
 %terminals NULL_LITERAL;
 %terminals IDENTIFIER;
 %terminals COMMENT;
 
 // Precedence and associativity.
-%left SEMICOLON, COMMA;
-%left OROR;
-%left ANDAND;
-%left OR;
-%left AND;
-%left EQEQ, NOTEQ;
-%left LT, GT, LTEQ, GTEQ;
-%left LSHIFT, RSHIFT;
-%left COLON;
-%left PLUS, MINUS, EPLUS, EMINUS;
+%left LPAREN;
+%left POW, EPOW, TRANSPOSE;
+%left NOT;
+//%left PLUSPLUS, MINUSMINUS;
 %left MULT, DIV, LEFTDIV, EMULT, EDIV, ELEFTDIV;
-%left PLUSPLUS, MINUSMINUS, NOT;
-%left POW, EPOW, TRANSPOSE;	
-%left LPAREN;	
+%left PLUS, MINUS, EPLUS, EMINUS;
+%left COLON;
+%left LSHIFT, RSHIFT;
+%left LT, GT, LTEQ, GTEQ;
+%left EQEQ, NOTEQ;
+%left AND;
+%left OR;
+%left ANDAND;
+%left OROR;
+%left SEMICOLON, COMMA;
 
+
+/* The value of number literal will be calculater later, following type are not used!!!
 %typeof INTEGER_LITERAL, FLOATING_POINT_LITERAL = "Number";
 %typeof BOOLEAN_LITERAL = "Boolean";
 %typeof SQ_STRING_LITERAL = "String";
 %typeof DQ_STRING_LITERAL, IDENTIFIER = "String";
+*/
+%typeof program = "Program";
+%typeof statement_list = "List";
+%typeof statement = "Stmt";
+%typeof expression = "Expr";
+%typeof empty_statement = "EmptyStmt";
+%typeof expression_statement = "ExprStmt";
+%typeof literal = "Literal";
+%typeof name, simple_name = "ParseName";
+%typeof simple_expression, assignment_expression, assignment = "Expr";
+%typeof left_hand_side = "Access";
+%typeof primary_expression = "Expr";
+%typeof argument_list = "List";
+%typeof method_invocation = "Access";
+%typeof matrix_access = "Access";
+%typeof matrix = "Access";
+%typeof maxtrix_rows = "List";
+%typeof cell_or_matrix_row = "MatrixRow";
+%typeof colon_expression, binary_expression, prefix_expression, postfix_expression= "Expr";
 
-%goal statement_list;
+
+%goal program;
 
 // Currently, a .m file is treated as a list of statements.
+program = statement_list.stmtlist     {: return new Program(stmtlist); :}
+  ;
+statement_list =    
+     statement.stmt                    {: return new List().add(stmt); :}
+  |  statement_list.sl statement.stmt  {: return sl.add(stmt); :}
+  ;
 
-statement_list =	
-		statement
-	|	statement_list statement
-	;
-
-statement =	
-		empty_statement
-	|	expression_statement
+statement =    
+     empty_statement.s              {: return s; :}
+  |  expression_statement.s         {: return s; :}
 /*
-	|	if_then_statement
-	|	if_then_else_statement
-	|	while_statement
-	|	for_statement
-	|	switch_statement
-	|	do_statement
-	|	break_statement
-	|	continue_statement
-	|	try_statement
+  |  if_then_statement
+  |  if_then_else_statement
+  |  while_statement
+  |  for_statement
+  |  switch_statement
+  |  do_statement
+  |  break_statement
+  |  continue_statement
+  |  try_statement
 */
-	;
+  ;
 empty_statement =
-		SEMICOLON
-	|	COMMENT
-	;
+     SEMICOLON            {: return new EmptyStmt(""); :}
+  |  COMMENT.str          {: return new CommentStmt(str); :}
+  ;
 
 expression_statement =
-		expression SEMICOLON
-	;
+     assignment.a SEMICOLON     {: return new ExprStmt(a); :}
+  |  method_invocation.m SEMICOLON   {: return new ExprStmt(m); :}
+  ;
 
 // Lexical Structure.
-literal =	INTEGER_LITERAL
-	|	FLOATING_POINT_LITERAL
-	|	BOOLEAN_LITERAL
-	|	SQ_STRING_LITERAL
-	|	DQ_STRING_LITERAL
-	|	NULL_LITERAL
-	;
+literal =    INTEGER_LITERAL.i     {: return new IntegerLiteral(i); :}
+  |  FLOATING_POINT_LITERAL.f     {: return new FloatingPointLiteral(f); :}
+  |  BOOLEAN_LITERAL.b     {: return new BooleanLiteral(b); :}
+  |  SQ_STRING_LITERAL.s      {: return new StringLiteral(s); :}
+  |  DQ_STRING_LITERAL.s      {: return new StringLiteral(s); :}
+  |  NULL_LITERAL          {: return new NullLiteral("null"); :}
+  ;
 
 //  Names
-name	=	simple_name
-	;
-simple_name =	IDENTIFIER
-	;
+name    =    simple_name
+  ;
+simple_name =    IDENTIFIER.id     {: return new ParseName(id); :}
+  ;
 
 // Matrix of MATLAB -JL
 matrix =
-		LBRACK maxtrix_rows SEMICOLON RBRACK
-	|	LBRACK maxtrix_rows RBRACK
-	|	LBRACK SEMICOLON RBRACK
-	|	LBRACK RBRACK
-	;
-	
-maxtrix_rows = 	
-		cell_or_matrix_row
-	|	maxtrix_rows SEMICOLON cell_or_matrix_row
-	;
+     LBRACK maxtrix_rows.l SEMICOLON RBRACK    {: return new MatrixDecl(l); :}
+  |  LBRACK maxtrix_rows.l RBRACK     {: return new MatrixDecl(l); :}
+  |  LBRACK SEMICOLON RBRACK         {: return new MatrixDecl(new List()); :}
+  |  LBRACK RBRACK         {: return new MatrixDecl(new List()); :}
+  ;
+    
+maxtrix_rows =     
+     cell_or_matrix_row.row            {: return new List().add(row); :}
+  |  maxtrix_rows.l SEMICOLON cell_or_matrix_row.row   {: return l.add(row); :}
+  ;
 
 cell_or_matrix_row =
-		argument_list
-	|	argument_list COMMA 
-	;
+     argument_list.l         {: return new MatrixRow(l); :}
+  |  argument_list.l COMMA      {: return new MatrixRow(l); :}
+  ;
 
 // Expressions
-primary =	primary_no_new_array
-	;
-
-// Don't need to add Matrix into the expression  -JL 
-// because in RHS, matrix_access ==  method_invocation
-primary_no_new_array =
-		literal
-	|	matrix
-	|	LPAREN expression RPAREN
-	|	method_invocation
-	;
-	
+primary_expression =    
+     literal.l                {: return l; :}
+  |  LPAREN expression.e RPAREN     {: return new ParExpr(e); :}
+  |  matrix.m                 {: return m; :}
+  |  method_invocation.m      {: return m; :}
+  ;
+    
 // Adding ':' for compatible with MATLAB matrix-access
 argument_list =
-		expression
-	|	argument_list COMMA expression
-	|	COLON
-	|	argument_list COMMA COLON
-	;
+     expression.e                        {: return new List().add(e); :}
+  |  argument_list.l COMMA expression.e      {: return l.add(e); :}
+  |  COLON.c                             {: return new List().add(new Colon(":")); :}
+  |  argument_list.l COMMA COLON.c       {: return l.add(new Colon(":")); :}
+  ;
+    
 method_invocation =
-		name LPAREN RPAREN
-	|	name LPAREN argument_list RPAREN
-	;
-// Matrix of MATLAB -JL	
+     name.n LPAREN RPAREN     
+     {: 
+         ParseName pn = (ParseName)n;
+         return new MethodAccess(pn.getID(), null);
+     :}
+  |  name.n LPAREN argument_list.l RPAREN     
+     {: 
+         ParseName pn = (ParseName)n;
+         return new MethodAccess(pn.getID(), l);
+     :}
+  ;
+// Matrix of MATLAB -JL    
 matrix_access = 
-		name LPAREN argument_list RPAREN
-	;
-	
+     name.n LPAREN argument_list.l RPAREN
+     {: 
+         ParseName pn = (ParseName)n;
+         return new MatrixAccess(pn.getID(), l);
+     :}
+  ;
+
 postfix_expression =
-		primary
-	|	name
-	|	postfix_expression PLUSPLUS
-	|	postfix_expression MINUSMINUS
-	|	postfix_expression TRANSPOSE
-	;
+     primary_expression.e        {: return e; :}
+  |  name.n                      {: return n; :}
+//    |  postfix_expression PLUSPLUS
+//    |  postfix_expression MINUSMINUS  
+  |  postfix_expression.e TRANSPOSE  {: return new TransposeExpr(e); :}
+  ;
 prefix_expression =
-		postfix_expression
-	|	binary_expression
-	|	PLUSPLUS prefix_expression
-	|	MINUSMINUS prefix_expression
-	|	NOT prefix_expression
-	|	PLUS prefix_expression
-	|	MINUS prefix_expression
-	;
+     postfix_expression.e        {: return e; :}
+  |  binary_expression.e         {: return e; :}
+//    |  PLUSPLUS prefix_expression
+//    |  MINUSMINUS prefix_expression
+  |  NOT prefix_expression.e     {: return new LogNotExpr(e); :}
+  |  PLUS prefix_expression.e    {: return new PlusExpr(e); :}
+  |  MINUS prefix_expression.e   {: return new MinusExpr(e); :}
+  ;
 binary_expression =
-		prefix_expression POW prefix_expression
-	|	prefix_expression EPOW prefix_expression 
-	|	prefix_expression MULT prefix_expression
-	|	prefix_expression DIV prefix_expression
-	|	prefix_expression EMULT prefix_expression
-	|	prefix_expression EDIV prefix_expression
-	|	prefix_expression LEFTDIV prefix_expression
-	|	prefix_expression ELEFTDIV prefix_expression
-	|	prefix_expression PLUS prefix_expression
-	|	prefix_expression MINUS prefix_expression
-	|	prefix_expression EPLUS prefix_expression
-	|	prefix_expression EMINUS prefix_expression
-	;
+     prefix_expression.e1 POW prefix_expression.e2       {: return new PowExpr(e1, e2); :}
+  |  prefix_expression.e1 EPOW prefix_expression.e2      {: return new EPowExpr(e1, e2); :}
+  |  prefix_expression.e1 MULT prefix_expression.e2      {: return new MulExpr(e1, e2); :}
+  |  prefix_expression.e1 DIV prefix_expression.e2       {: return new DivExpr(e1, e2); :}
+  |  prefix_expression.e1 EMULT prefix_expression.e2     {: return new EMulExpr(e1, e2); :}
+  |  prefix_expression.e1 EDIV prefix_expression.e2      {: return new EDivExpr(e1, e2); :}
+  |  prefix_expression.e1 LEFTDIV prefix_expression.e2   {: return new LeftDivExpr(e1, e2); :}
+  |  prefix_expression.e1 ELEFTDIV prefix_expression.e2  {: return new ELeftDivExpr(e1, e2); :}
+  |  prefix_expression.e1 PLUS prefix_expression.e2      {: return new AddExpr(e1, e2); :}
+  |  prefix_expression.e1 MINUS prefix_expression.e2     {: return new SubExpr(e1, e2); :}
+  |  prefix_expression.e1 EPLUS prefix_expression.e2     {: return new EAddExpr(e1, e2); :}
+  |  prefix_expression.e1 EMINUS prefix_expression.e2    {: return new ESubExpr(e1, e2); :}
+  ;
 // Colon expression for MATLAB -JL
-colon_expression =	
-		prefix_expression
-	|	colon_expression COLON prefix_expression
-	;
+colon_expression =
+     prefix_expression.e        {: return e; :}
+//  |  colon_expression COLON prefix_expression
+  ;
 simple_expression =
-		colon_expression
-	|	simple_expression LSHIFT simple_expression
-	|	simple_expression RSHIFT simple_expression
-	|	simple_expression LT simple_expression
-	|	simple_expression GT simple_expression
-	|	simple_expression LTEQ simple_expression
-	|	simple_expression GTEQ simple_expression
-	|	simple_expression EQEQ simple_expression
-	|	simple_expression NOTEQ simple_expression
-	|	simple_expression AND simple_expression
-	|	simple_expression OR simple_expression
-	|	simple_expression ANDAND simple_expression
-	|	simple_expression OROR simple_expression
-	;
+     colon_expression
+  |  simple_expression.e1 LSHIFT simple_expression.e2   {: return new LShiftExpr(e1, e2); :}
+  |  simple_expression.e1 RSHIFT simple_expression.e2   {: return new RShiftExpr(e1, e2); :}
+  |  simple_expression.e1 LT simple_expression.e2       {: return new LTExpr(e1, e2); :}
+  |  simple_expression.e1 GT simple_expression.e2       {: return new GTExpr(e1, e2); :}
+  |  simple_expression.e1 LTEQ simple_expression.e2     {: return new LEExpr(e1, e2); :}
+  |  simple_expression.e1 GTEQ simple_expression.e2     {: return new GEExpr(e1, e2); :}
+  |  simple_expression.e1 EQEQ simple_expression.e2     {: return new EQExpr(e1, e2); :}
+  |  simple_expression.e1 NOTEQ simple_expression.e2    {: return new NEExpr(e1, e2); :}
+  |  simple_expression.e1 AND simple_expression.e2        {: return new AndLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 OR simple_expression.e2        {: return new OrLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 ANDAND simple_expression.e2    {: return new AndLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 OROR simple_expression.e2        {: return new OrLogicalExpr(e1, e2); :}
+  ;
+
 assignment_expression =
-		simple_expression
-	|	assignment
-	;
-assignment = left_hand_side assignment_operator assignment_expression
-	;
-// Adding 	matrix_access -JL 
+     simple_expression.e     {: return e; :}
+  |  assignment.a            {: return a; :}
+  ;
+assignment = 
+    left_hand_side.dest EQ assignment_expression.source {: return new AssignSimpleExpr(dest, source); :}
+  ;
+  
+/***************** Octave extension *********************************
+    
+  | left_hand_side.dest MULTEQ assignment_expression.source {: return new AssignMulExpr(dest, source); :}
+  | left_hand_side.dest DIVEQ assignment_expression.source {: return new AssignDivExpr(dest, source); :}
+  | left_hand_side.dest LEFTDIVEQ assignment_expression.source {: return new AssignLeftDivExpr(dest, source); :}
+  | left_hand_side.dest PLUSEQ assignment_expression.source {: return new AssignPlusExpr(dest, source); :}
+  | left_hand_side.dest MINUSEQ assignment_expression.source {: return new AssignMinusExpr(dest, source); :}
+  | left_hand_side.dest LSHIFTEQ assignment_expression.source {: return new AssignLShiftExpr(dest, source); :}
+  | left_hand_side.dest RSHIFTEQ assignment_expression.source {: return new AssignRShiftExpr(dest, source); :}
+  | left_hand_side.dest ANDEQ assignment_expression.source {: return new AssignAndExpr(dest, source); :}
+  | left_hand_side.dest OREQ assignment_expression.source {: return new AssignOrExpr(dest, source); :}
+
+  | left_hand_side.dest POWEQ assignment_expression.source {: return new AssignPowExpr(dest, source); :}
+  | left_hand_side.dest EPOWEQ assignment_expression.source {: return new AssignEPowExpr(dest, source); :}
+  | left_hand_side.dest EMULTEQ assignment_expression.source {: return new AssignEMulExpr(dest, source); :}
+  | left_hand_side.dest EDIVEQ assignment_expression.source {: return new AssignEDivExpr(dest, source); :}
+  | left_hand_side.dest ELEFTDIVEQ assignment_expression.source {: return new AssignELeftDivExpr(dest, source); :}
+  | left_hand_side.dest EPLUSEQ assignment_expression.source {: return new AssignEPlusExpr(dest, source); :}
+  | left_hand_side.dest EMINUSEQ assignment_expression.source {: return new AssignEMinusExpr(dest, source); :}
+********************************************************************/
+
+// Adding matrix_access -JL 
 left_hand_side =
-		name
-	|	matrix_access
-	;
-assignment_operator =
-		EQ
-	|	ANDEQ
-	|	OREQ
-	|	MULTEQ
-	|	DIVEQ
-	|	LEFTDIVEQ
-	|	PLUSEQ
-	|	MINUSEQ
-	|	EMULTEQ
-	|	EDIVEQ
-	|	ELEFTDIVEQ
-	|	EPLUSEQ
-	|	EMINUSEQ
-	|	LSHIFTEQ
-	|	RSHIFTEQ
-	|	POWEQ
-	|	EPOWEQ
-	;
+     name.id             {: return id; :}
+  |  matrix_access.m     {: return m; :}
+  ;
 
 expression =
-	assignment_expression
-	;
+    assignment_expression.ae    {: return ae; :}
+  ;
