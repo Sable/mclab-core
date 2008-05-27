@@ -19,27 +19,38 @@ import beaver.Scanner;
 %column
 
 %{
+  //wrap a type (e.g. IDENTIFIER) in a symbol object with appropriate position info
   private Symbol symbol(short type) {
+    //if we return anything while in FIELD_NAME, then switch back to initial
+    //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
         yybegin(YYINITIAL);
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength());
   }
+  
+  //wrap a type (e.g. IDENTIFIER) and value (e.g. "x") in a symbol object with appropriate position info
   private Symbol symbol(short type, Object value) {
+    //if we return anything while in FIELD_NAME, then switch back to initial
+    //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
         yybegin(YYINITIAL);
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
   
+  //throw an exceptions with appropriate position information
   private void error(String msg) throws Scanner.Exception {
     throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
   }
   
+  //throw an exceptions with appropriate position information
+  //columnOffset is added to the column
   private void error(String msg, int columnOffset) throws Scanner.Exception {
     throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
   }
   
+  //throws an exception if the string contains any invalid escape sequences
   private void validateEscapeSequences(String str) throws Scanner.Exception {
     boolean expectEscape = false;
     int offset = 0;
@@ -61,7 +72,9 @@ import beaver.Scanner;
     }
   }
   
+  //number of '%}'s expected
   private int bracketCommentNestingDepth = 0;
+  //bracket comment string consumed so far
   private StringBuffer bracketCommentBuf = null;
 %}
 
@@ -92,15 +105,17 @@ ShellCommand=[!].*
 
 String=[']([^'\r\n] | [']['])*[']
 
+//parsing the bit after a DOT
 %state FIELD_NAME
+//within a bracket comment (i.e. %{)
 %xstate COMMENT_NESTING
 
 %%
 
 {EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)); }
-{OtherWhiteSpace} { /* ignore */ }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
+{OtherWhiteSpace} { /* ignore */ }
 
 {Number} { return symbol(NUMBER, yytext()); }
 
@@ -211,7 +226,8 @@ String=[']([^'\r\n] | [']['])*[']
 /* error fallback */
 .|\n { error("Illegal character '" + yytext() + "'"); }
 
-<<EOF>> { 
+<<EOF>> {
+            //don't finish scanning if there's an unclosed comment
             if(bracketCommentNestingDepth != 0) {
                 error(bracketCommentNestingDepth + " levels of comments not closed");
             }
