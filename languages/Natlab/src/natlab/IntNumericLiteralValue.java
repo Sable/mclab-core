@@ -1,5 +1,8 @@
 package natlab;
 
+/**
+ * The value of a numeric literal that is definitely not a FP number.
+ */
 public abstract class IntNumericLiteralValue extends NumericLiteralValue {
 	private final Integer value;
 

@@ -1,5 +1,8 @@
 package natlab;
 
+/**
+ * An integer literal specified in base 10.
+ */
 public class DecIntNumericLiteralValue extends IntNumericLiteralValue {
 	public DecIntNumericLiteralValue(String text) {
 		this(text, false);

@@ -1,5 +1,9 @@
 package natlab;
 
+/** 
+ * The value of a *_NUMBER_LITERAL token.
+ * Contains both String and Number representations.
+ */
 public abstract class NumericLiteralValue {
 	private final String text;
 	private final boolean isImaginary;

@@ -1,5 +1,8 @@
 package natlab;
 
+/**
+ * An integer literal specified in base 16.
+ */
 public class HexNumericLiteralValue extends IntNumericLiteralValue {
 	public HexNumericLiteralValue(String text) {
 		this(text, false);
