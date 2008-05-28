@@ -1,6 +1,7 @@
 package natlab;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -25,7 +26,9 @@ public class Interpreter {
 
 			NatlabParser parser = new NatlabParser();
 			try {
-				NatlabScanner scanner = new NatlabScanner(new StringReader(line));
+				// Temporarily changed to accept a file name - JL 2008.05.27 
+				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
+				// NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				Root original = (Root) parser.parse(scanner);
 				if(parser.hasError()) {
 					System.out.println("**ERROR**");
