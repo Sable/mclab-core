@@ -37,6 +37,7 @@ public class Interpreter {
 					}
 				} else {
 					System.out.println(original.getStructureString());
+					System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {
 				System.out.println("**ERROR**");
