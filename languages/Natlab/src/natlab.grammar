@@ -145,25 +145,15 @@ NonTerm
 //===================================================================
 
 // Precedence and associativity.
-%left LPAREN;
 %left MPOW, EPOW, ARRAYTRANSPOSE;
 %left NOT;
 %left MTIMES, MDIV, MLDIV, ETIMES, EDIV, ELDIV;
 %left PLUS, MINUS;
-%left COLON;
 %left LT, GT, LE, GE;
 %left EQ, NE;
 %left AND, SHORTAND;
 %left OR, SHORTOR;
-%left SEMICOLON, COMMA;
 
-
-/* The value of number literal will be calculater later, following type are not used!!!
-%typeof INT_NUMBER, FP_NUMBER = "Number";
-%typeof BOOLEAN_LITERAL = "Boolean";
-%typeof STRING = "String";
-%typeof STRING, IDENTIFIER = "String";
-*/
 %typeof program = "Program";
 %typeof statement_list = "List";
 %typeof statement = "Stmt";
@@ -256,7 +246,9 @@ expression_statement =
   ;
 
 statement_separator =
-     SEMICOLON? LINE_TERMINATOR
+     LINE_TERMINATOR
+  |  SEMICOLON LINE_TERMINATOR?
+  |  COMMA LINE_TERMINATOR?
   ;
 
 // Lexical Structure.
