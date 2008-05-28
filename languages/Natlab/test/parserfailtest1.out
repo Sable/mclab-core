@@ -1,2 +1,2 @@
 [1, 3]  unexpected token RPAREN
-[1, 3]  try deleting RPAREN
+[1, 1]  try inserting LPAREN
