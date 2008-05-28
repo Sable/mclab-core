@@ -1,14 +1,21 @@
-# current a program consists of a list of statements, which separated by ;
-# except single line comment 
-# Notes 
-#  - Current grammar doesn't support 
-#		- cell, structure, object, ...
-#  		- list of lhs variables, i.g.  [a, b]=foo();
-#  - Run it : 
-#     - ant test
-#     - java Main Test.m >log.txt
+% current a program consists of a list of statements, which separated by ;
+% except single line comment 
+% Notes 
+%  - Current grammar doesn't support 
+%		- cell, structure, object, ...
+%  		- list of lhs variables, i.g.  [a, b]=foo();
+%  - Run it : 
+%     - ant test
+%     - java Main Test.m >log.txt
 
-# following are some test cases
+% following are some test cases
+
+% Accept statement_separator =  SEMICOLON? LINE_TERMINATOR
+
+a = b
+x = 5;
+
+x = @foo;
 
 % expressions
 a = 1 & 5;
@@ -24,12 +31,12 @@ a = a **5* b;
 
 % java Main Test0.m >log.txt
 % Mini-set of grammar, including 
-# comments, lhs expr needs to be: (expr)
+% comments, lhs expr needs to be: (expr)
 
 ;
 x = 5;
-c =  (5 ...   
-  );
+% c =  (5 ...   
+%   );
 y = (z>=5);  
  a = (c >=(d!=5));
  
@@ -53,18 +60,18 @@ a(2,:)=7;
 
 ;
 % Continuation/ Elipsis
-a = ...
-  b;
-c =  a + ...   
-  d;
+% a = ...
+%  b;
+#c =  a + ...   
+%  d;
 % '/' left-div series operators
 a = a \ b;
-c =  a \    ... 
-  d;
+% c =  a \    ... 
+%   d;
 a = a .\ b;		
 
 
-# some operators
+% some operators
 x = a**5;
 y = b^6;
 
@@ -85,7 +92,7 @@ a='string';
 b="DOUBLUE QU";
 a = 5;
 
-# Matrix...
+% Matrix...
 matrixA = [1, 2; 3, a=5; a, a+6];
 matrixA = [1, 2, 3, a=5];
 

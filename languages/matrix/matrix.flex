@@ -44,7 +44,7 @@ import beaver.Scanner;
 
 
 
-Space = [ \t]
+Space = [ \t\f]
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | {Space}
 
@@ -87,13 +87,12 @@ SingleCharacter = [^\r\n\'\\]
 
 <YYINITIAL> {
 
-  /* boolean literals */
+  /* boolean literals 
   "true"                         { return token(MatrixParser.Terminals.BOOLEAN_LITERAL, new Boolean(true)); }
   "false"                        { return token(MatrixParser.Terminals.BOOLEAN_LITERAL, new Boolean(false)); }
 
-  /* null literal */
   "null"                         { return token(MatrixParser.Terminals.NULL_LITERAL); }
-
+*/
 
   /* separators */
   "("                            { return token(MatrixParser.Terminals.LPAREN); }
@@ -105,33 +104,34 @@ SingleCharacter = [^\r\n\'\\]
   "."                            { return token(MatrixParser.Terminals.DOT); }
 */
 
-  "["                            { return token(MatrixParser.Terminals.LBRACK); }
-  "]"                            { return token(MatrixParser.Terminals.RBRACK); }
+  "["                            { return token(MatrixParser.Terminals.LSQUARE); }
+  "]"                            { return token(MatrixParser.Terminals.RSQUARE); }
   ","                            { return token(MatrixParser.Terminals.COMMA); }
   ";"                            { return token(MatrixParser.Terminals.SEMICOLON); }
   ":"                            { return token(MatrixParser.Terminals.COLON); }
+  "@"                            { return token(MatrixParser.Terminals.AT); }
 
   /* operators */
-  "="                            { return token(MatrixParser.Terminals.EQ); }
+  "="                            { return token(MatrixParser.Terminals.ASSIGN); }
   /* Arithmetic Operators */  
 /*************************************************************/
   
   "+"                            { return token(MatrixParser.Terminals.PLUS); }
   "-"                            { return token(MatrixParser.Terminals.MINUS); }
-  "*"                            { return token(MatrixParser.Terminals.MULT); }
-  "/"                            { return token(MatrixParser.Terminals.DIV); }
-  "\\"                           { return token(MatrixParser.Terminals.LEFTDIV); }
-  "^"                            { return token(MatrixParser.Terminals.POW); }
-  "**"                           { return token(MatrixParser.Terminals.POW); }
+  "*"                            { return token(MatrixParser.Terminals.MTIMES); }
+  "/"                            { return token(MatrixParser.Terminals.MDIV); }
+  "\\"                           { return token(MatrixParser.Terminals.MLDIV); }
+  "^"                            { return token(MatrixParser.Terminals.MPOW); }
+  "**"                           { return token(MatrixParser.Terminals.MPOW); }
   
-  ".+"                           { return token(MatrixParser.Terminals.EPLUS); }
-  ".-"                           { return token(MatrixParser.Terminals.EMINUS); }
-  ".*"                           { return token(MatrixParser.Terminals.EMULT); }
+//  ".+"                           { return token(MatrixParser.Terminals.EPLUS); }
+//  ".-"                           { return token(MatrixParser.Terminals.EMINUS); }
+  ".*"                           { return token(MatrixParser.Terminals.ETIMES); }
   "./"                           { return token(MatrixParser.Terminals.EDIV); }
-  ".\\"                          { return token(MatrixParser.Terminals.ELEFTDIV); }
+  ".\\"                          { return token(MatrixParser.Terminals.ELDIV); }
   ".^"                           { return token(MatrixParser.Terminals.EPOW); }
   ".**"                          { return token(MatrixParser.Terminals.EPOW); }
-  ".'"                           { return token(MatrixParser.Terminals.TRANSPOSE); }
+  ".'"                           { return token(MatrixParser.Terminals.ARRAYTRANSPOSE); }
   
   // Matlab doesn't support ++, --
 //  "++"                           { return token(MatrixParser.Terminals.PLUSPLUS); }
@@ -140,24 +140,24 @@ SingleCharacter = [^\r\n\'\\]
   // Comparision Operators 
   ">"                            { return token(MatrixParser.Terminals.GT); }
   "<"                            { return token(MatrixParser.Terminals.LT); }
-  "=="                           { return token(MatrixParser.Terminals.EQEQ); }
-  "<="                           { return token(MatrixParser.Terminals.LTEQ); }
-  ">="                           { return token(MatrixParser.Terminals.GTEQ); }
-  "!="                           { return token(MatrixParser.Terminals.NOTEQ); }
-  "~="                           { return token(MatrixParser.Terminals.NOTEQ); }
+  "=="                           { return token(MatrixParser.Terminals.EQ); }
+  "<="                           { return token(MatrixParser.Terminals.LE); }
+  ">="                           { return token(MatrixParser.Terminals.GE); }
+  "!="                           { return token(MatrixParser.Terminals.NE); }
+  "~="                           { return token(MatrixParser.Terminals.NE); }
   
   // Boolean/Logical Operators 
   "!"                            { return token(MatrixParser.Terminals.NOT); }
   "~"                            { return token(MatrixParser.Terminals.NOT); }
   "&"                            { return token(MatrixParser.Terminals.AND); }
   "|"                            { return token(MatrixParser.Terminals.OR); }
-  "&&"                           { return token(MatrixParser.Terminals.ANDAND); }
-  "||"                           { return token(MatrixParser.Terminals.OROR); }
+  "&&"                           { return token(MatrixParser.Terminals.SHORTAND); }
+  "||"                           { return token(MatrixParser.Terminals.SHORTOR); }
   
+/***************** Octave extension *********************************
   "<<"                           { return token(MatrixParser.Terminals.LSHIFT); }
   ">>"                           { return token(MatrixParser.Terminals.RSHIFT); }
 
-/***************** Octave extension *********************************
   "+="                           { return token(MatrixParser.Terminals.PLUSEQ); }
   "-="                           { return token(MatrixParser.Terminals.MINUSEQ); }
   "*="                           { return token(MatrixParser.Terminals.MULTEQ); }
@@ -188,17 +188,14 @@ SingleCharacter = [^\r\n\'\\]
 
   /* numeric literals */
 
-  {DecimalInteger}               { return token(MatrixParser.Terminals.INTEGER_LITERAL, yytext()); }
+  {DecimalInteger}               { return token(MatrixParser.Terminals.INT_NUMBER, yytext()); }
 
-  {HexNumber}                    { return token(MatrixParser.Terminals.INTEGER_LITERAL, (Integer.valueOf(yytext().substring(2),16)).toString()); }
+  {HexNumber}                    { return token(MatrixParser.Terminals.INT_NUMBER, (Integer.valueOf(yytext().substring(2),16)).toString()); }
 
-  {DecimalDouble}                { return token(MatrixParser.Terminals.FLOATING_POINT_LITERAL, yytext()); }
+  {DecimalDouble}                { return token(MatrixParser.Terminals.FP_NUMBER, yytext()); }
 
   /* comments */
   {Comment}                      { return token(MatrixParser.Terminals.COMMENT, yytext());  }
-
-  /* whitespace */
-  {WhiteSpace}                   { /* ignore */ }
 
   /* identifiers */
   {Identifier}                   { return token(MatrixParser.Terminals.IDENTIFIER, yytext()); }
@@ -206,10 +203,15 @@ SingleCharacter = [^\r\n\'\\]
   /* continuation */
   {Continuation}                 { /* ignore */ }
   
+  {LineTerminator}               { return token(MatrixParser.Terminals.LINE_TERMINATOR, yytext()); }
+  
+  /* whitespace */
+  {Space}                   { /* ignore */ }
+
 }
 
 <DQ_STRING> {
-  \"                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.DQ_STRING_LITERAL, string.toString()); }
+  \"                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.STRING, string.toString()); }
 
   {StringCharacter}+             { string.append( yytext() ); }
 
@@ -232,7 +234,7 @@ SingleCharacter = [^\r\n\'\\]
 }
 
 <SQ_STRING> {
-  \'                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.SQ_STRING_LITERAL, string.toString()); }
+  \'                             { yybegin(YYINITIAL); return token(MatrixParser.Terminals.STRING, string.toString()); }
 
   {SingleCharacter}+             { string.append( yytext() ); }
 
@@ -256,5 +258,5 @@ SingleCharacter = [^\r\n\'\\]
 
 
 /* error fallback */
-.|\n                             { throw new Scanner.Exception(yyline + 1, yycolumn + 1, "unrecognized character '" + yytext() + "'"); }
 <<EOF>>                          { return token(MatrixParser.Terminals.EOF); }
+.|\n                             { throw new Scanner.Exception(yyline + 1, yycolumn + 1, "unrecognized character '" + yytext() + "'"); }

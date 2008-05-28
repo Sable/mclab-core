@@ -1,36 +1,86 @@
-// AST for part of matrix g
-abstract Stmt;
+// AST for Natlab grammar
+
+Root:Program;
 Program:List ::= Stmt*;
+abstract Node;
+Stmt:Node;
+EmptyStmt:Stmt ::= <str:String>;
+CommentStmt:EmptyStmt ::= <str:String>;
 ExprStmt:Stmt ::= Expr;
 
 abstract Expr;
+
+ColonExpr:Expr ::= Base:Expr [Incr:Expr] Limit:Expr;
+Colon:Expr ::= <ID:String>;
+
 abstract Access:Expr;
-AssignExpr:Expr ::= LHS:Access <AssignOp:String> RHS:Expr;
 
-// LHS nodes
-abstract IdUse:Access ::= <Name:String>;
-Use:IdUse;
-MatrixAccess:Access ::= Name:IdUse Args:ArgList;
+abstract AssignExpr : Expr ::= Dest:Expr Source:Expr;
 
-// should be Expr+, or checking later on?
-ArgList:List ::= Expr*;	
-Colon:Expr ::= <Name:String>;
+AssignSimpleExpr : AssignExpr ;
 
-// matrix consists of a set of row
-Matrix:Expr ::= CellMatrixRow*;
-CellMatrixRow:List ::= Args:ArgList;
+// LHS of assignments
+IdUse:Access ::= <ID:String>;
+ParseName:Access ::= <ID:String>;
 
-MethodInvocation:Expr ::= IdUse ArgList*;
+MethodAccess : Access ::= <ID:String> Arg:Expr*;
+MatrixAccess : Access ::= <ID:String> Arg:Expr*;
+MatrixDecl : Access ::= Arg:MatrixRow*;
+MatrixRow : Access ::= Arg:Expr*;
 
-BinaryExpr:Expr ::= LHSExpr:Expr <Op:String> RHSExpr:Expr;
+// VarAccess : Access ::= <ID:String>;
 
-UnaryExpr:Expr ::= <Op:String> Expr;
-PostfixExpr:Expr ::= Expr <Op:String>;
+// Other expressions 
+abstract PrimaryExpr : Expr;
 
-ColonExpr:Expr ::= Base:Expr Incr:Expr Limit:Expr;
+ParExpr : PrimaryExpr ::= Expr;
 
-IntegerLiteral:Expr ::= <Value:String>;
-FloatingLiteral:Expr ::= <Value:String>;
-BooleanLiteral:Expr ::= <Value:String>;
-CharLiteral:Expr ::= <Value:String>;
-StringLiteral:Expr ::= <Value:String>;
+abstract Literal : PrimaryExpr ::= <LITERAL:String>;
+IntegerLiteral : Literal ;
+DoubleLiteral : Literal ;
+BooleanLiteral : Literal ;
+StringLiteral : Literal ;
+
+//-------------------------------------------------------------------
+abstract Unary : Expr ::= Operand:Expr;
+MinusExpr : Unary ;
+PlusExpr : Unary ;
+LogNotExpr : Unary ;
+TransposeExpr : Unary ;
+ArrayTransposeExpr : Unary ;
+
+abstract Binary : Expr ::= LeftOperand:Expr RightOperand:Expr;
+
+abstract ArithmeticExpr : Binary;
+abstract MultiplicativeExpr : ArithmeticExpr;
+MulExpr : MultiplicativeExpr ;
+DivExpr : MultiplicativeExpr ;
+LeftDivExpr : MultiplicativeExpr ;
+PowExpr : MultiplicativeExpr ;
+
+abstract AdditiveExpr : ArithmeticExpr;
+AddExpr : AdditiveExpr ;
+SubExpr : AdditiveExpr ;
+
+// Element wise expression
+abstract EMultiplicativeExpr : ArithmeticExpr;
+EMulExpr : EMultiplicativeExpr ;
+EDivExpr : EMultiplicativeExpr ;
+ELeftDivExpr : EMultiplicativeExpr ;
+EPowExpr : EMultiplicativeExpr ;
+
+abstract LogicalExpr : Binary;
+AndLogicalExpr : LogicalExpr ;
+OrLogicalExpr : LogicalExpr ;
+
+abstract RelationalExpr : Binary;
+LTExpr : RelationalExpr ;
+GTExpr : RelationalExpr ;
+LEExpr : RelationalExpr ;
+GEExpr : RelationalExpr ;
+
+abstract EqualityExpr : RelationalExpr;
+EQExpr : EqualityExpr ;
+NEExpr : EqualityExpr ;
+
+
