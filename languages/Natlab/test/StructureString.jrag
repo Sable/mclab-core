@@ -1,4 +1,6 @@
 aspect StructureString {
+
+/********  Original code
     syn String Node.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
     eq Var.getStructureString() = getName();
     eq App.getStructureString() = "app(" + getRator().getStructureString() + ", " + getRand().getStructureString() + ")";
@@ -16,4 +18,5 @@ aspect StructureString {
     }
 
     syn String Root.getStructureString() = getNode().getStructureString();
+*********/
 }
