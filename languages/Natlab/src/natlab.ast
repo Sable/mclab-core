@@ -72,6 +72,10 @@ abstract LogicalExpr : Binary;
 AndLogicalExpr : LogicalExpr ;
 OrLogicalExpr : LogicalExpr ;
 
+abstract ShortCircuitExpr : Binary;
+ShortCircuitAndExpr : ShortCircuitExpr ;
+ShortCircuitOrExpr : ShortCircuitExpr ;
+
 abstract RelationalExpr : Binary;
 LTExpr : RelationalExpr ;
 GTExpr : RelationalExpr ;

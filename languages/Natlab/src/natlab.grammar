@@ -290,8 +290,8 @@ simple_expression =
   |  simple_expression.e1 NE simple_expression.e2       {: return new NEExpr(e1, e2); :}
   |  simple_expression.e1 AND simple_expression.e2      {: return new AndLogicalExpr(e1, e2); :}
   |  simple_expression.e1 OR simple_expression.e2       {: return new OrLogicalExpr(e1, e2); :}
-  |  simple_expression.e1 SHORTAND simple_expression.e2    {: return new AndLogicalExpr(e1, e2); :}
-  |  simple_expression.e1 SHORTOR simple_expression.e2     {: return new OrLogicalExpr(e1, e2); :}
+  |  simple_expression.e1 SHORTAND simple_expression.e2    {: return new ShortCircuitAndExpr(e1, e2); :}
+  |  simple_expression.e1 SHORTOR simple_expression.e2     {: return new ShortCircuitOrExpr(e1, e2); :}
   ;
 
 assignment =

@@ -206,8 +206,10 @@ aspect PrettyPrint {
   eq ELeftDivExpr.printOp() = " .\\ ";
   eq EPowExpr.printOp() = " .^ ";
 
-  eq AndLogicalExpr.printOp() = " && ";
-  eq OrLogicalExpr.printOp() = " || ";
+  eq AndLogicalExpr.printOp() = " & ";
+  eq OrLogicalExpr.printOp() = " | ";
+  eq ShortCircuitAndExpr.printOp() = " && ";
+  eq ShortCircuitOrExpr.printOp() = " || ";
   eq LTExpr.printOp() = " < ";
   eq GTExpr.printOp() = " > ";
   eq LEExpr.printOp() = " <= ";
