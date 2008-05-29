@@ -62,48 +62,22 @@ class ParserPassTestBase extends TestCase {
 					if(expectedLine == null) {
 						buf.append("Actual AST is larger than expected AST:\n");
 						buf.append(actualLine);
-						while(true) {
-							String line = actualReader.readLine();
-							if(line == null) {
-								fail(buf.toString());
-							}
-							buf.append(line);
-							buf.append('\n');
-						}
+						appendRemainingToBuffer(actualReader, buf);
+						fail(buf.toString());
 					} else if(actualLine == null) {
 						buf.append("Expected AST is larger than actual AST:\n");
 						buf.append(expectedLine);
-						while(true) {
-							String line = expectedReader.readLine();
-							if(line == null) {
-								fail(buf.toString());
-							}
-							buf.append(line);
-							buf.append('\n');
-						}
+						appendRemainingToBuffer(expectedReader, buf);
+						fail(buf.toString());
 					} else {
 						buf.append("ASTs do not match:\n");
 						buf.append("Remaining expected:\n");
 						buf.append(expectedLine);
-						while(true) {
-							String line = expectedReader.readLine();
-							if(line == null) {
-								break;
-							}
-							buf.append(line);
-							buf.append('\n');
-						}
+						appendRemainingToBuffer(expectedReader, buf);
 						buf.append('\n');
 						buf.append("Remaining actual:\n");
 						buf.append(actualLine);
-						while(true) {
-							String line = actualReader.readLine();
-							if(line == null) {
-								break;
-							}
-							buf.append(line);
-							buf.append('\n');
-						}
+						appendRemainingToBuffer(actualReader, buf);
 						fail(buf.toString());
 					}
 				} else if(actualLine == null) {
@@ -126,6 +100,17 @@ class ParserPassTestBase extends TestCase {
 		int actualEndCol = Symbol.getColumn(actualEndPos);
 		assertEquals(expected.getEndLine(), actualEndLine);
 		assertEquals(expected.getEndCol(), actualEndCol);
+	}
+
+	private static void appendRemainingToBuffer(BufferedReader reader, StringBuffer buf) throws IOException {
+		while(true) {
+			String line = reader.readLine();
+			if(line == null) {
+				break;
+			}
+			buf.append(line);
+			buf.append('\n');
+		}
 	}
 	
 	private static boolean equals(String str1, String str2) {
