@@ -103,6 +103,9 @@ import beaver.Scanner;
   private int bracketCommentNestingDepth = 0;
   //bracket comment string consumed so far
   private StringBuffer bracketCommentBuf = null;
+  
+  //used to distinguish between bracket comments and bracket help comments
+  private short bracketCommentType = 0;
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -125,9 +128,9 @@ ImaginaryIntNumber = {Digit}+{Imaginary}
 ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
 ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
 
-CommentSymbol = %
-HelpComment={CommentSymbol}{CommentSymbol}.*
-Comment={CommentSymbol} | {CommentSymbol}[^{].*
+HelpComment=%% | %%[^{].*
+OpenBracketHelpComment = %%\{
+Comment=% | %[^%{].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
 
@@ -159,18 +162,29 @@ String=[']([^'\r\n] | [']['])*[']
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { return symbol(COMMENT, yytext()); }
 
-{OpenBracketComment} { yybegin(COMMENT_NESTING); bracketCommentNestingDepth++; bracketCommentBuf = new StringBuffer(yytext()); }
+{OpenBracketHelpComment} { 
+    bracketCommentType = BRACKET_HELP_COMMENT;
+    yybegin(COMMENT_NESTING);
+    bracketCommentNestingDepth++;
+    bracketCommentBuf = new StringBuffer(yytext());
+}
+{OpenBracketComment} { 
+    bracketCommentType = BRACKET_COMMENT;
+    yybegin(COMMENT_NESTING);
+    bracketCommentNestingDepth++;
+    bracketCommentBuf = new StringBuffer(yytext());
+}
 
 <COMMENT_NESTING> {
     [^%]+ { bracketCommentBuf.append(yytext()); }
-    {CommentSymbol} { bracketCommentBuf.append(yytext()); }
+    % { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
     {CloseBracketComment} { 
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
             yybegin(YYINITIAL);
-            return symbol(BRACKET_COMMENT, bracketCommentBuf.toString());
+            return symbol(bracketCommentType, bracketCommentBuf.toString());
         }
     }
 }
