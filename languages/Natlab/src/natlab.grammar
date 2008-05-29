@@ -1,7 +1,5 @@
 %import "natlab.ast.*";
-// %import "java.util.Collections";
 %import "java.util.Iterator";
-// %import "java.util.List";
 
 %package "natlab";
 
@@ -59,96 +57,12 @@
 %terminals STRING;
 %terminals PROPERTIES, METHODS, EVENTS;
 
-/****************************************************************
-
-%typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
-%typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
-%typeof FP_NUMBER, IM_FP_NUMBER = "FPNumericLiteralValue";
-
-%typeof Start  = "List";
-%typeof NonTerm  = "ASTNode";
-
-%goal Start;
-
-Start
-  = NonTerm+
-  ;
-
-NonTerm
-  = IDENTIFIER
-  | INT_NUMBER
-  | FP_NUMBER
-  | IM_INT_NUMBER
-  | IM_FP_NUMBER
-  | LPAREN
-  | RPAREN
-  | LSQUARE
-  | RSQUARE
-  | LCURLY
-  | RCURLY
-  | BREAK
-  | CASE
-  | CATCH
-  | CONTINUE
-  | ELSE
-  | ELSEIF
-  | END
-  | FOR
-  | FUNCTION
-  | GLOBAL
-  | IF
-  | OTHERWISE
-  | RETURN
-  | PERSISTENT
-  | SWITCH
-  | TRY
-  | WHILE
-  | LINE_TERMINATOR
-  | COMMENT
-  | HELP_COMMENT
-  | DOT
-  | COMMA
-  | SEMICOLON
-  | COLON
-  | PLUS
-  | MINUS
-  | MTIMES
-  | ETIMES
-  | MDIV
-  | EDIV
-  | MLDIV
-  | ELDIV
-  | MPOW
-  | EPOW
-  | MTRANSPOSE
-  | ARRAYTRANSPOSE
-  | LE
-  | GE
-  | LT
-  | GT
-  | EQ
-  | NE
-  | AND
-  | OR
-  | NOT
-  | SHORTAND
-  | SHORTOR
-  | AT
-  | STRING
-  | SHELL_COMMAND
-  | ELLIPSIS_COMMENT
-  | BRACKET_COMMENT
-  | ASSIGN
-  ;
-********************************************************************/
-
 //===================================================================
 // Starting from here, a copy from matrix.gramm to natlab.grammar
 //===================================================================
 
 // Precedence and associativity.
-%left MPOW, EPOW, ARRAYTRANSPOSE;
-%left NOT;
+%left MPOW, EPOW;
 %left MTIMES, MDIV, MLDIV, ETIMES, EDIV, ELDIV;
 %left PLUS, MINUS;
 %left LT, GT, LE, GE;
@@ -157,7 +71,7 @@ NonTerm
 %left OR, SHORTOR;
 
 %typeof program = "Root";
-%typeof statement_list = "List";
+%typeof statement_list = "List<Stmt>";
 %typeof statement = "Stmt";
 %typeof expression = "Expr";
 %typeof empty_statement = "EmptyStmt";
@@ -165,14 +79,14 @@ NonTerm
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
 %typeof simple_expression= "Expr";
-%typeof assignment = "AssignExpr";			 
+%typeof assignment = "AssignExpr";           
 %typeof left_hand_side = "Access";
 %typeof primary_expression = "Expr";
-%typeof argument_list = "List";
+%typeof argument_list = "List<Expr>";
 %typeof method_invocation = "Access";
 %typeof matrix_access = "Access";
 %typeof matrix = "Access";
-%typeof maxtrix_rows = "List";
+%typeof matrix_rows = "List<MatrixRow>";
 %typeof cell_or_matrix_row = "MatrixRow";
 %typeof colon_expression, binary_expression, prefix_expression, postfix_expression= "Expr";
 
@@ -206,7 +120,7 @@ statement =
   |  try_statement
 */
   |  FOR LPAREN? assignment.a RPAREN? statement_separator program.p END
-  						  {: return new ForStmt(a, p); :}	
+                          {: return new ForStmt(a, p); :}   
   ;
 
 empty_statement =
@@ -277,15 +191,15 @@ simple_name =    IDENTIFIER.id          {: return new ParseName(id); :}
 
 // Matrix
 matrix =
-     LSQUARE maxtrix_rows.l SEMICOLON RSQUARE    {: return new MatrixDecl(l); :}
-  |  LSQUARE maxtrix_rows.l RSQUARE     {: return new MatrixDecl(l); :}
+     LSQUARE matrix_rows.l SEMICOLON RSQUARE    {: return new MatrixDecl(l); :}
+  |  LSQUARE matrix_rows.l RSQUARE     {: return new MatrixDecl(l); :}
   |  LSQUARE SEMICOLON RSQUARE          {: return new MatrixDecl(new List()); :}
   |  LSQUARE RSQUARE                    {: return new MatrixDecl(new List()); :}
   ;
 
-maxtrix_rows =
+matrix_rows =
      cell_or_matrix_row.row             {: return new List().add(row); :}
-  |  maxtrix_rows.l SEMICOLON cell_or_matrix_row.row   {: return l.add(row); :}
+  |  matrix_rows.l SEMICOLON cell_or_matrix_row.row   {: return l.add(row); :}
   ;
 
 cell_or_matrix_row =
