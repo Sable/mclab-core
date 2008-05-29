@@ -52,7 +52,7 @@ class ParserPassTestBase extends TestCase {
 
 	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Root actual, Structure expected) {
-		assertEquals(expected.getStructureString(), actual.getStructureString());
+		assertEquals("AST: ", expected.getStructureString(), actual.getStructureString());
 
 		int actualStartPos = actual.getStart();
 		int actualStartLine = Symbol.getLine(actualStartPos);
