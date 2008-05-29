@@ -9,5 +9,6 @@ scanner_string
 scanner_badescape
 scanner_shell
 scanner_badbracketcomment
+scanner_statestack
 scanner_classdef
 scanner_looseendclassdef
