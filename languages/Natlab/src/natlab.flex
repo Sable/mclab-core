@@ -26,7 +26,8 @@ import beaver.Scanner;
     //if we return anything while in FIELD_NAME, then switch back to initial
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
-        yybegin(YYINITIAL);
+        int state = stateStack.pop();
+        yybegin(state);
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength());
   }
@@ -36,7 +37,8 @@ import beaver.Scanner;
     //if we return anything while in FIELD_NAME, then switch back to initial
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
-        yybegin(YYINITIAL);
+        int state = stateStack.pop();
+        yybegin(state);
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
@@ -139,6 +141,12 @@ import beaver.Scanner;
   public boolean hasComment() {
       return !commentQueue.isEmpty();
   }
+  
+  //// State transitions ///////////////////////////////////////////////////////
+  
+  //most of our states are used for bracketing
+  //this gives us a way to nest bracketing states
+  private java.util.Stack<Integer> stateStack = new java.util.Stack<Integer>();
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -197,12 +205,14 @@ String=[']([^'\r\n] | [']['])*[']
 
 {OpenBracketHelpComment} { 
     isBracketHelpCommentType = true;
+    stateStack.push(yystate());
     yybegin(COMMENT_NESTING);
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
 }
 {OpenBracketComment} { 
     isBracketHelpCommentType = false;
+    stateStack.push(yystate());
     yybegin(COMMENT_NESTING);
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
@@ -216,7 +226,8 @@ String=[']([^'\r\n] | [']['])*[']
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
-            yybegin(YYINITIAL);
+            int state = stateStack.pop();
+            yybegin(state);
             if(isBracketHelpCommentType) {
                 return symbol(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
             } else {
@@ -301,6 +312,7 @@ String=[']([^'\r\n] | [']['])*[']
     \. {
             //NB: have to change the state AFTER calling symbol
             Symbol result = symbol(DOT);
+            stateStack.push(yystate());
             yybegin(FIELD_NAME);
             return result;
        }
