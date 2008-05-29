@@ -136,7 +136,6 @@ NonTerm
   | SHELL_COMMAND
   | ELLIPSIS_COMMENT
   | BRACKET_COMMENT
-  | BRACKET_HELP_COMMENT
   | ASSIGN
   ;
 ********************************************************************/
@@ -163,7 +162,7 @@ NonTerm
 %typeof expression_statement = "ExprStmt";
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
-%typeof simple_expression, assignment_expression, assignment = "Expr";
+%typeof simple_expression, assignment = "Expr";
 %typeof left_hand_side = "Access";
 %typeof primary_expression = "Expr";
 %typeof argument_list = "List";
@@ -207,7 +206,6 @@ empty_statement =
   |  COMMENT.str          {: return new CommentStmt(str); :}
   |  HELP_COMMENT.str     {: return new CommentStmt(str); :}
   |  BRACKET_COMMENT.str  {: return new CommentStmt(str); :}
-  |  BRACKET_HELP_COMMENT.str     {: return new CommentStmt(str); :}
 //----------------------------------------------------------------->>
 // Unsupport tokens in current version
   |  NonTerm+             {: return new EmptyStmt(""); :}
@@ -243,8 +241,7 @@ NonTerm
 //-----------------------------------------------------------------<<
 
 expression_statement =
-     assignment.a statement_separator          {: return new ExprStmt(a); :}
-  |  method_invocation.m statement_separator   {: return new ExprStmt(m); :}
+     expression.e statement_separator          {: return new ExprStmt(e); :}
   ;
 
 statement_separator =
@@ -370,12 +367,8 @@ simple_expression =
   |  simple_expression.e1 SHORTOR simple_expression.e2     {: return new OrLogicalExpr(e1, e2); :}
   ;
 
-assignment_expression =
-     simple_expression.e        {: return e; :}
-  |  assignment.a               {: return a; :}
-  ;
 assignment =
-    left_hand_side.dest ASSIGN assignment_expression.source {: return new AssignSimpleExpr(dest, source); :}
+    left_hand_side.dest ASSIGN expression.source {: return new AssignSimpleExpr(dest, source); :}
   ;
 
 // Adding matrix_access
@@ -385,5 +378,6 @@ left_hand_side =
   ;
 
 expression =
-    assignment_expression.e     {: return e; :}
+     simple_expression.e        {: return e; :}
+  |  assignment.a               {: return a; :}
   ;
