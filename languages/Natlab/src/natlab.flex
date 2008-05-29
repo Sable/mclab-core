@@ -175,6 +175,10 @@ Comment=% | %[^%{].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
 
+OpenClassDef = classdef
+//NB: not a valid identifier
+CloseClassDef = end-classdef
+
 ShellCommand=[!].*
 
 String=[']([^'\r\n] | [']['])*[']
@@ -183,6 +187,7 @@ String=[']([^'\r\n] | [']['])*[']
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
 %xstate COMMENT_NESTING
+%state CLASS
 
 %%
 
@@ -284,11 +289,30 @@ String=[']([^'\r\n] | [']['])*[']
 "=" { return symbol(ASSIGN); }
 
 <YYINITIAL> {
+    {OpenClassDef} {
+        stateStack.push(yystate());
+        yybegin(CLASS);
+        return symbol(CLASSDEF);
+    }
+}
+
+<CLASS> {
+    {CloseClassDef} {
+        int state = stateStack.pop();
+        yybegin(state);
+        return symbol(END); //NB: just return normal END token
+    }
+    
+    properties { return symbol(PROPERTIES); }
+    methods { return symbol(METHODS); }
+    events { return symbol(EVENTS); }
+}
+
+<YYINITIAL, CLASS> {
     //from matlab "iskeyword" function
     break { return symbol(BREAK); }
     case { return symbol(CASE); }
     catch { return symbol(CATCH); }
-    classdef { return symbol(CLASSDEF); }
     continue { return symbol(CONTINUE); }
     else { return symbol(ELSE); }
     elseif { return symbol(ELSEIF); }
@@ -324,6 +348,8 @@ String=[']([^'\r\n] | [']['])*[']
     //NB: lower precedence than ellipsis
     \. { return symbol(DOT); }
 }
+
+{CloseClassDef} { error(yytext() + " must be paired with a classdef keyword."); }
 
 /* error fallback */
 .|\n { error("Illegal character '" + yytext() + "'"); }
