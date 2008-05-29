@@ -18,12 +18,17 @@ public class ScannerTestTool {
 		String basename = args[0];
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
-			Scanner scanner = new NatlabScanner(in);
+			NatlabScanner scanner = new NatlabScanner(in);
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			while(true) {
 				Symbol curr = null;
 				try {
 					curr = scanner.nextToken();
+					for(Symbol comment : scanner.pollAllComments()) {
+						out.print('#');
+						out.print(' ');
+						printSymbol(out, comment);
+					}
 				} catch (Scanner.Exception e) {
 					out.print('~');
 					out.print(' ');
@@ -35,22 +40,7 @@ public class ScannerTestTool {
 				if(curr.getId() == NatlabParser.Terminals.EOF) {
 					break;
 				}
-				out.print(NatlabParser.Terminals.NAMES[curr.getId()]);
-				out.print(' ');
-				int start = curr.getStart();
-				int startLine = Symbol.getLine(start);
-				int startCol = Symbol.getColumn(start);
-				out.print(startLine);
-				out.print(' ');
-				out.print(startCol);
-				out.print(' ');
-				out.print(curr.getEnd() - start + 1);
-				if(curr.value != null) {
-					out.print(' ');
-					out.print('=');
-					out.print(stringifyValue(curr.value));
-				}
-				out.println();
+				printSymbol(out, curr);
 			}
 			out.close();
 			in.close();
@@ -59,6 +49,25 @@ public class ScannerTestTool {
 			e.printStackTrace();
 			System.exit(2);
 		}
+	}
+	
+	public static void printSymbol(PrintWriter out, Symbol symbol) {
+		out.print(NatlabParser.Terminals.NAMES[symbol.getId()]);
+		out.print(' ');
+		int start = symbol.getStart();
+		int startLine = Symbol.getLine(start);
+		int startCol = Symbol.getColumn(start);
+		out.print(startLine);
+		out.print(' ');
+		out.print(startCol);
+		out.print(' ');
+		out.print(symbol.getEnd() - start + 1);
+		if(symbol.value != null) {
+			out.print(' ');
+			out.print('=');
+			out.print(stringifyValue(symbol.value));
+		}
+		out.println();
 	}
 	
 	public static String stringifyValue(Object value) {

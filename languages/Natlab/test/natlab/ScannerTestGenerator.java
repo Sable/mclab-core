@@ -31,10 +31,11 @@ public class ScannerTestGenerator extends AbstractTestGenerator {
 		String outFileName = "test/" + testName + ".out";
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
-		testFileWriter.println("		Scanner scanner = getScanner(\"" + inFileName + "\");");
+		testFileWriter.println("		NatlabScanner scanner = getScanner(\"" + inFileName + "\");");
 		testFileWriter.println("		List<Symbol> symbols = new ArrayList<Symbol>();");
-		testFileWriter.println("		Scanner.Exception exception = parseSymbols(\"" + outFileName + "\", symbols);");
-		testFileWriter.println("		checkScan(scanner, symbols, exception);");
+		testFileWriter.println("		List<Symbol> comments = new ArrayList<Symbol>();");
+		testFileWriter.println("		Scanner.Exception exception = parseSymbols(\"" + outFileName + "\", symbols, comments);");
+		testFileWriter.println("		checkScan(scanner, symbols, comments, exception);");
 		testFileWriter.println("	}");
 	}
 

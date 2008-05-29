@@ -21,14 +21,14 @@ class ScannerTestBase extends TestCase {
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s=(.*))?$");
 
 	/* Compare the output of the scanner with a list of expected symbols and an optional exception. */
-	static void checkScan(Scanner scanner, List<Symbol> symbols, Scanner.Exception exception) 
+	static void checkScan(NatlabScanner scanner, List<Symbol> symbols, List<Symbol> comments, Scanner.Exception exception) 
 			throws IOException, Scanner.Exception {
-		int i = 0;
+		int tokenNum = 0;
 		for(Symbol expected : symbols) {
 			try {
 				Symbol actual = scanner.nextToken();
-				assertEquals("Token #" + i, actual, expected);
-				i++;
+				assertEquals("Token #" + tokenNum, actual, expected);
+				tokenNum++;
 			} catch(Scanner.Exception e) {
 				assertEquals(e.getMessage(), e, exception);
 				return;
@@ -38,17 +38,22 @@ class ScannerTestBase extends TestCase {
 			short actualId = scanner.nextToken().getId();
 			short expectedId = NatlabParser.Terminals.EOF;
 			if(actualId != expectedId) {
-				fail("Token #" + i + ": incorrect token type - " +
+				fail("Token #" + tokenNum + ": incorrect token type - " +
 						"expected: " + expectedId + " (" + NatlabParser.Terminals.NAMES[expectedId] + ") " +
 						"but was: " + actualId + " (" + NatlabParser.Terminals.NAMES[actualId] + ")");
 			}
 		} catch(Scanner.Exception e) {
 			assertEquals(e.getMessage(), e, exception);
 		}
+		List<Symbol> actualComments = scanner.pollAllComments();
+		assertEquals("Number of comments: ", comments.size(), actualComments.size());
+		for(int commentNum = 0; commentNum < comments.size(); commentNum++) {
+			assertEquals("Comment #" + commentNum + ": ", actualComments.get(commentNum), comments.get(commentNum));
+		}
 	}
 
 	/* Construct a scanner that will read from the specified file. */
-	static Scanner getScanner(String filename) throws FileNotFoundException {
+	static NatlabScanner getScanner(String filename) throws FileNotFoundException {
 		return new NatlabScanner(new BufferedReader(new FileReader(filename)));
 	}
 
@@ -56,7 +61,7 @@ class ScannerTestBase extends TestCase {
 	 * Read symbols from the .out file.
 	 * Returns an exception if there is an exception line and null otherwise.
 	 */
-	static Scanner.Exception parseSymbols(String filename, /*OUT*/ List<Symbol> symbols) 
+	static Scanner.Exception parseSymbols(String filename, /*OUT*/ List<Symbol> symbols, /*OUT*/ List<Symbol> comments) 
 			throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		while(in.ready()) {
@@ -64,7 +69,11 @@ class ScannerTestBase extends TestCase {
 			if(isExceptionLine(line)) {
 				return parseException(line);
 			}
-			symbols.add(parseSymbol(line));
+			if(isCommentLine(line)) {
+				comments.add(parseComment(line));
+			} else {
+				symbols.add(parseSymbol(line));
+			}
 		}
 		in.close();
 		return null;
@@ -86,6 +95,23 @@ class ScannerTestBase extends TestCase {
 		int lineNum = Integer.parseInt(tokenizer.nextToken());
 		int colNum = Integer.parseInt(tokenizer.nextToken());
 		return new Scanner.Exception(lineNum, colNum, null);
+	}
+
+	/* Returns true if the line should be treated as a non-token comment line. */
+	private static boolean isCommentLine(String line) {
+		return line.charAt(0) == '#';
+	}
+
+	/*
+	 * Constructs a Symbol from a line of text.
+	 * Format:
+	 *   # TYPE start_line start_col length [=value]
+	 *   e.g. # FOR 2 1 3
+	 *        # IDENTIFIER 3 2 1 =x
+	 */
+	private static Symbol parseComment(String line) 
+			throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
+		return parseSymbol(line.substring(1));
 	}
 
 	/*

@@ -19,6 +19,8 @@ import beaver.Scanner;
 %column
 
 %{
+  //// Returning symbols ///////////////////////////////////////////////////////
+
   //wrap a type (e.g. IDENTIFIER) in a symbol object with appropriate position info
   private Symbol symbol(short type) {
     //if we return anything while in FIELD_NAME, then switch back to initial
@@ -39,6 +41,8 @@ import beaver.Scanner;
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
   
+  //// Errors //////////////////////////////////////////////////////////////////
+  
   //throw an exceptions with appropriate position information
   private void error(String msg) throws Scanner.Exception {
     throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
@@ -49,6 +53,8 @@ import beaver.Scanner;
   private void error(String msg, int columnOffset) throws Scanner.Exception {
     throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
   }
+  
+  //// Strings /////////////////////////////////////////////////////////////////
   
   //throws an exception if the string contains any invalid escape sequences
   private void validateEscapeSequences(String str) throws Scanner.Exception {
@@ -71,6 +77,8 @@ import beaver.Scanner;
         error("Incomplete escape sequence '\\'", offset);
     }
   }
+  
+  //// Numbers /////////////////////////////////////////////////////////////////
   
   private DecIntNumericLiteralValue parseDecInt(String text, boolean imaginary) throws Scanner.Exception {
       try { 
@@ -99,13 +107,38 @@ import beaver.Scanner;
       }
   }
   
+  //// Comment nesting /////////////////////////////////////////////////////////
+  
   //number of '%}'s expected
   private int bracketCommentNestingDepth = 0;
   //bracket comment string consumed so far
   private StringBuffer bracketCommentBuf = null;
   
   //used to distinguish between bracket comments and bracket help comments
-  private short bracketCommentType = 0;
+  private boolean isBracketHelpCommentType = false;
+  
+  //// Comment queue ///////////////////////////////////////////////////////////
+  
+  private final java.util.Queue<Symbol> commentQueue = new java.util.LinkedList<Symbol>();
+  
+  public Symbol peekComment() {
+      return commentQueue.peek();
+  }
+  
+  public Symbol pollComment() {
+      return commentQueue.poll();
+  }
+  
+  public java.util.List<Symbol> pollAllComments() {
+      java.util.List<Symbol> allComments = new java.util.ArrayList<Symbol>();
+      allComments.addAll(commentQueue);
+      commentQueue.clear();
+      return allComments;
+  }
+  
+  public boolean hasComment() {
+      return !commentQueue.isEmpty();
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -145,7 +178,7 @@ String=[']([^'\r\n] | [']['])*[']
 
 %%
 
-{EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)); }
+{EscapedLineTerminator} { commentQueue.add(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
@@ -160,16 +193,16 @@ String=[']([^'\r\n] | [']['])*[']
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { return symbol(COMMENT, yytext()); }
+{Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
 
 {OpenBracketHelpComment} { 
-    bracketCommentType = BRACKET_HELP_COMMENT;
+    isBracketHelpCommentType = true;
     yybegin(COMMENT_NESTING);
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
 }
 {OpenBracketComment} { 
-    bracketCommentType = BRACKET_COMMENT;
+    isBracketHelpCommentType = false;
     yybegin(COMMENT_NESTING);
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
@@ -184,7 +217,11 @@ String=[']([^'\r\n] | [']['])*[']
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
             yybegin(YYINITIAL);
-            return symbol(bracketCommentType, bracketCommentBuf.toString());
+            if(isBracketHelpCommentType) {
+                return symbol(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
+            } else {
+                commentQueue.add(symbol(BRACKET_COMMENT, bracketCommentBuf.toString()));
+            }
         }
     }
 }
