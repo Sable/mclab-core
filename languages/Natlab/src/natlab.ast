@@ -15,7 +15,7 @@ Colon:Expr ::= <ID:String>;
 
 abstract Access:Expr;
 
-abstract AssignExpr : Expr ::= Dest:Expr Source:Expr;
+AssignExpr : Expr ::= Dest:Expr Source:Expr;
 
 AssignSimpleExpr : AssignExpr ;
 
@@ -82,4 +82,8 @@ abstract EqualityExpr : RelationalExpr;
 EQExpr : EqualityExpr ;
 NEExpr : EqualityExpr ;
 
+//------- ------------------------------------------------------------
+// statement that can be reached by break or continue
+abstract BranchTargetStmt : Stmt;  
+ForStmt : BranchTargetStmt ::= AssignExpr Block:Root; 
 

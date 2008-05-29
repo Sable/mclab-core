@@ -61,6 +61,17 @@ aspect PrettyPrint {
     }
   }
 
+  // Flow control ... 
+
+  public void ForStmt.toString(StringBuffer s) {
+    s.append("FOR ");
+    s.append("(");		// need adjust ...
+ 	getAssignExpr().toString(s);
+ 	s.append(");\n");
+ 	getBlock().toString(s);
+    s.append("END ");
+  }
+
   // Assign Expression
 
   public void AssignExpr.toString(StringBuffer s) {
@@ -82,7 +93,7 @@ aspect PrettyPrint {
 	  	s.append(" : "); 
 	}
     getLimit().toString(s);
-  	s.append(" \n"); 
+  	s.append(""); 
   }
 
   public void ParExpr.toString(StringBuffer s) {

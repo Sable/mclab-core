@@ -155,7 +155,7 @@ NonTerm
 %left AND, SHORTAND;
 %left OR, SHORTOR;
 
-%typeof program = "Program";
+%typeof program = "Root";
 %typeof statement_list = "List";
 %typeof statement = "Stmt";
 %typeof expression = "Expr";
@@ -163,7 +163,8 @@ NonTerm
 %typeof expression_statement = "ExprStmt";
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
-%typeof simple_expression, assignment = "Expr";
+%typeof simple_expression= "Expr";
+%typeof assignment = "AssignExpr";			 
 %typeof left_hand_side = "Access";
 %typeof primary_expression = "Expr";
 %typeof argument_list = "List";
@@ -197,13 +198,14 @@ statement =
   |  if_then_statement
   |  if_then_else_statement
   |  while_statement
-  |  for_statement
   |  switch_statement
   |  do_statement
   |  break_statement
   |  continue_statement
   |  try_statement
 */
+  |  FOR LPAREN? assignment.a RPAREN? statement_separator program.p END
+  						  {: return new ForStmt(a, p); :}	
   ;
 
 empty_statement =
@@ -230,8 +232,6 @@ NonTerm
   | CONTINUE
   | ELSE
   | ELSEIF
-  | END
-  | FOR
   | FUNCTION
   | GLOBAL
   | IF
