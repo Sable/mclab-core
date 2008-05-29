@@ -73,7 +73,7 @@
 //===================================================================
 
 // Precedence and associativity.
-%left MPOW, EPOW;
+%left MPOW, EPOW; //NB: pow is left-associative in Matlab (vs right-associative in math)
 %left MTIMES, MDIV, MLDIV, ETIMES, EDIV, ELDIV;
 %left PLUS, MINUS;
 %left LT, GT, LE, GE;
