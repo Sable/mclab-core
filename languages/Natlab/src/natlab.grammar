@@ -251,7 +251,7 @@ matrix_access =
 postfix_expression =
      primary_expression.e       {: return e; :}
   |  name.n                     {: return n; :}
-  |  postfix_expression.e ARRAYTRANSPOSE  {: return new TransposeExpr(e); :}
+  |  postfix_expression.e ARRAYTRANSPOSE  {: return new ArrayTransposeExpr(e); :}
   |  postfix_expression.e MTRANSPOSE      {: return new TransposeExpr(e); :}
   ;
 prefix_expression =
