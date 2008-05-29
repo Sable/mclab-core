@@ -150,12 +150,12 @@ String=[']([^'\r\n] | [']['])*[']
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
 
-{IntNumber} { return symbol(INT_NUMBER, yytext()); }//, parseDecInt(yytext(), false)); }
-{FPNumber} { return symbol(FP_NUMBER, yytext()); }//, parseFP(yytext(), false)); }
-{HexNumber} { return symbol(INT_NUMBER, yytext()); }//, parseHexInt(yytext(), false)); }
-{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, yytext()); }//, parseDecInt(yytext(), true)); }
-{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, yytext()); }//, parseFP(yytext(), true)); }
-{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, yytext()); }//, parseHexInt(yytext(), true)); }
+{IntNumber} { return symbol(INT_NUMBER, parseDecInt(yytext(), false)); }
+{FPNumber} { return symbol(FP_NUMBER, parseFP(yytext(), false)); }
+{HexNumber} { return symbol(INT_NUMBER, parseHexInt(yytext(), false)); }
+{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); }
+{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); }
+{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); }
 
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 

@@ -35,11 +35,10 @@ abstract PrimaryExpr : Expr;
 
 ParExpr : PrimaryExpr ::= Expr;
 
-abstract Literal : PrimaryExpr ::= <LITERAL:String>;
-IntegerLiteral : Literal ;
-DoubleLiteral : Literal ;
-BooleanLiteral : Literal ;
-StringLiteral : Literal ;
+abstract Literal : PrimaryExpr;
+IntegerLiteral : Literal ::= <Value:natlab.IntNumericLiteralValue>;
+DoubleLiteral : Literal ::= <Value:natlab.FPNumericLiteralValue>;
+StringLiteral : Literal ::= <Value:String>;
 
 //-------------------------------------------------------------------
 abstract Unary : Expr ::= Operand:Expr;

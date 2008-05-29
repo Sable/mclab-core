@@ -59,6 +59,7 @@
 %terminals STRING;
 
 /****************************************************************
+
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
 %typeof FP_NUMBER, IM_FP_NUMBER = "FPNumericLiteralValue";
@@ -175,6 +176,10 @@ NonTerm
 
 %typeof NonTerm = "EmptyStmt";
 
+%typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
+%typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
+%typeof FP_NUMBER, IM_FP_NUMBER = "FPNumericLiteralValue";
+
 %goal program;
 
 // Currently, a .m file is treated as a list of statements.
@@ -206,6 +211,7 @@ empty_statement =
   |  COMMENT.str          {: return new CommentStmt(str); :}
   |  HELP_COMMENT.str     {: return new CommentStmt(str); :}
   |  BRACKET_COMMENT.str  {: return new CommentStmt(str); :}
+  |  BRACKET_HELP_COMMENT.str  {: return new CommentStmt(str); :}
 //----------------------------------------------------------------->>
 // Unsupport tokens in current version
   |  NonTerm+             {: return new EmptyStmt(""); :}

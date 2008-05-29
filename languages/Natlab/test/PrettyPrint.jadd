@@ -17,7 +17,9 @@ aspect PrettyPrint {
   }
 
   syn String ASTNode.dumpStringOnly() = toString() ;
-  eq Literal.dumpStringOnly() = getLITERAL() ;
+  eq DoubleLiteral.dumpStringOnly() = getValue().getText() ;
+  eq IntegerLiteral.dumpStringOnly() = getValue().getText() ;
+  eq StringLiteral.dumpStringOnly() = getValue() ;
   eq ParseName.dumpStringOnly() = getID() ;
   eq MethodAccess.dumpStringOnly() = getID() ;
   eq MatrixAccess.dumpStringOnly() = getID() ;
@@ -106,18 +108,17 @@ aspect PrettyPrint {
   }
 
   // Literals
-    
-  public void Literal.toString(StringBuffer s) {
-    s.append(getLITERAL());
-  }
   
   public void StringLiteral.toString(StringBuffer s) {
-    s.append("\"" + escape(getLITERAL()) + "\"");
+    s.append("\"" + escape(getValue()) + "\"");
   }
   
   public void DoubleLiteral.toString(StringBuffer s) {
-    s.append(getLITERAL());
-    s.append(" ");
+    s.append(getValue().getText());
+  }
+  
+  public void IntegerLiteral.toString(StringBuffer s) {
+    s.append(getValue().getText());
   }
 
   protected static String Literal.escape(String s) {
@@ -305,7 +306,9 @@ aspect PrettyPrint {
   }
 
   syn String ASTNode.dumpString() = getClass().getName() + " [" + toString() + "]";
-  eq Literal.dumpString() = getClass().getName() + " [" + getLITERAL() + "]";
+  eq IntegerLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq DoubleLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq StringLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq ParseName.dumpString() = getClass().getName() + " [" + getID() + "]";
   eq MethodAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
   eq MatrixAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
