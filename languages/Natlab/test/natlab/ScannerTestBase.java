@@ -172,6 +172,15 @@ class ScannerTestBase extends TestCase {
 
 	/* Checks deep equality of two Scanner.Exceptions. */
 	public static void assertEquals(String msg, Scanner.Exception actual, Scanner.Exception expected) {
+		if(actual == null) {
+			if(expected == null) {
+				return;
+			} else {
+				fail("Actual exception was unexpectedly null (expected: [" + actual.line + ", " + actual.column + "] " + expected + ")");
+			}
+		} else if(expected == null) {
+			fail("Unexpected exception: [" + actual.line + ", " + actual.column + "] " + actual);
+		}
 		assertEquals(msg + " - exception line number", actual.line, expected.line);
 		assertEquals(msg + " - exception column number", actual.column, expected.column);
 	}
