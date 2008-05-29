@@ -43,6 +43,17 @@
     }
 
     { report = new Events(); } // Use error handler in parser
+    
+    private static <T extends ASTNode<?>> natlab.ast.List<T> addAll(natlab.ast.List<T> node, java.util.List<T> children) {
+        for(T child : children) {
+            node.add(child);
+        }
+        return node;
+    }
+
+    private static <T extends ASTNode<?>> natlab.ast.List<T> makeListNode(java.util.List<T> children) {
+        return addAll(new natlab.ast.List<T>(), children);
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -71,7 +82,6 @@
 %left OR, SHORTOR;
 
 %typeof program = "Root";
-%typeof statement_list = "List<Stmt>";
 %typeof statement = "Stmt";
 %typeof expression = "Expr";
 %typeof empty_statement = "EmptyStmt";
@@ -83,10 +93,10 @@
 %typeof left_hand_side = "Access";
 %typeof primary_expression = "Expr";
 %typeof argument_list = "List<Expr>";
+%typeof argument = "Expr";
 %typeof method_invocation = "Access";
 %typeof matrix_access = "Access";
 %typeof matrix = "Access";
-%typeof matrix_rows = "List<MatrixRow>";
 %typeof cell_or_matrix_row = "MatrixRow";
 %typeof colon_expression, binary_expression, prefix_expression, postfix_expression= "Expr";
 
@@ -99,16 +109,13 @@
 %goal program;
 
 // Currently, a .m file is treated as a list of statements.
-program = statement_list.stmtlist      {: return new Root(stmtlist); :}
-  ;
-statement_list =
-     statement.stmt                    {: return new List().add(stmt); :}
-  |  statement_list.sl statement.stmt  {: return sl.add(stmt); :}
+program = 
+     statement.stmts+ {: return new Root(makeListNode(_list_stmts)); :}
   ;
 
 statement =
-     empty_statement.s              {: return s; :}
-  |  expression_statement.s         {: return s; :}
+     empty_statement.s
+  |  expression_statement.s
 /*  // those statement could be here ...
   |  if_then_statement
   |  if_then_else_statement
@@ -191,20 +198,11 @@ simple_name =    IDENTIFIER.id          {: return new ParseName(id); :}
 
 // Matrix
 matrix =
-     LSQUARE matrix_rows.l SEMICOLON RSQUARE    {: return new MatrixDecl(l); :}
-  |  LSQUARE matrix_rows.l RSQUARE     {: return new MatrixDecl(l); :}
-  |  LSQUARE SEMICOLON RSQUARE          {: return new MatrixDecl(new List()); :}
-  |  LSQUARE RSQUARE                    {: return new MatrixDecl(new List()); :}
-  ;
-
-matrix_rows =
-     cell_or_matrix_row.row             {: return new List().add(row); :}
-  |  matrix_rows.l SEMICOLON cell_or_matrix_row.row   {: return l.add(row); :}
+     LSQUARE cell_or_matrix_row.rows* SEMICOLON? RSQUARE    {: return new MatrixDecl(makeListNode(_list_rows)); :}
   ;
 
 cell_or_matrix_row =
-     argument_list.l            {: return new MatrixRow(l); :}
-  |  argument_list.l COMMA      {: return new MatrixRow(l); :}
+     argument_list.l COMMA?      {: return new MatrixRow(l); :}
   ;
 
 // Expressions
@@ -220,10 +218,13 @@ primary_expression =
 // There is ambiguous that allows foo(:), if foo() is an function,
 // and A() if A is matrix.
 argument_list =
-     expression.e                        {: return new List().add(e); :}
-  |  argument_list.l COMMA expression.e  {: return l.add(e); :}
-  |  COLON.c                             {: return new List().add(new Colon(":")); :}
-  |  argument_list.l COMMA COLON.c       {: return l.add(new Colon(":")); :}
+     argument.a                        {: return new List().add(a); :}
+  |  argument_list.l COMMA argument.a  {: return l.add(a); :}
+  ;
+
+argument =
+     expression.e
+  |  COLON.c {: return new Colon(":"); :}
   ;
 
 method_invocation =
