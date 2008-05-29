@@ -3,4 +3,6 @@ parserpasstest2
 parserpass_unary
 parserpass_binary
 parserpass_precedence
+parserpass_logicalprecedence
+parserpass_compprecedence
 parserpass_parensprecedence
