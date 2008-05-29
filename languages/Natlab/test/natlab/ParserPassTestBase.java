@@ -1,9 +1,6 @@
 package natlab;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
@@ -43,6 +40,7 @@ class ParserPassTestBase extends TestCase {
 
 		while(in.ready()) {
 			structureBuf.append(in.readLine());
+			structureBuf.append('\n');
 		}
 
 		in.close();
@@ -52,7 +50,70 @@ class ParserPassTestBase extends TestCase {
 
 	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Root actual, Structure expected) {
-		assertEquals("AST: ", expected.getStructureString(), actual.getStructureString());
+		try {
+			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString()));
+			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString()));
+			while(true) {
+				String expectedLine = expectedReader.readLine();
+				String actualLine = actualReader.readLine();
+
+				if(!equals(expectedLine, actualLine)) {
+					StringBuffer buf = new StringBuffer();
+					if(expectedLine == null) {
+						buf.append("Actual AST is larger than expected AST:\n");
+						buf.append(actualLine);
+						while(true) {
+							String line = actualReader.readLine();
+							if(line == null) {
+								fail(buf.toString());
+							}
+							buf.append(line);
+							buf.append('\n');
+						}
+					} else if(actualLine == null) {
+						buf.append("Expected AST is larger than actual AST:\n");
+						buf.append(expectedLine);
+						while(true) {
+							String line = expectedReader.readLine();
+							if(line == null) {
+								fail(buf.toString());
+							}
+							buf.append(line);
+							buf.append('\n');
+						}
+					} else {
+						buf.append("ASTs do not match:\n");
+						buf.append("Remaining expected:\n");
+						buf.append(expectedLine);
+						while(true) {
+							String line = expectedReader.readLine();
+							if(line == null) {
+								break;
+							}
+							buf.append(line);
+							buf.append('\n');
+						}
+						buf.append('\n');
+						buf.append("Remaining actual:\n");
+						buf.append(actualLine);
+						while(true) {
+							String line = actualReader.readLine();
+							if(line == null) {
+								break;
+							}
+							buf.append(line);
+							buf.append('\n');
+						}
+						fail(buf.toString());
+					}
+				} else if(actualLine == null) {
+					break;
+				}
+			}
+		} catch(IOException e) {
+			//this can't happen since we're reading strings
+			e.printStackTrace();
+		}
 
 		int actualStartPos = actual.getStart();
 		int actualStartLine = Symbol.getLine(actualStartPos);
@@ -65,6 +126,16 @@ class ParserPassTestBase extends TestCase {
 		int actualEndCol = Symbol.getColumn(actualEndPos);
 		assertEquals(expected.getEndLine(), actualEndLine);
 		assertEquals(expected.getEndCol(), actualEndCol);
+	}
+	
+	private static boolean equals(String str1, String str2) {
+		if(str1 == null) {
+			return str2 == null;
+		} else if(str2 == null) {
+			return str1 == null;
+		} else {
+			return str1.equals(str2);
+		}
 	}
 
 	/* struct for storing .out file contents. */
