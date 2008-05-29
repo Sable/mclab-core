@@ -1,5 +1,7 @@
 package natlab;
 
+import java.math.BigInteger;
+
 /**
  * An integer literal specified in base 10.
  */
@@ -9,6 +11,6 @@ public class DecIntNumericLiteralValue extends IntNumericLiteralValue {
 	}
 
 	public DecIntNumericLiteralValue(String text, boolean isImaginary) {
-		super(text, Integer.parseInt(stripImaginary(text, isImaginary)), isImaginary);
+		super(text, new BigInteger(stripImaginary(text, isImaginary)), isImaginary);
 	}
 }

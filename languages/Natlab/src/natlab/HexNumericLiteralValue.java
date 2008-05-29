@@ -1,5 +1,7 @@
 package natlab;
 
+import java.math.BigInteger;
+
 /**
  * An integer literal specified in base 16.
  */
@@ -12,10 +14,10 @@ public class HexNumericLiteralValue extends IntNumericLiteralValue {
 		super(text, parseHex(stripImaginary(text, isImaginary)), isImaginary);
 	}
 
-	private static Integer parseHex(String text) {
+	private static BigInteger parseHex(String text) {
 		if(!text.startsWith("0x")) {
 			throw new NumberFormatException("Hex literals must begin with '0x': " + text);
 		}
-		return Integer.parseInt(text.substring(2), 16);
+		return new BigInteger(text.substring(2), 16);
 	}
 }

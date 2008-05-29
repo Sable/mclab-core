@@ -1,10 +1,12 @@
 package natlab;
 
+import java.math.BigDecimal;
+
 /**
  * The value of a numeric literal that may be FP (includes e.g. 1.0).
  */
 public class FPNumericLiteralValue extends NumericLiteralValue {
-	private final Double value;
+	private final BigDecimal value;
 
 	public FPNumericLiteralValue(String text) {
 		this(text, false);
@@ -12,11 +14,11 @@ public class FPNumericLiteralValue extends NumericLiteralValue {
 
 	public FPNumericLiteralValue(String text, boolean isImaginary) {
 		super(text, isImaginary);
-		value = Double.parseDouble(stripImaginary(text, isImaginary));
+		value = new BigDecimal(stripImaginary(text, isImaginary));
 	}
 
 	@Override
-	public Double getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
 }
