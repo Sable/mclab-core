@@ -62,21 +62,25 @@ class ParserPassTestBase extends TestCase {
 					if(expectedLine == null) {
 						buf.append("Actual AST is larger than expected AST:\n");
 						buf.append(actualLine);
+						buf.append('\n');
 						appendRemainingToBuffer(actualReader, buf);
 						fail(buf.toString());
 					} else if(actualLine == null) {
 						buf.append("Expected AST is larger than actual AST:\n");
 						buf.append(expectedLine);
+						buf.append('\n');
 						appendRemainingToBuffer(expectedReader, buf);
 						fail(buf.toString());
 					} else {
 						buf.append("ASTs do not match:\n");
 						buf.append("Remaining expected:\n");
 						buf.append(expectedLine);
+						buf.append('\n');
 						appendRemainingToBuffer(expectedReader, buf);
 						buf.append('\n');
 						buf.append("Remaining actual:\n");
 						buf.append(actualLine);
+						buf.append('\n');
 						appendRemainingToBuffer(actualReader, buf);
 						fail(buf.toString());
 					}
