@@ -277,6 +277,7 @@ String=[']([^'\r\n] | [']['])*[']
     break { return symbol(BREAK); }
     case { return symbol(CASE); }
     catch { return symbol(CATCH); }
+    classdef { return symbol(CLASSDEF); }
     continue { return symbol(CONTINUE); }
     else { return symbol(ELSE); }
     elseif { return symbol(ELSEIF); }
@@ -286,6 +287,7 @@ String=[']([^'\r\n] | [']['])*[']
     global { return symbol(GLOBAL); }
     if { return symbol(IF); }
     otherwise { return symbol(OTHERWISE); }
+    parfor { return symbol(PARFOR); }
     persistent { return symbol(PERSISTENT); }
     return { return symbol(RETURN); }
     switch { return symbol(SWITCH); }
