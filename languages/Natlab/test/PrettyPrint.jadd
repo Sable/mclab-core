@@ -66,9 +66,12 @@ aspect PrettyPrint {
   public void ForStmt.toString(StringBuffer s) {
     s.append("FOR ");
     s.append("(");		// need adjust ...
- 	getAssignExpr().toString(s);
- 	s.append(");\n");
- 	getBlock().toString(s);
+    getAssignExpr().toString(s);
+    s.append(");\n");
+    for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
+      Stmt stmt = (Stmt)iter.next();
+      stmt.toString(s);
+    }
     s.append("END ");
   }
 

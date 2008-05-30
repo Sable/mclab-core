@@ -89,5 +89,5 @@ NEExpr : EqualityExpr ;
 //------- ------------------------------------------------------------
 // statement that can be reached by break or continue
 abstract BranchTargetStmt : Stmt;  
-ForStmt : BranchTargetStmt ::= AssignExpr Block:Root; 
+ForStmt : BranchTargetStmt ::= AssignExpr Stmt*; 
 

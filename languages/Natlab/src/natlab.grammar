@@ -72,7 +72,7 @@
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt = "Stmt";
 %typeof for_assign, assign = "AssignExpr";
-%typeof expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
+%typeof expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof lvalue = "Access";
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
@@ -101,7 +101,7 @@
 // Currently, a .m file is treated as a list of statements.
 program = 
      stmt_list.list {: return new Root(list); :}
-  |  OtherNonTerm {: return null; :} //TODO-AC: eventually remove this
+  |  OtherNonTerm {: return new Root(new List()); :} //TODO-AC: eventually remove this
   ;
 
 stmt_list =
@@ -113,7 +113,7 @@ stmt =
   ;
 
 stmt_body =
-     
+    		{: return new EmptyStmt(""); :} // Empty  
   |  HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  BRACKET_HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  expr.e {: return new ExprStmt(e); :}
@@ -155,12 +155,12 @@ access =
      name.n LPAREN RPAREN
      {:
          ParseName pn = (ParseName) n;
-         return new Access(pn.getID(), new List());
+         return new MethodAccess(pn.getID(), new List());
      :}
   |  name.n LPAREN arg_list.l RPAREN
      {:
          ParseName pn = (ParseName) n;
-         return new Access(pn.getID(), l);
+         return new MethodAccess(pn.getID(), l);
      :}
   ;
 
