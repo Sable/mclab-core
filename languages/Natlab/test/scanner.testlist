@@ -12,3 +12,4 @@ scanner_badbracketcomment
 scanner_statestack
 scanner_classdef
 scanner_looseendclassdef
+scanner_terminator

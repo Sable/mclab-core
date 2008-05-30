@@ -26,8 +26,7 @@ import beaver.Scanner;
     //if we return anything while in FIELD_NAME, then switch back to initial
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
-        int state = stateStack.pop();
-        yybegin(state);
+        restoreState();
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength());
   }
@@ -37,8 +36,7 @@ import beaver.Scanner;
     //if we return anything while in FIELD_NAME, then switch back to initial
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
-        int state = stateStack.pop();
-        yybegin(state);
+        restoreState();
     }
     return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
   }
@@ -116,9 +114,6 @@ import beaver.Scanner;
   //bracket comment string consumed so far
   private StringBuffer bracketCommentBuf = null;
   
-  //used to distinguish between bracket comments and bracket help comments
-  private boolean isBracketHelpCommentType = false;
-  
   //// Comment queue ///////////////////////////////////////////////////////////
   
   private final java.util.Queue<Symbol> commentQueue = new java.util.LinkedList<Symbol>();
@@ -147,6 +142,15 @@ import beaver.Scanner;
   //most of our states are used for bracketing
   //this gives us a way to nest bracketing states
   private java.util.Stack<Integer> stateStack = new java.util.Stack<Integer>();
+  
+  private void saveStateAndTransition(int newState) {
+      stateStack.push(yystate());
+      yybegin(newState);
+  }
+  
+  private void restoreState() {
+      yybegin(stateStack.pop());
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -169,9 +173,9 @@ ImaginaryIntNumber = {Digit}+{Imaginary}
 ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
 ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
 
-HelpComment=%% | %%[^{].*
+HelpComment=%% | %%[^{\r\n].*
 OpenBracketHelpComment = %%\{
-Comment=% | %[^%{].*
+Comment=% | %[^%{\r\n].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
 
@@ -187,7 +191,10 @@ String=[']([^'\r\n] | [']['])*[']
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
 %xstate COMMENT_NESTING
+%xstate HELP_COMMENT_NESTING
 %state CLASS
+%xstate COMMA_TERMINATOR
+%xstate SEMICOLON_TERMINATOR
 
 %%
 
@@ -209,35 +216,41 @@ String=[']([^'\r\n] | [']['])*[']
 {Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
 
 {OpenBracketHelpComment} { 
-    isBracketHelpCommentType = true;
-    stateStack.push(yystate());
-    yybegin(COMMENT_NESTING);
-    bracketCommentNestingDepth++;
-    bracketCommentBuf = new StringBuffer(yytext());
-}
-{OpenBracketComment} { 
-    isBracketHelpCommentType = false;
-    stateStack.push(yystate());
-    yybegin(COMMENT_NESTING);
+    saveStateAndTransition(HELP_COMMENT_NESTING);
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
 }
 
-<COMMENT_NESTING> {
+{OpenBracketComment} { 
+    saveStateAndTransition(COMMENT_NESTING);
+    bracketCommentNestingDepth++;
+    bracketCommentBuf = new StringBuffer(yytext());
+}
+
+<COMMENT_NESTING, HELP_COMMENT_NESTING> {
     [^%]+ { bracketCommentBuf.append(yytext()); }
     % { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
+}
+
+<COMMENT_NESTING> {
     {CloseBracketComment} { 
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
-            int state = stateStack.pop();
-            yybegin(state);
-            if(isBracketHelpCommentType) {
-                return symbol(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
-            } else {
-                commentQueue.add(symbol(BRACKET_COMMENT, bracketCommentBuf.toString()));
-            }
+            restoreState();
+            commentQueue.add(symbol(BRACKET_COMMENT, bracketCommentBuf.toString()));
+        }
+    }
+}
+
+<HELP_COMMENT_NESTING> {
+    {CloseBracketComment} { 
+        bracketCommentNestingDepth--;
+        bracketCommentBuf.append(yytext());
+        if(bracketCommentNestingDepth == 0) {
+            restoreState();
+            return symbol(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
         }
     }
 }
@@ -251,8 +264,30 @@ String=[']([^'\r\n] | [']['])*[']
 \{ { return symbol(LCURLY); }
 \} { return symbol(RCURLY); }
 
-, { return symbol(COMMA); }
-; { return symbol(SEMICOLON); }
+, { saveStateAndTransition(COMMA_TERMINATOR); }
+; { saveStateAndTransition(SEMICOLON_TERMINATOR); }
+
+<COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
+    {OtherWhiteSpace} { /* ignore */ }
+
+    {Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
+
+    {OpenBracketComment} { 
+        saveStateAndTransition(COMMENT_NESTING);
+        bracketCommentNestingDepth++;
+        bracketCommentBuf = new StringBuffer(yytext());
+    }
+}
+
+<COMMA_TERMINATOR> {
+    {LineTerminator} { restoreState(); return symbol(COMMA_LINE_TERMINATOR); }
+    .                { yypushback(1); restoreState(); return symbol(COMMA); }
+}
+
+<SEMICOLON_TERMINATOR> {
+    {LineTerminator} { restoreState(); return symbol(SEMICOLON_LINE_TERMINATOR); }
+    .                { yypushback(1); restoreState(); return symbol(SEMICOLON); }
+}
 
 : { return symbol(COLON); }
 @ { return symbol(AT); }
@@ -290,16 +325,14 @@ String=[']([^'\r\n] | [']['])*[']
 
 <YYINITIAL> {
     {OpenClassDef} {
-        stateStack.push(yystate());
-        yybegin(CLASS);
+        saveStateAndTransition(CLASS);
         return symbol(CLASSDEF);
     }
 }
 
 <CLASS> {
     {CloseClassDef} {
-        int state = stateStack.pop();
-        yybegin(state);
+        restoreState();
         return symbol(END); //NB: just return normal END token
     }
     
@@ -336,8 +369,7 @@ String=[']([^'\r\n] | [']['])*[']
     \. {
             //NB: have to change the state AFTER calling symbol
             Symbol result = symbol(DOT);
-            stateStack.push(yystate());
-            yybegin(FIELD_NAME);
+            saveStateAndTransition(FIELD_NAME);
             return result;
        }
 }
