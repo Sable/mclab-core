@@ -208,7 +208,7 @@ binary_expr =
 prefix_expr =
      pow_expr.e
   |  NOT prefix_expr.e {: return new LogNotExpr(e); :}
-  |  PLUS prefix_expr.e
+  |  PLUS prefix_expr.e {: return new PlusExpr(e); :}
   |  MINUS prefix_expr.e {: return new MinusExpr(e); :}
   ;
 
