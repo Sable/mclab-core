@@ -99,13 +99,13 @@
 
 // Currently, a .m file is treated as a list of statements.
 program = 
-     stmt_list.list {: return new Root(list); :}
+     stmt.stmts+ last_stmt.s {: return new Root(makeListNode(_list_stmts).add(s)); :}
+  |  last_stmt.s {: return new Root(new List<Stmt>().add(s)); :}
   |  OtherNonTerm {: return new Root(new List()); :} //TODO-AC: eventually remove this
   ;
 
 stmt_list =
-     stmt.stmts+ last_stmt.s {: return makeListNode(_list_stmts).add(s); :}
-  |  last_stmt.s {: return new List<Stmt>().add(s); :}
+     stmt.stmts+ {: return makeListNode(_list_stmts); :}
   ;
 
 last_stmt =
