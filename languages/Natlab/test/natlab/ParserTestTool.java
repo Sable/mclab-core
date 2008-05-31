@@ -32,7 +32,7 @@ public class ParserTestTool {
 				int endPos = actual.getEnd();
 				out.println(Root.getLine(startPos) + " " + Root.getColumn(startPos));
 				out.println(Root.getLine(endPos) + " " + Root.getColumn(endPos));
-				out.println(actual.getStructureString());
+				out.print(actual.getStructureString());
 			}
 			out.close();
 			in.close();
