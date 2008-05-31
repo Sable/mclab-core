@@ -69,7 +69,7 @@
 
 %typeof program = "Root";
 %typeof stmt_list = "List<Stmt>";
-%typeof stmt = "Stmt";
+%typeof stmt, stmt_body, last_stmt = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
 %typeof expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof lvalue = "Access";
@@ -104,7 +104,13 @@ program =
   ;
 
 stmt_list =
-     stmt.stmts+ {: return makeListNode(_list_stmts); :}
+     stmt.stmts+ last_stmt.s {: return makeListNode(_list_stmts).add(s); :}
+  |  last_stmt.s {: return new List<Stmt>().add(s); :}
+  ;
+
+last_stmt =
+     stmt_body.s
+  |  stmt
   ;
 
 stmt =

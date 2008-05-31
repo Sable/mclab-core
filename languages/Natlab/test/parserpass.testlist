@@ -6,3 +6,7 @@ parserpass_arithprecedence
 parserpass_logicalprecedence
 parserpass_compprecedence
 parserpass_parensprecedence
+parserpass_eof1
+parserpass_eof2
+parserpass_eof3
+parserpass_eof4
