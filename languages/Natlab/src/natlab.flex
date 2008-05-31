@@ -358,6 +358,11 @@ String=[']([^'\r\n] | [']['])*[']
         restoreState();
         return sym;
     }
+    <<EOF>> { 
+        Symbol sym = symbolFromMarkedStart(COMMA, 1);
+        restoreState();
+        return sym;
+    }
     . { 
         yypushback(1);
         Symbol sym = symbolFromMarkedStart(COMMA, 1);
@@ -370,6 +375,11 @@ String=[']([^'\r\n] | [']['])*[']
     {LineTerminator} { 
         markEndPosition();
         Symbol sym = symbolFromMarkedPositions(SEMICOLON_LINE_TERMINATOR);
+        restoreState();
+        return sym;
+    }
+    <<EOF>> { 
+        Symbol sym = symbolFromMarkedStart(SEMICOLON, 1);
         restoreState();
         return sym;
     }
