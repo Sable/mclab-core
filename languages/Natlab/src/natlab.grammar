@@ -128,13 +128,13 @@ stmt_body =
   | FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
   ;
 
-stmt_separator = //TODO-AC: other separators (esp EOF)
+stmt_separator =
      LINE_TERMINATOR
   |  SEMICOLON
   |  SEMICOLON_LINE_TERMINATOR
   |  COMMA
   |  COMMA_LINE_TERMINATOR
-//  |  EOF
+//  |  EOF //TODO-AC
   ;
 
 for_assign =
