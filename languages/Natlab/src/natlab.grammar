@@ -142,7 +142,6 @@ stmt_separator =
   |  SEMICOLON_LINE_TERMINATOR
   |  COMMA
   |  COMMA_LINE_TERMINATOR
-//  |  EOF //TODO-AC
   ;
 
 for_assign =
