@@ -54,6 +54,13 @@
     private static <T extends ASTNode<?>> natlab.ast.List<T> makeListNode(java.util.List<T> children) {
         return addAll(new natlab.ast.List<T>(), children);
     }
+
+    //need this because non-terminals must return symbols
+    private static class BooleanFakeSymbol extends Symbol {
+        private boolean value;
+        BooleanFakeSymbol(boolean value) { this.value = value; }
+        Stmt annotateStmt(Stmt stmt) { stmt.setOutputSuppressed(value); return stmt; }
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -80,6 +87,7 @@
 %typeof row = "MatrixRow";
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
+%typeof stmt_separator = "BooleanFakeSymbol";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -119,8 +127,8 @@ last_stmt =
   ;
 
 stmt =
-     stmt_body.s stmt_separator
-  |  stmt_separator {: return new EmptyStmt(""); :} //TODO-AC: do we really need this in the AST?
+     stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
+  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt("")); :} //TODO-AC: do we really need this in the AST?
   ;
 
 stmt_body =
@@ -140,11 +148,11 @@ stmt_body =
   ;
 
 stmt_separator =
-     LINE_TERMINATOR
-  |  SEMICOLON
-  |  SEMICOLON_LINE_TERMINATOR
-  |  COMMA
-  |  COMMA_LINE_TERMINATOR
+     LINE_TERMINATOR {: return new BooleanFakeSymbol(false); :}
+  |  SEMICOLON {: return new BooleanFakeSymbol(true); :}
+  |  SEMICOLON_LINE_TERMINATOR {: return new BooleanFakeSymbol(true); :}
+  |  COMMA {: return new BooleanFakeSymbol(false); :}
+  |  COMMA_LINE_TERMINATOR {: return new BooleanFakeSymbol(false); :}
   ;
 
 for_assign =
