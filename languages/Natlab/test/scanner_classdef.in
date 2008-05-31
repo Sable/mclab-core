@@ -5,7 +5,6 @@ catch
 continue
 else
 elseif
-end
 for
 function
 global
@@ -20,7 +19,23 @@ while
 properties
 methods
 events
-end end end end end end end end end
+end
+events
+end
+events
+end
+events
+end
+events
+end
+events
+end
+events
+end
+events
+end
+events
+end
 
 break
 case
