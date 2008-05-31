@@ -240,12 +240,14 @@ literal =
   ;
 
 matrix =
-     LSQUARE optional_row_list.l RSQUARE {: return new MatrixDecl(l); :} //TODO-AC: trailing semicolon
+     LSQUARE optional_row_list.l RSQUARE {: return new MatrixDecl(l); :}
   ;
 
 optional_row_list =
      {: return new List<MatrixRow>(); :}
+  |  row_separator {: return new List<MatrixRow>(); :}
   |  row_list.l {: return l; :}
+  |  row_list.l row_separator {: return l; :}
   ;
 
 row_list =
