@@ -99,6 +99,7 @@
 
 // Currently, a .m file is treated as a list of statements.
 program = 
+     //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
      stmt.stmts+ last_stmt.s {: return new Root(makeListNode(_list_stmts).add(s)); :}
   |  last_stmt.s {: return new Root(new List<Stmt>().add(s)); :}
   |  {: return new Root(new List<Stmt>()); :}
