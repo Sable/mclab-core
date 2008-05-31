@@ -101,11 +101,13 @@
 program = 
      stmt.stmts+ last_stmt.s {: return new Root(makeListNode(_list_stmts).add(s)); :}
   |  last_stmt.s {: return new Root(new List<Stmt>().add(s)); :}
+  |  {: return new Root(new List<Stmt>()); :}
   |  OtherNonTerm {: return new Root(new List()); :} //TODO-AC: eventually remove this
   ;
 
 stmt_list =
      stmt.stmts+ {: return makeListNode(_list_stmts); :}
+  |  {: return new List<Stmt>(); :}
   ;
 
 last_stmt =
