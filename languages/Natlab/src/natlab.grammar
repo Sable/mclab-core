@@ -128,7 +128,7 @@ last_stmt =
 
 stmt =
      stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
-  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt("")); :} //TODO-AC: do we really need this in the AST?
+  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST?
   ;
 
 stmt_body =
@@ -274,7 +274,7 @@ row_list =
   ;
 
 row =
-     arg_list.l {: return new MatrixRow(l); :}
+     arg_list.l COMMA? {: return new MatrixRow(l); :}
   ;
 
 row_separator =
@@ -290,7 +290,7 @@ arg_list =
 
 arg =
      expr.e
-  |  COLON.c {: return new Colon(":"); :}
+  |  COLON.c {: return new Colon(); :}
   ;
 
 OtherNonTerm =

@@ -2,9 +2,9 @@
 
 Root:Program;
 Program:List ::= Stmt*;
-abstract Node;
-Stmt:Node;
-EmptyStmt:Stmt ::= <str:String>;
+
+abstract Stmt; 
+EmptyStmt:Stmt;
 CommentStmt:EmptyStmt ::= <str:String>;
 ExprStmt:Stmt ::= Expr;
 AssignStmt:Stmt ::= Dest:Expr Source:Expr;
@@ -12,7 +12,7 @@ AssignStmt:Stmt ::= Dest:Expr Source:Expr;
 abstract Expr;
 
 ColonExpr:Expr ::= Base:Expr [Incr:Expr] Limit:Expr;
-Colon:Expr ::= <ID:String>;
+Colon:Expr;
 
 abstract Access:Expr;
 

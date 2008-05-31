@@ -13,7 +13,7 @@ aspect StructureString {
     }
     
     //stmts
-    eq EmptyStmt.getStructureString() = getstr() + (isOutputSuppressed() ? ";" : "");
+    eq EmptyStmt.getStructureString() =  (isOutputSuppressed() ? ";" : "");
     eq CommentStmt.getStructureString() = getstr() + (isOutputSuppressed() ? ";" : "");
     eq ExprStmt.getStructureString() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
     eq AssignStmt.getStructureString() = getDest().getStructureString() + " = " + getSource().getStructureString() + (isOutputSuppressed() ? ";" : "");
