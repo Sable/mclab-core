@@ -18,7 +18,7 @@ import beaver.Symbol;
  * Provides helper methods to keep NatlabScannerTests short.
  */
 class ScannerTestBase extends TestCase {
-	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s=(.*))?$");
+	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s(\\d+))?\\s*(?:\\s=(.*))?$");
 
 	/* Compare the output of the scanner with a list of expected symbols and an optional exception. */
 	static void checkScan(NatlabScanner scanner, List<Symbol> symbols, List<Symbol> comments, Scanner.Exception exception) 
@@ -131,9 +131,17 @@ class ScannerTestBase extends TestCase {
 		short id = NatlabParser.Terminals.class.getField(idString).getShort(null); //null since the field is static
 		int lineNum = Integer.parseInt(matcher.group(2));
 		int colNum = Integer.parseInt(matcher.group(3));
-		int length = Integer.parseInt(matcher.group(4));
-		String value = matcher.group(5);
-		return new Symbol(id, lineNum, colNum, length, value);
+		String value = matcher.group(6);
+		if(matcher.group(5) == null) {
+			int length = Integer.parseInt(matcher.group(4));
+			return new Symbol(id, lineNum, colNum, length, value);
+		} else {
+			int endLine = Integer.parseInt(matcher.group(4));
+			int endCol = Integer.parseInt(matcher.group(5));
+			int startPos = Symbol.makePosition(lineNum, colNum);
+			int endPos = Symbol.makePosition(endLine, endCol);
+			return new Symbol(id, startPos, endPos, value);
+		}
 	}
 
 	/* Checks deep equality of two Symbols (complexity comes from giving nice error messages). */

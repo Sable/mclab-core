@@ -21,24 +21,67 @@ import beaver.Scanner;
 %{
   //// Returning symbols ///////////////////////////////////////////////////////
 
-  //wrap a type (e.g. IDENTIFIER) in a symbol object with appropriate position info
+  //wrap a type (e.g. COLON) in a symbol object with appropriate position info
   private Symbol symbol(short type) {
-    //if we return anything while in FIELD_NAME, then switch back to initial
-    //i.e. only the first token after the dot is parsed specially
-    if(yystate() == FIELD_NAME) {
-        restoreState();
-    }
-    return new Symbol(type, yyline + 1, yycolumn + 1, yylength());
+    return symbol(type, null);
   }
   
   //wrap a type (e.g. IDENTIFIER) and value (e.g. "x") in a symbol object with appropriate position info
   private Symbol symbol(short type, Object value) {
+    int startLine = yyline + 1;
+    int startCol = yycolumn + 1;
+    int endLine = startLine;
+    int endCol = startCol + yylength() - 1;
+    return symbol(type, value, startLine, startCol, endLine, endCol);
+  }
+  
+  //wrap a type (e.g. IDENTIFIER) and value (e.g. "x") in a symbol object with explicit position info
+  private Symbol symbol(short type, Object value, int startLine, int startCol, int endLine, int endCol) {
     //if we return anything while in FIELD_NAME, then switch back to initial
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
         restoreState();
     }
-    return new Symbol(type, yyline + 1, yycolumn + 1, yylength(), value);
+    int startPos = Symbol.makePosition(startLine, startCol);
+    int endPos = Symbol.makePosition(endLine, endCol);
+    return new Symbol(type, startPos, endPos, value);
+  }
+  
+  //// Position ////////////////////////////////////////////////////////////////
+  
+  private static class PositionRecord {
+      int startLine = -1;
+      int startCol = -1;
+      int endLine = -1;
+      int endCol = -1;
+  }
+  
+  private PositionRecord pos = new PositionRecord();
+  
+  private void markStartPosition() {
+    pos.startLine = yyline + 1;
+    pos.startCol = yycolumn + 1;
+  }
+  
+  private void markEndPosition() {
+    pos.endLine = yyline + 1;
+    pos.endCol = (yycolumn + 1) + yylength() - 1;
+  }
+  
+  private Symbol symbolFromMarkedPositions(short type) {
+    return symbolFromMarkedPositions(type, null);
+  }
+  
+  private Symbol symbolFromMarkedPositions(short type, Object value) {
+    return symbol(type, value, pos.startLine, pos.startCol, pos.endLine, pos.endCol);
+  }
+  
+  private Symbol symbolFromMarkedStart(short type, int length) {
+    return symbolFromMarkedStart(type, null, length);
+  }
+  
+  private Symbol symbolFromMarkedStart(short type, Object value, int length) {
+    return symbol(type, value, pos.startLine, pos.startCol, pos.startLine, pos.startCol + length - 1);
   }
   
   //// Errors //////////////////////////////////////////////////////////////////
@@ -139,17 +182,30 @@ import beaver.Scanner;
   
   //// State transitions ///////////////////////////////////////////////////////
   
+  private static class StateRecord {
+    int stateNum;
+    PositionRecord pos;
+    
+    StateRecord(int stateNum, PositionRecord pos) {
+        this.stateNum = stateNum;
+        this.pos = pos;
+    }
+  }
+  
   //most of our states are used for bracketing
   //this gives us a way to nest bracketing states
-  private java.util.Stack<Integer> stateStack = new java.util.Stack<Integer>();
+  private java.util.Stack<StateRecord> stateStack = new java.util.Stack<StateRecord>();
   
   private void saveStateAndTransition(int newState) {
-      stateStack.push(yystate());
-      yybegin(newState);
+    stateStack.push(new StateRecord(yystate(), pos));
+    pos = new PositionRecord();
+    yybegin(newState);
   }
   
   private void restoreState() {
-      yybegin(stateStack.pop());
+    StateRecord rec = stateStack.pop();
+    yybegin(rec.stateNum);
+    pos = rec.pos;
   }
 %}
 
@@ -215,14 +271,16 @@ String=[']([^'\r\n] | [']['])*[']
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
 
-{OpenBracketHelpComment} { 
+{OpenBracketHelpComment} {
     saveStateAndTransition(HELP_COMMENT_NESTING);
+    markStartPosition();
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
 }
 
-{OpenBracketComment} { 
+{OpenBracketComment} {
     saveStateAndTransition(COMMENT_NESTING);
+    markStartPosition();
     bracketCommentNestingDepth++;
     bracketCommentBuf = new StringBuffer(yytext());
 }
@@ -238,8 +296,10 @@ String=[']([^'\r\n] | [']['])*[']
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
+            markEndPosition();
+            Symbol sym = symbolFromMarkedPositions(BRACKET_COMMENT, bracketCommentBuf.toString());
             restoreState();
-            commentQueue.add(symbol(BRACKET_COMMENT, bracketCommentBuf.toString()));
+            commentQueue.add(sym);
         }
     }
 }
@@ -249,8 +309,10 @@ String=[']([^'\r\n] | [']['])*[']
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
         if(bracketCommentNestingDepth == 0) {
+            markEndPosition();
+            Symbol sym = symbolFromMarkedPositions(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
             restoreState();
-            return symbol(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
+            return sym;
         }
     }
 }
@@ -264,29 +326,50 @@ String=[']([^'\r\n] | [']['])*[']
 \{ { return symbol(LCURLY); }
 \} { return symbol(RCURLY); }
 
-, { saveStateAndTransition(COMMA_TERMINATOR); }
-; { saveStateAndTransition(SEMICOLON_TERMINATOR); }
+, { saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
+; { saveStateAndTransition(SEMICOLON_TERMINATOR); markStartPosition(); }
 
 <COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
     {OtherWhiteSpace} { /* ignore */ }
 
     {Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
 
-    {OpenBracketComment} { 
+    {OpenBracketComment} {
         saveStateAndTransition(COMMENT_NESTING);
+        markStartPosition();
         bracketCommentNestingDepth++;
         bracketCommentBuf = new StringBuffer(yytext());
     }
 }
 
 <COMMA_TERMINATOR> {
-    {LineTerminator} { restoreState(); return symbol(COMMA_LINE_TERMINATOR); }
-    .                { yypushback(1); restoreState(); return symbol(COMMA); }
+    {LineTerminator} { 
+        markEndPosition();
+        Symbol sym = symbolFromMarkedPositions(COMMA_LINE_TERMINATOR);
+        restoreState();
+        return sym;
+    }
+    . { 
+        yypushback(1);
+        Symbol sym = symbolFromMarkedStart(COMMA, 1);
+        restoreState();
+        return sym;
+    }
 }
 
 <SEMICOLON_TERMINATOR> {
-    {LineTerminator} { restoreState(); return symbol(SEMICOLON_LINE_TERMINATOR); }
-    .                { yypushback(1); restoreState(); return symbol(SEMICOLON); }
+    {LineTerminator} { 
+        markEndPosition();
+        Symbol sym = symbolFromMarkedPositions(SEMICOLON_LINE_TERMINATOR);
+        restoreState();
+        return sym;
+    }
+    . { 
+        yypushback(1);
+        Symbol sym = symbolFromMarkedStart(SEMICOLON, 1);
+        restoreState();
+        return sym;
+    }
 }
 
 : { return symbol(COLON); }

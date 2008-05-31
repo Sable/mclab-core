@@ -57,11 +57,24 @@ public class ScannerTestTool {
 		int start = symbol.getStart();
 		int startLine = Symbol.getLine(start);
 		int startCol = Symbol.getColumn(start);
-		out.print(startLine);
-		out.print(' ');
-		out.print(startCol);
-		out.print(' ');
-		out.print(symbol.getEnd() - start + 1);
+		int end = symbol.getEnd();
+		int endLine = Symbol.getLine(end);
+		int endCol = Symbol.getColumn(end);
+		if(startLine == endLine) {
+			out.print(startLine);
+			out.print(' ');
+			out.print(startCol);
+			out.print(' ');
+			out.print(endCol - startCol + 1);
+		} else {
+			out.print(startLine);
+			out.print(' ');
+			out.print(startCol);
+			out.print(' ');
+			out.print(endLine);
+			out.print(' ');
+			out.print(endCol);
+		}
 		if(symbol.value != null) {
 			out.print(' ');
 			out.print('=');
