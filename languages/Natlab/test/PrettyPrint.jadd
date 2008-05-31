@@ -8,9 +8,9 @@ import java.util.*;
 
 aspect PrettyPrint {
 	
-  // For getStructureString()
+  // For getStringRepresentation()
   
-  public String ASTNode.getStructureString() {
+  public String ASTNode.getStringRepresentation() {
     StringBuffer s = new StringBuffer();
     s.append(dumpStringOnly() + "");
     return s.toString();
