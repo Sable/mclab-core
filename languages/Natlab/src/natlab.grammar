@@ -259,7 +259,8 @@ row =
 
 row_separator =
      LINE_TERMINATOR
-  |  SEMICOLON LINE_TERMINATOR?
+  |  SEMICOLON
+  |  SEMICOLON_LINE_TERMINATOR
   ;
 
 arg_list =
