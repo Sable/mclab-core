@@ -207,6 +207,19 @@ import beaver.Scanner;
     yybegin(rec.stateNum);
     pos = rec.pos;
   }
+  
+  //// End-bracketing //////////////////////////////////////////////////////////
+  
+  //Number of end keywords expected before we leave the CLASS state
+  //NB: NOT USED TO VERIFY STRUCTURE (that happens in the parser)
+  int numEndsExpected = 0;
+  
+  //Increment the number of 'end's expected if we are int the CLASS state
+  void maybeIncrNumEndsExpected() {
+    if(yystate() == CLASS) {
+        numEndsExpected++;
+    }
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -234,10 +247,6 @@ OpenBracketHelpComment = %%\{
 Comment=% | %[^%{\r\n].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
-
-OpenClassDef = classdef
-//NB: not a valid identifier
-CloseClassDef = end-classdef
 
 ShellCommand=[!].*
 
@@ -407,43 +416,61 @@ String=[']([^'\r\n] | [']['])*[']
 "=" { return symbol(ASSIGN); }
 
 <YYINITIAL> {
-    {OpenClassDef} {
+    classdef {
+        numEndsExpected++; 
         saveStateAndTransition(CLASS);
         return symbol(CLASSDEF);
     }
+    
+    case { return symbol(CASE); }
+    for { return symbol(FOR); }
+    function { return symbol(FUNCTION); }
+    if { return symbol(IF); }
+    parfor { return symbol(PARFOR); }
+    switch { return symbol(SWITCH); }
+    try { return symbol(TRY); }
+    while { return symbol(WHILE); }
+    
+    end { return symbol(END); }
 }
 
 <CLASS> {
-    {CloseClassDef} {
-        restoreState();
-        return symbol(END); //NB: just return normal END token
-    }
+    classdef { numEndsExpected++; return symbol(CLASSDEF); }
+    
+    case { numEndsExpected++; return symbol(CASE); }
+    for { numEndsExpected++; return symbol(FOR); }
+    function { numEndsExpected++; return symbol(FUNCTION); }
+    if { numEndsExpected++; return symbol(IF); }
+    parfor { numEndsExpected++; return symbol(PARFOR); }
+    switch { numEndsExpected++; return symbol(SWITCH); }
+    try { numEndsExpected++; return symbol(TRY); }
+    while { numEndsExpected++; return symbol(WHILE); }
     
     properties { return symbol(PROPERTIES); }
     methods { return symbol(METHODS); }
     events { return symbol(EVENTS); }
+    
+    end {
+        numEndsExpected--;
+        if(numEndsExpected == 0) {
+            restoreState();
+        }
+        return symbol(END); //NB: just return normal END token
+    }
 }
 
 <YYINITIAL, CLASS> {
     //from matlab "iskeyword" function
     break { return symbol(BREAK); }
-    case { return symbol(CASE); }
     catch { return symbol(CATCH); }
     continue { return symbol(CONTINUE); }
     else { return symbol(ELSE); }
     elseif { return symbol(ELSEIF); }
     end { return symbol(END); }
-    for { return symbol(FOR); }
-    function { return symbol(FUNCTION); }
     global { return symbol(GLOBAL); }
-    if { return symbol(IF); }
     otherwise { return symbol(OTHERWISE); }
-    parfor { return symbol(PARFOR); }
     persistent { return symbol(PERSISTENT); }
     return { return symbol(RETURN); }
-    switch { return symbol(SWITCH); }
-    try { return symbol(TRY); }
-    while { return symbol(WHILE); }
     
     //NB: lower precedence than keywords
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
@@ -464,8 +491,6 @@ String=[']([^'\r\n] | [']['])*[']
     \. { return symbol(DOT); }
 }
 
-{CloseClassDef} { error(yytext() + " must be paired with a classdef keyword."); }
-
 /* error fallback */
 .|\n { error("Illegal character '" + yytext() + "'"); }
 
@@ -474,5 +499,9 @@ String=[']([^'\r\n] | [']['])*[']
             if(bracketCommentNestingDepth != 0) {
                 error(bracketCommentNestingDepth + " levels of comments not closed");
             }
+            //don't need to check that we're in the initial state, because the
+            //  xstates don't accept EOF and the non-xstates are acceptable when ending
+            //don't need to check numEndsExpected since that's only used for changing
+            //  states - the parser actually checks the bracketing
             return symbol(EOF);
         }

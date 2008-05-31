@@ -4,7 +4,7 @@ methods
 methods
 x.for
 methods
-end-classdef
+end
 methods
 %{%}
 methods
