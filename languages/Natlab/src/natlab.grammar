@@ -70,7 +70,7 @@
 %typeof program = "Root";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt = "Stmt";
-%typeof for_assign, assign = "AssignExpr";
+%typeof for_assign, assign = "AssignStmt";
 %typeof expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof lvalue = "Access";
 %typeof arg_list = "List<Expr>";
@@ -116,7 +116,7 @@ stmt_body =
      HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  BRACKET_HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  expr.e {: return new ExprStmt(e); :}
-  |  assign.a {: return new ExprStmt(a); :} //TODO-AC: not an expr
+  |  assign.a
 //  |  if_then_statement
 //  |  if_then_else_statement
 //  |  while_statement
@@ -143,7 +143,7 @@ for_assign =
   ;
 
 assign =
-     lvalue.lhs ASSIGN expr.rhs {: return new AssignSimpleExpr(lhs, rhs); :}
+     lvalue.lhs ASSIGN expr.rhs {: return new AssignStmt(lhs, rhs); :}
   ;
 
 lvalue =

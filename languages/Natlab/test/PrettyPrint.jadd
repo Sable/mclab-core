@@ -66,7 +66,7 @@ aspect PrettyPrint {
   public void ForStmt.toString(StringBuffer s) {
     s.append("FOR ");
     s.append("(");		// need adjust ...
-    getAssignExpr().toString(s);
+    getAssignStmt().toString(s);
     s.append(");\n");
     for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
       Stmt stmt = (Stmt)iter.next();
@@ -77,14 +77,14 @@ aspect PrettyPrint {
 
   // Assign Expression
 
-  public void AssignExpr.toString(StringBuffer s) {
+  public void AssignStmt.toString(StringBuffer s) {
     getDest().toString(s);
     s.append(printOp());
     getSource().toString(s);
+    s.append(";\n");
   }
 
-  syn String AssignExpr.printOp() = " = ";
-  eq AssignSimpleExpr.printOp() = " = ";
+  syn String AssignStmt.printOp() = " = ";
   
   // Colon Expression
   

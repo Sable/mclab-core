@@ -7,6 +7,7 @@ Stmt:Node;
 EmptyStmt:Stmt ::= <str:String>;
 CommentStmt:EmptyStmt ::= <str:String>;
 ExprStmt:Stmt ::= Expr;
+AssignStmt:Stmt ::= Dest:Expr Source:Expr;
 
 abstract Expr;
 
@@ -14,10 +15,6 @@ ColonExpr:Expr ::= Base:Expr [Incr:Expr] Limit:Expr;
 Colon:Expr ::= <ID:String>;
 
 abstract Access:Expr;
-
-AssignExpr : Expr ::= Dest:Expr Source:Expr;
-
-AssignSimpleExpr : AssignExpr ;
 
 // LHS of assignments
 IdUse:Access ::= <ID:String>;
@@ -89,5 +86,5 @@ NEExpr : EqualityExpr ;
 //------- ------------------------------------------------------------
 // statement that can be reached by break or continue
 abstract BranchTargetStmt : Stmt;  
-ForStmt : BranchTargetStmt ::= AssignExpr Stmt*; 
+ForStmt : BranchTargetStmt ::= AssignStmt Stmt*; 
 
