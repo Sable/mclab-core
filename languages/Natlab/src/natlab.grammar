@@ -109,11 +109,11 @@ stmt_list =
 
 stmt =
      stmt_body.s stmt_separator
+  |  stmt_separator {: return new EmptyStmt(""); :} //TODO-AC: do we really need this in the AST?
   ;
 
 stmt_body =
-    		{: return new EmptyStmt(""); :} // Empty  
-  |  HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
+     HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  BRACKET_HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
   |  expr.e {: return new ExprStmt(e); :}
   |  assign.a {: return new ExprStmt(a); :} //TODO-AC: not an expr
@@ -130,9 +130,10 @@ stmt_body =
 
 stmt_separator = //TODO-AC: other separators (esp EOF)
      LINE_TERMINATOR
-  |  SEMICOLON LINE_TERMINATOR
-//  |  SEMICOLON LINE_TERMINATOR?
-//  |  COMMA LINE_TERMINATOR?
+  |  SEMICOLON
+  |  SEMICOLON_LINE_TERMINATOR
+  |  COMMA
+  |  COMMA_LINE_TERMINATOR
 //  |  EOF
   ;
 
@@ -302,6 +303,4 @@ OtherNonTerm =
   | COMMENT
   | BRACKET_COMMENT
   | AT
-  | COMMA_LINE_TERMINATOR
-  | SEMICOLON_LINE_TERMINATOR
   ;
