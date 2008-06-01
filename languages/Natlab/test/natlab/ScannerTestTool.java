@@ -31,6 +31,11 @@ public class ScannerTestTool {
 						printSymbol(out, comment);
 					}
 				} catch (Scanner.Exception e) {
+					for(Symbol comment : scanner.getCommentBuffer().pollAllComments()) {
+						out.print('#');
+						out.print(' ');
+						printSymbol(out, comment);
+					}
 					out.print('~');
 					out.print(' ');
 					out.print(e.line);
