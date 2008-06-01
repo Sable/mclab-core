@@ -213,8 +213,8 @@ LineTerminator = \r|\n|\r\n
 OtherWhiteSpace = [ \t\f]
 
 Ellipsis = \.\.\.
-//NB: require preceding whitespace to prevent '....' case.
-EscapedLineTerminator = {OtherWhiteSpace}+{Ellipsis}.*{LineTerminator}
+//NB: acceptable to conflict with ... - matlab just treats .... as a comment containing .
+EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 
 Letter = [a-zA-Z]
 Digit = [0-9]
