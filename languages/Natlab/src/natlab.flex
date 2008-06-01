@@ -159,25 +159,14 @@ import beaver.Scanner;
   
   //// Comment queue ///////////////////////////////////////////////////////////
   
-  private final java.util.Queue<Symbol> commentQueue = new java.util.LinkedList<Symbol>();
+  private CommentBuffer commentBuffer = null;
   
-  public Symbol peekComment() {
-      return commentQueue.peek();
+  public void setCommentBuffer(CommentBuffer commentBuffer) {
+      this.commentBuffer = commentBuffer;
   }
   
-  public Symbol pollComment() {
-      return commentQueue.poll();
-  }
-  
-  public java.util.List<Symbol> pollAllComments() {
-      java.util.List<Symbol> allComments = new java.util.ArrayList<Symbol>();
-      allComments.addAll(commentQueue);
-      commentQueue.clear();
-      return allComments;
-  }
-  
-  public boolean hasComment() {
-      return !commentQueue.isEmpty();
+  public CommentBuffer getCommentBuffer() {
+      return commentBuffer;
   }
   
   //// State transitions ///////////////////////////////////////////////////////
@@ -263,7 +252,7 @@ String=[']([^'\r\n] | [']['])*[']
 
 %%
 
-{EscapedLineTerminator} { commentQueue.add(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
+{EscapedLineTerminator} { commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { /* ignore */ }
@@ -278,7 +267,7 @@ String=[']([^'\r\n] | [']['])*[']
 {String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
+{Comment} { commentBuffer.pushComment(symbol(COMMENT, yytext())); }
 
 {OpenBracketHelpComment} {
     saveStateAndTransition(HELP_COMMENT_NESTING);
@@ -308,7 +297,7 @@ String=[']([^'\r\n] | [']['])*[']
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(BRACKET_COMMENT, bracketCommentBuf.toString());
             restoreState();
-            commentQueue.add(sym);
+            commentBuffer.pushComment(sym);
         }
     }
 }
@@ -341,7 +330,7 @@ String=[']([^'\r\n] | [']['])*[']
 <COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
     {OtherWhiteSpace} { /* ignore */ }
 
-    {Comment} { commentQueue.add(symbol(COMMENT, yytext())); }
+    {Comment} { commentBuffer.pushComment(symbol(COMMENT, yytext())); }
 
     {OpenBracketComment} {
         saveStateAndTransition(COMMENT_NESTING);

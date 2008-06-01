@@ -45,7 +45,7 @@ class ScannerTestBase extends TestCase {
 		} catch(Scanner.Exception e) {
 			assertEquals(e.getMessage(), e, exception);
 		}
-		List<Symbol> actualComments = scanner.pollAllComments();
+		List<Symbol> actualComments = scanner.getCommentBuffer().pollAllComments();
 		assertEquals("Number of comments: ", comments.size(), actualComments.size());
 		for(int commentNum = 0; commentNum < comments.size(); commentNum++) {
 			assertEquals("Comment #" + commentNum + ": ", actualComments.get(commentNum), comments.get(commentNum));

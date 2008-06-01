@@ -32,6 +32,7 @@ public class ScannerTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
 		testFileWriter.println("		NatlabScanner scanner = getScanner(\"" + inFileName + "\");");
+		testFileWriter.println("		scanner.setCommentBuffer(new CommentBuffer());");
 		testFileWriter.println("		List<Symbol> symbols = new ArrayList<Symbol>();");
 		testFileWriter.println("		List<Symbol> comments = new ArrayList<Symbol>();");
 		testFileWriter.println("		Scanner.Exception exception = parseSymbols(\"" + outFileName + "\", symbols, comments);");

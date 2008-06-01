@@ -19,12 +19,13 @@ public class ScannerTestTool {
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
 			NatlabScanner scanner = new NatlabScanner(in);
+			scanner.setCommentBuffer(new CommentBuffer());
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			while(true) {
 				Symbol curr = null;
 				try {
 					curr = scanner.nextToken();
-					for(Symbol comment : scanner.pollAllComments()) {
+					for(Symbol comment : scanner.getCommentBuffer().pollAllComments()) {
 						out.print('#');
 						out.print(' ');
 						printSymbol(out, comment);
