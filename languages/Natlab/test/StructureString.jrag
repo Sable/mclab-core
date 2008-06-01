@@ -1,12 +1,22 @@
 aspect StructureString {
+    syn String ASTNode.getStructureString() {
+        StringBuffer buf = new StringBuffer();
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(comment.value);
+            buf.append('\n');
+        }
+        buf.append(getStructureStringLessComments());
+        return buf.toString();
+    }
+
     //default - exception
-    syn String ASTNode.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
+    syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
     
     //program
-    eq Program.getStructureString() {
+    eq Program.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureString());
+            buf.append(comment.getStructureStringLessComments());
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
@@ -18,22 +28,22 @@ aspect StructureString {
     
     //help comments
     
-    eq HelpComment.getStructureString() = getText();
+    eq HelpComment.getStructureStringLessComments() = getText();
     
     //stmts
-    eq EmptyStmt.getStructureString() =  (isOutputSuppressed() ? ";" : "");
-    eq ExprStmt.getStructureString() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
-    eq AssignStmt.getStructureString() = getDest().getStructureString() + " = " + getSource().getStructureString() + (isOutputSuppressed() ? ";" : "");
+    eq EmptyStmt.getStructureStringLessComments() =  (isOutputSuppressed() ? ";" : "");
+    eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getStructureStringLessComments() = getDest().getStructureStringLessComments() + " = " + getSource().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
     
     //TODO-AC: indentation for nested loops
-    eq ForStmt.getStructureString() {
+    eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("for ");
-        buf.append(getAssignStmt().getStructureString());
+        buf.append(getAssignStmt().getStructureStringLessComments());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureStringLessComments());
             buf.append('\n');
         }
         buf.append("end");
@@ -41,25 +51,25 @@ aspect StructureString {
     }
     
     //exprs
-    eq ColonExpr.getStructureString() {
+    eq ColonExpr.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
-        buf.append(getBase().getStructureString());
+        buf.append(getBase().getStructureStringLessComments());
         buf.append(" : ");
         if(hasIncr()) {
-            buf.append(getIncr().getStructureString());
+            buf.append(getIncr().getStructureStringLessComments());
             buf.append(" : ");
         }
-        buf.append(getLimit().getStructureString());
+        buf.append(getLimit().getStructureStringLessComments());
         buf.append(')');
         return buf.toString();
     }
-    eq Colon.getStructureString() = ":";
+    eq Colon.getStructureStringLessComments() = ":";
     
     //accesses
-    eq IdUse.getStructureString() = getID();
-    eq ParseName.getStructureString() = getID();
-    eq MethodAccess.getStructureString() {
+    eq IdUse.getStructureStringLessComments() = getID();
+    eq ParseName.getStructureStringLessComments() = getID();
+    eq MethodAccess.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
         buf.append(getID());
@@ -68,13 +78,13 @@ aspect StructureString {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(arg.getStructureStringLessComments());
             first = false;
         }
         buf.append(')');
         return buf.toString();
     }
-    eq MatrixAccess.getStructureString() {
+    eq MatrixAccess.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
         buf.append(getID());
@@ -83,14 +93,14 @@ aspect StructureString {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(arg.getStructureStringLessComments());
             first = false;
         }
         buf.append(')');
         return buf.toString();
     }
     
-    eq MatrixDecl.getStructureString() {
+    eq MatrixDecl.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('[');
         boolean first = true;
@@ -98,57 +108,57 @@ aspect StructureString {
             if(!first) {
                 buf.append("; ");
             }
-            buf.append(row.getStructureString());
+            buf.append(row.getStructureStringLessComments());
             first = false;
         }
         buf.append(']');
         return buf.toString();
     }
-    eq MatrixRow.getStructureString() {
+    eq MatrixRow.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         boolean first = true;
         for(Expr arg : getArgs()) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(arg.getStructureStringLessComments());
             first = false;
         }
         return buf.toString();
     }
     
     //literals
-    eq IntegerLiteral.getStructureString() = getValue().getText();
-    eq DoubleLiteral.getStructureString() = getValue().getText();
-    eq StringLiteral.getStructureString() = "'" + getValue() + "'";
+    eq IntegerLiteral.getStructureStringLessComments() = getValue().getText();
+    eq DoubleLiteral.getStructureStringLessComments() = getValue().getText();
+    eq StringLiteral.getStructureStringLessComments() = "'" + getValue() + "'";
     
-    eq MinusExpr.getStructureString() = "(-" + getOperand().getStructureString() + ")";
-    eq PlusExpr.getStructureString() = "(+" + getOperand().getStructureString() + ")";
-    eq LogNotExpr.getStructureString() = "(~" + getOperand().getStructureString() + ")";
-    eq TransposeExpr.getStructureString() = "(" + getOperand().getStructureString() + "')";
-    eq ArrayTransposeExpr.getStructureString() = "(" + getOperand().getStructureString() + ".')";
+    eq MinusExpr.getStructureStringLessComments() = "(-" + getOperand().getStructureStringLessComments() + ")";
+    eq PlusExpr.getStructureStringLessComments() = "(+" + getOperand().getStructureStringLessComments() + ")";
+    eq LogNotExpr.getStructureStringLessComments() = "(~" + getOperand().getStructureStringLessComments() + ")";
+    eq TransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureStringLessComments() + "')";
+    eq ArrayTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureStringLessComments() + ".')";
     
-    syn String Binary.getStructureString(String op) = "(" + getLeftOperand().getStructureString() + " " + op + " " + getRightOperand().getStructureString() + ")";
+    syn String Binary.getStructureStringLessComments(String op) = "(" + getLeftOperand().getStructureStringLessComments() + " " + op + " " + getRightOperand().getStructureStringLessComments() + ")";
     
-    eq MulExpr.getStructureString() = getStructureString("*");
-    eq DivExpr.getStructureString() = getStructureString("/");
-    eq LeftDivExpr.getStructureString() = getStructureString("\\");
-    eq PowExpr.getStructureString() = getStructureString("^");
-    eq AddExpr.getStructureString() = getStructureString("+");
-    eq SubExpr.getStructureString() = getStructureString("-");
-    eq EMulExpr.getStructureString() = getStructureString(".*");
-    eq EDivExpr.getStructureString() = getStructureString("./");
-    eq ELeftDivExpr.getStructureString() = getStructureString(".\\");
-    eq EPowExpr.getStructureString() = getStructureString(".^");
+    eq MulExpr.getStructureStringLessComments() = getStructureStringLessComments("*");
+    eq DivExpr.getStructureStringLessComments() = getStructureStringLessComments("/");
+    eq LeftDivExpr.getStructureStringLessComments() = getStructureStringLessComments("\\");
+    eq PowExpr.getStructureStringLessComments() = getStructureStringLessComments("^");
+    eq AddExpr.getStructureStringLessComments() = getStructureStringLessComments("+");
+    eq SubExpr.getStructureStringLessComments() = getStructureStringLessComments("-");
+    eq EMulExpr.getStructureStringLessComments() = getStructureStringLessComments(".*");
+    eq EDivExpr.getStructureStringLessComments() = getStructureStringLessComments("./");
+    eq ELeftDivExpr.getStructureStringLessComments() = getStructureStringLessComments(".\\");
+    eq EPowExpr.getStructureStringLessComments() = getStructureStringLessComments(".^");
     
-    eq AndLogicalExpr.getStructureString() = getStructureString("&");
-    eq OrLogicalExpr.getStructureString() = getStructureString("|");
-    eq ShortCircuitAndExpr.getStructureString() = getStructureString("&&");
-    eq ShortCircuitOrExpr.getStructureString() = getStructureString("||");
-    eq LTExpr.getStructureString() = getStructureString("<");
-    eq GTExpr.getStructureString() = getStructureString(">");
-    eq LEExpr.getStructureString() = getStructureString("<=");
-    eq GEExpr.getStructureString() = getStructureString(">=");
-    eq EQExpr.getStructureString() = getStructureString("==");
-    eq NEExpr.getStructureString() = getStructureString("~=");
+    eq AndLogicalExpr.getStructureStringLessComments() = getStructureStringLessComments("&");
+    eq OrLogicalExpr.getStructureStringLessComments() = getStructureStringLessComments("|");
+    eq ShortCircuitAndExpr.getStructureStringLessComments() = getStructureStringLessComments("&&");
+    eq ShortCircuitOrExpr.getStructureStringLessComments() = getStructureStringLessComments("||");
+    eq LTExpr.getStructureStringLessComments() = getStructureStringLessComments("<");
+    eq GTExpr.getStructureStringLessComments() = getStructureStringLessComments(">");
+    eq LEExpr.getStructureStringLessComments() = getStructureStringLessComments("<=");
+    eq GEExpr.getStructureStringLessComments() = getStructureStringLessComments(">=");
+    eq EQExpr.getStructureStringLessComments() = getStructureStringLessComments("==");
+    eq NEExpr.getStructureStringLessComments() = getStructureStringLessComments("~=");
 }

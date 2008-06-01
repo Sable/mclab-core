@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import beaver.Scanner;
 
 /** 
  * Parent class of the generated NatlabParserFailTests class.
@@ -17,7 +16,7 @@ import beaver.Scanner;
 class ParserFailTestBase extends TestCase {
 
 	/* Construct a scanner that will read from the specified file. */
-	static Scanner getScanner(String filename) throws FileNotFoundException {
+	static NatlabScanner getScanner(String filename) throws FileNotFoundException {
 		return new NatlabScanner(new BufferedReader(new FileReader(filename)));
 	}
 

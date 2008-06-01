@@ -1,0 +1,13 @@
+//Add a list of comments to each node.
+//Empty by default.
+aspect Comments {
+    private java.util.List<beaver.Symbol> ASTNode.comments = new java.util.ArrayList<beaver.Symbol>();
+    
+    public void ASTNode.setComments(java.util.List<beaver.Symbol> comments) {
+        this.comments = new java.util.ArrayList<beaver.Symbol>(comments);
+    }
+    
+    public java.util.List<beaver.Symbol> ASTNode.getComments() {
+        return java.util.Collections.unmodifiableList(comments);
+    }
+}

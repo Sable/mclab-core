@@ -73,6 +73,13 @@
     public CommentBuffer getCommentBuffer() {
         return commentBuffer;
     }
+    
+    private <T extends ASTNode> T annotateWithComments(T node) {
+        if(node != null && commentBuffer != null) {
+            node.setComments(commentBuffer.pollAllComments());
+        }
+        return node;
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -86,9 +93,9 @@
 %terminals STRING;
 %terminals PROPERTIES, METHODS, EVENTS;
 
-%typeof program = "Program";
+%typeof program, program_before_comments = "Program";
 %typeof stmt_list = "List<Stmt>";
-%typeof stmt, stmt_body, last_stmt = "Stmt";
+%typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
 %typeof expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof lvalue = "Access";
@@ -120,8 +127,12 @@
 
 %goal program;
 
+program =
+     program_before_comments.p {: return annotateWithComments(p); :}
+  ;
+
 // Currently, a .m file is treated as a list of statements.
-program = 
+program_before_comments = 
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
      stmt.stmts+ last_stmt.s {: return new Program(new List<HelpComment>(), makeListNode(_list_stmts).add(s)); :}
   |  last_stmt.s {: return new Program(new List<HelpComment>(), new List<Stmt>().add(s)); :}
@@ -159,10 +170,15 @@ last_stmt =
 
 stmt =
      stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
-  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST?
+     //NB: not attaching comments to empty statements
+  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST
   ;
 
 stmt_body =
+     stmt_body_before_comments.s {: return annotateWithComments(s); :}
+  ;
+
+stmt_body_before_comments =
      expr.e {: return new ExprStmt(e); :}
   |  assign.a
 //  |  if_then_statement

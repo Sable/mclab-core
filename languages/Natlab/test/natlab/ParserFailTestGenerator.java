@@ -30,8 +30,11 @@ public class ParserFailTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
 		testFileWriter.println("		List<String> expectedErrors = readErrors(\"" + outFileName + "\");");
-		testFileWriter.println("		Scanner scanner = getScanner(\"" + inFileName + "\");");
+		testFileWriter.println("		CommentBuffer commentBuffer = new CommentBuffer();");
+		testFileWriter.println("		NatlabScanner scanner = getScanner(\"" + inFileName + "\");");
+		testFileWriter.println("		scanner.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		NatlabParser parser = new NatlabParser();");
+		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		parser.parse(scanner);");
 		testFileWriter.println("		assertTrue(parser.hasError());");
 		testFileWriter.println("		assertEquals(expectedErrors, parser.getErrors());");
