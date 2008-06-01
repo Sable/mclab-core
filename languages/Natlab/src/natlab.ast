@@ -1,11 +1,13 @@
 // AST for Natlab grammar
 
-Root:Program;
-Program:List ::= Stmt*;
+Program ::= HelpComment* Stmt*;
+
+abstract HelpComment ::= <Text:String>;
+OneLineHelpComment : HelpComment;
+MultiLineHelpComment : HelpComment;
 
 abstract Stmt; 
 EmptyStmt:Stmt;
-CommentStmt:EmptyStmt ::= <str:String>;
 ExprStmt:Stmt ::= Expr;
 AssignStmt:Stmt ::= Dest:Expr Source:Expr;
 

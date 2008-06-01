@@ -51,6 +51,9 @@
     }
 
     private static <T extends ASTNode<?>> natlab.ast.List<T> makeListNode(java.util.List<T> children) {
+        if(children == null) {
+            return null;
+        }
         return addAll(new natlab.ast.List<T>(), children);
     }
 
@@ -83,7 +86,7 @@
 %terminals STRING;
 %terminals PROPERTIES, METHODS, EVENTS;
 
-%typeof program = "Root";
+%typeof program = "Program";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
@@ -97,6 +100,7 @@
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
 %typeof stmt_separator = "BooleanFakeSymbol";
+%typeof help_comment, help_comment_body, last_help_comment = "HelpComment";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -119,10 +123,28 @@
 // Currently, a .m file is treated as a list of statements.
 program = 
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
-     stmt.stmts+ last_stmt.s {: return new Root(makeListNode(_list_stmts).add(s)); :}
-  |  last_stmt.s {: return new Root(new List<Stmt>().add(s)); :}
-  |  {: return new Root(new List<Stmt>()); :}
-  |  OtherNonTerm {: return new Root(new List()); :} //TODO-AC: eventually remove this
+     stmt.stmts+ last_stmt.s {: return new Program(new List<HelpComment>(), makeListNode(_list_stmts).add(s)); :}
+  |  last_stmt.s {: return new Program(new List<HelpComment>(), new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ stmt.stmts+ last_stmt.s {: return new Program(makeListNode(_list_comments), makeListNode(_list_stmts).add(s)); :}
+  |  help_comment.comments+ last_stmt.s {: return new Program(makeListNode(_list_comments), new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ last_help_comment.c {: return new Program(makeListNode(_list_comments).add(c), new List<Stmt>()); :}
+  |  last_help_comment.c {: return new Program(new List<HelpComment>().add(c), new List<Stmt>()); :}
+  |  {: return new Program(new List<HelpComment>(), new List<Stmt>()); :}
+  |  OtherNonTerm {: return new Program(new List<HelpComment>(), new List<Stmt>()); :} //TODO-AC: eventually remove this
+  ;
+
+last_help_comment =
+     help_comment.c
+  |  help_comment_body.c
+  ;
+
+help_comment =
+     help_comment_body.c LINE_TERMINATOR
+  ;
+
+help_comment_body =
+     HELP_COMMENT.c {: return new OneLineHelpComment(c); :}
+  |  BRACKET_HELP_COMMENT.c {: return new MultiLineHelpComment(c); :}
   ;
 
 stmt_list =
@@ -132,7 +154,7 @@ stmt_list =
 
 last_stmt =
      stmt_body.s
-  |  stmt
+  |  stmt.s
   ;
 
 stmt =
@@ -141,9 +163,7 @@ stmt =
   ;
 
 stmt_body =
-     HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
-  |  BRACKET_HELP_COMMENT.str {: return new CommentStmt(str); :} //TODO-AC: these aren't stmts
-  |  expr.e {: return new ExprStmt(e); :}
+     expr.e {: return new ExprStmt(e); :}
   |  assign.a
 //  |  if_then_statement
 //  |  if_then_else_statement

@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
-import natlab.ast.Root;
+import natlab.ast.Program;
 import beaver.Symbol;
 
 /** 
@@ -48,7 +48,7 @@ class ParserPassTestBase extends TestCase {
 	}
 
 	/* Check deep equality of an AST and the contents of the .out file. */
-	public static void assertEquiv(Root actual, Structure expected) {
+	public static void assertEquiv(Program actual, Structure expected) {
 		try {
 			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString()));
 			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString()));

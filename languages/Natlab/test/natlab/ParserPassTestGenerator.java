@@ -16,7 +16,7 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package natlab;");
 		testFileWriter.println();
-		testFileWriter.println("import natlab.ast.Root;");
+		testFileWriter.println("import natlab.ast.Program;");
 		testFileWriter.println();
 		testFileWriter.println("public class NatlabParserPassTests extends ParserPassTestBase {");
 	}
@@ -32,7 +32,7 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println("		scanner.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		NatlabParser parser = new NatlabParser();");
 		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
-		testFileWriter.println("		Root actual = (Root) parser.parse(scanner);");
+		testFileWriter.println("		Program actual = (Program) parser.parse(scanner);");
 		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
 		testFileWriter.println("	}");

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import natlab.ast.Root;
+import natlab.ast.Program;
 import beaver.Parser;
 
 public class Interpreter {
@@ -32,7 +32,7 @@ public class Interpreter {
 				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
 				scanner.setCommentBuffer(commentBuffer);
 				// NatlabScanner scanner = new NatlabScanner(new StringReader(line));
-				Root original = (Root) parser.parse(scanner);
+				Program original = (Program) parser.parse(scanner);
 				if(parser.hasError()) {
 					System.out.println("**ERROR**");
 					for(String error : parser.getErrors()) {

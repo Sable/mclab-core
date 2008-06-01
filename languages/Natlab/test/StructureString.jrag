@@ -5,6 +5,10 @@ aspect StructureString {
     //program
     eq Program.getStructureString() {
         StringBuffer buf = new StringBuffer();
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
         for(Stmt stmt : getStmts()) {
             buf.append(stmt.getStructureString());
             buf.append('\n');
@@ -12,9 +16,12 @@ aspect StructureString {
         return buf.toString();
     }
     
+    //help comments
+    
+    eq HelpComment.getStructureString() = getText();
+    
     //stmts
     eq EmptyStmt.getStructureString() =  (isOutputSuppressed() ? ";" : "");
-    eq CommentStmt.getStructureString() = getstr() + (isOutputSuppressed() ? ";" : "");
     eq ExprStmt.getStructureString() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
     eq AssignStmt.getStructureString() = getDest().getStructureString() + " = " + getSource().getStructureString() + (isOutputSuppressed() ? ";" : "");
     

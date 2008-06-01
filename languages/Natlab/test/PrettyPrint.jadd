@@ -269,8 +269,8 @@ aspect PrettyPrint {
   }
 
   // for MATLAB -JL
-  public void CommentStmt.toString(StringBuffer s) {
-    s.append(getstr());
+  public void HelpComment.toString(StringBuffer s) {
+    s.append(getText());
     s.append("\n");
   }
 
