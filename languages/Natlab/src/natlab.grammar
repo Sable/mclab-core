@@ -1,5 +1,4 @@
 %import "natlab.ast.*";
-%import "java.util.Iterator";
 
 %package "natlab";
 
@@ -60,6 +59,16 @@
         private boolean value;
         BooleanFakeSymbol(boolean value) { this.value = value; }
         Stmt annotateStmt(Stmt stmt) { stmt.setOutputSuppressed(value); return stmt; }
+    }
+    
+    private CommentBuffer commentBuffer = null;
+
+    public void setCommentBuffer(CommentBuffer commentBuffer) {
+        this.commentBuffer = commentBuffer;
+    }
+
+    public CommentBuffer getCommentBuffer() {
+        return commentBuffer;
     }
 :};
 

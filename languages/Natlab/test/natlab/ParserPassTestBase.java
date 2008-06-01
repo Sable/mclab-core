@@ -5,7 +5,6 @@ import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
 import natlab.ast.Root;
-import beaver.Scanner;
 import beaver.Symbol;
 
 /** 
@@ -15,7 +14,7 @@ import beaver.Symbol;
 class ParserPassTestBase extends TestCase {
 
 	/* Construct a scanner that will read from the specified file. */
-	static Scanner getScanner(String filename) throws FileNotFoundException {
+	static NatlabScanner getScanner(String filename) throws FileNotFoundException {
 		return new NatlabScanner(new BufferedReader(new FileReader(filename)));
 	}
 

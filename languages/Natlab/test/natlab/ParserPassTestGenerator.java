@@ -17,7 +17,6 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println("package natlab;");
 		testFileWriter.println();
 		testFileWriter.println("import natlab.ast.Root;");
-		testFileWriter.println("import beaver.Scanner;");
 		testFileWriter.println();
 		testFileWriter.println("public class NatlabParserPassTests extends ParserPassTestBase {");
 	}
@@ -28,8 +27,12 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		String outFileName = "test/" + testName + ".out";
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
-		testFileWriter.println("		Scanner scanner = getScanner(\"" + inFileName + "\");");
-		testFileWriter.println("		Root actual = (Root) new NatlabParser().parse(scanner);");
+		testFileWriter.println("		CommentBuffer commentBuffer = new CommentBuffer();");
+		testFileWriter.println("		NatlabScanner scanner = getScanner(\"" + inFileName + "\");");
+		testFileWriter.println("		scanner.setCommentBuffer(commentBuffer);");
+		testFileWriter.println("		NatlabParser parser = new NatlabParser();");
+		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
+		testFileWriter.println("		Root actual = (Root) parser.parse(scanner);");
 		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
 		testFileWriter.println("	}");

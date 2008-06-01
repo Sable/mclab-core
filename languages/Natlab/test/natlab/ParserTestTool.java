@@ -19,8 +19,12 @@ public class ParserTestTool {
 		String basename = args[0];
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
-			Scanner scanner = new NatlabScanner(in);
+			
+			CommentBuffer commentBuffer = new CommentBuffer();
+			NatlabScanner scanner = new NatlabScanner(in);
+			scanner.setCommentBuffer(commentBuffer);
 			NatlabParser parser = new NatlabParser();
+			parser.setCommentBuffer(commentBuffer);
 			Root actual = (Root) parser.parse(scanner);
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			if(parser.hasError()) {

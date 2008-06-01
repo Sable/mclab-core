@@ -24,10 +24,13 @@ public class Interpreter {
 				break;
 			}
 
+			CommentBuffer commentBuffer = new CommentBuffer();
 			NatlabParser parser = new NatlabParser();
+			parser.setCommentBuffer(commentBuffer);
 			try {
 				// Temporarily changed to accept a file name - JL 2008.05.27 
 				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
+				scanner.setCommentBuffer(commentBuffer);
 				// NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				Root original = (Root) parser.parse(scanner);
 				if(parser.hasError()) {
