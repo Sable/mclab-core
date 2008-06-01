@@ -42,6 +42,7 @@ import beaver.Scanner;
     if(yystate() == FIELD_NAME) {
         restoreState();
     }
+    transposeNext = TYPE_PRECEDING_TRANSPOSE.contains(type);
     int startPos = Symbol.makePosition(startLine, startCol);
     int endPos = Symbol.makePosition(endLine, endCol);
     return new Symbol(type, startPos, endPos, value);
@@ -95,30 +96,6 @@ import beaver.Scanner;
   //columnOffset is added to the column
   private void error(String msg, int columnOffset) throws Scanner.Exception {
     throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
-  }
-  
-  //// Strings /////////////////////////////////////////////////////////////////
-  
-  //throws an exception if the string contains any invalid escape sequences
-  private void validateEscapeSequences(String str) throws Scanner.Exception {
-    boolean expectEscape = false;
-    int offset = 0;
-    for(char ch : str.toCharArray()) {
-        if(expectEscape) {
-            if("bfnrt\\\"".indexOf(ch) < 0) {
-                //NB: offset - 1 so that the preceding \ is flagged as the error
-                error("Invalid escape sequence '\\" + ch + "'", offset - 1);
-            }
-            expectEscape = false;
-        } else if(ch == '\\') {
-            expectEscape = true;
-        }
-        offset++;
-    }
-    if(expectEscape) {
-        //TODO-AC: better column number
-        error("Incomplete escape sequence '\\'", offset);
-    }
   }
   
   //// Numbers /////////////////////////////////////////////////////////////////
@@ -209,6 +186,27 @@ import beaver.Scanner;
         numEndsExpected++;
     }
   }
+  
+  //// Transpose ///////////////////////////////////////////////////////////////
+  
+  private static final java.util.Set<Short> TYPE_PRECEDING_TRANSPOSE = new java.util.HashSet<Short>();
+  static {
+    //NB: cannot contain DOT
+    TYPE_PRECEDING_TRANSPOSE.add(IDENTIFIER);
+    TYPE_PRECEDING_TRANSPOSE.add(INT_NUMBER);
+    TYPE_PRECEDING_TRANSPOSE.add(FP_NUMBER);
+    TYPE_PRECEDING_TRANSPOSE.add(RPAREN);
+    TYPE_PRECEDING_TRANSPOSE.add(RSQUARE);
+    TYPE_PRECEDING_TRANSPOSE.add(RCURLY);
+    TYPE_PRECEDING_TRANSPOSE.add(ARRAYTRANSPOSE);
+    TYPE_PRECEDING_TRANSPOSE.add(MTRANSPOSE);
+  }
+  
+  private boolean transposeNext = false;
+  
+  //// String literals /////////////////////////////////////////////////////////
+  
+  private StringBuffer strBuf = new StringBuffer();
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -239,7 +237,7 @@ CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
-String=[']([^'\r\n] | [']['])*[']
+ValidEscape=\\[bfnrt\\\"]
 
 //parsing the bit after a DOT
 %state FIELD_NAME
@@ -249,13 +247,16 @@ String=[']([^'\r\n] | [']['])*[']
 %state CLASS
 %xstate COMMA_TERMINATOR
 %xstate SEMICOLON_TERMINATOR
+%xstate INSIDE_STRING
 
 %%
 
-{EscapedLineTerminator} { commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
+//TODO-AC: anything that doesn't call symbol might have to explicitly set transposeNext (probably to false)
+
+{EscapedLineTerminator} { transposeNext = false; commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
 
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
-{OtherWhiteSpace} { /* ignore */ }
+{OtherWhiteSpace} { transposeNext = false; /* ignore */ }
 
 {IntNumber} { return symbol(INT_NUMBER, parseDecInt(yytext(), false)); }
 {FPNumber} { return symbol(FP_NUMBER, parseFP(yytext(), false)); }
@@ -264,12 +265,38 @@ String=[']([^'\r\n] | [']['])*[']
 {ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); }
 {ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); }
 
-{String} { validateEscapeSequences(yytext()); return symbol(STRING, yytext().substring(1, yylength() - 1)); }
+"'" {
+    //NB: cannot be a string if we're expecting a transpose - even if string is a longer match
+    if(transposeNext) {
+        return symbol(MTRANSPOSE);
+    } else {
+        saveStateAndTransition(INSIDE_STRING);
+        strBuf = new StringBuffer();
+        markStartPosition();
+    }
+}
+
+<INSIDE_STRING> {
+    "''" { strBuf.append(yytext()); }
+    "'" {
+        markEndPosition();
+        Symbol sym = symbolFromMarkedPositions(STRING, strBuf.toString());
+        restoreState();
+        return sym;
+    }
+    {ValidEscape} { strBuf.append(yytext()); }
+    \\ { error("Invalid escape sequence"); }
+    . { strBuf.append(yytext()); }
+    <<EOF>> { 
+        error("Unterminated string literal: '" + strBuf);
+    }
+}
 
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { commentBuffer.pushComment(symbol(COMMENT, yytext())); }
+{Comment} { transposeNext = false; commentBuffer.pushComment(symbol(COMMENT, yytext())); }
 
 {OpenBracketHelpComment} {
+    transposeNext = false; 
     saveStateAndTransition(HELP_COMMENT_NESTING);
     markStartPosition();
     bracketCommentNestingDepth++;
@@ -277,6 +304,7 @@ String=[']([^'\r\n] | [']['])*[']
 }
 
 {OpenBracketComment} {
+    transposeNext = false; 
     saveStateAndTransition(COMMENT_NESTING);
     markStartPosition();
     bracketCommentNestingDepth++;
@@ -324,8 +352,8 @@ String=[']([^'\r\n] | [']['])*[']
 \{ { return symbol(LCURLY); }
 \} { return symbol(RCURLY); }
 
-, { saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
-; { saveStateAndTransition(SEMICOLON_TERMINATOR); markStartPosition(); }
+, { transposeNext = false; saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
+; { transposeNext = false; saveStateAndTransition(SEMICOLON_TERMINATOR); markStartPosition(); }
 
 <COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
     {OtherWhiteSpace} { /* ignore */ }
@@ -394,7 +422,7 @@ String=[']([^'\r\n] | [']['])*[']
 ".\\" { return symbol(ELDIV); }
 "^" { return symbol(MPOW); }
 ".^" { return symbol(EPOW); }
-"'" { return symbol(MTRANSPOSE); }
+//"'" { return symbol(MTRANSPOSE); } //mixed with string rule above
 ".'" { return symbol(ARRAYTRANSPOSE); }
 
 //from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/relationaloperators.html
