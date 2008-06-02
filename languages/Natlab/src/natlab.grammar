@@ -326,18 +326,14 @@ row_separator =
      LINE_TERMINATOR
   |  SEMICOLON
   |  SEMICOLON_LINE_TERMINATOR
+  |  COMMA_LINE_TERMINATOR 
   ;
 
 arg_list =
      arg.a {: return new List<Expr>().add(a); :}
-  |  arg_list.l column_separator arg.a {: return l.add(a); :}
+  |  arg_list.l COMMA arg.a {: return l.add(a); :}
   ;
   
-column_separator =   
-     COMMA 
-  |  COMMA_LINE_TERMINATOR
-  ;
-
 arg =
      expr.e
   |  COLON.c {: return new Colon(); :}
