@@ -47,10 +47,10 @@ aspect PrettyPrint {
       s.append("WARNING: toString(StringBuffer s) not implemented for " + getClass().getName()+"\n");
   }
   public void List.toString(StringBuffer s) {
-      s.append("-- in List --");
+      s.append("");
   }
   public void Opt.toString(StringBuffer s) {
-      s.append("-- in Opt --");
+      s.append("");
   }
 
   public void Program.toString(StringBuffer s) {
@@ -63,7 +63,7 @@ aspect PrettyPrint {
   // Flow control ... 
 
   public void ForStmt.toString(StringBuffer s) {
-    s.append("FOR ");
+    s.append("for ");
     s.append("(");		// need adjust ...
     getAssignStmt().toString(s);
     s.append(");\n");
@@ -71,7 +71,7 @@ aspect PrettyPrint {
       Stmt stmt = (Stmt)iter.next();
       stmt.toString(s);
     }
-    s.append("END ");
+    s.append("end ");
   }
 
   // Assign Expression
