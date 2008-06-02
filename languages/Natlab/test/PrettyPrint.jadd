@@ -21,8 +21,7 @@ aspect PrettyPrint {
   eq IntegerLiteral.dumpStringOnly() = getValue().getText() ;
   eq StringLiteral.dumpStringOnly() = getValue() ;
   eq ParseName.dumpStringOnly() = getID() ;
-  eq MethodAccess.dumpStringOnly() = getID() ;
-  eq MatrixAccess.dumpStringOnly() = getID() ;
+  eq ParameterizedAccess.dumpStringOnly() = getID() ;
 
   // Helper for indentation  
   protected static int ASTNode.indent = 0;
@@ -220,19 +219,7 @@ aspect PrettyPrint {
   eq EQExpr.printOp() = " == ";
   eq NEExpr.printOp() = " ~= ";
 
-  public void MethodAccess.toString(StringBuffer s) {
-    s.append(getID());
-    s.append("(");
-    if(getNumArg() > 0) {
-      getArg(0).toString(s);
-      for(int i = 1; i < getNumArg(); i++) {
-        s.append(", ");
-        getArg(i).toString(s);
-      }
-    }
-    s.append(")");
-  }
-  public void MatrixAccess.toString(StringBuffer s) {
+  public void ParameterizedAccess.toString(StringBuffer s) {
     s.append(getID());
     s.append("(");
     if(getNumArg() > 0) {
@@ -326,8 +313,7 @@ aspect PrettyPrint {
   eq DoubleLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq StringLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq ParseName.dumpString() = getClass().getName() + " [" + getID() + "]";
-  eq MethodAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
-  eq MatrixAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
+  eq ParameterizedAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
 
   public String Program.dumpTree() {
     StringBuffer s = new StringBuffer();

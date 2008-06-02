@@ -218,12 +218,12 @@ access =
      name.n LPAREN RPAREN
      {:
          ParseName pn = (ParseName) n;
-         return new MethodAccess(pn.getID(), new List());
+         return new ParameterizedAccess(pn.getID(), new List());
      :}
   |  name.n LPAREN arg_list.l RPAREN
      {:
          ParseName pn = (ParseName) n;
-         return new MethodAccess(pn.getID(), l);
+         return new ParameterizedAccess(pn.getID(), l);
      :}
   ;
 

@@ -69,22 +69,7 @@ aspect StructureString {
     //accesses
     eq IdUse.getStructureStringLessComments() = getID();
     eq ParseName.getStructureStringLessComments() = getID();
-    eq MethodAccess.getStructureStringLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getID());
-        buf.append('(');
-        boolean first = true;
-        for(Expr arg : getArgs()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(arg.getStructureStringLessComments());
-            first = false;
-        }
-        buf.append(')');
-        return buf.toString();
-    }
-    eq MatrixAccess.getStructureStringLessComments() {
+    eq ParameterizedAccess.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append(getID());
         buf.append('(');

@@ -22,8 +22,7 @@ abstract Access:Expr;
 IdUse:Access ::= <ID:String>;
 ParseName:Access ::= <ID:String>;
 
-MethodAccess : Access ::= <ID:String> Arg:Expr*;
-MatrixAccess : Access ::= <ID:String> Arg:Expr*;
+ParameterizedAccess : Access ::= <ID:String> Arg:Expr*;
 MatrixDecl : Access ::= Arg:MatrixRow*;
 MatrixRow : Access ::= Arg:Expr*;
 
