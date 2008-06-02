@@ -10,8 +10,38 @@
 
 % following are some test cases
 
-% Accept statement_separator =  SEMICOLON? LINE_TERMINATOR
+%================================
+% ERROR : No annoteted comments
+%================================
 
+x = 0; n = 1;
+% comment-for
+for a=1:3;  % comment-assign
+x = x+1; break;  n = n*2, % comment-stmt 
+end
+
+x = 0; n = 1;
+% comment-while
+while ~feof(fid)  % comment-expr
+x = x+1; continue;  n = n*2, % comment-stmt 
+end
+
+
+
+x = 0; n = 1;
+% comment-for
+for a=1:3;  % comment-assign
+x = x+1;   n = n*2, % comment-stmt 
+end
+
+x = 0; n = 1;
+% comment-while
+while ~feof(fid)  % comment-expr
+x = x+1;   n = n*2, % comment-stmt 
+end
+
+% Accept statement_separator =  SEMICOLON? LINE_TERMINATOR
+x=0;n=1;y=1:10;b=1:3;
 for i=b
   x = x+1;
 	for j=1:5
@@ -19,7 +49,12 @@ for i=b
 	end
   n = n*2;
 end
-% for a=1:3;  x = x+1;   n = n*2; end
+
+for a=1:3;  x = x+1;   n = n*2; end
+
+for j = (1 : 5)
+	x = (x + y(j))
+end
 
 %b=1:3
 % a = 1,2,3
@@ -28,17 +63,18 @@ end
 %matrixA = [1, 2; 3, a~=5; a, a+6;];
 
 
+x=0;n=1;
 
-FOR (a = 1 : 3 );
-x = (x + 1);
-n = (n * 2);
-END
+for (a = 1 : 3)
+x = (x + 1)
+n = (n * 2)
+end
 
 b = 1 : 3 ;
-FOR (i = b);
+for (i = b);
 x = (x + 1);
 n = (n * 2);
-END
+end
 
 a = b
 x = 5;
