@@ -71,8 +71,8 @@ aspect StructureString {
     eq ParseName.getStructureStringLessComments() = getID();
     eq MethodAccess.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append('(');
         buf.append(getID());
+        buf.append('(');
         boolean first = true;
         for(Expr arg : getArgs()) {
             if(!first) {
@@ -86,8 +86,8 @@ aspect StructureString {
     }
     eq MatrixAccess.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append('(');
         buf.append(getID());
+        buf.append('(');
         boolean first = true;
         for(Expr arg : getArgs()) {
             if(!first) {
