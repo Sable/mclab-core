@@ -4,6 +4,7 @@ abstract Program;
 
 Script : Program ::= HelpComment* Stmt*;
 EmptyProgram : Program;
+ClassDef : Program; //TODO-AC: contents
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;

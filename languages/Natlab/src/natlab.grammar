@@ -95,6 +95,7 @@
 
 %typeof program, program_before_comments = "Program";
 %typeof script = "Script";
+%typeof class_def = "ClassDef";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
@@ -136,10 +137,12 @@ program =
 // Currently, a .m file is treated as a list of statements.
 program_before_comments = 
      script.s
+  |  class_def.c
   |  {: return new EmptyProgram(); :}
   |  OtherNonTerm {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
   ;
 
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
 script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
      stmt.stmts+ last_stmt.s {: return new Script(new List<HelpComment>(), makeListNode(_list_stmts).add(s)); :}
@@ -148,6 +151,11 @@ script =
   |  help_comment.comments+ last_stmt.s {: return new Script(makeListNode(_list_comments), new List<Stmt>().add(s)); :}
   |  help_comment.comments+ last_help_comment.c {: return new Script(makeListNode(_list_comments).add(c), new List<Stmt>()); :}
   |  last_help_comment.c {: return new Script(new List<HelpComment>().add(c), new List<Stmt>()); :}
+  ;
+
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+class_def = //TODO-AC: fill in
+     CLASSDEF END {: return new ClassDef(); :}
   ;
 
 last_help_comment =
