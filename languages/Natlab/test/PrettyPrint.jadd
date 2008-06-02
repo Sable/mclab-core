@@ -53,11 +53,14 @@ aspect PrettyPrint {
       s.append("");
   }
 
-  public void Program.toString(StringBuffer s) {
+  public void Script.toString(StringBuffer s) {
     for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
       Stmt stmt = (Stmt)iter.next();
       stmt.toString(s);
     }
+  }
+
+  public void EmptyProgram.toString(StringBuffer s) {
   }
 
   // Flow control ... 
@@ -313,13 +316,16 @@ aspect PrettyPrint {
   eq ParseName.dumpString() = getClass().getName() + " [" + getID() + "]";
   eq ParameterizedAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
 
-  public String Program.dumpTree() {
+  public String Script.dumpTree() {
     StringBuffer s = new StringBuffer();
     for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
       Stmt stmt = (Stmt)iter.next();
         s.append(stmt.dumpTree());
     }
     return s.toString();
+  }
+  public String EmptyProgram.dumpTree() {
+    return "";
   }
   
 }

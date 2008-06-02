@@ -94,6 +94,7 @@
 %terminals PROPERTIES, METHODS, EVENTS;
 
 %typeof program, program_before_comments = "Program";
+%typeof script = "Script";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
@@ -128,20 +129,25 @@
 %goal program;
 
 program =
+     //gather up any unclaimed comments
      program_before_comments.p {: return annotateWithComments(p); :}
   ;
 
 // Currently, a .m file is treated as a list of statements.
 program_before_comments = 
+     script.s
+  |  {: return new EmptyProgram(); :}
+  |  OtherNonTerm {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
+  ;
+
+script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
-     stmt.stmts+ last_stmt.s {: return new Program(new List<HelpComment>(), makeListNode(_list_stmts).add(s)); :}
-  |  last_stmt.s {: return new Program(new List<HelpComment>(), new List<Stmt>().add(s)); :}
-  |  help_comment.comments+ stmt.stmts+ last_stmt.s {: return new Program(makeListNode(_list_comments), makeListNode(_list_stmts).add(s)); :}
-  |  help_comment.comments+ last_stmt.s {: return new Program(makeListNode(_list_comments), new List<Stmt>().add(s)); :}
-  |  help_comment.comments+ last_help_comment.c {: return new Program(makeListNode(_list_comments).add(c), new List<Stmt>()); :}
-  |  last_help_comment.c {: return new Program(new List<HelpComment>().add(c), new List<Stmt>()); :}
-  |  {: return new Program(new List<HelpComment>(), new List<Stmt>()); :}
-  |  OtherNonTerm {: return new Program(new List<HelpComment>(), new List<Stmt>()); :} //TODO-AC: eventually remove this
+     stmt.stmts+ last_stmt.s {: return new Script(new List<HelpComment>(), makeListNode(_list_stmts).add(s)); :}
+  |  last_stmt.s {: return new Script(new List<HelpComment>(), new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ stmt.stmts+ last_stmt.s {: return new Script(makeListNode(_list_comments), makeListNode(_list_stmts).add(s)); :}
+  |  help_comment.comments+ last_stmt.s {: return new Script(makeListNode(_list_comments), new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ last_help_comment.c {: return new Script(makeListNode(_list_comments).add(c), new List<Stmt>()); :}
+  |  last_help_comment.c {: return new Script(new List<HelpComment>().add(c), new List<Stmt>()); :}
   ;
 
 last_help_comment =
@@ -187,8 +193,8 @@ stmt_body_before_comments =
 //  |  try_statement
   |  BREAK    {: return new BreakStmt(); :}
   |  CONTINUE {: return new ContinueStmt(); :}
-  | WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
-  | FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
+  |  WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
+  |  FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
   ;
 
 stmt_separator =

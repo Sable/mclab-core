@@ -1,6 +1,9 @@
 // AST for Natlab grammar
 
-Program ::= HelpComment* Stmt*;
+abstract Program;
+
+Script : Program ::= HelpComment* Stmt*;
+EmptyProgram : Program;
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;

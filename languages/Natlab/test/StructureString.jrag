@@ -13,7 +13,7 @@ aspect StructureString {
     syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
     
     //program
-    eq Program.getStructureStringLessComments() {
+    eq Script.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
             buf.append(comment.getStructureStringLessComments());
@@ -24,6 +24,9 @@ aspect StructureString {
             buf.append('\n');
         }
         return buf.toString();
+    }
+    eq EmptyProgram.getStructureStringLessComments() {
+        return "";
     }
     
     //help comments
