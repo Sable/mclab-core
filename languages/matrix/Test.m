@@ -6,11 +6,39 @@
 %  		- list of lhs variables, i.g.  [a, b]=foo();
 %  - Run it : 
 %     - ant test
-%     - java Main Test.m >log.txt
+%     - java Main Test0.m >log.txt
 
 % following are some test cases
 
 % Accept statement_separator =  SEMICOLON? LINE_TERMINATOR
+
+for i=b
+  x = x+1;
+	for j=1:5
+	  x = x + y(j)
+	end
+  n = n*2;
+end
+% for a=1:3;  x = x+1;   n = n*2; end
+
+%b=1:3
+% a = 1,2,3
+% b = 2;d,f
+% c = 3; d=4, a = a - b*c^5+d/7
+%matrixA = [1, 2; 3, a~=5; a, a+6;];
+
+
+
+FOR (a = 1 : 3 );
+x = (x + 1);
+n = (n * 2);
+END
+
+b = 1 : 3 ;
+FOR (i = b);
+x = (x + 1);
+n = (n * 2);
+END
 
 a = b
 x = 5;
@@ -51,8 +79,35 @@ a = foo(x<=y);
 e =[];
 e =[;];
 
+m = [1 2
+3 4
+]
+
+e =[1, 2,
+    3, 4]
+
+
+% ERROR 
+a = M'+M'
+
+matrixA = [1, 2; 3, a-5; a, a+6]
+% matrixA = [N.', ~~true; M', a---3; ++2,  N.'.']
+matrixA = [N.', ~~true; N.'.', M'; a---3, ++2]
+
+a = [1]
+  
+  % hello comment
+a = [1,;2;]
+matrixA = [1, 2; 3, a-5; a, a+6;];
+
+
 a =[1, 2];
-a =[1, 2; 3 , 4];
+b =[1, 2,;];
+c =[1, 2,; 3, 4,;];
+
+a = [1,;2;]
+matrixA = [1, 2; 3, a-5; a, a+6;];
+
 % Matrix access
 a(1)=5;
 a(:)=6;
