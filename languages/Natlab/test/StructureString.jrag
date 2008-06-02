@@ -35,6 +35,9 @@ aspect StructureString {
     eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
     eq AssignStmt.getStructureStringLessComments() = getDest().getStructureStringLessComments() + " = " + getSource().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
     
+    eq BreakStmt.getStructureStringLessComments() = "break";
+    eq ContinueStmt.getStructureStringLessComments() = "continue";
+
     //TODO-AC: indentation for nested loops
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
@@ -49,6 +52,21 @@ aspect StructureString {
         buf.append("end");
         return buf.toString();
     }
+    //TODO-AC: indentation for nested loops
+    eq WhileStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("where ");
+        buf.append(getExpr());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureStringLessComments());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
     
     //exprs
     eq ColonExpr.getStructureStringLessComments() {

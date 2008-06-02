@@ -183,12 +183,11 @@ stmt_body_before_comments =
   |  assign.a
 //  |  if_then_statement
 //  |  if_then_else_statement
-//  |  while_statement
 //  |  switch_statement
-//  |  do_statement
-//  |  break_statement
-//  |  continue_statement
 //  |  try_statement
+  |  BREAK    {: return new BreakStmt(); :}
+  |  CONTINUE {: return new ContinueStmt(); :}
+  | WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
   | FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
   ;
 
@@ -344,11 +343,11 @@ OtherNonTerm =
   | IM_FP_NUMBER
   | LCURLY
   | RCURLY
-  | BREAK
+//  | BREAK
   | CASE
   | CATCH
   | CLASSDEF
-  | CONTINUE
+//  | CONTINUE
   | ELSE
   | ELSEIF
   | FUNCTION
@@ -360,7 +359,7 @@ OtherNonTerm =
   | PERSISTENT
   | SWITCH
   | TRY
-  | WHILE
+//  | WHILE
   | SHELL_COMMAND
   | ELLIPSIS_COMMENT
   | DOT

@@ -88,4 +88,8 @@ NEExpr : EqualityExpr ;
 // statement that can be reached by break or continue
 abstract BranchTargetStmt : Stmt;  
 ForStmt : BranchTargetStmt ::= AssignStmt Stmt*; 
+WhileStmt : BranchTargetStmt ::= Expr Stmt*; 
+
+BreakStmt : Stmt;
+ContinueStmt : Stmt;
 
