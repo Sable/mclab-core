@@ -360,7 +360,6 @@ OtherNonTerm =
 //  | BREAK
   | CASE
   | CATCH
-  | CLASSDEF
 //  | CONTINUE
   | ELSE
   | ELSEIF
