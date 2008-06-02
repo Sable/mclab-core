@@ -330,7 +330,12 @@ row_separator =
 
 arg_list =
      arg.a {: return new List<Expr>().add(a); :}
-  |  arg_list.l COMMA arg.a {: return l.add(a); :}
+  |  arg_list.l column_separator arg.a {: return l.add(a); :}
+  ;
+  
+column_separator =   
+     COMMA 
+  |  COMMA_LINE_TERMINATOR
   ;
 
 arg =
