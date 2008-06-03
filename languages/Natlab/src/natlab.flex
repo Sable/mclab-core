@@ -7,27 +7,39 @@ import beaver.Scanner;
 
 %%
 
+//general header info
 %public
 %final
 %class NatlabScanner
+
+//required for beaver compatibility
 %extends Scanner
 %unicode
 %function nextToken
 %type Symbol
 %yylexthrow Scanner.Exception
+
+//for debugging - track line and column
 %line
 %column
 
 %{
   //// Returning symbols ///////////////////////////////////////////////////////
 
-  //wrap a type (e.g. COLON) in a symbol object with appropriate position info
+  //Create a symbol using the current line and column number, as computed by JFlex
+  //No attached value
+  //Symbol is assumed to start and end on the same line
+  //e.g. symbol(SEMICOLON)
   private Symbol symbol(short type) {
     return symbol(type, null);
   }
   
-  //wrap a type (e.g. IDENTIFIER) and value (e.g. "x") in a symbol object with appropriate position info
+  //Create a symbol using the current line and column number, as computed by JFlex
+  //Attached value gives content information
+  //Symbol is assumed to start and end on the same line
+  //e.g. symbol(IDENTIFIER, "x")
   private Symbol symbol(short type, Object value) {
+    //NB: JFlex is zero-indexed, but we want one-indexed
     int startLine = yyline + 1;
     int startCol = yycolumn + 1;
     int endLine = startLine;
@@ -35,13 +47,14 @@ import beaver.Scanner;
     return symbol(type, value, startLine, startCol, endLine, endCol);
   }
   
-  //wrap a type (e.g. IDENTIFIER) and value (e.g. "x") in a symbol object with explicit position info
+  //Create a symbol using explicit position information (one-indexed)
   private Symbol symbol(short type, Object value, int startLine, int startCol, int endLine, int endCol) {
-    //if we return anything while in FIELD_NAME, then switch back to initial
+    //if we return anything while in state FIELD_NAME, then restore state
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
         restoreState();
     }
+    //if we saw something that forces the next single-quote to mean MTRANSPOSE, then set transposeNext
     transposeNext = TYPE_PRECEDING_TRANSPOSE.contains(type);
     int startPos = Symbol.makePosition(startLine, startCol);
     int endPos = Symbol.makePosition(endLine, endCol);
@@ -50,6 +63,7 @@ import beaver.Scanner;
   
   //// Position ////////////////////////////////////////////////////////////////
   
+  //records the position of a symbol
   private static class PositionRecord {
       int startLine = -1;
       int startCol = -1;
@@ -57,44 +71,63 @@ import beaver.Scanner;
       int endCol = -1;
   }
   
+  //the position of the current symbol
   private PositionRecord pos = new PositionRecord();
   
+  //populate the start line and column fields of the Position record with
+  //values from JFlex
   private void markStartPosition() {
+    //correct to one-indexed
     pos.startLine = yyline + 1;
     pos.startCol = yycolumn + 1;
   }
   
+  //populate the start line and column fields of the Position record with
+  //values from JFlex
   private void markEndPosition() {
+    //correct to one-indexed
     pos.endLine = yyline + 1;
     pos.endCol = (yycolumn + 1) + yylength() - 1;
   }
   
+  //like symbol(type), but uses the position stored in pos rather than
+  //the position computed by JFlex
   private Symbol symbolFromMarkedPositions(short type) {
     return symbolFromMarkedPositions(type, null);
   }
   
+  //like symbol(type, value), but uses the position stored in pos rather than
+  //the position computed by JFlex
   private Symbol symbolFromMarkedPositions(short type, Object value) {
     return symbol(type, value, pos.startLine, pos.startCol, pos.endLine, pos.endCol);
   }
   
+  //like symbol(type), but uses the start position stored in pos rather than
+  //the start position computed by JFlex and an explicit length param rather
+  //than yylength
   private Symbol symbolFromMarkedStart(short type, int length) {
     return symbolFromMarkedStart(type, null, length);
   }
   
+  //like symbol(type, value), but uses the start position stored in pos rather than
+  //the start position computed by JFlex and an explicit length param rather
+  //than yylength
   private Symbol symbolFromMarkedStart(short type, Object value, int length) {
     return symbol(type, value, pos.startLine, pos.startCol, pos.startLine, pos.startCol + length - 1);
   }
   
   //// Errors //////////////////////////////////////////////////////////////////
   
-  //throw an exceptions with appropriate position information
+  //throw an exceptions with position information from JFlex
   private void error(String msg) throws Scanner.Exception {
+    //correct to one-indexed
     throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
   }
   
-  //throw an exceptions with appropriate position information
+  //throw an exceptions with position information from JFlex
   //columnOffset is added to the column
   private void error(String msg, int columnOffset) throws Scanner.Exception {
+  //correct to one-indexed
     throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
   }
   
@@ -136,6 +169,8 @@ import beaver.Scanner;
   
   //// Comment queue ///////////////////////////////////////////////////////////
   
+  //put comments in the buffer rather than returning them
+  //NB: must be non-null before scanning starts
   private CommentBuffer commentBuffer = null;
   
   public void setCommentBuffer(CommentBuffer commentBuffer) {
@@ -148,6 +183,7 @@ import beaver.Scanner;
   
   //// State transitions ///////////////////////////////////////////////////////
   
+  //stack entry: stack identifier + symbol position
   private static class StateRecord {
     int stateNum;
     PositionRecord pos;
@@ -189,6 +225,10 @@ import beaver.Scanner;
   
   //// Transpose ///////////////////////////////////////////////////////////////
   
+  //if any of these symbols is seen, then an immediately following single-quote
+  //will be interpreted as MTRANSPOSE
+  //if any other symbol is seen, then a single-quote will be interpreted as the
+  //beginning of a string literal
   private static final java.util.Set<Short> TYPE_PRECEDING_TRANSPOSE = new java.util.HashSet<Short>();
   static {
     //NB: cannot contain DOT
@@ -206,14 +246,15 @@ import beaver.Scanner;
   
   //// String literals /////////////////////////////////////////////////////////
   
+  //for accumulating the contents of a string literal
   private StringBuffer strBuf = new StringBuffer();
 %}
 
 LineTerminator = \r|\n|\r\n
 OtherWhiteSpace = [ \t\f]
 
-Ellipsis = \.\.\.
 //NB: acceptable to conflict with ... - matlab just treats .... as a comment containing .
+Ellipsis = \.\.\.
 EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 
 Letter = [a-zA-Z]
@@ -243,21 +284,32 @@ ValidEscape=\\[bfnrt\\\"]
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
 %xstate COMMENT_NESTING
+//within a bracket help comment (i.e. %%{)
 %xstate HELP_COMMENT_NESTING
+//within a classdef
 %state CLASS
+//seen a comma - could be COMMA or COMMA_LINE_TERMINATOR
 %xstate COMMA_TERMINATOR
+//seen a semicolon - could be SEMICOLON or SEMICOLON_LINE_TERMINATOR
 %xstate SEMICOLON_TERMINATOR
+//within a string literal
 %xstate INSIDE_STRING
 
 %%
 
 //TODO-AC: anything that doesn't call symbol might have to explicitly set transposeNext (probably to false)
 
-{EscapedLineTerminator} { transposeNext = false; commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1))); }
+//... comment
+{EscapedLineTerminator} {
+    transposeNext = false;
+    commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
+}
 
+//whitespace
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
 {OtherWhiteSpace} { transposeNext = false; /* ignore */ }
 
+//numeric literals
 {IntNumber} { return symbol(INT_NUMBER, parseDecInt(yytext(), false)); }
 {FPNumber} { return symbol(FP_NUMBER, parseFP(yytext(), false)); }
 {HexNumber} { return symbol(INT_NUMBER, parseHexInt(yytext(), false)); }
@@ -265,6 +317,7 @@ ValidEscape=\\[bfnrt\\\"]
 {ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); }
 {ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); }
 
+//MTRANSPOSE or STRING (start)
 "'" {
     //NB: cannot be a string if we're expecting a transpose - even if string is a longer match
     if(transposeNext) {
@@ -276,6 +329,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//remainder of string literal (i.e. after initial single quote)
 <INSIDE_STRING> {
     "''" { strBuf.append(yytext()); }
     "'" {
@@ -292,9 +346,11 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//single-line comments
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
 {Comment} { transposeNext = false; commentBuffer.pushComment(symbol(COMMENT, yytext())); }
 
+//start multiline help comment
 {OpenBracketHelpComment} {
     transposeNext = false; 
     saveStateAndTransition(HELP_COMMENT_NESTING);
@@ -303,6 +359,7 @@ ValidEscape=\\[bfnrt\\\"]
     bracketCommentBuf = new StringBuffer(yytext());
 }
 
+//start multiline comment
 {OpenBracketComment} {
     transposeNext = false; 
     saveStateAndTransition(COMMENT_NESTING);
@@ -311,12 +368,14 @@ ValidEscape=\\[bfnrt\\\"]
     bracketCommentBuf = new StringBuffer(yytext());
 }
 
+//continue multiline (help) comment
 <COMMENT_NESTING, HELP_COMMENT_NESTING> {
     [^%]+ { bracketCommentBuf.append(yytext()); }
     % { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
 }
 
+//terminate multiline comment
 <COMMENT_NESTING> {
     {CloseBracketComment} { 
         bracketCommentNestingDepth--;
@@ -330,6 +389,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//terminate multiline help comment
 <HELP_COMMENT_NESTING> {
     {CloseBracketComment} { 
         bracketCommentNestingDepth--;
@@ -343,8 +403,10 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//bang (!) syntax
 {ShellCommand} { return symbol(SHELL_COMMAND, yytext()); }
 
+//bracketing
 \( { return symbol(LPAREN); }
 \) { return symbol(RPAREN); }
 \[ { return symbol(LSQUARE); }
@@ -352,9 +414,11 @@ ValidEscape=\\[bfnrt\\\"]
 \{ { return symbol(LCURLY); }
 \} { return symbol(RCURLY); }
 
+//stmt terminators
 , { transposeNext = false; saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
 ; { transposeNext = false; saveStateAndTransition(SEMICOLON_TERMINATOR); markStartPosition(); }
 
+//consume whitespace and comments if this will turn into a COMMA_/SEMICOLON_LINE_TERMINATOR
 <COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
     {OtherWhiteSpace} { /* ignore */ }
 
@@ -368,6 +432,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//terminate or kick out of COMMA/COMMA_LINE_TERMINATOR
 <COMMA_TERMINATOR> {
     {LineTerminator} { 
         markEndPosition();
@@ -388,6 +453,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//terminate or kick out of SEMICOLON/SEMICOLON_LINE_TERMINATOR
 <SEMICOLON_TERMINATOR> {
     {LineTerminator} { 
         markEndPosition();
@@ -408,6 +474,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
+//misc punctuation
 : { return symbol(COLON); }
 @ { return symbol(AT); }
 
@@ -511,6 +578,7 @@ ValidEscape=\\[bfnrt\\\"]
        }
 }
 
+//ignore keywords - we just saw a dot
 <FIELD_NAME> {
     {Identifier} { return symbol(IDENTIFIER, yytext()); }
     
