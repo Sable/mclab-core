@@ -99,7 +99,7 @@
                     int pos = stmtOrFcn.getStart();
                     int line = Symbol.getLine(pos);
                     int col = Symbol.getColumn(pos);
-                    throw new RuntimeException("Symbol in body is neither a Stmt nor a Function: [" + line + ", " + col + "] " + stmtOrFcn);
+                    throw new RuntimeException("Symbol in body is neither a Stmt nor a Function: " + getPosString(stmtOrFcn) + "  " + stmtOrFcn);
                 }
             }
         }
