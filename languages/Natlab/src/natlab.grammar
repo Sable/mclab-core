@@ -492,12 +492,10 @@ OtherTerminal =
   | CATCH
   | ELSE
   | ELSEIF
-  | GLOBAL
   | IF
   | OTHERWISE
   | RETURN
   | PARFOR
-  | PERSISTENT
   | SWITCH
   | TRY
   | SHELL_COMMAND
