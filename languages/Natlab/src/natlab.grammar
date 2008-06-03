@@ -438,7 +438,9 @@ primary_expr =
 
 literal =
      INT_NUMBER.i {: return new IntegerLiteral(i); :}
+  |  IM_INT_NUMBER.i {: return new IntegerLiteral(i); :}
   |  FP_NUMBER.f {: return new DoubleLiteral(f); :}
+  |  IM_FP_NUMBER.f {: return new DoubleLiteral(f); :}
   |  STRING.s {: return new StringLiteral(s); :}
   ;
 
@@ -482,14 +484,10 @@ arg =
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
 //but which aren't used in other productions
 OtherTerminal =
-    IM_INT_NUMBER
-  | IM_FP_NUMBER
-  | LCURLY
+    LCURLY
   | RCURLY
-//  | BREAK
   | CASE
   | CATCH
-//  | CONTINUE
   | ELSE
   | ELSEIF
   | GLOBAL
@@ -500,7 +498,6 @@ OtherTerminal =
   | PERSISTENT
   | SWITCH
   | TRY
-//  | WHILE
   | SHELL_COMMAND
   | ELLIPSIS_COMMENT
   | DOT
