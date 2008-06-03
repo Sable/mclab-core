@@ -1,0 +1,4 @@
+function y = f()
+%%helpcomment
+y = x;
+end
