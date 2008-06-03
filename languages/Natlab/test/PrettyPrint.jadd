@@ -96,6 +96,14 @@ aspect PrettyPrint {
 
   syn String AssignStmt.printOp() = " = ";
   
+  public void GlobalStmt.toString(StringBuffer s) {
+    s.append(getStructureString());
+  }
+  
+  public void PersistentStmt.toString(StringBuffer s) {
+    s.append(getStructureString());
+  }
+  
   // Colon Expression
   
   public void ColonExpr.toString(StringBuffer s) {

@@ -87,12 +87,36 @@ aspect StructureString {
     eq HelpComment.getStructureStringLessComments() = getText();
     
     //stmts
-    eq EmptyStmt.getStructureStringLessComments() =  (isOutputSuppressed() ? ";" : "");
+    eq EmptyStmt.getStructureStringLessComments() = (isOutputSuppressed() ? ";" : "");
     eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
     eq AssignStmt.getStructureStringLessComments() = getDest().getStructureString() + " = " + getSource().getStructureString() + (isOutputSuppressed() ? ";" : "");
+    eq GlobalStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("global");
+        for(ParseName name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getStructureString());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq PersistentStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("persistent");
+        for(ParseName name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getStructureString());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
     
-    eq BreakStmt.getStructureStringLessComments() = "break";
-    eq ContinueStmt.getStructureStringLessComments() = "continue";
+    eq BreakStmt.getStructureStringLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
+    eq ContinueStmt.getStructureStringLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
 
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
@@ -107,7 +131,7 @@ aspect StructureString {
         buf.append("end");
         return buf.toString();
     }
-    //TODO-AC: indentation for nested loops
+
     eq WhileStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("where ");

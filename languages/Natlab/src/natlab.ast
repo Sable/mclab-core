@@ -18,6 +18,8 @@ abstract Stmt;
 EmptyStmt:Stmt;
 ExprStmt:Stmt ::= Expr;
 AssignStmt:Stmt ::= Dest:Expr Source:Expr;
+GlobalStmt : Stmt ::= Name:ParseName*;
+PersistentStmt : Stmt ::= Name:ParseName*;
 
 abstract Expr;
 

@@ -321,6 +321,8 @@ stmt_body =
 stmt_body_before_comments =
      expr.e {: return new ExprStmt(e); :}
   |  assign.a
+  |  GLOBAL simple_name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
+  |  PERSISTENT simple_name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
 //  |  if_then_statement
 //  |  if_then_else_statement
 //  |  switch_statement
