@@ -1,3 +1,5 @@
+//TODO-AC: indentation?
+//NB: output may not re-parse as same AST (esp comments, empty stmts)
 aspect StructureString {
     syn String ASTNode.getStructureString() {
         StringBuffer buf = new StringBuffer();
@@ -13,6 +15,10 @@ aspect StructureString {
     syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
     
     //program
+    eq EmptyProgram.getStructureStringLessComments() {
+        return "";
+    }
+    
     eq Script.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
@@ -25,8 +31,55 @@ aspect StructureString {
         }
         return buf.toString();
     }
-    eq EmptyProgram.getStructureStringLessComments() {
-        return "";
+    
+    eq FunctionList.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Function func : getFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq Function.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append(" [");
+        boolean first = true;
+        for(Param param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Param param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureStringLessComments());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
     }
     
     //help comments
@@ -41,7 +94,6 @@ aspect StructureString {
     eq BreakStmt.getStructureStringLessComments() = "break";
     eq ContinueStmt.getStructureStringLessComments() = "continue";
 
-    //TODO-AC: indentation for nested loops
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("for ");
@@ -62,7 +114,6 @@ aspect StructureString {
         buf.append(getExpr());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            buf.append('\t');
             buf.append(stmt.getStructureStringLessComments());
             buf.append('\n');
         }

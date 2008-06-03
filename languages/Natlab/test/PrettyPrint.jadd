@@ -60,6 +60,14 @@ aspect PrettyPrint {
     }
   }
 
+  public void FunctionList.toString(StringBuffer s) {
+    s.append(getStructureString());
+  }
+
+  public void Function.toString(StringBuffer s) {
+    s.append(getStructureString());
+  }
+
   public void EmptyProgram.toString(StringBuffer s) {
   }
 

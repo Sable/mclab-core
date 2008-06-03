@@ -10,4 +10,8 @@ aspect Comments {
     public java.util.List<beaver.Symbol> ASTNode.getComments() {
         return java.util.Collections.unmodifiableList(comments);
     }
+    
+    public boolean ASTNode.hasComments() {
+        return !comments.isEmpty();
+    }
 }

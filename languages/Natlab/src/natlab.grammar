@@ -80,6 +80,10 @@
         }
         return node;
     }
+    
+    private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
+        return original == null ? new List<T>() : original;
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -95,6 +99,9 @@
 
 %typeof program, program_before_comments = "Program";
 %typeof script = "Script";
+%typeof function_list = "FunctionList";
+%typeof function, function_body = "Function";
+%typeof input_params, output_params, param_list = "List<Param>";
 %typeof class_def = "ClassDef";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
@@ -137,6 +144,7 @@ program =
 // Currently, a .m file is treated as a list of statements.
 program_before_comments = 
      script.s
+  |  function_list.f
   |  class_def.c
   |  {: return new EmptyProgram(); :}
   |  OtherNonTerm {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
@@ -151,6 +159,42 @@ script =
   |  help_comment.comments+ last_stmt.s {: return new Script(makeListNode(_list_comments), new List<Stmt>().add(s)); :}
   |  help_comment.comments+ last_help_comment.c {: return new Script(makeListNode(_list_comments).add(c), new List<Stmt>()); :}
   |  last_help_comment.c {: return new Script(new List<HelpComment>().add(c), new List<Stmt>()); :}
+  ;
+
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+function_list =
+     function.functions+ {: return new FunctionList(makeListNode(_list_functions)); :}
+  ;
+
+function =
+     function_body.f
+  |  function_body.f LINE_TERMINATOR
+  ;
+
+function_body =
+     //output params
+     FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
+         {: return new Function(out, name, nullToEmpty(in), nullToEmpty(makeListNode(_list_comments)), nullToEmpty(makeListNode(_list_stmts)), nullToEmpty(makeListNode(_list_nested))); :}
+     //no output params
+  |  FUNCTION IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
+         {: return new Function(new List<Param>(), name, nullToEmpty(in), nullToEmpty(makeListNode(_list_comments)), nullToEmpty(makeListNode(_list_stmts)), nullToEmpty(makeListNode(_list_nested))); :}
+  ;
+
+input_params =
+     LPAREN RPAREN {: return new List<Param>(); :}
+  |  LPAREN param_list.l RPAREN
+  ;
+
+output_params =
+     LSQUARE RSQUARE {: return new List<Param>(); :}
+  |  LSQUARE param_list.l RSQUARE
+  |  IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
+  ;
+
+//Non-empty, comma-separated list of parameters (note: no trailing comma)
+param_list =
+     IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
+  |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Param(p)); :}
   ;
 
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
@@ -363,7 +407,6 @@ OtherNonTerm =
 //  | CONTINUE
   | ELSE
   | ELSEIF
-  | FUNCTION
   | GLOBAL
   | IF
   | OTHERWISE

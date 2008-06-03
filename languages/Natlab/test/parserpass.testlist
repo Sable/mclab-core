@@ -30,3 +30,5 @@ parserpass_matrixunary
 parserpass_matrixbinary
 parserpass_matrixcomments
 parserpass_matrixaccess
+parserpass_onelinefunction
+parserpass_functionlist

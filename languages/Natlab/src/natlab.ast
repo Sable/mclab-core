@@ -3,8 +3,12 @@
 abstract Program;
 
 Script : Program ::= HelpComment* Stmt*;
-EmptyProgram : Program;
+FunctionList : Program ::= Function*;
 ClassDef : Program; //TODO-AC: contents
+EmptyProgram : Program;
+
+Function ::= OutputParam:Param* <Name:String> InputParam:Param* HelpComment* Stmt* NestedFunction:Function*;
+Param : ParseName; //TODO-AC: is this the correct parent type?
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;
