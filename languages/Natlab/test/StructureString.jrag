@@ -114,6 +114,7 @@ aspect StructureString {
         }
         return buf.toString();
     }
+    eq ShellCommandStmt.getStructureStringLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
     
     eq BreakStmt.getStructureStringLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
     eq ContinueStmt.getStructureStringLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");

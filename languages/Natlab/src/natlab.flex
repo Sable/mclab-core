@@ -404,7 +404,7 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //bang (!) syntax
-{ShellCommand} { return symbol(SHELL_COMMAND, yytext()); }
+{ShellCommand} { return symbol(SHELL_COMMAND, yytext().substring(1)); }
 
 //bracketing
 \( { return symbol(LPAREN); }

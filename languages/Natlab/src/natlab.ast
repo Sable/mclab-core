@@ -20,6 +20,7 @@ ExprStmt:Stmt ::= Expr;
 AssignStmt:Stmt ::= Dest:Expr Source:Expr;
 GlobalStmt : Stmt ::= Name:ParseName*;
 PersistentStmt : Stmt ::= Name:ParseName*;
+ShellCommandStmt : Stmt ::= <Command : String>;
 
 abstract Expr;
 

@@ -104,6 +104,10 @@ aspect PrettyPrint {
     s.append(getStructureString());
   }
   
+  public void ShellCommandStmt.toString(StringBuffer s) {
+    s.append(getStructureString());
+  }
+  
   // Colon Expression
   
   public void ColonExpr.toString(StringBuffer s) {

@@ -3,3 +3,4 @@ a = M'+M'
 global x y
 persistent x;
 return
+!cmd1;cmd2

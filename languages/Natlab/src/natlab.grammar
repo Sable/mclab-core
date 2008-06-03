@@ -323,6 +323,7 @@ stmt_body_before_comments =
   |  assign.a
   |  GLOBAL simple_name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
   |  PERSISTENT simple_name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
+  |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
 //  |  if_then_statement
 //  |  if_then_else_statement
 //  |  switch_statement
@@ -498,7 +499,6 @@ OtherTerminal =
   | PARFOR
   | SWITCH
   | TRY
-  | SHELL_COMMAND
   | DOT
   | PROPERTIES
   | METHODS
