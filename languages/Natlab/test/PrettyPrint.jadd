@@ -22,6 +22,8 @@ aspect PrettyPrint {
   eq StringLiteral.dumpStringOnly() = getValue() ;
   eq ParseName.dumpStringOnly() = getID() ;
   eq ParameterizedAccess.dumpStringOnly() = getID() ;
+  
+  eq FunctionHandle.dumpStringOnly() = "@" + getName();
 
   // Helper for indentation  
   protected static int ASTNode.indent = 0;
@@ -141,6 +143,10 @@ aspect PrettyPrint {
   
   public void IntegerLiteral.toString(StringBuffer s) {
     s.append(getValue().getText());
+  }
+  
+  public void FunctionHandle.toString(StringBuffer s) {
+    s.append("@" + getName());
   }
 
   protected static String Literal.escape(String s) {
@@ -323,6 +329,8 @@ aspect PrettyPrint {
   eq StringLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq ParseName.dumpString() = getClass().getName() + " [" + getID() + "]";
   eq ParameterizedAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
+
+  eq FunctionHandle.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
 
   public String Script.dumpTree() {
     StringBuffer s = new StringBuffer();

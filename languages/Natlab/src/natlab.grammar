@@ -432,8 +432,8 @@ primary_expr =
   |  LPAREN expr.e RPAREN
   |  matrix.m
   |  access.a
-//  |  AT name.n //TODO-AC: return handle node 
   |  name.n
+  |  AT IDENTIFIER.name {: return new FunctionHandle(name); :} //TODO-AC: allow qualified name?
   ;
 
 literal =

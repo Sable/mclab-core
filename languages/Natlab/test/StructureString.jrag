@@ -184,6 +184,8 @@ aspect StructureString {
         return buf.toString();
     }
     
+    eq FunctionHandle.getStructureStringLessComments() = "@" + getName();
+    
     //literals
     eq IntegerLiteral.getStructureStringLessComments() = getValue().getText();
     eq DoubleLiteral.getStructureStringLessComments() = getValue().getText();

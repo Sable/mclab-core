@@ -92,6 +92,8 @@ abstract EqualityExpr : RelationalExpr;
 EQExpr : EqualityExpr ;
 NEExpr : EqualityExpr ;
 
+FunctionHandle : Expr ::= <Name : String>;
+
 //------- ------------------------------------------------------------
 // statement that can be reached by break or continue
 abstract BranchTargetStmt : Stmt;  
