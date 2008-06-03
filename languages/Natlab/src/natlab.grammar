@@ -165,8 +165,8 @@
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
 %typeof matrix = "MatrixDecl";
-%typeof row_list, optional_row_list = "List<MatrixRow>";
-%typeof row = "MatrixRow";
+%typeof row_list, optional_row_list = "List<Row>";
+%typeof row = "Row";
 %typeof literal = "Literal";
 %typeof name, simple_name = "ParseName";
 %typeof stmt_separator = "BooleanFakeSymbol";
@@ -440,6 +440,7 @@ primary_expr =
      literal.l
   |  LPAREN expr.e RPAREN
   |  matrix.m
+  |  cell_array.c
   |  access.a
   |  name.n
   |  AT IDENTIFIER.name {: return new FunctionHandle(name); :} //TODO-AC: allow qualified name?
@@ -457,20 +458,24 @@ matrix =
      LSQUARE optional_row_list.l RSQUARE {: return new MatrixDecl(l); :}
   ;
 
+cell_array =
+     LCURLY optional_row_list.l RCURLY {: return new CellArrayDecl(l); :}
+  ;
+
 optional_row_list =
-     {: return new List<MatrixRow>(); :}
-  |  row_separator {: return new List<MatrixRow>(); :}
+     {: return new List<Row>(); :}
+  |  row_separator {: return new List<Row>(); :}
   |  row_list.l {: return l; :}
   |  row_list.l row_separator {: return l; :}
   ;
 
 row_list =
-     row.r {: return new List<MatrixRow>().add(r); :}
+     row.r {: return new List<Row>().add(r); :}
   |  row_list.l row_separator row.r {: return l.add(r); :}
   ;
 
 row =
-     arg_list.l COMMA? {: return new MatrixRow(l); :}
+     arg_list.l COMMA? {: return new Row(l); :}
   ;
 
 row_separator =
@@ -493,9 +498,7 @@ arg =
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
 //but which aren't used in other productions
 OtherTerminal =
-    LCURLY
-  | RCURLY
-  | CASE
+    CASE
   | CATCH
   | ELSE
   | ELSEIF

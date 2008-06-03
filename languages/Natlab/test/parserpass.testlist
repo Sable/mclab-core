@@ -50,3 +50,7 @@ parserpass_functioncompleteness15
 parserpass_functioncompleteness16
 parserpass_numbers
 parserpass_lambda
+parserpass_cell1
+parserpass_cellcomments
+parserpass_cellempty
+parserpass_cellunary

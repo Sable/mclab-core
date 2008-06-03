@@ -34,8 +34,9 @@ IdUse:Access ::= <ID:String>;
 ParseName:Access ::= <ID:String>;
 
 ParameterizedAccess : Access ::= <ID:String> Arg:Expr*;
-MatrixDecl : Access ::= Arg:MatrixRow*;
-MatrixRow : Access ::= Arg:Expr*;
+MatrixDecl : Access ::= Row*;
+CellArrayDecl : Access ::= Row*;
+Row : Access ::= Element:Expr*;
 
 // VarAccess : Access ::= <ID:String>;
 

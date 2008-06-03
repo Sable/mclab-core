@@ -187,7 +187,7 @@ aspect StructureString {
         StringBuffer buf = new StringBuffer();
         buf.append('[');
         boolean first = true;
-        for(MatrixRow row : getArgs()) {
+        for(Row row : getRows()) {
             if(!first) {
                 buf.append("; ");
             }
@@ -197,14 +197,28 @@ aspect StructureString {
         buf.append(']');
         return buf.toString();
     }
-    eq MatrixRow.getStructureStringLessComments() {
+    eq CellArrayDecl.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('{');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getStructureString());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+    eq Row.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         boolean first = true;
-        for(Expr arg : getArgs()) {
+        for(Expr element : getElements()) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(element.getStructureString());
             first = false;
         }
         return buf.toString();
