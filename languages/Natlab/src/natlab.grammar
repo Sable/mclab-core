@@ -84,6 +84,16 @@
     private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
         return original == null ? new List<T>() : original;
     }
+    
+    private static Function function(List<Param> outParams, String name, List<Param> inParams, ArrayList<HelpComment> comments, ArrayList<Stmt> stmts, ArrayList<Function> nestedFunctions) {
+        return new Function(
+                nullToEmpty(outParams),
+                name,
+                nullToEmpty(inParams),
+                nullToEmpty(makeListNode(comments)),
+                nullToEmpty(makeListNode(stmts)),
+                nullToEmpty(makeListNode(nestedFunctions)));
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -174,10 +184,10 @@ function =
 function_body =
      //output params
      FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
-         {: return new Function(out, name, nullToEmpty(in), nullToEmpty(makeListNode(_list_comments)), nullToEmpty(makeListNode(_list_stmts)), nullToEmpty(makeListNode(_list_nested))); :}
+         {: return function(out, name, in, _list_comments, _list_stmts, _list_nested); :}
      //no output params
   |  FUNCTION IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
-         {: return new Function(new List<Param>(), name, nullToEmpty(in), nullToEmpty(makeListNode(_list_comments)), nullToEmpty(makeListNode(_list_stmts)), nullToEmpty(makeListNode(_list_nested))); :}
+         {: return function(null, name, in, _list_comments, _list_stmts, _list_nested); :}
   ;
 
 input_params =
