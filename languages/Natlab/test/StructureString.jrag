@@ -22,7 +22,7 @@ aspect StructureString {
     eq Script.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureStringLessComments());
+            buf.append(comment.getStructureString());
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
@@ -67,7 +67,7 @@ aspect StructureString {
         buf.append(")");
         buf.append('\n');
         for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureStringLessComments());
+            buf.append(comment.getStructureString());
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
@@ -88,8 +88,8 @@ aspect StructureString {
     
     //stmts
     eq EmptyStmt.getStructureStringLessComments() =  (isOutputSuppressed() ? ";" : "");
-    eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
-    eq AssignStmt.getStructureStringLessComments() = getDest().getStructureStringLessComments() + " = " + getSource().getStructureStringLessComments() + (isOutputSuppressed() ? ";" : "");
+    eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getStructureStringLessComments() = getDest().getStructureString() + " = " + getSource().getStructureString() + (isOutputSuppressed() ? ";" : "");
     
     eq BreakStmt.getStructureStringLessComments() = "break";
     eq ContinueStmt.getStructureStringLessComments() = "continue";
@@ -97,11 +97,11 @@ aspect StructureString {
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("for ");
-        buf.append(getAssignStmt().getStructureStringLessComments());
+        buf.append(getAssignStmt().getStructureString());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
-            buf.append(stmt.getStructureStringLessComments());
+            buf.append(stmt.getStructureString());
             buf.append('\n');
         }
         buf.append("end");
@@ -114,7 +114,7 @@ aspect StructureString {
         buf.append(getExpr());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getStructureStringLessComments());
+            buf.append(stmt.getStructureString());
             buf.append('\n');
         }
         buf.append("end");
@@ -126,13 +126,13 @@ aspect StructureString {
     eq ColonExpr.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
-        buf.append(getBase().getStructureStringLessComments());
+        buf.append(getBase().getStructureString());
         buf.append(" : ");
         if(hasIncr()) {
-            buf.append(getIncr().getStructureStringLessComments());
+            buf.append(getIncr().getStructureString());
             buf.append(" : ");
         }
-        buf.append(getLimit().getStructureStringLessComments());
+        buf.append(getLimit().getStructureString());
         buf.append(')');
         return buf.toString();
     }
@@ -150,7 +150,7 @@ aspect StructureString {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureStringLessComments());
+            buf.append(arg.getStructureString());
             first = false;
         }
         buf.append(')');
@@ -165,7 +165,7 @@ aspect StructureString {
             if(!first) {
                 buf.append("; ");
             }
-            buf.append(row.getStructureStringLessComments());
+            buf.append(row.getStructureString());
             first = false;
         }
         buf.append(']');
@@ -178,7 +178,7 @@ aspect StructureString {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureStringLessComments());
+            buf.append(arg.getStructureString());
             first = false;
         }
         return buf.toString();
@@ -189,13 +189,13 @@ aspect StructureString {
     eq DoubleLiteral.getStructureStringLessComments() = getValue().getText();
     eq StringLiteral.getStructureStringLessComments() = "'" + getValue() + "'";
     
-    eq MinusExpr.getStructureStringLessComments() = "(-" + getOperand().getStructureStringLessComments() + ")";
-    eq PlusExpr.getStructureStringLessComments() = "(+" + getOperand().getStructureStringLessComments() + ")";
-    eq LogNotExpr.getStructureStringLessComments() = "(~" + getOperand().getStructureStringLessComments() + ")";
-    eq TransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureStringLessComments() + "')";
-    eq ArrayTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureStringLessComments() + ".')";
+    eq MinusExpr.getStructureStringLessComments() = "(-" + getOperand().getStructureString() + ")";
+    eq PlusExpr.getStructureStringLessComments() = "(+" + getOperand().getStructureString() + ")";
+    eq LogNotExpr.getStructureStringLessComments() = "(~" + getOperand().getStructureString() + ")";
+    eq TransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + "')";
+    eq ArrayTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + ".')";
     
-    syn String Binary.getStructureStringLessComments(String op) = "(" + getLeftOperand().getStructureStringLessComments() + " " + op + " " + getRightOperand().getStructureStringLessComments() + ")";
+    syn String Binary.getStructureStringLessComments(String op) = "(" + getLeftOperand().getStructureString() + " " + op + " " + getRightOperand().getStructureString() + ")";
     
     eq MulExpr.getStructureStringLessComments() = getStructureStringLessComments("*");
     eq DivExpr.getStructureStringLessComments() = getStructureStringLessComments("/");
