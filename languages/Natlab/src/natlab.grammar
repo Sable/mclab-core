@@ -329,6 +329,7 @@ stmt_body_before_comments =
 //  |  try_statement
   |  BREAK    {: return new BreakStmt(); :}
   |  CONTINUE {: return new ContinueStmt(); :}
+  |  RETURN   {: return new ReturnStmt(); :}
   |  WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
   |  FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
   ;
@@ -494,7 +495,6 @@ OtherTerminal =
   | ELSEIF
   | IF
   | OTHERWISE
-  | RETURN
   | PARFOR
   | SWITCH
   | TRY

@@ -104,4 +104,5 @@ WhileStmt : BranchTargetStmt ::= Expr Stmt*;
 
 BreakStmt : Stmt;
 ContinueStmt : Stmt;
+ReturnStmt : Stmt;
 

@@ -117,6 +117,7 @@ aspect StructureString {
     
     eq BreakStmt.getStructureStringLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
     eq ContinueStmt.getStructureStringLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
+    eq ReturnStmt.getStructureStringLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
 
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();

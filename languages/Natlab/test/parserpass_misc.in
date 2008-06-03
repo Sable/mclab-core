@@ -1,4 +1,5 @@
 a = M'+M'
 @handle
 global x y
-persistent x; 
+persistent x;
+return
