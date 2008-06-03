@@ -582,13 +582,13 @@ ValidEscape=\\[bfnrt\\\"]
 .|\n { error("Illegal character '" + yytext() + "'"); }
 
 <<EOF>> {
-            //don't finish scanning if there's an unclosed comment
-            if(bracketCommentNestingDepth != 0) {
-                error(bracketCommentNestingDepth + " levels of comments not closed");
-            }
-            //don't need to check that we're in the initial state, because the
-            //  xstates don't accept EOF and the non-xstates are acceptable when ending
-            //don't need to check numEndsExpected since that's only used for changing
-            //  states - the parser actually checks the bracketing
-            return symbol(EOF);
-        }
+    //don't finish scanning if there's an unclosed comment
+    if(bracketCommentNestingDepth != 0) {
+        error(bracketCommentNestingDepth + " levels of comments not closed");
+    }
+    //don't need to check that we're in the initial state, because the
+    //  xstates don't accept EOF and the non-xstates are acceptable when ending
+    //don't need to check numEndsExpected since that's only used for changing
+    //  states - the parser actually checks the bracketing
+    return symbol(EOF);
+}
