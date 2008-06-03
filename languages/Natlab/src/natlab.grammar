@@ -85,14 +85,31 @@
         return original == null ? new List<T>() : original;
     }
     
-    private static Function function(List<Param> outParams, String name, List<Param> inParams, ArrayList<HelpComment> comments, ArrayList<Stmt> stmts, ArrayList<Function> nestedFunctions) {
+    private static Function function(List<Param> outParams, String name, List<Param> inParams, ArrayList<HelpComment> comments, ArrayList<Symbol> body) {
+        List<Stmt> stmts = new List<Stmt>();
+        List<Function> nestedFunctions = new List<Function>();
+        if(body != null) {
+            for(Symbol stmtOrFcn : body) {
+                if(stmtOrFcn instanceof Stmt) {
+                    stmts.add((Stmt) stmtOrFcn);
+                } else if(stmtOrFcn instanceof Function) {
+                    nestedFunctions.add((Function) stmtOrFcn);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = stmtOrFcn.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is neither a Stmt nor a Function: [" + line + ", " + col + "] " + stmtOrFcn);
+                }
+            }
+        }
         return new Function(
                 nullToEmpty(outParams),
                 name,
                 nullToEmpty(inParams),
                 nullToEmpty(makeListNode(comments)),
-                nullToEmpty(makeListNode(stmts)),
-                nullToEmpty(makeListNode(nestedFunctions)));
+                stmts,
+                nestedFunctions);
     }
 :};
 
@@ -111,6 +128,7 @@
 %typeof script = "Script";
 %typeof function_list = "FunctionList";
 %typeof function, function_body = "Function";
+%typeof stmt_or_function = "Symbol";
 %typeof input_params, output_params, param_list = "List<Param>";
 %typeof class_def = "ClassDef";
 %typeof stmt_list = "List<Stmt>";
@@ -183,11 +201,11 @@ function =
 
 function_body =
      //output params
-     FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
-         {: return function(out, name, in, _list_comments, _list_stmts, _list_nested); :}
+     FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return function(out, name, in, _list_comments, _list_body); :}
      //no output params
-  |  FUNCTION IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt.stmts* function.nested* END
-         {: return function(null, name, in, _list_comments, _list_stmts, _list_nested); :}
+  |  FUNCTION IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return function(null, name, in, _list_comments, _list_body); :}
   ;
 
 input_params =
@@ -205,6 +223,14 @@ output_params =
 param_list =
      IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
   |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Param(p)); :}
+  ;
+
+stmt_or_function =
+     stmt.s
+     //NB: body since otherwise there is a conflict: function newline could be (function, empty stmt) or (function with newline)
+     //resolve as (function, empty stmt) because that's easier
+     //TODO-AC: eliminate spurious empty stmts?
+  |  function_body.f
   ;
 
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
