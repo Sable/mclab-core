@@ -516,33 +516,11 @@ ValidEscape=\\[bfnrt\\\"]
         return symbol(CLASSDEF);
     }
     
-    case { return symbol(CASE); }
-    for { return symbol(FOR); }
-    function { return symbol(FUNCTION); }
-    if { return symbol(IF); }
-    parfor { return symbol(PARFOR); }
-    switch { return symbol(SWITCH); }
-    try { return symbol(TRY); }
-    while { return symbol(WHILE); }
-    
     end { return symbol(END); }
 }
 
 <CLASS> {
     classdef { numEndsExpected++; return symbol(CLASSDEF); }
-    
-    case { numEndsExpected++; return symbol(CASE); }
-    for { numEndsExpected++; return symbol(FOR); }
-    function { numEndsExpected++; return symbol(FUNCTION); }
-    if { numEndsExpected++; return symbol(IF); }
-    parfor { numEndsExpected++; return symbol(PARFOR); }
-    switch { numEndsExpected++; return symbol(SWITCH); }
-    try { numEndsExpected++; return symbol(TRY); }
-    while { numEndsExpected++; return symbol(WHILE); }
-    
-    properties { return symbol(PROPERTIES); }
-    methods { return symbol(METHODS); }
-    events { return symbol(EVENTS); }
     
     end {
         numEndsExpected--;
@@ -551,10 +529,24 @@ ValidEscape=\\[bfnrt\\\"]
         }
         return symbol(END); //NB: just return normal END token
     }
+    
+    properties { return symbol(PROPERTIES); }
+    methods { return symbol(METHODS); }
+    events { return symbol(EVENTS); }
 }
 
 <YYINITIAL, CLASS> {
     //from matlab "iskeyword" function
+    
+    case { maybeIncrNumEndsExpected(); return symbol(CASE); }
+    for { maybeIncrNumEndsExpected(); return symbol(FOR); }
+    function { maybeIncrNumEndsExpected(); return symbol(FUNCTION); }
+    if { maybeIncrNumEndsExpected(); return symbol(IF); }
+    parfor { maybeIncrNumEndsExpected(); return symbol(PARFOR); }
+    switch { maybeIncrNumEndsExpected(); return symbol(SWITCH); }
+    try { maybeIncrNumEndsExpected(); return symbol(TRY); }
+    while { maybeIncrNumEndsExpected(); return symbol(WHILE); }
+    
     break { return symbol(BREAK); }
     catch { return symbol(CATCH); }
     continue { return symbol(CONTINUE); }
@@ -575,7 +567,7 @@ ValidEscape=\\[bfnrt\\\"]
             Symbol result = symbol(DOT);
             saveStateAndTransition(FIELD_NAME);
             return result;
-       }
+    }
 }
 
 //ignore keywords - we just saw a dot
