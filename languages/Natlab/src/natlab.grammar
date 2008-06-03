@@ -5,6 +5,9 @@
 %class "NatlabParser";
 
 %embed {:
+    //// Errors ////////////////////////////////////////////////////////////////
+
+    //list of errors encountered while parsing
     private final java.util.List<String> errors = new java.util.ArrayList<String>();
 
     public java.util.List<String> getErrors() {
@@ -15,14 +18,20 @@
         return !errors.isEmpty();
     }
 
+    //given a symbol, return a canonical string representation of it's position
     private static String getPosString(Symbol token) {
         return getPosString(token.getLine(token.getStart()), token.getColumn(token.getStart()));
     }
 
+    //given a position, return a canonical string representation
     private static String getPosString(int line, int col) {
         return "[" + line + ", " + col + "]";
     }
 
+    //override the default error handling:
+    //  1) no writing to stderr
+    //  2) no exceptions
+    //  3) suggestions based on automatic corrections
     class Events extends Parser.Events {
         public void syntaxError(Symbol token) {
             errors.add(getPosString(token) + "  unexpected token " + Terminals.NAMES[token.getId()]);
@@ -41,8 +50,12 @@
         }
     }
 
-    { report = new Events(); } // Use error handler in parser
-    
+    //tell handler to use subclass defined above
+    { report = new Events(); }
+
+    //// AST helpers ///////////////////////////////////////////////////////////
+
+    //add all elements of a util list to an ast list
     private static <T extends ASTNode<?>> natlab.ast.List<T> addAll(natlab.ast.List<T> node, java.util.List<T> children) {
         for(T child : children) {
             node.add(child);
@@ -50,6 +63,7 @@
         return node;
     }
 
+    //make a new ast list for a given util list
     private static <T extends ASTNode<?>> natlab.ast.List<T> makeListNode(java.util.List<T> children) {
         if(children == null) {
             return null;
@@ -57,13 +71,20 @@
         return addAll(new natlab.ast.List<T>(), children);
     }
 
+    //// Stmt terminators //////////////////////////////////////////////////////
+
+    //return type of statement terminators
     //need this because non-terminals must return symbols
     private static class BooleanFakeSymbol extends Symbol {
         private boolean value;
         BooleanFakeSymbol(boolean value) { this.value = value; }
         Stmt annotateStmt(Stmt stmt) { stmt.setOutputSuppressed(value); return stmt; }
     }
-    
+
+    //// Comments //////////////////////////////////////////////////////////////
+
+    //comment buffer populated by scanner
+    //should be non-null, but null is handled gracefully
     private CommentBuffer commentBuffer = null;
 
     public void setCommentBuffer(CommentBuffer commentBuffer) {
@@ -73,18 +94,23 @@
     public CommentBuffer getCommentBuffer() {
         return commentBuffer;
     }
-    
+
+    //attach all comments since last request to provided node
     private <T extends ASTNode> T annotateWithComments(T node) {
         if(node != null && commentBuffer != null) {
             node.setComments(commentBuffer.pollAllComments());
         }
         return node;
     }
-    
+
+    //AST really doesn't like null nodes, but beaver returns null for empty optional lists
+    //Create an appropriate empty node to replace the null
     private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
         return original == null ? new List<T>() : original;
     }
-    
+
+    //helper for constructing an AST Function node
+    //separates stmts from nested functions and attaches comments
     private Function function(List<Param> outParams, String name, List<Param> inParams, ArrayList<HelpComment> comments, ArrayList<Symbol> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
@@ -164,20 +190,22 @@
 
 %goal program;
 
+//everything
 program =
      //gather up any unclaimed comments
      program_before_comments.p {: return annotateWithComments(p); :}
   ;
 
-// Currently, a .m file is treated as a list of statements.
+//everything except left-over comments
 program_before_comments = 
      script.s
   |  function_list.f
   |  class_def.c
   |  {: return new EmptyProgram(); :}
-  |  OtherNonTerm {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
+  |  OtherTerminal {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
   ;
 
+//script file: list of help comments followed by list of stmts
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
@@ -189,15 +217,18 @@ script =
   |  last_help_comment.c {: return new Script(new List<HelpComment>().add(c), new List<Stmt>()); :}
   ;
 
+//function file: list of functions, separated by whitespace
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 function_list =
      function.functions+ {: return new FunctionList(makeListNode(_list_functions)); :}
   ;
 
+//function followed by whitespace - only used by function_list (otherwise use function_body)
 function =
      function_body.f LINE_TERMINATOR*
   ;
 
+//a function with nothing following the final END
 function_body =
      //output params
      FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
@@ -207,11 +238,13 @@ function_body =
          {: return function(null, name, in, _list_comments, _list_body); :}
   ;
 
+//input parameter list for a function
 input_params =
      LPAREN RPAREN {: return new List<Param>(); :}
   |  LPAREN param_list.l RPAREN
   ;
 
+//output parameter list for a function
 output_params =
      LSQUARE RSQUARE {: return new List<Param>(); :}
   |  LSQUARE param_list.l RSQUARE
@@ -219,58 +252,72 @@ output_params =
   ;
 
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
+//shared by input and output parameters
 param_list =
      IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
   |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Param(p)); :}
   ;
 
+//used to mix stmts and nested functions in a containing function
 stmt_or_function =
      stmt.s
-     //NB: body since otherwise there is a conflict: function newline could be (function, empty stmt) or (function with newline)
+     //NB: body since otherwise there is a conflict: function newline could be 
+     //  (function, empty stmt) or (function with newline)
      //resolve as (function, empty stmt) because that's easier
      //TODO-AC: eliminate spurious empty stmts?
   |  function_body.f
   ;
 
+//a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def = //TODO-AC: fill in
      CLASSDEF END {: return new ClassDef(); :}
   ;
 
+//usually help comments are followed by a newline, but the last one could be followed by EOF instead
 last_help_comment =
      help_comment.c
   |  help_comment_body.c
   ;
 
+//help comment with a newline
 help_comment =
      help_comment_body.c LINE_TERMINATOR
   ;
 
+//help comment without a newline
 help_comment_body =
      HELP_COMMENT.c {: return new OneLineHelpComment(c); :}
   |  BRACKET_HELP_COMMENT.c {: return new MultiLineHelpComment(c); :}
   ;
 
+//list of statements (each followed by a separator)
+//may be empty
 stmt_list =
      stmt.stmts+ {: return makeListNode(_list_stmts); :}
   |  {: return new List<Stmt>(); :}
   ;
 
+//usually stmts are followed by separators, but the last one could be followed by EOF instead
 last_stmt =
      stmt_body.s
   |  stmt.s
   ;
 
+//stmt followed by separator
 stmt =
      stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
      //NB: not attaching comments to empty statements
-  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST
+  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST?
   ;
 
+//stmt not followed by separator
+//production just exists to attach comments to the real stmt bodies in stmt_body_before_comments
 stmt_body =
      stmt_body_before_comments.s {: return annotateWithComments(s); :}
   ;
 
+//stmt not followed by a separator and not having attached comments
 stmt_body_before_comments =
      expr.e {: return new ExprStmt(e); :}
   |  assign.a
@@ -292,6 +339,7 @@ stmt_separator =
   |  COMMA_LINE_TERMINATOR {: return new BooleanFakeSymbol(false); :}
   ;
 
+//assingment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
      assign.a
   |  LPAREN assign.a RPAREN
@@ -431,7 +479,9 @@ arg =
   |  COLON.c {: return new Colon(); :}
   ;
 
-OtherNonTerm =
+//terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
+//but which aren't used in other productions
+OtherTerminal =
     IM_INT_NUMBER
   | IM_FP_NUMBER
   | LCURLY
