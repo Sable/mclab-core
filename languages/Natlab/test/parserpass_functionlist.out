@@ -10,9 +10,9 @@ end
 function  [y, z] = fcn3(a)
 y = (a + 1);
 
-%comment1
 z = y;
 y = z;
+%comment1
 function  [q] = fcn4()
 q = 3
 
