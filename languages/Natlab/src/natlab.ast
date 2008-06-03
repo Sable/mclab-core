@@ -96,6 +96,7 @@ EQExpr : EqualityExpr ;
 NEExpr : EqualityExpr ;
 
 FunctionHandle : Expr ::= <Name : String>;
+LambdaDef : Expr ::= InputParam:Param* Body:Expr;
 
 //------- ------------------------------------------------------------
 // statement that can be reached by break or continue

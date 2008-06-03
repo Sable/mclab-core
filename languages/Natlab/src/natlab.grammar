@@ -160,7 +160,7 @@
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
-%typeof expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
+%typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof lvalue = "Access";
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
@@ -381,17 +381,22 @@ simple_name =
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr =
+     logic_expr.l
+  |  AT input_params.params expr.body {: return new LambdaDef(params, body); :}
+  ;
+
+logic_expr =
      colon_expr.e
-  |  expr.e1 LT expr.e2 {: return new LTExpr(e1, e2); :}
-  |  expr.e1 GT expr.e2 {: return new GTExpr(e1, e2); :}
-  |  expr.e1 LE expr.e2 {: return new LEExpr(e1, e2); :}
-  |  expr.e1 GE expr.e2 {: return new GEExpr(e1, e2); :}
-  |  expr.e1 EQ expr.e2 {: return new EQExpr(e1, e2); :}
-  |  expr.e1 NE expr.e2 {: return new NEExpr(e1, e2); :}
-  |  expr.e1 AND expr.e2 {: return new AndLogicalExpr(e1, e2); :}
-  |  expr.e1 OR expr.e2 {: return new OrLogicalExpr(e1, e2); :}
-  |  expr.e1 SHORTAND expr.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
-  |  expr.e1 SHORTOR expr.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
+  |  logic_expr.e1 LT logic_expr.e2 {: return new LTExpr(e1, e2); :}
+  |  logic_expr.e1 GT logic_expr.e2 {: return new GTExpr(e1, e2); :}
+  |  logic_expr.e1 LE logic_expr.e2 {: return new LEExpr(e1, e2); :}
+  |  logic_expr.e1 GE logic_expr.e2 {: return new GEExpr(e1, e2); :}
+  |  logic_expr.e1 EQ logic_expr.e2 {: return new EQExpr(e1, e2); :}
+  |  logic_expr.e1 NE logic_expr.e2 {: return new NEExpr(e1, e2); :}
+  |  logic_expr.e1 AND logic_expr.e2 {: return new AndLogicalExpr(e1, e2); :}
+  |  logic_expr.e1 OR logic_expr.e2 {: return new OrLogicalExpr(e1, e2); :}
+  |  logic_expr.e1 SHORTAND logic_expr.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
+  |  logic_expr.e1 SHORTOR logic_expr.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
   ;
 
 colon_expr =

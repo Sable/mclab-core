@@ -50,6 +50,7 @@ aspect PrettyPrint {
   eq ParameterizedAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
 
   eq FunctionHandle.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
+  eq LambdaDef.dumpString() = getClass().getName() + " [" + getStructureStringLessComments() + "]";
 
   public String Script.dumpTree() {
     StringBuffer s = new StringBuffer();

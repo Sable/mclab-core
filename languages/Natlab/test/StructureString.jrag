@@ -211,6 +211,22 @@ aspect StructureString {
     }
     
     eq FunctionHandle.getStructureStringLessComments() = "@" + getName();
+    eq LambdaDef.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("(@(");
+        boolean first = true;
+        for(Param param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(") ");
+        buf.append(getBody().getStructureString());
+        buf.append(")");
+        return buf.toString();
+    }
     
     //literals
     eq IntegerLiteral.getStructureStringLessComments() = getValue().getText();
