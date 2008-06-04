@@ -1,0 +1,388 @@
+//TODO-AC: indentation
+//TODO-AC: comment placement
+aspect PrettyPrint {
+    syn String ASTNode.getPrettyPrinted() {
+        StringBuffer buf = new StringBuffer();
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(comment.value);
+            buf.append('\n');
+        }
+        buf.append(getPrettyPrintedLessComments());
+        return buf.toString();
+    }
+
+    //default - exception
+    syn String ASTNode.getPrettyPrintedLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()"); }
+    
+    //program
+    eq EmptyProgram.getPrettyPrintedLessComments() {
+        return "";
+    }
+    
+    eq Script.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionList.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Function func : getFunctions()) {
+            buf.append(func.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq Function.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append(" [");
+        boolean first = true;
+        for(Param param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Param param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    //help comments
+    
+    eq HelpComment.getPrettyPrintedLessComments() = getText();
+    
+    //stmts
+    eq EmptyStmt.getPrettyPrintedLessComments() = (isOutputSuppressed() ? ";" : "");
+    eq ExprStmt.getPrettyPrintedLessComments() = getExpr().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getPrettyPrintedLessComments() = getDest().getPrettyPrinted() + " = " + getSource().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
+    eq GlobalStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("global");
+        for(ParseName name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getPrettyPrinted());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq PersistentStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("persistent");
+        for(ParseName name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getPrettyPrinted());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq ShellCommandStmt.getPrettyPrintedLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
+    
+    eq BreakStmt.getPrettyPrintedLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
+    eq ContinueStmt.getPrettyPrintedLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
+    eq ReturnStmt.getPrettyPrintedLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
+
+    eq ForStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("for ");
+        buf.append(getAssignStmt().getPrettyPrinted());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq WhileStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("where ");
+        buf.append(getExpr());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    // if-elseif-else
+    eq IfStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("if ");
+        buf.append(getCondition().getPrettyPrinted());
+        buf.append('\n');
+        for(Stmt stmt : getThenList()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(ElseifStmt stmt : getElseifList()) {
+            buf.append(stmt.getPrettyPrinted());
+        }
+        if(hasElse()) {
+            buf.append("else ");
+            buf.append('\n');
+	        for(Stmt stmt : (List<Stmt>)getElse()) {
+	            buf.append('\t');
+	            buf.append(stmt.getPrettyPrinted());
+	            buf.append('\n');
+	        }
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq ElseifStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("elseif ");
+        buf.append(getCondition().getPrettyPrinted());
+        buf.append('\n');
+        for(Stmt stmt : getThenList()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+
+// SwitchStmt : BranchTargetStmt ::= Expr SwithCase* [DefaultCase];
+// abstract Case : Stmt;
+// SwithCase : Case ::= Expr Stmt*;
+// DefaultCase : Case  ::= Stmt*;
+    // switch-case
+    eq SwitchStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("switch ");
+        buf.append(getExpr().getPrettyPrinted());
+        buf.append('\n');
+        for(SwithCase scase : getSwithCaseList()) {
+            buf.append(scase.getPrettyPrinted());
+        }
+        if(hasDefaultCase()) {
+            buf.append(getDefaultCase().getPrettyPrinted());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    eq SwithCase.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("case ");
+        buf.append(getExpr().getPrettyPrinted());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    eq DefaultCase.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("otherwise ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // try-catch
+    eq TryStmt.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("try ");
+        buf.append('\n');
+        for(Stmt stmt : getTryBlockList()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("catch ");
+        buf.append('\n');
+        for(Stmt stmt : getCatchBlockList()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    //exprs
+    eq ColonExpr.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('(');
+        buf.append(getBase().getPrettyPrinted());
+        buf.append(" : ");
+        if(hasIncr()) {
+            buf.append(getIncr().getPrettyPrinted());
+            buf.append(" : ");
+        }
+        buf.append(getLimit().getPrettyPrinted());
+        buf.append(')');
+        return buf.toString();
+    }
+    eq Colon.getPrettyPrintedLessComments() = ":";
+    
+    //accesses
+    eq IdUse.getPrettyPrintedLessComments() = getID();
+    eq ParseName.getPrettyPrintedLessComments() = getID();
+    eq ParameterizedAccess.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getID());
+        buf.append('(');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(')');
+        return buf.toString();
+    }
+    
+    eq MatrixDecl.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('[');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(']');
+        return buf.toString();
+    }
+    eq CellArrayDecl.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('{');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getPrettyPrinted());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+    eq Row.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for(Expr element : getElements()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(element.getPrettyPrinted());
+            first = false;
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionHandle.getPrettyPrintedLessComments() = "@" + getName();
+    eq LambdaDef.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("(@(");
+        boolean first = true;
+        for(Param param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(") ");
+        buf.append(getBody().getPrettyPrinted());
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    //literals
+    eq IntegerLiteral.getPrettyPrintedLessComments() = getValue().getText();
+    eq DoubleLiteral.getPrettyPrintedLessComments() = getValue().getText();
+    eq StringLiteral.getPrettyPrintedLessComments() = "'" + getValue() + "'";
+    
+    eq MinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
+    eq PlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
+    eq LogNotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
+    eq TransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
+    eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
+    
+    syn String Binary.getPrettyPrintedLessComments(String op) = "(" + getLeftOperand().getPrettyPrinted() + " " + op + " " + getRightOperand().getPrettyPrinted() + ")";
+    
+    eq MulExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
+    eq DivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
+    eq LeftDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
+    eq PowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
+    eq AddExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
+    eq SubExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
+    eq EMulExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
+    eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
+    eq ELeftDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
+    eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
+    
+    eq AndLogicalExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
+    eq OrLogicalExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
+    eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
+    eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
+    eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");
+    eq GTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">");
+    eq LEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<=");
+    eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
+    eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
+    eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
+
+    // Beaver classes
+    eq List.getPrettyPrintedLessComments() = "";
+    eq Opt.getPrettyPrintedLessComments()  = "";
+}

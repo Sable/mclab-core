@@ -6,21 +6,21 @@
  */
 import java.util.*;
 
-aspect PrettyPrint {
+aspect ASTPrint {
 
   // Default output
   
-  public String ASTNode.toString() {
+  public String ASTNode.getNodeString() {
     StringBuffer s = new StringBuffer();
     s.append(getStructureString());
     return s.toString().trim();
   }
   
 
-  public void ASTNode.toString(StringBuffer s) {
-    //  throw new Error("ERROR: toString(StringBuffer s) not implemented for " + getClass().getName());
+  public void ASTNode.getNodeString(StringBuffer s) {
+    //  throw new Error("ERROR: getNodeString(StringBuffer s) not implemented for " + getClass().getName());
     // no need to throw exception when building tree
-    s.append("WARNING: toString(StringBuffer s) not implemented for " + getClass().getName()+"\n");
+    s.append("WARNING: getNodeString(StringBuffer s) not implemented for " + getClass().getName()+"\n");
   }
 
   // dump the AST to standard output
@@ -42,7 +42,7 @@ aspect PrettyPrint {
     }
   }
 
-  syn String ASTNode.dumpString() = getClass().getName() + " [" + toString() + "]";
+  syn String ASTNode.dumpString() = getClass().getName() + " [" + getNodeString() + "]";
   eq IntegerLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq DoubleLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq StringLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";

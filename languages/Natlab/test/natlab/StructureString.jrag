@@ -1,4 +1,4 @@
-//TODO-AC: indentation?
+//TODO-AC: point at PrettyPrint once it stabilizes
 //NB: output may not re-parse as same AST (esp comments, empty stmts)
 aspect StructureString {
     syn String ASTNode.getStructureString() {
