@@ -381,8 +381,4 @@ aspect StructureString {
     eq GEExpr.getStructureStringLessComments() = getStructureStringLessComments(">=");
     eq EQExpr.getStructureStringLessComments() = getStructureStringLessComments("==");
     eq NEExpr.getStructureStringLessComments() = getStructureStringLessComments("~=");
-
-    // Beaver classes
-    eq List.getStructureStringLessComments() = "";
-    eq Opt.getStructureStringLessComments()  = "";
 }

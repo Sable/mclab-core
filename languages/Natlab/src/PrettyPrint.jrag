@@ -381,8 +381,4 @@ aspect PrettyPrint {
     eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
     eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
     eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
-
-    // Beaver classes
-    eq List.getPrettyPrintedLessComments() = "";
-    eq Opt.getPrettyPrintedLessComments()  = "";
 }

@@ -16,6 +16,14 @@ aspect ASTPrint {
     return s.toString().trim();
   }
   
+  public String Opt.getNodeString() {
+    return "--IN LIST--";
+  }
+  
+  public String List.getNodeString() {
+    return "--IN OPT--";
+  }
+  
 
   public void ASTNode.getNodeString(StringBuffer s) {
     //  throw new Error("ERROR: getNodeString(StringBuffer s) not implemented for " + getClass().getName());
