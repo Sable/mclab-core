@@ -140,6 +140,7 @@ aspect StructureString {
         buf.append(getExpr());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
+            buf.append('\t');
             buf.append(stmt.getStructureString());
             buf.append('\n');
         }
