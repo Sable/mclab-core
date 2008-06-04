@@ -104,8 +104,17 @@ LambdaDef : Expr ::= InputParam:Param* Body:Expr;
 abstract BranchTargetStmt : Stmt;  
 ForStmt : BranchTargetStmt ::= AssignStmt Stmt*; 
 WhileStmt : BranchTargetStmt ::= Expr Stmt*; 
+SwitchStmt : BranchTargetStmt ::= Expr SwithCase* [DefaultCase];
+abstract Case : Stmt;
+SwithCase : Case ::= Expr Stmt*;
+DefaultCase : Case  ::= Stmt*;
 
 BreakStmt : Stmt;
 ContinueStmt : Stmt;
 ReturnStmt : Stmt;
+
+IfStmt : Stmt ::= Condition:Expr Then:Stmt* Elseif:ElseifStmt* [Else:List];
+ElseifStmt : Stmt ::= Condition:Expr Then:Stmt*;
+
+TryStmt : Stmt ::= TryBlock:Stmt* CatchBlock:Stmt*;
 

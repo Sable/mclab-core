@@ -171,6 +171,12 @@
 %typeof name, simple_name = "ParseName";
 %typeof stmt_separator = "BooleanFakeSymbol";
 %typeof help_comment, help_comment_body, last_help_comment = "HelpComment";
+%typeof else_clause = "List<Stmt>";
+%typeof else_if_clause = "ElseifStmt";
+%typeof if_statement = "IfStmt";
+%typeof switch_statement = "SwitchStmt";
+%typeof switch_case = "SwithCase";
+%typeof default_case = "DefaultCase";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -324,15 +330,52 @@ stmt_body_before_comments =
   |  GLOBAL simple_name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
   |  PERSISTENT simple_name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
   |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
-//  |  if_then_statement
-//  |  if_then_else_statement
-//  |  switch_statement
-//  |  try_statement
+  |  TRY stmt_separator stmt_list.tl CATCH stmt_separator stmt_list.cl END
+     {: return new TryStmt(tl, cl); :}
+  |  switch_statement
+  |  if_statement
   |  BREAK    {: return new BreakStmt(); :}
   |  CONTINUE {: return new ContinueStmt(); :}
   |  RETURN   {: return new ReturnStmt(); :}
   |  WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
   |  FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
+  ;
+
+switch_statement = 
+     SWITCH expr.e stmt_separator default_case.d? END
+     {: if(d==null) return new SwitchStmt(e, new List(), new Opt());
+     	else return new SwitchStmt(e, new List(), new Opt(d)); 
+     :}
+  |  SWITCH expr.e stmt_separator switch_case.s+ default_case.d? END
+     {: if(d==null) return new SwitchStmt(e, makeListNode(_list_s), new Opt());
+     	else return new SwitchStmt(e, makeListNode(_list_s), new Opt(d)); 
+     :}
+  ;
+
+switch_case	= 
+     CASE expr.e stmt_separator stmt_list.l {: return new SwithCase(e, l); :}
+  ;
+default_case = 
+     OTHERWISE stmt_separator stmt_list.l  {: return new DefaultCase(l); :}
+  ;
+  
+if_statement = 
+     IF expr.e stmt_separator stmt_list.l else_clause.els? END   
+     {: if(els==null) return new IfStmt(e, l, new List(), new Opt());
+     	else return new IfStmt(e, l, new List(), new Opt(els)); 
+     :}
+  |  IF expr.e stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END   
+     {: if(els==null) return new IfStmt(e, l, makeListNode(_list_elseif), new Opt());
+     	else return new IfStmt(e, l, makeListNode(_list_elseif), new Opt(els)); 
+     :}
+  ;
+
+else_if_clause = 
+     ELSEIF expr.e stmt_separator stmt_list.l  {: return new ElseifStmt(e, l); :}
+  ;
+  
+else_clause = 
+     ELSE stmt_separator stmt_list.l {: return l; :}
   ;
 
 stmt_separator =
@@ -498,15 +541,7 @@ arg =
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
 //but which aren't used in other productions
 OtherTerminal =
-    CASE
-  | CATCH
-  | ELSE
-  | ELSEIF
-  | IF
-  | OTHERWISE
-  | PARFOR
-  | SWITCH
-  | TRY
+    PARFOR
   | DOT
   | PROPERTIES
   | METHODS

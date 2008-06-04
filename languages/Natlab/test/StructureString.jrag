@@ -146,8 +146,112 @@ aspect StructureString {
         buf.append("end");
         return buf.toString();
     }
+
+    // if-elseif-else
+    eq IfStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("if ");
+        buf.append(getCondition().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getThenList()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        for(ElseifStmt stmt : getElseifList()) {
+            buf.append(stmt.getStructureString());
+        }
+        if(hasElse()) {
+            buf.append("else ");
+            buf.append('\n');
+	        for(Stmt stmt : (List<Stmt>)getElse()) {
+	            buf.append('\t');
+	            buf.append(stmt.getStructureString());
+	            buf.append('\n');
+	        }
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq ElseifStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("elseif ");
+        buf.append(getCondition().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getThenList()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
     
-    
+
+// SwitchStmt : BranchTargetStmt ::= Expr SwithCase* [DefaultCase];
+// abstract Case : Stmt;
+// SwithCase : Case ::= Expr Stmt*;
+// DefaultCase : Case  ::= Stmt*;
+    // switch-case
+    eq SwitchStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("switch ");
+        buf.append(getExpr().getStructureString());
+        buf.append('\n');
+        for(SwithCase scase : getSwithCaseList()) {
+            buf.append(scase.getStructureString());
+        }
+        if(hasDefaultCase()) {
+            buf.append(getDefaultCase().getStructureString());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    eq SwithCase.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("case ");
+        buf.append(getExpr().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    eq DefaultCase.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("otherwise ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // try-catch
+    eq TryStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("try ");
+        buf.append('\n');
+        for(Stmt stmt : getTryBlockList()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("catch ");
+        buf.append('\n');
+        for(Stmt stmt : getCatchBlockList()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
     //exprs
     eq ColonExpr.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
@@ -278,10 +382,6 @@ aspect StructureString {
     eq NEExpr.getStructureStringLessComments() = getStructureStringLessComments("~=");
 
     // Beaver classes
-    eq List.getStructureStringLessComments() {
-        return "-- List --";
-    }
-    eq Opt.getStructureStringLessComments() {
-        return "-- Opt --";
-    }
+    eq List.getStructureStringLessComments() = "";
+    eq Opt.getStructureStringLessComments()  = "";
 }
