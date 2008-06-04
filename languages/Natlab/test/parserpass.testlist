@@ -72,3 +72,8 @@ parserpass_switch6
 parserpass_switch7
 parserpass_trycatch1
 parserpass_trycatch2
+parserpass_for1
+parserpass_for2
+parserpass_for3
+parserpass_while1
+parserpass_while2

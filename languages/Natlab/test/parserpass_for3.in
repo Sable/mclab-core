@@ -1,0 +1,7 @@
+for i=b
+  x = x+i;
+	for j=1:5
+	  x = x * j
+	end
+  n = n+x^2
+end
