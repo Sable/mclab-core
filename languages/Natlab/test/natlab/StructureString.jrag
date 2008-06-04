@@ -136,8 +136,8 @@ aspect StructureString {
 
     eq WhileStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("where ");
-        buf.append(getExpr());
+        buf.append("while ");
+        buf.append(getExpr().getStructureString());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
