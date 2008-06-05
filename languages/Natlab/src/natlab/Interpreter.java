@@ -39,8 +39,10 @@ public class Interpreter {
 						System.out.println(error);
 					}
 				} else {
-					System.out.println(original.getStructureString());
-					System.out.println(original.dumpTree());
+					// Using Pretty print
+					System.out.println(original.getPrettyPrinted());
+					// System.out.println(original.getStructureString());
+					// System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {
 				System.out.println("**ERROR**");
