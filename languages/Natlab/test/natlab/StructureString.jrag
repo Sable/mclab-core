@@ -242,13 +242,16 @@ aspect StructureString {
             buf.append(stmt.getStructureString());
             buf.append('\n');
         }
-        buf.append("catch ");
-        buf.append('\n');
-        for(Stmt stmt : getCatchBlockList()) {
-            buf.append('\t');
-            buf.append(stmt.getStructureString());
-            buf.append('\n');
-        }
+        List<Stmt> catchList = getCatchBlockList();
+        if (catchList.getNumChild()>0) {
+	        buf.append("catch ");
+	        buf.append('\n');        
+	        for(Stmt stmt : catchList) {
+	            buf.append('\t');
+	            buf.append(stmt.getStructureString());
+	            buf.append('\n');
+	        }
+	    }
         buf.append("end");
         return buf.toString();
     }
@@ -287,7 +290,54 @@ aspect StructureString {
         buf.append(')');
         return buf.toString();
     }
+
+    eq SingleCellContentAccess.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getID());
+        buf.append('{');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+    eq MultiCellContentAccess.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getCellContentAccess().getStructureStringLessComments());
+        buf.append('{');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
     
+    eq CellIndexAccess.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getCellContentAccess().getStructureStringLessComments());
+        buf.append('(');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append(')');
+        return buf.toString();
+    }
+
     eq MatrixDecl.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('[');

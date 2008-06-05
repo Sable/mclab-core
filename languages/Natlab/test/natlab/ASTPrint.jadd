@@ -17,11 +17,11 @@ aspect ASTPrint {
   }
   
   public String Opt.getNodeString() {
-    return "--IN LIST--";
+    return "";
   }
   
   public String List.getNodeString() {
-    return "--IN OPT--";
+    return "";
   }
   
 

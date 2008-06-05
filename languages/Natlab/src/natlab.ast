@@ -34,6 +34,12 @@ IdUse:Access ::= <ID:String>;
 ParseName:Access ::= <ID:String>;
 
 ParameterizedAccess : Access ::= <ID:String> Arg:Expr*;
+
+abstract CellContentAccess:Access;
+SingleCellContentAccess : CellContentAccess ::= <ID:String> Arg:Expr*;
+MultiCellContentAccess : CellContentAccess ::= CellContentAccess Arg:Expr*;
+CellIndexAccess : Access ::= CellContentAccess Arg:Expr*;
+
 MatrixDecl : Access ::= Row*;
 CellArrayDecl : Access ::= Row*;
 Row : Access ::= Element:Expr*;

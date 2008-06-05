@@ -177,6 +177,8 @@
 %typeof switch_statement = "SwitchStmt";
 %typeof switch_case = "SwithCase";
 %typeof default_case = "DefaultCase";
+%typeof cell_access = "Access";
+%typeof cell_content_access = "CellContentAccess";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -330,6 +332,8 @@ stmt_body_before_comments =
   |  GLOBAL simple_name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
   |  PERSISTENT simple_name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
   |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
+  |  TRY stmt_separator stmt_list.tl END
+     {: return new TryStmt(tl, new List()); :}
   |  TRY stmt_separator stmt_list.tl CATCH stmt_separator stmt_list.cl END
      {: return new TryStmt(tl, cl); :}
   |  switch_statement
@@ -399,6 +403,30 @@ assign =
 lvalue =
      name.id
   |  access.a
+  |  cell_access.c
+  ;
+
+cell_access =
+     cell_content_access.c
+  |  cell_index_access.c
+  ;
+
+cell_content_access =
+     single_cell_content_access.s
+  |  cell_content_access.c LCURLY arg_list.l RCURLY {: return new MultiCellContentAccess(c, l); :}
+  ;
+
+single_cell_content_access =
+     name.n LCURLY arg_list.l RCURLY 
+     {:
+         ParseName pn = (ParseName) n;
+         return new SingleCellContentAccess(pn.getID(), l);
+     :}
+  ;
+
+cell_index_access =
+     cell_content_access.c LPAREN RPAREN    {: return new CellIndexAccess(c, new List()); :}
+  |  cell_content_access.c LPAREN arg_list.l RPAREN   {: return new CellIndexAccess(c, l); :}
   ;
 
 access =
@@ -484,6 +512,7 @@ primary_expr =
   |  LPAREN expr.e RPAREN
   |  matrix.m
   |  cell_array.c
+  |  cell_access.a  //TODO-AC: current cell only support name{..}{..}[(..)]
   |  access.a
   |  name.n
   |  AT IDENTIFIER.name {: return new FunctionHandle(name); :} //TODO-AC: allow qualified name?
