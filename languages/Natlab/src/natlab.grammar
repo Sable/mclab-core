@@ -161,9 +161,8 @@
 %typeof class_def = "ClassDef";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
-%typeof for_assign, assign = "AssignStmt";
+%typeof for_assign = "AssignStmt";
 %typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
-%typeof lvalue = "LValueExpr";
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
 %typeof matrix = "MatrixExpr";
@@ -179,8 +178,7 @@
 %typeof switch_statement = "SwitchStmt";
 %typeof switch_case = "SwitchCaseBlock";
 %typeof default_case = "DefaultCaseBlock";
-//%typeof cell_index_access = "CellIndexExpr";
-%typeof parameterized_access = "ParameterizedExpr";
+%typeof access, cell_access, var_access = "LValueExpr";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -330,7 +328,7 @@ stmt_body =
 //stmt not followed by a separator and not having attached comments
 stmt_body_before_comments =
      expr.e {: return new ExprStmt(e); :}
-  |  assign.a
+  |  expr.lhs ASSIGN expr.rhs {: return new AssignStmt(lhs, rhs); :}
   |  GLOBAL  name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
   |  PERSISTENT name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
   |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
@@ -388,30 +386,9 @@ stmt_separator =
 
 //assingment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
-     assign.a
-  |  LPAREN assign.a RPAREN
+     name.lhs ASSIGN expr.rhs {: return new AssignStmt(new NameExpr(lhs), rhs); :}
+  |  LPAREN name.lhs ASSIGN expr.rhs RPAREN {: return new AssignStmt(new NameExpr(lhs), rhs); :}
   ;
-
-assign =
-     lvalue.lhs ASSIGN expr.rhs {: return new AssignStmt(lhs, rhs); :}
-  ;
-
-lvalue =
-     name.id {: return new NameExpr(id); :}
-  |  parameterized_access.a
-//  |  cell_index_access.c
-  ;
-
-parameterized_access =
-     name.n LPAREN RPAREN {: return new ParameterizedExpr(new NameExpr(n), new List<Expr>()); :}
-  |  name.n LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(new NameExpr(n), l); :}
-  ;
-
-//cell_index_access =
-//  |  name.n LCURLY arg_list.l RCURLY {: return new ParameterizedExpr(new NameExpr(n), l); :}
-//  |  cell_index_access.c LCURLY arg_list.l RCURLY {: return new ParameterizedExpr(c, l); :}
-//  ;
-
 
 name =
      IDENTIFIER.id {: return new Name(id); :}
@@ -479,10 +456,23 @@ primary_expr =
   |  LPAREN expr.e RPAREN
   |  matrix.m
   |  cell_array.c
-  |  name.id {: return new NameExpr(id); :}
-  |  parameterized_access.a
-//  |  cell_index_access.c
+  |  access.a
   |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  ;
+
+access =
+     cell_access.c
+  |  cell_access.c LPAREN RPAREN {: return new ParameterizedExpr(c, new List<Expr>()); :}
+  |  cell_access.c LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(c, l); :}
+  ;
+
+cell_access =
+     var_access.v
+  |  var_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
+  ;
+
+var_access = //TODO-AC: dot-separated names here
+     name.n {: return new NameExpr(n); :}
   ;
 
 literal =
