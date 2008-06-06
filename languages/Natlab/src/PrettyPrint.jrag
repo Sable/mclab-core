@@ -46,7 +46,7 @@ aspect PrettyPrint {
         buf.append("function ");
         buf.append(" [");
         boolean first = true;
-        for(Param param : getOutputParams()) {
+        for(Name param : getOutputParams()) {
             if(!first) {
                 buf.append(", ");
             }
@@ -57,7 +57,7 @@ aspect PrettyPrint {
         buf.append(getName());
         buf.append("(");
         first = true;
-        for(Param param : getInputParams()) {
+        for(Name param : getInputParams()) {
             if(!first) {
                 buf.append(", ");
             }
@@ -87,13 +87,13 @@ aspect PrettyPrint {
     eq HelpComment.getPrettyPrintedLessComments() = getText();
     
     //stmts
-    eq EmptyStmt.getPrettyPrintedLessComments() = (isOutputSuppressed() ? ";" : "");
+    eq EmptyStmt.getPrettyPrintedLessComments() = "";
     eq ExprStmt.getPrettyPrintedLessComments() = getExpr().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
-    eq AssignStmt.getPrettyPrintedLessComments() = getDest().getPrettyPrinted() + " = " + getSource().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getPrettyPrintedLessComments() = getLHS().getPrettyPrinted() + " = " + getRHS().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
     eq GlobalStmt.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("global");
-        for(ParseName name : getNames()) {
+        for(Name name : getNames()) {
             buf.append(" ");
             buf.append(name.getPrettyPrinted());
         }
@@ -105,7 +105,7 @@ aspect PrettyPrint {
     eq PersistentStmt.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("persistent");
-        for(ParseName name : getNames()) {
+        for(Name name : getNames()) {
             buf.append(" ");
             buf.append(name.getPrettyPrinted());
         }
@@ -137,7 +137,7 @@ aspect PrettyPrint {
     eq WhileStmt.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("while ");
-        buf.append(getExpr().getStructureString());
+        buf.append(getExpr().getPrettyPrinted());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
@@ -151,64 +151,62 @@ aspect PrettyPrint {
     // if-elseif-else
     eq IfStmt.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("if ");
-        buf.append(getCondition().getPrettyPrinted());
-        buf.append('\n');
-        for(Stmt stmt : getThenList()) {
-            buf.append('\t');
-            buf.append(stmt.getPrettyPrinted());
-            buf.append('\n');
+        boolean first = true;
+        for(IfBlock block : getIfBlocks()) {
+            if(!first) {
+                buf.append("else");
+            }
+            buf.append(block.getPrettyPrinted());
+            first = false;
         }
-        for(ElseifStmt stmt : getElseifList()) {
-            buf.append(stmt.getPrettyPrinted());
-        }
-        if(hasElse()) {
-            buf.append("else ");
-            buf.append('\n');
-	        for(Stmt stmt : (List<Stmt>)getElse()) {
-	            buf.append('\t');
-	            buf.append(stmt.getPrettyPrinted());
-	            buf.append('\n');
-	        }
+        if(hasElseBlock()) {
+            buf.append(getElseBlock().getStructureString());
         }
         buf.append("end");
         return buf.toString();
     }
 
-    eq ElseifStmt.getPrettyPrintedLessComments() {
+    eq IfBlock.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("elseif ");
+        buf.append("if ");
         buf.append(getCondition().getPrettyPrinted());
         buf.append('\n');
-        for(Stmt stmt : getThenList()) {
+        for(Stmt stmt : getStmts()) {
             buf.append('\t');
             buf.append(stmt.getPrettyPrinted());
             buf.append('\n');
         }
         return buf.toString();
     }
-    
 
-// SwitchStmt : BranchTargetStmt ::= Expr SwithCase* [DefaultCase];
-// abstract Case : Stmt;
-// SwithCase : Case ::= Expr Stmt*;
-// DefaultCase : Case  ::= Stmt*;
+    eq ElseBlock.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("else ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
     // switch-case
     eq SwitchStmt.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("switch ");
         buf.append(getExpr().getPrettyPrinted());
         buf.append('\n');
-        for(SwithCase scase : getSwithCaseList()) {
+        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
             buf.append(scase.getPrettyPrinted());
         }
-        if(hasDefaultCase()) {
-            buf.append(getDefaultCase().getPrettyPrinted());
+        if(hasDefaultCaseBlock()) {
+            buf.append(getDefaultCaseBlock().getPrettyPrinted());
         }
         buf.append("end");
         return buf.toString();
     }
-    eq SwithCase.getPrettyPrintedLessComments() {
+    eq SwitchCaseBlock.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("case ");
         buf.append(getExpr().getPrettyPrinted());
@@ -220,7 +218,7 @@ aspect PrettyPrint {
         }
         return buf.toString();
     }
-    eq DefaultCase.getPrettyPrintedLessComments() {
+    eq DefaultCaseBlock.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("otherwise ");
         buf.append('\n');
@@ -237,44 +235,50 @@ aspect PrettyPrint {
         StringBuffer buf = new StringBuffer();
         buf.append("try ");
         buf.append('\n');
-        for(Stmt stmt : getTryBlockList()) {
+        for(Stmt stmt : getTryStmts()) {
             buf.append('\t');
             buf.append(stmt.getPrettyPrinted());
             buf.append('\n');
         }
-        buf.append("catch ");
-        buf.append('\n');
-        for(Stmt stmt : getCatchBlockList()) {
-            buf.append('\t');
-            buf.append(stmt.getPrettyPrinted());
-            buf.append('\n');
+        List<Stmt> catchList = getCatchStmts();
+        if (catchList.getNumChild()>0) {
+            buf.append("catch ");
+            buf.append('\n');        
+            for(Stmt stmt : catchList) {
+                buf.append('\t');
+                buf.append(stmt.getPrettyPrinted());
+                buf.append('\n');
+            }
         }
         buf.append("end");
         return buf.toString();
     }
 
     //exprs
-    eq ColonExpr.getPrettyPrintedLessComments() {
+    
+    eq RangeExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
-        buf.append(getBase().getPrettyPrinted());
+        buf.append(getLower().getPrettyPrinted());
         buf.append(" : ");
         if(hasIncr()) {
             buf.append(getIncr().getPrettyPrinted());
             buf.append(" : ");
         }
-        buf.append(getLimit().getPrettyPrinted());
+        buf.append(getUpper().getPrettyPrinted());
         buf.append(')');
         return buf.toString();
     }
-    eq Colon.getPrettyPrintedLessComments() = ":";
+    eq ColonExpr.getPrettyPrintedLessComments() = ":";
     
+    eq Name.getPrettyPrintedLessComments() = getID();
+
     //accesses
-    eq IdUse.getPrettyPrintedLessComments() = getID();
-    eq ParseName.getPrettyPrintedLessComments() = getID();
-    eq ParameterizedAccess.getPrettyPrintedLessComments() {
+    eq NameExpr.getPrettyPrintedLessComments() = getName().getPrettyPrinted();
+    eq DotExpr.getPrettyPrintedLessComments() = getTarget().getPrettyPrinted() + "." + getField().getPrettyPrinted();
+    eq ParameterizedExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append(getID());
+        buf.append(getTarget().getPrettyPrinted());
         buf.append('(');
         boolean first = true;
         for(Expr arg : getArgs()) {
@@ -287,8 +291,23 @@ aspect PrettyPrint {
         buf.append(')');
         return buf.toString();
     }
-    
-    eq MatrixDecl.getPrettyPrintedLessComments() {
+    eq CellIndexExpr.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getTarget().getPrettyPrinted());
+        buf.append('{');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getPrettyPrinted());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+
+    eq MatrixExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('[');
         boolean first = true;
@@ -302,7 +321,7 @@ aspect PrettyPrint {
         buf.append(']');
         return buf.toString();
     }
-    eq CellArrayDecl.getPrettyPrintedLessComments() {
+    eq CellArrayExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append('{');
         boolean first = true;
@@ -329,12 +348,12 @@ aspect PrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionHandle.getPrettyPrintedLessComments() = "@" + getName();
-    eq LambdaDef.getPrettyPrintedLessComments() {
+    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getStructureString();
+    eq LambdaExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("(@(");
         boolean first = true;
-        for(Param param : getInputParams()) {
+        for(Name param : getInputParams()) {
             if(!first) {
                 buf.append(", ");
             }
@@ -348,31 +367,33 @@ aspect PrettyPrint {
     }
     
     //literals
-    eq IntegerLiteral.getPrettyPrintedLessComments() = getValue().getText();
-    eq DoubleLiteral.getPrettyPrintedLessComments() = getValue().getText();
-    eq StringLiteral.getPrettyPrintedLessComments() = "'" + getValue() + "'";
+    eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+    eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+    eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue() + "'";
     
-    eq MinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
-    eq PlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
-    eq LogNotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
-    eq TransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
+    eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
+    eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
+    eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
+    eq MTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
     eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
     
-    syn String Binary.getPrettyPrintedLessComments(String op) = "(" + getLeftOperand().getPrettyPrinted() + " " + op + " " + getRightOperand().getPrettyPrinted() + ")";
+    syn String BinaryExpr.getPrettyPrintedLessComments(String op) = "(" + getLHS().getPrettyPrinted() + " " + op + " " + getRHS().getPrettyPrinted() + ")";
     
-    eq MulExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
-    eq DivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
-    eq LeftDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
-    eq PowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
-    eq AddExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
-    eq SubExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
-    eq EMulExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
+    eq PlusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
+    eq MinusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
+    
+    eq MTimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
+    eq MDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
+    eq MLDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
+    eq MPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
+    
+    eq ETimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
     eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
-    eq ELeftDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
+    eq ELDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
     eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
     
-    eq AndLogicalExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
-    eq OrLogicalExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
+    eq AndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
+    eq OrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
     eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
     eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
     eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");

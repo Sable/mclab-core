@@ -1,126 +1,96 @@
 // AST for Natlab grammar
-
 abstract Program;
-
 Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;
 ClassDef : Program; //TODO-AC: contents
 EmptyProgram : Program;
 
-Function ::= OutputParam:Param* <Name:String> InputParam:Param* HelpComment* Stmt* NestedFunction:Function*;
-Param : ParseName; //TODO-AC: is this the correct parent type?
-
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;
 MultiLineHelpComment : HelpComment;
 
-abstract Stmt; 
-EmptyStmt:Stmt;
-ExprStmt:Stmt ::= Expr;
-AssignStmt:Stmt ::= Dest:Expr Source:Expr;
-GlobalStmt : Stmt ::= Name:ParseName*;
-PersistentStmt : Stmt ::= Name:ParseName*;
+Name ::= <ID : String>;
+
+Function ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+
+abstract Stmt;
+ExprStmt : Stmt ::= Expr;
+AssignStmt : Stmt ::= LHS:Expr RHS:Expr;
+GlobalStmt : Stmt ::= Name*;
+PersistentStmt : Stmt ::= Name*;
 ShellCommandStmt : Stmt ::= <Command : String>;
-
-abstract Expr;
-
-ColonExpr:Expr ::= Base:Expr [Incr:Expr] Limit:Expr;
-Colon:Expr;
-
-abstract Access:Expr;
-
-// LHS of assignments
-IdUse:Access ::= <ID:String>;
-ParseName:Access ::= <ID:String>;
-
-ParameterizedAccess : Access ::= <ID:String> Arg:Expr*;
-
-abstract CellContentAccess:Access;
-SingleCellContentAccess : CellContentAccess ::= <ID:String> Arg:Expr*;
-MultiCellContentAccess : CellContentAccess ::= CellContentAccess Arg:Expr*;
-CellIndexAccess : Access ::= CellContentAccess Arg:Expr*;
-
-MatrixDecl : Access ::= Row*;
-CellArrayDecl : Access ::= Row*;
-Row : Access ::= Element:Expr*;
-
-// VarAccess : Access ::= <ID:String>;
-
-// Other expressions 
-abstract PrimaryExpr : Expr;
-
-ParExpr : PrimaryExpr ::= Expr;
-
-abstract Literal : PrimaryExpr;
-IntegerLiteral : Literal ::= <Value:natlab.IntNumericLiteralValue>;
-DoubleLiteral : Literal ::= <Value:natlab.FPNumericLiteralValue>;
-StringLiteral : Literal ::= <Value:String>;
-
-//-------------------------------------------------------------------
-abstract Unary : Expr ::= Operand:Expr;
-MinusExpr : Unary ;
-PlusExpr : Unary ;
-LogNotExpr : Unary ;
-TransposeExpr : Unary ;
-ArrayTransposeExpr : Unary ;
-
-abstract Binary : Expr ::= LeftOperand:Expr RightOperand:Expr;
-
-abstract ArithmeticExpr : Binary;
-abstract MultiplicativeExpr : ArithmeticExpr;
-MulExpr : MultiplicativeExpr ;
-DivExpr : MultiplicativeExpr ;
-LeftDivExpr : MultiplicativeExpr ;
-PowExpr : MultiplicativeExpr ;
-
-abstract AdditiveExpr : ArithmeticExpr;
-AddExpr : AdditiveExpr ;
-SubExpr : AdditiveExpr ;
-
-// Element wise expression
-abstract EMultiplicativeExpr : ArithmeticExpr;
-EMulExpr : EMultiplicativeExpr ;
-EDivExpr : EMultiplicativeExpr ;
-ELeftDivExpr : EMultiplicativeExpr ;
-EPowExpr : EMultiplicativeExpr ;
-
-abstract LogicalExpr : Binary;
-AndLogicalExpr : LogicalExpr ;
-OrLogicalExpr : LogicalExpr ;
-
-abstract ShortCircuitExpr : Binary;
-ShortCircuitAndExpr : ShortCircuitExpr ;
-ShortCircuitOrExpr : ShortCircuitExpr ;
-
-abstract RelationalExpr : Binary;
-LTExpr : RelationalExpr ;
-GTExpr : RelationalExpr ;
-LEExpr : RelationalExpr ;
-GEExpr : RelationalExpr ;
-
-abstract EqualityExpr : RelationalExpr;
-EQExpr : EqualityExpr ;
-NEExpr : EqualityExpr ;
-
-FunctionHandle : Expr ::= <Name : String>;
-LambdaDef : Expr ::= InputParam:Param* Body:Expr;
-
-//------- ------------------------------------------------------------
-// statement that can be reached by break or continue
-abstract BranchTargetStmt : Stmt;  
-ForStmt : BranchTargetStmt ::= AssignStmt Stmt*; 
-WhileStmt : BranchTargetStmt ::= Expr Stmt*; 
-SwitchStmt : BranchTargetStmt ::= Expr SwithCase* [DefaultCase];
-abstract Case : Stmt;
-SwithCase : Case ::= Expr Stmt*;
-DefaultCase : Case  ::= Stmt*;
 
 BreakStmt : Stmt;
 ContinueStmt : Stmt;
 ReturnStmt : Stmt;
 
-IfStmt : Stmt ::= Condition:Expr Then:Stmt* Elseif:ElseifStmt* [Else:List];
-ElseifStmt : Stmt ::= Condition:Expr Then:Stmt*;
+EmptyStmt : Stmt; //TODO-AC: remove this
 
-TryStmt : Stmt ::= TryBlock:Stmt* CatchBlock:Stmt*;
+ForStmt : Stmt ::= AssignStmt Stmt*;
+WhileStmt : Stmt ::= Expr Stmt*;
 
+TryStmt : Stmt ::= TryStmt:Stmt* CatchStmt:Stmt*;
+
+SwitchStmt : Stmt ::= Expr SwitchCaseBlock* [DefaultCaseBlock];
+SwitchCaseBlock ::= Expr Stmt*;
+DefaultCaseBlock ::= Stmt*;
+
+IfStmt : Stmt ::= IfBlock* [ElseBlock];
+IfBlock ::= Condition:Expr Stmt*;
+ElseBlock ::= Stmt*;
+
+abstract Expr;
+RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
+ColonExpr : Expr;
+
+abstract LValueExpr : Expr;
+NameExpr : LValueExpr ::= Name;
+ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+DotExpr : LValueExpr ::= Target:Expr Field:Name;
+MatrixExpr : LValueExpr ::= Row*;
+CellArrayExpr : LValueExpr ::= Row*;
+
+Row ::= Element:Expr*;
+
+abstract LiteralExpr : Expr;
+IntLiteralExpr : LiteralExpr ::= <Value:natlab.IntNumericLiteralValue>;
+FPLiteralExpr : LiteralExpr ::= <Value:natlab.FPNumericLiteralValue>;
+StringLiteralExpr : LiteralExpr ::= <Value:String>;
+
+abstract UnaryExpr : Expr ::= Operand:Expr;
+UMinusExpr : UnaryExpr;
+UPlusExpr : UnaryExpr;
+NotExpr : UnaryExpr;
+MTransposeExpr : UnaryExpr;
+ArrayTransposeExpr : UnaryExpr;
+
+abstract BinaryExpr : Expr ::= LHS:Expr RHS:Expr;
+PlusExpr : BinaryExpr;
+MinusExpr : BinaryExpr;
+
+MTimesExpr : BinaryExpr;
+MDivExpr : BinaryExpr;
+MLDivExpr : BinaryExpr;
+MPowExpr : BinaryExpr;
+
+ETimesExpr : BinaryExpr;
+EDivExpr : BinaryExpr;
+ELDivExpr : BinaryExpr;
+EPowExpr : BinaryExpr;
+
+AndExpr : BinaryExpr;
+OrExpr : BinaryExpr;
+
+ShortCircuitAndExpr : BinaryExpr;
+ShortCircuitOrExpr : BinaryExpr;
+
+LTExpr : BinaryExpr;
+GTExpr : BinaryExpr;
+LEExpr : BinaryExpr;
+GEExpr : BinaryExpr;
+EQExpr : BinaryExpr;
+NEExpr : BinaryExpr;
+
+FunctionHandleExpr : Expr ::= Name;
+LambdaExpr : Expr ::= InputParam:Name* Body:Expr;

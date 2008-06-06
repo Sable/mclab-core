@@ -50,15 +50,15 @@ aspect ASTPrint {
     }
   }
 
-  syn String ASTNode.dumpString() = getClass().getName() + " [" + getNodeString() + "]";
-  eq IntegerLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
-  eq DoubleLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
-  eq StringLiteral.dumpString() = getClass().getName() + " [" + getValue() + "]";
-  eq ParseName.dumpString() = getClass().getName() + " [" + getID() + "]";
-  eq ParameterizedAccess.dumpString() = getClass().getName() + " [" + getID() + "]";
+  syn String ASTNode.dumpString() = getClass().getName() + " [" + toString() + "]";
+  eq IntLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq FPLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq StringLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq NameExpr.dumpString() = getClass().getName() + " [" + getName().getID() + "]";
+  eq ParameterizedExpr.dumpString() = getClass().getName() + " [" + getTarget().getStructureStringLessComments() + "]";
 
-  eq FunctionHandle.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
-  eq LambdaDef.dumpString() = getClass().getName() + " [" + getStructureStringLessComments() + "]";
+  eq FunctionHandleExpr.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
+  eq LambdaExpr.dumpString() = getClass().getName() + " [" + getStructureStringLessComments() + "]";
 
   public String Script.dumpTree() {
     StringBuffer s = new StringBuffer();

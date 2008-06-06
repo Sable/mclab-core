@@ -1,3 +1,5 @@
+//TODO-AC: restore cell array access
+
 %import "natlab.ast.*";
 
 %package "natlab";
@@ -111,7 +113,7 @@
 
     //helper for constructing an AST Function node
     //separates stmts from nested functions and attaches comments
-    private Function function(List<Param> outParams, String name, List<Param> inParams, ArrayList<HelpComment> comments, ArrayList<Symbol> body) {
+    private Function function(List<Name> outParams, String name, List<Name> inParams, ArrayList<HelpComment> comments, ArrayList<Symbol> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         if(body != null) {
@@ -155,30 +157,30 @@
 %typeof function_list = "FunctionList";
 %typeof function, function_body = "Function";
 %typeof stmt_or_function = "Symbol";
-%typeof input_params, output_params, param_list = "List<Param>";
+%typeof input_params, output_params, param_list = "List<Name>";
 %typeof class_def = "ClassDef";
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign, assign = "AssignStmt";
 %typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
-%typeof lvalue = "Access";
+%typeof lvalue = "LValueExpr";
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
-%typeof matrix = "MatrixDecl";
+%typeof matrix = "MatrixExpr";
 %typeof row_list, optional_row_list = "List<Row>";
 %typeof row = "Row";
-%typeof literal = "Literal";
-%typeof name, simple_name = "ParseName";
+%typeof literal = "LiteralExpr";
+%typeof name = "Name";
 %typeof stmt_separator = "BooleanFakeSymbol";
 %typeof help_comment, help_comment_body, last_help_comment = "HelpComment";
-%typeof else_clause = "List<Stmt>";
-%typeof else_if_clause = "ElseifStmt";
+%typeof else_clause = "ElseBlock";
+%typeof else_if_clause = "IfBlock";
 %typeof if_statement = "IfStmt";
 %typeof switch_statement = "SwitchStmt";
-%typeof switch_case = "SwithCase";
-%typeof default_case = "DefaultCase";
-%typeof cell_access = "Access";
-%typeof cell_content_access = "CellContentAccess";
+%typeof switch_case = "SwitchCaseBlock";
+%typeof default_case = "DefaultCaseBlock";
+//%typeof cell_index_access = "CellIndexExpr";
+%typeof parameterized_access = "ParameterizedExpr";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -248,22 +250,22 @@ function_body =
 
 //input parameter list for a function
 input_params =
-     LPAREN RPAREN {: return new List<Param>(); :}
+     LPAREN RPAREN {: return new List<Name>(); :}
   |  LPAREN param_list.l RPAREN
   ;
 
 //output parameter list for a function
 output_params =
-     LSQUARE RSQUARE {: return new List<Param>(); :}
+     LSQUARE RSQUARE {: return new List<Name>(); :}
   |  LSQUARE param_list.l RSQUARE
-  |  IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
+  |  IDENTIFIER.p {: return new List<Name>().add(new Name(p)); :}
   ;
 
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
 //shared by input and output parameters
 param_list =
-     IDENTIFIER.p {: return new List<Param>().add(new Param(p)); :}
-  |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Param(p)); :}
+     IDENTIFIER.p {: return new List<Name>().add(new Name(p)); :}
+  |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Name(p)); :}
   ;
 
 //used to mix stmts and nested functions in a containing function
@@ -316,7 +318,7 @@ last_stmt =
 stmt =
      stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
      //NB: not attaching comments to empty statements
-  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: do we really need this in the AST?
+  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: how do we discard this?
   ;
 
 //stmt not followed by separator
@@ -329,13 +331,11 @@ stmt_body =
 stmt_body_before_comments =
      expr.e {: return new ExprStmt(e); :}
   |  assign.a
-  |  GLOBAL simple_name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
-  |  PERSISTENT simple_name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
+  |  GLOBAL  name.names+ {: return new GlobalStmt(makeListNode(_list_names)); :}
+  |  PERSISTENT name.names+ {: return new PersistentStmt(makeListNode(_list_names)); :}
   |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
-  |  TRY stmt_separator stmt_list.tl END
-     {: return new TryStmt(tl, new List()); :}
-  |  TRY stmt_separator stmt_list.tl CATCH stmt_separator stmt_list.cl END
-     {: return new TryStmt(tl, cl); :}
+  |  TRY stmt_separator stmt_list.tl END {: return new TryStmt(tl, new List()); :}
+  |  TRY stmt_separator stmt_list.tl CATCH stmt_separator stmt_list.cl END {: return new TryStmt(tl, cl); :}
   |  switch_statement
   |  if_statement
   |  BREAK    {: return new BreakStmt(); :}
@@ -347,39 +347,35 @@ stmt_body_before_comments =
 
 switch_statement = 
      SWITCH expr.e stmt_separator default_case.d? END
-     {: if(d==null) return new SwitchStmt(e, new List(), new Opt());
-     	else return new SwitchStmt(e, new List(), new Opt(d)); 
-     :}
+        {: return new SwitchStmt(e, new List<SwitchCaseBlock>(), d == null ? new Opt<DefaultCaseBlock>() : new Opt<DefaultCaseBlock>(d)); :}
   |  SWITCH expr.e stmt_separator switch_case.s+ default_case.d? END
-     {: if(d==null) return new SwitchStmt(e, makeListNode(_list_s), new Opt());
-     	else return new SwitchStmt(e, makeListNode(_list_s), new Opt(d)); 
-     :}
+        {: return new SwitchStmt(e, makeListNode(_list_s), d == null ? new Opt<DefaultCaseBlock>() : new Opt<DefaultCaseBlock>(d)); :}
   ;
 
 switch_case	= 
-     CASE expr.e stmt_separator stmt_list.l {: return new SwithCase(e, l); :}
+     CASE expr.e stmt_separator stmt_list.l {: return new SwitchCaseBlock(e, l); :}
   ;
 default_case = 
-     OTHERWISE stmt_separator stmt_list.l  {: return new DefaultCase(l); :}
+     OTHERWISE stmt_separator stmt_list.l  {: return new DefaultCaseBlock(l); :}
   ;
   
 if_statement = 
-     IF expr.e stmt_separator stmt_list.l else_clause.els? END   
-     {: if(els==null) return new IfStmt(e, l, new List(), new Opt());
-     	else return new IfStmt(e, l, new List(), new Opt(els)); 
-     :}
-  |  IF expr.e stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END   
-     {: if(els==null) return new IfStmt(e, l, makeListNode(_list_elseif), new Opt());
-     	else return new IfStmt(e, l, makeListNode(_list_elseif), new Opt(els)); 
-     :}
+     IF expr.e stmt_separator stmt_list.l else_clause.els? END
+        {: return new IfStmt(new List<IfBlock>().add(new IfBlock(e, l)), els == null ? new Opt<ElseBlock>() : new Opt<ElseBlock>(els)); :}
+  |  IF expr.e stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
+        {:
+            List<IfBlock> ifBlocks = makeListNode(_list_elseif);
+            ifBlocks.insertChild(new IfBlock(e, l), 0);
+            return new IfStmt(ifBlocks, els == null ? new Opt<ElseBlock>() : new Opt<ElseBlock>(els));
+        :}
   ;
 
 else_if_clause = 
-     ELSEIF expr.e stmt_separator stmt_list.l  {: return new ElseifStmt(e, l); :}
+     ELSEIF expr.e stmt_separator stmt_list.l  {: return new IfBlock(e, l); :}
   ;
   
 else_clause = 
-     ELSE stmt_separator stmt_list.l {: return l; :}
+     ELSE stmt_separator stmt_list.l {: return new ElseBlock(l); :}
   ;
 
 stmt_separator =
@@ -401,59 +397,30 @@ assign =
   ;
 
 lvalue =
-     name.id
-  |  access.a
-  |  cell_access.c
+     name.id {: return new NameExpr(id); :}
+  |  parameterized_access.a
+//  |  cell_index_access.c
   ;
 
-cell_access =
-     cell_content_access.c
-  |  cell_index_access.c
+parameterized_access =
+     name.n LPAREN RPAREN {: return new ParameterizedExpr(new NameExpr(n), new List<Expr>()); :}
+  |  name.n LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(new NameExpr(n), l); :}
   ;
 
-cell_content_access =
-     single_cell_content_access.s
-  |  cell_content_access.c LCURLY arg_list.l RCURLY {: return new MultiCellContentAccess(c, l); :}
-  ;
+//cell_index_access =
+//  |  name.n LCURLY arg_list.l RCURLY {: return new ParameterizedExpr(new NameExpr(n), l); :}
+//  |  cell_index_access.c LCURLY arg_list.l RCURLY {: return new ParameterizedExpr(c, l); :}
+//  ;
 
-single_cell_content_access =
-     name.n LCURLY arg_list.l RCURLY 
-     {:
-         ParseName pn = (ParseName) n;
-         return new SingleCellContentAccess(pn.getID(), l);
-     :}
-  ;
-
-cell_index_access =
-     cell_content_access.c LPAREN RPAREN    {: return new CellIndexAccess(c, new List()); :}
-  |  cell_content_access.c LPAREN arg_list.l RPAREN   {: return new CellIndexAccess(c, l); :}
-  ;
-
-access =
-     name.n LPAREN RPAREN
-     {:
-         ParseName pn = (ParseName) n;
-         return new ParameterizedAccess(pn.getID(), new List());
-     :}
-  |  name.n LPAREN arg_list.l RPAREN
-     {:
-         ParseName pn = (ParseName) n;
-         return new ParameterizedAccess(pn.getID(), l);
-     :}
-  ;
 
 name =
-     simple_name.n
-  ;
-
-simple_name =
-     IDENTIFIER.id {: return new ParseName(id); :}
+     IDENTIFIER.id {: return new Name(id); :}
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr =
      logic_expr.l
-  |  AT input_params.params expr.body {: return new LambdaDef(params, body); :}
+  |  AT input_params.params expr.body {: return new LambdaExpr(params, body); :}
   ;
 
 logic_expr =
@@ -464,47 +431,47 @@ logic_expr =
   |  logic_expr.e1 GE logic_expr.e2 {: return new GEExpr(e1, e2); :}
   |  logic_expr.e1 EQ logic_expr.e2 {: return new EQExpr(e1, e2); :}
   |  logic_expr.e1 NE logic_expr.e2 {: return new NEExpr(e1, e2); :}
-  |  logic_expr.e1 AND logic_expr.e2 {: return new AndLogicalExpr(e1, e2); :}
-  |  logic_expr.e1 OR logic_expr.e2 {: return new OrLogicalExpr(e1, e2); :}
+  |  logic_expr.e1 AND logic_expr.e2 {: return new AndExpr(e1, e2); :}
+  |  logic_expr.e1 OR logic_expr.e2 {: return new OrExpr(e1, e2); :}
   |  logic_expr.e1 SHORTAND logic_expr.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
   |  logic_expr.e1 SHORTOR logic_expr.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
   ;
 
 colon_expr =
      binary_expr.e
-  |  binary_expr.e1 COLON binary_expr.e3 {: return new ColonExpr(e1, new Opt(), e3); :}
-  |  binary_expr.e1 COLON binary_expr.e2 COLON binary_expr.e3 {: return new ColonExpr(e1, new Opt(e2), e3); :}
+  |  binary_expr.e1 COLON binary_expr.e3 {: return new RangeExpr(e1, new Opt(), e3); :}
+  |  binary_expr.e1 COLON binary_expr.e2 COLON binary_expr.e3 {: return new RangeExpr(e1, new Opt(e2), e3); :}
   ;
 
 binary_expr =
      prefix_expr.e
-  |  binary_expr.e1 MTIMES binary_expr.e2  {: return new MulExpr(e1, e2); :}
-  |  binary_expr.e1 ETIMES binary_expr.e2  {: return new EMulExpr(e1, e2); :}
-  |  binary_expr.e1 MDIV binary_expr.e2    {: return new DivExpr(e1, e2); :}
+  |  binary_expr.e1 MTIMES binary_expr.e2  {: return new MTimesExpr(e1, e2); :}
+  |  binary_expr.e1 ETIMES binary_expr.e2  {: return new ETimesExpr(e1, e2); :}
+  |  binary_expr.e1 MDIV binary_expr.e2    {: return new MDivExpr(e1, e2); :}
   |  binary_expr.e1 EDIV binary_expr.e2    {: return new EDivExpr(e1, e2); :}
-  |  binary_expr.e1 MLDIV binary_expr.e2   {: return new LeftDivExpr(e1, e2); :}
-  |  binary_expr.e1 ELDIV binary_expr.e2   {: return new ELeftDivExpr(e1, e2); :}
-  |  binary_expr.e1 PLUS binary_expr.e2    {: return new AddExpr(e1, e2); :}
-  |  binary_expr.e1 MINUS binary_expr.e2   {: return new SubExpr(e1, e2); :}
+  |  binary_expr.e1 MLDIV binary_expr.e2   {: return new MLDivExpr(e1, e2); :}
+  |  binary_expr.e1 ELDIV binary_expr.e2   {: return new ELDivExpr(e1, e2); :}
+  |  binary_expr.e1 PLUS binary_expr.e2    {: return new PlusExpr(e1, e2); :}
+  |  binary_expr.e1 MINUS binary_expr.e2   {: return new MinusExpr(e1, e2); :}
   ;
 
 prefix_expr =
      pow_expr.e
-  |  NOT prefix_expr.e {: return new LogNotExpr(e); :}
-  |  PLUS prefix_expr.e {: return new PlusExpr(e); :}
-  |  MINUS prefix_expr.e {: return new MinusExpr(e); :}
+  |  NOT prefix_expr.e {: return new NotExpr(e); :}
+  |  PLUS prefix_expr.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_expr.e {: return new UMinusExpr(e); :}
   ;
 
 pow_expr =
      postfix_expr.e
-  |  pow_expr.e1 MPOW pow_expr.e2    {: return new PowExpr(e1, e2); :}
+  |  pow_expr.e1 MPOW pow_expr.e2    {: return new MPowExpr(e1, e2); :}
   |  pow_expr.e1 EPOW pow_expr.e2    {: return new EPowExpr(e1, e2); :}
   ;
 
 postfix_expr =
      primary_expr.e
   |  postfix_expr.e ARRAYTRANSPOSE {: return new ArrayTransposeExpr(e); :}
-  |  postfix_expr.e MTRANSPOSE {: return new TransposeExpr(e); :}
+  |  postfix_expr.e MTRANSPOSE {: return new MTransposeExpr(e); :}
   ;
 
 primary_expr =
@@ -512,26 +479,26 @@ primary_expr =
   |  LPAREN expr.e RPAREN
   |  matrix.m
   |  cell_array.c
-  |  cell_access.a  //TODO-AC: current cell only support name{..}{..}[(..)]
-  |  access.a
-  |  name.n
-  |  AT IDENTIFIER.name {: return new FunctionHandle(name); :} //TODO-AC: allow qualified name?
+  |  name.id {: return new NameExpr(id); :}
+  |  parameterized_access.a
+//  |  cell_index_access.c
+  |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
   ;
 
 literal =
-     INT_NUMBER.i {: return new IntegerLiteral(i); :}
-  |  IM_INT_NUMBER.i {: return new IntegerLiteral(i); :}
-  |  FP_NUMBER.f {: return new DoubleLiteral(f); :}
-  |  IM_FP_NUMBER.f {: return new DoubleLiteral(f); :}
-  |  STRING.s {: return new StringLiteral(s); :}
+     INT_NUMBER.i {: return new IntLiteralExpr(i); :}
+  |  IM_INT_NUMBER.i {: return new IntLiteralExpr(i); :}
+  |  FP_NUMBER.f {: return new FPLiteralExpr(f); :}
+  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(f); :}
+  |  STRING.s {: return new StringLiteralExpr(s); :}
   ;
 
 matrix =
-     LSQUARE optional_row_list.l RSQUARE {: return new MatrixDecl(l); :}
+     LSQUARE optional_row_list.l RSQUARE {: return new MatrixExpr(l); :}
   ;
 
 cell_array =
-     LCURLY optional_row_list.l RCURLY {: return new CellArrayDecl(l); :}
+     LCURLY optional_row_list.l RCURLY {: return new CellArrayExpr(l); :}
   ;
 
 optional_row_list =
@@ -564,7 +531,7 @@ arg_list =
   
 arg =
      expr.e
-  |  COLON.c {: return new Colon(); :}
+  |  COLON.c {: return new ColonExpr(); :}
   ;
 
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
