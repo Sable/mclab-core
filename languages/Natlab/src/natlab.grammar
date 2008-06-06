@@ -471,8 +471,9 @@ cell_access =
   |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
   ;
 
-var_access = //TODO-AC: dot-separated names here
+var_access =
      name.n {: return new NameExpr(n); :}
+  |  var_access.v DOT name.n {: return new DotExpr(v, n); :}
   ;
 
 literal =
