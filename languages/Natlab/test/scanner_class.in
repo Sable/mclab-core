@@ -1,0 +1,13 @@
+classdef myClass < double & int32
+properties
+a = 1
+end
+events
+end
+methods
+function obj = myClass
+x = 125
+end
+b = bbb
+end
+end

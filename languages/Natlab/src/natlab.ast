@@ -2,8 +2,21 @@
 abstract Program;
 Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;
-ClassDef : Program; //TODO-AC: contents
 EmptyProgram : Program;
+
+abstract ClassBody;
+ClassDef : Program ::= Attr:Attribute* <Name:String> SuperClasses:SuperClass* HelpComment* Properties* Methods* ClassEvents*;
+Attribute ::= <Key:String> ExprStmt;
+SuperClass ::= <Name:String>;
+Properties:ClassBody ::= Attr:Attribute* Property*;
+Property ::= <Name:String> ExprStmt;
+Methods:ClassBody ::= Attr:Attribute* Signature* Function*;
+Signature ::= OutputParam:Param* <Name:String> InputParam:Param*;
+ClassEvents:ClassBody ::= Attr:Attribute* Event*;
+Event ::= <Name:String>;
+
+//Function ::= OutputParam:Param* <Name:String> InputParam:Param* HelpComment* Stmt* NestedFunction:Function*;
+//Param : ParseName; //TODO-AC: is this the correct parent type?
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;

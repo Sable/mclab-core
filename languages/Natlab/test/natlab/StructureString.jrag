@@ -82,6 +82,50 @@ aspect StructureString {
         return buf.toString();
     }
     
+    eq ClassDef.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("classdef ");
+		/*buf.append(" (");
+        boolean first = true;
+        for(Attribute attr : getAttr()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(attr.getStructureString());
+            first = false;
+        }
+        buf.append(") ");
+        buf.append(getName());
+        buf.append(" < ");
+        first = true;
+        for(SuperClass sup : getSuperClasses()) {
+            if(!first) {
+                buf.append(" & ");
+            }
+            buf.append(sup.getStructureString());
+            first = false;
+        }
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
+        for(Properties prop : getProperties()) {
+            buf.append(prop.getStructureString());
+            buf.append('\n');
+        }
+        for(Methods methods : getMethods()) {
+            buf.append(methods.getStructureString());
+            buf.append('\n');
+        }
+        for(ClassEvents events : getClassEvents()) {
+            buf.append(events.getStructureString());
+            buf.append('\n');
+        }*/
+        buf.append("end");
+        return buf.toString();
+    }
+    
     //help comments
     
     eq HelpComment.getStructureStringLessComments() = getText();
