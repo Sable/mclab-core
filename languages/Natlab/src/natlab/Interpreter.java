@@ -29,9 +29,9 @@ public class Interpreter {
 			parser.setCommentBuffer(commentBuffer);
 			try {
 				// Temporarily changed to accept a file name - JL 2008.05.27 
-				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
-				scanner.setCommentBuffer(commentBuffer);
-				// NatlabScanner scanner = new NatlabScanner(new StringReader(line));
+				// NatlabScanner scanner = new NatlabScanner(new FileReader(line));
+				// scanner.setCommentBuffer(commentBuffer);
+				NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				Program original = (Program) parser.parse(scanner);
 				if(parser.hasError()) {
 					System.out.println("**ERROR**");
