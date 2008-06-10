@@ -81,7 +81,7 @@ aspect PrettyPrint {
         buf.append("end");
         return buf.toString();
     }
-    
+       
     //help comments
     
     eq HelpComment.getPrettyPrintedLessComments() = getText();
