@@ -139,6 +139,56 @@
                 stmts,
                 nestedFunctions));
     }
+    
+    //helper for constructing an AST Methods node
+    //separates signatures from functions
+    private Methods methods(List<Attribute> attr, ArrayList<Symbol> body) {
+        List<Signature> sign = new List<Signature>();
+        List<Function> function = new List<Function>();
+        if(body != null) {
+            for(Symbol signOrFcn : body) {
+                if(signOrFcn instanceof Signature) {
+                    sign.add((Signature) signOrFcn);
+                } else if(signOrFcn instanceof Function) {
+                    function.add((Function) signOrFcn);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = signOrFcn.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is neither a Signature nor a Function: " + getPosString(signOrFcn) + "  " + signOrFcn);
+                }
+            }
+        }
+        return new Methods(nullToEmpty(attr), sign, function);
+    }
+    
+    //helper for constructing an AST ClassDef node
+    //separates properties, methods and events
+    private ClassDef classdef(List<Attribute> attr, String name, List<SuperClass> supClass, ArrayList<HelpComment> comments, ArrayList<Symbol> body) {
+        List<Properties> prop = new List<Properties>();
+        List<Methods> methods = new List<Methods>();
+        List<ClassEvents> events = new List<ClassEvents>();
+        
+        if(body != null) {
+            for(Symbol propOrMethodOrEvent : body) {
+                if(propOrMethodOrEvent instanceof Properties) {
+                    prop.add((Properties) propOrMethodOrEvent);
+                } else if(propOrMethodOrEvent instanceof Methods) {
+                    methods.add((Methods) propOrMethodOrEvent);
+                } else if(propOrMethodOrEvent instanceof ClassEvents) {
+                    events.add((ClassEvents) propOrMethodOrEvent);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = propOrMethodOrEvent.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is neither a Signature nor a Function: " + getPosString(propOrMethodOrEvent) + "  " + propOrMethodOrEvent);
+                }
+            }
+        }
+        return new ClassDef(nullToEmpty(attr), name, nullToEmpty(supClass), nullToEmpty(makeListNode(comments)), prop, methods, events);
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -158,7 +208,20 @@
 %typeof function, function_body = "Function";
 %typeof stmt_or_function = "Symbol";
 %typeof input_params, output_params, param_list = "List<Name>";
+
 %typeof class_def = "ClassDef";
+%typeof attribute = "Attribute";
+%typeof attribute_list, attributes = "List<Attribute>";
+%typeof superclass_list = "List<SuperClass>";
+%typeof class_body = "ClassBody";
+%typeof properties_block = "Properties";
+%typeof methods_block = "Methods";
+%typeof events_block = "ClassEvents";
+%typeof properties_body = "Property";
+%typeof methods_body = "Symbol";
+%typeof events_body = "Event";
+%typeof function_signature = "Signature";
+
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign = "AssignStmt";
@@ -278,10 +341,73 @@ stmt_or_function =
 
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
-class_def = //TODO-AC: fill in
-     CLASSDEF END {: return new ClassDef(); :}
+class_def =
+	 CLASSDEF attributes.attr? IDENTIFIER.name stmt_separator+ help_comment.comments* class_body.body* END 
+	 	{: return classdef(attr, name, null, _list_comments, _list_body); :}
+  |  CLASSDEF attributes.attr? IDENTIFIER.name LT superclass_list.superclasses stmt_separator+ help_comment.comments* class_body.body* END 
+  		{: return classdef(attr, name, superclasses, _list_comments, _list_body); :}
+  ;
+  
+attributes =
+	 LPAREN attribute_list RPAREN
+  ;
+  
+attribute_list =
+	 attribute.a {: return new List<Attribute>().add(a); :}
+  |  attribute_list.l COMMA attribute.a {: return l.add(a); :}
+  ;
+    
+attribute =
+	 IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteral("true"))); :}
+  |  NOT IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteral("false"))); :}
+  |  IDENTIFIER.key ASSIGN expr.value {: return new Attribute(key, new ExprStmt(value)); :}
+  ;
+   
+superclass_list =
+	 IDENTIFIER.name {: return new List<SuperClass>().add(new SuperClass(name)); :}
+  |  superclass_list.l AND IDENTIFIER.name {: return l.add(new SuperClass(name)); :}
+  ;
+  
+class_body =
+	 properties_block stmt_separator*
+  |  methods_block stmt_separator*
+  |  events_block stmt_separator*
+  ;
+  
+properties_block =
+	 PROPERTIES attributes.attr? stmt_separator+ properties_body.body* END
+	 {: return new Properties(attr, makeListNode(_list_body)); :}
+  ;
+  
+methods_block =
+	 METHODS attributes.attr? stmt_separator+ methods_body.body* END
+	 {: return methods(attr, _list_body); :}
+  ;
+    
+events_block =
+	 EVENTS attributes.attr? stmt_separator+ events_body.body* END 
+	 {: return new ClassEvents(attr, makeListNode(_list_body)); :}
+  ;
+  
+properties_body =
+	 IDENTIFIER.name stmt_separator+ {: return new Property(name, null); :}
+  |  IDENTIFIER.name ASSIGN expr.value stmt_separator+ {: return new Property(name, new ExprStmt(value)); :}
   ;
 
+methods_body =
+	 function
+  |  function_signature
+  ;
+  
+function_signature =
+	 IDENTIFIER.name input_params.in? stmt_separator+ {: return new Signature(null, name, in); :}
+  |  output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator+ {: return new Signature(out, name, in); :}
+  ;
+  
+events_body =
+	 IDENTIFIER.name stmt_separator+ {: return new Event(name); :}
+  ;
+  
 //usually help comments are followed by a newline, but the last one could be followed by EOF instead
 last_help_comment =
      help_comment.c
