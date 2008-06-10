@@ -11,12 +11,9 @@ SuperClass ::= <Name:String>;
 Properties:ClassBody ::= Attr:Attribute* Property*;
 Property ::= <Name:String> ExprStmt;
 Methods:ClassBody ::= Attr:Attribute* Signature* Function*;
-Signature ::= OutputParam:Param* <Name:String> InputParam:Param*;
+Signature ::= OutputParam:Name* <Name:String> InputParam:Name*;
 ClassEvents:ClassBody ::= Attr:Attribute* Event*;
 Event ::= <Name:String>;
-
-//Function ::= OutputParam:Param* <Name:String> InputParam:Param* HelpComment* Stmt* NestedFunction:Function*;
-//Param : ParseName; //TODO-AC: is this the correct parent type?
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;

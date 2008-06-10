@@ -358,8 +358,8 @@ attribute_list =
   ;
     
 attribute =
-	 IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteral("true"))); :}
-  |  NOT IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteral("false"))); :}
+	 IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteralExpr("true"))); :}
+  |  NOT IDENTIFIER.key {: return new Attribute(key, new ExprStmt(new StringLiteralExpr("false"))); :}
   |  IDENTIFIER.key ASSIGN expr.value {: return new Attribute(key, new ExprStmt(value)); :}
   ;
    
