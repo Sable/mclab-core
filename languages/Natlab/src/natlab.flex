@@ -216,7 +216,7 @@ import beaver.Scanner;
   //NB: NOT USED TO VERIFY STRUCTURE (that happens in the parser)
   int numEndsExpected = 0;
   
-  //Increment the number of 'end's expected if we are int the CLASS state
+  //Increment the number of 'end's expected if we are in the CLASS state
   void maybeIncrNumEndsExpected() {
     if(yystate() == CLASS) {
         numEndsExpected++;
@@ -530,9 +530,13 @@ ValidEscape=\\[bfnrt\\\"]
         return symbol(END); //NB: just return normal END token
     }
     
-    properties { return symbol(PROPERTIES); }
-    methods { return symbol(METHODS); }
-    events { return symbol(EVENTS); }
+    //properties { return symbol(PROPERTIES); }
+    //methods { return symbol(METHODS); }
+    //events { return symbol(EVENTS); }
+    
+    properties { numEndsExpected++; return symbol(PROPERTIES); }
+    methods { numEndsExpected++; return symbol(METHODS); }
+    events { numEndsExpected++; return symbol(EVENTS); }
 }
 
 <YYINITIAL, CLASS> {
