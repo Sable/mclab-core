@@ -1,5 +1,3 @@
-//TODO-AC: restore cell array access
-
 %import "natlab.ast.*";
 
 %package "natlab";
