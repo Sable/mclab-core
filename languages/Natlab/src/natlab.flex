@@ -198,13 +198,13 @@ import beaver.Scanner;
   //this gives us a way to nest bracketing states
   private java.util.Stack<StateRecord> stateStack = new java.util.Stack<StateRecord>();
   
-  private void saveStateAndTransition(int newState) {
+  void saveStateAndTransition(int newState) {
     stateStack.push(new StateRecord(yystate(), pos));
     pos = new PositionRecord();
     yybegin(newState);
   }
   
-  private void restoreState() {
+  void restoreState() {
     StateRecord rec = stateStack.pop();
     yybegin(rec.stateNum);
     pos = rec.pos;
@@ -248,6 +248,60 @@ import beaver.Scanner;
   
   //for accumulating the contents of a string literal
   private StringBuffer strBuf = new StringBuffer();
+    
+  //// Command-style call arguments ////////////////////////////////////////////
+    
+  private StringBuffer cmdArgBuf = new StringBuffer();
+  private int cmdQuoteCount = 0;
+  
+  private Symbol cmdArgSymbol() {
+    String cmdArg = cmdArgBuf.toString();
+    cmdArgBuf = new StringBuffer();
+    cmdQuoteCount = 0;
+    
+    StringBuffer resultBuf = new StringBuffer();
+    
+    String oldCmdArg = cmdArg;
+    
+    int index = cmdArg.indexOf('\'');
+    int lastIndex = cmdArg.lastIndexOf('\'');
+    
+    if(index < 0) {
+        System.err.println("Didn't touch \"" + oldCmdArg + "\"");
+        return symbolFromMarkedPositions(STRING, cmdArg);
+    }
+    
+    //delete last quote
+    cmdArg = cmdArg.substring(0, lastIndex) + cmdArg.substring(lastIndex + 1);
+    //delete first quote
+    cmdArg = cmdArg.substring(0, index) + cmdArg.substring(index + 1);
+    
+    while(true) {
+        index = cmdArg.indexOf("''");
+        if(index < 0) {
+            resultBuf.append(cmdArg.replaceAll("'", ""));
+            break;
+        }
+        resultBuf.append(cmdArg.substring(0, index).replaceAll("'", ""));
+        resultBuf.append("''");
+        cmdArg = cmdArg.substring(index + 1);
+    }
+    
+    System.err.println("Changed \"" + oldCmdArg + "\" to \"" + resultBuf + "\"");
+    
+    return symbolFromMarkedPositions(STRING, resultBuf.toString());
+  }
+    
+  private Symbol endCmdArg() throws Scanner.Exception {
+    if(cmdQuoteCount % 2 == 1) {
+        error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
+    }
+    yypushback(yylength());
+    markEndPosition();
+    Symbol sym = (cmdArgBuf.length() == 0) ? null : cmdArgSymbol();
+    restoreState();
+    return sym;
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -294,6 +348,8 @@ ValidEscape=\\[bfnrt\\\"]
 %xstate SEMICOLON_TERMINATOR
 //within a string literal
 %xstate INSIDE_STRING
+//inside a command-style call
+%xstate COMMAND
 
 %%
 
@@ -342,7 +398,7 @@ ValidEscape=\\[bfnrt\\\"]
     \\ { error("Invalid escape sequence"); }
     . { strBuf.append(yytext()); }
     <<EOF>> { 
-        error("Unterminated string literal: '" + strBuf);
+        error("Unterminated string literal: '" + strBuf + "'");
     }
 }
 
@@ -580,6 +636,57 @@ ValidEscape=\\[bfnrt\\\"]
     
     //NB: lower precedence than ellipsis
     \. { return symbol(DOT); }
+}
+
+<COMMAND> {
+    //not stringified - return collected string and restore state
+    {LineTerminator} | "," | ";" | "%" { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
+    <<EOF>> { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
+    
+    {EscapedLineTerminator} {
+        if(cmdQuoteCount % 2 == 1) {
+            error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
+        } else {
+            commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
+            if(cmdArgBuf.length() > 0) {
+                return cmdArgSymbol();
+            }
+        }
+    }
+    
+    {OtherWhiteSpace}+ {
+        if(cmdQuoteCount % 2 == 1) {
+            cmdArgBuf.append(yytext());
+            markEndPosition(); //NB: this will likely be overwritten before the string is returned
+        } else if(cmdArgBuf.length() > 0) {
+            return cmdArgSymbol();
+        }
+    }
+    
+    //an initial "=" or "(" is not stringified
+    "=" | "(" {
+        if(cmdArgBuf.length() == 0) {
+            Symbol sym = endCmdArg();
+            if(sym != null) {
+                return sym;
+            }
+        } else {
+            cmdArgBuf.append(yytext());
+            markEndPosition(); //NB: this will likely be overwritten before the string is returned
+        }
+    }
+    
+    //an initial "==" IS stringified
+    "==" | . {
+        if(yytext().equals("'")) {
+            cmdQuoteCount++;
+        }
+        if(cmdArgBuf.length() == 0) {
+            markStartPosition();
+        }
+        cmdArgBuf.append(yytext());
+        markEndPosition(); //NB: this will likely be overwritten before the string is returned
+    }
 }
 
 /* error fallback */
