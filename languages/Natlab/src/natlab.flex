@@ -253,43 +253,15 @@ import beaver.Scanner;
     
   private StringBuffer cmdArgBuf = new StringBuffer();
   private int cmdQuoteCount = 0;
+  private boolean cmdArgPrevCharWasQuote = false;
   
   private Symbol cmdArgSymbol() {
     String cmdArg = cmdArgBuf.toString();
     cmdArgBuf = new StringBuffer();
     cmdQuoteCount = 0;
+    cmdArgPrevCharWasQuote = false;
     
-    StringBuffer resultBuf = new StringBuffer();
-    
-    String oldCmdArg = cmdArg;
-    
-    int index = cmdArg.indexOf('\'');
-    int lastIndex = cmdArg.lastIndexOf('\'');
-    
-    if(index < 0) {
-        System.err.println("Didn't touch \"" + oldCmdArg + "\"");
-        return symbolFromMarkedPositions(STRING, cmdArg);
-    }
-    
-    //delete last quote
-    cmdArg = cmdArg.substring(0, lastIndex) + cmdArg.substring(lastIndex + 1);
-    //delete first quote
-    cmdArg = cmdArg.substring(0, index) + cmdArg.substring(index + 1);
-    
-    while(true) {
-        index = cmdArg.indexOf("''");
-        if(index < 0) {
-            resultBuf.append(cmdArg.replaceAll("'", ""));
-            break;
-        }
-        resultBuf.append(cmdArg.substring(0, index).replaceAll("'", ""));
-        resultBuf.append("''");
-        cmdArg = cmdArg.substring(index + 1);
-    }
-    
-    System.err.println("Changed \"" + oldCmdArg + "\" to \"" + resultBuf + "\"");
-    
-    return symbolFromMarkedPositions(STRING, resultBuf.toString());
+    return symbolFromMarkedPositions(STRING, cmdArg);
   }
     
   private Symbol endCmdArg() throws Scanner.Exception {
@@ -657,6 +629,7 @@ ValidEscape=\\[bfnrt\\\"]
     {OtherWhiteSpace}+ {
         if(cmdQuoteCount % 2 == 1) {
             cmdArgBuf.append(yytext());
+            cmdArgPrevCharWasQuote = false;
             markEndPosition(); //NB: this will likely be overwritten before the string is returned
         } else if(cmdArgBuf.length() > 0) {
             return cmdArgSymbol();
@@ -672,20 +645,28 @@ ValidEscape=\\[bfnrt\\\"]
             }
         } else {
             cmdArgBuf.append(yytext());
+            cmdArgPrevCharWasQuote = false;
             markEndPosition(); //NB: this will likely be overwritten before the string is returned
         }
     }
     
     //an initial "==" IS stringified
     "==" | . {
-        if(yytext().equals("'")) {
-            cmdQuoteCount++;
-        }
         if(cmdArgBuf.length() == 0) {
             markStartPosition();
         }
-        cmdArgBuf.append(yytext());
-        markEndPosition(); //NB: this will likely be overwritten before the string is returned
+        boolean isQuote = yytext().equals("'");
+        if(isQuote) {
+            cmdQuoteCount++;
+            if(cmdArgPrevCharWasQuote && (cmdQuoteCount % 2 == 1)) {
+                cmdArgBuf.append("''");
+                markEndPosition(); //NB: this will likely be overwritten before the string is returned
+            }
+        } else {
+            cmdArgBuf.append(yytext());
+            markEndPosition(); //NB: this will likely be overwritten before the string is returned
+        }
+        cmdArgPrevCharWasQuote = isQuote;
     }
 }
 
