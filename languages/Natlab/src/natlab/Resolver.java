@@ -1,6 +1,10 @@
 package natlab;
 
 import java.util.*;
+import natlab.ast.Program;
+import natlab.ast.Script;
+import natlab.ast.FunctionList;
+import beaver.Parser;
 
 /**
  * Used to resolve fn and script names. Contains lists of scripts, 
@@ -12,4 +16,15 @@ import java.util.*;
 public class Resolver
 {
     private Queue<ProgramEntry> toProcess;
+
+    private List<Script> scripts;
+
+    private List<FunctionList> functions;
+
+    Resolver(Queue<ProgramEntry> toP)
+    {
+        toProcess = toP;
+        scripts = new LinkedList<Script>();
+        functions = new LinkedList<FunctionList>();
+    }
 }
