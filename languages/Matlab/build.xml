@@ -1,0 +1,77 @@
+<project name="Matlab" default="build">
+	<!-- load properties -->
+	<property file="matlab.properties" />
+
+	<!-- useful paths -->
+	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
+	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
+	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
+	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+
+	<!--=====================================================================-->
+	<!-- Private Targets                                                     -->
+	<!--=====================================================================-->
+
+	<import file="../shared/taskdef.xml" />
+	<import file="../shared/gen.xml" />
+	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
+
+	<!-- Extend and override parts of gen.xml -->
+
+	<target name="compile.test.generators" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<src path="${test.dir}" />
+			<include name="**/*TestGenerator.java" />
+		</javac>
+	</target>
+
+	<target name="gen.scanner.tests" depends="set.bin.dir">
+		<echo message="Generating scanner tests" />
+		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
+			<arg value="${lexer.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.parser.pass.tests" depends="set.bin.dir">
+		<echo message="Generating parser pass tests" />
+		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
+			<arg value="${parser.pass.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.parser.fail.tests" depends="set.bin.dir">
+		<echo message="Generating parser fail tests" />
+		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
+			<arg value="${parser.fail.test.list.file}" />
+			<arg value="${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
+
+	<!-- jflex, beaver, jastadd, and tests -->
+	<!-- NB: overrides target from gen.xml -->
+	<target name="gen" depends="compile.test.generators, Gen.gen" /> <!--TODO-AC: gen.tests -->
+
+	<!--=====================================================================-->
+	<!-- Public Targets                                                      -->
+	<!--=====================================================================-->
+
+	<import file="../shared/cli.xml" />
+	<import file="../shared/eclipse.xml" />
+
+	<!-- public versions of cli.xml targets -->
+	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
+	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
+	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+
+	<!-- public versions of eclipse.xml targets -->
+	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
+	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
+	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
+</project>
