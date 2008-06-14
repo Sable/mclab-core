@@ -100,18 +100,32 @@
 %left SHORTAND;
 %left SHORTOR;
 
+%typeof array = "Array";
+%typeof matrix = "Matrix";
+%typeof cell_array = "CellArray";
+
 %goal array;
 
 array =
+     matrix
+  |  cell_array
+  |  other_term {: return null; :}
+  ;
+
+matrix =
+     LSQUARE RSQUARE {: return new Matrix(new List<Row>()); :}
+  ;
+
+cell_array =
+     LCURLY RCURLY {: return new CellArray(new List<Row>()); :}
+  ;
+
+other_term =
      IDENTIFIER
   |  NUMBER
   |  STRING
   |  LPAREN
   |  RPAREN
-  |  LSQUARE
-  |  RSQUARE
-  |  LCURLY
-  |  RCURLY
   |  PLUS
   |  MINUS
   |  MTIMES
