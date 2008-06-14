@@ -1,0 +1,5 @@
+abstract Array ::= Row*;
+Matrix : Array;
+CellArray : Array;
+Row ::= Element*;
+Element ::= <Text>;

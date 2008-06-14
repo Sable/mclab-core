@@ -1,6 +1,6 @@
-package matrix;
+package array;
 
-import static matrix.MatrixParser.Terminals.*;
+import static array.ArrayParser.Terminals.*;
 
 import beaver.Symbol;
 import beaver.Scanner;
@@ -10,7 +10,7 @@ import beaver.Scanner;
 //general header info
 %public
 %final
-%class MatrixScanner
+%class ArrayScanner
 
 //required for beaver compatibility
 %extends Scanner
@@ -383,6 +383,6 @@ ValidEscape=\\[bfnrt\\\"]
 {Identifier} { return symbol(IDENTIFIER, yytext()); }
 
 /* error fallback */
-.|\n { error("Illegal character found inside matrix '" + yytext() + "'"); }
+.|\n { error("Illegal character found inside array '" + yytext() + "'"); }
 
 <<EOF>> { return symbol(EOF); }

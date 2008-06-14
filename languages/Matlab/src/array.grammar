@@ -1,8 +1,8 @@
-%import "matrix.ast.*";
+%import "array.ast.*";
 
-%package "matrix";
+%package "array";
 
-%class "MatrixParser";
+%class "ArrayParser";
 
 %embed {:
     //TODO-AC: factor out common code
@@ -58,7 +58,7 @@
     //// AST helpers ///////////////////////////////////////////////////////////
 
     //add all elements of a util list to an ast list
-    private static <T extends ASTNode<?>> matrix.ast.List<T> addAll(matrix.ast.List<T> node, java.util.List<T> children) {
+    private static <T extends ASTNode<?>> array.ast.List<T> addAll(array.ast.List<T> node, java.util.List<T> children) {
         for(T child : children) {
             node.add(child);
         }
@@ -66,11 +66,11 @@
     }
 
     //make a new ast list for a given util list
-    private static <T extends ASTNode<?>> matrix.ast.List<T> makeListNode(java.util.List<T> children) {
+    private static <T extends ASTNode<?>> array.ast.List<T> makeListNode(java.util.List<T> children) {
         if(children == null) {
             return null;
         }
-        return addAll(new matrix.ast.List<T>(), children);
+        return addAll(new array.ast.List<T>(), children);
     }
 
     //AST really doesn't like null nodes, but beaver returns null for empty optional lists
@@ -100,9 +100,9 @@
 %left SHORTAND;
 %left SHORTOR;
 
-%goal matrix;
+%goal array;
 
-matrix =
+array =
      IDENTIFIER
   |  NUMBER
   |  STRING
