@@ -652,12 +652,8 @@ arg =
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
 //but which aren't used in other productions
 OtherTerminal =
-    PARFOR
-  | DOT
-  | PROPERTIES
-  | METHODS
-  | EVENTS
-  | COMMENT
-  | ELLIPSIS_COMMENT
-  | BRACKET_COMMENT
+     PARFOR
+  |  COMMENT
+  |  ELLIPSIS_COMMENT
+  |  BRACKET_COMMENT
   ;
