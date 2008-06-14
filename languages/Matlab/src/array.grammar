@@ -102,10 +102,13 @@
 
 %typeof input_params, param_list = "List<Name>";
 
+%typeof array = "Array";
+
 %typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
 %typeof arg_list = "List<Expr>";
 %typeof arg = "Expr";
 %typeof matrix = "MatrixExpr";
+%typeof cell_array = "CellArrayExpr";
 %typeof row_list, optional_row_list = "List<Row>";
 %typeof row = "Row";
 %typeof literal = "LiteralExpr";
@@ -129,8 +132,8 @@
 %goal array;
 
 array =
-     matrix
-  |  cell_array
+     matrix.m {: return new Matrix(m); :}
+  |  cell_array.c {: return new CellArray(c); :}
   |  other_terminal {: return null; :}
   ;
 
