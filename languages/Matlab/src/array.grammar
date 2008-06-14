@@ -162,16 +162,16 @@ expr =
 
 logic_expr =
      colon_expr.e
-  |  logic_expr.e1 LT logic_expr.e2 {: return new LTExpr(e1, e2); :}
-  |  logic_expr.e1 GT logic_expr.e2 {: return new GTExpr(e1, e2); :}
-  |  logic_expr.e1 LE logic_expr.e2 {: return new LEExpr(e1, e2); :}
-  |  logic_expr.e1 GE logic_expr.e2 {: return new GEExpr(e1, e2); :}
-  |  logic_expr.e1 EQ logic_expr.e2 {: return new EQExpr(e1, e2); :}
-  |  logic_expr.e1 NE logic_expr.e2 {: return new NEExpr(e1, e2); :}
-  |  logic_expr.e1 AND logic_expr.e2 {: return new AndExpr(e1, e2); :}
-  |  logic_expr.e1 OR logic_expr.e2 {: return new OrExpr(e1, e2); :}
-  |  logic_expr.e1 SHORTAND logic_expr.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
-  |  logic_expr.e1 SHORTOR logic_expr.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
+  |  logic_expr.e1 LT logic_expr.e2 {: return new BinaryExpr(Terminals.LT, e1, e2); :}
+  |  logic_expr.e1 GT logic_expr.e2 {: return new BinaryExpr(Terminals.GT, e1, e2); :}
+  |  logic_expr.e1 LE logic_expr.e2 {: return new BinaryExpr(Terminals.LE, e1, e2); :}
+  |  logic_expr.e1 GE logic_expr.e2 {: return new BinaryExpr(Terminals.GE, e1, e2); :}
+  |  logic_expr.e1 EQ logic_expr.e2 {: return new BinaryExpr(Terminals.EQ, e1, e2); :}
+  |  logic_expr.e1 NE logic_expr.e2 {: return new BinaryExpr(Terminals.NE, e1, e2); :}
+  |  logic_expr.e1 AND logic_expr.e2 {: return new BinaryExpr(Terminals.AND, e1, e2); :}
+  |  logic_expr.e1 OR logic_expr.e2 {: return new BinaryExpr(Terminals.OR, e1, e2); :}
+  |  logic_expr.e1 SHORTAND logic_expr.e2 {: return new BinaryExpr(Terminals.SHORTAND, e1, e2); :}
+  |  logic_expr.e1 SHORTOR logic_expr.e2 {: return new BinaryExpr(Terminals.SHORTOR, e1, e2); :}
   ;
 
 colon_expr =
@@ -182,38 +182,38 @@ colon_expr =
 
 binary_expr =
      prefix_expr.e
-  |  binary_expr.e1 MTIMES binary_expr.e2  {: return new MTimesExpr(e1, e2); :}
-  |  binary_expr.e1 ETIMES binary_expr.e2  {: return new ETimesExpr(e1, e2); :}
-  |  binary_expr.e1 MDIV binary_expr.e2    {: return new MDivExpr(e1, e2); :}
-  |  binary_expr.e1 EDIV binary_expr.e2    {: return new EDivExpr(e1, e2); :}
-  |  binary_expr.e1 MLDIV binary_expr.e2   {: return new MLDivExpr(e1, e2); :}
-  |  binary_expr.e1 ELDIV binary_expr.e2   {: return new ELDivExpr(e1, e2); :}
-  |  binary_expr.e1 PLUS binary_expr.e2    {: return new PlusExpr(e1, e2); :}
-  |  binary_expr.e1 MINUS binary_expr.e2   {: return new MinusExpr(e1, e2); :}
+  |  binary_expr.e1 MTIMES binary_expr.e2 {: return new BinaryExpr(Terminals.MTIMES, e1, e2); :}
+  |  binary_expr.e1 ETIMES binary_expr.e2 {: return new BinaryExpr(Terminals.ETIMES, e1, e2); :}
+  |  binary_expr.e1 MDIV binary_expr.e2 {: return new BinaryExpr(Terminals.MDIV, e1, e2); :}
+  |  binary_expr.e1 EDIV binary_expr.e2 {: return new BinaryExpr(Terminals.EDIV, e1, e2); :}
+  |  binary_expr.e1 MLDIV binary_expr.e2 {: return new BinaryExpr(Terminals.MLDIV, e1, e2); :}
+  |  binary_expr.e1 ELDIV binary_expr.e2 {: return new BinaryExpr(Terminals.ELDIV, e1, e2); :}
+  |  binary_expr.e1 PLUS binary_expr.e2 {: return new BinaryExpr(Terminals.PLUS, e1, e2); :}
+  |  binary_expr.e1 MINUS binary_expr.e2 {: return new BinaryExpr(Terminals.MINUS, e1, e2); :}
   ;
 
 prefix_expr =
      pow_expr.e
-  |  NOT prefix_expr.e {: return new NotExpr(e); :}
-  |  PLUS prefix_expr.e {: return new UPlusExpr(e); :}
-  |  MINUS prefix_expr.e {: return new UMinusExpr(e); :}
+  |  NOT prefix_expr.e {: return new PrefixExpr(Terminals.NOT, e); :}
+  |  PLUS prefix_expr.e {: return new PrefixExpr(Terminals.PLUS, e); :}
+  |  MINUS prefix_expr.e {: return new PrefixExpr(Terminals.MINUS, e); :}
   ;
 
 pow_expr =
      postfix_expr.e
-  |  pow_expr.e1 MPOW pow_expr.e2    {: return new MPowExpr(e1, e2); :}
-  |  pow_expr.e1 EPOW pow_expr.e2    {: return new EPowExpr(e1, e2); :}
+  |  pow_expr.e1 MPOW pow_expr.e2 {: return new BinaryExpr(Terminals.MPOW, e1, e2); :}
+  |  pow_expr.e1 EPOW pow_expr.e2 {: return new BinaryExpr(Terminals.EPOW, e1, e2); :}
   ;
 
 postfix_expr =
      primary_expr.e
-  |  postfix_expr.e ARRAYTRANSPOSE {: return new ArrayTransposeExpr(e); :}
-  |  postfix_expr.e MTRANSPOSE {: return new MTransposeExpr(e); :}
+  |  postfix_expr.e ARRAYTRANSPOSE {: return new PostfixExpr(Terminals.ARRAYTRANSPOSE, e); :}
+  |  postfix_expr.e MTRANSPOSE {: return new PostfixExpr(Terminals.MTRANSPOSE, e); :}
   ;
 
 primary_expr =
      literal.l
-  |  LPAREN expr.e RPAREN
+  |  LPAREN expr.e RPAREN {: return new ParenExpr(e); :}
   |  matrix.m
   |  cell_array.c
   |  access.a
@@ -237,8 +237,8 @@ var_access =
   ;
 
 literal =
-     NUMBER.n {: return new NumberLiteralExpr(n); :}
-  |  STRING.s {: return new StringLiteralExpr(s); :}
+     NUMBER.n {: return new LiteralExpr(n); :}
+  |  STRING.s {: return new LiteralExpr(s); :}
   ;
 
 matrix =
