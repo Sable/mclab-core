@@ -1,5 +1,60 @@
-abstract Array ::= Row*;
-Matrix : Array;
-CellArray : Array;
-Row ::= Element*;
-Element ::= <Text>;
+abstract Array;
+Matrix : Array ::= Expr:MatrixExpr;
+CellArray : Array ::= Expr:CellArrayExpr;
+
+abstract Expr;
+RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
+ColonExpr : Expr;
+
+abstract LValueExpr : Expr;
+NameExpr : LValueExpr ::= Name;
+ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+DotExpr : LValueExpr ::= Target:Expr Field:Name;
+MatrixExpr : LValueExpr ::= Row*;
+CellArrayExpr : LValueExpr ::= Row*;
+
+Row ::= Element:Expr*;
+
+abstract LiteralExpr : Expr ::= <Value:String>;
+NumberLiteralExpr : LiteralExpr;
+StringLiteralExpr : LiteralExpr;
+
+abstract UnaryExpr : Expr ::= Operand:Expr;
+UMinusExpr : UnaryExpr;
+UPlusExpr : UnaryExpr;
+NotExpr : UnaryExpr;
+MTransposeExpr : UnaryExpr;
+ArrayTransposeExpr : UnaryExpr;
+
+abstract BinaryExpr : Expr ::= LHS:Expr RHS:Expr;
+PlusExpr : BinaryExpr;
+MinusExpr : BinaryExpr;
+
+MTimesExpr : BinaryExpr;
+MDivExpr : BinaryExpr;
+MLDivExpr : BinaryExpr;
+MPowExpr : BinaryExpr;
+
+ETimesExpr : BinaryExpr;
+EDivExpr : BinaryExpr;
+ELDivExpr : BinaryExpr;
+EPowExpr : BinaryExpr;
+
+AndExpr : BinaryExpr;
+OrExpr : BinaryExpr;
+
+ShortCircuitAndExpr : BinaryExpr;
+ShortCircuitOrExpr : BinaryExpr;
+
+LTExpr : BinaryExpr;
+GTExpr : BinaryExpr;
+LEExpr : BinaryExpr;
+GEExpr : BinaryExpr;
+EQExpr : BinaryExpr;
+NEExpr : BinaryExpr;
+
+FunctionHandleExpr : Expr ::= Name;
+LambdaExpr : Expr ::= InputParam:Name* Body:Expr;
+
+Name ::= <ID : String>;
