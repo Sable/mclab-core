@@ -78,6 +78,14 @@
     private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
         return original == null ? new List<T>() : original;
     }
+    
+    private static <T extends ASTNode> List<T> maybeAppend(List<T> list, Opt<T> opt) {
+        if(opt.getNumChild() == 0) {
+            return list;
+        } else {
+            return list.add(opt.getChild(0));
+        }
+    }
 :};
 
 %terminals IDENTIFIER, NUMBER, STRING;
@@ -100,13 +108,11 @@
 %left SHORTAND;
 %left SHORTOR;
 
-%typeof input_params, param_list = "List<Name>";
-
 %typeof array = "Array";
 
 %typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
-%typeof arg_list = "List<Expr>";
-%typeof arg = "Expr";
+%typeof arg_list = "List<Arg>";
+%typeof arg = "Arg";
 %typeof matrix = "MatrixExpr";
 %typeof cell_array = "CellArrayExpr";
 %typeof row_list, optional_row_list = "List<Row>";
@@ -114,6 +120,10 @@
 %typeof literal = "LiteralExpr";
 %typeof name = "Name";
 %typeof access, cell_access, var_access = "LValueExpr";
+
+%typeof param_list = "List<Param>";
+%typeof nbfs = "List<Comment>";
+%typeof nbf = "Opt<Comment>";
 
 %typeof IDENTIFIER, COMMENT, STRING, NUMBER = "String";
 
@@ -137,17 +147,15 @@ array =
   |  other_terminal {: return null; :}
   ;
 
-//input parameter list for a function
-input_params =
-     LPAREN RPAREN {: return new List<Name>(); :}
-  |  LPAREN param_list.l RPAREN
-  ;
-
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
 //shared by input and output parameters
 param_list =
-     IDENTIFIER.p {: return new List<Name>().add(new Name(p)); :}
-  |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Name(p)); :}
+     param.p {: return new List<Param>().add(p); :}
+  |  param_list.l COMMA param.p {: return l.add(p); :}
+  ;
+
+param =
+     nbfs.f1 IDENTIFIER.id nbfs.f2 {: return new Param(f1, id, f2); :}
   ;
 
 name =
@@ -157,83 +165,84 @@ name =
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr =
      logic_expr.l
-  |  AT input_params.params expr.body {: return new LambdaExpr(params, body); :}
+  |  AT nbfs.f1 LPAREN nbfs.f2 RPAREN nbfs.f3 expr.body {: return new LambdaExpr(f1, new EmptyParamList(f2), f3, body); :}
+  |  AT nbfs.f1 LPAREN param_list.l RPAREN nbfs.f3 expr.body {: return new LambdaExpr(f1, new NonEmptyParamList(l), f2, body); :}
   ;
 
 logic_expr =
      colon_expr.e
-  |  logic_expr.e1 LT logic_expr.e2 {: return new BinaryExpr(Terminals.LT, e1, e2); :}
-  |  logic_expr.e1 GT logic_expr.e2 {: return new BinaryExpr(Terminals.GT, e1, e2); :}
-  |  logic_expr.e1 LE logic_expr.e2 {: return new BinaryExpr(Terminals.LE, e1, e2); :}
-  |  logic_expr.e1 GE logic_expr.e2 {: return new BinaryExpr(Terminals.GE, e1, e2); :}
-  |  logic_expr.e1 EQ logic_expr.e2 {: return new BinaryExpr(Terminals.EQ, e1, e2); :}
-  |  logic_expr.e1 NE logic_expr.e2 {: return new BinaryExpr(Terminals.NE, e1, e2); :}
-  |  logic_expr.e1 AND logic_expr.e2 {: return new BinaryExpr(Terminals.AND, e1, e2); :}
-  |  logic_expr.e1 OR logic_expr.e2 {: return new BinaryExpr(Terminals.OR, e1, e2); :}
-  |  logic_expr.e1 SHORTAND logic_expr.e2 {: return new BinaryExpr(Terminals.SHORTAND, e1, e2); :}
-  |  logic_expr.e1 SHORTOR logic_expr.e2 {: return new BinaryExpr(Terminals.SHORTOR, e1, e2); :}
+  |  logic_expr.e1 nbfs.f1 LT nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.LT, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 GT nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.GT, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 LE nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.LE, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 GE nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.GE, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 EQ nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.EQ, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 NE nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.NE, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 AND nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.AND, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 OR nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.OR, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 SHORTAND nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.SHORTAND, f2, e2); :}
+  |  logic_expr.e1 nbfs.f1 SHORTOR nbfs.f2 logic_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.SHORTOR, f2, e2); :}
   ;
 
 colon_expr =
      binary_expr.e
-  |  binary_expr.e1 COLON binary_expr.e3 {: return new RangeExpr(e1, new Opt(), e3); :}
-  |  binary_expr.e1 COLON binary_expr.e2 COLON binary_expr.e3 {: return new RangeExpr(e1, new Opt(e2), e3); :}
+  |  binary_expr.e1 nbfs.f1 COLON nbfs.f2 binary_expr.e3 {: return new RangeExpr(e1, f1, f2, new Opt(), new List<Comment>(), new List<Comment>(), e3); :}
+  |  binary_expr.e1 nbfs.f1 COLON nbfs.f2 binary_expr.e2 nbfs.f3 COLON nbfs.f4 binary_expr.e3 {: return new RangeExpr(e1, f1, f2, new Opt(e2), f3, f4, e3); :}
   ;
 
 binary_expr =
      prefix_expr.e
-  |  binary_expr.e1 MTIMES binary_expr.e2 {: return new BinaryExpr(Terminals.MTIMES, e1, e2); :}
-  |  binary_expr.e1 ETIMES binary_expr.e2 {: return new BinaryExpr(Terminals.ETIMES, e1, e2); :}
-  |  binary_expr.e1 MDIV binary_expr.e2 {: return new BinaryExpr(Terminals.MDIV, e1, e2); :}
-  |  binary_expr.e1 EDIV binary_expr.e2 {: return new BinaryExpr(Terminals.EDIV, e1, e2); :}
-  |  binary_expr.e1 MLDIV binary_expr.e2 {: return new BinaryExpr(Terminals.MLDIV, e1, e2); :}
-  |  binary_expr.e1 ELDIV binary_expr.e2 {: return new BinaryExpr(Terminals.ELDIV, e1, e2); :}
-  |  binary_expr.e1 PLUS binary_expr.e2 {: return new BinaryExpr(Terminals.PLUS, e1, e2); :}
-  |  binary_expr.e1 MINUS binary_expr.e2 {: return new BinaryExpr(Terminals.MINUS, e1, e2); :}
+  |  binary_expr.e1 nbfs.f1 MTIMES nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.MTIMES, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 ETIMES nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.ETIMES, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 MDIV nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.MDIV, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 EDIV nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.EDIV, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 MLDIV nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.MLDIV, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 ELDIV nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.ELDIV, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 PLUS nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.PLUS, f2, e2); :}
+  |  binary_expr.e1 nbfs.f1 MINUS nbfs.f2 binary_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.MINUS, f2, e2); :}
   ;
 
 prefix_expr =
      pow_expr.e
-  |  NOT prefix_expr.e {: return new PrefixExpr(Terminals.NOT, e); :}
-  |  PLUS prefix_expr.e {: return new PrefixExpr(Terminals.PLUS, e); :}
-  |  MINUS prefix_expr.e {: return new PrefixExpr(Terminals.MINUS, e); :}
+  |  NOT nbfs.f prefix_expr.e {: return new PrefixExpr(Terminals.NOT, f, e); :}
+  |  PLUS nbfs.f prefix_expr.e {: return new PrefixExpr(Terminals.PLUS, f, e); :}
+  |  MINUS nbfs.f prefix_expr.e {: return new PrefixExpr(Terminals.MINUS, f, e); :}
   ;
 
 pow_expr =
      postfix_expr.e
-  |  pow_expr.e1 MPOW pow_expr.e2 {: return new BinaryExpr(Terminals.MPOW, e1, e2); :}
-  |  pow_expr.e1 EPOW pow_expr.e2 {: return new BinaryExpr(Terminals.EPOW, e1, e2); :}
+  |  pow_expr.e1 nbfs.f1 MPOW nbfs.f2 pow_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.MPOW, f2, e2); :}
+  |  pow_expr.e1 nbfs.f1 EPOW nbfs.f2 pow_expr.e2 {: return new BinaryExpr(e1, f1, Terminals.EPOW, f2, e2); :}
   ;
 
 postfix_expr =
      primary_expr.e
-  |  postfix_expr.e ARRAYTRANSPOSE {: return new PostfixExpr(Terminals.ARRAYTRANSPOSE, e); :}
-  |  postfix_expr.e MTRANSPOSE {: return new PostfixExpr(Terminals.MTRANSPOSE, e); :}
+  |  postfix_expr.e nbfs.f ARRAYTRANSPOSE {: return new PostfixExpr(Terminals.ARRAYTRANSPOSE, f, e); :}
+  |  postfix_expr.e nbfs.f MTRANSPOSE {: return new PostfixExpr(Terminals.MTRANSPOSE, f, e); :}
   ;
 
 primary_expr =
      literal.l
-  |  LPAREN expr.e RPAREN {: return new ParenExpr(e); :}
+  |  LPAREN nbfs.f1 expr.e nbfs.f2 RPAREN {: return new ParenExpr(f1, e, f2); :}
   |  matrix.m
   |  cell_array.c
   |  access.a
-  |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  |  AT nbfs.f name.name {: return new FunctionHandleExpr(f, name); :} //TODO-AC: allow qualified name?
   ;
 
 access =
      cell_access.c
-  |  cell_access.c LPAREN RPAREN {: return new ParameterizedExpr(c, new List<Expr>()); :}
-  |  cell_access.c LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(c, l); :}
+  |  cell_access.c nbfs.f1 LPAREN nbfs.f2 RPAREN {: return new ParameterizedExpr(c, f1, new EmptyArgList(f2)); :}
+  |  cell_access.c nbfs.f1 LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(c, f1, new NonEmptyArgList(l)); :}
   ;
 
 cell_access =
      var_access.v
-  |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
+  |  cell_access.v nbfs.f LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, f, l); :}
   ;
 
 var_access =
      name.n {: return new NameExpr(n); :}
-  |  var_access.v DOT name.n {: return new DotExpr(v, n); :}
+  |  var_access.v nbfs.f1 DOT nbfs.f2 name.n {: return new DotExpr(v, f1, f2, n); :}
   ;
 
 literal =
@@ -242,11 +251,11 @@ literal =
   ;
 
 matrix =
-     LSQUARE optional_row_list.l RSQUARE {: return new MatrixExpr(l); :}
+     LSQUARE nbfs.f optional_row_list.l RSQUARE {: return new MatrixExpr(f, l); :}
   ;
 
 cell_array =
-     LCURLY optional_row_list.l RCURLY {: return new CellArrayExpr(l); :}
+     LCURLY nbfs.f optional_row_list.l RCURLY {: return new CellArrayExpr(f, l); :}
   ;
 
 optional_row_list =
@@ -262,7 +271,7 @@ row_list =
   ;
 
 row =
-     arg_list.l COMMA? {: return new Row(l); :}
+     COMMA {: return new Row(new EmptyArgList(new List<Comment>())); :} //TODO-AC: arg_list.l COMMA?
   ;
 
 row_separator =
@@ -271,20 +280,37 @@ row_separator =
   ;
 
 arg_list =
-     arg.a {: return new List<Expr>().add(a); :}
+     arg.a {: return new List<Arg>().add(a); :}
   |  arg_list.l COMMA arg.a {: return l.add(a); :}
   ;
   
 arg =
-     expr.e
-  |  COLON.c {: return new ColonExpr(); :}
+     nbfs.f1 expr.e nbfs.f2 {: return new Arg(f1, e, f2); :}
+  |  nbfs.f1 COLON.c nbfs.f2 {: return new Arg(f1, new ColonExpr(), f2); :}
+  ;
+
+//TODO-AC
+////non-breaking fillers (zero or more)
+//nbfs =
+//     {: return new List<Comment>(); :}
+//  |  nbfs1.fs
+//  ;
+
+//non-breaking fillers (one or more)
+nbfs =
+     nbf.f {: return maybeAppend(new List<Comment>(), f); :}
+  |  nbfs.fs nbf.f {: return maybeAppend(fs, f); :}
+  ;
+
+//non-breaking filler
+nbf =
+     OTHER_WHITESPACE {: return new Opt<Comment>(); :}
+  |  ELLIPSIS_COMMENT.c {: return new Opt<Comment>(new Comment(c)); :}
   ;
 
 //terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
 //but which aren't used in other productions
 other_terminal =
   |  COMMENT
-  |  ELLIPSIS_COMMENT
   |  BRACKET_COMMENT
-  |  OTHER_WHITESPACE
   ;

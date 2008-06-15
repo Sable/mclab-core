@@ -2,33 +2,42 @@ abstract Array;
 Matrix : Array ::= Expr:MatrixExpr;
 CellArray : Array ::= Expr:CellArrayExpr;
 
-Comment ::= <Text>;
-
 abstract Expr;
-ParenExpr : Expr ::= Expr;
+ParenExpr : Expr ::= PostLParenComment:Comment* Expr  PreRParenComment:Comment*;
 
-RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
+RangeExpr : Expr ::= Lower:Expr PreColon1Comment:Comment* PostColon1Comment:Comment* [Incr:Expr] PreColon2Comment:Comment* PostColon2Comment:Comment* Upper:Expr;
 ColonExpr : Expr;
 
 abstract LValueExpr : Expr;
 NameExpr : LValueExpr ::= Name;
-ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
-CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
-DotExpr : LValueExpr ::= Target:Expr Field:Name;
-MatrixExpr : LValueExpr ::= Row*;
-CellArrayExpr : LValueExpr ::= Row*;
-
-Row ::= Element:Expr*;
+ParameterizedExpr : LValueExpr ::= Target:Expr PreLParenComment:Comment* ArgList;
+CellIndexExpr : LValueExpr ::= Target:Expr PreLCurlyComment:Comment* Arg*;
+DotExpr : LValueExpr ::= Target:Expr PreDotComment:Comment* PostDotComment:Comment* Field:Name;
+MatrixExpr : LValueExpr ::= PostLSquareComment:Comment* Row* PreRSquareComment:Comment*;
+CellArrayExpr : LValueExpr ::= PostLCurlyComment:Comment* Row* PreRCurlyComment:Comment*;
 
 LiteralExpr : Expr ::= <Value>;
 
-abstract UnaryExpr : Expr ::= <Operator : short> Operand:Expr;
+abstract UnaryExpr : Expr ::= <Operator : short> OperatorComment:Comment* Operand:Expr;
 PrefixExpr : UnaryExpr;
 PostfixExpr : UnaryExpr;
 
-BinaryExpr : Expr ::= <Operator : short> LHS:Expr RHS:Expr;
+BinaryExpr : Expr ::= LHS:Expr PreOperatorComment:Comment* <Operator : short> PostOperatorComment:Comment* RHS:Expr;
 
-FunctionHandleExpr : Expr ::= Name;
-LambdaExpr : Expr ::= InputParam:Name* Body:Expr;
+FunctionHandleExpr : Expr ::= PostAtComment:Comment* Name;
+LambdaExpr : Expr ::= PostAtComment:Comment* PreLParenComment:Comment* ParamList PostRParenComment:Comment* Body:Expr;
+
+Row ::= Element : ArgList Comment*;
+
+Param ::= PreComment:Comment* Name PostComment:Comment*;
+abstract ParamList;
+EmptyParamList : ParamList ::= Comment*;
+NonEmptyParamList : ParamList ::= Param*; 
+
+Arg ::= PreComment:Comment* Expr PostComment:Comment*;
+abstract ArgList;
+EmptyArgList : ArgList ::= Comment*;
+NonEmptyArgList : ArgList ::= Arg*;
 
 Name ::= <ID>;
+Comment ::= <Text>;
