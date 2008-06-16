@@ -10,21 +10,30 @@ import beaver.Parser;
  * Used to resolve fn and script names. Contains lists of scripts, 
  * functions and class constructors. Resolution process is intertwined 
  * with the loading process, and they share a queue of files that need 
- * processing
+ * processing. This queue is produced by Resolver and consumed by the 
+ * loader
  */
 
 public class Resolver
 {
-    private Queue<ProgramEntry> toProcess;
+    private Queue<ProgramEntry<Program> > toProcess;
 
-    private List<Script> scripts;
+    private List<ProgramEntry<Script> > scripts;
 
-    private List<FunctionList> functions;
+    private List<ProgramEntry<FunctionList> > functions;
 
-    Resolver(Queue<ProgramEntry> toP)
+    Resolver(Queue<ProgramEntry<Program> > toP)
     {
         toProcess = toP;
-        scripts = new LinkedList<Script>();
-        functions = new LinkedList<FunctionList>();
+        scripts = new LinkedList<ProgramEntry<Script> >();
+        functions = new LinkedList<ProgramEntry<FunctionList> >();
+    }
+
+    public ProgramEntry<Script> addScript(Script s, String name)
+    {
+        ProgramEntry<Script> script = new ProgramEntry<Script>(s, name);
+        scripts.add(script);
+        //        toProcess.offer(script); //TODO-JD add some protection
+        return script; 
     }
 }

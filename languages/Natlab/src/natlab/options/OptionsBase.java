@@ -17,10 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-package soot.options;
+package natlab.options;
 import java.util.*;
 
-import soot.*;
 
 /** Soot command-line options parser base class.
  * @author Ondrej Lhotak
@@ -57,7 +56,7 @@ abstract class OptionsBase {
         return b.toString();
     }
 
-    protected String padOpt( String opts, String desc ) {
+    /*    protected String padOpt( String opts, String desc ) {
         return pad( 1, opts, 30, desc );
     }
 
@@ -91,7 +90,7 @@ abstract class OptionsBase {
 
     public boolean setPhaseOption( String phase, String option ) {
         return PhaseOptions.v().processPhaseOptions( phase, option );
-    }
+        }*/
 
 }
   

@@ -6,17 +6,17 @@ import natlab.ast.Program;
  * A entry for a Program used in the Resolver's and loaders lists
  */
 
-public class ProgramEntry
+public class ProgramEntry<T extends Program>
 {
-    private Program program;
+    private T program;
     private String name;
 
-    public ProgramEntry(Program p, String n)
+    public ProgramEntry(T p, String n)
     {
         program = p;
         name = n;
     }
-    public Program getProgram()
+    public T getProgram()
     {
         return program;
     }
