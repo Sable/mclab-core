@@ -168,13 +168,13 @@ class_body =
   ;
 
 methods_block =
-     METHODS nbf* stmt_separator_list1 nbf* methods_body.body* END
-  |  METHODS nbf* attributes.attr nbf* stmt_separator_list1 nbf* methods_body.body* END
+     METHODS nbf* stmt_separator+ methods_body.body* END
+  |  METHODS nbf* attributes.attr nbf* stmt_separator+ methods_body.body* END
   ;
 
 methods_body =
      function
-  |  function_signature stmt_separator_list1
+  |  function_signature stmt_separator+
   ;
   
 function_signature =
@@ -283,11 +283,6 @@ else_if_clause =
   
 else_clause = 
      ELSE nbf* stmt_separator stmt_list.l
-  ;
-
-stmt_separator_list1 =
-     stmt_separator_no_nbf
-  |  stmt_separator stmt_separator_list1
   ;
 
 stmt_separator =
