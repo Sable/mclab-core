@@ -496,11 +496,6 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
-//loose closing brackets (for better error messages)
-\) { return symbol(RPAREN); }
-\] { return symbol(RSQUARE); }
-\} { return symbol(RCURLY); }
-
 //stmt terminators
 , { return symbol(COMMA); }
 ; { return symbol(SEMICOLON); }

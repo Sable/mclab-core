@@ -59,21 +59,20 @@
 %terminals IDENTIFIER;
 %terminals NUMBER;
 %terminals COMMENT, HELP_COMMENT, ELLIPSIS_COMMENT, BRACKET_COMMENT, BRACKET_HELP_COMMENT, SHELL_COMMAND;
-%terminals RPAREN, RSQUARE, RCURLY;
 %terminals BREAK, CASE, CATCH, CLASSDEF, CONTINUE, ELSE, ELSEIF, END, FOR, FUNCTION, GLOBAL, IF, OTHERWISE, PARFOR, PERSISTENT, RETURN, SWITCH, TRY, WHILE;
 %terminals PLUS, MINUS, MTIMES, ETIMES, MDIV, EDIV, MLDIV, ELDIV, MPOW, EPOW, MTRANSPOSE, ARRAYTRANSPOSE, LE, GE, LT, GT, EQ, NE, AND, OR, NOT, SHORTAND, SHORTOR, ASSIGN;
-%terminals DOT, COMMA, SEMICOLON, LINE_TERMINATOR, COMMA_LINE_TERMINATOR, SEMICOLON_LINE_TERMINATOR;
+%terminals DOT, COMMA, SEMICOLON, LINE_TERMINATOR;
 %terminals COLON, AT;
 %terminals STRING;
 %terminals METHODS;
 %terminals PROPERTIES_BLOCK, EVENTS_BLOCK;
 %terminals OTHER_WHITESPACE;
-%terminals PARENTHESIZE, MATRIX, CELL_ARRAY;
+%terminals PARENTHESIZED, MATRIX, CELL_ARRAY;
 
 %typeof IDENTIFIER, NUMBER, STRING = "String";
 %typeof COMMENT, BRACKET_COMMENT, HELP_COMMENT, BRACKET_HELP_COMMENT, ELLIPSIS_COMMENT = "String";
 %typeof OTHER_WHITESPACE, LINE_TERMINATOR = "String";
-%typeof PARENTHESIZE, MATRIX, CELL_ARRAY = "String";
+%typeof PARENTHESIZED, MATRIX, CELL_ARRAY = "String";
 
 %goal program;
 
@@ -120,11 +119,11 @@ function_separator =
 //a function with nothing following the final END
 function_body =
      //output params
-     FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
-  |  FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+     FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
      //no output params
-  |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
-  |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+  |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
   ;
 
 //input parameter list for a function
@@ -147,10 +146,10 @@ stmt_or_function =
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def =
-     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END 
-  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* class_body.body* nbf* END 
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END
+     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body_list nbf* END 
+  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body_list nbf* END
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body.body* nbf* END 
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body_list nbf* END
   ;
 
 attributes =
@@ -198,13 +197,18 @@ function_signature =
 //usually help comments are followed by a newline, but the last one could be followed by EOF instead
 last_help_comment =
      help_comment.c
-  |  help_comment_body.c
+  |  nbf* help_comment_body.c
+  ;
+
+help_comment_list =
+     nbf*
+  |  help_comment+ nbf*
   ;
 
 //help comment with a newline
-//NB: preceded by whitespace, not nbf
+//NB: should be preceded by whitespace, not nbf, but we'll cheat since Natlab does the real checking
 help_comment =
-     OTHER_WHITESPACE* help_comment_body.c LINE_TERMINATOR
+     nbf* help_comment_body.c LINE_TERMINATOR
   ;
 
 //help comment without a newline
@@ -234,12 +238,12 @@ stmt =
 
 //stmt not followed by a separator
 stmt_body =
-     IDENTIFIER magic string_or_nbf* STRING
+     IDENTIFIER string_or_nbf* STRING //TODO-AC: magic
   |  IDENTIFIER
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id
-  |  GLOBAL  nbf* name.names+
-  |  PERSISTENT nbf* name.names+
+  |  GLOBAL name.names+
+  |  PERSISTENT name.names+
   |  SHELL_COMMAND.c
   |  TRY nbf* stmt_separator stmt_list.tl nbf* END
   |  TRY nbf* stmt_separator stmt_list.tl nbf* CATCH nbf* stmt_separator stmt_list.cl nbf* END
@@ -250,13 +254,18 @@ stmt_body =
   |  RETURN
   |  WHILE nbf* expr.e nbf* stmt_separator stmt_list.l END
   |  FOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END
+  |  PARFOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END
   ;
 
-magic = {: scanner.saveStateAndTransition(COMMAND); :}
+//magic = {: scanner.saveStateAndTransition(COMMAND); :};
 
 string_or_nbf =
      STRING
   |  nbf
+  ;
+
+name =
+     nbf* IDENTIFIER
   ;
 
 switch_statement = 
@@ -326,7 +335,7 @@ expr_token_or_nbf =
   ;
 
 expr_token =
-     expr_token
+     expr_token_not_id
   |  IDENTIFIER
   ;
 
