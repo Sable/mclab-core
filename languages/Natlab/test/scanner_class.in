@@ -9,5 +9,7 @@ function obj = myClass
 x = 125
 end
 b = bbb
+function obj = get.a()
+end
 end
 end

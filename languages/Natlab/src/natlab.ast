@@ -5,14 +5,15 @@ FunctionList : Program ::= Function*;
 EmptyProgram : Program;
 
 abstract ClassBody;
-ClassDef : Program ::= Attr:Attribute* <Name:String> SuperClasses:SuperClass* HelpComment* Properties* Methods* ClassEvents*;
-Attribute ::= <Key:String> ExprStmt;
+ClassDef : Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents*;
+Attribute ::= <Key:String> Expr;
 SuperClass ::= <Name:String>;
-Properties:ClassBody ::= Attr:Attribute* Property*;
-Property ::= <Name:String> ExprStmt;
-Methods:ClassBody ::= Attr:Attribute* Signature* Function*;
+Properties:ClassBody ::= Attribute* Property*;
+Property ::= <Name:String> Expr;
+Methods:ClassBody ::= Attribute* Signature* PropAcc:PropertyAccess* Function*;
 Signature ::= OutputParam:Name* <Name:String> InputParam:Name*;
-ClassEvents:ClassBody ::= Attr:Attribute* Event*;
+PropertyAccess ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+ClassEvents:ClassBody ::= Attribute* Event*;
 Event ::= <Name:String>;
 
 abstract HelpComment ::= <Text:String>;
