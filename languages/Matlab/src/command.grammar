@@ -238,7 +238,7 @@ stmt =
 
 //stmt not followed by a separator
 stmt_body =
-     IDENTIFIER string_or_nbf* STRING //TODO-AC: magic
+     IDENTIFIER string_nbf+ //TODO-AC: magic
   |  IDENTIFIER
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id
@@ -259,9 +259,8 @@ stmt_body =
 
 //magic = {: scanner.saveStateAndTransition(COMMAND); :};
 
-string_or_nbf =
-     STRING
-  |  nbf
+string_nbf =
+     nbf* STRING
   ;
 
 name =
