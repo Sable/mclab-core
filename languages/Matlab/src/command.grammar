@@ -225,7 +225,7 @@ stmt =
 
 //stmt not followed by a separator
 stmt_body =
-     IDENTIFIER nbfs string_nbf* //TODO-AC: magic
+     command_name nbfs string_nbf*
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id ASSIGN nbfs expr_not_starting_with_id
   |  GLOBAL name.names+ nbfs
@@ -243,7 +243,9 @@ stmt_body =
   |  PARFOR nbfs for_assign.a stmt_separator stmt_list.l END nbfs
   ;
 
-//magic = {: scanner.saveStateAndTransition(COMMAND); :};
+command_name =
+     IDENTIFIER.cmd //{: scanner.saveStateAndTransition(ExtractionScanner.COMMAND); return _symbol_cmd; :}
+  ;
 
 string_nbf =
      STRING nbfs
