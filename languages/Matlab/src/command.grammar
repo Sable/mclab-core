@@ -1,10 +1,8 @@
 //TODO-AC: factor out common bits
 
-%import "natlab.ast.*";
+%package "matlab";
 
-%package "natlab";
-
-%class "NatlabParser";
+%class "ExtractionParser";
 
 %embed {:
     //// Errors ////////////////////////////////////////////////////////////////

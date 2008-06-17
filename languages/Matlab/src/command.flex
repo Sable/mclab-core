@@ -1,8 +1,8 @@
 //TODO-AC: factor out common bits
 
-package natlab;
+package matlab;
 
-import static natlab.NatlabParser.Terminals.*;
+import static matlab.ExtractionParser.Terminals.*;
 
 import beaver.Symbol;
 import beaver.Scanner;
@@ -12,7 +12,7 @@ import beaver.Scanner;
 //general header info
 %public
 %final
-%class NatlabScanner
+%class ExtractionScanner
 
 //required for beaver compatibility
 %extends Scanner
@@ -203,13 +203,10 @@ import beaver.Scanner;
   static {
     //NB: cannot contain DOT
     TYPE_PRECEDING_TRANSPOSE.add(IDENTIFIER);
-    TYPE_PRECEDING_TRANSPOSE.add(INT_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(IM_INT_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(FP_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(IM_FP_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(RPAREN);
-    TYPE_PRECEDING_TRANSPOSE.add(RSQUARE);
-    TYPE_PRECEDING_TRANSPOSE.add(RCURLY);
+    TYPE_PRECEDING_TRANSPOSE.add(NUMBER);
+    TYPE_PRECEDING_TRANSPOSE.add(PARENTHESIZED);
+    TYPE_PRECEDING_TRANSPOSE.add(MATRIX);
+    TYPE_PRECEDING_TRANSPOSE.add(CELL_ARRAY);
     TYPE_PRECEDING_TRANSPOSE.add(ARRAYTRANSPOSE);
     TYPE_PRECEDING_TRANSPOSE.add(MTRANSPOSE);
   }
