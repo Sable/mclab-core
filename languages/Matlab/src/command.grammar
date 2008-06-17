@@ -320,17 +320,18 @@ for_assign =
 
 expr =
      expr_token
-  |  expr_token expr_token_or_nbf* expr_token
+  |  expr_token expr_token_list1
   ;
 
 expr_not_starting_with_id =
      expr_token_not_id
-  |  expr_token_not_id expr_token_or_nbf* expr_token
+  |  expr_token_not_id expr_token_list1
   ;
 
-expr_token_or_nbf =
-     expr_token
-  |  nbf
+expr_token_list1 =
+     nbf expr_token_list1
+  |  expr_token expr_token_list1
+  |  expr_token
   ;
 
 expr_token =
