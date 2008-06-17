@@ -230,8 +230,8 @@ stmt =
 stmt_body =
      IDENTIFIER string_nbf+ nbf* //TODO-AC: magic
   |  IDENTIFIER nbf*
-  |  expr_not_starting_with_id nbf*
-  |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id nbf*
+  |  expr_not_starting_with_id
+  |  expr_not_starting_with_id ASSIGN nbf* expr_not_starting_with_id
   |  GLOBAL name.names+ nbf*
   |  PERSISTENT name.names+ nbf*
   |  SHELL_COMMAND.c nbf*
@@ -242,9 +242,9 @@ stmt_body =
   |  BREAK nbf*
   |  CONTINUE nbf*
   |  RETURN nbf*
-  |  WHILE nbf* expr.e nbf* stmt_separator stmt_list.l END nbf*
-  |  FOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END nbf*
-  |  PARFOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END nbf*
+  |  WHILE nbf* expr.e stmt_separator stmt_list.l END nbf*
+  |  FOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
+  |  PARFOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
   ;
 
 //magic = {: scanner.saveStateAndTransition(COMMAND); :};
@@ -258,27 +258,27 @@ name =
   ;
 
 switch_statement = 
-     SWITCH nbf* expr.e nbf* stmt_separator END
-  |  SWITCH nbf* expr.e nbf* stmt_separator default_case.d END
-  |  SWITCH nbf* expr.e nbf* stmt_separator switch_case.s+ END
-  |  SWITCH nbf* expr.e nbf* stmt_separator switch_case.s+ default_case.d END
+     SWITCH nbf* expr stmt_separator END
+  |  SWITCH nbf* expr stmt_separator default_case.d END
+  |  SWITCH nbf* expr stmt_separator switch_case.s+ END
+  |  SWITCH nbf* expr stmt_separator switch_case.s+ default_case.d END
   ;
 
 switch_case = 
-     CASE nbf* expr.e nbf* stmt_separator stmt_list.l
+     CASE nbf* expr stmt_separator stmt_list.l
   ;
 default_case = 
      OTHERWISE nbf* stmt_separator stmt_list.l 
   ;
   
 if_statement = 
-     IF nbf* expr.e nbf* stmt_separator stmt_list.l END
-  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_clause.els END
-  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
+     IF nbf* expr stmt_separator stmt_list.l END
+  |  IF nbf* expr stmt_separator stmt_list.l else_clause.els END
+  |  IF nbf* expr stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
   ;
 
 else_if_clause = 
-     ELSEIF nbf* expr.e nbf* stmt_separator stmt_list.l
+     ELSEIF nbf* expr stmt_separator stmt_list.l
   ;
   
 else_clause = 
@@ -299,24 +299,21 @@ stmt_separator_no_nbf =
 
 //assignment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
-     IDENTIFIER.lhs nbf* ASSIGN nbf* expr.rhs
-  |  PARENTHESIZED
+     IDENTIFIER.lhs nbf* ASSIGN nbf* expr
+  |  PARENTHESIZED nbf*
   ;
 
 expr =
-     expr_token
-  |  expr_token expr_token_list1
+     expr_token expr_token_or_nbf*
   ;
 
 expr_not_starting_with_id =
-     expr_token_not_id
-  |  expr_token_not_id expr_token_list1
+     expr_token_not_id expr_token_or_nbf*
   ;
 
-expr_token_list1 =
-     nbf expr_token_list1
-  |  expr_token expr_token_list1
-  |  expr_token
+expr_token_or_nbf =
+     expr_token
+  |  nbf
   ;
 
 expr_token =
