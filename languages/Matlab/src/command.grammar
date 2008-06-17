@@ -1,0 +1,370 @@
+//TODO-AC: factor out common bits
+
+%import "natlab.ast.*";
+
+%package "natlab";
+
+%class "NatlabParser";
+
+%embed {:
+    //// Errors ////////////////////////////////////////////////////////////////
+
+    //list of errors encountered while parsing
+    private final java.util.List<String> errors = new java.util.ArrayList<String>();
+
+    public java.util.List<String> getErrors() {
+        return java.util.Collections.unmodifiableList(errors);
+    }
+
+    public boolean hasError() {
+        return !errors.isEmpty();
+    }
+
+    //given a symbol, return a canonical string representation of it's position
+    private static String getPosString(Symbol token) {
+        return getPosString(token.getLine(token.getStart()), token.getColumn(token.getStart()));
+    }
+
+    //given a position, return a canonical string representation
+    private static String getPosString(int line, int col) {
+        return "[" + line + ", " + col + "]";
+    }
+
+    //override the default error handling:
+    //  1) no writing to stderr
+    //  2) no exceptions
+    //  3) suggestions based on automatic corrections
+    class Events extends Parser.Events {
+        public void syntaxError(Symbol token) {
+            errors.add(getPosString(token) + "  unexpected token " + Terminals.NAMES[token.getId()]);
+        }
+        public void scannerError(Scanner.Exception e) {
+            errors.add(getPosString(e.line + 1, e.column + 1) + "  scanner error: " + e.getMessage());
+        }
+        public void unexpectedTokenRemoved(Symbol token) {
+            errors.add(getPosString(token) + "  try deleting " + Terminals.NAMES[token.getId()]);
+        }
+        public void missingTokenInserted(Symbol token) {
+            errors.add(getPosString(token) + "  try inserting " + Terminals.NAMES[token.getId()]);
+        }
+        public void misspelledTokenReplaced(Symbol token) {
+            errors.add(getPosString(token) + "  try replacing with " + Terminals.NAMES[token.getId()]);
+        }
+    }
+
+    //tell handler to use subclass defined above
+    { report = new Events(); }
+:};
+
+%terminals IDENTIFIER;
+%terminals NUMBER;
+%terminals COMMENT, HELP_COMMENT, ELLIPSIS_COMMENT, BRACKET_COMMENT, BRACKET_HELP_COMMENT, SHELL_COMMAND;
+%terminals RPAREN, RSQUARE, RCURLY;
+%terminals BREAK, CASE, CATCH, CLASSDEF, CONTINUE, ELSE, ELSEIF, END, FOR, FUNCTION, GLOBAL, IF, OTHERWISE, PARFOR, PERSISTENT, RETURN, SWITCH, TRY, WHILE;
+%terminals PLUS, MINUS, MTIMES, ETIMES, MDIV, EDIV, MLDIV, ELDIV, MPOW, EPOW, MTRANSPOSE, ARRAYTRANSPOSE, LE, GE, LT, GT, EQ, NE, AND, OR, NOT, SHORTAND, SHORTOR, ASSIGN;
+%terminals DOT, COMMA, SEMICOLON, LINE_TERMINATOR, COMMA_LINE_TERMINATOR, SEMICOLON_LINE_TERMINATOR;
+%terminals COLON, AT;
+%terminals STRING;
+%terminals METHODS;
+%terminals PROPERTIES_BLOCK, EVENTS_BLOCK;
+%terminals OTHER_WHITESPACE;
+%terminals PARENTHESIZE, MATRIX, CELL_ARRAY;
+
+%typeof IDENTIFIER, NUMBER, STRING = "String";
+%typeof COMMENT, BRACKET_COMMENT, HELP_COMMENT, BRACKET_HELP_COMMENT, ELLIPSIS_COMMENT = "String";
+%typeof OTHER_WHITESPACE, LINE_TERMINATOR = "String";
+%typeof PARENTHESIZE, MATRIX, CELL_ARRAY = "String";
+
+%goal program;
+
+//everything
+program = 
+     script.s
+  |  function_list.f
+  |  class_def.c
+  |  
+  ;
+
+//script file: list of help comments followed by list of stmts
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+script =
+     //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
+     nbf* stmt.stmts+ last_stmt.s
+  |  nbf* last_stmt.s
+  |  help_comment.comments+ nbf* stmt.stmts+ last_stmt.s
+  |  help_comment.comments+ nbf* last_stmt.s
+  |  help_comment.comments+ last_help_comment.c
+  |  last_help_comment.c
+  ;
+
+//function file: list of functions, separated by whitespace
+//NB: no leading whitespace allowed
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+function_list =
+     function.functions+
+  ;
+
+//function followed by whitespace - only used by function_list (otherwise use function_body)
+function =
+     function_body.f function_separator*
+  ;
+
+function_separator =
+     LINE_TERMINATOR
+  |  OTHER_WHITESPACE
+  |  ELLIPSIS_COMMENT
+  |  COMMENT LINE_TERMINATOR
+  |  BRACKET_COMMENT LINE_TERMINATOR
+  ;
+
+//a function with nothing following the final END
+function_body =
+     //output params
+     FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+  |  FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+     //no output params
+  |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+  |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment.comments* nbf* stmt_or_function.body* END
+  ;
+
+//input parameter list for a function
+input_params =
+     PARENTHESIZED
+  ;
+
+//output parameter list for a function
+output_params =
+     MATRIX
+  |  IDENTIFIER.p
+  ;
+
+//used to mix stmts and nested functions in a containing function
+stmt_or_function =
+     stmt.s
+  |  function_body.f nbf*
+  ;
+
+//a classdef file
+//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+class_def =
+     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END 
+  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment.comments* nbf* class_body.body* nbf* END 
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment.comments* nbf* class_body_list nbf* END
+  ;
+
+attributes =
+     PARENTHESIZED
+  ;
+
+superclass_list =
+     IDENTIFIER.name
+  |  superclass_list.l nbf* AND nbf* IDENTIFIER.name
+  ;
+
+class_body_list =
+     class_body_list1
+  |  
+  ;
+
+class_body_list1 =
+     class_body
+  |  class_body_list1 nbf* class_body
+  ;
+
+class_body =
+     PROPERTIES_BLOCK nbf* stmt_separator*
+  |  EVENTS_BLOCK nbf* stmt_separator*
+  |  methods_block nbf* stmt_separator*
+  ;
+
+methods_block =
+     METHODS nbf* stmt_separator_list1 nbf* methods_body.body* END
+  |  METHODS nbf* attributes.attr nbf* stmt_separator_list1 nbf* methods_body.body* END
+  ;
+
+methods_body =
+     function nbf*
+  |  function_signature nbf* stmt_separator_list1
+  ;
+  
+function_signature =
+     IDENTIFIER.name
+  |  IDENTIFIER.name nbf* input_params.in
+  |  output_params.out nbf* ASSIGN nbf* IDENTIFIER.name
+  |  output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in
+  ;
+
+//usually help comments are followed by a newline, but the last one could be followed by EOF instead
+last_help_comment =
+     help_comment.c
+  |  help_comment_body.c
+  ;
+
+//help comment with a newline
+//NB: preceded by whitespace, not nbf
+help_comment =
+     OTHER_WHITESPACE* help_comment_body.c LINE_TERMINATOR
+  ;
+
+//help comment without a newline
+help_comment_body =
+     HELP_COMMENT.c
+  |  BRACKET_HELP_COMMENT.c
+  ;
+
+//list of statements (each followed by a separator)
+//may be empty
+stmt_list =
+     stmt.stmts+
+  |  
+  ;
+
+//usually stmts are followed by separators, but the last one could be followed by EOF instead
+last_stmt =
+     stmt_body.s nbf*
+  |  stmt.s
+  ;
+
+//stmt followed by separator
+stmt =
+     stmt_body.s nbf* stmt_separator.sep nbf*
+  |  stmt_separator.sep nbf*
+  ;
+
+//stmt not followed by a separator
+stmt_body =
+     IDENTIFIER magic string_or_nbf* STRING
+  |  IDENTIFIER
+  |  expr_not_starting_with_id
+  |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id
+  |  GLOBAL  nbf* name.names+
+  |  PERSISTENT nbf* name.names+
+  |  SHELL_COMMAND.c
+  |  TRY nbf* stmt_separator stmt_list.tl nbf* END
+  |  TRY nbf* stmt_separator stmt_list.tl nbf* CATCH nbf* stmt_separator stmt_list.cl nbf* END
+  |  switch_statement
+  |  if_statement
+  |  BREAK
+  |  CONTINUE
+  |  RETURN
+  |  WHILE nbf* expr.e nbf* stmt_separator stmt_list.l END
+  |  FOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END
+  ;
+
+magic = {: scanner.saveStateAndTransition(COMMAND); :}
+
+string_or_nbf =
+     STRING
+  |  nbf
+  ;
+
+switch_statement = 
+     SWITCH nbf* expr.e nbf* stmt_separator END
+  |  SWITCH nbf* expr.e nbf* stmt_separator default_case.d END
+  |  SWITCH nbf* expr.e nbf* stmt_separator switch_case.s+ END
+  |  SWITCH nbf* expr.e nbf* stmt_separator switch_case.s+ default_case.d END
+  ;
+
+switch_case = 
+     CASE nbf* expr.e nbf* stmt_separator stmt_list.l nbf*
+  ;
+default_case = 
+     OTHERWISE nbf* stmt_separator stmt_list.l 
+  ;
+  
+if_statement = 
+     IF nbf* expr.e nbf* stmt_separator stmt_list.l END
+  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_clause.els nbf* END
+  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
+  ;
+
+else_if_clause = 
+     ELSEIF nbf* expr.e nbf* stmt_separator stmt_list.l nbf*
+  ;
+  
+else_clause = 
+     ELSE nbf* stmt_separator stmt_list.l nbf*
+  ;
+
+stmt_separator_list1 =
+     stmt_separator_no_nbf
+  |  stmt_separator stmt_separator_list1
+  ;
+
+stmt_separator =
+      stmt_separator_no_nbf nbf*
+  ;
+
+stmt_separator_no_nbf =
+     LINE_TERMINATOR
+  |  SEMICOLON
+  |  COMMA
+  |  COMMENT LINE_TERMINATOR
+  |  BRACKET_COMMENT LINE_TERMINATOR
+  ;
+
+//assignment appearing in a for loop (i.e. optionally surrounded by parens)
+for_assign =
+     IDENTIFIER.lhs nbf* ASSIGN nbf* expr.rhs
+  |  PARENTHESIZED
+  ;
+
+expr =
+     expr_token
+  |  expr_token expr_token_or_nbf* expr_token
+  ;
+
+expr_not_starting_with_id =
+     expr_token_not_id
+  |  expr_token_not_id expr_token_or_nbf* expr_token
+  ;
+
+expr_token_or_nbf =
+     expr_token
+  |  nbf
+  ;
+
+expr_token =
+     expr_token
+  |  IDENTIFIER
+  ;
+
+expr_token_not_id =
+     LT
+  |  GT
+  |  LE
+  |  GE
+  |  EQ
+  |  NE
+  |  AND
+  |  OR
+  |  SHORTAND
+  |  SHORTOR
+  |  COLON
+  |  MTIMES
+  |  ETIMES
+  |  MDIV
+  |  EDIV
+  |  MLDIV
+  |  ELDIV
+  |  PLUS
+  |  MINUS
+  |  NOT
+  |  MPOW
+  |  EPOW
+  |  ARRAYTRANSPOSE
+  |  MTRANSPOSE
+  |  AT
+  |  DOT
+  |  NUMBER
+  |  STRING
+  |  PARENTHESIZED
+  |  MATRIX
+  |  CELL_ARRAY
+  ;
+
+nbf =
+     OTHER_WHITESPACE
+  |  ELLIPSIS_COMMENT
+  ;
