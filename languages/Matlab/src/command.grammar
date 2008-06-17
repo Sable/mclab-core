@@ -119,8 +119,8 @@ function_separator =
 //a function with nothing following the final END
 function_body =
      //output params
-     FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-  |  FUNCTION nbf* output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+     FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
      //no output params
   |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
   |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
@@ -133,8 +133,8 @@ input_params =
 
 //output parameter list for a function
 output_params =
-     MATRIX
-  |  IDENTIFIER.p
+     MATRIX nbf*
+  |  IDENTIFIER.p nbf*
   ;
 
 //used to mix stmts and nested functions in a containing function
@@ -146,10 +146,10 @@ stmt_or_function =
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def =
-     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body_list nbf* END 
-  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body_list nbf* END
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body.body* nbf* END 
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body_list nbf* END
+     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
+  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
   ;
 
 attributes =
@@ -159,16 +159,6 @@ attributes =
 superclass_list =
      IDENTIFIER.name
   |  superclass_list.l nbf* AND nbf* IDENTIFIER.name
-  ;
-
-class_body_list =
-     class_body_list1
-  |  
-  ;
-
-class_body_list1 =
-     class_body
-  |  class_body_list1 nbf* class_body
   ;
 
 class_body =
@@ -183,15 +173,15 @@ methods_block =
   ;
 
 methods_body =
-     function nbf*
-  |  function_signature nbf* stmt_separator_list1
+     function
+  |  function_signature stmt_separator_list1
   ;
   
 function_signature =
-     IDENTIFIER.name
-  |  IDENTIFIER.name nbf* input_params.in
-  |  output_params.out nbf* ASSIGN nbf* IDENTIFIER.name
-  |  output_params.out nbf* ASSIGN nbf* IDENTIFIER.name nbf* input_params.in
+     IDENTIFIER.name nbf*
+  |  IDENTIFIER.name nbf* input_params.in nbf*
+  |  output_params ASSIGN nbf* IDENTIFIER.name nbf*
+  |  output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf*
   ;
 
 //usually help comments are followed by a newline, but the last one could be followed by EOF instead
@@ -221,7 +211,7 @@ help_comment_body =
 //may be empty
 stmt_list =
      stmt.stmts+
-  |  
+  |  nbf*
   ;
 
 //usually stmts are followed by separators, but the last one could be followed by EOF instead
@@ -232,8 +222,8 @@ last_stmt =
 
 //stmt followed by separator
 stmt =
-     stmt_body.s nbf* stmt_separator.sep nbf*
-  |  stmt_separator.sep nbf*
+     stmt_body.s nbf* stmt_separator.sep
+  |  stmt_separator.sep
   ;
 
 //stmt not followed by a separator
@@ -245,8 +235,8 @@ stmt_body =
   |  GLOBAL name.names+
   |  PERSISTENT name.names+
   |  SHELL_COMMAND.c
-  |  TRY nbf* stmt_separator stmt_list.tl nbf* END
-  |  TRY nbf* stmt_separator stmt_list.tl nbf* CATCH nbf* stmt_separator stmt_list.cl nbf* END
+  |  TRY nbf* stmt_separator stmt_list.tl END
+  |  TRY nbf* stmt_separator stmt_list.tl CATCH nbf* stmt_separator stmt_list.cl END
   |  switch_statement
   |  if_statement
   |  BREAK
@@ -275,7 +265,7 @@ switch_statement =
   ;
 
 switch_case = 
-     CASE nbf* expr.e nbf* stmt_separator stmt_list.l nbf*
+     CASE nbf* expr.e nbf* stmt_separator stmt_list.l
   ;
 default_case = 
      OTHERWISE nbf* stmt_separator stmt_list.l 
@@ -283,16 +273,16 @@ default_case =
   
 if_statement = 
      IF nbf* expr.e nbf* stmt_separator stmt_list.l END
-  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_clause.els nbf* END
+  |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_clause.els END
   |  IF nbf* expr.e nbf* stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
   ;
 
 else_if_clause = 
-     ELSEIF nbf* expr.e nbf* stmt_separator stmt_list.l nbf*
+     ELSEIF nbf* expr.e nbf* stmt_separator stmt_list.l
   ;
   
 else_clause = 
-     ELSE nbf* stmt_separator stmt_list.l nbf*
+     ELSE nbf* stmt_separator stmt_list.l
   ;
 
 stmt_separator_list1 =
