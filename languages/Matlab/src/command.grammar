@@ -216,35 +216,35 @@ stmt_list =
 
 //usually stmts are followed by separators, but the last one could be followed by EOF instead
 last_stmt =
-     stmt_body.s nbf*
-  |  stmt.s
+     stmt_body
+  |  stmt
   ;
 
 //stmt followed by separator
 stmt =
-     stmt_body.s nbf* stmt_separator.sep
-  |  stmt_separator.sep
+     stmt_body stmt_separator
+  |  stmt_separator
   ;
 
 //stmt not followed by a separator
 stmt_body =
-     IDENTIFIER string_nbf+ //TODO-AC: magic
-  |  IDENTIFIER
-  |  expr_not_starting_with_id
-  |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id
-  |  GLOBAL name.names+
-  |  PERSISTENT name.names+
-  |  SHELL_COMMAND.c
-  |  TRY nbf* stmt_separator stmt_list.tl END
-  |  TRY nbf* stmt_separator stmt_list.tl CATCH nbf* stmt_separator stmt_list.cl END
-  |  switch_statement
-  |  if_statement
-  |  BREAK
-  |  CONTINUE
-  |  RETURN
-  |  WHILE nbf* expr.e nbf* stmt_separator stmt_list.l END
-  |  FOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END
-  |  PARFOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END
+     IDENTIFIER string_nbf+ nbf* //TODO-AC: magic
+  |  IDENTIFIER nbf*
+  |  expr_not_starting_with_id nbf*
+  |  expr_not_starting_with_id nbf* ASSIGN nbf* expr_not_starting_with_id nbf*
+  |  GLOBAL name.names+ nbf*
+  |  PERSISTENT name.names+ nbf*
+  |  SHELL_COMMAND.c nbf*
+  |  TRY nbf* stmt_separator stmt_list.tl END nbf*
+  |  TRY nbf* stmt_separator stmt_list.tl CATCH nbf* stmt_separator stmt_list.cl END nbf*
+  |  switch_statement nbf*
+  |  if_statement nbf*
+  |  BREAK nbf*
+  |  CONTINUE nbf*
+  |  RETURN nbf*
+  |  WHILE nbf* expr.e nbf* stmt_separator stmt_list.l END nbf*
+  |  FOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END nbf*
+  |  PARFOR nbf* for_assign.a nbf* stmt_separator stmt_list.l END nbf*
   ;
 
 //magic = {: scanner.saveStateAndTransition(COMMAND); :};
