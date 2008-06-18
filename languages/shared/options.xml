@@ -1,0 +1,25 @@
+<!--
+    Requires:
+        Properties: src.dir, gen.dir, options.pkg, options.style.cli
+        Paths: n/a
+        Targets: n/a
+-->
+
+<project name="Options">
+
+        <!-- generates Java files from xml specification file -->
+        <target name="options" >
+          <mkdir dir="${gen.dir}/${options.pkg}" />
+          <xslt
+             style="${src.dir}/${options.pkg}/${options.style.cli}"
+             in="${src.dir}/${options.pkg}/${options.in}"
+             out="${gen.dir}/${options.pkg}/${options.out.cli}" />
+        </target>
+        
+        <!-- remove files created by options -->
+        <target name="clean.options">
+          <delete includeemptydirs="true">
+            <fileset dir="${gen.dir}/${options.pkg}" include="**/*" />
+          </delete>
+        </target>
+</project>

@@ -32,9 +32,9 @@
 		</jastadd>
 	</target>
 
-	<!-- jflex, beaver, and jastadd -->
-	<target name="gen" depends="jflex, beaver, jastadd" />
-
+	<!-- jflex, beaver, jastadd, and options -->
+	<target name="gen" depends="jflex, beaver, jastadd, options" />
+	<!--<target name="gen" depends="jflex, beaver, jastadd" /> -->
 	<!-- remove files created by gen -->
 	<target name="clean.gen">
 		<delete includeemptydirs="true">

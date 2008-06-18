@@ -56,7 +56,7 @@ abstract class OptionsBase {
         return b.toString();
     }
 
-    /*    protected String padOpt( String opts, String desc ) {
+    protected String padOpt( String opts, String desc ) {
         return pad( 1, opts, 30, desc );
     }
 
@@ -64,7 +64,7 @@ abstract class OptionsBase {
         return pad( 4, vals, 32, desc );
     }
 
-    protected String getPhaseUsage() {
+    /*protected String getPhaseUsage() {
         StringBuffer b = new StringBuffer();
         b.append( "\nPhases and phase options:\n" );
         for (Pack p : PackManager.v().allPacks()) {
@@ -75,7 +75,7 @@ abstract class OptionsBase {
             }
         }
         return b.toString();
-    }
+        }*/
 
     private final LinkedList<String> options = new LinkedList<String>();
     protected void pushOptions( String s ) {
@@ -85,10 +85,10 @@ abstract class OptionsBase {
     protected boolean hasMoreOptions() { return !options.isEmpty(); }
     protected String nextOption() { return options.removeFirst(); }
 
-    protected LinkedList classes = new LinkedList();
-    public LinkedList classes() { return classes; }
+    protected LinkedList files = new LinkedList();
+    public LinkedList getFiles() { return files; }
 
-    public boolean setPhaseOption( String phase, String option ) {
+    /*public boolean setPhaseOption( String phase, String option ) {
         return PhaseOptions.v().processPhaseOptions( phase, option );
         }*/
 

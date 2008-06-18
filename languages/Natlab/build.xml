@@ -17,6 +17,7 @@
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
+        <import file="../shared/options.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
 
@@ -56,7 +57,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
+	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests, options" />
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->

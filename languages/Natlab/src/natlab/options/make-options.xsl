@@ -32,18 +32,15 @@
 
 /* THIS FILE IS AUTO-GENERATED FROM soot_options.xml. DO NOT MODIFY. */
 
-package soot.options;
-import soot.*;
+package natlab.options;
 import java.util.*;
-import soot.PackManager;
 
 /** Soot command-line options parser.
  * @author Ondrej Lhotak
  */
 
 public class Options extends OptionsBase {
-    public Options(Singletons.Global g) { }
-    public static Options v() { return G.v().soot_options_Options(); }
+    public Options() { }
 
 <xsl:apply-templates mode="constants" select="/options/section"/>
 
@@ -56,7 +53,7 @@ public class Options extends OptionsBase {
         while( hasMoreOptions() ) {
             String option = nextOption();
             if( option.charAt(0) != '-' ) {
-                classes.add( option );
+                files.add( option );
                 continue;
             }
             while( option.charAt(0) == '-' ) {
@@ -65,12 +62,13 @@ public class Options extends OptionsBase {
             if( false );
 <xsl:apply-templates mode="parse" select="/options/section"/>
             else {
-                G.v().out.println( "Invalid option -"+option );
+                //G.v().out.println( "Invalid option -"+option );
+                System.out.println( "Invalid option -"+option );
                 return false;
             }
         }
 
-        Iterator it = phaseOptions.iterator();
+        /*Iterator it = phaseOptions.iterator();
         while( it.hasNext() ) {
             String phaseName = (String) it.next();
             String phaseOption = (String) it.next();
@@ -83,7 +81,7 @@ public class Options extends OptionsBase {
             String phaseOption = (String) it.next();
             if( !setPhaseOption( phaseName, phaseOption ) ) return false;
         }
-
+        */
         return true;
     }
 
