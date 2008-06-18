@@ -1,5 +1,7 @@
 //TODO-AC: factor out common bits
 
+%import "matlab.ast.*";
+
 %package "matlab";
 
 %class "ExtractionParser";
@@ -52,6 +54,38 @@
 
     //tell handler to use subclass defined above
     { report = new Events(); }
+    
+    //// AST helpers ///////////////////////////////////////////////////////////
+
+    //add all elements of a util list to an ast list
+    private static <T extends ASTNode<?>> matlab.ast.List<T> addAll(matlab.ast.List<T> node, java.util.List<T> children) {
+        for(T child : children) {
+            node.add(child);
+        }
+        return node;
+    }
+
+    //make a new ast list for a given util list
+    private static <T extends ASTNode<?>> matlab.ast.List<T> makeListNode(java.util.List<T> children) {
+        if(children == null) {
+            return null;
+        }
+        return addAll(new matlab.ast.List<T>(), children);
+    }
+
+    //AST really doesn't like null nodes, but beaver returns null for empty optional lists
+    //Create an appropriate empty node to replace the null
+    private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
+        return original == null ? new List<T>() : original;
+    }
+    
+    private static <T extends ASTNode> List<T> maybeAppend(List<T> list, Opt<T> opt) {
+        if(opt.getNumChild() == 0) {
+            return list;
+        } else {
+            return list.add(opt.getChild(0));
+        }
+    }
 :};
 
 %terminals IDENTIFIER;
@@ -68,11 +102,7 @@
 %terminals PARENTHESIZED, MATRIX, CELL_ARRAY;
 %terminals MISC;
 
-%typeof IDENTIFIER, NUMBER, STRING = "String";
-%typeof COMMENT, BRACKET_COMMENT, HELP_COMMENT, BRACKET_HELP_COMMENT, ELLIPSIS_COMMENT = "String";
-%typeof OTHER_WHITESPACE, LINE_TERMINATOR = "String";
-%typeof PARENTHESIZED, MATRIX, CELL_ARRAY = "String";
-%typeof MISC = "String";
+%typeof program = "ListNode";
 
 %goal program;
 
@@ -341,37 +371,40 @@ if_statement =
   ;
 
 else_if_clause = 
-     ELSEIF nbf* expr stmt_separator stmt_list.l
+     ELSEIF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5
+        {: new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
   ;
   
 else_clause = 
-     ELSE nbf* stmt_separator stmt_list.l
+     ELSE.s1 nbf.s2* stmt_separator.s3 stmt_list.s4 
+        {: new ListNode().add(s1).add(s2).add(s3).add(s4); :}
   ;
 
 stmt_separator =
-      stmt_separator_no_nbf nbf*
+      stmt_separator_no_nbf.s1 nbf.s2* {: new ListNode().add(s1).add(s2); :}
   ;
 
 stmt_separator_no_nbf =
      LINE_TERMINATOR
   |  SEMICOLON
   |  COMMA
-  |  COMMENT LINE_TERMINATOR
-  |  BRACKET_COMMENT LINE_TERMINATOR
+  |  COMMENT.s1 LINE_TERMINATOR.s2 {: new ListNode().add(s1).add(s2); :}
+  |  BRACKET_COMMENT.s1 LINE_TERMINATOR.s2 {: new ListNode().add(s1).add(s2); :}
   ;
 
 //assignment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
-     IDENTIFIER.lhs nbf* ASSIGN nbf* expr
+     IDENTIFIER.s1 nbf.s2* ASSIGN.s3 nbf.s4* expr.s5
+        {: new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
   |  PARENTHESIZED nbf*
   ;
 
 expr =
-     expr_token expr_token_or_nbf*
+     expr_token.s1 expr_token_or_nbf.s2* {: new ListNode().add(s1).add(s2); :}
   ;
 
 expr_not_starting_with_id =
-     expr_token_not_id expr_token_or_nbf*
+     expr_token_not_id.s1 expr_token_or_nbf.s2* {: new ListNode().add(s1).add(s2); :}
   ;
 
 expr_token_or_nbf =
