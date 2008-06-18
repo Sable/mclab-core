@@ -496,8 +496,8 @@ expr_token_not_id =
   |  NUMBER
   |  STRING
   |  PARENTHESIZED
-  |  MATRIX.m {: return new MatrixExtract((String) m.value); :}
-  |  CELL_ARRAY.c {: return new CellArrayExtract((String) c.value); :}
+  |  MATRIX.m {: return new MatrixExtract(m); :}
+  |  CELL_ARRAY.c {: return new CellArrayExtract(c); :}
   ;
 
 nbf =
