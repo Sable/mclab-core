@@ -20,4 +20,14 @@ aspect Children {
         }
         return this;
     }
+    public ListNode ListNode.add(beaver.Symbol[] newChildren) {
+        if(newChildren != null) {
+            List<Node> nodes = getNodes();
+            for(beaver.Symbol newChild : newChildren) {
+                //don't bother to recurse - should be a flat list
+                nodes.add(new SymbolNode(newChild));
+            }
+        }
+        return this;
+    }
 }

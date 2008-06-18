@@ -102,58 +102,66 @@
 %terminals PARENTHESIZED, MATRIX, CELL_ARRAY;
 %terminals MISC;
 
-%typeof program = "ListNode";
+%typeof program, script, function_list, class_def = "ListNode";
 
 %goal program;
 
 //everything
 program = 
-     script.s
-  |  function_list.f
-  |  class_def.c
-  |  
+     script
+  |  function_list
+  |  class_def
+  |  {: return new ListNode(); :}
   ;
 
 //script file: list of help comments followed by list of stmts
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
-     nbf* stmt.stmts+ last_stmt.s
-  |  nbf* last_stmt.s
-  |  help_comment.comments+ nbf* stmt.stmts+ last_stmt.s
-  |  help_comment.comments+ nbf* last_stmt.s
-  |  help_comment.comments+ last_help_comment.c
-  |  last_help_comment.c
+     nbf.s1* stmt.s2+ last_stmt.s3
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  nbf.s1* last_stmt.s2
+        {: return new ListNode().add(s1).add(s2); :}
+  |  help_comment.s1+ nbf.s2* stmt.s3+ last_stmt.s4
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
+  |  help_comment.s1+ nbf.s2* last_stmt.s3
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  help_comment.s1+ last_help_comment.s2
+        {: return new ListNode().add(s1).add(s2); :}
+  |  last_help_comment.s1
+        {: return new ListNode().add(s1); :}
   ;
 
 //function file: list of functions, separated by whitespace
 //NB: no leading whitespace allowed
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 function_list =
-     function.functions+
+     function.s1+ {: return new ListNode().add(s1); :}
   ;
 
 //function followed by whitespace - only used by function_list (otherwise use function_body)
 function =
-     function_body.f function_separator*
+     function_body.s1 function_separator.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 function_separator =
      LINE_TERMINATOR
   |  OTHER_WHITESPACE
   |  ELLIPSIS_COMMENT
-  |  COMMENT LINE_TERMINATOR
-  |  BRACKET_COMMENT LINE_TERMINATOR
+  |  COMMENT.s1 LINE_TERMINATOR.s2 {: return new ListNode().add(s1).add(s2); :}
+  |  BRACKET_COMMENT.s1 LINE_TERMINATOR.s2 {: return new ListNode().add(s1).add(s2); :}
   ;
 
 //a function with nothing following the final END
 function_body =
-     //output params
-     FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-  |  FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-     //no output params
-  |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-  |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+     FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* stmt_separator_no_nbf.s8 help_comment_list.s9 stmt_or_function.s10* END.s11
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11); :}
+  |  FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* input_params.s8 nbf.s9* stmt_separator_no_nbf.s10 help_comment_list.s11 stmt_or_function.s12* END.s13
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12).add(s13); :}
+  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator_no_nbf.s5 help_comment_list.s6 stmt_or_function.s7* END.s8
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8); :}
+  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* input_params.s5 nbf.s6* stmt_separator_no_nbf.s7 help_comment_list.s8 stmt_or_function.s9* END.s10
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10); :}
   ;
 
 //input parameter list for a function
@@ -163,23 +171,27 @@ input_params =
 
 //output parameter list for a function
 output_params =
-     MATRIX nbf*
-  |  IDENTIFIER.p nbf*
+     MATRIX.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
+  |  IDENTIFIER.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 //used to mix stmts and nested functions in a containing function
 stmt_or_function =
-     stmt.s
-  |  function_body.f nbf*
+     stmt
+  |  function_body.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def =
-     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
-  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
-  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
+     CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* stmt_separator_no_nbf.s7 help_comment_list.s8 class_body.s9* END.s10
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10); :} 
+  |  CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* LT.s7 nbf.s8* superclass_list.s9 stmt_separator_no_nbf.s10 help_comment_list.s11 class_body.s12* END.s13
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12).add(s13); :}
+  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator_no_nbf.s5 help_comment_list.s6 class_body.s7* END.s8
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8); :} 
+  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* LT.s5 nbf.s6* superclass_list.s7 stmt_separator_no_nbf.s8 help_comment_list.s9 class_body.s10* END.s11
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11); :}
   ;
 
 attributes =
@@ -187,60 +199,70 @@ attributes =
   ;
 
 superclass_list =
-     IDENTIFIER.name
-  |  superclass_list.l nbf* AND nbf* IDENTIFIER.name
+     IDENTIFIER
+  |  superclass_list.s1 nbf.s2* AND.s3 nbf.s4* IDENTIFIER.s5
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
   ;
 
 class_body =
-     PROPERTIES_BLOCK nbf* stmt_separator*
-  |  EVENTS_BLOCK nbf* stmt_separator*
-  |  methods_block nbf* stmt_separator*
+     PROPERTIES_BLOCK.s1 nbf.s2* stmt_separator.s3*
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  EVENTS_BLOCK.s1 nbf.s2* stmt_separator.s3*
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  methods_block.s1 nbf.s2* stmt_separator.s3*
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
   ;
 
 methods_block =
-     METHODS nbf* stmt_separator+ methods_body.body* END
-  |  METHODS nbf* attributes.attr nbf* stmt_separator+ methods_body.body* END
+     METHODS.s1 nbf.s2* stmt_separator.s3+ methods_body.s4* END.s5
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+  |  METHODS.s1 nbf.s2* attributes.s3 nbf.s4* stmt_separator.s5+ methods_body.s6* END.s7
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
 methods_body =
      function
-  |  function_signature stmt_separator+
+  |  function_signature.s1 stmt_separator.s2+ {: return new ListNode().add(s1).add(s2); :}
   ;
   
 function_signature =
-     IDENTIFIER.name nbf*
-  |  IDENTIFIER.name nbf* input_params.in nbf*
-  |  output_params ASSIGN nbf* IDENTIFIER.name nbf*
-  |  output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf*
+     IDENTIFIER.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  IDENTIFIER.s1 nbf.s2* input_params.s3 nbf.s4*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
+  |  output_params.s1 ASSIGN.s2 nbf.s3* IDENTIFIER.s4 nbf.s5*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+  |  output_params.s1 ASSIGN.s2 nbf.s3* IDENTIFIER.s4 nbf.s5* input_params.s6 nbf.s7*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
 //usually help comments are followed by a newline, but the last one could be followed by EOF instead
 last_help_comment =
-     help_comment.c
-  |  nbf* help_comment_body.c
+     help_comment
+  |  nbf.s1* help_comment_body.s2 {: return new ListNode().add(s1).add(s2); :}
   ;
 
 help_comment_list =
      nbf*
-  |  help_comment+ nbf*
+  |  help_comment.s1+ nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 //help comment with a newline
 //NB: should be preceded by whitespace, not nbf, but we'll cheat since Natlab does the real checking
 help_comment =
-     nbf* help_comment_body.c LINE_TERMINATOR
+     nbf.s1* help_comment_body.s2 LINE_TERMINATOR.s3 {: return new ListNode().add(s1).add(s2).add(s3); :}
   ;
 
 //help comment without a newline
 help_comment_body =
-     HELP_COMMENT.c
-  |  BRACKET_HELP_COMMENT.c
+     HELP_COMMENT
+  |  BRACKET_HELP_COMMENT
   ;
 
 //list of statements (each followed by a separator)
 //may be empty
 stmt_list =
-     stmt.stmts*
+     stmt*
   ;
 
 //usually stmts are followed by separators, but the last one could be followed by EOF instead
@@ -251,33 +273,80 @@ last_stmt =
 
 //stmt followed by separator
 stmt =
-     stmt_body stmt_separator
+     stmt_body.s1 stmt_separator.s2 {: return new ListNode().add(s1).add(s2); :}
   |  stmt_separator
   ;
 
 //stmt not followed by a separator
 stmt_body =
-     IDENTIFIER command_arg*
+     IDENTIFIER.cmd command_arg.args*
+        //{: TODO-AC :}
   |  expr_not_starting_with_id
-  |  expr_not_starting_with_id ASSIGN nbf* expr_not_starting_with_id
-  |  GLOBAL name.names+ nbf*
-  |  PERSISTENT name.names+ nbf*
-  |  SHELL_COMMAND.c nbf*
-  |  TRY nbf* stmt_separator stmt_list.tl END nbf*
-  |  TRY nbf* stmt_separator stmt_list.tl CATCH nbf* stmt_separator stmt_list.cl END nbf*
-  |  switch_statement nbf*
-  |  if_statement nbf*
-  |  BREAK nbf*
-  |  CONTINUE nbf*
-  |  RETURN nbf*
-  |  WHILE nbf* expr.e stmt_separator stmt_list.l END nbf*
-  |  FOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
-  |  PARFOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
+  |  expr_not_starting_with_id.s1 ASSIGN.s2 nbf.s3* expr_not_starting_with_id.s4
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
+  |  GLOBAL.s1 name.s2+ nbf.s3*
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  PERSISTENT.s1 name.s2+ nbf.s3*
+        {: return new ListNode().add(s1).add(s2).add(s3); :}
+  |  SHELL_COMMAND.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  TRY.s1 nbf.s2* stmt_separator.s3 stmt_list.s4 END.s5 nbf.s6*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6); :}
+  |  TRY.s1 nbf.s2* stmt_separator.s3 stmt_list.s4 CATCH.s5 nbf.s6* stmt_separator.s7 stmt_list.s8 END.s9 nbf.s10*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10); :}
+  |  switch_statement.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  if_statement.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  BREAK.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  CONTINUE.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  RETURN.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
+  |  WHILE.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 END.s6 nbf.s7*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
+  |  FOR.s1 nbf.s2* for_assign.s3 stmt_separator.s4 stmt_list.s5 END.s6 nbf.s7*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
+  |  PARFOR.s1 nbf.s2* for_assign.s3 stmt_separator.s4 stmt_list.s5 END.s6 nbf.s7*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
 command_arg =
+  //expr tokens (NB: not just delegating because returns may be different)
      IDENTIFIER
+  |  LT
+  |  GT
+  |  LE
+  |  GE
+  |  EQ
+  |  NE
+  |  AND
+  |  OR
+  |  SHORTAND
+  |  SHORTOR
+  |  COLON
+  |  MTIMES
+  |  ETIMES
+  |  MDIV
+  |  EDIV
+  |  MLDIV
+  |  ELDIV
+  |  PLUS
+  |  MINUS
+  |  NOT
+  |  MPOW
+  |  EPOW
+  |  ARRAYTRANSPOSE
+  |  MTRANSPOSE
+  |  AT
+  |  DOT
   |  NUMBER
+  |  STRING
+  |  PARENTHESIZED
+  |  MATRIX
+  |  CELL_ARRAY
+  //other tokens
   |  SHELL_COMMAND
   |  BREAK
   |  CASE
@@ -298,41 +367,11 @@ command_arg =
   |  SWITCH
   |  TRY
   |  WHILE
-  |  PLUS
-  |  MINUS
-  |  MTIMES
-  |  ETIMES
-  |  MDIV
-  |  EDIV
-  |  MLDIV
-  |  ELDIV
-  |  MPOW
-  |  EPOW
-  |  MTRANSPOSE
-  |  ARRAYTRANSPOSE
-  |  LE
-  |  GE
-  |  LT
-  |  GT
-  |  EQ
-  |  NE
-  |  AND
-  |  OR
-  |  NOT
-  |  SHORTAND
-  |  SHORTOR
   |  ASSIGN
-  |  DOT
-  |  COLON
-  |  AT
-  |  STRING
   |  METHODS
   |  PROPERTIES_BLOCK
   |  EVENTS_BLOCK
   |  OTHER_WHITESPACE
-  |  PARENTHESIZED
-  |  MATRIX
-  |  CELL_ARRAY
   |  MISC
 
 //NB: NOT these
@@ -347,64 +386,74 @@ command_arg =
   ;
 
 name =
-     nbf* IDENTIFIER
+     nbf.s1* IDENTIFIER.s2  {: return new ListNode().add(s1).add(s2); :}
   ;
 
 switch_statement = 
-     SWITCH nbf* expr stmt_separator END
-  |  SWITCH nbf* expr stmt_separator default_case.d END
-  |  SWITCH nbf* expr stmt_separator switch_case.s+ END
-  |  SWITCH nbf* expr stmt_separator switch_case.s+ default_case.d END
+     SWITCH.s1 nbf.s2* expr.s3 stmt_separator.s4 END.s5
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+  |  SWITCH.s1 nbf.s2* expr.s3 stmt_separator.s4 default_case.s5 END.s6
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6); :}
+  |  SWITCH.s1 nbf.s2* expr.s3 stmt_separator.s4 switch_case.s5+ END.s6
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6); :}
+  |  SWITCH.s1 nbf.s2* expr.s3 stmt_separator.s4 switch_case.s5+ default_case.s6 END.s7
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
 switch_case = 
-     CASE nbf* expr stmt_separator stmt_list.l
+     CASE.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
   ;
 default_case = 
-     OTHERWISE nbf* stmt_separator stmt_list.l 
+     OTHERWISE.s1 nbf.s2* stmt_separator.s3 stmt_list.s4
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
   ;
   
 if_statement = 
-     IF nbf* expr stmt_separator stmt_list.l END
-  |  IF nbf* expr stmt_separator stmt_list.l else_clause.els END
-  |  IF nbf* expr stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
+     IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 END.s6
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+  |  IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 else_clause.s6 END
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6); :}
+  |  IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 else_if_clause.s6+ else_clause.s7? END
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
 else_if_clause = 
      ELSEIF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5
-        {: new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
   ;
   
 else_clause = 
      ELSE.s1 nbf.s2* stmt_separator.s3 stmt_list.s4 
-        {: new ListNode().add(s1).add(s2).add(s3).add(s4); :}
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
   ;
 
 stmt_separator =
-      stmt_separator_no_nbf.s1 nbf.s2* {: new ListNode().add(s1).add(s2); :}
+      stmt_separator_no_nbf.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 stmt_separator_no_nbf =
      LINE_TERMINATOR
   |  SEMICOLON
   |  COMMA
-  |  COMMENT.s1 LINE_TERMINATOR.s2 {: new ListNode().add(s1).add(s2); :}
-  |  BRACKET_COMMENT.s1 LINE_TERMINATOR.s2 {: new ListNode().add(s1).add(s2); :}
+  |  COMMENT.s1 LINE_TERMINATOR.s2 {: return new ListNode().add(s1).add(s2); :}
+  |  BRACKET_COMMENT.s1 LINE_TERMINATOR.s2 {: return new ListNode().add(s1).add(s2); :}
   ;
 
 //assignment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
      IDENTIFIER.s1 nbf.s2* ASSIGN.s3 nbf.s4* expr.s5
-        {: new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
-  |  PARENTHESIZED nbf*
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+  |  PARENTHESIZED.s1 nbf.s2*
+        {: return new ListNode().add(s1).add(s2); :}
   ;
 
 expr =
-     expr_token.s1 expr_token_or_nbf.s2* {: new ListNode().add(s1).add(s2); :}
+     expr_token.s1 expr_token_or_nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 expr_not_starting_with_id =
-     expr_token_not_id.s1 expr_token_or_nbf.s2* {: new ListNode().add(s1).add(s2); :}
+     expr_token_not_id.s1 expr_token_or_nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
 expr_token_or_nbf =
@@ -447,7 +496,7 @@ expr_token_not_id =
   |  NUMBER
   |  STRING
   |  PARENTHESIZED
-  |  MATRIX
+  |  MATRIX //{: TODO-AC :}
   |  CELL_ARRAY
   ;
 
