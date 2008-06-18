@@ -88,10 +88,10 @@ program =
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
-     nbfs stmt.stmts+ last_stmt.s
-  |  nbfs last_stmt.s
-  |  help_comment.comments+ nbfs stmt.stmts+ last_stmt.s
-  |  help_comment.comments+ nbfs last_stmt.s
+     nbf* stmt.stmts+ last_stmt.s
+  |  nbf* last_stmt.s
+  |  help_comment.comments+ nbf* stmt.stmts+ last_stmt.s
+  |  help_comment.comments+ nbf* last_stmt.s
   |  help_comment.comments+ last_help_comment.c
   |  last_help_comment.c
   ;
@@ -119,11 +119,11 @@ function_separator =
 //a function with nothing following the final END
 function_body =
      //output params
-     FUNCTION nbfs output_params ASSIGN nbfs IDENTIFIER.name nbfs stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-  |  FUNCTION nbfs output_params ASSIGN nbfs IDENTIFIER.name nbfs input_params.in nbfs stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+     FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
      //no output params
-  |  FUNCTION nbfs IDENTIFIER.name nbfs stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
-  |  FUNCTION nbfs IDENTIFIER.name nbfs input_params.in nbfs stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
+  |  FUNCTION nbf* IDENTIFIER.name nbf* input_params.in nbf* stmt_separator_no_nbf help_comment_list stmt_or_function.body* END
   ;
 
 //input parameter list for a function
@@ -133,23 +133,23 @@ input_params =
 
 //output parameter list for a function
 output_params =
-     MATRIX nbfs
-  |  IDENTIFIER.p nbfs
+     MATRIX nbf*
+  |  IDENTIFIER.p nbf*
   ;
 
 //used to mix stmts and nested functions in a containing function
 stmt_or_function =
      stmt.s
-  |  function_body.f nbfs
+  |  function_body.f nbf*
   ;
 
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def =
-     CLASSDEF nbfs attributes.attr nbfs IDENTIFIER.name nbfs stmt_separator_no_nbf help_comment_list class_body* END 
-  |  CLASSDEF nbfs attributes.attr nbfs IDENTIFIER.name nbfs LT nbfs superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
-  |  CLASSDEF nbfs IDENTIFIER.name nbfs stmt_separator_no_nbf help_comment_list class_body* END 
-  |  CLASSDEF nbfs IDENTIFIER.name nbfs LT nbfs superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
+     CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
+  |  CLASSDEF nbf* attributes.attr nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* stmt_separator_no_nbf help_comment_list class_body* END 
+  |  CLASSDEF nbf* IDENTIFIER.name nbf* LT nbf* superclass_list.superclasses stmt_separator_no_nbf help_comment_list class_body* END
   ;
 
 attributes =
@@ -158,18 +158,18 @@ attributes =
 
 superclass_list =
      IDENTIFIER.name
-  |  superclass_list.l nbfs AND nbfs IDENTIFIER.name
+  |  superclass_list.l nbf* AND nbf* IDENTIFIER.name
   ;
 
 class_body =
-     PROPERTIES_BLOCK nbfs stmt_separator*
-  |  EVENTS_BLOCK nbfs stmt_separator*
-  |  methods_block nbfs stmt_separator*
+     PROPERTIES_BLOCK nbf* stmt_separator*
+  |  EVENTS_BLOCK nbf* stmt_separator*
+  |  methods_block nbf* stmt_separator*
   ;
 
 methods_block =
-     METHODS nbfs stmt_separator+ methods_body.body* END
-  |  METHODS nbfs attributes.attr nbfs stmt_separator+ methods_body.body* END
+     METHODS nbf* stmt_separator+ methods_body.body* END
+  |  METHODS nbf* attributes.attr nbf* stmt_separator+ methods_body.body* END
   ;
 
 methods_body =
@@ -178,27 +178,27 @@ methods_body =
   ;
   
 function_signature =
-     IDENTIFIER.name nbfs
-  |  IDENTIFIER.name nbfs input_params.in nbfs
-  |  output_params ASSIGN nbfs IDENTIFIER.name nbfs
-  |  output_params ASSIGN nbfs IDENTIFIER.name nbfs input_params.in nbfs
+     IDENTIFIER.name nbf*
+  |  IDENTIFIER.name nbf* input_params.in nbf*
+  |  output_params ASSIGN nbf* IDENTIFIER.name nbf*
+  |  output_params ASSIGN nbf* IDENTIFIER.name nbf* input_params.in nbf*
   ;
 
 //usually help comments are followed by a newline, but the last one could be followed by EOF instead
 last_help_comment =
      help_comment.c
-  |  nbfs help_comment_body.c
+  |  nbf* help_comment_body.c
   ;
 
 help_comment_list =
-     nbfs
-  |  help_comment+ nbfs
+     nbf*
+  |  help_comment+ nbf*
   ;
 
 //help comment with a newline
 //NB: should be preceded by whitespace, not nbf, but we'll cheat since Natlab does the real checking
 help_comment =
-     nbfs help_comment_body.c LINE_TERMINATOR
+     nbf* help_comment_body.c LINE_TERMINATOR
   ;
 
 //help comment without a newline
@@ -229,20 +229,20 @@ stmt =
 stmt_body =
      IDENTIFIER command_arg*
   |  expr_not_starting_with_id
-  |  expr_not_starting_with_id ASSIGN nbfs expr_not_starting_with_id
-  |  GLOBAL name.names+ nbfs
-  |  PERSISTENT name.names+ nbfs
-  |  SHELL_COMMAND.c nbfs
-  |  TRY nbfs stmt_separator stmt_list.tl END nbfs
-  |  TRY nbfs stmt_separator stmt_list.tl CATCH nbfs stmt_separator stmt_list.cl END nbfs
-  |  switch_statement nbfs
-  |  if_statement nbfs
-  |  BREAK nbfs
-  |  CONTINUE nbfs
-  |  RETURN nbfs
-  |  WHILE nbfs expr.e stmt_separator stmt_list.l END nbfs
-  |  FOR nbfs for_assign.a stmt_separator stmt_list.l END nbfs
-  |  PARFOR nbfs for_assign.a stmt_separator stmt_list.l END nbfs
+  |  expr_not_starting_with_id ASSIGN nbf* expr_not_starting_with_id
+  |  GLOBAL name.names+ nbf*
+  |  PERSISTENT name.names+ nbf*
+  |  SHELL_COMMAND.c nbf*
+  |  TRY nbf* stmt_separator stmt_list.tl END nbf*
+  |  TRY nbf* stmt_separator stmt_list.tl CATCH nbf* stmt_separator stmt_list.cl END nbf*
+  |  switch_statement nbf*
+  |  if_statement nbf*
+  |  BREAK nbf*
+  |  CONTINUE nbf*
+  |  RETURN nbf*
+  |  WHILE nbf* expr.e stmt_separator stmt_list.l END nbf*
+  |  FOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
+  |  PARFOR nbf* for_assign.a stmt_separator stmt_list.l END nbf*
   ;
 
 command_arg =
@@ -317,39 +317,39 @@ command_arg =
   ;
 
 name =
-     nbfs IDENTIFIER
+     nbf* IDENTIFIER
   ;
 
 switch_statement = 
-     SWITCH nbfs expr stmt_separator END
-  |  SWITCH nbfs expr stmt_separator default_case.d END
-  |  SWITCH nbfs expr stmt_separator switch_case.s+ END
-  |  SWITCH nbfs expr stmt_separator switch_case.s+ default_case.d END
+     SWITCH nbf* expr stmt_separator END
+  |  SWITCH nbf* expr stmt_separator default_case.d END
+  |  SWITCH nbf* expr stmt_separator switch_case.s+ END
+  |  SWITCH nbf* expr stmt_separator switch_case.s+ default_case.d END
   ;
 
 switch_case = 
-     CASE nbfs expr stmt_separator stmt_list.l
+     CASE nbf* expr stmt_separator stmt_list.l
   ;
 default_case = 
-     OTHERWISE nbfs stmt_separator stmt_list.l 
+     OTHERWISE nbf* stmt_separator stmt_list.l 
   ;
   
 if_statement = 
-     IF nbfs expr stmt_separator stmt_list.l END
-  |  IF nbfs expr stmt_separator stmt_list.l else_clause.els END
-  |  IF nbfs expr stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
+     IF nbf* expr stmt_separator stmt_list.l END
+  |  IF nbf* expr stmt_separator stmt_list.l else_clause.els END
+  |  IF nbf* expr stmt_separator stmt_list.l else_if_clause.elseif+ else_clause.els? END
   ;
 
 else_if_clause = 
-     ELSEIF nbfs expr stmt_separator stmt_list.l
+     ELSEIF nbf* expr stmt_separator stmt_list.l
   ;
   
 else_clause = 
-     ELSE nbfs stmt_separator stmt_list.l
+     ELSE nbf* stmt_separator stmt_list.l
   ;
 
 stmt_separator =
-      stmt_separator_no_nbf nbfs
+      stmt_separator_no_nbf nbf*
   ;
 
 stmt_separator_no_nbf =
@@ -362,8 +362,8 @@ stmt_separator_no_nbf =
 
 //assignment appearing in a for loop (i.e. optionally surrounded by parens)
 for_assign =
-     IDENTIFIER.lhs nbfs ASSIGN nbfs expr
-  |  PARENTHESIZED nbfs
+     IDENTIFIER.lhs nbf* ASSIGN nbf* expr
+  |  PARENTHESIZED nbf*
   ;
 
 expr =
@@ -422,5 +422,3 @@ nbf =
      OTHER_WHITESPACE
   |  ELLIPSIS_COMMENT
   ;
-
-nbfs =   | nbf+;
