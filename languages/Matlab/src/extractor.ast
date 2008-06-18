@@ -4,5 +4,5 @@ SymbolNode : Node ::= <Symbol : beaver.Symbol>;
 ExtractNode : Node ::= <Text>;
 MaybeCmdExtract : ExtractNode;
 ArrayExtract : ExtractNode;
-MatrixExtract : Array;
-CellArrayExtract : Array;
+MatrixExtract : ArrayExtract;
+CellArrayExtract : ArrayExtract;
