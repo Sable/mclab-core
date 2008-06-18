@@ -280,7 +280,13 @@ stmt =
 //stmt not followed by a separator
 stmt_body =
      IDENTIFIER.cmd command_arg.args*
-        //{: TODO-AC :}
+        {:
+            if(args == null) {
+                //no args => simple function call or variable expr
+                return cmd;
+            }
+            return new MaybeCmdExtract(cmd, (ArrayList<beaver.Symbol>) args.value);
+        :}
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id.s1 ASSIGN.s2 nbf.s3* expr_not_starting_with_id.s4
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
