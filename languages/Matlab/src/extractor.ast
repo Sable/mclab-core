@@ -1,0 +1,8 @@
+abstract Node;
+ListNode : Node ::= Node*;
+SymbolNode : Node ::= <Symbol : beaver.Symbol>;
+ExtractNode : Node ::= <Text>;
+MaybeCmdExtract : ExtractNode;
+ArrayExtract : ExtractNode;
+MatrixExtract : Array;
+CellArrayExtract : Array;
