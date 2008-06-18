@@ -217,32 +217,6 @@ import beaver.Scanner;
   
   //for accumulating the contents of a string literal
   private StringBuffer strBuf = new StringBuffer();
-    
-  //// Command-style call arguments ////////////////////////////////////////////
-    
-  private StringBuffer cmdArgBuf = new StringBuffer();
-  private int cmdQuoteCount = 0;
-  private boolean cmdArgPrevCharWasQuote = false;
-  
-  private Symbol cmdArgSymbol() {
-    String cmdArg = cmdArgBuf.toString();
-    cmdArgBuf = new StringBuffer();
-    cmdQuoteCount = 0;
-    cmdArgPrevCharWasQuote = false;
-    
-    return symbolFromMarkedPositions(STRING, cmdArg);
-  }
-    
-  private Symbol endCmdArg() throws Scanner.Exception {
-    if(cmdQuoteCount % 2 == 1) {
-        error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-    }
-    yypushback(yylength());
-    markEndPosition();
-    Symbol sym = (cmdArgBuf.length() == 0) ? null : cmdArgSymbol();
-    restoreState();
-    return sym;
-  }
   
   //// Other blocks ////////////////////////////////////////////////////////////
   
@@ -298,8 +272,6 @@ ValidEscape=\\[bfnrt\\\"]
 %xstate INSIDE_PROPERTIES
 //within an events block
 %xstate INSIDE_EVENTS
-//inside a command-style call
-%xstate COMMAND
 
 %%
 
@@ -638,75 +610,8 @@ ValidEscape=\\[bfnrt\\\"]
     \. { return symbol(DOT); }
 }
 
-<COMMAND> {
-    //not stringified - return collected string and restore state
-    {LineTerminator} | "," | ";" | "%" { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    <<EOF>> { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    
-    {EscapedLineTerminator} {
-        if(cmdQuoteCount % 2 == 1) {
-            error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-        } else {
-            Symbol comment = symbol(ELLIPSIS_COMMENT, yytext());
-            if(cmdArgBuf.length() > 0) {
-                //TODO-AC: check that this fixes yyline and yycol
-                yypushback(yylength()); //push comment back onto stream to be returned next
-                return cmdArgSymbol();
-            } else {
-                return symbol(ELLIPSIS_COMMENT, yytext());
-            }
-        }
-    }
-    
-    {OtherWhiteSpace}+ {
-        if(cmdQuoteCount % 2 == 1) {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        } else if(cmdArgBuf.length() > 0) {
-            yypushback(yylength()); //push whitespace back onto stream to be returned next
-            return cmdArgSymbol();
-        } else {
-            return symbol(OTHER_WHITESPACE, yytext());
-        }
-    }
-    
-    //an initial "=" or "(" is not stringified
-    "=" | "(" {
-        if(cmdArgBuf.length() == 0) {
-            Symbol sym = endCmdArg();
-            if(sym != null) {
-                return sym;
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-    }
-    
-    //an initial "==" IS stringified
-    "==" | . {
-        if(cmdArgBuf.length() == 0) {
-            markStartPosition();
-        }
-        boolean isQuote = yytext().equals("'");
-        if(isQuote) {
-            cmdQuoteCount++;
-            if(cmdArgPrevCharWasQuote && (cmdQuoteCount % 2 == 1)) {
-                cmdArgBuf.append("''");
-                markEndPosition(); //NB: this will likely be overwritten before the string is returned
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-        cmdArgPrevCharWasQuote = isQuote;
-    }
-}
-
 /* error fallback */
-.|\n { error("Illegal character '" + yytext() + "'"); }
+.|\n { return symbol(MISC, yytext()); }
 
 <<EOF>> {
     //don't need to check that we're in the initial state, because the

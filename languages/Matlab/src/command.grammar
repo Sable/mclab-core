@@ -66,11 +66,13 @@
 %terminals PROPERTIES_BLOCK, EVENTS_BLOCK;
 %terminals OTHER_WHITESPACE;
 %terminals PARENTHESIZED, MATRIX, CELL_ARRAY;
+%terminals MISC;
 
 %typeof IDENTIFIER, NUMBER, STRING = "String";
 %typeof COMMENT, BRACKET_COMMENT, HELP_COMMENT, BRACKET_HELP_COMMENT, ELLIPSIS_COMMENT = "String";
 %typeof OTHER_WHITESPACE, LINE_TERMINATOR = "String";
 %typeof PARENTHESIZED, MATRIX, CELL_ARRAY = "String";
+%typeof MISC = "String";
 
 %goal program;
 
@@ -225,7 +227,7 @@ stmt =
 
 //stmt not followed by a separator
 stmt_body =
-     command_name nbfs string_nbf*
+     IDENTIFIER command_arg*
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id ASSIGN nbfs expr_not_starting_with_id
   |  GLOBAL name.names+ nbfs
@@ -243,12 +245,75 @@ stmt_body =
   |  PARFOR nbfs for_assign.a stmt_separator stmt_list.l END nbfs
   ;
 
-command_name =
-     IDENTIFIER.cmd //{: scanner.saveStateAndTransition(ExtractionScanner.COMMAND); return _symbol_cmd; :}
-  ;
+command_arg =
+     IDENTIFIER
+  |  NUMBER
+  |  SHELL_COMMAND
+  |  BREAK
+  |  CASE
+  |  CATCH
+  |  CLASSDEF
+  |  CONTINUE
+  |  ELSE
+  |  ELSEIF
+  |  END
+  |  FOR
+  |  FUNCTION
+  |  GLOBAL
+  |  IF
+  |  OTHERWISE
+  |  PARFOR
+  |  PERSISTENT
+  |  RETURN
+  |  SWITCH
+  |  TRY
+  |  WHILE
+  |  PLUS
+  |  MINUS
+  |  MTIMES
+  |  ETIMES
+  |  MDIV
+  |  EDIV
+  |  MLDIV
+  |  ELDIV
+  |  MPOW
+  |  EPOW
+  |  MTRANSPOSE
+  |  ARRAYTRANSPOSE
+  |  LE
+  |  GE
+  |  LT
+  |  GT
+  |  EQ
+  |  NE
+  |  AND
+  |  OR
+  |  NOT
+  |  SHORTAND
+  |  SHORTOR
+  |  ASSIGN
+  |  DOT
+  |  COLON
+  |  AT
+  |  STRING
+  |  METHODS
+  |  PROPERTIES_BLOCK
+  |  EVENTS_BLOCK
+  |  OTHER_WHITESPACE
+  |  PARENTHESIZED
+  |  MATRIX
+  |  CELL_ARRAY
+  |  MISC
 
-string_nbf =
-     STRING nbfs
+//NB: NOT these
+//  |  COMMENT
+//  |  HELP_COMMENT
+//  |  ELLIPSIS_COMMENT
+//  |  BRACKET_COMMENT
+//  |  BRACKET_HELP_COMMENT
+//  |  COMMA
+//  |  SEMICOLON
+//  |  LINE_TERMINATOR
   ;
 
 name =
