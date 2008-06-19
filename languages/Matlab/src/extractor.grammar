@@ -281,7 +281,7 @@ stmt =
 stmt_body =
      IDENTIFIER.cmd command_arg.args*
         {:
-            if(args == null) {
+            if(args == null || args.value == null) {
                 //no args => simple function call or variable expr
                 return cmd;
             }
