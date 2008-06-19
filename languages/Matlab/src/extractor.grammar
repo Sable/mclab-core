@@ -111,7 +111,7 @@ program =
      script
   |  function_list
   |  class_def
-  |  {: return new ListNode(); :}
+  |  nbf.s1* {: return new ListNode().add(s1); :}
   ;
 
 //script file: list of help comments followed by list of stmts
