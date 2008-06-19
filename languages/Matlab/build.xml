@@ -20,6 +20,12 @@
 
 	<!-- Extend and override parts of gen.xml -->
 
+	<target name="jflex.command" depends="def.jflex.task">
+		<jflex file="${src.dir}/${command.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex" depends="Gen.jflex, jflex.command" />
+
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
