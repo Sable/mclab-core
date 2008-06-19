@@ -1,3 +1,4 @@
+FakeRoot; //not used - just to satisfy requirement for root
 abstract Node;
 ListNode : Node ::= Node*;
 SymbolNode : Node ::= <Symbol : beaver.Symbol>;
