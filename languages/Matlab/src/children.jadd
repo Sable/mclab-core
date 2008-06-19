@@ -13,7 +13,7 @@ aspect Children {
                     nodes.add(new SymbolNode((beaver.Symbol) child));
                 }
             } else if(newChild.value instanceof Node) {
-                nodes.add((Node) newChild);
+                nodes.add((Node) newChild.value);
             } else {
                 nodes.add(new SymbolNode(newChild));
             }
@@ -28,7 +28,7 @@ aspect Children {
             }
             //don't bother to recurse - should be a flat list
             if(newChild.value instanceof Node) {
-                nodes.add((Node) newChild);
+                nodes.add((Node) newChild.value);
             } else {
                 nodes.add(new SymbolNode(newChild));
             }
