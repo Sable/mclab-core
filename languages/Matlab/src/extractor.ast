@@ -1,7 +1,7 @@
-FakeRoot; //not used - just to satisfy requirement for root
+Program ::= ListNode;
 abstract Node;
 ListNode : Node ::= Node*;
-SymbolNode : Node ::= <Symbol : beaver.Symbol>;
+SymbolNode : Node ::= <Text>;
 ExtractNode : Node;
 MaybeCmdExtract : ExtractNode ::= <Cmd> <Args : java.util.List<beaver.Symbol>>;
 ArrayExtract : ExtractNode ::= <Text>;

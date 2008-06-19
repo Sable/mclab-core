@@ -2,8 +2,7 @@ package matlab;
 
 import java.io.*;
 
-import matlab.ast.ListNode;
-
+import matlab.ast.Program;
 import beaver.Parser;
 
 /**
@@ -22,7 +21,7 @@ public class ParserTestTool {
 			
 			ExtractionScanner scanner = new ExtractionScanner(in);
 			ExtractionParser parser = new ExtractionParser();
-			ListNode actual = (ListNode) parser.parse(scanner);
+			Program actual = (Program) parser.parse(scanner);
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			if(parser.hasError()) {
 				for(String error : parser.getErrors()) {
@@ -31,8 +30,8 @@ public class ParserTestTool {
 			} else {
 				int startPos = actual.getStart();
 				int endPos = actual.getEnd();
-				out.println(ListNode.getLine(startPos) + " " + ListNode.getColumn(startPos));
-				out.println(ListNode.getLine(endPos) + " " + ListNode.getColumn(endPos));
+				out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
+				out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
 				out.print(actual.getStructureString());
 			}
 			out.close();

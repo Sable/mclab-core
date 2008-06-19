@@ -102,16 +102,21 @@
 %terminals PARENTHESIZED, MATRIX, CELL_ARRAY;
 %terminals MISC;
 
-%typeof program, script, function_list, class_def = "ListNode";
+%typeof program = "Program";
+%typeof script, function_list, class_def, empty_program = "ListNode";
 
 %goal program;
 
 //everything
 program = 
-     script
-  |  function_list
-  |  class_def
-  |  nbf.s1* {: return new ListNode().add(s1); :}
+     script.l {: return new Program(l); :}
+  |  function_list.l {: return new Program(l); :}
+  |  class_def.l {: return new Program(l); :}
+  |  empty_program.l {: return new Program(l); :}
+  ;
+
+empty_program =
+     nbf.s1* {: return new ListNode().add(s1); :}
   ;
 
 //script file: list of help comments followed by list of stmts

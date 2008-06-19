@@ -2,6 +2,8 @@ aspect StructureString {
     //default - exception
     syn String ASTNode.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
     
+    eq Program.getStructureString() = getListNode().getStructureString();
+    
     eq ListNode.getStructureString() {
         StringBuffer buf = new StringBuffer();
         for(Node node : getNodes()) {
@@ -10,10 +12,7 @@ aspect StructureString {
         return buf.toString();
     }
     
-    eq SymbolNode.getStructureString() {
-        String value = (String) getSymbol().value;
-        return value == null ? "" : value;
-    }
+    eq SymbolNode.getStructureString() = getText();
     
     eq MaybeCmdExtract.getStructureString() {
         StringBuffer buf = new StringBuffer();

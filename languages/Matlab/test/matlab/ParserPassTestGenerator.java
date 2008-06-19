@@ -16,7 +16,7 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package matlab;");
 		testFileWriter.println();
-		testFileWriter.println("import matlab.ast.ListNode;");
+		testFileWriter.println("import matlab.ast.Program;");
 		testFileWriter.println();
 		testFileWriter.println("public class ExtractionParserPassTests extends ParserPassTestBase {");
 	}
@@ -29,7 +29,7 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
 		testFileWriter.println("		ExtractionScanner scanner = getScanner(\"" + inFileName + "\");");
 		testFileWriter.println("		ExtractionParser parser = new ExtractionParser();");
-		testFileWriter.println("		ListNode actual = (ListNode) parser.parse(scanner);");
+		testFileWriter.println("		Program actual = (Program) parser.parse(scanner);");
 		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
 		testFileWriter.println("	}");
