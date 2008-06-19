@@ -44,15 +44,7 @@
 		</java>
 	</target>
 
-	<target name="gen.parser.fail.tests" depends="set.bin.dir">
-		<echo message="Generating parser fail tests" />
-		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${parser.fail.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
