@@ -123,9 +123,13 @@ empty_program =
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
-     nbf.s1* stmt.s2+ last_stmt.s3
+     stmt.s1+ last_stmt.s2
+        {: return new ListNode().add(s1).add(s2); :}
+  |  nbf.s1+ stmt.s2+ last_stmt.s3
         {: return new ListNode().add(s1).add(s2).add(s3); :}
-  |  nbf.s1* last_stmt.s2
+  |  last_stmt.s1
+        {: return new ListNode().add(s1); :}
+  |  nbf.s1+ last_stmt.s2
         {: return new ListNode().add(s1).add(s2); :}
   |  help_comment.s1+ nbf.s2* stmt.s3+ last_stmt.s4
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
