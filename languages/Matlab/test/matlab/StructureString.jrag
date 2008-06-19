@@ -1,0 +1,33 @@
+aspect StructureString {
+    //default - exception
+    syn String ASTNode.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
+    
+    eq ListNode.getStructureString() {
+        StringBuffer buf = new StringBuffer();
+        for(Node node : getNodes()) {
+            buf.append(node.getStructureString());
+        }
+        return buf.toString();
+    }
+    
+    eq SymbolNode.getStructureString() {
+        String value = (String) getSymbol().value;
+        return value == null ? "" : value;
+    }
+    
+    eq MaybeCmdExtract.getStructureString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getCmd());
+        for(beaver.Symbol node : getArgs()) {
+            String value = (String) node.value;
+            if(value != null) {
+                buf.append(value);
+            }
+        }
+        return buf.toString();
+    }
+    
+    eq MatrixExtract.getStructureString() = getText();
+    
+    eq CellArrayExtract.getStructureString() = getText();
+}
