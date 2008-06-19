@@ -529,6 +529,9 @@ ValidEscape=\\[bfnrt\\\"]
         return sym;
     }
     . { propertiesBuf.append(yytext()); }
+    <<EOF>> {
+        error("Unterminated properties block", pos.startLine, pos.startCol);
+    }
 }
 
 <INSIDE_EVENTS> {
@@ -541,6 +544,9 @@ ValidEscape=\\[bfnrt\\\"]
         return sym;
     }
     . { eventsBuf.append(yytext()); }
+    <<EOF>> {
+        error("Unterminated events block", pos.startLine, pos.startCol);
+    }
 }
 
 
