@@ -1,0 +1,42 @@
+0 0
+40 12
+a + b
+a - b
+a * b
+a / b
+a \ b
+a ^ b
+
+a + b + c
+a - b - c
+a * b * c
+a / b / c
+a \ b \ c
+a ^ b ^ c
+
+a .* b
+a ./ b
+a .\ b
+a .^ b
+
+a .* b .* c
+a ./ b ./ c
+a .\ b .\ c
+a .^ b .^ c
+
+a & b
+a | b
+a && b
+a || b
+
+a & b & c
+a | b | c
+a && b && c
+a || b || c
+
+a == b == c
+a ~= b ~= c
+a < b < c
+a > b > c
+a <= b <= c
+a >= b >= c

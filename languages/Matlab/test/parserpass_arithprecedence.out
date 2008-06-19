@@ -1,0 +1,43 @@
+0 0
+41 10
+a + b + c
+a + b - c
+a + b * c
+a + b / c
+a + b \ c
+a + b ^ c
+
+a - b + c
+a - b - c
+a - b * c
+a - b / c
+a - b \ c
+a - b ^ c
+
+a * b + c
+a * b - c
+a * b * c
+a * b / c
+a * b \ c
+a * b ^ c
+
+a / b + c
+a / b - c
+a / b * c
+a / b / c
+a / b \ c
+a / b ^ c
+
+a \ b + c
+a \ b - c
+a \ b * c
+a \ b / c
+a \ b \ c
+a \ b ^ c
+
+a ^ b + c
+a ^ b - c
+a ^ b * c
+a ^ b / c
+a ^ b \ c
+a ^ b ^ c
