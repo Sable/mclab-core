@@ -436,7 +436,7 @@ default_case =
   
 if_statement = 
      IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 END.s6
-        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5); :}
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6); :}
   |  IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 else_clause.s6 END.s7
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   |  IF.s1 nbf.s2* expr.s3 stmt_separator.s4 stmt_list.s5 else_if_clause.s6+ else_clause.s7? END.s8
