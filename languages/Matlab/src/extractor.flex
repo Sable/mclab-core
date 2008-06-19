@@ -320,6 +320,7 @@ ValidEscape=\\[bfnrt\\\"]
     <<EOF>> {
         //don't finish scanning if there's an unclosed comment
         if(bracketCommentNestingDepth != 0) {
+            yybegin(YYINITIAL); //so that we'll return EOF as the next token
             error(bracketCommentNestingDepth + " levels of comments not closed");
         }
         return symbol(EOF);
@@ -436,6 +437,7 @@ ValidEscape=\\[bfnrt\\\"]
     <<EOF>> {
         //don't finish scanning if there's an unclosed bracket
         if(bracketNestingDepth != 0) {
+            yybegin(YYINITIAL); //so that we'll return EOF as the next token
             error("Unbalanced brackets", pos.startLine, pos.startCol);
         }
         return symbol(EOF);
@@ -530,6 +532,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
     .|\n { propertiesBuf.append(yytext()); }
     <<EOF>> {
+        yybegin(YYINITIAL); //so that we'll return EOF as the next token
         error("Unterminated properties block", pos.startLine, pos.startCol);
     }
 }
@@ -545,6 +548,7 @@ ValidEscape=\\[bfnrt\\\"]
     }
     .|\n { eventsBuf.append(yytext()); }
     <<EOF>> {
+        yybegin(YYINITIAL); //so that we'll return EOF as the next token
         error("Unterminated events block", pos.startLine, pos.startCol);
     }
 }
