@@ -1,37 +1,20 @@
 aspect Children {
-    public ListNode ListNode.add(ExtractNode newChild) {
-        List<Node> nodes = getNodes();
-        nodes.add(newChild);
-        return this;
-    }
     public ListNode ListNode.add(beaver.Symbol newChild) {
-        if(newChild != null && newChild.value != null) {
-            List<Node> nodes = getNodes();
-            if(newChild.value instanceof java.util.ArrayList) {
-                for(Object child : (java.util.ArrayList) newChild.value) {
-                    //don't bother to recurse - should be a flat list
-                    nodes.add(new SymbolNode((beaver.Symbol) child));
-                }
-            } else if(newChild.value instanceof Node) {
-                nodes.add((Node) newChild.value);
-            } else {
-                nodes.add(new SymbolNode(newChild));
+        List<Node> nodes = getNodes();
+        if(newChild instanceof Node) {
+            nodes.add((Node) newChild);
+        } else if(newChild.value instanceof String) {
+            nodes.add(new SymbolNode(newChild));
+        } else if(newChild.value instanceof java.util.ArrayList) {
+            for(Object child : (java.util.ArrayList) newChild.value) {
+                add((beaver.Symbol) child);
             }
         }
         return this;
     }
     public ListNode ListNode.add(beaver.Symbol[] newChildren) {
-        List<Node> nodes = getNodes();
         for(beaver.Symbol newChild : newChildren) {
-            if(newChild.value == null) {
-                continue;
-            }
-            //don't bother to recurse - should be a flat list
-            if(newChild.value instanceof Node) {
-                nodes.add((Node) newChild.value);
-            } else {
-                nodes.add(new SymbolNode(newChild));
-            }
+            add(newChild);
         }
         return this;
     }
