@@ -267,6 +267,7 @@ ValidEscape=\\[bfnrt\\\"]
     } else {
         saveStateAndTransition(INSIDE_STRING);
         strBuf = new StringBuffer();
+        strBuf.append(yytext());
         markStartPosition();
     }
 }
@@ -275,6 +276,7 @@ ValidEscape=\\[bfnrt\\\"]
 <INSIDE_STRING> {
     "''" { strBuf.append(yytext()); }
     "'" {
+        strBuf.append(yytext());
         markEndPosition();
         Symbol sym = symbolFromMarkedPositions(STRING, strBuf.toString());
         restoreState();
