@@ -29,18 +29,10 @@ import beaver.Scanner;
   //// Returning symbols ///////////////////////////////////////////////////////
 
   //Create a symbol using the current line and column number, as computed by JFlex
-  //No attached value
   //Symbol is assumed to start and end on the same line
-  //e.g. symbol(SEMICOLON)
+  //Attaches yytext() as value
   private Symbol symbol(short type) {
-    return symbol(type, null);
-  }
-  
-  //Create a symbol using the current line and column number, as computed by JFlex
-  //Attached value gives content information
-  //Symbol is assumed to start and end on the same line
-  //e.g. symbol(IDENTIFIER, "x")
-  private Symbol symbol(short type, Object value) {
+    Object value = type == EOF ? null : yytext();
     //NB: JFlex is zero-indexed, but we want one-indexed
     int startLine = yyline + 1;
     int startCol = yycolumn + 1;
@@ -94,28 +86,8 @@ import beaver.Scanner;
   
   //like symbol(type), but uses the position stored in pos rather than
   //the position computed by JFlex
-  private Symbol symbolFromMarkedPositions(short type) {
-    return symbolFromMarkedPositions(type, null);
-  }
-  
-  //like symbol(type, value), but uses the position stored in pos rather than
-  //the position computed by JFlex
   private Symbol symbolFromMarkedPositions(short type, Object value) {
     return symbol(type, value, pos.startLine, pos.startCol, pos.endLine, pos.endCol);
-  }
-  
-  //like symbol(type), but uses the start position stored in pos rather than
-  //the start position computed by JFlex and an explicit length param rather
-  //than yylength
-  private Symbol symbolFromMarkedStart(short type, int length) {
-    return symbolFromMarkedStart(type, null, length);
-  }
-  
-  //like symbol(type, value), but uses the start position stored in pos rather than
-  //the start position computed by JFlex and an explicit length param rather
-  //than yylength
-  private Symbol symbolFromMarkedStart(short type, Object value, int length) {
-    return symbol(type, value, pos.startLine, pos.startCol, pos.startLine, pos.startCol + length - 1);
   }
   
   //// Errors //////////////////////////////////////////////////////////////////
@@ -278,14 +250,14 @@ ValidEscape=\\[bfnrt\\\"]
 //TODO-AC: anything that doesn't call symbol might have to explicitly set transposeNext (probably to false)
 
 //... comment
-{EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT, yytext()); }
+{EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT); }
 
 //whitespace
-{LineTerminator} { return symbol(LINE_TERMINATOR, yytext()); }
-{OtherWhiteSpace} { return symbol(OTHER_WHITESPACE, yytext()); }
+{LineTerminator} { return symbol(LINE_TERMINATOR); }
+{OtherWhiteSpace} { return symbol(OTHER_WHITESPACE); }
 
 //numeric literals
-{Number} { return symbol(NUMBER, yytext()); }
+{Number} { return symbol(NUMBER); }
 
 //MTRANSPOSE or STRING (start)
 "'" {
@@ -317,8 +289,8 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //single-line comments
-{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { return symbol(COMMENT, yytext()); }
+{HelpComment} { return symbol(HELP_COMMENT); }
+{Comment} { return symbol(COMMENT); }
 
 //start multiline help comment
 {OpenBracketHelpComment} {
@@ -381,7 +353,7 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //bang (!) syntax
-{ShellCommand} { return symbol(SHELL_COMMAND, yytext().substring(1)); }
+{ShellCommand} { return symbol(SHELL_COMMAND); }
 
 //start parenthesized section
 \( {
@@ -591,7 +563,7 @@ ValidEscape=\\[bfnrt\\\"]
     return { return symbol(RETURN); }
     
     //NB: lower precedence than keywords
-    {Identifier} { return symbol(IDENTIFIER, yytext()); }
+    {Identifier} { return symbol(IDENTIFIER); }
     
     //NB: lower precedence than ellipsis
     \. {
@@ -604,14 +576,14 @@ ValidEscape=\\[bfnrt\\\"]
 
 //ignore keywords - we just saw a dot
 <FIELD_NAME> {
-    {Identifier} { return symbol(IDENTIFIER, yytext()); }
+    {Identifier} { return symbol(IDENTIFIER); }
     
     //NB: lower precedence than ellipsis
     \. { return symbol(DOT); }
 }
 
 /* error fallback */
-.|\n { return symbol(MISC, yytext()); }
+.|\n { return symbol(MISC); }
 
 <<EOF>> {
     //don't need to check that we're in the initial state, because the
