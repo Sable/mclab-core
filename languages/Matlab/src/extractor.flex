@@ -528,7 +528,7 @@ ValidEscape=\\[bfnrt\\\"]
         restoreState();
         return sym;
     }
-    . { propertiesBuf.append(yytext()); }
+    .|\n { propertiesBuf.append(yytext()); }
     <<EOF>> {
         error("Unterminated properties block", pos.startLine, pos.startCol);
     }
@@ -543,7 +543,7 @@ ValidEscape=\\[bfnrt\\\"]
         restoreState();
         return sym;
     }
-    . { eventsBuf.append(yytext()); }
+    .|\n { eventsBuf.append(yytext()); }
     <<EOF>> {
         error("Unterminated events block", pos.startLine, pos.startCol);
     }
