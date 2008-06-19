@@ -4,7 +4,11 @@ aspect Children {
         if(newChild instanceof Node) {
             nodes.add((Node) newChild);
         } else if(newChild.value instanceof String) {
-            nodes.add(new SymbolNode(newChild));
+            SymbolNode symNode = new SymbolNode((String) newChild.value);
+            symNode.setLocation(newChild);
+            //System.err.println("Symbol position: " + newChild.getStart() + " " + newChild.getEnd());
+            //System.err.println("Symbol node position: " + symNode.getStart() + " " + symNode.getEnd());
+            nodes.add(symNode);
         } else if(newChild.value instanceof java.util.ArrayList) {
             for(Object child : (java.util.ArrayList) newChild.value) {
                 add((beaver.Symbol) child);
@@ -17,5 +21,14 @@ aspect Children {
             add(newChild);
         }
         return this;
+    }
+    
+    public void ASTNode.setLocation(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
+    
+    public void ASTNode.setLocation(beaver.Symbol sym) {
+        setLocation(sym.getStart(), sym.getEnd());
     }
 }
