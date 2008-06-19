@@ -274,6 +274,8 @@ stmt_list =
 last_stmt =
      stmt_body
   |  stmt
+  |  COMMENT
+  |  BRACKET_COMMENT
   ;
 
 //stmt followed by separator
