@@ -360,6 +360,7 @@ ValidEscape=\\[bfnrt\\\"]
 //start parenthesized section
 \( {
     transposeNext = false; 
+    bracketNestingDepth++;
     saveStateAndTransition(INSIDE_PARENS);
     markStartPosition();
     bracketBuf = new StringBuffer(yytext());
@@ -383,7 +384,8 @@ ValidEscape=\\[bfnrt\\\"]
 
 //start cell array
 \{ {
-    transposeNext = false; 
+    transposeNext = false;
+    bracketNestingDepth++;
     saveStateAndTransition(INSIDE_CELL_ARRAY);
     markStartPosition();
     bracketBuf = new StringBuffer(yytext());
@@ -407,7 +409,8 @@ ValidEscape=\\[bfnrt\\\"]
 
 //start matrix
 \[ {
-    transposeNext = false; 
+    transposeNext = false;
+    bracketNestingDepth++;
     saveStateAndTransition(INSIDE_MATRIX);
     markStartPosition();
     bracketBuf = new StringBuffer(yytext());
