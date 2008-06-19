@@ -189,13 +189,13 @@ stmt_or_function =
 //a classdef file
 //NB: must be non-empty to avoid conflicting with EmptyProgram case above
 class_def =
-     CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* stmt_separator_no_nbf.s7 help_comment_list.s8 class_body.s9* END.s10 trailing_filler.s11
+     CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* stmt_separator_no_nbf.s7 help_comment_list.s8 class_body.s9* END.s10 trailing_filler.s11*
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11); :} 
-  |  CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* LT.s7 nbf.s8* superclass_list.s9 stmt_separator_no_nbf.s10 help_comment_list.s11 class_body.s12* END.s13 trailing_filler.s14
+  |  CLASSDEF.s1 nbf.s2* attributes.s3 nbf.s4* IDENTIFIER.s5 nbf.s6* LT.s7 nbf.s8* superclass_list.s9 stmt_separator_no_nbf.s10 help_comment_list.s11 class_body.s12* END.s13 trailing_filler.s14*
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12).add(s13).add(s14); :}
-  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator_no_nbf.s5 help_comment_list.s6 class_body.s7* END.s8 trailing_filler.s9
+  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator_no_nbf.s5 help_comment_list.s6 class_body.s7* END.s8 trailing_filler.s9*
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9); :} 
-  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* LT.s5 nbf.s6* superclass_list.s7 stmt_separator_no_nbf.s8 help_comment_list.s9 class_body.s10* END.s11 trailing_filler.s12
+  |  CLASSDEF.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* LT.s5 nbf.s6* superclass_list.s7 stmt_separator_no_nbf.s8 help_comment_list.s9 class_body.s10* END.s11 trailing_filler.s12*
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12); :}
   ;
 
