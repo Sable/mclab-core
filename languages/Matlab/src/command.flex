@@ -24,6 +24,24 @@ import beaver.Scanner;
 %column
 
 %{
+  //// Base position ///////////////////////////////////////////////////////////
+  
+  private int baseLine = 1;
+  private int baseCol = 1;
+  
+  public void setBasePosition(int baseLine, int baseCol) {
+    this.baseLine = baseLine;
+    this.baseCol = baseCol;
+  }
+  
+  public int getBaseLine() {
+    return baseLine;
+  }
+  
+  public int getBaseCol() {
+    return baseCol;
+  }
+
   //// Returning symbols ///////////////////////////////////////////////////////
 
   //Create a symbol using the current line and column number, as computed by JFlex
@@ -39,9 +57,9 @@ import beaver.Scanner;
   //Symbol is assumed to start and end on the same line
   //e.g. symbol(IDENTIFIER, "x")
   private Symbol symbol(short type, Object value) {
-    //NB: JFlex is zero-indexed, but we want one-indexed
-    int startLine = yyline + 1;
-    int startCol = yycolumn + 1;
+    //NB: re-index wrt base position (given that JFlex is zero-indexed)
+    int startLine = yyline + baseLine;
+    int startCol = yycolumn + baseCol;
     int endLine = startLine;
     int endCol = startCol + yylength() - 1;
     return symbol(type, value, startLine, startCol, endLine, endCol);
@@ -71,16 +89,16 @@ import beaver.Scanner;
   //values from JFlex
   private void markStartPosition() {
     //correct to one-indexed
-    pos.startLine = yyline + 1;
-    pos.startCol = yycolumn + 1;
+    pos.startLine = yyline + baseLine;
+    pos.startCol = yycolumn + baseCol;
   }
   
   //populate the start line and column fields of the Position record with
   //values from JFlex
   private void markEndPosition() {
     //correct to one-indexed
-    pos.endLine = yyline + 1;
-    pos.endCol = (yycolumn + 1) + yylength() - 1;
+    pos.endLine = yyline + baseLine;
+    pos.endCol = (yycolumn + baseCol) + yylength() - 1;
   }
   
   //like symbol(type), but uses the position stored in pos rather than
@@ -100,7 +118,7 @@ import beaver.Scanner;
   //throw an exceptions with position information from JFlex
   private void error(String msg) throws Scanner.Exception {
     //correct to one-indexed
-    throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
+    throw new Scanner.Exception(yyline + baseLine, yycolumn + baseCol, msg);
   }
   
   //// Command-style call arguments ////////////////////////////////////////////
