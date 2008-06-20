@@ -133,7 +133,7 @@ import beaver.Scanner;
     cmdQuoteCount = 0;
     cmdArgPrevCharWasQuote = false;
     
-    return symbolFromMarkedPositions(STRING, cmdArg);
+    return symbolFromMarkedPositions(STRING, "'" + cmdArg + "'");
   }
   
   private Symbol handleNonArg(Symbol nonArg) throws Scanner.Exception {
