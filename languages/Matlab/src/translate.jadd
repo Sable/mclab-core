@@ -1,0 +1,41 @@
+aspect Translate {
+    //default - exception
+    public String ASTNode.translate() throws matlab.TranslationException { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
+    
+    public String Program.translate() throws matlab.TranslationException {
+        return getListNode().translate();
+    }
+    
+    public String ListNode.translate() throws matlab.TranslationException {
+        StringBuffer buf = new StringBuffer();
+        for(Node node : getNodes()) {
+            buf.append(node.translate());
+        }
+        return buf.toString();
+    }
+    
+    public String SymbolNode.translate() {
+        return getText();
+    }
+    
+    public String MaybeCmdExtract.translate() throws matlab.TranslationException {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getCmd());
+        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs());
+        for(beaver.Symbol node : formattedArgSymbols) {
+            String value = (String) node.value;
+            if(value != null) {
+                buf.append(value);
+            }
+        }
+        return buf.toString();
+    }
+    
+    public String MatrixExtract.translate() {
+        return getText();
+    }
+    
+    public String CellArrayExtract.translate() {
+        return getText();
+    }
+}
