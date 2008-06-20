@@ -3,6 +3,7 @@ package matlab;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import matlab.ExtractionParser.Terminals;
@@ -23,7 +24,7 @@ public class CommandFormatter {
         }
         List<Symbol> argSymbols = rescan(originalSymbols);
         CommandFormatter cf = new CommandFormatter();
-        return null;
+        return cf.reformat(argSymbols);
     }
 
     private static List<Symbol> rescan(List<Symbol> originalSymbols) throws CommandException {
@@ -58,6 +59,31 @@ public class CommandFormatter {
         return argSymbols;
     }
 
+    //TODO-AC: track position changes
+    private List<Symbol> reformat(List<Symbol> unformattedSymbols) {
+        List<Symbol> reversedUnformattedSymbols = new ArrayList<Symbol>(unformattedSymbols);
+        Collections.reverse(reversedUnformattedSymbols);
+        boolean first = true;
+        formattedSymbols.add(new Symbol(")")); //TODO-AC: id?
+        for(Symbol sym : reversedUnformattedSymbols) {
+            if(!isFiller(sym)) {
+                if(!first) {
+                    formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
+                }
+                first = false;
+            }
+            formattedSymbols.add(sym);
+        }
+        formattedSymbols.add(new Symbol("("));
+        Collections.reverse(formattedSymbols);
+        return formattedSymbols;
+    }
+    
+    private static boolean isFiller(Symbol sym) {
+        short type = sym.getId();
+        return type == Terminals.OTHER_WHITESPACE || type == Terminals.ELLIPSIS_COMMENT;
+    }
+
     private static boolean isNotCmd(List<Symbol> originalSymbols) {
         //no args => not a command
         if(originalSymbols == null || originalSymbols.isEmpty()) {
@@ -73,11 +99,10 @@ public class CommandFormatter {
 
         Symbol firstNonWhitespace = null;
         for(Symbol sym : originalSymbols) {
-            short type = sym.getId();
-            if(type != Terminals.OTHER_WHITESPACE && type != Terminals.ELLIPSIS_COMMENT) {
+            if(!isFiller(sym)) {
                 if(firstNonWhitespace == null) {
                     firstNonWhitespace = sym;
-                    switch(type) {
+                    switch(sym.getId()) {
                     //paren or assign => definitely not a command
                     case Terminals.PARENTHESIZED:
                     case Terminals.ASSIGN:
