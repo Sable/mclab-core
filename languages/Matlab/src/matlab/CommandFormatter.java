@@ -107,7 +107,7 @@ public class CommandFormatter {
                     case Terminals.PARENTHESIZED:
                     case Terminals.ASSIGN:
                         return true;
-                        //operator => command iff nothing important follows
+                    //operator => command iff nothing important follows
                     case Terminals.LT:
                     case Terminals.GT:
                     case Terminals.LE:
@@ -131,13 +131,10 @@ public class CommandFormatter {
                     case Terminals.EPOW:
                     case Terminals.DOT:
                         break;
-                        //otherwise => definitely a command
+                    //otherwise => definitely a command
                     default:
                         return false;
                     }
-                    //if lparen, return true
-                    //if assign, return true
-                    //if not a binary operator, return false
                 } else {
                     return true;
                 }
