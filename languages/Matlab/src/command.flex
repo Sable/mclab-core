@@ -159,7 +159,7 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 
 %%
 
-{EscapedLineTerminator} { handleNonArg(symbol(ELLIPSIS_COMMENT, yytext())); }
+{EscapedLineTerminator} { return handleNonArg(symbol(ELLIPSIS_COMMENT, yytext())); }
 
 {OtherWhiteSpace}+ {
     if(cmdQuoteCount % 2 == 1) {
@@ -189,4 +189,4 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
     cmdArgPrevCharWasQuote = isQuote;
 }
 
-<<EOF>> { handleNonArg(symbol(EOF)); }
+<<EOF>> { return handleNonArg(symbol(EOF)); }
