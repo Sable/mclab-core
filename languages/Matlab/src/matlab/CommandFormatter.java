@@ -76,7 +76,7 @@ public class CommandFormatter {
         for(Symbol sym : rescannedSymbols) {
             formattedSymbols.add(sym);
             if(!isFiller(sym)) {
-                if(i < numArgs) {
+                if(i < numArgs - 1) {
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
                 }
                 i++;
