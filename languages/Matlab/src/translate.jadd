@@ -1,27 +1,27 @@
 aspect Translate {
     //default - exception
-    public String ASTNode.translate() throws matlab.TranslationException { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
+    public String ASTNode.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
     
-    public String Program.translate() throws matlab.TranslationException {
-        return getListNode().translate();
+    public String Program.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
+        return getListNode().translate(offsetTracker);
     }
     
-    public String ListNode.translate() throws matlab.TranslationException {
+    public String ListNode.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
         StringBuffer buf = new StringBuffer();
         for(Node node : getNodes()) {
-            buf.append(node.translate());
+            buf.append(node.translate(offsetTracker));
         }
         return buf.toString();
     }
     
-    public String SymbolNode.translate() {
+    public String SymbolNode.translate(matlab.OffsetTracker offsetTracker) {
         return getText();
     }
     
-    public String MaybeCmdExtract.translate() throws matlab.TranslationException {
+    public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
         StringBuffer buf = new StringBuffer();
         buf.append(getCmd());
-        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs());
+        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker);
         for(beaver.Symbol node : formattedArgSymbols) {
             String value = (String) node.value;
             if(value != null) {
@@ -31,11 +31,11 @@ aspect Translate {
         return buf.toString();
     }
     
-    public String MatrixExtract.translate() {
+    public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) {
         return getText();
     }
     
-    public String CellArrayExtract.translate() {
+    public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) {
         return getText();
     }
 }

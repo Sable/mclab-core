@@ -27,7 +27,7 @@ public class Translator {
 					System.err.println(error);
 				}
 			} else {
-				out.print(actual.translate());
+				out.print(actual.translate(null));
 			}
 			out.close();
 			in.close();

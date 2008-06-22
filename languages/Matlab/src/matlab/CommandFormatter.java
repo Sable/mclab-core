@@ -10,19 +10,21 @@ import beaver.Scanner;
 import beaver.Symbol;
 
 public class CommandFormatter {
+    private final OffsetTracker offsetTracker;
     private final List<Symbol> originalSymbols;
     private final List<Symbol> rescannedSymbols;
     private final List<Symbol> formattedSymbols;
     private int numArgs;
 
-    private CommandFormatter(List<Symbol> originalSymbols) throws CommandException {
+    private CommandFormatter(List<Symbol> originalSymbols, OffsetTracker offsetTracker) {
+        this.offsetTracker = offsetTracker;
         this.originalSymbols = originalSymbols;
         this.rescannedSymbols = new ArrayList<Symbol>();
         this.formattedSymbols = new ArrayList<Symbol>();
         this.numArgs = 0;
     }
 
-    public static List<Symbol> format(List<Symbol> originalSymbols) throws CommandException {
+    public static List<Symbol> format(List<Symbol> originalSymbols, OffsetTracker offsetTracker) throws CommandException {
         if(originalSymbols == null) {
             return null;
         }
@@ -30,7 +32,11 @@ public class CommandFormatter {
         if(isNotCmd(originalSymbols)) {
             return originalSymbols;
         }
-        CommandFormatter cf = new CommandFormatter(originalSymbols);
+        if(offsetTracker == null) {
+            //easier than checking for null everywhere
+            offsetTracker = new OffsetTracker();
+        }
+        CommandFormatter cf = new CommandFormatter(originalSymbols, offsetTracker);
         cf.rescan();
         cf.format();
         return cf.formattedSymbols;
@@ -75,7 +81,7 @@ public class CommandFormatter {
         int startPos = rescannedSymbols.get(0).getStart();
         //NB: column may have the invalid value zero.
         //    this shouldn't matter since it will still preceded the first position
-        recordOffsetChange(Symbol.getLine(startPos), Symbol.getColumn(startPos) - 1, 0, 1);
+        offsetTracker.recordOffsetChange(Symbol.getLine(startPos), Symbol.getColumn(startPos) - 1, 0, 1);
         colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         int i = 0;
@@ -84,34 +90,21 @@ public class CommandFormatter {
             int symEndPos = sym.getEnd();
             if(!isFiller(sym)) {
                 if(i < numArgs - 1) {
-                    recordOffsetChange(symEndPos, 0, 1);
+                    offsetTracker.recordOffsetChange(symEndPos, 0, 1);
                     colOffsetChangeInLine++;
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
                 }
                 i++;
             } else if(sym.getId() == Terminals.ELLIPSIS_COMMENT) { //only way to increase line num
-                recordOffsetChange(symEndPos, 0, -1 * colOffsetChangeInLine);
+                offsetTracker.recordOffsetChange(symEndPos, 0, -1 * colOffsetChangeInLine);
                 colOffsetChangeInLine = 0;
             }
         }
         
         int endPos = rescannedSymbols.get(rescannedSymbols.size() - 1).getEnd();
-        recordOffsetChange(endPos, 0, 1);
+        offsetTracker.recordOffsetChange(endPos, 0, 1);
         colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol(")"));//TODO-AC: id?
-    }
-    
-    private void recordOffsetChange(int pos, int lineOffsetChange, int colOffsetChange) {
-        int line = Symbol.getLine(pos);
-        int col = Symbol.getColumn(pos);
-        recordOffsetChange(line, col, lineOffsetChange, colOffsetChange);
-    }
-    
-    private void recordOffsetChange(int line, int col, int lineOffsetChange, int colOffsetChange) {
-        //interpretation: if position in matlab (NB: not natlab) file is greater than (line, col),
-        //  then add the accumulated offsets (i.e. sums of changes) to the matlab position to get the
-        //  natlab position.
-        System.err.println("[" + line + ", " + col + "]  Offset change: " + lineOffsetChange + " " + colOffsetChange);
     }
     
     private static boolean isFiller(Symbol sym) {
