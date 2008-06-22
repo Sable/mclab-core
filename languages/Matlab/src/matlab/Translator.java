@@ -16,12 +16,12 @@ public class Translator {
 		}
 		String basename = args[0];
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
+			BufferedReader in = new BufferedReader(new FileReader(basename + ".m"));
 			
 			ExtractionScanner scanner = new ExtractionScanner(in);
 			ExtractionParser parser = new ExtractionParser();
 			Program actual = (Program) parser.parse(scanner);
-			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
+			PrintWriter out = new PrintWriter(new FileWriter(basename + ".n"));
 			if(parser.hasError()) {
 				for(String error : parser.getErrors()) {
 					System.err.println(error);
