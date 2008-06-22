@@ -3,31 +3,40 @@ package matlab;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import matlab.ExtractionParser.Terminals;
-
 import beaver.Scanner;
 import beaver.Symbol;
 
 public class CommandFormatter {
+    private final List<Symbol> originalSymbols;
+    private final List<Symbol> rescannedSymbols;
     private final List<Symbol> formattedSymbols;
+    private int numArgs;
 
-    private CommandFormatter() {
+    private CommandFormatter(List<Symbol> originalSymbols) throws CommandException {
+        this.originalSymbols = originalSymbols;
+        this.rescannedSymbols = new ArrayList<Symbol>();
         this.formattedSymbols = new ArrayList<Symbol>();
+        this.numArgs = 0;
     }
 
     public static List<Symbol> format(List<Symbol> originalSymbols) throws CommandException {
-        if(isNotCmd(originalSymbols)) {
-            return originalSymbols == null ? null : new ArrayList<Symbol>(originalSymbols);
+        if(originalSymbols == null) {
+            return null;
         }
-        List<Symbol> argSymbols = rescan(originalSymbols);
-        CommandFormatter cf = new CommandFormatter();
-        return cf.reformat(argSymbols);
+        originalSymbols = new ArrayList<Symbol>(originalSymbols);
+        if(isNotCmd(originalSymbols)) {
+            return originalSymbols;
+        }
+        CommandFormatter cf = new CommandFormatter(originalSymbols);
+        cf.rescan();
+        cf.format();
+        return cf.formattedSymbols;
     }
 
-    private static List<Symbol> rescan(List<Symbol> originalSymbols) throws CommandException {
+    private void rescan() throws CommandException {
         StringBuffer textBuf = new StringBuffer();
         for(Symbol sym : originalSymbols) {
             textBuf.append(sym.value);
@@ -39,7 +48,6 @@ public class CommandFormatter {
         int baseCol = Symbol.getColumn(basePos);
         scanner.setBasePosition(baseLine, baseCol);
 
-        List<Symbol> argSymbols = new ArrayList<Symbol>();
         while(true) {
             Symbol curr = null;
             try {
@@ -54,29 +62,27 @@ public class CommandFormatter {
             if(curr.getId() == ExtractionParser.Terminals.EOF) {
                 break;
             }
-            argSymbols.add(curr);
+            if(!isFiller(curr)) {
+                numArgs++;
+            }
+            rescannedSymbols.add(curr);
         }
-        return argSymbols;
     }
 
     //TODO-AC: track position changes
-    private List<Symbol> reformat(List<Symbol> unformattedSymbols) {
-        List<Symbol> reversedUnformattedSymbols = new ArrayList<Symbol>(unformattedSymbols);
-        Collections.reverse(reversedUnformattedSymbols);
-        boolean first = true;
-        formattedSymbols.add(new Symbol(")")); //TODO-AC: id?
-        for(Symbol sym : reversedUnformattedSymbols) {
+    private void format() {
+        formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
+        int i = 0;
+        for(Symbol sym : rescannedSymbols) {
+            formattedSymbols.add(sym);
             if(!isFiller(sym)) {
-                if(!first) {
+                if(i < numArgs) {
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
                 }
-                first = false;
+                i++;
             }
-            formattedSymbols.add(sym);
         }
-        formattedSymbols.add(new Symbol("("));
-        Collections.reverse(formattedSymbols);
-        return formattedSymbols;
+        formattedSymbols.add(new Symbol(")"));//TODO-AC: id?
     }
     
     private static boolean isFiller(Symbol sym) {
