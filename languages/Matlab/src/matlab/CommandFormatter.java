@@ -71,18 +71,47 @@ public class CommandFormatter {
 
     //TODO-AC: track position changes
     private void format() {
+        int colOffsetChangeInLine = 0;
+        int startPos = rescannedSymbols.get(0).getStart();
+        //NB: column may have the invalid value zero.
+        //    this shouldn't matter since it will still preceded the first position
+        recordOffsetChange(Symbol.getLine(startPos), Symbol.getColumn(startPos) - 1, 0, 1);
+        colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         int i = 0;
         for(Symbol sym : rescannedSymbols) {
             formattedSymbols.add(sym);
+            int symEndPos = sym.getEnd();
             if(!isFiller(sym)) {
                 if(i < numArgs - 1) {
+                    recordOffsetChange(symEndPos, 0, 1);
+                    colOffsetChangeInLine++;
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
                 }
                 i++;
+            } else if(sym.getId() == Terminals.ELLIPSIS_COMMENT) { //only way to increase line num
+                recordOffsetChange(symEndPos, 0, -1 * colOffsetChangeInLine);
+                colOffsetChangeInLine = 0;
             }
         }
+        
+        int endPos = rescannedSymbols.get(rescannedSymbols.size() - 1).getEnd();
+        recordOffsetChange(endPos, 0, 1);
+        colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol(")"));//TODO-AC: id?
+    }
+    
+    private void recordOffsetChange(int pos, int lineOffsetChange, int colOffsetChange) {
+        int line = Symbol.getLine(pos);
+        int col = Symbol.getColumn(pos);
+        recordOffsetChange(line, col, lineOffsetChange, colOffsetChange);
+    }
+    
+    private void recordOffsetChange(int line, int col, int lineOffsetChange, int colOffsetChange) {
+        //interpretation: if position in matlab (NB: not natlab) file is greater than (line, col),
+        //  then add the accumulated offsets (i.e. sums of changes) to the matlab position to get the
+        //  natlab position.
+        System.err.println("[" + line + ", " + col + "]  Offset change: " + lineOffsetChange + " " + colOffsetChange);
     }
     
     private static boolean isFiller(Symbol sym) {
