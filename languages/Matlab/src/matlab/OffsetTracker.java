@@ -101,7 +101,11 @@ public class OffsetTracker {
                 offset = offsetMap.get(source);
             } else {
                 SortedMap<TextPosition, Offset> headMap = offsetMap.headMap(source);
-                offset = headMap.get(headMap.lastKey());
+                if(headMap.isEmpty()) {
+                    offset = new Offset(0, 0);
+                } else {
+                    offset = headMap.get(headMap.lastKey());
+                }
             }
             return offset.forwardOffset(source);
         }
