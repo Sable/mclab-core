@@ -11,6 +11,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ExtractionScannerTests.class);
 		suite.addTestSuite(ExtractionParserPassTests.class);
+		suite.addTestSuite(ExtractionTranslatorTests.class);
 		//$JUnit-END$
 		return suite;
 	}

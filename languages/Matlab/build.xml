@@ -24,7 +24,11 @@
 		<jflex file="${src.dir}/${command.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
-	<target name="jflex" depends="Gen.jflex, jflex.command" />
+	<target name="jflex.trivial" depends="def.jflex.task">
+		<jflex file="${test.dir}/${trivial.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex" depends="Gen.jflex, jflex.command, jflex.trivial" />
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
@@ -50,7 +54,15 @@
 		</java>
 	</target>
 
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests" />
+    <target name="gen.translator.tests" depends="set.bin.dir">
+        <echo message="Generating translator tests" />
+        <java classname="${translator.test.generator.class}" classpath="${bin.dir}">
+            <arg value="${translator.test.list.file}" />
+            <arg value="${gen.dir}" />
+        </java>
+    </target>
+
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.translator.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
