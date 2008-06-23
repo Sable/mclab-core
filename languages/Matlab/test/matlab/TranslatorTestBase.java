@@ -15,7 +15,6 @@ import matlab.ast.Program;
  */
 class TranslatorTestBase extends TestCase {
     private static final String SEPARATOR = ">>>>";
-    private static final Pattern SOURCE_TO_DEST_PATTERN = Pattern.compile("^\\s*\\(([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\)\\s*[-][>]\\s*\\[([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\]\\s*$");
     private static final Pattern DEST_TO_SOURCE_PATTERN = Pattern.compile("^\\s*\\[([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\]\\s*[-][>]\\s*\\(([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\)\\s*$");
 
     /* Construct a scanner that will read from the specified file. */
@@ -27,8 +26,6 @@ class TranslatorTestBase extends TestCase {
      * Returns a structure containing the contents of the .out file
      * Format:
      *   >>>> blah
-     *   (source line, source col) -> [dest line, dest col]
-     *   >>>> blah
      *   [dest line, dest col] -> (source line, source col)
      *   >>>> blah 
      *   {translated text - see translate.jrag}
@@ -38,24 +35,7 @@ class TranslatorTestBase extends TestCase {
 
         while(in.ready() && !in.readLine().startsWith(SEPARATOR)) {}
 
-        Map<TextPosition, TextPosition> sourceToDestMap = new HashMap<TextPosition, TextPosition>();
-        while(in.ready()) {
-            String line = in.readLine();
-            if(line.startsWith(SEPARATOR)) {
-                break;
-            }
-            Matcher matcher = SOURCE_TO_DEST_PATTERN.matcher(line);
-            if(!matcher.matches()) {
-                fail("Invalid source-to-dest line: " + line);
-            }
-            int sourceLine = Integer.parseInt(matcher.group(1));
-            int sourceCol = Integer.parseInt(matcher.group(2));
-            int destLine = Integer.parseInt(matcher.group(3));
-            int destCol = Integer.parseInt(matcher.group(4));
-            sourceToDestMap.put(new TextPosition(sourceLine, sourceCol), new TextPosition(destLine, destCol));
-        }
-
-        Map<TextPosition, TextPosition> destToSource = new HashMap<TextPosition, TextPosition>();
+        Map<TextPosition, TextPosition> destToSourceMap = new HashMap<TextPosition, TextPosition>();
         while(in.ready()) {
             String line = in.readLine();
             if(line.startsWith(SEPARATOR)) {
@@ -69,7 +49,7 @@ class TranslatorTestBase extends TestCase {
             int sourceCol = Integer.parseInt(matcher.group(2));
             int destLine = Integer.parseInt(matcher.group(3));
             int destCol = Integer.parseInt(matcher.group(4));
-            sourceToDestMap.put(new TextPosition(sourceLine, sourceCol), new TextPosition(destLine, destCol));
+            destToSourceMap.put(new TextPosition(sourceLine, sourceCol), new TextPosition(destLine, destCol));
         }
 
         StringBuffer translateBuf = new StringBuffer();
@@ -80,7 +60,7 @@ class TranslatorTestBase extends TestCase {
 
         in.close();
 
-        return new Structure(sourceToDestMap, destToSource, translateBuf.toString());
+        return new Structure(destToSourceMap, translateBuf.toString());
     }
 
     /* Check deep equality of an AST and the contents of the .out file. */
@@ -131,30 +111,17 @@ class TranslatorTestBase extends TestCase {
             assertEquals("Translation exception ", expected.getTranslatedText().substring(1), e.getMessage());
         }
 
-        //TODO-AC: re-enable these tests
-//        PositionMap posMap = offsetTracker.buildPositionMap();
-//
-//        for(Map.Entry<TextPosition, TextPosition> entry : expected.getSourceToDestMap().entrySet()) {
-//            TextPosition sourcePos = entry.getKey();
-//            TextPosition expectedDestPos = entry.getValue();
-//            TextPosition actualDestPos = posMap.sourceToDest(sourcePos);
-//            if(expectedDestPos.compareTo(actualDestPos) != 0) {
-//                fail("Source position (" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ") mapped to " +
-//                        "[" + actualDestPos.getLine() + ", " + actualDestPos.getColumn() + "] instead of " +
-//                        "[" + expectedDestPos.getLine() + ", " + expectedDestPos.getColumn() + "]");
-//            }
-//        }
-//
-//        for(Map.Entry<TextPosition, TextPosition> entry : expected.getDestToSourceMap().entrySet()) {
-//            TextPosition destPos = entry.getKey();
-//            TextPosition expectedSourcePos = entry.getValue();
-//            TextPosition actualSourcePos = posMap.destToSource(destPos);
-//            if(expectedSourcePos.compareTo(actualSourcePos) != 0) {
-//                fail("Destination position [" + destPos.getLine() + ", " + destPos.getColumn() + "] mapped to " +
-//                        "(" + actualSourcePos.getLine() + ", " + actualSourcePos.getColumn() + ") instead of " +
-//                        "(" + expectedSourcePos.getLine() + ", " + expectedSourcePos.getColumn() + ")");
-//            }
-//        }
+        PositionMap posMap = offsetTracker.buildPositionMap();
+        for(Map.Entry<TextPosition, TextPosition> entry : expected.getDestToSourceMap().entrySet()) {
+            TextPosition destPos = entry.getKey();
+            TextPosition expectedSourcePos = entry.getValue();
+            TextPosition actualSourcePos = posMap.getPreTranslationPosition(destPos);
+            if(expectedSourcePos.compareTo(actualSourcePos) != 0) {
+                fail("Destination position [" + destPos.getLine() + ", " + destPos.getColumn() + "] mapped to " +
+                        "(" + actualSourcePos.getLine() + ", " + actualSourcePos.getColumn() + ") instead of " +
+                        "(" + expectedSourcePos.getLine() + ", " + expectedSourcePos.getColumn() + ")");
+            }
+        }
     }
 
     private static void appendRemainingToBuffer(BufferedReader reader, StringBuffer buf) throws IOException {
@@ -180,19 +147,12 @@ class TranslatorTestBase extends TestCase {
 
     /* struct for storing .out file contents. */
     static class Structure {
-        private final Map<TextPosition, TextPosition> sourceToDestMap;
         private final Map<TextPosition, TextPosition> destToSourceMap;
         private final String translatedText;
 
-        private Structure(Map<TextPosition, TextPosition> sourceToDestMap, 
-                Map<TextPosition, TextPosition> destToSourceMap, String translatedText) {
-            this.sourceToDestMap = sourceToDestMap;
+        private Structure(Map<TextPosition, TextPosition> destToSourceMap, String translatedText) {
             this.destToSourceMap = destToSourceMap;
             this.translatedText = translatedText;
-        }
-
-        public Map<TextPosition, TextPosition> getSourceToDestMap() {
-            return sourceToDestMap;
         }
 
         public Map<TextPosition, TextPosition> getDestToSourceMap() {

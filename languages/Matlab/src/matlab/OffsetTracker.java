@@ -94,8 +94,7 @@ public class OffsetTracker {
         }
 
         @Override
-        //TODO-AC: return null if the character has been deleted?
-        public TextPosition sourceToDest(TextPosition source) {
+        public TextPosition getPreTranslationPosition(TextPosition source) {
             Offset offset = null;
             if(offsetMap.containsKey(source)) {
                 offset = offsetMap.get(source);
@@ -108,29 +107,6 @@ public class OffsetTracker {
                 }
             }
             return offset.forwardOffset(source);
-        }
-
-        @Override
-        //TODO-AC: return null if the character has been added?
-        public TextPosition destToSource(TextPosition dest) {
-            Offset offset = new Offset(0, 0);
-            for(Map.Entry<TextPosition, Offset> entry : offsetMap.entrySet()) {
-                TextPosition sourcePos = entry.getKey();
-                Offset currOffset = entry.getValue();
-                TextPosition destPos = currOffset.forwardOffset(sourcePos);
-                int comp = destPos.compareTo(dest);
-                if(comp == 0) {
-                    return sourcePos;
-                } else if(comp < 0) {
-                    //not there yet
-                    offset = currOffset;
-                } else {
-                    //too far - use previous, as stored in offset
-                    return offset.reverseOffset(dest);
-                }
-            }
-            //stepping off the end is the same as going too far
-            return offset.reverseOffset(dest);
         }
     }
 }

@@ -33,20 +33,12 @@ public class TranslatorTestTool {
             } else {
                 try {
                     OffsetTracker offsetTracker = new OffsetTracker();
-                    String sourceText = actual.getStructureString();
                     String destText = actual.translate(offsetTracker);
                     PositionMap posMap = offsetTracker.buildPositionMap();
 
-                    out.println(">>>> Source -> Dest");
-                    for(TextPosition sourcePos : getAllTextPositions(sourceText)) {
-                        TextPosition destPos = posMap.sourceToDest(sourcePos);
-                        out.println("(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ") -> " +
-                                "[" + destPos.getLine() + ", " + destPos.getColumn() + "]");
-                    }
-
-                    out.println(">>>> Dest -> Source");
+                    out.println(">>>> Destination Language -> Source Language");
                     for(TextPosition destPos : getAllTextPositions(destText)) {
-                        TextPosition sourcePos = posMap.destToSource(destPos);
+                        TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
                         out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
                                 "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
                     }
