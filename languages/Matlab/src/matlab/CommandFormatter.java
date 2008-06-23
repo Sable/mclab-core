@@ -5,6 +5,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import matlab.CommandToken.Arg;
+import matlab.CommandToken.EllipsisComment;
 import matlab.ExtractionParser.Terminals;
 import beaver.Scanner;
 import beaver.Symbol;
@@ -12,14 +14,14 @@ import beaver.Symbol;
 public class CommandFormatter {
     private final OffsetTracker offsetTracker;
     private final List<Symbol> originalSymbols;
-    private final List<Symbol> rescannedSymbols;
+    private final List<CommandToken> rescannedSymbols;
     private final List<Symbol> formattedSymbols;
     private int numArgs;
 
     private CommandFormatter(List<Symbol> originalSymbols, OffsetTracker offsetTracker) {
         this.offsetTracker = offsetTracker;
         this.originalSymbols = originalSymbols;
-        this.rescannedSymbols = new ArrayList<Symbol>();
+        this.rescannedSymbols = new ArrayList<CommandToken>();
         this.formattedSymbols = new ArrayList<Symbol>();
         this.numArgs = 0;
     }
@@ -55,17 +57,15 @@ public class CommandFormatter {
         scanner.setBasePosition(baseLine, baseCol);
 
         while(true) {
-            Symbol curr = null;
+            CommandToken curr = null;
             try {
                 curr = scanner.nextToken();
-            } catch (Scanner.Exception e) {
-                throw new CommandException(e.line, e.column, e.getMessage());
             } catch (IOException e) {
                 //can't happen - using a StringReader
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-            if(curr.getId() == ExtractionParser.Terminals.EOF) {
+            if(curr == null) { //EOF
                 break;
             }
             if(!isFiller(curr)) {
@@ -78,14 +78,16 @@ public class CommandFormatter {
     //TODO-AC: track position changes
     private void format() {
         int colOffsetChangeInLine = 0;
-        int startPos = rescannedSymbols.get(0).getStart();
+        int startLine = rescannedSymbols.get(0).getLine();
+        int startCol = rescannedSymbols.get(0).getStartCol();
         //NB: column may have the invalid value zero.
         //    this shouldn't matter since it will still preceded the first position
-        offsetTracker.recordOffsetChange(Symbol.getLine(startPos), Symbol.getColumn(startPos) - 1, 0, 1);
+        offsetTracker.recordOffsetChange(startLine, startCol - 1, 0, 1);
         colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         int i = 0;
-        for(Symbol sym : rescannedSymbols) {
+        for(CommandToken tok : rescannedSymbols) {
+            Symbol sym = convertToSymbol(tok);
             formattedSymbols.add(sym);
             int symEndPos = sym.getEnd();
             if(!isFiller(sym)) {
@@ -101,15 +103,36 @@ public class CommandFormatter {
             }
         }
         
-        int endPos = rescannedSymbols.get(rescannedSymbols.size() - 1).getEnd();
-        offsetTracker.recordOffsetChange(endPos, 0, 1);
+        int endLine = rescannedSymbols.get(rescannedSymbols.size() - 1).getLine();
+        int endCol = rescannedSymbols.get(rescannedSymbols.size() - 1).getEndCol();
+        offsetTracker.recordOffsetChange(endLine, endCol, 0, 1);
         colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol(")"));//TODO-AC: id?
     }
     
+    private static Symbol convertToSymbol(CommandToken tok) {
+        int startLine = tok.getLine();
+        int startCol = tok.getStartCol();
+        int startPos = Symbol.makePosition(startLine, startCol);
+        int endLine = tok.getLine();
+        int endCol = tok.getEndCol();
+        int endPos = Symbol.makePosition(endLine, endCol);
+        if(tok instanceof Arg) {
+            return new Symbol(Terminals.STRING, startPos, endPos, "'" + ((Arg) tok).getArgText() + "'");
+        } else if(tok instanceof EllipsisComment) {
+            return new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText());
+        } else {
+            throw new IllegalArgumentException("Unexpected token type: " + tok.getClass().getName());
+        }
+    }
+    
+    private static boolean isFiller(CommandToken tok) {
+        return tok instanceof EllipsisComment;
+    }
+    
     private static boolean isFiller(Symbol sym) {
         short type = sym.getId();
-        return type == Terminals.OTHER_WHITESPACE || type == Terminals.ELLIPSIS_COMMENT;
+        return (type == Terminals.OTHER_WHITESPACE) || (type == Terminals.ELLIPSIS_COMMENT);
     }
 
     private static boolean isNotCmd(List<Symbol> originalSymbols) {
