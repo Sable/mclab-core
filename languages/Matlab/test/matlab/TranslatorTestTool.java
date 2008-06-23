@@ -31,27 +31,31 @@ public class TranslatorTestTool {
                     System.err.println(error);
                 }
             } else {
-                OffsetTracker offsetTracker = new OffsetTracker();
-                String sourceText = actual.getStructureString();
-                String destText = actual.translate(offsetTracker);
-                PositionMap posMap = offsetTracker.buildPositionMap();
+                try {
+                    OffsetTracker offsetTracker = new OffsetTracker();
+                    String sourceText = actual.getStructureString();
+                    String destText = actual.translate(offsetTracker);
+                    PositionMap posMap = offsetTracker.buildPositionMap();
 
-                out.println(">>>> Source -> Dest");
-                for(TextPosition sourcePos : getAllTextPositions(sourceText)) {
-                    TextPosition destPos = posMap.sourceToDest(sourcePos);
-                    out.println("(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ") -> " +
+                    out.println(">>>> Source -> Dest");
+                    for(TextPosition sourcePos : getAllTextPositions(sourceText)) {
+                        TextPosition destPos = posMap.sourceToDest(sourcePos);
+                        out.println("(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ") -> " +
                                 "[" + destPos.getLine() + ", " + destPos.getColumn() + "]");
-                }
+                    }
 
-                out.println(">>>> Dest -> Source");
-                for(TextPosition destPos : getAllTextPositions(destText)) {
-                    TextPosition sourcePos = posMap.destToSource(destPos);
-                    out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+                    out.println(">>>> Dest -> Source");
+                    for(TextPosition destPos : getAllTextPositions(destText)) {
+                        TextPosition sourcePos = posMap.destToSource(destPos);
+                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
                                 "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-                }
+                    }
 
-                out.println(">>>> Translated Text");
-                out.print(destText);
+                    out.println(">>>> Translated Text");
+                    out.print(destText);
+                } catch(TranslationException e) {
+                    out.println("~" + e.getMessage());
+                }
             }
             out.close();
             in.close();
@@ -62,9 +66,6 @@ public class TranslatorTestTool {
         } catch (Parser.Exception e) {
             e.printStackTrace();
             System.exit(3);
-        } catch (TranslationException e) {
-            e.printStackTrace();
-            System.exit(4);
         }
     }
 
