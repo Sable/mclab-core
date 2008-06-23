@@ -185,29 +185,27 @@ aspect StructureString {
     
     eq Signature.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
+        buf.append("[");
         boolean first = true;
         for(Name param : getOutputParams()) {
-            if(first)
-            	buf.append("[");
-           	else
+            if(!first) {
                 buf.append(", ");
+            }
             buf.append(param.getStructureString());
             first = false;
         }
-        if(!first)
-        	buf.append("] = ");
+        buf.append("] = ");
         buf.append(getName());
+        buf.append("(");
         first = true;
         for(Name param : getInputParams()) {
-            if(first)
-            	buf.append("(");
-           	else
+            if(!first) {
                 buf.append(", ");
+            }
             buf.append(param.getStructureString());
             first = false;
         }
-        if(!first)
-        	buf.append(")");
+        buf.append(")");
         return buf.toString();
     }
     
@@ -224,8 +222,8 @@ aspect StructureString {
             first = false;
         }
         buf.append("] = ");
-        //buf.append(getAccess());
-        //buf.append(".");
+        buf.append(getAccess());
+        buf.append(".");
         buf.append(getName());
         buf.append("(");
         first = true;
@@ -281,6 +279,24 @@ aspect StructureString {
     eq SuperClass.getStructureStringLessComments() = getName();
     eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString();
     eq Event.getStructureStringLessComments() = getName();
+    
+    eq SuperClassMethodCallExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getFuncName().getStructureString());
+        buf.append("@");
+        buf.append(getClassName().getStructureString());
+        buf.append("(");
+        boolean first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(")");
+        return buf.toString();
+    }
     
     //help comments
     

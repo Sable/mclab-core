@@ -6,6 +6,7 @@ events
 end
 methods
 function obj = myClass
+obj@double;
 x = 125
 end
 b = bbb

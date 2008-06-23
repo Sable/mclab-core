@@ -29,9 +29,9 @@ public class Interpreter {
 			parser.setCommentBuffer(commentBuffer);
 			try {
 				// Temporarily changed to accept a file name - JL 2008.05.27 
-				// NatlabScanner scanner = new NatlabScanner(new FileReader(line));
-				// scanner.setCommentBuffer(commentBuffer);
-				NatlabScanner scanner = new NatlabScanner(new StringReader(line));
+				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
+				scanner.setCommentBuffer(commentBuffer);
+				//NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				Program original = (Program) parser.parse(scanner);
 				if(parser.hasError()) {
 					System.out.println("**ERROR**");
@@ -39,9 +39,16 @@ public class Interpreter {
 						System.out.println(error);
 					}
 				} else {
+					java.util.List<String> weedingErrors = original.getWeedingErrors();
+					if(!weedingErrors.isEmpty()) {
+						System.out.println("Weeding Error(s):");
+						for(String error : weedingErrors) {
+							System.out.println(error);
+						}
+					} else
 					// Using Pretty print
-					System.out.println(original.getPrettyPrinted());
-					// System.out.println(original.getStructureString());
+					//System.out.println(original.getPrettyPrinted());
+					System.out.println(original.getStructureString());
 					// System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {

@@ -1,0 +1,298 @@
+//Weeding Errors
+
+aspect ErrorHelper {
+	public String ASTNode.getPosString() {
+        return "[" + getLine(getStart()) + ", " + getColumn(getStart()) + "]  ";
+    }
+}
+
+aspect WeedingErrors {
+    //default - exception
+    syn java.util.List<String> ASTNode.getWeedingErrors() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingErrors()"); }
+     
+    //program
+    eq EmptyProgram.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        return errors;
+    }
+
+    eq Script.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+    	for(Stmt stmt : getStmts()) {
+    		if(stmt instanceof AssignStmt) {
+            	errors.addAll(stmt.getWeedingErrors());
+            }
+        }
+    	return errors;
+    }
+    
+    eq FunctionList.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        for(Function func : getFunctions()) {
+            errors.addAll(func.getWeedingErrors());
+        }
+        return errors;
+    }
+    
+    eq Function.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        
+        if(getParent().getParent().getClass().getName().indexOf("Methods") != -1) {
+        	String name = getName();
+        	ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
+        	
+	  		if(grandParent.getName().compareTo(getName()) == 0) {
+		  		if(getOutputParams().getNumChild() == 0) {
+	               	errors.add(getPosString() + "A class constructor must at least return an object constructed as output");
+				}
+			}
+        }
+        
+    	for(Stmt stmt : getStmts()) {
+            if(stmt instanceof AssignStmt) {
+            	errors.addAll(stmt.getWeedingErrors());
+            }
+        }
+        for(Function func : getNestedFunctions()) {
+            errors.addAll(func.getWeedingErrors());
+        }
+    	return errors;
+    }
+
+    // Class
+    
+    eq ClassDef.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+
+		String classAttributes = "ConstructOnLoad,InferiorClasses,Hidden,Sealed,";	
+        for(Attribute attr : getAttributes()) {
+        	if(classAttributes.indexOf(attr.getKey()+",") == -1) {
+            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid class attribute");
+            	
+           	}
+           	//ToDo-TA: Values???
+        }
+
+		for(Properties prop : getPropertys()) {
+            errors.addAll(prop.getWeedingErrors());
+        }
+        for(Methods methods : getMethods()) {
+            errors.addAll(methods.getWeedingErrors());
+        }
+        for(ClassEvents events : getClassEvents()) {
+            errors.addAll(events.getWeedingErrors());
+        }
+        return errors;
+    }
+   
+    eq Properties.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        
+        Boolean constExists = false, depExists = false;
+        String propertyAttributes = "Abstract,Constant,Dependent,GetAccess,SetAccess,GetObservable,SetObservable,Hidden,Transient,";	
+        
+        for(Attribute attr : getAttributes()) {
+        	if(propertyAttributes.indexOf(attr.getKey()+",") == -1) {
+            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid property attribute");
+            	
+           	}
+           	//ToDo-TA: Values???
+           	
+           	//ToDo-TA: also add value=true condition below
+           	if(attr.getKey().compareTo("Abstract") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
+           		ClassDef parent = (ClassDef) getParent().getParent();
+           		for(Methods mthd : parent.getMethods()) {
+		            for(PropertyAccess pty : mthd.getPropAccs()) {
+		            	for(Property prop : getPropertys()) {
+			            	if(prop.getName().compareTo(pty.getName()) == 0) {
+			            		errors.add(pty.getPosString() + "Property access methods can not be defined for abstract property: " + prop.getName());
+			            	}
+		            	}
+		            }
+		        }
+		        
+		        for(Property prop : getPropertys()) {
+		        	if(prop.getExpr().getPrettyPrintedLessComments().compareTo("[]") != 0) {
+		        		errors.add(prop.getExpr().getPosString() + "Initial value can not be specified for abstract property: " + prop.getName());            			
+		        	} 
+		        }
+		        
+		        for(Attribute pAttr : parent.getAttributes()) {
+		        	//ToDo-TA: also add value=true condition below
+		        	if(pAttr.getKey().compareTo("Sealed") == 0 && pAttr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
+		            	errors.add(attr.getPosString() + "Abstract properties are not allowed in a sealed class");		            	
+		           	}
+		        }
+			}
+           	
+           	//ToDo-TA: also add value=true conditions below
+           	if(attr.getKey().compareTo("Constant") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) 
+           		constExists = true;
+           	if(attr.getKey().compareTo("Dependent") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) 
+           		depExists = true;
+        }
+        
+        if(constExists && depExists) {
+        	errors.add(getPosString() + "Constant properties can not be Dependent and vice-versa");        	
+       	}
+        
+        for(Property prop : getPropertys()) {
+        	String name = prop.getName();
+            ClassDef grandParent = (ClassDef) getParent().getParent();
+            
+  			if(grandParent.getName().compareTo(name) == 0) {
+        		errors.add(prop.getPosString() + "A property may not use the same name as the name of the class");				
+			}
+        }
+
+        return errors;
+    } 
+    
+    eq Methods.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        
+        String methodAttributes = "Abstract,Access,Hidden,Sealed,Static,";	
+        for(Attribute attr : getAttributes()) {
+        	if(methodAttributes.indexOf(attr.getKey()+",") == -1) {
+            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid method attribute");            	
+           	}
+           	//ToDo-TA: Values???
+           	
+           	if(attr.getKey().compareTo("Abstract") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
+            	if(getPropAccs().getNumChild() > 0 || getFunctions().getNumChild() > 0) {
+            		errors.add(attr.getPosString() + "Only function signatures are valid inside abstract methods block");            		
+            	}
+           	}
+        }
+        
+        for(Signature sign : getSignatures()) {
+            errors.addAll(sign.getWeedingErrors());
+        }
+        for(PropertyAccess prop : getPropAccs()) {
+            errors.addAll(prop.getWeedingErrors());
+        }
+        for(Function func : getFunctions()) {
+            errors.addAll(func.getWeedingErrors());
+        }
+        
+        return errors;
+    }
+    
+    eq Signature.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        
+ 		String name = getName();
+  		ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
+  		
+  		if(grandParent.getName().compareTo(getName()) == 0) {
+        	errors.add(getPosString() + "A class constructor must not be external");			
+		}
+		
+    	return errors;
+    }
+    
+    eq PropertyAccess.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+       
+		Methods parent = (Methods) getParent().getParent();
+		if(parent.getAttributes().getNumChild() > 0){
+			errors.add(getPosString() + "Property access method should be in a methods block with no attributes");			
+		}
+		
+		String access = getAccess();
+		if(access.compareTo("set") != 0 && access.compareTo("get") != 0) {
+			errors.add(getPosString() + access + " is neither get or set in property access method");			
+        }
+        else if(access.compareTo("set") == 0){
+        	if(getInputParams().getNumChild() < 2) {
+               	errors.add(getPosString() + "A property set method must have an object and its value as input");				
+			}
+        }
+        else if(access.compareTo("get") == 0){
+        	if(getInputParams().getNumChild() < 1) {
+               	errors.add(getPosString() + "A property get method must have an object as input");				
+			}
+			if(getOutputParams().getNumChild() < 1) {
+               	errors.add(getPosString() + "A property get method must return its value as output");				
+			}
+        }
+        
+        String name = getName();
+        Boolean match = false; 
+        ClassDef grandParent = (ClassDef) parent.getParent().getParent();
+        for(Properties prop : grandParent.getPropertys()) {
+            for(Property pty : prop.getPropertys()) {
+            	if(name.compareTo(pty.getName()) == 0) {
+            		match = true;
+            		break;
+            	}
+            }
+        }
+        if(!match) {
+        	errors.add(getPosString() + name + " is not a valid property in property access method");			
+        }
+                
+        for(Stmt stmt : getStmts()) {
+            if(stmt instanceof AssignStmt) {
+            	errors.addAll(stmt.getWeedingErrors());            	
+            }
+        }
+        
+        for(Function func : getNestedFunctions()) {
+            errors.addAll(func.getWeedingErrors());            
+        }
+
+        return errors;
+    }
+    
+    eq ClassEvents.getWeedingErrors() {
+        java.util.List<String> errors = new java.util.ArrayList<String>();
+        
+        String eventAttributes = "Hidden,ListenAccess,NotifyAccess,";	
+        for(Attribute attr : getAttributes()) {
+        	if(eventAttributes.indexOf(attr.getKey()+",") == -1) {
+            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid event attribute");            	
+           	}
+           	//ToDo-TA: Values???
+        }
+
+		for(Event eve : getEvents()) {
+			String name = eve.getName();
+            ClassDef grandParent = (ClassDef) getParent().getParent();
+  			
+  			if(grandParent.getName().compareTo(name) == 0) {
+        		errors.add(eve.getPosString() + "An event may not use the same name as the name of the class");				
+			}
+        }
+        
+        return errors;
+    }
+
+    eq AssignStmt.getWeedingErrors() {
+    	java.util.List<String> errors = new java.util.ArrayList<String>();
+    	Expr lhs = getLHS();
+    	
+    	if((lhs instanceof NameExpr) || (lhs instanceof DotExpr) || (lhs instanceof ParameterizedExpr) || (lhs instanceof CellIndexExpr) || (lhs instanceof MatrixExpr)) {
+    		if(lhs instanceof MatrixExpr){
+    			MatrixExpr me = (MatrixExpr) lhs;
+    			Integer noOfRows = 0;
+    			for(Row row : me.getRows()) {
+    				noOfRows++;
+    				if(noOfRows > 1) {
+			        	errors.add(row.getPosString() + "Left hand side of assignment statement can only have a single-row matrix");						
+						break;
+			        }
+    				
+					for(Expr exp : row.getElements()) {
+    					if(!((exp instanceof NameExpr) || (exp instanceof DotExpr) || (exp instanceof ParameterizedExpr) || (exp instanceof CellIndexExpr))) {
+    						errors.add(exp.getPosString() + "Left hand side of assignment statement is not valid matrix expression");							
+    					} 
+    				}
+		        }
+    		}
+    	} else {
+    		errors.add(lhs.getPosString() + "Left hand side of assignment statement is not a valid expression");			
+    	}  	   
+    	return errors;
+    }  
+}

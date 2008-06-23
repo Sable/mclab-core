@@ -433,13 +433,15 @@ methods_body =
   ;
   
 function_signature =
-	 IDENTIFIER.name input_params.in? stmt_separator+ {: return new Signature(null, name, in); :}
+	 IDENTIFIER.name input_params.in? stmt_separator+ {: return new Signature(new List<Name>(), name, in); :}
   |  output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator+ {: return new Signature(out, name, in); :}
   ;
   
 property_access =
      FUNCTION output_params.out ASSIGN IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
          {: return propertyAccess(out, acc, name, in, _list_comments, _list_body); :}
+  |  FUNCTION IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return propertyAccess(null, acc, name, in, _list_comments, _list_body); :}
   ;
   
 events_body =
@@ -622,6 +624,7 @@ primary_expr =
   |  cell_array.c
   |  access.a
   |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  |  name.f AT name.c input_params.in? {: return new SuperClassMethodCallExpr(f, c, nullToEmpty(in)); :}
   ;
 
 access =
