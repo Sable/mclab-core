@@ -92,7 +92,13 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 
 %%
 
-{EscapedLineTerminator} { return handleNonArg(new EllipsisComment(yytext())); }
+{EscapedLineTerminator} { 
+    CommandToken tok = new EllipsisComment(yytext());
+    tok.setLine(yyline + baseLine);
+    tok.setStartCol(yycolumn + baseCol);
+    tok.setEndCol(yycolumn + baseCol + yylength() - 1);
+    return handleNonArg(tok);
+}
 
 {OtherWhiteSpace}+ {
     if(arg.isQuoteCountOdd()) {
