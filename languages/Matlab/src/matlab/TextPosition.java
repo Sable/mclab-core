@@ -36,4 +36,8 @@ public class TextPosition implements Comparable<TextPosition> {
             return colDif;
         }
     }
+
+    public String toString() {
+        return "(" + line + ", " + col + ")";
+    }
 }

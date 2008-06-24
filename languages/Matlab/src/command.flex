@@ -26,6 +26,7 @@ import matlab.CommandToken.EllipsisComment;
   private int baseLine = 1;
   private int baseCol = 1;
   
+  //NB: baseCol only lasts until the first line break
   public void setBasePosition(int baseLine, int baseCol) {
     this.baseLine = baseLine;
     this.baseCol = baseCol;
@@ -92,7 +93,8 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 
 %%
 
-{EscapedLineTerminator} { 
+{EscapedLineTerminator} {
+    baseCol = 1; //NB: reset base col after the first line break
     CommandToken tok = new EllipsisComment(yytext());
     tok.setLine(yyline + baseLine);
     tok.setStartCol(yycolumn + baseCol);

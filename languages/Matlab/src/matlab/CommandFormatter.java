@@ -98,6 +98,8 @@ public class CommandFormatter {
                 int startPos = Symbol.makePosition(tok.getLine(), tok.getStartCol());
                 int endPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
                 formattedSymbols.add(new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText()));
+                offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(i));
+                System.err.println(tok.getText() + " - " + (argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(i)));
                 offsetTracker.advanceToNewLine(1, 1);
             }
         }
@@ -108,6 +110,7 @@ public class CommandFormatter {
         offsetTracker.advanceInLine(1);
     }
 
+    //TODO-AC: is it safe to use indexOf and length?  do we need to use positions for everything?
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
         formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));

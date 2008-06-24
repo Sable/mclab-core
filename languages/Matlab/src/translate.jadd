@@ -20,7 +20,9 @@ aspect Translate {
     
     public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
         StringBuffer buf = new StringBuffer();
-        buf.append(getCmd());
+        String cmd = getCmd();
+        buf.append(cmd);
+        offsetTracker.advanceInLine(cmd.length());
         java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker);
         for(beaver.Symbol node : formattedArgSymbols) {
             String value = (String) node.value;
