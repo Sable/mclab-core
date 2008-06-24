@@ -94,11 +94,11 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 %%
 
 {EscapedLineTerminator} {
-    baseCol = 1; //NB: reset base col after the first line break
     CommandToken tok = new EllipsisComment(yytext());
     tok.setLine(yyline + baseLine);
     tok.setStartCol(yycolumn + baseCol);
     tok.setEndCol(yycolumn + baseCol + yylength() - 1);
+    baseCol = 1; //NB: reset base col after the first line break
     return handleNonArg(tok);
 }
 
