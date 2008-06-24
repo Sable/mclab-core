@@ -108,6 +108,10 @@ public class CommandFormatter {
         offsetTracker.recordOffsetChange(0, -1);
         System.err.println(") - " + (-1));
         offsetTracker.advanceInLine(1);
+        
+        CommandToken lastRescannedTok = rescannedSymbols.get(rescannedSymbols.size() - 1);
+        Symbol lastOriginalSym = originalSymbols.get(originalSymbols.size() - 1);
+        offsetTracker.recordOffsetChange(0, Symbol.getColumn(lastOriginalSym.getEnd()) - lastRescannedTok.getEndCol());
     }
 
     //TODO-AC: it seems to be safe to use indexOf and length for finding positions since JFlex seems
