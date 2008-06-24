@@ -110,7 +110,8 @@ public class CommandFormatter {
         offsetTracker.advanceInLine(1);
     }
 
-    //TODO-AC: is it safe to use indexOf and length?  do we need to use positions for everything?
+    //TODO-AC: it seems to be safe to use indexOf and length for finding positions since JFlex seems
+    //  to give every character length 1 (even, eg tab).  This might change (e.g. full unicode).
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
         formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));
