@@ -15,6 +15,7 @@ aspect Translate {
     }
     
     public String SymbolNode.translate(matlab.OffsetTracker offsetTracker) {
+        offsetTracker.advanceByTextSize(getText());
         return getText();
     }
     
@@ -22,7 +23,7 @@ aspect Translate {
         StringBuffer buf = new StringBuffer();
         String cmd = getCmd();
         buf.append(cmd);
-        offsetTracker.advanceInLine(cmd.length());
+        offsetTracker.advanceByTextSize(cmd);
         java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker);
         for(beaver.Symbol node : formattedArgSymbols) {
             String value = (String) node.value;
@@ -34,10 +35,12 @@ aspect Translate {
     }
     
     public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) {
+        offsetTracker.advanceByTextSize(getText());
         return getText();
     }
     
     public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) {
+        offsetTracker.advanceByTextSize(getText());
         return getText();
     }
 }

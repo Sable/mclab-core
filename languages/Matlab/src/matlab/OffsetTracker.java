@@ -1,5 +1,7 @@
 package matlab;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -28,6 +30,26 @@ public class OffsetTracker {
             throw new IllegalArgumentException("Attempted to move to an invalid column: " + newCol);
         }
         currPos = new TextPosition(currPos.getLine() + numLines, newCol);
+    }
+
+    //NB: slower than specifying in ints
+    public void advanceByTextSize(String text) {
+        StringReader reader = new StringReader(text);
+        LengthScanner scanner = new LengthScanner(reader);
+        TextPosition eofPos = null;
+        try {
+            eofPos = scanner.getEOFPosition();
+            reader.close();
+        } catch(IOException e) {
+            //can't happen since StringReader
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        if(eofPos.getLine() == 1) {
+            advanceInLine(eofPos.getColumn() - 1);
+        } else {
+            advanceToNewLine(eofPos.getLine() - 1, eofPos.getColumn());
+        }
     }
 
     public void recordOffsetChange(int lineOffsetChange, int colOffsetChange) {
