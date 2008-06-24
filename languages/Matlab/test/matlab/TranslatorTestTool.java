@@ -32,7 +32,7 @@ public class TranslatorTestTool {
                 }
             } else {
                 try {
-                    OffsetTracker offsetTracker = new OffsetTracker();
+                    OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
                     String destText = actual.translate(offsetTracker);
                     PositionMap posMap = offsetTracker.buildPositionMap();
 

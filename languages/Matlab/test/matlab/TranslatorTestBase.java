@@ -65,7 +65,7 @@ class TranslatorTestBase extends TestCase {
 
     /* Check deep equality of an AST and the contents of the .out file. */
     public static void assertEquiv(Program actual, Structure expected) {
-        OffsetTracker offsetTracker = new OffsetTracker();
+        OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         try {
             BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getTranslatedText()));
             BufferedReader actualReader = new BufferedReader(new StringReader(actual.translate(offsetTracker)));

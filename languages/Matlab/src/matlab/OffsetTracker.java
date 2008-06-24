@@ -7,35 +7,58 @@ import java.util.TreeMap;
 public class OffsetTracker {
 
     private final Map<TextPosition, OffsetChange> offsetChangeMap;
+    private TextPosition currPos;
 
-    public OffsetTracker() {
+    public OffsetTracker(TextPosition basePos) {
         this.offsetChangeMap = new TreeMap<TextPosition, OffsetChange>();
+        this.currPos = basePos;
     }
 
-    public void recordOffsetChange(TextPosition pos, int lineOffsetChange, int colOffsetChange) {
-        OffsetChange existingOC = offsetChangeMap.get(pos);
+    public void advanceInLine(int numCols) {
+        if(numCols < 0) {
+            throw new IllegalArgumentException("Attempted to move backwards in line: " + numCols);
+        }
+        currPos = new TextPosition(currPos.getLine(), currPos.getColumn() + numCols);
+    }
+
+    public void advanceToNewLine(int numLines, int newCol) {
+        if(numLines < 1) {
+            throw new IllegalArgumentException("Attempted to move to an earlier line: " + numLines);
+        } else if(newCol < 1) {
+            throw new IllegalArgumentException("Attempted to move to an invalid column: " + newCol);
+        }
+        currPos = new TextPosition(currPos.getLine() + numLines, newCol);
+    }
+
+    public void recordOffsetChange(int lineOffsetChange, int colOffsetChange) {
+        if(lineOffsetChange == 0 && colOffsetChange == 0) {
+            return;
+        }
+        OffsetChange existingOC = offsetChangeMap.get(currPos);
         OffsetChange newOC = new OffsetChange(lineOffsetChange, colOffsetChange);
         if(existingOC == null) {
-            offsetChangeMap.put(pos, newOC);
+            offsetChangeMap.put(currPos, newOC);
         } else {
             existingOC.incorporate(newOC);
         }
     }
-    public void recordOffsetChange(int line, int col, int lineOffsetChange, int colOffsetChange) {
-        recordOffsetChange(new TextPosition(line, col), lineOffsetChange, colOffsetChange);
-    }
-
-    public void recordOffsetChange(int pos, int lineOffsetChange, int colOffsetChange) {
-        recordOffsetChange(new TextPosition(pos), lineOffsetChange, colOffsetChange);
-    }
 
     public PositionMap buildPositionMap() { //TODO-AC: verify correctness of map?
+        int accumulatedLineOffset = 0;
+        int line = -1;
+        int lineAccumulatedColOffset = 0;
         SortedMap<TextPosition, Offset> offsetMap = new TreeMap<TextPosition, Offset>();
-        Offset currOffset = new Offset(0, 0);
         //NB: must iterate in order of increasing position
         for(Map.Entry<TextPosition, OffsetChange> entry : offsetChangeMap.entrySet()) {
-            currOffset.incorporate(entry.getValue());
-            offsetMap.put(entry.getKey(), new Offset(currOffset));
+            TextPosition pos = entry.getKey();
+            if(line != pos.getLine()) {
+                line = pos.getLine();
+                lineAccumulatedColOffset = 0;
+            }
+            OffsetChange offsetChange = entry.getValue();
+            accumulatedLineOffset += offsetChange.lineOffsetChange;
+            lineAccumulatedColOffset += offsetChange.colOffsetChange;
+            offsetMap.put(entry.getKey(), new Offset(accumulatedLineOffset, lineAccumulatedColOffset));
         }
         return new OffsetPositionMap(offsetMap);
     }
@@ -76,11 +99,11 @@ public class OffsetTracker {
             this.lineOffset += change.lineOffsetChange;
             this.colOffset += change.colOffsetChange;
         }
-        
+
         TextPosition forwardOffset(TextPosition original) {
             return new TextPosition(original.getLine() + lineOffset, original.getColumn() + colOffset);
         }
-        
+
         TextPosition reverseOffset(TextPosition original) {
             return new TextPosition(original.getLine() - lineOffset, original.getColumn() - colOffset);
         }

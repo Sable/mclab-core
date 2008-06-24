@@ -8,7 +8,6 @@ import java.util.List;
 import matlab.CommandToken.Arg;
 import matlab.CommandToken.EllipsisComment;
 import matlab.ExtractionParser.Terminals;
-import beaver.Scanner;
 import beaver.Symbol;
 
 public class CommandFormatter {
@@ -36,7 +35,7 @@ public class CommandFormatter {
         }
         if(offsetTracker == null) {
             //easier than checking for null everywhere
-            offsetTracker = new OffsetTracker();
+            offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         }
         CommandFormatter cf = new CommandFormatter(originalSymbols, offsetTracker);
         cf.rescan();
@@ -77,59 +76,106 @@ public class CommandFormatter {
 
     //TODO-AC: track position changes
     private void format() {
-        int colOffsetChangeInLine = 0;
-        int startLine = rescannedSymbols.get(0).getLine();
-        int startCol = rescannedSymbols.get(0).getStartCol();
-        //NB: column may have the invalid value zero.
-        //    this shouldn't matter since it will still preceded the first position
-        offsetTracker.recordOffsetChange(startLine, startCol - 1, 0, 1);
-        colOffsetChangeInLine++;
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
-        int i = 0;
-        for(CommandToken tok : rescannedSymbols) {
-            Symbol sym = convertToSymbol(tok);
-            formattedSymbols.add(sym);
-            int symEndPos = sym.getEnd();
-            if(!isFiller(sym)) {
-                if(i < numArgs - 1) {
-                    offsetTracker.recordOffsetChange(symEndPos, 0, 1);
-                    colOffsetChangeInLine++;
+        offsetTracker.recordOffsetChange(0, findPrecedingWhitespaceLength(0));
+        System.err.println("( - " + findPrecedingWhitespaceLength(0));
+        offsetTracker.advanceInLine(1);
+
+        int argsSeen = 0; //used to figure out when we're at the last arg
+        for(int i = 0; i < rescannedSymbols.size(); i++) {
+            CommandToken tok = rescannedSymbols.get(i);
+            if(tok instanceof Arg) {
+                formatArg(argsSeen, i, (Arg) tok);
+
+                if(argsSeen < numArgs - 1) {
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
+                    offsetTracker.recordOffsetChange(0, -1);
+                    System.err.println(", - " + (-1));
+                    offsetTracker.advanceInLine(1);
                 }
-                i++;
-            } else if(sym.getId() == Terminals.ELLIPSIS_COMMENT) { //only way to increase line num
-                offsetTracker.recordOffsetChange(symEndPos, 0, -1 * colOffsetChangeInLine);
-                colOffsetChangeInLine = 0;
+                argsSeen++;
+            } else if(tok instanceof EllipsisComment) {
+                int startPos = Symbol.makePosition(tok.getLine(), tok.getStartCol());
+                int endPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
+                formattedSymbols.add(new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText()));
+                offsetTracker.advanceToNewLine(1, 1);
             }
         }
-        
-        int endLine = rescannedSymbols.get(rescannedSymbols.size() - 1).getLine();
-        int endCol = rescannedSymbols.get(rescannedSymbols.size() - 1).getEndCol();
-        offsetTracker.recordOffsetChange(endLine, endCol, 0, 1);
-        colOffsetChangeInLine++;
-        formattedSymbols.add(new Symbol(")"));//TODO-AC: id?
+
+        formattedSymbols.add(new Symbol(")")); //TODO-AC: id?
+        offsetTracker.recordOffsetChange(0, -1);
+        System.err.println(") - " + (-1));
+        offsetTracker.advanceInLine(1);
     }
-    
-    private static Symbol convertToSymbol(CommandToken tok) {
-        int startLine = tok.getLine();
-        int startCol = tok.getStartCol();
-        int startPos = Symbol.makePosition(startLine, startCol);
-        int endLine = tok.getLine();
-        int endCol = tok.getEndCol();
-        int endPos = Symbol.makePosition(endLine, endCol);
-        if(tok instanceof Arg) {
-            return new Symbol(Terminals.STRING, startPos, endPos, "'" + ((Arg) tok).getArgText() + "'");
-        } else if(tok instanceof EllipsisComment) {
-            return new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText());
+
+    private void formatArg(int argsSeen, int tokNum, Arg tok) {
+        formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
+        offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));
+        System.err.println("' - " + (argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum)));
+        offsetTracker.advanceInLine(1);
+
+        String argText = tok.getArgText();
+        String text = tok.getText();
+        int textIndex = -1;
+        for(char ch : argText.toCharArray()) {
+            int newTextIndex = text.indexOf(ch, textIndex + 1);
+            if(textIndex < 0) {
+                textIndex = 0;
+            }
+            offsetTracker.recordOffsetChange(0, newTextIndex - textIndex - 1);
+            System.err.println(ch + " - " + (newTextIndex - textIndex - 1));
+            offsetTracker.advanceInLine(1);
+            textIndex = newTextIndex;
+        }
+
+        int argStartPos = Symbol.makePosition(tok.getLine(), tok.getStartCol());
+        int argEndPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
+        formattedSymbols.add(new Symbol(Terminals.STRING, argStartPos, argEndPos, argText));
+
+        formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
+        offsetTracker.recordOffsetChange(0, (text.length() - 1) - textIndex - 1);
+        System.err.println("' - " + ((text.length() - 1) - textIndex - 1));
+        offsetTracker.advanceInLine(1);
+    }
+
+    private int findPrecedingWhitespaceLength(int rescannedSymbolNum) {
+        if(rescannedSymbolNum == 0) {
+            int firstNonFillerPos = 0;
+            for(Symbol sym : originalSymbols) {
+                if(!isFiller(sym)) {
+                    //must happen at least once - won't reach this point if there are no args
+                    break;
+                }
+                firstNonFillerPos++;
+            }
+            int length = 0;
+            for(int i = firstNonFillerPos - 1; i >= 0; i--) {
+                Symbol sym = originalSymbols.get(i);
+                if(sym.getId() != Terminals.OTHER_WHITESPACE) {
+                    break;
+                }
+                int startPos = sym.getStart();
+                int endPos = sym.getEnd();
+                length += Symbol.getColumn(endPos) - Symbol.getColumn(startPos) + 1;
+            }
+            return length;
         } else {
-            throw new IllegalArgumentException("Unexpected token type: " + tok.getClass().getName());
+            CommandToken tok = rescannedSymbols.get(rescannedSymbolNum);
+            CommandToken precedingTok = rescannedSymbols.get(rescannedSymbolNum - 1);
+            if(precedingTok instanceof EllipsisComment) {
+                //=> first arg on this line - just use pos
+                return tok.getStartCol() - 1;
+            } else {
+                //use distance from previous token
+                return tok.getStartCol() - precedingTok.getEndCol() - 1;
+            }
         }
     }
-    
+
     private static boolean isFiller(CommandToken tok) {
         return tok instanceof EllipsisComment;
     }
-    
+
     private static boolean isFiller(Symbol sym) {
         short type = sym.getId();
         return (type == Terminals.OTHER_WHITESPACE) || (type == Terminals.ELLIPSIS_COMMENT);

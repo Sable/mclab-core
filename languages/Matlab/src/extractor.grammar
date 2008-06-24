@@ -304,7 +304,11 @@ stmt_body =
                 //no args => simple function call or variable expr
                 return cmd;
             }
-            return new MaybeCmdExtract(cmd, (ArrayList<beaver.Symbol>) args.value);
+            ArrayList<beaver.Symbol> argSyms = new ArrayList<beaver.Symbol>();
+            for(Object o : (ArrayList) args.value) {
+                argSyms.add((beaver.Symbol) ((beaver.Symbol) o).value);
+            }
+            return new MaybeCmdExtract(cmd, argSyms);
         :}
   |  expr_not_starting_with_id
   |  expr_not_starting_with_id.s1 ASSIGN.s2 nbf.s3* expr_not_starting_with_id.s4
@@ -337,68 +341,69 @@ stmt_body =
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
+//Wrap each symbol in antoher symbol so that when beaver mangles the IDs, the original symbols are still recoverable
 command_arg =
   //expr tokens (NB: not just delegating because returns may be different)
-     IDENTIFIER
-  |  LT
-  |  GT
-  |  LE
-  |  GE
-  |  EQ
-  |  NE
-  |  AND
-  |  OR
-  |  SHORTAND
-  |  SHORTOR
-  |  COLON
-  |  MTIMES
-  |  ETIMES
-  |  MDIV
-  |  EDIV
-  |  MLDIV
-  |  ELDIV
-  |  PLUS
-  |  MINUS
-  |  NOT
-  |  MPOW
-  |  EPOW
-  |  ARRAYTRANSPOSE
-  |  MTRANSPOSE
-  |  AT
-  |  DOT
-  |  NUMBER
-  |  STRING
-  |  PARENTHESIZED
-  |  MATRIX
-  |  CELL_ARRAY
+     IDENTIFIER.s {: return new Symbol(s); :}
+  |  LT.s {: return new beaver.Symbol(s); :}
+  |  GT.s {: return new beaver.Symbol(s); :}
+  |  LE.s {: return new beaver.Symbol(s); :}
+  |  GE.s {: return new beaver.Symbol(s); :}
+  |  EQ.s {: return new beaver.Symbol(s); :}
+  |  NE.s {: return new beaver.Symbol(s); :}
+  |  AND.s {: return new beaver.Symbol(s); :}
+  |  OR.s {: return new beaver.Symbol(s); :}
+  |  SHORTAND.s {: return new beaver.Symbol(s); :}
+  |  SHORTOR.s {: return new beaver.Symbol(s); :}
+  |  COLON.s {: return new beaver.Symbol(s); :}
+  |  MTIMES.s {: return new beaver.Symbol(s); :}
+  |  ETIMES.s {: return new beaver.Symbol(s); :}
+  |  MDIV.s {: return new beaver.Symbol(s); :}
+  |  EDIV.s {: return new beaver.Symbol(s); :}
+  |  MLDIV.s {: return new beaver.Symbol(s); :}
+  |  ELDIV.s {: return new beaver.Symbol(s); :}
+  |  PLUS.s {: return new beaver.Symbol(s); :}
+  |  MINUS.s {: return new beaver.Symbol(s); :}
+  |  NOT.s {: return new beaver.Symbol(s); :}
+  |  MPOW.s {: return new beaver.Symbol(s); :}
+  |  EPOW.s {: return new beaver.Symbol(s); :}
+  |  ARRAYTRANSPOSE.s {: return new beaver.Symbol(s); :}
+  |  MTRANSPOSE.s {: return new beaver.Symbol(s); :}
+  |  AT.s {: return new beaver.Symbol(s); :}
+  |  DOT.s {: return new beaver.Symbol(s); :}
+  |  NUMBER.s {: return new beaver.Symbol(s); :}
+  |  STRING.s {: return new beaver.Symbol(s); :}
+  |  PARENTHESIZED.s {: return new beaver.Symbol(s); :}
+  |  MATRIX.s {: return new beaver.Symbol(s); :}
+  |  CELL_ARRAY.s {: return new beaver.Symbol(s); :}
   //other tokens
-  |  SHELL_COMMAND
-  |  BREAK
-  |  CASE
-  |  CATCH
-  |  CLASSDEF
-  |  CONTINUE
-  |  ELSE
-  |  ELSEIF
-  |  END
-  |  FOR
-  |  FUNCTION
-  |  GLOBAL
-  |  IF
-  |  OTHERWISE
-  |  PARFOR
-  |  PERSISTENT
-  |  RETURN
-  |  SWITCH
-  |  TRY
-  |  WHILE
-  |  ASSIGN
-  |  METHODS
-  |  PROPERTIES_BLOCK
-  |  EVENTS_BLOCK
-  |  OTHER_WHITESPACE
-  |  ELLIPSIS_COMMENT
-  |  MISC
+  |  SHELL_COMMAND.s {: return new beaver.Symbol(s); :}
+  |  BREAK.s {: return new beaver.Symbol(s); :}
+  |  CASE.s {: return new beaver.Symbol(s); :}
+  |  CATCH.s {: return new beaver.Symbol(s); :}
+  |  CLASSDEF.s {: return new beaver.Symbol(s); :}
+  |  CONTINUE.s {: return new beaver.Symbol(s); :}
+  |  ELSE.s {: return new beaver.Symbol(s); :}
+  |  ELSEIF.s {: return new beaver.Symbol(s); :}
+  |  END.s {: return new beaver.Symbol(s); :}
+  |  FOR.s {: return new beaver.Symbol(s); :}
+  |  FUNCTION.s {: return new beaver.Symbol(s); :}
+  |  GLOBAL.s {: return new beaver.Symbol(s); :}
+  |  IF.s {: return new beaver.Symbol(s); :}
+  |  OTHERWISE.s {: return new beaver.Symbol(s); :}
+  |  PARFOR.s {: return new beaver.Symbol(s); :}
+  |  PERSISTENT.s {: return new beaver.Symbol(s); :}
+  |  RETURN.s {: return new beaver.Symbol(s); :}
+  |  SWITCH.s {: return new beaver.Symbol(s); :}
+  |  TRY.s {: return new beaver.Symbol(s); :}
+  |  WHILE.s {: return new beaver.Symbol(s); :}
+  |  ASSIGN.s {: return new beaver.Symbol(s); :}
+  |  METHODS.s {: return new beaver.Symbol(s); :}
+  |  PROPERTIES_BLOCK.s {: return new beaver.Symbol(s); :}
+  |  EVENTS_BLOCK.s {: return new beaver.Symbol(s); :}
+  |  OTHER_WHITESPACE.s {: return new beaver.Symbol(s); :}
+  |  ELLIPSIS_COMMENT.s {: return new beaver.Symbol(s); :}
+  |  MISC.s {: return new beaver.Symbol(s); :}
 
 //NB: NOT these
 //  |  COMMENT
