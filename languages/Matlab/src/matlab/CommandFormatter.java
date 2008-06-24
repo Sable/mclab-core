@@ -74,7 +74,6 @@ public class CommandFormatter {
         }
     }
 
-    //TODO-AC: track position changes
     private void format() {
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, findPrecedingWhitespaceLength(0));
