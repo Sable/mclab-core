@@ -133,7 +133,7 @@ expr =
   ;
 
 logic_expr =
-     colon_expr.e
+     colon_expr
   |  logic_expr LT logic_expr
   |  logic_expr GT logic_expr
   |  logic_expr LE logic_expr
