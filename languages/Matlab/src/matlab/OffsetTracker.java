@@ -54,16 +54,13 @@ public class OffsetTracker {
 
     public void recordOffsetChange(int lineOffsetChange, int colOffsetChange) {
         if(lineOffsetChange == 0 && colOffsetChange == 0) {
-            System.err.println("Discarding offset change at " + currPos);
             return;
         }
         OffsetChange existingOC = offsetChangeMap.get(currPos);
         OffsetChange newOC = new OffsetChange(lineOffsetChange, colOffsetChange);
         if(existingOC == null) {
-            System.err.println("recordOffsetChange: " + currPos + " " + newOC);
             offsetChangeMap.put(currPos, newOC);
         } else {
-            System.err.println("Updating offset change at " + currPos);
             existingOC.incorporate(newOC);
         }
     }
@@ -85,9 +82,6 @@ public class OffsetTracker {
             lineAccumulatedColOffset += offsetChange.colOffsetChange;
             offsetMap.put(pos, new Offset(accumulatedLineOffset, lineAccumulatedColOffset));
             offsetMap.put(new TextPosition(pos.getLine() + 1, 1), new Offset(accumulatedLineOffset, 0)); //expect this to be overridden
-        }
-        for(Map.Entry<TextPosition, Offset> entry : offsetMap.entrySet()) {
-            System.err.println("Offset entry: " + entry.getKey() + " " + entry.getValue());
         }
         return new OffsetPositionMap(offsetMap);
     }

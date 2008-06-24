@@ -78,7 +78,6 @@ public class CommandFormatter {
     private void format() {
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, findPrecedingWhitespaceLength(0));
-        System.err.println("( - " + findPrecedingWhitespaceLength(0));
         offsetTracker.advanceInLine(1);
 
         int argsSeen = 0; //used to figure out when we're at the last arg
@@ -90,7 +89,6 @@ public class CommandFormatter {
                 if(argsSeen < numArgs - 1) {
                     formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
                     offsetTracker.recordOffsetChange(0, -1);
-                    System.err.println(", - " + (-1));
                     offsetTracker.advanceInLine(1);
                 }
                 argsSeen++;
@@ -99,14 +97,12 @@ public class CommandFormatter {
                 int endPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
                 formattedSymbols.add(new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText()));
                 offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(i));
-                System.err.println(tok.getText() + " - " + (argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(i)));
                 offsetTracker.advanceToNewLine(1, 1);
             }
         }
 
         formattedSymbols.add(new Symbol(")")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, -1);
-        System.err.println(") - " + (-1));
         offsetTracker.advanceInLine(1);
         
         CommandToken lastRescannedTok = rescannedSymbols.get(rescannedSymbols.size() - 1);
@@ -119,7 +115,6 @@ public class CommandFormatter {
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
         formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));
-        System.err.println("' - " + (argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum)));
         offsetTracker.advanceInLine(1);
 
         String argText = tok.getArgText();
@@ -131,7 +126,6 @@ public class CommandFormatter {
                 textIndex = 0;
             }
             offsetTracker.recordOffsetChange(0, newTextIndex - textIndex - 1);
-            System.err.println(ch + " - " + (newTextIndex - textIndex - 1));
             offsetTracker.advanceInLine(1);
             textIndex = newTextIndex;
         }
@@ -142,7 +136,6 @@ public class CommandFormatter {
 
         formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, (text.length() - 1) - textIndex - 1);
-        System.err.println("' - " + ((text.length() - 1) - textIndex - 1));
         offsetTracker.advanceInLine(1);
     }
 
