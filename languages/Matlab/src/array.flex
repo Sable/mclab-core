@@ -115,33 +115,12 @@ import beaver.Scanner;
     return symbol(type, value, pos.startLine, pos.startCol, pos.endLine, pos.endCol);
   }
   
-  //like symbol(type), but uses the start position stored in pos rather than
-  //the start position computed by JFlex and an explicit length param rather
-  //than yylength
-  private Symbol symbolFromMarkedStart(short type, int length) {
-    return symbolFromMarkedStart(type, null, length);
-  }
-  
-  //like symbol(type, value), but uses the start position stored in pos rather than
-  //the start position computed by JFlex and an explicit length param rather
-  //than yylength
-  private Symbol symbolFromMarkedStart(short type, Object value, int length) {
-    return symbol(type, value, pos.startLine, pos.startCol, pos.startLine, pos.startCol + length - 1);
-  }
-  
   //// Errors //////////////////////////////////////////////////////////////////
   
   //throw an exceptions with position information from JFlex
   private void error(String msg) throws Scanner.Exception {
     //correct to one-indexed
     throw new Scanner.Exception(yyline + 1, yycolumn + 1, msg);
-  }
-  
-  //throw an exceptions with position information from JFlex
-  //columnOffset is added to the column
-  private void error(String msg, int columnOffset) throws Scanner.Exception {
-  //correct to one-indexed
-    throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
   }
   
   //// Comment nesting /////////////////////////////////////////////////////////
