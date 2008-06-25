@@ -26,6 +26,7 @@ import matlab.CommandToken.EllipsisComment;
   private int baseLine = 1;
   private int baseCol = 1;
   
+  //TODO-AC: supposedly, jflex 1.4.2 would let us put this in the constructor where it belongs
   //NB: baseCol only lasts until the first line break
   public void setBasePosition(int baseLine, int baseCol) {
     this.baseLine = baseLine;
