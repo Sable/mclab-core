@@ -250,32 +250,6 @@ import beaver.Scanner;
   
   //for accumulating the contents of a string literal
   private StringBuffer strBuf = new StringBuffer();
-    
-  //// Command-style call arguments ////////////////////////////////////////////
-    
-  private StringBuffer cmdArgBuf = new StringBuffer();
-  private int cmdQuoteCount = 0;
-  private boolean cmdArgPrevCharWasQuote = false;
-  
-  private Symbol cmdArgSymbol() {
-    String cmdArg = cmdArgBuf.toString();
-    cmdArgBuf = new StringBuffer();
-    cmdQuoteCount = 0;
-    cmdArgPrevCharWasQuote = false;
-    
-    return symbolFromMarkedPositions(STRING, cmdArg);
-  }
-    
-  private Symbol endCmdArg() throws Scanner.Exception {
-    if(cmdQuoteCount % 2 == 1) {
-        error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-    }
-    yypushback(yylength());
-    markEndPosition();
-    Symbol sym = (cmdArgBuf.length() == 0) ? null : cmdArgSymbol();
-    restoreState();
-    return sym;
-  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -322,8 +296,6 @@ ValidEscape=\\[bfnrt\\\"]
 %xstate SEMICOLON_TERMINATOR
 //within a string literal
 %xstate INSIDE_STRING
-//inside a command-style call
-%xstate COMMAND
 
 %%
 
@@ -617,66 +589,6 @@ ValidEscape=\\[bfnrt\\\"]
     
     //NB: lower precedence than ellipsis
     \. { return symbol(DOT); }
-}
-
-<COMMAND> {
-    //not stringified - return collected string and restore state
-    {LineTerminator} | "," | ";" | "%" { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    <<EOF>> { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    
-    {EscapedLineTerminator} {
-        if(cmdQuoteCount % 2 == 1) {
-            error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-        } else {
-            commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
-            if(cmdArgBuf.length() > 0) {
-                return cmdArgSymbol();
-            }
-        }
-    }
-    
-    {OtherWhiteSpace}+ {
-        if(cmdQuoteCount % 2 == 1) {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        } else if(cmdArgBuf.length() > 0) {
-            return cmdArgSymbol();
-        }
-    }
-    
-    //an initial "=" or "(" is not stringified
-    "=" | "(" {
-        if(cmdArgBuf.length() == 0) {
-            Symbol sym = endCmdArg();
-            if(sym != null) {
-                return sym;
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-    }
-    
-    //an initial "==" IS stringified
-    "==" | . {
-        if(cmdArgBuf.length() == 0) {
-            markStartPosition();
-        }
-        boolean isQuote = yytext().equals("'");
-        if(isQuote) {
-            cmdQuoteCount++;
-            if(cmdArgPrevCharWasQuote && (cmdQuoteCount % 2 == 1)) {
-                cmdArgBuf.append("''");
-                markEndPosition(); //NB: this will likely be overwritten before the string is returned
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-        cmdArgPrevCharWasQuote = isQuote;
-    }
 }
 
 /* error fallback */
