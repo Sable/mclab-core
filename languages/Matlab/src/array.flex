@@ -24,6 +24,29 @@ import beaver.Scanner;
 %column
 
 %{
+  //// Keyword handling ////////////////////////////////////////////////////////
+
+  private boolean inClass = false;
+  
+  public void setInClass(boolean inClass) {
+    this.inClass = inClass;
+  }
+  
+  public boolean isInClass() {
+    return inClass;
+  }
+  
+  private Symbol handleClassKeyword(Symbol sym) throws Scanner.Exception {
+    if(inClass) {
+        keywordError();
+    }
+    return sym;
+  }
+  
+  private void keywordError() throws Scanner.Exception {
+    error("The keyword '" + yytext() + "' may not appear in an expression.");
+  }
+
   //// Returning symbols ///////////////////////////////////////////////////////
 
   //Create a symbol using the current line and column number, as computed by JFlex
@@ -131,55 +154,12 @@ import beaver.Scanner;
     throw new Scanner.Exception(yyline + 1, yycolumn + 1 + columnOffset, msg);
   }
   
-  //// Numbers /////////////////////////////////////////////////////////////////
-  
-  private DecIntNumericLiteralValue parseDecInt(String text, boolean imaginary) throws Scanner.Exception {
-      try { 
-          return new DecIntNumericLiteralValue(yytext(), imaginary);
-      } catch(NumberFormatException e) {
-          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
-          return null; //unreachable - error throws an exception
-      }
-  }
-  
-  private HexNumericLiteralValue parseHexInt(String text, boolean imaginary) throws Scanner.Exception {
-      try { 
-          return new HexNumericLiteralValue(yytext(), imaginary);
-      } catch(NumberFormatException e) {
-          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
-          return null; //unreachable - error throws an exception
-      }
-  }
-  
-  private FPNumericLiteralValue parseFP(String text, boolean imaginary) throws Scanner.Exception {
-      try { 
-          return new FPNumericLiteralValue(yytext(), imaginary);
-      } catch(NumberFormatException e) {
-          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
-          return null; //unreachable - error throws an exception
-      }
-  }
-  
   //// Comment nesting /////////////////////////////////////////////////////////
   
   //number of '%}'s expected
   private int bracketCommentNestingDepth = 0;
   //bracket comment string consumed so far
   private StringBuffer bracketCommentBuf = null;
-  
-  //// Comment queue ///////////////////////////////////////////////////////////
-  
-  //put comments in the buffer rather than returning them
-  //NB: must be non-null before scanning starts
-  private CommentBuffer commentBuffer = null;
-  
-  public void setCommentBuffer(CommentBuffer commentBuffer) {
-      this.commentBuffer = commentBuffer;
-  }
-  
-  public CommentBuffer getCommentBuffer() {
-      return commentBuffer;
-  }
   
   //// State transitions ///////////////////////////////////////////////////////
   
@@ -210,19 +190,6 @@ import beaver.Scanner;
     pos = rec.pos;
   }
   
-  //// End-bracketing //////////////////////////////////////////////////////////
-  
-  //Number of end keywords expected before we leave the CLASS state
-  //NB: NOT USED TO VERIFY STRUCTURE (that happens in the parser)
-  int numEndsExpected = 0;
-  
-  //Increment the number of 'end's expected if we are in the CLASS state
-  void maybeIncrNumEndsExpected() {
-    if(yystate() == CLASS) {
-        numEndsExpected++;
-    }
-  }
-  
   //// Transpose ///////////////////////////////////////////////////////////////
   
   //if any of these symbols is seen, then an immediately following single-quote
@@ -233,10 +200,7 @@ import beaver.Scanner;
   static {
     //NB: cannot contain DOT
     TYPE_PRECEDING_TRANSPOSE.add(IDENTIFIER);
-    TYPE_PRECEDING_TRANSPOSE.add(INT_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(IM_INT_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(FP_NUMBER);
-    TYPE_PRECEDING_TRANSPOSE.add(IM_FP_NUMBER);
+    TYPE_PRECEDING_TRANSPOSE.add(NUMBER);
     TYPE_PRECEDING_TRANSPOSE.add(RPAREN);
     TYPE_PRECEDING_TRANSPOSE.add(RSQUARE);
     TYPE_PRECEDING_TRANSPOSE.add(RCURLY);
@@ -250,32 +214,6 @@ import beaver.Scanner;
   
   //for accumulating the contents of a string literal
   private StringBuffer strBuf = new StringBuffer();
-    
-  //// Command-style call arguments ////////////////////////////////////////////
-    
-  private StringBuffer cmdArgBuf = new StringBuffer();
-  private int cmdQuoteCount = 0;
-  private boolean cmdArgPrevCharWasQuote = false;
-  
-  private Symbol cmdArgSymbol() {
-    String cmdArg = cmdArgBuf.toString();
-    cmdArgBuf = new StringBuffer();
-    cmdQuoteCount = 0;
-    cmdArgPrevCharWasQuote = false;
-    
-    return symbolFromMarkedPositions(STRING, cmdArg);
-  }
-    
-  private Symbol endCmdArg() throws Scanner.Exception {
-    if(cmdQuoteCount % 2 == 1) {
-        error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-    }
-    yypushback(yylength());
-    markEndPosition();
-    Symbol sym = (cmdArgBuf.length() == 0) ? null : cmdArgSymbol();
-    restoreState();
-    return sym;
-  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -294,17 +232,13 @@ Imaginary = [iIjJ]
 IntNumber = {Digit}+
 FPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?
 HexNumber = 0[xX]{HexDigit}+
-ImaginaryIntNumber = {Digit}+{Imaginary}
-ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
-ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
+Number = ({IntNumber} | {FPNumber} | {HexNumber}) {Imaginary}?
 
 HelpComment=%% | %%[^{\r\n].*
 OpenBracketHelpComment = %%\{
 Comment=% | %[^%{\r\n].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
-
-ShellCommand=[!].*
 
 ValidEscape=\\[bfnrt\\\"]
 
@@ -314,16 +248,8 @@ ValidEscape=\\[bfnrt\\\"]
 %xstate COMMENT_NESTING
 //within a bracket help comment (i.e. %%{)
 %xstate HELP_COMMENT_NESTING
-//within a classdef
-%state CLASS
-//seen a comma - could be COMMA or COMMA_LINE_TERMINATOR
-%xstate COMMA_TERMINATOR
-//seen a semicolon - could be SEMICOLON or SEMICOLON_LINE_TERMINATOR
-%xstate SEMICOLON_TERMINATOR
 //within a string literal
 %xstate INSIDE_STRING
-//inside a command-style call
-%xstate COMMAND
 
 %%
 
@@ -332,7 +258,7 @@ ValidEscape=\\[bfnrt\\\"]
 //... comment
 {EscapedLineTerminator} {
     transposeNext = false;
-    commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
+    return symbol(ELLIPSIS_COMMENT, yytext());
 }
 
 //whitespace
@@ -340,12 +266,7 @@ ValidEscape=\\[bfnrt\\\"]
 {OtherWhiteSpace} { transposeNext = false; /* ignore */ }
 
 //numeric literals
-{IntNumber} { return symbol(INT_NUMBER, parseDecInt(yytext(), false)); }
-{FPNumber} { return symbol(FP_NUMBER, parseFP(yytext(), false)); }
-{HexNumber} { return symbol(INT_NUMBER, parseHexInt(yytext(), false)); }
-{ImaginaryIntNumber} { return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); }
-{ImaginaryFPNumber} { return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); }
-{ImaginaryHexNumber} { return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); }
+{Number} { return symbol(NUMBER, yytext()); }
 
 //MTRANSPOSE or STRING (start)
 "'" {
@@ -378,7 +299,7 @@ ValidEscape=\\[bfnrt\\\"]
 
 //single-line comments
 {HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { transposeNext = false; commentBuffer.pushComment(symbol(COMMENT, yytext())); }
+{Comment} { transposeNext = false; return symbol(COMMENT, yytext()); }
 
 //start multiline help comment
 {OpenBracketHelpComment} {
@@ -421,7 +342,7 @@ ValidEscape=\\[bfnrt\\\"]
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(BRACKET_COMMENT, bracketCommentBuf.toString());
             restoreState();
-            commentBuffer.pushComment(sym);
+            return sym;
         }
     }
 }
@@ -440,9 +361,6 @@ ValidEscape=\\[bfnrt\\\"]
     }
 }
 
-//bang (!) syntax
-{ShellCommand} { return symbol(SHELL_COMMAND, yytext().substring(1)); }
-
 //bracketing
 \( { return symbol(LPAREN); }
 \) { return symbol(RPAREN); }
@@ -452,64 +370,8 @@ ValidEscape=\\[bfnrt\\\"]
 \} { return symbol(RCURLY); }
 
 //stmt terminators
-, { transposeNext = false; saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
-; { transposeNext = false; saveStateAndTransition(SEMICOLON_TERMINATOR); markStartPosition(); }
-
-//consume whitespace and comments if this will turn into a COMMA_/SEMICOLON_LINE_TERMINATOR
-<COMMA_TERMINATOR, SEMICOLON_TERMINATOR> {
-    {OtherWhiteSpace} { /* ignore */ }
-
-    {Comment} { commentBuffer.pushComment(symbol(COMMENT, yytext())); }
-
-    {OpenBracketComment} {
-        saveStateAndTransition(COMMENT_NESTING);
-        markStartPosition();
-        bracketCommentNestingDepth++;
-        bracketCommentBuf = new StringBuffer(yytext());
-    }
-}
-
-//terminate or kick out of COMMA/COMMA_LINE_TERMINATOR
-<COMMA_TERMINATOR> {
-    {LineTerminator} { 
-        markEndPosition();
-        Symbol sym = symbolFromMarkedPositions(COMMA_LINE_TERMINATOR);
-        restoreState();
-        return sym;
-    }
-    <<EOF>> { 
-        Symbol sym = symbolFromMarkedStart(COMMA, 1);
-        restoreState();
-        return sym;
-    }
-    . { 
-        yypushback(1);
-        Symbol sym = symbolFromMarkedStart(COMMA, 1);
-        restoreState();
-        return sym;
-    }
-}
-
-//terminate or kick out of SEMICOLON/SEMICOLON_LINE_TERMINATOR
-<SEMICOLON_TERMINATOR> {
-    {LineTerminator} { 
-        markEndPosition();
-        Symbol sym = symbolFromMarkedPositions(SEMICOLON_LINE_TERMINATOR);
-        restoreState();
-        return sym;
-    }
-    <<EOF>> { 
-        Symbol sym = symbolFromMarkedStart(SEMICOLON, 1);
-        restoreState();
-        return sym;
-    }
-    . { 
-        yypushback(1);
-        Symbol sym = symbolFromMarkedStart(SEMICOLON, 1);
-        restoreState();
-        return sym;
-    }
-}
+, { return symbol(COMMA); }
+; { return symbol(SEMICOLON); }
 
 //misc punctuation
 : { return symbol(COLON); }
@@ -544,65 +406,34 @@ ValidEscape=\\[bfnrt\\\"]
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
 
-"=" { return symbol(ASSIGN); }
+properties { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
+methods { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
+events { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
+
+break { keywordError(); }
+case { keywordError(); }
+catch { keywordError(); }
+classdef { keywordError(); }
+continue { keywordError(); }
+else { keywordError(); }
+elseif { keywordError(); }
+end { keywordError(); }
+for { keywordError(); }
+function { keywordError(); }
+global { keywordError(); }
+if { keywordError(); }
+otherwise { keywordError(); }
+parfor { keywordError(); }
+persistent { keywordError(); }
+return { keywordError(); }
+switch { keywordError(); }
+try { keywordError(); }
+while { keywordError(); }
+
+//NB: lower precedence than keywords
+{Identifier} { return symbol(IDENTIFIER, yytext()); }
 
 <YYINITIAL> {
-    classdef {
-        numEndsExpected++; 
-        saveStateAndTransition(CLASS);
-        return symbol(CLASSDEF);
-    }
-    
-    end { return symbol(END); }
-}
-
-<CLASS> {
-    classdef { numEndsExpected++; return symbol(CLASSDEF); }
-    
-    end {
-        numEndsExpected--;
-        if(numEndsExpected == 0) {
-            restoreState();
-        }
-        return symbol(END); //NB: just return normal END token
-    }
-    
-    //properties { return symbol(PROPERTIES); }
-    //methods { return symbol(METHODS); }
-    //events { return symbol(EVENTS); }
-    
-    properties { numEndsExpected++; return symbol(PROPERTIES); }
-    methods { numEndsExpected++; return symbol(METHODS); }
-    events { numEndsExpected++; return symbol(EVENTS); }
-}
-
-<YYINITIAL, CLASS> {
-    //from matlab "iskeyword" function
-    
-    case { maybeIncrNumEndsExpected(); return symbol(CASE); }
-    for { maybeIncrNumEndsExpected(); return symbol(FOR); }
-    function { maybeIncrNumEndsExpected(); return symbol(FUNCTION); }
-    if { maybeIncrNumEndsExpected(); return symbol(IF); }
-    parfor { maybeIncrNumEndsExpected(); return symbol(PARFOR); }
-    switch { maybeIncrNumEndsExpected(); return symbol(SWITCH); }
-    try { maybeIncrNumEndsExpected(); return symbol(TRY); }
-    while { maybeIncrNumEndsExpected(); return symbol(WHILE); }
-    
-    break { return symbol(BREAK); }
-    catch { return symbol(CATCH); }
-    continue { return symbol(CONTINUE); }
-    else { return symbol(ELSE); }
-    elseif { return symbol(ELSEIF); }
-    end { return symbol(END); }
-    global { return symbol(GLOBAL); }
-    otherwise { return symbol(OTHERWISE); }
-    persistent { return symbol(PERSISTENT); }
-    return { return symbol(RETURN); }
-    
-    //NB: lower precedence than keywords
-    {Identifier} { return symbol(IDENTIFIER, yytext()); }
-    
-    //NB: lower precedence than ellipsis
     \. {
             //NB: have to change the state AFTER calling symbol
             Symbol result = symbol(DOT);
@@ -619,73 +450,11 @@ ValidEscape=\\[bfnrt\\\"]
     \. { return symbol(DOT); }
 }
 
-<COMMAND> {
-    //not stringified - return collected string and restore state
-    {LineTerminator} | "," | ";" | "%" { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    <<EOF>> { Symbol sym = endCmdArg(); if(sym != null) { return sym; } }
-    
-    {EscapedLineTerminator} {
-        if(cmdQuoteCount % 2 == 1) {
-            error("Unterminated command-style call argument: '" + cmdArgBuf + "'");
-        } else {
-            commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
-            if(cmdArgBuf.length() > 0) {
-                return cmdArgSymbol();
-            }
-        }
-    }
-    
-    {OtherWhiteSpace}+ {
-        if(cmdQuoteCount % 2 == 1) {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        } else if(cmdArgBuf.length() > 0) {
-            return cmdArgSymbol();
-        }
-    }
-    
-    //an initial "=" or "(" is not stringified
-    "=" | "(" {
-        if(cmdArgBuf.length() == 0) {
-            Symbol sym = endCmdArg();
-            if(sym != null) {
-                return sym;
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            cmdArgPrevCharWasQuote = false;
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-    }
-    
-    //an initial "==" IS stringified
-    "==" | . {
-        if(cmdArgBuf.length() == 0) {
-            markStartPosition();
-        }
-        boolean isQuote = yytext().equals("'");
-        if(isQuote) {
-            cmdQuoteCount++;
-            if(cmdArgPrevCharWasQuote && (cmdQuoteCount % 2 == 1)) {
-                cmdArgBuf.append("''");
-                markEndPosition(); //NB: this will likely be overwritten before the string is returned
-            }
-        } else {
-            cmdArgBuf.append(yytext());
-            markEndPosition(); //NB: this will likely be overwritten before the string is returned
-        }
-        cmdArgPrevCharWasQuote = isQuote;
-    }
-}
-
 /* error fallback */
 .|\n { error("Illegal character '" + yytext() + "'"); }
 
 <<EOF>> {
     //don't need to check that we're in the initial state, because the
     //  xstates handle EOF and the non-xstates are acceptable when ending
-    //don't need to check numEndsExpected since that's only used for changing
-    //  states - the parser actually checks the bracketing
     return symbol(EOF);
 }

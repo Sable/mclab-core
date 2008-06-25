@@ -32,7 +32,18 @@
 		<jflex file="${test.dir}/${trivial.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
-	<target name="jflex" depends="Gen.jflex, jflex.command, jflex.length, jflex.trivial" />
+	<target name="jflex.array" depends="def.jflex.task">
+		<jflex file="${src.dir}/${array.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex" depends="Gen.jflex, jflex.command, jflex.length, jflex.trivial, jflex.array" />
+
+	<!-- generates Java files from Beaver parser spec -->
+	<target name="beaver.array" depends="def.beaver.task">
+		<beaver file="${src.dir}/${array.parser.spec}" destdir="${gen.dir}" terminalNames="yes" compress="no" useSwitch="yes" />
+	</target>
+
+	<target name="beaver" depends="Gen.beaver, beaver.array" />
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
