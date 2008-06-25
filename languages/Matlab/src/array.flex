@@ -50,24 +50,14 @@ import beaver.Scanner;
   //// Returning symbols ///////////////////////////////////////////////////////
 
   //Create a symbol using the current line and column number, as computed by JFlex
-  //No attached value
-  //Symbol is assumed to start and end on the same line
-  //e.g. symbol(SEMICOLON)
+  //Attached yytext as value
   private Symbol symbol(short type) {
-    return symbol(type, null);
-  }
-  
-  //Create a symbol using the current line and column number, as computed by JFlex
-  //Attached value gives content information
-  //Symbol is assumed to start and end on the same line
-  //e.g. symbol(IDENTIFIER, "x")
-  private Symbol symbol(short type, Object value) {
     //NB: JFlex is zero-indexed, but we want one-indexed
     int startLine = yyline + 1;
     int startCol = yycolumn + 1;
     int endLine = startLine;
     int endCol = startCol + yylength() - 1;
-    return symbol(type, value, startLine, startCol, endLine, endCol);
+    return symbol(type, yytext(), startLine, startCol, endLine, endCol);
   }
   
   //Create a symbol using explicit position information (one-indexed)
@@ -258,7 +248,7 @@ ValidEscape=\\[bfnrt\\\"]
 //... comment
 {EscapedLineTerminator} {
     transposeNext = false;
-    return symbol(ELLIPSIS_COMMENT, yytext());
+    return symbol(ELLIPSIS_COMMENT);
 }
 
 //whitespace
@@ -266,7 +256,7 @@ ValidEscape=\\[bfnrt\\\"]
 {OtherWhiteSpace} { transposeNext = false; /* ignore */ }
 
 //numeric literals
-{Number} { return symbol(NUMBER, yytext()); }
+{Number} { return symbol(NUMBER); }
 
 //MTRANSPOSE or STRING (start)
 "'" {
@@ -298,8 +288,8 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //single-line comments
-{HelpComment} { return symbol(HELP_COMMENT, yytext()); }
-{Comment} { transposeNext = false; return symbol(COMMENT, yytext()); }
+{HelpComment} { return symbol(HELP_COMMENT); }
+{Comment} { transposeNext = false; return symbol(COMMENT); }
 
 //start multiline help comment
 {OpenBracketHelpComment} {
@@ -406,9 +396,9 @@ ValidEscape=\\[bfnrt\\\"]
 "&&" { return symbol(SHORTAND); }
 "||" { return symbol(SHORTOR); }
 
-properties { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
-methods { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
-events { return handleClassKeyword(symbol(IDENTIFIER, yytext())); }
+properties { return handleClassKeyword(symbol(IDENTIFIER)); }
+methods { return handleClassKeyword(symbol(IDENTIFIER)); }
+events { return handleClassKeyword(symbol(IDENTIFIER)); }
 
 break { keywordError(); }
 case { keywordError(); }
@@ -431,7 +421,7 @@ try { keywordError(); }
 while { keywordError(); }
 
 //NB: lower precedence than keywords
-{Identifier} { return symbol(IDENTIFIER, yytext()); }
+{Identifier} { return symbol(IDENTIFIER); }
 
 <YYINITIAL> {
     \. {
@@ -444,7 +434,7 @@ while { keywordError(); }
 
 //ignore keywords - we just saw a dot
 <FIELD_NAME> {
-    {Identifier} { return symbol(IDENTIFIER, yytext()); }
+    {Identifier} { return symbol(IDENTIFIER); }
     
     //NB: lower precedence than ellipsis
     \. { return symbol(DOT); }
