@@ -260,39 +260,51 @@ element_list =
   
 element =
      subelement
-  |  subelement LT nbf* element
-  |  subelement GT nbf* element
-  |  subelement LE nbf* element
-  |  subelement GE nbf* element
-  |  subelement EQ nbf* element
-  |  subelement NE nbf* element
-  |  subelement AND nbf* element
-  |  subelement OR nbf* element
-  |  subelement SHORTAND nbf* element
-  |  subelement SHORTOR nbf* element
-  |  subelement COLON nbf* element
-  |  subelement MTIMES nbf* element
-  |  subelement ETIMES nbf* element
-  |  subelement MDIV nbf* element
-  |  subelement EDIV nbf* element
-  |  subelement MLDIV nbf* element
-  |  subelement ELDIV nbf* element
-  |  subelement PLUS nbf* element
-  |  subelement MINUS nbf* element
+  |  subelement nbf* LT nbf* element
+  |  subelement nbf* GT nbf* element
+  |  subelement nbf* LE nbf* element
+  |  subelement nbf* GE nbf* element
+  |  subelement nbf* EQ nbf* element
+  |  subelement nbf* NE nbf* element
+  |  subelement nbf* AND nbf* element
+  |  subelement nbf* OR nbf* element
+  |  subelement nbf* SHORTAND nbf* element
+  |  subelement nbf* SHORTOR nbf* element
+  |  subelement nbf* COLON nbf* element
+  |  subelement nbf* MTIMES nbf* element
+  |  subelement nbf* ETIMES nbf* element
+  |  subelement nbf* MDIV nbf* element
+  |  subelement nbf* EDIV nbf* element
+  |  subelement nbf* MLDIV nbf* element
+  |  subelement nbf* ELDIV nbf* element
+  |  subelement nbf* PLUS nbf* element
+  |  subelement nbf* MINUS nbf* element
   |  NOT nbf* element
   |  PLUS nbf* element
   |  MINUS nbf* element
-  |  subelement MPOW nbf* element
-  |  subelement EPOW nbf* element
+  |  subelement nbf* MPOW nbf* element
+  |  subelement nbf* EPOW nbf* element
   ;
 
 subelement =
      LPAREN nbf* expr RPAREN
+  |  IDENTIFIER
+  |  NUMBER
+  |  STRING
+  |  matrix
+  |  cell_array
+  |  subelement nbf* LPAREN nbf* RPAREN
+  |  subelement nbf* LPAREN nbf* arg_list RPAREN
+  |  subelement nbf* LCURLY nbf* arg_list RCURLY
+  |  subelement nbf* AT nbf* IDENTIFIER
+  |  subelement nbf* DOT nbf* IDENTIFIER
+  |  subelement nbf* ARRAYTRANSPOSE
+  |  subelement nbf* MTRANSPOSE
   ;
 
 element_separator =
      COMMA
-  |  nbf
+//  |  nbf
   ;
 
 comment =
