@@ -2,7 +2,7 @@ package natlab;
 
 import java.util.*;
 
-public class SymbolTable {
+public class SymbolTableScope {
     // hash map for lookup with symbol name
     private HashMap<String, SymbolTableEntry> symTable;
     // hash map for lookup with original name of symbol
