@@ -222,14 +222,14 @@ cell_array =
 
 optional_row_list =
      
-  |  row_separator
+  |  row_separator+
   |  row_list
-  |  row_list row_separator
+  |  row_list row_separator+
   ;
 
 row_list =
      row
-  |  row_list row_separator row
+  |  row_list row_separator+ row
   ;
 
 row =
