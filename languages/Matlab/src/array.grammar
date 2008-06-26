@@ -147,7 +147,7 @@ logic_expr =
 colon_expr =
      binary_expr
   |  binary_expr COLON nbf* binary_expr
-  |  binary_expr COLON nbf* binary_expr COLON binary_expr
+  |  binary_expr COLON nbf* binary_expr COLON nbf* binary_expr
   ;
 
 binary_expr =
@@ -188,7 +188,6 @@ primary_expr =
   |  cell_array
   |  access
   |  AT nbf* name
-  |  name AT nbf* name input_params?
   ;
 
 access =
@@ -199,6 +198,7 @@ access =
 
 cell_access =
      var_access
+  |  name AT nbf* name
   |  cell_access LCURLY nbf* arg_list RCURLY nbf*
   ;
 
