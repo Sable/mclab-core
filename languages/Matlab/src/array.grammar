@@ -116,8 +116,8 @@ input_params =
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
 //shared by input and output parameters
 param_list =
-     IDENTIFIER nbf*
-  |  param_list COMMA nbf* IDENTIFIER nbf*
+     name
+  |  param_list COMMA nbf* name
   ;
 
 name =
@@ -233,7 +233,7 @@ row_list =
   ;
 
 row =
-     arg_list nbf*
+     arg_list
   |  arg_list COMMA nbf*
   ;
 
