@@ -109,115 +109,115 @@ array =
 
 //input parameter list for a function
 input_params =
-     LPAREN RPAREN
-  |  LPAREN param_list RPAREN
+     LPAREN nbf* RPAREN nbf*
+  |  LPAREN nbf* param_list RPAREN nbf*
   ;
 
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
 //shared by input and output parameters
 param_list =
-     IDENTIFIER
-  |  param_list COMMA nbf* IDENTIFIER
+     IDENTIFIER nbf*
+  |  param_list COMMA nbf* IDENTIFIER nbf*
   ;
 
 name =
-     IDENTIFIER
+     IDENTIFIER nbf*
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr =
      logic_expr
-  |  AT input_params expr
+  |  AT nbf* input_params expr
   ;
 
 logic_expr =
      colon_expr
-  |  logic_expr LT logic_expr
-  |  logic_expr GT logic_expr
-  |  logic_expr LE logic_expr
-  |  logic_expr GE logic_expr
-  |  logic_expr EQ logic_expr
-  |  logic_expr NE logic_expr
-  |  logic_expr AND logic_expr
-  |  logic_expr OR logic_expr
-  |  logic_expr SHORTAND logic_expr
-  |  logic_expr SHORTOR logic_expr
+  |  logic_expr LT nbf* logic_expr
+  |  logic_expr GT nbf* logic_expr
+  |  logic_expr LE nbf* logic_expr
+  |  logic_expr GE nbf* logic_expr
+  |  logic_expr EQ nbf* logic_expr
+  |  logic_expr NE nbf* logic_expr
+  |  logic_expr AND nbf* logic_expr
+  |  logic_expr OR nbf* logic_expr
+  |  logic_expr SHORTAND nbf* logic_expr
+  |  logic_expr SHORTOR nbf* logic_expr
   ;
 
 colon_expr =
      binary_expr
-  |  binary_expr COLON binary_expr
-  |  binary_expr COLON binary_expr COLON binary_expr
+  |  binary_expr COLON nbf* binary_expr
+  |  binary_expr COLON nbf* binary_expr COLON binary_expr
   ;
 
 binary_expr =
      prefix_expr
-  |  binary_expr MTIMES binary_expr
-  |  binary_expr ETIMES binary_expr
-  |  binary_expr MDIV binary_expr
-  |  binary_expr EDIV binary_expr
-  |  binary_expr MLDIV binary_expr
-  |  binary_expr ELDIV binary_expr
-  |  binary_expr PLUS binary_expr
-  |  binary_expr MINUS binary_expr
+  |  binary_expr MTIMES nbf* binary_expr
+  |  binary_expr ETIMES nbf* binary_expr
+  |  binary_expr MDIV nbf* binary_expr
+  |  binary_expr EDIV nbf* binary_expr
+  |  binary_expr MLDIV nbf* binary_expr
+  |  binary_expr ELDIV nbf* binary_expr
+  |  binary_expr PLUS nbf* binary_expr
+  |  binary_expr MINUS nbf* binary_expr
   ;
 
 prefix_expr =
      pow_expr
-  |  NOT prefix_expr
-  |  PLUS prefix_expr
-  |  MINUS prefix_expr
+  |  NOT nbf* prefix_expr
+  |  PLUS nbf* prefix_expr
+  |  MINUS nbf* prefix_expr
   ;
 
 pow_expr =
      postfix_expr
-  |  pow_expr MPOW pow_expr
-  |  pow_expr EPOW pow_expr
+  |  pow_expr MPOW nbf* pow_expr
+  |  pow_expr EPOW nbf* pow_expr
   ;
 
 postfix_expr =
      primary_expr
-  |  postfix_expr ARRAYTRANSPOSE
-  |  postfix_expr MTRANSPOSE
+  |  postfix_expr ARRAYTRANSPOSE nbf*
+  |  postfix_expr MTRANSPOSE nbf*
   ;
 
 primary_expr =
      literal
-  |  LPAREN expr RPAREN
+  |  LPAREN nbf* expr RPAREN nbf*
   |  matrix
   |  cell_array
   |  access
-  |  AT name
-  |  name AT name input_params?
+  |  AT nbf* name
+  |  name AT nbf* name input_params?
   ;
 
 access =
      cell_access
-  |  cell_access LPAREN RPAREN
-  |  cell_access LPAREN arg_list RPAREN
+  |  cell_access LPAREN nbf* RPAREN nbf*
+  |  cell_access LPAREN nbf* arg_list RPAREN nbf*
   ;
 
 cell_access =
      var_access
-  |  cell_access LCURLY arg_list RCURLY
+  |  cell_access LCURLY nbf* arg_list RCURLY nbf*
   ;
 
 var_access =
      name
-  |  var_access DOT name
+  |  var_access DOT nbf* name
   ;
 
 literal =
-     NUMBER
-  |  STRING
+     NUMBER nbf*
+  |  STRING nbf*
   ;
 
 matrix =
-     LSQUARE optional_row_list RSQUARE
+     LSQUARE nbf* optional_row_list RSQUARE nbf*
   ;
 
 cell_array =
-     LCURLY optional_row_list RCURLY
+     LCURLY nbf* optional_row_list RCURLY nbf*
   ;
 
 optional_row_list =
@@ -233,23 +233,24 @@ row_list =
   ;
 
 row =
-     arg_list COMMA?
+     arg_list nbf*
+  |  arg_list COMMA nbf*
   ;
 
 row_separator =
-     LINE_TERMINATOR
-  |  SEMICOLON
+     LINE_TERMINATOR nbf*
+  |  SEMICOLON nbf*
   |  comment
   ;
 
 arg_list =
      arg
-  |  arg_list COMMA arg
+  |  arg_list COMMA nbf* arg
   ;
   
 arg =
      expr
-  |  COLON
+  |  COLON nbf*
   ;
 
 comment =
