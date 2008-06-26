@@ -11,7 +11,7 @@ public class SymbolTableScope {
     // with it
     private HashMap<String, HashMap<String, SymbolTableEntry>> onameTable;
 
-    SymbolTable() {
+    SymbolTableScope() {
         symTable = new HashMap<String, SymbolTableEntry>();
         onameTable = new HashMap<String, HashMap<String, SymbolTableEntry>>();
     }
