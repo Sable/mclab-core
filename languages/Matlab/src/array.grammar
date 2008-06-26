@@ -202,6 +202,16 @@ cell_access =
   |  cell_access LCURLY nbf* arg_list RCURLY nbf*
   ;
 
+arg_list =
+     arg
+  |  arg_list COMMA nbf* arg
+  ;
+  
+arg =
+     expr
+  |  COLON nbf*
+  ;
+
 var_access =
      name
   |  var_access DOT nbf* name
@@ -233,8 +243,8 @@ row_list =
   ;
 
 row =
-     arg_list
-  |  arg_list COMMA nbf*
+     element_list
+  |  element_list element_separator+
   ;
 
 row_separator =
@@ -243,14 +253,18 @@ row_separator =
   |  comment
   ;
 
-arg_list =
-     arg
-  |  arg_list COMMA nbf* arg
+element_list =
+     element
+  |  element_list element_separator+ element
   ;
   
-arg =
+element =
      expr
-  |  COLON nbf*
+  ;
+
+element_separator =
+     COMMA nbf*
+//  |  nbf+
   ;
 
 comment =
