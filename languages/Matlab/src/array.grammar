@@ -259,12 +259,40 @@ element_list =
   ;
   
 element =
-     expr
+     subelement
+  |  subelement LT nbf* element
+  |  subelement GT nbf* element
+  |  subelement LE nbf* element
+  |  subelement GE nbf* element
+  |  subelement EQ nbf* element
+  |  subelement NE nbf* element
+  |  subelement AND nbf* element
+  |  subelement OR nbf* element
+  |  subelement SHORTAND nbf* element
+  |  subelement SHORTOR nbf* element
+  |  subelement COLON nbf* element
+  |  subelement MTIMES nbf* element
+  |  subelement ETIMES nbf* element
+  |  subelement MDIV nbf* element
+  |  subelement EDIV nbf* element
+  |  subelement MLDIV nbf* element
+  |  subelement ELDIV nbf* element
+  |  subelement PLUS nbf* element
+  |  subelement MINUS nbf* element
+  |  NOT nbf* element
+  |  PLUS nbf* element
+  |  MINUS nbf* element
+  |  subelement MPOW nbf* element
+  |  subelement EPOW nbf* element
+  ;
+
+subelement =
+     LPAREN nbf* expr RPAREN
   ;
 
 element_separator =
-     COMMA nbf*
-//  |  nbf+
+     COMMA
+  |  nbf
   ;
 
 comment =
