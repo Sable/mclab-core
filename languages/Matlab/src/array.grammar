@@ -184,8 +184,8 @@ postfix_expr =
 primary_expr =
      literal
   |  LPAREN nbf* expr RPAREN nbf*
-  |  matrix
-  |  cell_array
+  |  matrix nbf*
+  |  cell_array nbf*
   |  access
   |  AT nbf* name
   ;
@@ -223,11 +223,11 @@ literal =
   ;
 
 matrix =
-     LSQUARE nbf* optional_row_list RSQUARE nbf*
+     LSQUARE nbf* optional_row_list RSQUARE
   ;
 
 cell_array =
-     LCURLY nbf* optional_row_list RCURLY nbf*
+     LCURLY nbf* optional_row_list RCURLY
   ;
 
 optional_row_list =
