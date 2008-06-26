@@ -105,10 +105,6 @@
 array =
      matrix
   |  cell_array
-  |  COMMENT
-  |  ELLIPSIS_COMMENT
-  |  BRACKET_COMMENT
-  |  OTHER_WHITESPACE
   ;
 
 //input parameter list for a function
@@ -121,7 +117,7 @@ input_params =
 //shared by input and output parameters
 param_list =
      IDENTIFIER
-  |  param_list COMMA IDENTIFIER
+  |  param_list COMMA nbf* IDENTIFIER
   ;
 
 name =
@@ -243,6 +239,7 @@ row =
 row_separator =
      LINE_TERMINATOR
   |  SEMICOLON
+  |  comment
   ;
 
 arg_list =
@@ -253,4 +250,14 @@ arg_list =
 arg =
      expr
   |  COLON
+  ;
+
+comment =
+     COMMENT
+  |  BRACKET_COMMENT
+  ;
+
+nbf =
+     OTHER_WHITESPACE
+  |  ELLIPSIS_COMMENT
   ;
