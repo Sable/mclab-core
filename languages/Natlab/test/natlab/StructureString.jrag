@@ -280,21 +280,11 @@ aspect StructureString {
     eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString();
     eq Event.getStructureStringLessComments() = getName();
     
-    eq SuperClassMethodCallExpr.getStructureStringLessComments() {
+    eq SuperClassMethodExpr.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append(getFuncName().getStructureString());
         buf.append("@");
         buf.append(getClassName().getStructureString());
-        buf.append("(");
-        boolean first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getStructureString());
-            first = false;
-        }
-        buf.append(")");
         return buf.toString();
     }
     

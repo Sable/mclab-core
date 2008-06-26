@@ -273,7 +273,8 @@
 %typeof switch_statement = "SwitchStmt";
 %typeof switch_case = "SwitchCaseBlock";
 %typeof default_case = "DefaultCaseBlock";
-%typeof access, cell_access, var_access = "LValueExpr";
+%typeof access, cell_access = "Expr";
+%typeof var_access = "LValueExpr";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -624,7 +625,6 @@ primary_expr =
   |  cell_array.c
   |  access.a
   |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
-  |  name.f AT name.c input_params.in? {: return new SuperClassMethodCallExpr(f, c, nullToEmpty(in)); :}
   ;
 
 access =
@@ -634,7 +634,8 @@ access =
   ;
 
 cell_access =
-     var_access.v
+     name.f AT name.c {: return new SuperClassMethodExpr(f, c); :}
+  |  var_access.v
   |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
   ;
 
