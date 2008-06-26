@@ -228,7 +228,7 @@ ValidEscape=\\[bfnrt\\\"]
 
 //whitespace
 {LineTerminator} { return symbol(LINE_TERMINATOR); }
-{OtherWhiteSpace} { transposeNext = false; /* ignore */ }
+{OtherWhiteSpace} { transposeNext = false; return symbol(OTHER_WHITESPACE); }
 
 //numeric literals
 {Number} { return symbol(NUMBER); }
