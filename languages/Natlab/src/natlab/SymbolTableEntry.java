@@ -11,6 +11,7 @@ public class SymbolTableEntry
     SymbolTableEntry(String s)
     {
         symbol = s;
+        original = s;
     }
     SymbolTableEntry(String s, String o)
     {

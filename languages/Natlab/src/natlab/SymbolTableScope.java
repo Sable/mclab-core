@@ -42,4 +42,13 @@ public class SymbolTableScope {
         onameEntries.put(symbol, e);
         return true;
     }
+
+    public SymbolTableEntry getSymbolById(String s)
+    {
+        return symTable.get(s);
+    }
+    public HashMap<String, SymbolTableEntry> getSymbolsByOName(String on)
+    {
+        return onameTable.get(on);
+    }
 }

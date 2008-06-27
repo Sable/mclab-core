@@ -13,6 +13,10 @@ public class AllTests {
 		//TODO-AC: uncomment
 		suite.addTestSuite(NatlabParserPassTests.class);
 		suite.addTestSuite(NatlabParserFailTests.class);
+
+                suite.addTestSuite(SymbolTablePassTests.class);
+                suite.addTestSuite(SymbolTableFailTests.class);
+                suite.addTestSuite(SymbolTableSanityTests.class);
 		//$JUnit-END$
 		return suite;
 	}
