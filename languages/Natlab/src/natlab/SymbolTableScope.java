@@ -51,4 +51,21 @@ public class SymbolTableScope {
     {
         return onameTable.get(on);
     }
+
+    /* 
+       splitSymbol will take a given symbol, create a new symbol with 
+       a related name, populate the symbol table entry with the correct 
+       information. 
+      
+       returns new entry
+
+       Idealy some housekeeping will be done. This would include creating a 
+       new decleration node site, and perhaps updating some use and def chains
+    */
+    public SymbolTableEntry splitSymbol(SymbolTableEntry se)
+    {
+        SymbolTableEntry newSe = se.split();
+        addSymbol( newSe );  //TODO-JD: would be good to throw error or have some recovery here if addSymbol fails
+        return newSe;
+    }
 }

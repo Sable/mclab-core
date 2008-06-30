@@ -8,16 +8,32 @@ public class SymbolTableEntry
     private String original;
     private ASTNode declLocation;
 
+    private SymbolCount symbolCount;
+
     SymbolTableEntry(String s)
     {
         symbol = s;
         original = s;
+
+        symbolCount = new SymbolCount();
     }
     SymbolTableEntry(String s, String o)
     {
         symbol = s;
         original = o;
+
+        symbolCount = new SymbolCount(); //TODO-JD: perhaps change this to search for other symbols with same original
     }
+
+    public SymbolTableEntry split()
+    {
+        String newName = original + symbolCount.newSymbol();
+        SymbolTableEntry se = new SymbolTableEntry( newName, original );
+        se.setDeclLocation( getDeclLocation() );
+
+        return se;
+    }
+
 
     public void setSymbol(String s){symbol=s;}
     public void setOriginal(String o){original=o;}
