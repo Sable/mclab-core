@@ -1,4 +1,4 @@
-grammar array;
+grammar Array;
 
 @parser::header {
 package matlab;
