@@ -14,5 +14,9 @@
 	<classpathentry kind="lib" path="lib/jastadd2-R20080423/jastadd2.jar"/>
 	<classpathentry kind="lib" path="lib/beaver-0.9.6.1/lib/beaver.jar" sourcepath="lib/beaver-0.9.6.1/src"/>
 	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/antlr3-task-20071115/antlr3-task.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/stringtemplate-3.1b1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
