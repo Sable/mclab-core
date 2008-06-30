@@ -152,6 +152,9 @@ nbf :
   |  ELLIPSIS_COMMENT
   ;
 
+//NB: not distinguishing between identifiers and keywords at this level - everything is an ID
+//NB: not distinguishing between decimal and hex numbers at this level
+
 fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
 fragment HEX_DIGIT : DIGIT | 'a'..'f' | 'A'..'F';
@@ -160,12 +163,6 @@ fragment HEX_NUMBER : HEX_DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP;
 NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
-
-BRACKET_COMMENT : '%{%}';
-
-fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
-COMMENT : '%' NOT_LINE_TERMINATOR*;
-ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : '\'' STRING_CHAR* '\'';
@@ -196,13 +193,20 @@ SHORTOR : '||';
 DOT : '.';
 COMMA : ',';
 SEMICOLON : ';';
-LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 COLON : ':';
 AT : '@';
-OTHER_WHITESPACE : ' ' | '\t' | '\f';
 LPAREN : '(';
 RPAREN : ')';
 LCURLY : '{';
 RCURLY : '}';
 LSQUARE : '[';
 RSQUARE : ']';
+
+BRACKET_COMMENT : '%{%}';
+
+fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
+COMMENT : '%' NOT_LINE_TERMINATOR*;
+ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
+
+LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
+OTHER_WHITESPACE : ' ' | '\t' | '\f';
