@@ -28,6 +28,13 @@
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
 
+	<!-- creates Antlr3 Ant task -->
+	<!-- TODO-AC: figure out why this warns that the class can't be found -->
+	<target name="def.antlr3.task" unless="antlr3.available">
+		<taskdef name="antlr3" classname="org.apache.tools.ant.antlr.ANTLR3" classpathref="antlr.jar.path" />
+		<property name="antlr3.available" value="yes" />
+	</target>
+
 	<!-- Extend and override parts of gen.xml -->
 
 	<target name="jflex.command" depends="def.jflex.task">
