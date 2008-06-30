@@ -161,9 +161,12 @@ fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP;
 NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
 
-COMMENT : '%';
-ELLIPSIS_COMMENT : '...';
 BRACKET_COMMENT : '%{%}';
+
+fragment NOT_LINE_TERMINATOR : '\u0000'..'\u0009' | '\u000b' | '\u000c' | '\u000e'..'\ufffe'; //TODO-AC: ~LINE_TERMINATOR
+COMMENT : '%' NOT_LINE_TERMINATOR*;
+ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
+
 STRING : '\'\'';
 
 PLUS : '+';
@@ -192,7 +195,7 @@ SHORTOR : '||';
 DOT : '.';
 COMMA : ',';
 SEMICOLON : ';';
-LINE_TERMINATOR : '\r'? '\n';
+LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 COLON : ':';
 AT : '@';
 OTHER_WHITESPACE : ' ' | '\t' | '\f';
