@@ -1,5 +1,13 @@
 grammar array;
 
+@parser::header {
+package matlab;
+}
+
+@lexer::header {
+package matlab;
+}
+
 array :
      matrix
   |  cell_array

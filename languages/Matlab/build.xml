@@ -55,10 +55,11 @@
 
 	<target name="beaver" depends="Gen.beaver, beaver.array" />
 
-    <target name="antlr3.array" depends="def.antlr3.task">
-        <antlr3 target="${src.dir}/${array.mixed.spec}" outputdirectory="${gen.dir}" />
-    </target>
-	
+	<target name="antlr3.array" depends="def.antlr3.task">
+		<mkdir dir="${gen.dir}/${root.pkg}" />
+		<antlr3 target="${src.dir}/${array.mixed.spec}" outputdirectory="${gen.dir}/${root.pkg}" />
+	</target>
+
 	<target name="antlr3" depends="antlr3.array" />
 
 	<target name="compile.test.generators" unless="inside.eclipse">
