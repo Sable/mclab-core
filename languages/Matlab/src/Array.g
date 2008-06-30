@@ -163,7 +163,7 @@ NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
 
 BRACKET_COMMENT : '%{%}';
 
-fragment NOT_LINE_TERMINATOR : '\u0000'..'\u0009' | '\u000b' | '\u000c' | '\u000e'..'\ufffe'; //TODO-AC: ~LINE_TERMINATOR
+fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' NOT_LINE_TERMINATOR*;
 ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 
