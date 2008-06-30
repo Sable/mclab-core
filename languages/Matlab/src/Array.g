@@ -126,7 +126,7 @@ row :
 row_separator :
      LINE_TERMINATOR nbf*
   |  SEMICOLON nbf*
-  |  comment
+  |  comment LINE_TERMINATOR
   ;
 
 element_list :
