@@ -51,12 +51,12 @@
 
 	<target name="jflex" depends="Gen.jflex, jflex.command, jflex.length, jflex.trivial" />
 
-	<target name="antlr3.array" depends="def.antlr3.task">
+	<target name="antlr.array" depends="def.antlr3.task">
 		<mkdir dir="${gen.dir}/${root.pkg}" />
 		<antlr3 target="${src.dir}/${array.mixed.spec}" outputdirectory="${gen.dir}/${root.pkg}" />
 	</target>
 
-	<target name="antlr3" depends="antlr3.array" />
+	<target name="antlr" depends="antlr.array" />
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
@@ -94,7 +94,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, antlr3, gen.tests" />
+	<target name="gen" depends="compile.test.generators, Gen.gen, antlr, gen.tests" />
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
