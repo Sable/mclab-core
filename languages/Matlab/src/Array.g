@@ -167,7 +167,8 @@ fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' NOT_LINE_TERMINATOR*;
 ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 
-STRING : '\'\'';
+fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
+STRING : '\'' STRING_CHAR* '\'';
 
 PLUS : '+';
 MINUS : '-';
