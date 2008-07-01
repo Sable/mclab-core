@@ -12,16 +12,16 @@ package matlab;
 }
 
 @parser::members {
-private matlab.TranslationException.Problem makeProblem(RecognitionException e) {
+private matlab.TranslationProblem makeProblem(RecognitionException e) {
     return makeProblem(getTokenNames(), e);
 }
 
-private matlab.TranslationException.Problem makeProblem(String[] tokenNames, RecognitionException e) {
+private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionException e) {
     //change column to 1-based
-    return new matlab.TranslationException.Problem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
+    return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
 }
 
-public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker) throws ArrayException {
+public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
     offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
@@ -32,22 +32,19 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     try {
         parser.array();
     } catch (RecognitionException e) {
-        e.printStackTrace();
         parser.problems.add(parser.makeProblem(e));
     }
-    if(parser.hasProblem()) {
-        throw new ArrayException(parser.getProblems());
-    }
+    problems.addAll(parser.getProblems());
     return tokens.toString();
 }
 
-private final List<matlab.TranslationException.Problem> problems = new ArrayList<matlab.TranslationException.Problem>();
+private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
 
 public boolean hasProblem() { 
     return !problems.isEmpty();
 }
 
-public List<matlab.TranslationException.Problem> getProblems() {
+public List<matlab.TranslationProblem> getProblems() {
     return java.util.Collections.unmodifiableList(problems);
 }
 

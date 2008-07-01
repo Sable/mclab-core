@@ -14,7 +14,7 @@ import matlab.CommandToken.EllipsisComment;
 %unicode
 %function nextToken
 %type CommandToken
-%yylexthrow CommandException
+%yylexthrow CommandScanner.Exception
 
 //for debugging - track line and column
 %line
@@ -43,10 +43,22 @@ import matlab.CommandToken.EllipsisComment;
   
   //// Errors //////////////////////////////////////////////////////////////////
   
+  static class Exception extends java.lang.Exception {
+    private final TranslationProblem problem;
+
+    public Exception(TranslationProblem problem) {
+        this.problem = problem;
+    }
+
+    public TranslationProblem getProblem() {
+        return problem;
+    }
+  }
+  
   //throw an exceptions with position information from JFlex
-  private void error(String msg) throws CommandException {
+  private void error(String msg) throws Exception {
     //correct to one-indexed
-    throw new CommandException(yyline + baseLine, yycolumn + baseCol, msg);
+    throw new Exception(new CommandTranslationProblem(yyline + baseLine, yycolumn + baseCol, msg));
   }
   
   //// Command-style call arguments ////////////////////////////////////////////
@@ -71,7 +83,7 @@ import matlab.CommandToken.EllipsisComment;
     return result;
   }
   
-  private CommandToken handleNonArg(CommandToken nonArg) throws CommandException {
+  private CommandToken handleNonArg(CommandToken nonArg) throws Exception {
     if(arg.isQuoteCountOdd()) {
         error("Unterminated command-style call argument: '" + arg.getText() + "'");
         return null; //unreachable, but Java can't tell that error always throws an exception

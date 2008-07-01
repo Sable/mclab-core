@@ -24,9 +24,9 @@ public class ParserTestTool {
 			Program actual = (Program) parser.parse(scanner);
 			PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
 			if(parser.hasError()) {
-				for(String error : parser.getErrors()) {
-					out.println(error);
-				}
+                for(TranslationProblem prob : parser.getErrors()) {
+                    System.err.println("[" + prob.getLine() + ", " + prob.getColumn() + "]  " + prob.getMessage());
+                }
 			} else {
 				int startPos = actual.getStart();
 				int endPos = actual.getEnd();

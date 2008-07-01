@@ -1,30 +1,30 @@
 aspect Translate {
     //default - exception
-    public String ASTNode.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
+    public String ASTNode.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
     
-    public String Program.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
-        return getListNode().translate(offsetTracker);
+    public String Program.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
+        return getListNode().translate(offsetTracker, problems);
     }
     
-    public String ListNode.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
+    public String ListNode.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         StringBuffer buf = new StringBuffer();
         for(Node node : getNodes()) {
-            buf.append(node.translate(offsetTracker));
+            buf.append(node.translate(offsetTracker, problems));
         }
         return buf.toString();
     }
     
-    public String SymbolNode.translate(matlab.OffsetTracker offsetTracker) {
+    public String SymbolNode.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         offsetTracker.advanceByTextSize(getText());
         return getText();
     }
     
-    public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.CommandException {
+    public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         StringBuffer buf = new StringBuffer();
         String cmd = getCmd();
         buf.append(cmd);
         offsetTracker.advanceByTextSize(cmd);
-        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker);
+        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker, problems);
         for(beaver.Symbol node : formattedArgSymbols) {
             String value = (String) node.value;
             if(value != null) {
@@ -34,17 +34,17 @@ aspect Translate {
         return buf.toString();
     }
     
-    public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
+    public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         int startPos = getStart();
         int startLine = beaver.Symbol.getLine(startPos);
         int startCol = beaver.Symbol.getColumn(startPos);
-        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker);
+        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker, problems);
     }
     
-    public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
+    public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         int startPos = getStart();
         int startLine = beaver.Symbol.getLine(startPos);
         int startCol = beaver.Symbol.getColumn(startPos);
-        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker);
+        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker, problems);
     }
 }

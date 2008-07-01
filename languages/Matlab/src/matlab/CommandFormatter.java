@@ -25,7 +25,7 @@ public class CommandFormatter {
         this.numArgs = 0;
     }
 
-    public static List<Symbol> format(List<Symbol> originalSymbols, OffsetTracker offsetTracker) throws CommandException {
+    public static List<Symbol> format(List<Symbol> originalSymbols, OffsetTracker offsetTracker, List<TranslationProblem> problems) {
         if(originalSymbols == null) {
             return null;
         }
@@ -38,12 +38,16 @@ public class CommandFormatter {
             offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         }
         CommandFormatter cf = new CommandFormatter(originalSymbols, offsetTracker);
-        cf.rescan();
-        cf.format();
+        try {
+            cf.rescan();
+            cf.format();
+        } catch (CommandScanner.Exception e) {
+            problems.add(e.getProblem());
+        }
         return cf.formattedSymbols;
     }
 
-    private void rescan() throws CommandException {
+    private void rescan() throws CommandScanner.Exception {
         StringBuffer textBuf = new StringBuffer();
         for(Symbol sym : originalSymbols) {
             textBuf.append(sym.value);

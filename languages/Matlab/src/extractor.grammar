@@ -10,9 +10,9 @@
     //// Errors ////////////////////////////////////////////////////////////////
 
     //list of errors encountered while parsing
-    private final java.util.List<String> errors = new java.util.ArrayList<String>();
+    private final java.util.List<matlab.ArrayTranslationProblem> errors = new java.util.ArrayList<matlab.ArrayTranslationProblem>();
 
-    public java.util.List<String> getErrors() {
+    public java.util.List<matlab.ArrayTranslationProblem> getErrors() {
         return java.util.Collections.unmodifiableList(errors);
     }
 
@@ -21,13 +21,13 @@
     }
 
     //given a symbol, return a canonical string representation of it's position
-    private static String getPosString(Symbol token) {
-        return getPosString(token.getLine(token.getStart()), token.getColumn(token.getStart()));
+    private static matlab.ArrayTranslationProblem makeProblem(Symbol token, String msg) {
+        return makeProblem(token.getLine(token.getStart()), token.getColumn(token.getStart()), msg);
     }
 
     //given a position, return a canonical string representation
-    private static String getPosString(int line, int col) {
-        return "[" + line + ", " + col + "]";
+    private static matlab.ArrayTranslationProblem makeProblem(int line, int col, String msg) {
+        return new matlab.ArrayTranslationProblem(line, col, msg);
     }
 
     //override the default error handling:
@@ -36,19 +36,19 @@
     //  3) suggestions based on automatic corrections
     class Events extends Parser.Events {
         public void syntaxError(Symbol token) {
-            errors.add(getPosString(token) + "  unexpected token " + Terminals.NAMES[token.getId()]);
+            errors.add(makeProblem(token, "unexpected token " + Terminals.NAMES[token.getId()]));
         }
         public void scannerError(Scanner.Exception e) {
-            errors.add(getPosString(e.line + 1, e.column + 1) + "  scanner error: " + e.getMessage());
+            errors.add(makeProblem(e.line + 1, e.column + 1, "scanner error: " + e.getMessage()));
         }
         public void unexpectedTokenRemoved(Symbol token) {
-            errors.add(getPosString(token) + "  try deleting " + Terminals.NAMES[token.getId()]);
+            errors.add(makeProblem(token, "try deleting " + Terminals.NAMES[token.getId()]));
         }
         public void missingTokenInserted(Symbol token) {
-            errors.add(getPosString(token) + "  try inserting " + Terminals.NAMES[token.getId()]);
+            errors.add(makeProblem(token, "try inserting " + Terminals.NAMES[token.getId()]));
         }
         public void misspelledTokenReplaced(Symbol token) {
-            errors.add(getPosString(token) + "  try replacing with " + Terminals.NAMES[token.getId()]);
+            errors.add(makeProblem(token, "try replacing with " + Terminals.NAMES[token.getId()]));
         }
     }
 

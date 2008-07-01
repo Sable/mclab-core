@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import matlab.TranslationException.Problem;
 import matlab.ast.Program;
 import beaver.Parser;
 import beaver.Symbol;
@@ -28,13 +27,15 @@ public class TranslatorTestTool {
             Program actual = (Program) parser.parse(scanner);
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
             if(parser.hasError()) {
-                for(String error : parser.getErrors()) {
-                    System.err.println(error);
+                for(TranslationProblem prob : parser.getErrors()) {
+                    out.println("~" + prob);
                 }
             } else {
-                try {
-                    OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-                    String destText = actual.translate(offsetTracker);
+                List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+                OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+                String destText = actual.translate(offsetTracker, problems);
+
+                if(problems.isEmpty()) {
                     PositionMap posMap = offsetTracker.buildPositionMap();
 
                     out.println(">>>> Destination Language -> Source Language");
@@ -46,9 +47,9 @@ public class TranslatorTestTool {
 
                     out.println(">>>> Translated Text");
                     out.print(destText);
-                } catch(TranslationException e) {
-                    for(Problem prob : e.getProblems()) {
-                        out.println("~" + "[" + prob.getLine() + ", " + prob.getColumn() + "]  " + prob.getMessage());
+                } else {
+                    for(TranslationProblem prob : problems) {
+                        out.println("~" + prob);
                     }
                 }
             }

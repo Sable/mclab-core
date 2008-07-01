@@ -1,7 +1,9 @@
 package matlab;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,7 +70,7 @@ class TranslatorTestBase extends TestCase {
         OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         try {
             BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getTranslatedText()));
-            BufferedReader actualReader = new BufferedReader(new StringReader(actual.translate(offsetTracker)));
+            BufferedReader actualReader = new BufferedReader(new StringReader(buildActualString(actual, offsetTracker)));
             while(true) {
                 String expectedLine = expectedReader.readLine();
                 String actualLine = actualReader.readLine();
@@ -107,8 +109,6 @@ class TranslatorTestBase extends TestCase {
         } catch(IOException e) {
             //this can't happen since we're reading strings
             e.printStackTrace();
-        } catch(TranslationException e) {
-            assertEquals("Translation exception ", expected.getTranslatedText().substring(1), e.getMessage());
         }
 
         PositionMap posMap = offsetTracker.buildPositionMap();
@@ -121,6 +121,20 @@ class TranslatorTestBase extends TestCase {
                         "(" + actualSourcePos.getLine() + ", " + actualSourcePos.getColumn() + ") instead of " +
                         "(" + expectedSourcePos.getLine() + ", " + expectedSourcePos.getColumn() + ")");
             }
+        }
+    }
+
+    private static String buildActualString(Program actual, OffsetTracker offsetTracker) {
+        List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+        String successString = actual.translate(offsetTracker, problems);
+        if(problems.isEmpty()) {
+            return successString;
+        } else {
+            StringBuffer failureStringBuffer = new StringBuffer();
+            for(TranslationProblem prob : problems) {
+                failureStringBuffer.append("~" + prob);
+            }
+            return failureStringBuffer.toString();
         }
     }
 
