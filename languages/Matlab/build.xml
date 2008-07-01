@@ -106,7 +106,17 @@
 	<!-- public versions of cli.xml targets -->
 	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+
+    <target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
+        <junit fork="true" haltonerror="true">
+            <formatter type="plain" usefile="false" />
+            <classpath refid="junit.jar.path" />
+            <classpath refid="beaver.rt.jar.path" />
+            <classpath refid="antlr.jar.path" />
+            <classpath location="${bin.dir}" />
+            <test name="${test.suite.name}" />
+        </junit>
+    </target>
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
