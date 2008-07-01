@@ -2,6 +2,11 @@ grammar Array;
 
 //AC: keep the lexer and the parser together for now because that's the default Antlr layout
 
+options {
+	output = template;
+	rewrite = true;
+}
+
 @parser::header {
 package matlab;
 }
@@ -32,6 +37,7 @@ array :
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
+//all binary operators are left associative so no special handling is required
 expr :
      short_or_expr
   |  AT input_params expr
