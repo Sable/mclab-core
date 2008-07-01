@@ -10,6 +10,12 @@ public class TranslationException extends Exception {
         this.col = col;
     }
 
+    protected TranslationException(int line, int col, Exception cause) {
+        super(cause);
+        this.line = line;
+        this.col = col;
+    }
+
     public int getLine() {
         return line;
     }

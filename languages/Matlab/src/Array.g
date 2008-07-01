@@ -11,6 +11,21 @@ options {
 package matlab;
 }
 
+@parser::members {
+public static String translate(String text) throws ArrayException {
+    ANTLRStringStream in = new ANTLRStringStream(text);
+    ArrayLexer lexer = new ArrayLexer(in);
+    TokenRewriteStream tokens = new TokenRewriteStream(lexer);
+    ArrayParser parser = new ArrayParser(tokens);
+    try {
+        parser.array();
+    } catch (RecognitionException e) {
+        throw new ArrayException(e);
+    }
+    return tokens.toString();
+}
+}
+
 @lexer::header {
 package matlab;
 }
