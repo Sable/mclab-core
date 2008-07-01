@@ -12,21 +12,49 @@ package matlab;
 }
 
 @parser::members {
+private matlab.TranslationException.Problem makeProblem(RecognitionException e) {
+    return makeProblem(getTokenNames(), e);
+}
+
+private matlab.TranslationException.Problem makeProblem(String[] tokenNames, RecognitionException e) {
+    //change column to 1-based
+    return new matlab.TranslationException.Problem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
+}
+
 public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker) throws ArrayException {
     offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
-    in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
+    in.setCharPositionInLine(baseCol - 1); //since antlr lines are 0-based
     ArrayLexer lexer = new ArrayLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
     ArrayParser parser = new ArrayParser(tokens);
     try {
         parser.array();
     } catch (RecognitionException e) {
-        System.err.println(e);
-        throw new ArrayException(e);
+        e.printStackTrace();
+        parser.problems.add(parser.makeProblem(e));
+    }
+    if(parser.hasProblem()) {
+        throw new ArrayException(parser.getProblems());
     }
     return tokens.toString();
+}
+
+private final List<matlab.TranslationException.Problem> problems = new ArrayList<matlab.TranslationException.Problem>();
+
+public boolean hasProblem() { 
+    return !problems.isEmpty();
+}
+
+public List<matlab.TranslationException.Problem> getProblems() {
+    return java.util.Collections.unmodifiableList(problems);
+}
+
+//AC: this is a hackish way to prevent messages from being printed to stderr
+public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
+    problems.add(makeProblem(tokenNames, e));
+    super.displayRecognitionError(tokenNames, e);
 }
 }
 

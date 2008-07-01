@@ -2,6 +2,7 @@ package matlab;
 
 import java.io.*;
 
+import matlab.TranslationException.Problem;
 import matlab.ast.Program;
 import beaver.Parser;
 
@@ -33,7 +34,9 @@ public class Translator {
 			in.close();
 			System.exit(0);
 		} catch(TranslationException e) {
-		    System.err.println("[" + e.getLine() + ", " + e.getCol() + "]  " + e.getMessage());
+		    for(Problem prob : e.getProblems()) {
+		        System.err.println("[" + prob.getLine() + ", " + prob.getColumn() + "]  " + prob.getMessage());
+		    }
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.exit(2);

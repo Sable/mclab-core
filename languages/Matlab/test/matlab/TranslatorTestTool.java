@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import matlab.TranslationException.Problem;
 import matlab.ast.Program;
 import beaver.Parser;
 import beaver.Symbol;
@@ -46,7 +47,9 @@ public class TranslatorTestTool {
                     out.println(">>>> Translated Text");
                     out.print(destText);
                 } catch(TranslationException e) {
-                    out.println("~" + e.getMessage());
+                    for(Problem prob : e.getProblems()) {
+                        out.println("~" + "[" + prob.getLine() + ", " + prob.getColumn() + "]  " + prob.getMessage());
+                    }
                 }
             }
             out.close();
