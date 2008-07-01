@@ -132,7 +132,7 @@ class TranslatorTestBase extends TestCase {
         } else {
             StringBuffer failureStringBuffer = new StringBuffer();
             for(TranslationProblem prob : problems) {
-                failureStringBuffer.append("~" + prob);
+                failureStringBuffer.append("~" + prob + "\n"); //TODO-AC: cross-platform?
             }
             return failureStringBuffer.toString();
         }
