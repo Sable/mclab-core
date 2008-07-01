@@ -179,7 +179,7 @@ MLDIV : '\\';
 ELDIV : '.\\';
 MPOW : '^';
 EPOW : '.^';
-MTRANSPOSE : {isPreTransposeChar(LA(-1))}? '\'';
+MTRANSPOSE : {isPreTransposeChar(input.LA(-1))}? '\'';
 ARRAYTRANSPOSE : '.\'';
 LE : '<=';
 GE : '>=';
