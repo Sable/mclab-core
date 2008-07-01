@@ -12,7 +12,8 @@ package matlab;
 }
 
 @parser::members {
-public static String translate(String text) throws ArrayException {
+public static String translate(String text, OffsetTracker offsetTracker) throws ArrayException {
+    offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
     ArrayLexer lexer = new ArrayLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);

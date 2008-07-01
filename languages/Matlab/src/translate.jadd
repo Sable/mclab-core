@@ -19,7 +19,7 @@ aspect Translate {
         return getText();
     }
     
-    public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.TranslationException {
+    public String MaybeCmdExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.CommandException {
         StringBuffer buf = new StringBuffer();
         String cmd = getCmd();
         buf.append(cmd);
@@ -34,13 +34,11 @@ aspect Translate {
         return buf.toString();
     }
     
-    public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) {
-        offsetTracker.advanceByTextSize(getText());
-        return getText();
+    public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
+        return matlab.ArrayParser.translate(getText(), offsetTracker);
     }
     
-    public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) {
-        offsetTracker.advanceByTextSize(getText());
-        return getText();
+    public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
+        return matlab.ArrayParser.translate(getText(), offsetTracker);
     }
 }
