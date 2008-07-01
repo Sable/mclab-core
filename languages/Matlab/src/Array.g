@@ -163,7 +163,8 @@ fragment HEX_NUMBER : HEX_DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP;
 NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
-
+ 
+//TODO-AC: handle transpose properly
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : '\'' STRING_CHAR* '\'';
 
@@ -202,11 +203,14 @@ RCURLY : '}';
 LSQUARE : '[';
 RSQUARE : ']';
 
-BRACKET_COMMENT : '%{%}';
+fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
+BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}'; //TODO-AC: test this
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
-COMMENT : '%' NOT_LINE_TERMINATOR*;
+COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
 ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 OTHER_WHITESPACE : ' ' | '\t' | '\f';
+
+MISC : .;
