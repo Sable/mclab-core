@@ -31,100 +31,85 @@ array :
   |  cell_array
   ;
 
-//input parameter list for a function
-input_params :
-     LPAREN nbf* param_list? RPAREN nbf*
-  ;
-
-//Non-empty, comma-separated list of parameters (note: no trailing comma)
-//shared by input and output parameters
-param_list :
-     name (COMMA nbf* name)*
-  ;
-
-name :
-     IDENTIFIER nbf*
-  ;
-
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr :
      logic_expr
-  |  AT nbf* input_params expr
+  |  AT input_params expr
   ;
 
 logic_expr :
-     colon_expr ((LT | GT | LE | GE | EQ | NE | AND | OR | SHORTAND | SHORTOR) nbf* colon_expr)*
+     colon_expr ((LT | GT | LE | GE | EQ | NE | AND | OR | SHORTAND | SHORTOR) colon_expr)*
   ;
 
 colon_expr :
-     binary_expr (COLON nbf* binary_expr (COLON nbf* binary_expr)?)?
+     binary_expr (COLON binary_expr (COLON binary_expr)?)?
   ;
 
 tricky_expr :
-     binary_expr ((PLUS | MINUS) nbf* binary_expr)*
+     binary_expr ((PLUS | MINUS) binary_expr)*
   ;
 
 binary_expr :
-     prefix_expr ((MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) nbf* prefix_expr)*
+     prefix_expr ((MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) prefix_expr)*
   ;
 
 prefix_expr :
      pow_expr
-  |  NOT nbf* prefix_expr
-  |  PLUS nbf* prefix_expr
-  |  MINUS nbf* prefix_expr
+  |  NOT prefix_expr
+  |  PLUS prefix_expr
+  |  MINUS prefix_expr
   ;
 
 pow_expr :
-     (postfix_expr) ((MPOW | EPOW) nbf* postfix_expr)*
+     (postfix_expr) ((MPOW | EPOW) postfix_expr)*
   ;
 
 postfix_expr :
-     (primary_expr) (ARRAYTRANSPOSE nbf* | MTRANSPOSE nbf*)*
+     (primary_expr) (ARRAYTRANSPOSE | MTRANSPOSE)*
   ;
 
 primary_expr :
      literal
-  |  LPAREN nbf* expr RPAREN nbf*
+  |  LPAREN expr RPAREN
   |  matrix
   |  cell_array
   |  access
-  |  AT nbf* name
-  |  name AT nbf* name input_params?
+  |  AT name
+  |  name AT name input_params?
   ;
 
 access :
-     cell_access (LPAREN nbf* arg_list? RPAREN nbf*)?
+     cell_access (LPAREN arg_list? RPAREN)?
   ;
 
 cell_access :
-     (var_access) (LCURLY nbf* arg_list RCURLY nbf*)*
+     (var_access) (LCURLY arg_list RCURLY)*
   ;
 
 arg_list :	
-     (arg) (COMMA nbf* arg)*
+     (arg) (COMMA arg)*
   ;
   
 arg :
      expr
-  |  COLON nbf*
+  |  COLON
   ;
 
 var_access :
-     (name) (DOT nbf* name)*
+     (name) (DOT name)*
   ;
 
 literal :
-     NUMBER nbf*
-  |  STRING nbf*
+     NUMBER
+  |  STRING
   ;
 
 matrix :
-     LSQUARE nbf* optional_row_list RSQUARE nbf*
+     LSQUARE optional_row_list RSQUARE
   ;
 
 cell_array :
-     LCURLY nbf* optional_row_list RCURLY nbf*
+     LCURLY optional_row_list RCURLY
   ;
 
 optional_row_list :
@@ -140,9 +125,8 @@ row :
   ;
 
 row_separator :
-     LINE_TERMINATOR nbf*
-  |  SEMICOLON nbf*
-  |  comment LINE_TERMINATOR
+     LINE_TERMINATOR
+  |  SEMICOLON
   ;
 
 element_list :
@@ -157,15 +141,20 @@ element_separator :
      COMMA
   //|  nbf
   ;
-
-comment :
-     COMMENT
-  |  BRACKET_COMMENT
+  
+//input parameter list for a function
+input_params :
+     LPAREN param_list? RPAREN
   ;
 
-nbf :
-     OTHER_WHITESPACE
-  |  ELLIPSIS_COMMENT
+//Non-empty, comma-separated list of parameters (note: no trailing comma)
+//shared by input and output parameters
+param_list :
+     name (COMMA name)*
+  ;
+
+name :
+     IDENTIFIER
   ;
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
@@ -220,13 +209,11 @@ fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : '\'' STRING_CHAR* '\'';
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
-BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}'; //TODO-AC: test this
+BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}' { $channel=HIDDEN; }; //TODO-AC: test this
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
-COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
-ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
+COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR* { $channel=HIDDEN; };
+ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR { $channel=HIDDEN; };
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
-OTHER_WHITESPACE : ' ' | '\t' | '\f';
-
-MISC : .;
+OTHER_WHITESPACE : ' ' | '\t' | '\f' { $channel=HIDDEN; };
