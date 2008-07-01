@@ -12,15 +12,18 @@ package matlab;
 }
 
 @parser::members {
-public static String translate(String text, OffsetTracker offsetTracker) throws ArrayException {
+public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker) throws ArrayException {
     offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
+    in.setLine(baseLine);
+    in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
     ArrayLexer lexer = new ArrayLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
     ArrayParser parser = new ArrayParser(tokens);
     try {
         parser.array();
     } catch (RecognitionException e) {
+        System.err.println(e);
         throw new ArrayException(e);
     }
     return tokens.toString();

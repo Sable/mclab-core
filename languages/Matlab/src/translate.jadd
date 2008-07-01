@@ -35,10 +35,16 @@ aspect Translate {
     }
     
     public String MatrixExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
-        return matlab.ArrayParser.translate(getText(), offsetTracker);
+        int startPos = getStart();
+        int startLine = beaver.Symbol.getLine(startPos);
+        int startCol = beaver.Symbol.getColumn(startPos);
+        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker);
     }
     
     public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker) throws matlab.ArrayException {
-        return matlab.ArrayParser.translate(getText(), offsetTracker);
+        int startPos = getStart();
+        int startLine = beaver.Symbol.getLine(startPos);
+        int startCol = beaver.Symbol.getColumn(startPos);
+        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker);
     }
 }
