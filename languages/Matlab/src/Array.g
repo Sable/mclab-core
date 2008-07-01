@@ -99,11 +99,11 @@ prefix_expr :
   ;
 
 pow_expr :
-     (postfix_expr) ((MPOW | EPOW) postfix_expr)*
+     postfix_expr ((MPOW | EPOW) postfix_expr)*
   ;
 
 postfix_expr :
-     (primary_expr) (ARRAYTRANSPOSE | MTRANSPOSE)*
+     primary_expr (ARRAYTRANSPOSE | MTRANSPOSE)*
   ;
 
 primary_expr :
@@ -113,7 +113,6 @@ primary_expr :
   |  cell_array
   |  access
   |  AT name
-  |  name AT name input_params?
   ;
 
 access :
@@ -122,6 +121,11 @@ access :
 
 cell_access :
      (var_access) (LCURLY arg_list RCURLY)*
+  |  name AT name
+  ;
+  
+var_access :
+     (name) (DOT name)*
   ;
 
 arg_list :	
@@ -131,10 +135,6 @@ arg_list :
 arg :
      expr
   |  COLON
-  ;
-
-var_access :
-     (name) (DOT name)*
   ;
 
 literal :
@@ -155,11 +155,11 @@ optional_row_list :
   ;
 
 row_list :
-     (row) (row_separator+ row)*
+     row (row_separator+ row)*
   ;
 
 row :
-     element_list (element_separator+)?
+     element_list element_separator*
   ;
 
 row_separator :
@@ -168,7 +168,7 @@ row_separator :
   ;
 
 element_list :
-     (element) (element_separator+ element)*
+     element (element_separator+ element)*
   ;
   
 element :
@@ -177,16 +177,12 @@ element :
 
 element_separator :
      COMMA
-  //|  nbf
   ;
-  
-//input parameter list for a function
+
 input_params :
      LPAREN param_list? RPAREN
   ;
 
-//Non-empty, comma-separated list of parameters (note: no trailing comma)
-//shared by input and output parameters
 param_list :
      name (COMMA name)*
   ;
