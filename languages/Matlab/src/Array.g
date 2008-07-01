@@ -10,6 +10,22 @@ package matlab;
 package matlab;
 }
 
+@lexer::members {
+private static boolean isPreTransposeChar(int ch) {
+    switch(ch) {
+    case ')':
+    case '}':
+    case ']':
+    case '_': //at the end of an identifier
+    case '\'': //at the end of a transpose 
+               //NB: if this was at the end of a string, it would have been an escape instead of a close quote
+        return true;
+    default:
+        return Character.isLetterOrDigit(ch); //at the end of an identifier
+    }
+}
+}
+
 array :
      matrix
   |  cell_array
@@ -163,10 +179,6 @@ fragment HEX_NUMBER : HEX_DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP;
 NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
- 
-//TODO-AC: handle transpose properly
-fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
-STRING : '\'' STRING_CHAR* '\'';
 
 PLUS : '+';
 MINUS : '-';
@@ -178,7 +190,7 @@ MLDIV : '\\';
 ELDIV : '.\\';
 MPOW : '^';
 EPOW : '.^';
-MTRANSPOSE : '\'';
+MTRANSPOSE : {isPreTransposeChar(LA(-1))}? '\'';
 ARRAYTRANSPOSE : '.\'';
 LE : '<=';
 GE : '>=';
@@ -202,6 +214,10 @@ LCURLY : '{';
 RCURLY : '}';
 LSQUARE : '[';
 RSQUARE : ']';
+ 
+//NB: matched AFTER transpose
+fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
+STRING : '\'' STRING_CHAR* '\'';
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}'; //TODO-AC: test this
