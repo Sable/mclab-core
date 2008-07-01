@@ -33,12 +33,28 @@ array :
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 expr :
-     logic_expr
+     short_or_expr
   |  AT input_params expr
   ;
 
-logic_expr :
-     colon_expr ((LT | GT | LE | GE | EQ | NE | AND | OR | SHORTAND | SHORTOR) colon_expr)*
+short_or_expr :
+     short_and_expr (SHORTOR short_and_expr)*
+  ;
+
+short_and_expr :
+     or_expr (SHORTAND or_expr)*
+  ;
+
+or_expr :
+     and_expr (OR and_expr)*
+  ;
+
+and_expr :
+     comp_expr (AND comp_expr)*
+  ;
+
+comp_expr :
+     colon_expr ((LT | GT | LE | GE | EQ | NE) colon_expr)*
   ;
 
 colon_expr :
