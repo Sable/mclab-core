@@ -65,6 +65,7 @@ short_or_expr :
 
 short_and_expr :
      or_expr (SHORTAND or_expr)*
+
   ;
 
 or_expr :
@@ -80,10 +81,10 @@ comp_expr :
   ;
 
 colon_expr :
-     binary_expr (COLON binary_expr (COLON binary_expr)?)?
+     plus_expr (COLON plus_expr (COLON plus_expr)?)?
   ;
 
-tricky_expr :
+plus_expr :
      binary_expr ((PLUS | MINUS) binary_expr)*
   ;
 
