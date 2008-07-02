@@ -25,7 +25,7 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
-    in.setCharPositionInLine(baseCol - 1); //since antlr lines are 0-based
+    in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
     ArrayLexer lexer = new ArrayLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
     ArrayParser parser = new ArrayParser(tokens);
@@ -51,7 +51,6 @@ public List<matlab.TranslationProblem> getProblems() {
 //AC: this is a hackish way to prevent messages from being printed to stderr
 public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
     problems.add(makeProblem(tokenNames, e));
-    super.displayRecognitionError(tokenNames, e);
 }
 }
 
@@ -279,4 +278,4 @@ COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR* { $channel=HIDDEN; };
 ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR { $channel=HIDDEN; };
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
-OTHER_WHITESPACE : ' ' | '\t' | '\f' { $channel=HIDDEN; };
+OTHER_WHITESPACE : (' ' | '\t' | '\f') { $channel=HIDDEN; };
