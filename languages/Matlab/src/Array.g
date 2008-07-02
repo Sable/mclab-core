@@ -1,3 +1,6 @@
+//TODO-AC: I really wanted most of this grammar to be whitespace insensitive,
+//  but I couldn't find a way to use whitespace as an element separator
+
 grammar Array;
 
 //AC: keep the lexer and the parser together for now because that's the default Antlr layout
@@ -95,99 +98,99 @@ array :
 //all binary operators are left associative so no special handling is required
 expr :
      short_or_expr
-  |  AT input_params expr
+  |  AT filler* input_params expr
   ;
 
 short_or_expr :
-     short_and_expr (SHORTOR short_and_expr)*
+     short_and_expr (SHORTOR filler* short_and_expr)*
   ;
 
 short_and_expr :
-     or_expr (SHORTAND or_expr)*
+     or_expr (SHORTAND filler* or_expr)*
 
   ;
 
 or_expr :
-     and_expr (OR and_expr)*
+     and_expr (OR filler* and_expr)*
   ;
 
 and_expr :
-     comp_expr (AND comp_expr)*
+     comp_expr (AND filler* comp_expr)*
   ;
 
 comp_expr :
-     colon_expr ((LT | GT | LE | GE | EQ | NE) colon_expr)*
+     colon_expr ((LT | GT | LE | GE | EQ | NE) filler* colon_expr)*
   ;
 
 colon_expr :
-     plus_expr (COLON plus_expr (COLON plus_expr)?)?
+     plus_expr (COLON filler* plus_expr (COLON filler* plus_expr)?)?
   ;
 
 plus_expr :
-     binary_expr ((PLUS | MINUS) binary_expr)*
+     binary_expr ((PLUS | MINUS) filler* binary_expr)*
   ;
 
 binary_expr :
-     prefix_expr ((MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) prefix_expr)*
+     prefix_expr ((MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) filler* prefix_expr)*
   ;
 
 prefix_expr :
      pow_expr
-  |  NOT prefix_expr
-  |  PLUS prefix_expr
-  |  MINUS prefix_expr
+  |  NOT filler* prefix_expr
+  |  PLUS filler* prefix_expr
+  |  MINUS filler* prefix_expr
   ;
 
 pow_expr :
-     postfix_expr ((MPOW | EPOW) postfix_expr)*
+     postfix_expr ((MPOW | EPOW) filler* postfix_expr)*
   ;
 
 postfix_expr :
-     primary_expr (ARRAYTRANSPOSE | MTRANSPOSE)*
+     primary_expr ((ARRAYTRANSPOSE | MTRANSPOSE) filler*)*
   ;
 
 primary_expr :
      literal
-  |  LPAREN expr RPAREN
+  |  LPAREN filler* expr RPAREN filler*
   |  matrix
   |  cell_array
   |  access
-  |  AT name
+  |  AT filler* name
   ;
 
 access :
-     cell_access (LPAREN arg_list? RPAREN)?
+     cell_access (LPAREN filler* arg_list? RPAREN filler*)?
   ;
 
 cell_access :
-     (var_access) (LCURLY arg_list RCURLY)*
-  |  name AT name
+     (var_access) (LCURLY filler* arg_list RCURLY filler*)*
+  |  name AT filler* name
   ;
   
 var_access :
-     (name) (DOT name)*
+     (name) (DOT filler* name)*
   ;
 
 arg_list :	
-     (arg) (COMMA arg)*
+     (arg) (COMMA filler* arg)*
   ;
   
 arg :
      expr
-  |  COLON
+  |  COLON filler*
   ;
 
 literal :
-     NUMBER
-  |  STRING
+     NUMBER filler*
+  |  STRING filler*
   ;
 
 matrix :
-     LSQUARE optional_row_list RSQUARE
+     LSQUARE filler* optional_row_list RSQUARE filler*
   ;
 
 cell_array :
-     LCURLY optional_row_list RCURLY
+     LCURLY filler* optional_row_list RCURLY filler*
   ;
 
 optional_row_list :
@@ -203,8 +206,8 @@ row :
   ;
 
 row_separator :
-     LINE_TERMINATOR
-  |  SEMICOLON
+     LINE_TERMINATOR filler*
+  |  SEMICOLON filler*
   ;
 
 element_list :
@@ -216,19 +219,24 @@ element :
   ;
 
 element_separator :
-     COMMA
+     COMMA filler*
   ;
 
 input_params :
-     LPAREN param_list? RPAREN
+     LPAREN filler* param_list? RPAREN filler*
   ;
 
 param_list :
-     name (COMMA name)*
+     name (COMMA filler* name)*
   ;
 
 name :
-     IDENTIFIER
+     IDENTIFIER filler*
+  ;
+
+filler :
+     OTHER_WHITESPACE
+  |  ELLIPSIS_COMMENT
   ;
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
@@ -287,7 +295,7 @@ BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR* { $channel=HIDDEN; };
-ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR { $channel=HIDDEN; };
+ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
-OTHER_WHITESPACE : (' ' | '\t' | '\f')+ { $channel=HIDDEN; };
+OTHER_WHITESPACE : (' ' | '\t' | '\f')+;
