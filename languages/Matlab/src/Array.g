@@ -151,6 +151,16 @@ private boolean isElementSeparator() {
              isLBracket(prevToken) || isRBracket(nextToken));
 }
 
+private boolean isPrevTokenElementSeparator() {
+    switch(input.LA(-1)) {
+    case COMMA:
+    case OTHER_WHITESPACE:
+        return true;
+    default:
+        return false;
+    }
+}
+
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
 private boolean inParens() { return bracketStack.peek() == LPAREN; }
 }
@@ -307,8 +317,11 @@ element :
   ;
 
 element_separator :
-     COMMA
-  |  {isElementSeparator()}? FILLER
+     {isPrevTokenElementSeparator()}? COMMA -> template() "" //delete comma
+  |  COMMA                                                   //just echo
+  |  {isElementSeparator()}?
+        ( {isPrevTokenElementSeparator()}? FILLER            //just echo
+        | FILLER -> template(filler={$text}) ",<filler>")    //insert comma
   ;
 
 input_params :
@@ -323,29 +336,12 @@ name :
      IDENTIFIER
   ;
 
-lparen :
-     LPAREN { bracketStack.push(LPAREN); }
-  ;
-
-rparen :
-     RPAREN { bracketStack.pop(); }
-  ;
-
-lsquare :
-     LSQUARE { bracketStack.push(LSQUARE); }
-  ;
-
-rsquare :
-     RSQUARE { bracketStack.pop(); }
-  ;
-
-lcurly :
-     LCURLY { bracketStack.push(LCURLY); }
-  ;
-
-rcurly :
-     RCURLY { bracketStack.pop(); }
-  ;
+lparen : LPAREN { bracketStack.push(LPAREN); };
+rparen : RPAREN { bracketStack.pop(); };
+lcurly : LCURLY { bracketStack.push(LCURLY); };
+rcurly : RCURLY { bracketStack.pop(); };
+lsquare : LSQUARE { bracketStack.push(LSQUARE); };
+rsquare : RSQUARE { bracketStack.pop(); };
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
 //NB: not distinguishing between decimal and hex numbers at this level
