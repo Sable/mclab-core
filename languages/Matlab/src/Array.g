@@ -152,6 +152,7 @@ private boolean isElementSeparator() {
 }
 
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
+private boolean inParens() { return bracketStack.peek() == LPAREN; }
 }
 
 @lexer::header {
@@ -244,12 +245,12 @@ primary_expr :
   ;
 
 access :
-     cell_access (({bracketStack.peek() == LPAREN}? FILLER?) lparen FILLER? (arg_list FILLER?)? rparen)?
+     cell_access (({inParens()}? FILLER?) lparen FILLER? (arg_list FILLER?)? rparen)?
   ;
 
 cell_access :
-     (var_access) (({bracketStack.peek() == LPAREN}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
-  |  {bracketStack.peek() == LPAREN}? name FILLER? AT FILLER? name
+     (var_access) (({inParens()}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
+  |  {inParens()}? name FILLER? AT FILLER? name
   |  name AT name
   ;
   
