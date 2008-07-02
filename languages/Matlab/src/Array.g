@@ -213,7 +213,8 @@ colon_expr :
   ;
 
 plus_expr :
-     binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
+     {inParens()}? binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
+  |  binary_expr (FILLER? (PLUS | MINUS) FILLER binary_expr)* //filler after op isn't optional
   ;
 
 binary_expr :
