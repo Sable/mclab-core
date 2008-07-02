@@ -145,7 +145,14 @@ private static boolean isRBracket(Token op) {
 
 private boolean isElementSeparator() {
     Token prevToken = input.LT(-1);
-    Token nextToken = input.LT(1);
+    Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
+    switch(nextToken.getType()) {
+    case PLUS:
+    case MINUS:
+        if(input.LA(3) != FILLER) {
+            return true;
+        }
+    }
     return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
              isPrefixOperator(prevToken) || isPostfixOperator(nextToken) || 
              isLBracket(prevToken) || isRBracket(nextToken));
@@ -224,7 +231,7 @@ colon_expr :
 
 plus_expr :
      {inParens()}? binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
-  |  binary_expr (FILLER? (PLUS | MINUS) FILLER binary_expr)* //filler after op isn't optional
+  |  binary_expr ((FILLER? (PLUS | MINUS) FILLER binary_expr) | ((PLUS | MINUS) binary_expr))* //don't allow filler, op, no filler
   ;
 
 binary_expr :
@@ -317,11 +324,11 @@ element :
   ;
 
 element_separator :
-     {isPrevTokenElementSeparator()}? COMMA -> template() "" //delete comma
+     {isPrevTokenElementSeparator()}? COMMA {System.err.println("deleting comma");}-> template() "" //delete comma
   |  COMMA                                                   //just echo
   |  {isElementSeparator()}?
         ( {isPrevTokenElementSeparator()}? FILLER            //just echo
-        | FILLER -> template(filler={$text}) ",<filler>")    //insert comma
+        | FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>")    //insert comma
   ;
 
 input_params :
