@@ -282,7 +282,7 @@ cell_array :
   ;
 
 optional_row_list :
-     row_list? row_separator*
+     row_list? (row_separator FILLER?)*
   ;
 
 row_list :
