@@ -299,15 +299,19 @@ cell_array :
   ;
 
 optional_row_list :
-     row_list? (row_separator FILLER?)*
+     row_list? row_separator_list?
   ;
 
 row_list :
-     row ((row_separator FILLER?)+ row)*
+     row (row_separator_list row)*
   ;
 
 row :
-     element_list element_separator*
+     element_list element_separator_list?
+  ;
+
+row_separator_list :
+     row_separator (element_separator_list? row_separator)*
   ;
 
 row_separator :
@@ -316,17 +320,25 @@ row_separator :
   ;
 
 element_list :
-     element (element_separator+ element)*
+     element (element_separator_list element)*
   ;
   
 element :
      expr
   ;
 
-element_separator :
+element_separator_list :
+     element_separator_filler* element_separator_comma element_separator_filler*
+  |  element_separator_filler+
+  ;
+
+element_separator_comma :
      {isPrevTokenElementSeparator()}? COMMA {System.err.println("deleting comma");}-> template() "" //delete comma
   |  COMMA                                                   //just echo
-  |  {isElementSeparator()}?
+  ;
+
+element_separator_filler :
+     {isElementSeparator()}?
         ( {isPrevTokenElementSeparator()}? FILLER            //just echo
         | FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>")    //insert comma
   ;
