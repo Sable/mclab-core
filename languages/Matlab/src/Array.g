@@ -52,6 +52,18 @@ public List<matlab.TranslationProblem> getProblems() {
 public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
     problems.add(makeProblem(tokenNames, e));
 }
+
+private boolean prevTokenIsFiller(Token currToken) {
+    int absIndex = currToken.getTokenIndex();
+    Token prevToken = input.get(absIndex - 1);
+    switch(prevToken.getType()) {
+    case ELLIPSIS_COMMENT:
+    case OTHER_WHITESPACE:
+        return true;
+    default:
+        return false;
+    }
+}
 }
 
 @lexer::header {
@@ -278,4 +290,4 @@ COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR* { $channel=HIDDEN; };
 ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR { $channel=HIDDEN; };
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
-OTHER_WHITESPACE : (' ' | '\t' | '\f') { $channel=HIDDEN; };
+OTHER_WHITESPACE : (' ' | '\t' | '\f')+ { $channel=HIDDEN; };
