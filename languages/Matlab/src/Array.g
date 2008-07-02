@@ -234,11 +234,6 @@ name :
      IDENTIFIER FILLER?
   ;
 
-filler :
-     OTHER_WHITESPACE
-  |  ELLIPSIS_COMMENT
-  ;
-
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
 //NB: not distinguishing between decimal and hex numbers at this level
 
