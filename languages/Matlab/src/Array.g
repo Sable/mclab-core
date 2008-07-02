@@ -6,8 +6,8 @@ grammar Array;
 //AC: keep the lexer and the parser together for now because that's the default Antlr layout
 
 options {
-	output = template;
-	rewrite = true;
+    output = template;
+    rewrite = true;
 }
 
 @parser::header {
@@ -67,6 +67,91 @@ private boolean prevTokenIsFiller(Token currToken) {
         return false;
     }
 }
+
+private static boolean isBinaryOperator(Token op) {
+    switch(op.getType()) {
+    case AT:
+    case COLON:
+    case DOT:
+    case PLUS:
+    case MINUS:
+    case MTIMES:
+    case ETIMES:
+    case MDIV:
+    case EDIV:
+    case MLDIV:
+    case ELDIV:
+    case MPOW:
+    case EPOW:
+    case LE:
+    case GE:
+    case LT:
+    case GT:
+    case EQ:
+    case NE:
+    case AND:
+    case OR:
+    case SHORTAND:
+    case SHORTOR:
+        return true;
+    default:
+        return false;
+    }
+}
+
+private static boolean isPrefixOperator(Token op) {
+    switch(op.getType()) {
+    case PLUS:
+    case MINUS:
+    case NOT:
+    case AT:
+        return true;
+    default:
+        return false;
+    }
+}
+
+private static boolean isPostfixOperator(Token op) {
+    switch(op.getType()) {
+    case MTRANSPOSE:
+    case ARRAYTRANSPOSE:
+        return true;
+    default:
+        return false;
+    }
+}
+
+private static boolean isLBracket(Token op) {
+    switch(op.getType()) {
+    case LPAREN:
+    case LSQUARE:
+    case LCURLY:
+        return true;
+    default:
+        return false;
+    }
+}
+
+private static boolean isRBracket(Token op) {
+    switch(op.getType()) {
+    case RPAREN:
+    case RSQUARE:
+    case RCURLY:
+        return true;
+    default:
+        return false;
+    }
+}
+
+private boolean isElementSeparator() {
+    Token prevToken = input.LT(-1);
+    Token nextToken = input.LT(1);
+    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
+             isPrefixOperator(prevToken) || isPostfixOperator(nextToken) || 
+             isLBracket(prevToken) || isRBracket(nextToken));
+}
+
+private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
 }
 
 @lexer::header {
@@ -151,7 +236,7 @@ postfix_expr :
 
 primary_expr :
      literal
-  |  LPAREN FILLER? expr RPAREN
+  |  lparen FILLER? expr FILLER? rparen
   |  matrix
   |  cell_array
   |  access
@@ -159,19 +244,20 @@ primary_expr :
   ;
 
 access :
-     cell_access (FILLER? LPAREN FILLER? (arg_list FILLER?)? RPAREN)?
+     cell_access (({bracketStack.peek() == LPAREN}? FILLER?) lparen FILLER? (arg_list FILLER?)? rparen)?
   ;
 
 cell_access :
-     (var_access) (LCURLY FILLER? arg_list FILLER? RCURLY)*
-  |  name FILLER? AT FILLER? name
+     (var_access) (({bracketStack.peek() == LPAREN}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
+  |  {bracketStack.peek() == LPAREN}? name FILLER? AT FILLER? name
+  |  name AT name
   ;
   
 var_access :
      (name) (FILLER? DOT FILLER? name)*
   ;
 
-arg_list :	
+arg_list :  
      (arg) (FILLER? COMMA FILLER? arg)*
   ;
   
@@ -186,11 +272,11 @@ literal :
   ;
 
 matrix :
-     LSQUARE FILLER? optional_row_list RSQUARE
+     lsquare FILLER? optional_row_list rsquare
   ;
 
 cell_array :
-     LCURLY FILLER? optional_row_list RCURLY
+     lcurly FILLER? optional_row_list rcurly
   ;
 
 optional_row_list :
@@ -220,6 +306,7 @@ element :
 
 element_separator :
      COMMA
+  |  {isElementSeparator()}? FILLER
   ;
 
 input_params :
@@ -232,6 +319,30 @@ param_list :
 
 name :
      IDENTIFIER
+  ;
+
+lparen :
+     LPAREN { bracketStack.push(LPAREN); }
+  ;
+
+rparen :
+     RPAREN { bracketStack.pop(); }
+  ;
+
+lsquare :
+     LSQUARE { bracketStack.push(LSQUARE); }
+  ;
+
+rsquare :
+     RSQUARE { bracketStack.pop(); }
+  ;
+
+lcurly :
+     LCURLY { bracketStack.push(LCURLY); }
+  ;
+
+rcurly :
+     RCURLY { bracketStack.pop(); }
   ;
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
