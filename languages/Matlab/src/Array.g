@@ -98,40 +98,40 @@ array :
 //all binary operators are left associative so no special handling is required
 expr :
      short_or_expr
-  |  AT FILLER? input_params expr
+  |  AT FILLER? input_params FILLER? expr
   ;
 
 short_or_expr :
-     short_and_expr (SHORTOR FILLER? short_and_expr)*
+     short_and_expr (FILLER? SHORTOR FILLER? short_and_expr)*
   ;
 
 short_and_expr :
-     or_expr (SHORTAND FILLER? or_expr)*
+     or_expr (FILLER? SHORTAND FILLER? or_expr)*
 
   ;
 
 or_expr :
-     and_expr (OR FILLER? and_expr)*
+     and_expr (FILLER? OR FILLER? and_expr)*
   ;
 
 and_expr :
-     comp_expr (AND FILLER? comp_expr)*
+     comp_expr (FILLER? AND FILLER? comp_expr)*
   ;
 
 comp_expr :
-     colon_expr ((LT | GT | LE | GE | EQ | NE) FILLER? colon_expr)*
+     colon_expr (FILLER? (LT | GT | LE | GE | EQ | NE) FILLER? colon_expr)*
   ;
 
 colon_expr :
-     plus_expr (COLON FILLER? plus_expr (COLON FILLER? plus_expr)?)?
+     plus_expr (FILLER? COLON FILLER? plus_expr (FILLER? COLON FILLER? plus_expr)?)?
   ;
 
 plus_expr :
-     binary_expr ((PLUS | MINUS) FILLER? binary_expr)*
+     binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
   ;
 
 binary_expr :
-     prefix_expr ((MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) FILLER? prefix_expr)*
+     prefix_expr (FILLER? (MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) FILLER? prefix_expr)*
   ;
 
 prefix_expr :
@@ -142,16 +142,16 @@ prefix_expr :
   ;
 
 pow_expr :
-     postfix_expr ((MPOW | EPOW) FILLER? postfix_expr)*
+     postfix_expr (FILLER? (MPOW | EPOW) FILLER? postfix_expr)*
   ;
 
 postfix_expr :
-     primary_expr ((ARRAYTRANSPOSE | MTRANSPOSE) FILLER?)*
+     primary_expr (FILLER? (ARRAYTRANSPOSE | MTRANSPOSE))*
   ;
 
 primary_expr :
      literal
-  |  LPAREN FILLER? expr RPAREN FILLER?
+  |  LPAREN FILLER? expr RPAREN
   |  matrix
   |  cell_array
   |  access
@@ -159,38 +159,38 @@ primary_expr :
   ;
 
 access :
-     cell_access (LPAREN FILLER? arg_list? RPAREN FILLER?)?
+     cell_access (FILLER? LPAREN FILLER? (arg_list FILLER?)? RPAREN)?
   ;
 
 cell_access :
-     (var_access) (LCURLY FILLER? arg_list RCURLY FILLER?)*
-  |  name AT FILLER? name
+     (var_access) (LCURLY FILLER? arg_list FILLER? RCURLY)*
+  |  name FILLER? AT FILLER? name
   ;
   
 var_access :
-     (name) (DOT FILLER? name)*
+     (name) (FILLER? DOT FILLER? name)*
   ;
 
 arg_list :	
-     (arg) (COMMA FILLER? arg)*
+     (arg) (FILLER? COMMA FILLER? arg)*
   ;
   
 arg :
      expr
-  |  COLON FILLER?
+  |  COLON
   ;
 
 literal :
-     NUMBER FILLER?
-  |  STRING FILLER?
+     NUMBER
+  |  STRING
   ;
 
 matrix :
-     LSQUARE FILLER? optional_row_list RSQUARE FILLER?
+     LSQUARE FILLER? optional_row_list RSQUARE
   ;
 
 cell_array :
-     LCURLY FILLER? optional_row_list RCURLY FILLER?
+     LCURLY FILLER? optional_row_list RCURLY
   ;
 
 optional_row_list :
@@ -198,7 +198,7 @@ optional_row_list :
   ;
 
 row_list :
-     row (row_separator+ row)*
+     row ((row_separator FILLER?)+ row)*
   ;
 
 row :
@@ -206,8 +206,8 @@ row :
   ;
 
 row_separator :
-     LINE_TERMINATOR FILLER?
-  |  SEMICOLON FILLER?
+     LINE_TERMINATOR
+  |  SEMICOLON
   ;
 
 element_list :
@@ -219,19 +219,19 @@ element :
   ;
 
 element_separator :
-     COMMA FILLER?
+     COMMA
   ;
 
 input_params :
-     LPAREN FILLER? param_list? RPAREN FILLER?
+     LPAREN FILLER? (param_list FILLER?)? RPAREN
   ;
 
 param_list :
-     name (COMMA FILLER? name)*
+     name (FILLER? COMMA FILLER? name)*
   ;
 
 name :
-     IDENTIFIER FILLER?
+     IDENTIFIER
   ;
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
