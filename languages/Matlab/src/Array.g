@@ -121,28 +121,6 @@ private static boolean isPostfixOperator(Token op) {
     }
 }
 
-private static boolean isLBracket(Token op) {
-    switch(op.getType()) {
-    case LPAREN:
-    case LSQUARE:
-    case LCURLY:
-        return true;
-    default:
-        return false;
-    }
-}
-
-private static boolean isRBracket(Token op) {
-    switch(op.getType()) {
-    case RPAREN:
-    case RSQUARE:
-    case RCURLY:
-        return true;
-    default:
-        return false;
-    }
-}
-
 private boolean isElementSeparator() {
     Token prevToken = input.LT(-1);
     Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
@@ -154,8 +132,7 @@ private boolean isElementSeparator() {
         }
     }
     return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
-             isPrefixOperator(prevToken) || isPostfixOperator(nextToken) || 
-             isLBracket(prevToken) || isRBracket(nextToken));
+             isPrefixOperator(prevToken) || isPostfixOperator(nextToken));
 }
 
 private boolean isPrevTokenElementSeparator() {
