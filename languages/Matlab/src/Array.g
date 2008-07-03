@@ -308,17 +308,17 @@ row_list :
   ;
 
 row :
-     quiet_element_separator_list element_list quiet_element_separator_list
+     quiet_element_separator_list? element_list quiet_element_separator_list?
   ;
 
 //non-empty
 row_separator_list :
-     row_separator (quiet_element_separator_list quiet_row_separator)*
+     row_separator (quiet_element_separator_list? quiet_row_separator)*
   ;
 
 //possibly empty
 quiet_row_separator_list :
-     quiet_row_separator (quiet_element_separator_list quiet_row_separator)*
+     quiet_row_separator (quiet_element_separator_list? quiet_row_separator)*
   |  
   ;
 
@@ -343,17 +343,14 @@ element :
 
 //non-empty
 element_separator_list :
-     element_separator_filler* COMMA element_separator_filler* //just echo
-  |  element_separator_filler+ {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
+     FILLER? COMMA FILLER? //just echo
+  |  {isElementSeparator()}? FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
   ;
 
-//possibly empty
+//non-empty
 quiet_element_separator_list :
-     element_separator_filler* quiet_element_separator_comma? element_separator_filler*
-  ;
-
-element_separator_filler :
-     {isElementSeparator()}? FILLER //just echo
+     FILLER? quiet_element_separator_comma FILLER? //just echo
+  |  {isElementSeparator()}? FILLER
   ;
 
 quiet_element_separator_comma :
