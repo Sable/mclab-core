@@ -120,6 +120,14 @@ private static boolean isPostfixOperator(Token op) {
     }
 }
 
+private static boolean isLParen(Token op) {
+    return op.getType() == LPAREN;
+}
+
+private static boolean isRParen(Token op) {
+    return op.getType() == RPAREN;
+}
+
 private boolean isElementSeparator() {
     Token prevToken = input.LT(-1);
     Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
@@ -131,7 +139,8 @@ private boolean isElementSeparator() {
         }
     }
     return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
-             isPrefixOperator(prevToken) || isPostfixOperator(nextToken));
+             isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
+             isLParen(prevToken) || isRParen(nextToken));
 }
 
 private boolean isPrevTokenElementSeparator() {
