@@ -311,8 +311,15 @@ row :
      quiet_element_separator_list element_list quiet_element_separator_list
   ;
 
+//non-empty
 row_separator_list :
-     row_separator (quiet_element_separator_list row_separator)*
+     row_separator (quiet_element_separator_list quiet_row_separator)*
+  ;
+
+//possibly empty
+quiet_row_separator_list :
+     quiet_row_separator (quiet_element_separator_list quiet_row_separator)*
+  |  
   ;
 
 row_separator :
@@ -320,45 +327,36 @@ row_separator :
   |  SEMICOLON
   ;
 
-quiet_row_separator_list :
-     row_separator (quiet_element_separator_list row_separator)*
-  |  
+quiet_row_separator : //match and delete row_separator
+     LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
+  |  SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   ;
 
 element_list :
      element (element_separator_list element)*
   ;
-  
+
 element :
      expr
   ;
 
+//non-empty
 element_separator_list :
-     element_separator_filler* element_separator_comma element_separator_filler*
-  |  element_separator_filler+
+     element_separator_filler* COMMA element_separator_filler* //just echo
+  |  element_separator_filler+ {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
   ;
 
-element_separator_comma :
-     {isPrevTokenElementSeparator()}? COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
-  |  COMMA                                                   //just echo
+//possibly empty
+quiet_element_separator_list :
+     element_separator_filler* quiet_element_separator_comma? element_separator_filler*
   ;
 
 element_separator_filler :
-     {isElementSeparator()}?
-        ( {isPrevTokenElementSeparator()}? FILLER            //just echo
-        | FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>")    //insert comma
-  ;
-
-quiet_element_separator_list :
-     quiet_element_separator_filler* quiet_element_separator_comma? quiet_element_separator_filler*
+     {isElementSeparator()}? FILLER //just echo
   ;
 
 quiet_element_separator_comma :
      COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
-  ;
-
-quiet_element_separator_filler :
-     {isElementSeparator()}? FILLER //just echo
   ;
 
 input_params :
