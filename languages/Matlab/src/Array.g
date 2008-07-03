@@ -230,8 +230,7 @@ colon_expr :
   ;
 
 plus_expr :
-     {inParens()}? binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
-  |  binary_expr ((FILLER? (PLUS | MINUS) FILLER binary_expr) | ((PLUS | MINUS) binary_expr))* //don't allow filler, op, no filler
+     binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
   ;
 
 binary_expr :
