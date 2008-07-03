@@ -291,15 +291,16 @@ literal :
   ;
 
 matrix :
-     lsquare FILLER? optional_row_list rsquare
+     lsquare optional_row_list rsquare
   ;
 
 cell_array :
-     lcurly FILLER? optional_row_list rcurly
+     lcurly optional_row_list rcurly
   ;
 
 optional_row_list :
-     row_list? row_separator_list?
+     quiet_row_separator_list row_list quiet_row_separator_list
+  |  quiet_row_separator_list
   ;
 
 row_list :
@@ -307,16 +308,21 @@ row_list :
   ;
 
 row :
-     element_list element_separator_list?
+     quiet_element_separator_list element_list quiet_element_separator_list
   ;
 
 row_separator_list :
-     row_separator (element_separator_list? row_separator)*
+     row_separator (quiet_element_separator_list row_separator)*
   ;
 
 row_separator :
      LINE_TERMINATOR
   |  SEMICOLON
+  ;
+
+quiet_row_separator_list :
+     row_separator (quiet_element_separator_list row_separator)*
+  |  
   ;
 
 element_list :
@@ -333,7 +339,7 @@ element_separator_list :
   ;
 
 element_separator_comma :
-     {isPrevTokenElementSeparator()}? COMMA {System.err.println("deleting comma");}-> template() "" //delete comma
+     {isPrevTokenElementSeparator()}? COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
   |  COMMA                                                   //just echo
   ;
 
@@ -341,6 +347,18 @@ element_separator_filler :
      {isElementSeparator()}?
         ( {isPrevTokenElementSeparator()}? FILLER            //just echo
         | FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>")    //insert comma
+  ;
+
+quiet_element_separator_list :
+     quiet_element_separator_filler* quiet_element_separator_comma? quiet_element_separator_filler*
+  ;
+
+quiet_element_separator_comma :
+     COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
+  ;
+
+quiet_element_separator_filler :
+     {isElementSeparator()}? FILLER //just echo
   ;
 
 input_params :
