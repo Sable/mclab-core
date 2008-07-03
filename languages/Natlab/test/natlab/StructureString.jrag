@@ -476,6 +476,7 @@ aspect StructureString {
         return buf.toString();
     }
     eq ColonExpr.getStructureStringLessComments() = ":";
+    eq EndExpr.getStructureStringLessComments() = "end";
     
     eq Name.getStructureStringLessComments() = getID();
 

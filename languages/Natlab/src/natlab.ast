@@ -53,6 +53,7 @@ ElseBlock ::= Stmt*;
 abstract Expr;
 RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
 ColonExpr : Expr;
+EndExpr : Expr;
 
 abstract LValueExpr : Expr;
 NameExpr : LValueExpr ::= Name;
