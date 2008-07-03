@@ -276,7 +276,6 @@
 %typeof switch_case = "SwitchCaseBlock";
 %typeof default_case = "DefaultCaseBlock";
 %typeof access, cell_access = "Expr";
-%typeof var_access = "LValueExpr";
 
 %typeof IDENTIFIER, COMMENT, HELP_COMMENT, STRING = "String";
 %typeof INT_NUMBER, IM_INT_NUMBER = "IntNumericLiteralValue";
@@ -636,14 +635,10 @@ access =
   ;
 
 cell_access =
-     name.f AT name.c {: return new SuperClassMethodExpr(f, c); :}
-  |  var_access.v
-  |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
-  ;
-
-var_access =
      name.n {: return new NameExpr(n); :}
-  |  var_access.v DOT name.n {: return new DotExpr(v, n); :}
+  |  name.f AT name.c {: return new SuperClassMethodExpr(f, c); :}
+  |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
+  |  access.v DOT name.n {: return new DotExpr(v, n); :}
   ;
 
 literal =
