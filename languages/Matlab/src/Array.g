@@ -299,10 +299,10 @@ quiet_row_separator_list :
   |  
   ;
 
+//TODO-AC: allow SEMICOLON LINE_TERMINATOR
 row_separator :
      LINE_TERMINATOR
   |  SEMICOLON
-  |  SEMICOLON_LINE_TERMINATOR
   ;
 
 quiet_row_separator : //match and delete row_separator
@@ -366,8 +366,6 @@ fragment HEX_NUMBER : HEX_DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP;
 NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
-
-SEMICOLON_LINE_TERMINATOR : SEMICOLON LINE_TERMINATOR;
 
 PLUS : '+';
 MINUS : '-';
