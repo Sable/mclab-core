@@ -70,7 +70,6 @@ private boolean prevTokenIsFiller(Token currToken) {
 
 private static boolean isBinaryOperator(Token op) {
     switch(op.getType()) {
-    case AT:
     case COLON:
     case DOT:
     case PLUS:
