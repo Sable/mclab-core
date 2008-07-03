@@ -263,17 +263,17 @@ primary_expr :
   ;
 
 access :
+     paren_access (FILLER? DOT FILLER? paren_access)*
+  ;
+
+paren_access :
      cell_access (({inParens()}? FILLER?) lparen FILLER? (arg_list FILLER?)? rparen)?
   ;
 
 cell_access :
-     (var_access) (({inParens()}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
+     name (({inParens()}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
   |  {inParens()}? name FILLER? AT FILLER? name
   |  name AT name
-  ;
-  
-var_access :
-     (name) (FILLER? DOT FILLER? name)*
   ;
 
 arg_list :  
