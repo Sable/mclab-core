@@ -276,8 +276,10 @@ cell_array :
   ;
 
 optional_row_list :
-     quiet_row_separator_list row_list quiet_row_separator_list
-  |  quiet_row_separator_list
+     
+  |  quiet_element_separator_list
+  |  (quiet_element_separator_list? quiet_row_separator)+ quiet_element_separator_list?
+  |  (quiet_element_separator_list? quiet_row_separator)* row_list quiet_row_separator_list?
   ;
 
 row_list :
@@ -296,7 +298,6 @@ row_separator_list :
 //possibly empty
 quiet_row_separator_list :
      quiet_row_separator (quiet_element_separator_list? quiet_row_separator)*
-  |  
   ;
 
 //TODO-AC: allow SEMICOLON LINE_TERMINATOR
