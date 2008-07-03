@@ -259,6 +259,7 @@ primary_expr :
   |  cell_array
   |  access
   |  AT FILLER? name
+  |  END
   ;
 
 access :
@@ -375,8 +376,10 @@ rcurly : RCURLY { bracketStack.pop(); };
 lsquare : LSQUARE { bracketStack.push(LSQUARE); };
 rsquare : RSQUARE { bracketStack.pop(); };
 
-//NB: not distinguishing between identifiers and keywords at this level - everything is an ID
+//NB: not distinguishing between identifiers and keywords at this level - everything is an ID (except END)
 //NB: not distinguishing between decimal and hex numbers at this level
+
+END : 'end'; //meaning "last index"
 
 fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
