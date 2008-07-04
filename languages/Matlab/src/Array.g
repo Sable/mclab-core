@@ -129,11 +129,15 @@ private static boolean isRParen(Token op) {
 }
 
 private boolean isElementSeparator() {
+    if(inParens()) {
+        return false;
+    }
     Token prevToken = input.LT(-1);
     Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
     switch(nextToken.getType()) {
     case PLUS:
     case MINUS:
+    case AT:
         if(input.LA(3) != FILLER) {
             return true;
         }
@@ -243,7 +247,7 @@ primary_expr :
   |  matrix
   |  cell_array
   |  access
-  |  AT FILLER? name
+  //|  AT FILLER? name
   |  END
   ;
 
@@ -252,13 +256,12 @@ access :
   ;
 
 paren_access :
-     cell_access (({inParens()}? FILLER?) lparen FILLER? (arg_list FILLER?)? rparen)?
+     cell_access (FILLER? lparen FILLER? (arg_list FILLER?)? rparen)?
   ;
 
 cell_access :
-     name (({inParens()}? FILLER?) lcurly FILLER? arg_list FILLER? rcurly)*
-  |  {inParens()}? name FILLER? AT FILLER? name
-  |  name AT name
+     name (FILLER? lcurly FILLER? arg_list FILLER? rcurly)*
+  //|  name FILLER? AT FILLER? name
   ;
 
 arg_list :  
