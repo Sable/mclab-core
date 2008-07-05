@@ -425,4 +425,4 @@ LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 
 fragment ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 fragment OTHER_WHITESPACE : (' ' | '\t' | '\f')+;
-FILLER : (ELLIPSIS_COMMENT | OTHER_WHITESPACE)+;
+FILLER : ((('...')=> ELLIPSIS_COMMENT) | OTHER_WHITESPACE)+; //NB: putting the predicate on the fragment doesn't work
