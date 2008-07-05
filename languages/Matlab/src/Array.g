@@ -42,7 +42,7 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     return tokens.toString();
 }
 
-private final OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+private OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
 
 private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
 
