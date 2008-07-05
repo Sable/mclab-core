@@ -150,16 +150,6 @@ private boolean isElementSeparator() {
              isLParen(prevToken) || isRParen(nextToken));
 }
 
-private boolean isPrevTokenElementSeparator() {
-    switch(input.LA(-1)) {
-    case COMMA:
-    case OTHER_WHITESPACE:
-        return true;
-    default:
-        return false;
-    }
-}
-
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
 private boolean inParens() { return bracketStack.peek() == LPAREN; }
 }
