@@ -32,6 +32,7 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     ArrayLexer lexer = new ArrayLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
     ArrayParser parser = new ArrayParser(tokens);
+    parser.offsetTracker = offsetTracker;
     try {
         parser.array();
     } catch (RecognitionException e) {
@@ -40,6 +41,8 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     problems.addAll(parser.getProblems());
     return tokens.toString();
 }
+
+private final OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
 
 private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
 
