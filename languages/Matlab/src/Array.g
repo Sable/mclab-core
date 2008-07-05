@@ -70,6 +70,7 @@ private boolean prevTokenIsFiller(Token currToken) {
 
 private static boolean isBinaryOperator(Token op) {
     switch(op.getType()) {
+    case AT:
     case COLON:
     case DOT:
     case PLUS:
@@ -137,10 +138,12 @@ private boolean isElementSeparator() {
     switch(nextToken.getType()) {
     case PLUS:
     case MINUS:
-    case AT:
         if(input.LA(3) != FILLER) {
             return true;
         }
+        break;
+    case AT:
+        return true;
     }
     return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
              isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
@@ -247,7 +250,7 @@ primary_expr :
   |  matrix
   |  cell_array
   |  access
-  //|  AT FILLER? name
+  |  AT FILLER? name
   |  END
   ;
 
@@ -261,7 +264,8 @@ paren_access :
 
 cell_access :
      name (FILLER? lcurly FILLER? arg_list FILLER? rcurly)*
-  //|  name FILLER? AT FILLER? name
+  |  {inParens()}? name FILLER? AT FILLER? name
+  |  {!inParens()}? name AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
 
 arg_list :  
