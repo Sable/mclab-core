@@ -30,7 +30,7 @@ public class Translator {
                 }
             } else {
                 List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-                out.print(actual.translate(null, problems));
+                out.print(actual.translate(new OffsetTracker(new TextPosition(1, 1)), problems));
                 for(TranslationProblem prob : problems) {
                     System.err.println(prob);
                 }
