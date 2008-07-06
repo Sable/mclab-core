@@ -372,6 +372,9 @@ name :
 
 //NB: always call these instead of the real tokens in order to keep the offsetTracker position up to date
 
+//TODO-AC: is it possible to attach these actions to the actual lexer rules?  I don't think the lexer and
+//  the parser are kept in sync (buffering, backtracking, etc)
+
 t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
 t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
 t_MTIMES : MTIMES { offsetTracker.advanceInLine(1); };
