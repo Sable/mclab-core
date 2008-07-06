@@ -214,9 +214,7 @@ FPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?
 HexNumber = 0[xX]{HexDigit}+
 Number = ({IntNumber} | {FPNumber} | {HexNumber}) {Imaginary}?
 
-HelpComment=%% | %%[^{\r\n].*
-OpenBracketHelpComment = %%\{
-Comment=% | %[^%{\r\n].*
+Comment=% | %[^{\r\n].*
 OpenBracketComment = %\{
 CloseBracketComment = %\}
 
@@ -228,8 +226,6 @@ ValidEscape=\\[bfnrt\\\"]
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
 %xstate COMMENT_NESTING
-//within a bracket help comment (i.e. %%{)
-%xstate HELP_COMMENT_NESTING
 //within a classdef
 %state CLASS
 //within a string literal
@@ -291,17 +287,7 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //single-line comments
-{HelpComment} { return symbol(HELP_COMMENT); }
 {Comment} { return symbol(COMMENT); }
-
-//start multiline help comment
-{OpenBracketHelpComment} {
-    transposeNext = false; 
-    saveStateAndTransition(HELP_COMMENT_NESTING);
-    markStartPosition();
-    bracketCommentNestingDepth++;
-    bracketCommentBuf = new StringBuffer(yytext());
-}
 
 //start multiline comment
 {OpenBracketComment} {
@@ -312,23 +298,11 @@ ValidEscape=\\[bfnrt\\\"]
     bracketCommentBuf = new StringBuffer(yytext());
 }
 
-//continue multiline (help) comment
-<COMMENT_NESTING, HELP_COMMENT_NESTING> {
+//continue multiline comment
+<COMMENT_NESTING> {
     [^%]+ { bracketCommentBuf.append(yytext()); }
     % { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
-    <<EOF>> {
-        //don't finish scanning if there's an unclosed comment
-        if(bracketCommentNestingDepth != 0) {
-            yybegin(YYINITIAL); //so that we'll return EOF as the next token
-            error(bracketCommentNestingDepth + " levels of comments not closed");
-        }
-        return symbol(EOF);
-    }
-}
-
-//terminate multiline comment
-<COMMENT_NESTING> {
     {CloseBracketComment} { 
         bracketCommentNestingDepth--;
         bracketCommentBuf.append(yytext());
@@ -339,19 +313,13 @@ ValidEscape=\\[bfnrt\\\"]
             return sym;
         }
     }
-}
-
-//terminate multiline help comment
-<HELP_COMMENT_NESTING> {
-    {CloseBracketComment} { 
-        bracketCommentNestingDepth--;
-        bracketCommentBuf.append(yytext());
-        if(bracketCommentNestingDepth == 0) {
-            markEndPosition();
-            Symbol sym = symbolFromMarkedPositions(BRACKET_HELP_COMMENT, bracketCommentBuf.toString());
-            restoreState();
-            return sym;
+    <<EOF>> {
+        //don't finish scanning if there's an unclosed comment
+        if(bracketCommentNestingDepth != 0) {
+            yybegin(YYINITIAL); //so that we'll return EOF as the next token
+            error(bracketCommentNestingDepth + " levels of comments not closed");
         }
+        return symbol(EOF);
     }
 }
 

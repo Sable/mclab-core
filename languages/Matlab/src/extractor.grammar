@@ -90,7 +90,7 @@
 
 %terminals IDENTIFIER;
 %terminals NUMBER;
-%terminals COMMENT, HELP_COMMENT, ELLIPSIS_COMMENT, BRACKET_COMMENT, BRACKET_HELP_COMMENT, SHELL_COMMAND;
+%terminals COMMENT, ELLIPSIS_COMMENT, BRACKET_COMMENT, SHELL_COMMAND;
 %terminals BREAK, CASE, CATCH, CLASSDEF, CONTINUE, ELSE, ELSEIF, END, FOR, FUNCTION, GLOBAL, IF, OTHERWISE, PARFOR, PERSISTENT, RETURN, SWITCH, TRY, WHILE;
 %terminals PLUS, MINUS, MTIMES, ETIMES, MDIV, EDIV, MLDIV, ELDIV, MPOW, EPOW, MTRANSPOSE, ARRAYTRANSPOSE, LE, GE, LT, GT, EQ, NE, AND, OR, NOT, SHORTAND, SHORTOR, ASSIGN;
 %terminals DOT, COMMA, SEMICOLON, LINE_TERMINATOR;
@@ -131,14 +131,6 @@ script =
         {: return new ListNode().add(s1); :}
   |  nbf.s1+ last_stmt.s2
         {: return new ListNode().add(s1).add(s2); :}
-  |  help_comment.s1+ nbf.s2* stmt.s3+ last_stmt.s4
-        {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
-  |  help_comment.s1+ nbf.s2* last_stmt.s3
-        {: return new ListNode().add(s1).add(s2).add(s3); :}
-  |  help_comment.s1+ last_help_comment.s2
-        {: return new ListNode().add(s1).add(s2); :}
-  |  last_help_comment.s1
-        {: return new ListNode().add(s1); :}
   ;
 
 //function file: list of functions, separated by whitespace
@@ -163,14 +155,14 @@ function_separator =
 
 //a function with nothing following the final END
 function_body =
-     FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* stmt_separator_no_nbf.s8 help_comment_list.s9 stmt_or_function.s10* END.s11
-        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11); :}
-  |  FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* input_params.s8 nbf.s9* stmt_separator_no_nbf.s10 help_comment_list.s11 stmt_or_function.s12* END.s13
-        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12).add(s13); :}
-  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator_no_nbf.s5 help_comment_list.s6 stmt_or_function.s7* END.s8
-        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8); :}
-  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* input_params.s5 nbf.s6* stmt_separator_no_nbf.s7 help_comment_list.s8 stmt_or_function.s9* END.s10
+     FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* stmt_separator.s8 stmt_or_function.s9* END.s10
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10); :}
+  |  FUNCTION.s1 nbf.s2* output_params.s3 ASSIGN.s4 nbf.s5* IDENTIFIER.s6 nbf.s7* input_params.s8 nbf.s9* stmt_separator.s10 stmt_or_function.s11* END.s12
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9).add(s10).add(s11).add(s12); :}
+  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* stmt_separator.s5 stmt_or_function.s6* END.s7
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
+  |  FUNCTION.s1 nbf.s2* IDENTIFIER.s3 nbf.s4* input_params.s5 nbf.s6* stmt_separator.s7 stmt_or_function.s8* END.s9
+        {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7).add(s8).add(s9); :}
   ;
 
 //input parameter list for a function
@@ -253,12 +245,6 @@ function_signature =
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4).add(s5).add(s6).add(s7); :}
   ;
 
-//usually help comments are followed by a newline, but the last one could be followed by EOF instead
-last_help_comment =
-     help_comment
-  |  nbf.s1* help_comment_body.s2 {: return new ListNode().add(s1).add(s2); :}
-  ;
-
 help_comment_list =
      nbf*
   |  help_comment.s1+ nbf.s2* {: return new ListNode().add(s1).add(s2); :}
@@ -272,8 +258,8 @@ help_comment =
 
 //help comment without a newline
 help_comment_body =
-     HELP_COMMENT
-  |  BRACKET_HELP_COMMENT
+     COMMENT
+  |  BRACKET_COMMENT
   ;
 
 //list of statements (each followed by a separator)
