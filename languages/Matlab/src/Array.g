@@ -249,7 +249,7 @@ postfix_expr :
 
 primary_expr :
      literal
-  |  lparen FILLER? expr FILLER? rparen
+  |  t_lparen FILLER? expr FILLER? t_rparen
   |  matrix
   |  cell_array
   |  access
@@ -261,11 +261,11 @@ access :
   ;
 
 paren_access :
-     cell_access (FILLER? lparen FILLER? (arg_list FILLER?)? rparen)?
+     cell_access (FILLER? t_lparen FILLER? (arg_list FILLER?)? t_rparen)?
   ;
 
 cell_access :
-     name (FILLER? lcurly FILLER? arg_list FILLER? rcurly)*
+     name (FILLER? t_lcurly FILLER? arg_list FILLER? t_rcurly)*
   |  {inParens()}? name FILLER? AT FILLER? name
   |  {!inParens()}? name AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
@@ -285,11 +285,11 @@ literal :
   ;
 
 matrix :
-     lsquare optional_row_list rsquare
+     t_lsquare optional_row_list t_rsquare
   ;
 
 cell_array :
-     lcurly optional_row_list rcurly
+     t_lcurly optional_row_list t_rcurly
   ;
 
 optional_row_list :
@@ -364,12 +364,12 @@ name :
      IDENTIFIER
   ;
 
-lparen : LPAREN { bracketStack.push(LPAREN); };
-rparen : RPAREN { bracketStack.pop(); };
-lcurly : LCURLY { bracketStack.push(LCURLY); };
-rcurly : RCURLY { bracketStack.pop(); };
-lsquare : LSQUARE { bracketStack.push(LSQUARE); };
-rsquare : RSQUARE { bracketStack.pop(); };
+t_lparen : LPAREN { bracketStack.push(LPAREN); };
+t_rparen : RPAREN { bracketStack.pop(); };
+t_lcurly : LCURLY { bracketStack.push(LCURLY); };
+t_rcurly : RCURLY { bracketStack.pop(); };
+t_lsquare : LSQUARE { bracketStack.push(LSQUARE); };
+t_rsquare : RSQUARE { bracketStack.pop(); };
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
 //NB: not distinguishing between decimal and hex numbers at this level
