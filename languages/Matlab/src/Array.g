@@ -320,11 +320,15 @@ quiet_row_separator_list :
 //TODO-AC: allow SEMICOLON LINE_TERMINATOR
 row_separator :
      LINE_TERMINATOR
+  |  COMMENT LINE_TERMINATOR
+  |  BRACKET_COMMENT LINE_TERMINATOR
   |  SEMICOLON
   ;
 
 quiet_row_separator : //match and delete row_separator
      LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
+  |  COMMENT LINE_TERMINATOR //can't delete in this case
+  |  BRACKET_COMMENT LINE_TERMINATOR //can't delete in this case
   |  SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   ;
 
@@ -370,6 +374,8 @@ t_LCURLY : LCURLY { bracketStack.push(LCURLY); };
 t_RCURLY : RCURLY { bracketStack.pop(); };
 t_LSQUARE : LSQUARE { bracketStack.push(LSQUARE); };
 t_RSQUARE : RSQUARE { bracketStack.pop(); };
+
+//// LEXER /////////////////////////////////////////////////////////////////////
 
 //NB: not distinguishing between identifiers and keywords at this level - everything is an ID
 //NB: not distinguishing between decimal and hex numbers at this level
@@ -423,10 +429,10 @@ fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : '\'' STRING_CHAR* '\'';
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
-BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}' { $channel=HIDDEN; }; //TODO-AC: test this
+BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}'; //TODO-AC: test this
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
-COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR* { $channel=HIDDEN; };
+COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 
