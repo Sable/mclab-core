@@ -326,8 +326,8 @@ row_separator :
   ;
 
 quiet_row_separator : //match and delete row_separator
-     t_LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
-  |  t_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
+     dt_LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
+  |  dt_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   |  t_COMMENT t_LINE_TERMINATOR //can't delete in this case
   |  t_BRACKET_COMMENT t_LINE_TERMINATOR //can't delete in this case
   ;
@@ -343,7 +343,7 @@ element :
 //non-empty
 element_separator_list :
      t_FILLER? t_COMMA t_FILLER? //just echo
-  |  {isElementSeparator()}? t_FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
+  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); } t_FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 //non-empty
@@ -353,7 +353,7 @@ quiet_element_separator_list :
   ;
 
 quiet_element_separator_comma :
-     t_COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
+     dt_COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
   ;
 
 input_params :
@@ -421,6 +421,10 @@ t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); };
 t_FILLER : FILLER { offsetTracker.advanceByTextSize($text); };
 
 t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
+
+dt_COMMA : COMMA { offsetTracker.recordOffsetChange(0, 1); };
+dt_SEMICOLON : SEMICOLON { offsetTracker.recordOffsetChange(0, 1); };
+dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * $LINE_TERMINATOR.pos); }; //NB: end pos of newline is 0-based
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
