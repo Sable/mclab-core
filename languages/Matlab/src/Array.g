@@ -25,7 +25,6 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 }
 
 public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
-    offsetTracker.advanceByTextSize(text); //TODO-AC: update during translation
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
     in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
