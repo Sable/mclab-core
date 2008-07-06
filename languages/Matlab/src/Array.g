@@ -38,6 +38,7 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     } catch (RecognitionException e) {
         parser.problems.add(parser.makeProblem(e));
     }
+    problems.addAll(lexer.getProblems());
     problems.addAll(parser.getProblems());
     return tokens.toString();
 }
@@ -162,6 +163,27 @@ private static boolean isPreTransposeChar(int ch) {
     default:
         return Character.isLetterOrDigit(ch); //at the end of an identifier
     }
+}
+
+//TODO-AC: This content is duplicated from the parser...maybe it can be factored out
+private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
+
+public boolean hasProblem() { 
+    return !problems.isEmpty();
+}
+
+public List<matlab.TranslationProblem> getProblems() {
+    return java.util.Collections.unmodifiableList(problems);
+}
+
+//AC: this is a hackish way to prevent messages from being printed to stderr
+public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
+    problems.add(makeProblem(tokenNames, e));
+}
+
+private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionException e) {
+    //change column to 1-based
+    return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, "LEXER: " + getErrorMessage(e, tokenNames));
 }
 }
 
