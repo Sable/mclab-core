@@ -196,92 +196,92 @@ array :
 //all binary operators are left associative so no special handling is required
 expr :
      short_or_expr
-  |  AT FILLER? input_params FILLER? expr
+  |  t_AT t_FILLER? input_params t_FILLER? expr
   ;
 
 short_or_expr :
-     short_and_expr (FILLER? SHORTOR FILLER? short_and_expr)*
+     short_and_expr (t_FILLER? t_SHORTOR t_FILLER? short_and_expr)*
   ;
 
 short_and_expr :
-     or_expr (FILLER? SHORTAND FILLER? or_expr)*
+     or_expr (t_FILLER? t_SHORTAND t_FILLER? or_expr)*
 
   ;
 
 or_expr :
-     and_expr (FILLER? OR FILLER? and_expr)*
+     and_expr (t_FILLER? t_OR t_FILLER? and_expr)*
   ;
 
 and_expr :
-     comp_expr (FILLER? AND FILLER? comp_expr)*
+     comp_expr (t_FILLER? t_AND t_FILLER? comp_expr)*
   ;
 
 comp_expr :
-     colon_expr (FILLER? (LT | GT | LE | GE | EQ | NE) FILLER? colon_expr)*
+     colon_expr (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr)*
   ;
 
 colon_expr :
-     plus_expr (FILLER? COLON FILLER? plus_expr (FILLER? COLON FILLER? plus_expr)?)?
+     plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
   ;
 
 plus_expr :
-     binary_expr (FILLER? (PLUS | MINUS) FILLER? binary_expr)*
+     binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
   ;
 
 binary_expr :
-     prefix_expr (FILLER? (MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) FILLER? prefix_expr)*
+     prefix_expr (t_FILLER? (t_MTIMES | t_ETIMES | t_MDIV | t_EDIV | t_MLDIV | t_ELDIV) t_FILLER? prefix_expr)*
   ;
 
 prefix_expr :
      pow_expr
-  |  NOT FILLER? prefix_expr
-  |  PLUS FILLER? prefix_expr
-  |  MINUS FILLER? prefix_expr
+  |  t_NOT t_FILLER? prefix_expr
+  |  t_PLUS t_FILLER? prefix_expr
+  |  t_MINUS t_FILLER? prefix_expr
   ;
 
 pow_expr :
-     postfix_expr (FILLER? (MPOW | EPOW) FILLER? postfix_expr)*
+     postfix_expr (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_expr)*
   ;
 
 postfix_expr :
-     primary_expr (FILLER? (ARRAYTRANSPOSE | MTRANSPOSE))*
+     primary_expr (t_FILLER? (t_ARRAYTRANSPOSE | t_MTRANSPOSE))*
   ;
 
 primary_expr :
      literal
-  |  t_LPAREN FILLER? expr FILLER? t_RPAREN
+  |  t_LPAREN t_FILLER? expr t_FILLER? t_RPAREN
   |  matrix
   |  cell_array
   |  access
-  |  AT FILLER? name
+  |  t_AT t_FILLER? name
   ;
 
 access :
-     paren_access (FILLER? DOT FILLER? paren_access)*
+     paren_access (t_FILLER? t_DOT t_FILLER? paren_access)*
   ;
 
 paren_access :
-     cell_access (FILLER? t_LPAREN FILLER? (arg_list FILLER?)? t_RPAREN)?
+     cell_access (t_FILLER? t_LPAREN t_FILLER? (arg_list t_FILLER?)? t_RPAREN)?
   ;
 
 cell_access :
-     name (FILLER? t_LCURLY FILLER? arg_list FILLER? t_RCURLY)*
-  |  {inParens()}? name FILLER? AT FILLER? name
-  |  {!inParens()}? name AT name //TODO-AC: fix error message for name AT FILLER name case
+     name (t_FILLER? t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
+  |  {inParens()}? name t_FILLER? t_AT t_FILLER? name
+  |  {!inParens()}? name t_AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
 
 arg_list :  
-     (arg) (FILLER? COMMA FILLER? arg)*
+     (arg) (t_FILLER? t_COMMA t_FILLER? arg)*
   ;
   
 arg :
      expr
-  |  COLON
+  |  t_COLON
   ;
 
 literal :
-     NUMBER
-  |  STRING
+     t_NUMBER
+  |  t_STRING
   ;
 
 matrix :
@@ -317,19 +317,19 @@ quiet_row_separator_list :
      quiet_row_separator (quiet_element_separator_list? quiet_row_separator)*
   ;
 
-//TODO-AC: allow SEMICOLON LINE_TERMINATOR
+//TODO-AC: allow t_SEMICOLON t_LINE_TERMINATOR
 row_separator :
-     LINE_TERMINATOR
-  |  COMMENT LINE_TERMINATOR
-  |  BRACKET_COMMENT LINE_TERMINATOR
-  |  SEMICOLON
+     t_LINE_TERMINATOR
+  |  t_COMMENT t_LINE_TERMINATOR
+  |  t_BRACKET_COMMENT t_LINE_TERMINATOR
+  |  t_SEMICOLON
   ;
 
 quiet_row_separator : //match and delete row_separator
-     LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
-  |  COMMENT LINE_TERMINATOR //can't delete in this case
-  |  BRACKET_COMMENT LINE_TERMINATOR //can't delete in this case
-  |  SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
+     t_LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
+  |  t_COMMENT t_LINE_TERMINATOR //can't delete in this case
+  |  t_BRACKET_COMMENT t_LINE_TERMINATOR //can't delete in this case
+  |  t_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   ;
 
 element_list :
@@ -342,33 +342,35 @@ element :
 
 //non-empty
 element_separator_list :
-     FILLER? COMMA FILLER? //just echo
-  |  {isElementSeparator()}? FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
+     t_FILLER? t_COMMA t_FILLER? //just echo
+  |  {isElementSeparator()}? t_FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 //non-empty
 quiet_element_separator_list :
-     FILLER? quiet_element_separator_comma FILLER? //just echo
-  |  {isElementSeparator()}? FILLER
+     t_FILLER? quiet_element_separator_comma t_FILLER? //just echo
+  |  {isElementSeparator()}? t_FILLER
   ;
 
 quiet_element_separator_comma :
-     COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
+     t_COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
   ;
 
 input_params :
-     LPAREN FILLER? (param_list FILLER?)? RPAREN
+     t_LPAREN t_FILLER? (param_list t_FILLER?)? t_RPAREN
   ;
 
 param_list :
-     name (FILLER? COMMA FILLER? name)*
+     name (t_FILLER? t_COMMA t_FILLER? name)*
   ;
 
 name :
-     IDENTIFIER
+     t_IDENTIFIER
   ;
 
 //// Terminal Rules ////////////////////////////////////////////////////////////
+
+//NB: always call these instead of the real tokens in order to keep the offsetTracker position up to date
 
 t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
 t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
