@@ -368,12 +368,53 @@ name :
      IDENTIFIER
   ;
 
-t_LPAREN : LPAREN { bracketStack.push(LPAREN); };
-t_RPAREN : RPAREN { bracketStack.pop(); };
-t_LCURLY : LCURLY { bracketStack.push(LCURLY); };
-t_RCURLY : RCURLY { bracketStack.pop(); };
-t_LSQUARE : LSQUARE { bracketStack.push(LSQUARE); };
-t_RSQUARE : RSQUARE { bracketStack.pop(); };
+//// Terminal Rules ////////////////////////////////////////////////////////////
+
+t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
+t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
+t_MTIMES : MTIMES { offsetTracker.advanceInLine(1); };
+t_ETIMES : ETIMES { offsetTracker.advanceInLine(2); };
+t_MDIV : MDIV { offsetTracker.advanceInLine(1); };
+t_EDIV : EDIV { offsetTracker.advanceInLine(2); };
+t_MLDIV : MLDIV { offsetTracker.advanceInLine(1); };
+t_ELDIV : ELDIV { offsetTracker.advanceInLine(2); };
+t_MPOW : MPOW { offsetTracker.advanceInLine(1); };
+t_EPOW : EPOW { offsetTracker.advanceInLine(2); };
+t_MTRANSPOSE : MTRANSPOSE { offsetTracker.advanceInLine(1); };
+t_ARRAYTRANSPOSE : ARRAYTRANSPOSE { offsetTracker.advanceInLine(2); };
+t_LE : LE { offsetTracker.advanceInLine(2); };
+t_GE : GE { offsetTracker.advanceInLine(2); };
+t_LT : LT { offsetTracker.advanceInLine(1); };
+t_GT : GT { offsetTracker.advanceInLine(1); };
+t_EQ : EQ { offsetTracker.advanceInLine(2); };
+t_NE : NE { offsetTracker.advanceInLine(2); };
+t_AND : AND { offsetTracker.advanceInLine(1); };
+t_OR : OR { offsetTracker.advanceInLine(1); };
+t_NOT : NOT { offsetTracker.advanceInLine(1); };
+t_SHORTAND : SHORTAND { offsetTracker.advanceInLine(2); };
+t_SHORTOR : SHORTOR { offsetTracker.advanceInLine(2); };
+t_DOT : DOT { offsetTracker.advanceInLine(1); };
+t_COMMA : COMMA { offsetTracker.advanceInLine(1); };
+t_SEMICOLON : SEMICOLON { offsetTracker.advanceInLine(1); };
+t_COLON : COLON { offsetTracker.advanceInLine(1); };
+t_AT : AT { offsetTracker.advanceInLine(1); };
+
+t_LPAREN : LPAREN { offsetTracker.advanceInLine(1); bracketStack.push(LPAREN); };
+t_RPAREN : RPAREN { offsetTracker.advanceInLine(1); bracketStack.pop(); };
+t_LCURLY : LCURLY { offsetTracker.advanceInLine(1); bracketStack.push(LCURLY); };
+t_RCURLY : RCURLY { offsetTracker.advanceInLine(1); bracketStack.pop(); };
+t_LSQUARE : LSQUARE { offsetTracker.advanceInLine(1); bracketStack.push(LSQUARE); };
+t_RSQUARE : RSQUARE { offsetTracker.advanceInLine(1); bracketStack.pop(); };
+
+t_IDENTIFIER : IDENTIFIER { offsetTracker.advanceByTextSize($text); };
+t_NUMBER : NUMBER { offsetTracker.advanceByTextSize($text); };
+t_STRING : STRING { offsetTracker.advanceByTextSize($text); };
+
+t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
+t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); };
+
+t_FILLER : FILLER { offsetTracker.advanceByTextSize($text); };
+t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceByTextSize($text); };
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
