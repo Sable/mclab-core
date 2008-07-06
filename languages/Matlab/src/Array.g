@@ -320,16 +320,16 @@ quiet_row_separator_list :
 //TODO-AC: allow t_SEMICOLON t_LINE_TERMINATOR
 row_separator :
      t_LINE_TERMINATOR
+  |  t_SEMICOLON
   |  t_COMMENT t_LINE_TERMINATOR
   |  t_BRACKET_COMMENT t_LINE_TERMINATOR
-  |  t_SEMICOLON
   ;
 
 quiet_row_separator : //match and delete row_separator
      t_LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
+  |  t_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   |  t_COMMENT t_LINE_TERMINATOR //can't delete in this case
   |  t_BRACKET_COMMENT t_LINE_TERMINATOR //can't delete in this case
-  |  t_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
   ;
 
 element_list :
@@ -419,7 +419,8 @@ t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
 t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); };
 
 t_FILLER : FILLER { offsetTracker.advanceByTextSize($text); };
-t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceByTextSize($text); };
+
+t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
