@@ -59,18 +59,6 @@ public void displayRecognitionError(String[] tokenNames, RecognitionException e)
     problems.add(makeProblem(tokenNames, e));
 }
 
-private boolean prevTokenIsFiller(Token currToken) {
-    int absIndex = currToken.getTokenIndex();
-    Token prevToken = input.get(absIndex - 1);
-    switch(prevToken.getType()) {
-    case ELLIPSIS_COMMENT:
-    case OTHER_WHITESPACE:
-        return true;
-    default:
-        return false;
-    }
-}
-
 private static boolean isBinaryOperator(Token op) {
     switch(op.getType()) {
     case AT:
