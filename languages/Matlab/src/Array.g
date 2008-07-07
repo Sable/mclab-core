@@ -325,8 +325,8 @@ row_separator :
   ;
 
 quiet_row_separator : //match and delete row_separator
-     dt_LINE_TERMINATOR {System.err.println("deleting newline before " + input.LT(1));}-> template() ""
-  |  dt_SEMICOLON {System.err.println("deleting semicolon before " + input.LT(1));}-> template() ""
+     dt_LINE_TERMINATOR -> template() ""
+  |  dt_SEMICOLON -> template() ""
   |  t_COMMENT t_LINE_TERMINATOR //can't delete in this case
   |  t_BRACKET_COMMENT t_LINE_TERMINATOR //can't delete in this case
   ;
@@ -342,7 +342,7 @@ element :
 //non-empty
 element_separator_list :
      t_FILLER? t_COMMA t_FILLER? //just echo
-  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); } t_FILLER {System.err.println("inserting comma before " + input.LT(1));}-> template(filler={$text}) ",<filler>" //insert comma
+  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 //non-empty
@@ -352,7 +352,7 @@ quiet_element_separator_list :
   ;
 
 quiet_element_separator_comma :
-     dt_COMMA {System.err.println("deleting comma " + retval.start);}-> template() "" //delete comma
+     dt_COMMA -> template() "" //delete comma
   ;
 
 input_params :
