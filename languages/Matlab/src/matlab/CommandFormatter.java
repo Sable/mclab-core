@@ -191,10 +191,12 @@ public class CommandFormatter {
             return true;
         }
 
-        //transpose => no args => not a command
         switch(originalSymbols.get(0).getId()) {
+        //transpose => no args => not a command
         case Terminals.MTRANSPOSE:
         case Terminals.ARRAYTRANSPOSE:
+        //NB: no filler before cell_array => access / filler => command
+        case Terminals.CELL_ARRAY:
             return true;
         }
 
