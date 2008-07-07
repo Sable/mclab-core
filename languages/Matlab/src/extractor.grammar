@@ -1,4 +1,14 @@
-//TODO-AC: factor out common bits
+//The extractor lexer/parser is used to pull apart a Matlab file so that
+//individual sections can be translated to Natlab by different tools and
+//re-assembled.
+
+//TODO-AC: factor out common bits (with natlab.grammar)
+
+//Lets Natlab handle a lot of the error checking.  For example, an expression
+//is any string of tokens which may appear in an expression, not necessarily
+//in the correct order.
+
+//Whitespace and comment sensitive.
 
 %import "matlab.ast.*";
 

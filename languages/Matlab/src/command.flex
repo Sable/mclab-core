@@ -1,3 +1,6 @@
+//Takes a string consisting of everything after the function name in a command
+//style call.  Returns a list of argument and comment tokens (drops whitespace).
+
 package matlab;
 
 import matlab.CommandToken.Arg;

@@ -1,3 +1,4 @@
+//A trivial lexer for determining the length of a string, as reported by JFlex
 package matlab;
 
 %%

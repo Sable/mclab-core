@@ -1,4 +1,11 @@
-//TODO-AC: factor out common bits
+//The extractor lexer/parser is used to pull apart a Matlab file so that
+//individual sections can be translated to Natlab by different tools and
+//re-assembled.
+
+//TODO-AC: factor out common bits (with natlab.flex)
+
+//In general, if a block of text has nice delimiters, it is returned as a single
+//token (e.g. any bracketed block).
 
 package matlab;
 

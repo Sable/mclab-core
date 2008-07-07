@@ -1,4 +1,4 @@
-Program ::= ListNode;
+Program ::= ListNode; //root node - purely because JastAdd requires one
 abstract Node;
 ListNode : Node ::= Node*;
 SymbolNode : Node ::= <Text>;

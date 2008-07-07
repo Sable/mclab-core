@@ -1,6 +1,13 @@
 aspect Translate {
-    //default - exception
-    public String ASTNode.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) { throw new UnsupportedOperationException(getClass().getName() + ".translate()"); }
+    /**
+     * Translate the contents of a node from Natlab to Matlab.
+     * Both arguments are to be updated - offsetTracker with position changes
+     *   and problems with problems encountered.
+     * The default behaviour is to throw an UnsupportedOperationException.
+     */
+    public String ASTNode.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
+        throw new UnsupportedOperationException(getClass().getName() + ".translate()");
+    }
     
     public String Program.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         return getListNode().translate(offsetTracker, problems);

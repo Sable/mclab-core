@@ -13,6 +13,7 @@ aspect Children {
         }
         return this;
     }
+    /* Special-case for when Beaver builds an array for a * or + element. */
     public ListNode ListNode.add(beaver.Symbol[] newChildren) {
         for(beaver.Symbol newChild : newChildren) {
             add(newChild);
