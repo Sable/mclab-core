@@ -1,8 +1,10 @@
 1 1
-6 10
+8 57
 a = M'+M'
 @handle
 global x y
 persistent x;
 return
 !cmd1;cmd2
+[x] = x
+[varargout{:}] = unpack (files, outputdir, mfilename ());

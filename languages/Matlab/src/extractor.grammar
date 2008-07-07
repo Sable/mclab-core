@@ -297,7 +297,7 @@ stmt_body =
             return new MaybeCmdExtract(cmd, argSyms);
         :}
   |  expr_not_starting_with_id
-  |  expr_not_starting_with_id.s1 ASSIGN.s2 nbf.s3* expr_not_starting_with_id.s4
+  |  expr_not_starting_with_id.s1 ASSIGN.s2 nbf.s3* expr.s4
         {: return new ListNode().add(s1).add(s2).add(s3).add(s4); :}
   |  GLOBAL.s1 name.s2+ nbf.s3*
         {: return new ListNode().add(s1).add(s2).add(s3); :}

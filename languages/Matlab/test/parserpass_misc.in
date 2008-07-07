@@ -4,3 +4,5 @@ global x y
 persistent x;
 return
 !cmd1;cmd2
+[x] = x
+[varargout{:}] = unpack (files, outputdir, mfilename ());
