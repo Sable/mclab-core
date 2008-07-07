@@ -1,4 +1,5 @@
 aspect Children {
+    /* Convenience method for building up a ListNode by chaining add() calls. */
     public ListNode ListNode.add(beaver.Symbol newChild) {
         List<Node> nodes = getNodes();
         if(newChild instanceof Node) {
@@ -17,14 +18,5 @@ aspect Children {
             add(newChild);
         }
         return this;
-    }
-    
-    public void ASTNode.setLocation(int start, int end) {
-        this.start = start;
-        this.end = end;
-    }
-    
-    public void ASTNode.setLocation(beaver.Symbol sym) {
-        setLocation(sym.getStart(), sym.getEnd());
     }
 }
