@@ -6,6 +6,7 @@ grammar Array;
 //AC: keep the lexer and the parser together for now because that's the default Antlr layout
 
 options {
+    //modify the buffer in place since our changes are small
     output = template;
     rewrite = true;
 }
@@ -15,15 +16,22 @@ package matlab;
 }
 
 @parser::members {
+/* Convert a RecognitionException into a TranslationException. */
 private matlab.TranslationProblem makeProblem(RecognitionException e) {
     return makeProblem(getTokenNames(), e);
 }
 
+/* Convert a RecognitionException into a TranslationException. */
 private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionException e) {
     //change column to 1-based
     return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
 }
 
+/**
+ * Input: a matrix or cell array with missing or extraneous row and column delimiters.
+ * Output: a matrix or cell array with a single comma separating consecutive elements
+ * and a single semicolon and/or newline separating consecutive rows.
+ */
 public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
@@ -120,6 +128,10 @@ private static boolean isRParen(Token op) {
     return op.getType() == RPAREN;
 }
 
+/*
+ * Key helper method: used to determine whether or not a FILLER token is meant
+ * to be a column delimiter.
+ */
 private boolean isElementSeparator() {
     if(inParens()) {
         return false;
@@ -186,6 +198,7 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 }
 }
 
+//start symbol
 array :
      matrix
   |  cell_array
@@ -421,6 +434,8 @@ t_FILLER : FILLER { offsetTracker.advanceByTextSize($text); };
 
 t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
 
+//special "delete" versions of the t_TOKEN non-terminals
+
 dt_COMMA : COMMA { offsetTracker.recordOffsetChange(0, 1); };
 dt_SEMICOLON : SEMICOLON { offsetTracker.recordOffsetChange(0, 1); };
 dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * $LINE_TERMINATOR.pos); }; //NB: end pos of newline is 0-based
@@ -479,7 +494,7 @@ fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : '\'' STRING_CHAR* '\'';
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
-BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}'; //TODO-AC: test this
+BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
