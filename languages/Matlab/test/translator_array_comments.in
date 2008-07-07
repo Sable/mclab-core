@@ -13,3 +13,12 @@ blah3 %}
 stuff
 %}
 b]
+
+[a
+%{
+stuff
+%{
+nested stuff
+%}
+%}
+b]
