@@ -9,6 +9,12 @@ import beaver.Parser;
 
 /**
  * A utility for translating from Matlab source to Natlab source.
+ * 
+ * Exit status:
+ *   0 - normal return: successful parse or list of errors
+ *   1 - incorrect usage
+ *   2 - I/O issue
+ *   3 - unexpected parse issue
  */
 public class Translator {
     public static void main(String[] args) {

@@ -1,7 +1,11 @@
 package matlab;
 
+/**
+ * From the text of a command style invocation: either an argument (after 
+ * re-scanning) or an ellipsis comment.
+ */
 abstract class CommandToken {
-    private int line;
+    private int line; //note: appears entirely on one line
     private int startCol;
     private int endCol;
     private StringBuffer textBuf;
@@ -49,6 +53,9 @@ abstract class CommandToken {
         return false;
     }
 
+    /**
+     * An argument to a command style call.  Built up by CommandScanner.
+     */
     static class Arg extends CommandToken {
         private StringBuffer argBuf;
         private int quoteCount;
@@ -87,6 +94,10 @@ abstract class CommandToken {
         }
     }
 
+    /**
+     * An ellipsis comment between arguments to a command style call.
+     * Built up by CommandScanner.
+     */
     static class EllipsisComment extends CommandToken {
         EllipsisComment(String text) {
             appendText(text);

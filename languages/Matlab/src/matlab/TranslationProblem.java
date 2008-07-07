@@ -1,5 +1,9 @@
 package matlab;
 
+/**
+ * Describes the position and nature of a problem encountered while translating
+ * a Matlab file to Natlab.
+ */
 public class TranslationProblem {
     private final int line;
     private final int col;

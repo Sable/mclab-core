@@ -10,11 +10,20 @@ import matlab.CommandToken.EllipsisComment;
 import matlab.ExtractionParser.Terminals;
 import beaver.Symbol;
 
+/**
+ * Translates a command style invocation into a function style invocation,
+ * if appropriate.
+ */
 public class CommandFormatter {
+    //keeping track of position changes
     private final OffsetTracker offsetTracker;
+    //input
     private final List<Symbol> originalSymbols;
+    //input after being concatenated and run through CommandScanner
     private final List<CommandToken> rescannedSymbols;
+    //output
     private final List<Symbol> formattedSymbols;
+    //number of arguments after re-scanning
     private int numArgs;
 
     private CommandFormatter(List<Symbol> originalSymbols, OffsetTracker offsetTracker) {
@@ -25,6 +34,11 @@ public class CommandFormatter {
         this.numArgs = 0;
     }
 
+    /**
+     * Input: Everything after the IDENTIFIER in a stmt starting with an IDENTIFIER.
+     * Output: Parenthesized, quoted, comma-delimited arguments or the input if
+     *   no translation is necessary
+     */
     public static List<Symbol> format(List<Symbol> originalSymbols, OffsetTracker offsetTracker, List<TranslationProblem> problems) {
         if(originalSymbols == null) {
             return null;
@@ -47,6 +61,9 @@ public class CommandFormatter {
         return cf.formattedSymbols;
     }
 
+    /*
+     * Concatenates the input symbosl together and runs them through CommandScanner.
+     */
     private void rescan() throws CommandScanner.Exception {
         StringBuffer textBuf = new StringBuffer();
         for(Symbol sym : originalSymbols) {
@@ -78,6 +95,10 @@ public class CommandFormatter {
         }
     }
 
+    /*
+     * Adds appropriate punctuation around the rescanned arguments and makes
+     * the necessary changes to the OffsetTracker.
+     */
     private void format() {
         formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, findPrecedingWhitespaceLength(0));
@@ -113,8 +134,12 @@ public class CommandFormatter {
         offsetTracker.recordOffsetChange(0, Symbol.getColumn(lastOriginalSym.getEnd()) - lastRescannedTok.getEndCol());
     }
 
-    //TODO-AC: it seems to be safe to use indexOf and length for finding positions since JFlex seems
-    //  to give every character length 1 (even, eg tab).  This might change (e.g. full unicode).
+    /*
+     * Outwardly, just quotes the argument.  Inwardly, tracks position changes
+     * that the translation entails.
+     * TODO-AC: JFlex seems to give every character length 1 (even tab).
+     *   If this changes, we won't be able to use indexOf and length to find positions.
+     */
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
         formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
         offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));
@@ -142,6 +167,10 @@ public class CommandFormatter {
         offsetTracker.advanceInLine(1);
     }
 
+    /* 
+     * The amount of whitespace between the specificed token and the previous
+     * non-whitespace token.
+     */
     private int findPrecedingWhitespaceLength(int rescannedSymbolNum) {
         if(rescannedSymbolNum == 0) {
             int firstNonFillerPos = 0;
@@ -185,6 +214,10 @@ public class CommandFormatter {
         return (type == Terminals.OTHER_WHITESPACE) || (type == Terminals.ELLIPSIS_COMMENT);
     }
 
+    /*
+     * Checks to determine whether or not the symbols are really arguments in
+     * a command style call
+     */
     private static boolean isNotCmd(List<Symbol> originalSymbols) {
         //no args => not a command
         if(originalSymbols == null || originalSymbols.isEmpty()) {

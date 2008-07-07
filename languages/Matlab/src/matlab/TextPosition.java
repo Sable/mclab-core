@@ -2,6 +2,10 @@ package matlab;
 
 import beaver.Symbol;
 
+/**
+ * A position in a block of text: line and column number.
+ * Comparable to non-null TextPositions.
+ */
 public class TextPosition implements Comparable<TextPosition> {
     private final int line;
     private final int col;
