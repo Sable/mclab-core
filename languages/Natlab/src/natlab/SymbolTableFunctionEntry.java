@@ -2,13 +2,12 @@ package natlab;
 
 import java.util.*;
 
-public class SymbolTableFunctionEntry
+public class SymbolTableFunctionEntry implements SymbolTableInterface
 {
     private String name;
     private SymbolTableScope localSymbols;
     private SymbolTableFunctionEntry parent;
     private HashMap< String, SymbolTableFunctionEntry > nestedFunctions;
-    private HashMap< String, SymbolTableFunctionEntry > localFunctions;
 
     //TODO-JD: Add some input output type info
 
@@ -22,15 +21,6 @@ public class SymbolTableFunctionEntry
         name = n;
         localSymbols = new SymbolTableScope();
         nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        parent = null;
-    }
-    SymbolTableFunctionEntry( String n, HashMap< String, SymbolTableFunctionEntry > lf )
-    {
-        name = n;
-        localSymbols = new SymbolTableScope();
-        nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = lf;
         parent = null;
     }
     SymbolTableFunctionEntry( String n, SymbolTableScope st )
@@ -38,33 +28,13 @@ public class SymbolTableFunctionEntry
         name = n;
         localSymbols = st;
         nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = new HashMap< String, SymbolTableFunctionEntry >();
         parent = null;
     }
-    SymbolTableFunctionEntry( String n, SymbolTableScope st, HashMap< String, SymbolTableFunctionEntry > lf )
-    {
-        name = n;
-        localSymbols = st;
-        nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = lf;
-        parent = null;
-    }
-    //For these, should the locals be set to parent's nested? Probably
     SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p )
     {
         name = n;
         localSymbols = new SymbolTableScope();
         nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        parent = p;
-    }
-    SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p, 
-                              HashMap< String, SymbolTableFunctionEntry > lf )
-    {
-        name = n;
-        localSymbols = new SymbolTableScope();
-        nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = lf;
         parent = p;
     }
     SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p, SymbolTableScope st )
@@ -72,34 +42,40 @@ public class SymbolTableFunctionEntry
         name = n;
         localSymbols = st;
         nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = new HashMap< String, SymbolTableFunctionEntry >();
         parent = p;
     }
-    /*SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p, 
-                              SymbolTableScope st, HashMap< String, SymbolTableFunctionEntry > lf )
-    {
-        name = n;
-        localSymbols = st;
-        nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
-        localFunctions = lf;
-        parent = p;
-        }*/
     
 
 
     public String getName(){ return name; }
     public SymbolTableScope getLocalsymbols(){ return localSymbols; }
     public HashMap< String, SymbolTableFunctionEntry > getNestedfunctions(){ return nestedFunctions; }
-    public HashMap< String, SymbolTableFunctionEntry > getLocalfunctions(){ return localFunctions; }
     public SymbolTableFunctionEntry getParent(){ return parent; }
 
     public void setName( String n ){ name = n; }
     public void setLocalSymbols( SymbolTableScope ls ){ localSymbols = ls; }
     public void setNestedFunctions( HashMap< String, SymbolTableFunctionEntry >  nf){ nestedFunctions = nf; }
-    public void setLocalFunctions( HashMap< String, SymbolTableFunctionEntry > lf){ localFunctions = lf; }
-    //Remove setParent?
-    //public void setParent( SymbolTableFunctionEntry p ){ parent = p; }
+    public void setParent( SymbolTableFunctionEntry p ){ parent = p; }
 
+    /* Implementation of SymbolTableInterface */
+    public boolean addSymbol( SymbolTableEntry e )
+    {
+        return localSymbols.addSymbol( e );
+    }
+    public SymbolTableEntry getSymbolById( String s )
+    {
+        SymbolTableEntry se = localSymbols.getSymbolById( s );
+        if( se == null )
+            return parent.getSymbolById( s );
+        else 
+            return se;
+    }
+    //Currently getSymbolsByOname for a function entry is just a wrapper for the localSymbols 
+    //version.
+    public HashMap<String, SymbolTableEntry> getSymbolsByOName( String on )
+    {
+        return localSymbols.getSymbolsByOName( on );
+    }
     /* When a nested function is added it's locals is set to be equal to the nested 
        functions of the current function entry. 
        Parent's nested = Child's locals 
@@ -111,7 +87,7 @@ public class SymbolTableFunctionEntry
     {
         SymbolTableFunctionEntry oldN = nestedFunctions.put(n.name, n);
         if( oldN == null ){
-            n.localFunctions = nestedFunctions;
+            // n.localFunctions = nestedFunctions;
             n.parent = this;
             return true;
         }
@@ -120,7 +96,7 @@ public class SymbolTableFunctionEntry
             return false;
         }
     }
-    public boolean addLocalFunction( SymbolTableFunctionEntry l )
+    /*public boolean addLocalFunction( SymbolTableFunctionEntry l )
     {
         SymbolTableFunctionEntry oldL = localFunctions.put(l.name, l);
         if( oldL == null )
@@ -129,7 +105,7 @@ public class SymbolTableFunctionEntry
             localFunctions.put(oldL.name, oldL);
             return false;
         }
-    }
+        }*/
 
 
 }
