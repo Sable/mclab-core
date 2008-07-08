@@ -177,8 +177,8 @@ ShellCommand=[!].*
     if(transposeNext) {
         append(true);
     } else {
-        saveStateAndTransition(INSIDE_STRING);
         append();
+        saveStateAndTransition(INSIDE_STRING);
     }
 }
 
@@ -199,8 +199,8 @@ ShellCommand=[!].*
 //start multiline comment
 {OpenBracketComment} {
     append();
-    saveStateAndTransition(INSIDE_BRACKET_COMMENT);
     commentNestingDepth++;
+    saveStateAndTransition(INSIDE_BRACKET_COMMENT);
 }
 
 //continue multiline comment
@@ -250,33 +250,33 @@ ShellCommand=[!].*
 }
 
 <INSIDE_CLASS> {
-    classdef { endNestingDepth++; append(); }
+    classdef { append(); endNestingDepth++; }
     
     end {
+        append();
         endNestingDepth--;
         if(endNestingDepth == 0) { //safe test since classdef must be top-level
             restoreState();
         }
-        append();
     }
     
-    methods { endNestingDepth++; append(); }
-    properties { endNestingDepth++; append(); }
-    events { endNestingDepth++; append(); }
+    methods { append(); endNestingDepth++; }
+    properties { append(); endNestingDepth++; }
+    events { append(); endNestingDepth++; }
 }
 
 //i.e. not in FIELD_NAME
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    case { endNestingDepth++; append(); }
-    for { endNestingDepth++; append(); }
-    function { endNestingDepth++; append(); }
-    if { endNestingDepth++; append(); }
-    parfor { endNestingDepth++; append(); }
-    switch { endNestingDepth++; append(); }
-    try { endNestingDepth++; append(); }
-    while { endNestingDepth++; append(); }
+    case { append(); endNestingDepth++; }
+    for { append(); endNestingDepth++; }
+    function { append(); endNestingDepth++; }
+    if { append(); endNestingDepth++; }
+    parfor { append(); endNestingDepth++; }
+    switch { append(); endNestingDepth++; }
+    try { append(); endNestingDepth++; }
+    while { append(); endNestingDepth++; }
     
     break { append(); }
     catch { append(); }
@@ -294,9 +294,9 @@ ShellCommand=[!].*
     
     //NB: lower precedence than ellipsis
     \. {
-            //NB: have to change the state AFTER calling append
-            append();
-            saveStateAndTransition(FIELD_NAME);
+        //NB: have to change the state AFTER calling append
+        append();
+        saveStateAndTransition(FIELD_NAME);
     }
 }
 
