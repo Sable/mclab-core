@@ -75,7 +75,7 @@ public class SymbolTableFunctionEntry
         localFunctions = new HashMap< String, SymbolTableFunctionEntry >();
         parent = p;
     }
-    SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p, 
+    /*SymbolTableFunctionEntry( String n, SymbolTableFunctionEntry p, 
                               SymbolTableScope st, HashMap< String, SymbolTableFunctionEntry > lf )
     {
         name = n;
@@ -83,7 +83,7 @@ public class SymbolTableFunctionEntry
         nestedFunctions = new HashMap< String, SymbolTableFunctionEntry >();
         localFunctions = lf;
         parent = p;
-    }
+        }*/
     
 
 
@@ -97,7 +97,39 @@ public class SymbolTableFunctionEntry
     public void setLocalSymbols( SymbolTableScope ls ){ localSymbols = ls; }
     public void setNestedFunctions( HashMap< String, SymbolTableFunctionEntry >  nf){ nestedFunctions = nf; }
     public void setLocalFunctions( HashMap< String, SymbolTableFunctionEntry > lf){ localFunctions = lf; }
-    public void setParent( SymbolTableFunctionEntry p ){ parent = p; }
+    //Remove setParent?
+    //public void setParent( SymbolTableFunctionEntry p ){ parent = p; }
+
+    /* When a nested function is added it's locals is set to be equal to the nested 
+       functions of the current function entry. 
+       Parent's nested = Child's locals 
+       Currently this does no checking to see if the child had a locals already set.
+       Such a check should either be a check for null or a check for object equality. 
+       One could also do a deeper check */
+       
+    public boolean addNestedFunction( SymbolTableFunctionEntry n )
+    {
+        SymbolTableFunctionEntry oldN = nestedFunctions.put(n.name, n);
+        if( oldN == null ){
+            n.localFunctions = nestedFunctions;
+            n.parent = this;
+            return true;
+        }
+        else{
+            nestedFunctions.put(oldN.name, oldN);
+            return false;
+        }
+    }
+    public boolean addLocalFunction( SymbolTableFunctionEntry l )
+    {
+        SymbolTableFunctionEntry oldL = localFunctions.put(l.name, l);
+        if( oldL == null )
+            return true;
+        else{
+            localFunctions.put(oldL.name, oldL);
+            return false;
+        }
+    }
 
 
 }
