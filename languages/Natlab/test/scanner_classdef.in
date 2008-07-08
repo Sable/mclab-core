@@ -80,3 +80,10 @@ end
 properties
 methods
 events
+
+classdef
+a(end)
+events
+end
+end
+events

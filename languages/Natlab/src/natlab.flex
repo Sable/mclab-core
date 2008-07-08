@@ -160,6 +160,12 @@ import beaver.Scanner;
       }
   }
   
+  //// Bracket nesting /////////////////////////////////////////////////////////
+  
+  //purely to avoid decrementing numEndsExpected for end in exprs
+  
+  private int bracketNestingDepth = 0;
+  
   //// Comment nesting /////////////////////////////////////////////////////////
   
   //number of '%}'s expected
@@ -416,12 +422,12 @@ ValidEscape=\\[bfnrt\\\"]
 {ShellCommand} { return symbol(SHELL_COMMAND, yytext().substring(1)); }
 
 //bracketing
-\( { return symbol(LPAREN); }
-\) { return symbol(RPAREN); }
-\[ { return symbol(LSQUARE); }
-\] { return symbol(RSQUARE); }
-\{ { return symbol(LCURLY); }
-\} { return symbol(RCURLY); }
+\( { bracketNestingDepth++; return symbol(LPAREN); }
+\) { bracketNestingDepth--; return symbol(RPAREN); }
+\[ { bracketNestingDepth++; return symbol(LSQUARE); }
+\] { bracketNestingDepth--; return symbol(RSQUARE); }
+\{ { bracketNestingDepth++; return symbol(LCURLY); }
+\} { bracketNestingDepth--; return symbol(RCURLY); }
 
 //stmt terminators
 , { transposeNext = false; saveStateAndTransition(COMMA_TERMINATOR); markStartPosition(); }
@@ -532,9 +538,11 @@ ValidEscape=\\[bfnrt\\\"]
     classdef { numEndsExpected++; return symbol(CLASSDEF); }
     
     end {
-        numEndsExpected--;
-        if(numEndsExpected == 0) {
-            restoreState();
+        if(bracketNestingDepth == 0) {
+            numEndsExpected--;
+            if(numEndsExpected == 0) {
+                restoreState();
+            }
         }
         return symbol(END); //NB: just return normal END token
     }
