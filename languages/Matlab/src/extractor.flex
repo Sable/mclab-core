@@ -201,14 +201,6 @@ import beaver.Scanner;
   
   private StringBuffer propertiesBuf = new StringBuffer();
   private StringBuffer eventsBuf = new StringBuffer();
-  
-  //// Delayed return //////////////////////////////////////////////////////////
-  
-  private java.util.Queue<beaver.Symbol> symQueue = new java.util.LinkedList<beaver.Symbol>();
-  
-  private void append(beaver.Symbol sym) {
-    symQueue.add(sym);
-  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -261,20 +253,20 @@ ValidEscape=\\[bfnrt\\\"]
 //TODO-AC: anything that doesn't call symbol might have to explicitly set transposeNext (probably to false)
 
 //... comment
-{EscapedLineTerminator} { append(symbol(ELLIPSIS_COMMENT)); }
+{EscapedLineTerminator} { return symbol(ELLIPSIS_COMMENT); }
 
 //whitespace
-{LineTerminator} { append(symbol(LINE_TERMINATOR)); }
-{OtherWhiteSpace} { append(symbol(OTHER_WHITESPACE)); }
+{LineTerminator} { return symbol(LINE_TERMINATOR); }
+{OtherWhiteSpace} { return symbol(OTHER_WHITESPACE); }
 
 //numeric literals
-{Number} { append(symbol(NUMBER)); }
+{Number} { return symbol(NUMBER); }
 
 //MTRANSPOSE or STRING (start)
 "'" {
     //NB: cannot be a string if we're expecting a transpose - even if string is a longer match
     if(transposeNext) {
-        append(symbol(MTRANSPOSE));
+        return symbol(MTRANSPOSE);
     } else {
         saveStateAndTransition(INSIDE_STRING);
         strBuf = new StringBuffer();
@@ -291,7 +283,7 @@ ValidEscape=\\[bfnrt\\\"]
         markEndPosition();
         Symbol sym = symbolFromMarkedPositions(STRING, strBuf.toString());
         restoreState();
-        append(sym);
+        return sym;
     }
     {ValidEscape} { strBuf.append(yytext()); }
     \\ { error("Invalid escape sequence"); }
@@ -302,7 +294,7 @@ ValidEscape=\\[bfnrt\\\"]
 }
 
 //single-line comments
-{Comment} { append(symbol(COMMENT)); }
+{Comment} { return symbol(COMMENT); }
 
 //start multiline comment
 {OpenBracketComment} {
@@ -325,19 +317,21 @@ ValidEscape=\\[bfnrt\\\"]
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(BRACKET_COMMENT, bracketCommentBuf.toString());
             restoreState();
-            append(sym);
+            return sym;
         }
     }
     <<EOF>> {
-        yybegin(YYINITIAL); //so that we'll return EOF as the next token
+        //don't finish scanning if there's an unclosed comment
         if(bracketCommentNestingDepth != 0) {
+            yybegin(YYINITIAL); //so that we'll return EOF as the next token
             error(bracketCommentNestingDepth + " levels of comments not closed");
         }
+        return symbol(EOF);
     }
 }
 
 //bang (!) syntax
-{ShellCommand} { append(symbol(SHELL_COMMAND)); }
+{ShellCommand} { return symbol(SHELL_COMMAND); }
 
 //start parenthesized section
 \( {
@@ -359,7 +353,7 @@ ValidEscape=\\[bfnrt\\\"]
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(PARENTHESIZED, bracketBuf.toString());
             restoreState();
-            append(sym);
+            return sym;
         }
     }
 }
@@ -384,7 +378,7 @@ ValidEscape=\\[bfnrt\\\"]
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(CELL_ARRAY, bracketBuf.toString());
             restoreState();
-            append(sym);
+            return sym;
         }
     }
 }
@@ -409,81 +403,83 @@ ValidEscape=\\[bfnrt\\\"]
             markEndPosition();
             Symbol sym = symbolFromMarkedPositions(MATRIX, bracketBuf.toString());
             restoreState();
-            append(sym);
+            return sym;
         }
     }
 }
 
 <INSIDE_PARENS, INSIDE_MATRIX, INSIDE_CELL_ARRAY> {
     <<EOF>> {
-        yybegin(YYINITIAL); //so that we'll return EOF as the next token
+        //don't finish scanning if there's an unclosed bracket
         if(bracketNestingDepth != 0) {
+            yybegin(YYINITIAL); //so that we'll return EOF as the next token
             error("Unbalanced brackets", pos.startLine, pos.startCol);
         }
+        return symbol(EOF);
     }
 }
 
 //stmt terminators
-, { append(symbol(COMMA)); }
-; { append(symbol(SEMICOLON)); }
+, { return symbol(COMMA); }
+; { return symbol(SEMICOLON); }
 
 //misc punctuation
-: { append(symbol(COLON)); }
-@ { append(symbol(AT)); }
+: { return symbol(COLON); }
+@ { return symbol(AT); }
 
 //from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/arithmeticoperators.html
-"+" { append(symbol(PLUS)); }
-"-" { append(symbol(MINUS)); }
-"*" { append(symbol(MTIMES)); }
-".*" { append(symbol(ETIMES)); }
-"/" { append(symbol(MDIV)); }
-"./" { append(symbol(EDIV)); }
-"\\" { append(symbol(MLDIV)); }
-".\\" { append(symbol(ELDIV)); }
-"^" { append(symbol(MPOW)); }
-".^" { append(symbol(EPOW)); }
-//"'" { append(symbol(MTRANSPOSE)); } //mixed with string rule above
-".'" { append(symbol(ARRAYTRANSPOSE)); }
+"+" { return symbol(PLUS); }
+"-" { return symbol(MINUS); }
+"*" { return symbol(MTIMES); }
+".*" { return symbol(ETIMES); }
+"/" { return symbol(MDIV); }
+"./" { return symbol(EDIV); }
+"\\" { return symbol(MLDIV); }
+".\\" { return symbol(ELDIV); }
+"^" { return symbol(MPOW); }
+".^" { return symbol(EPOW); }
+//"'" { return symbol(MTRANSPOSE); } //mixed with string rule above
+".'" { return symbol(ARRAYTRANSPOSE); }
 
 //from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/relationaloperators.html
-"<=" { append(symbol(LE)); }
-">=" { append(symbol(GE)); }
-"<" { append(symbol(LT)); }
-">" { append(symbol(GT)); }
-"==" { append(symbol(EQ)); }
-"~=" { append(symbol(NE)); }
+"<=" { return symbol(LE); }
+">=" { return symbol(GE); }
+"<" { return symbol(LT); }
+">" { return symbol(GT); }
+"==" { return symbol(EQ); }
+"~=" { return symbol(NE); }
 
 //from http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
-"&" { append(symbol(AND)); }
-"|" { append(symbol(OR)); }
-"~" { append(symbol(NOT)); }
-"&&" { append(symbol(SHORTAND)); }
-"||" { append(symbol(SHORTOR)); }
+"&" { return symbol(AND); }
+"|" { return symbol(OR); }
+"~" { return symbol(NOT); }
+"&&" { return symbol(SHORTAND); }
+"||" { return symbol(SHORTOR); }
 
-"=" { append(symbol(ASSIGN)); }
+"=" { return symbol(ASSIGN); }
 
 <YYINITIAL> {
     classdef {
         numEndsExpected++; 
         saveStateAndTransition(CLASS);
-        append(symbol(CLASSDEF));
+        return symbol(CLASSDEF);
     }
     
-    end { append(symbol(END)); }
+    end { return symbol(END); }
 }
 
 <CLASS> {
-    classdef { numEndsExpected++; append(symbol(CLASSDEF)); }
+    classdef { numEndsExpected++; return symbol(CLASSDEF); }
     
     end {
         numEndsExpected--;
         if(numEndsExpected == 0) {
             restoreState();
         }
-        append(symbol(END)); //NB: just return normal END token
+        return symbol(END); //NB: just return normal END token
     }
     
-    methods { numEndsExpected++; append(symbol(METHODS)); }
+    methods { numEndsExpected++; return symbol(METHODS); }
     properties {
         transposeNext = false;
         numEndsExpected++;
@@ -507,7 +503,7 @@ ValidEscape=\\[bfnrt\\\"]
         markEndPosition();
         Symbol sym = symbolFromMarkedPositions(PROPERTIES_BLOCK, propertiesBuf.toString());
         restoreState();
-        append(sym);
+        return sym;
     }
     .|\n { propertiesBuf.append(yytext()); }
     <<EOF>> {
@@ -523,7 +519,7 @@ ValidEscape=\\[bfnrt\\\"]
         markEndPosition();
         Symbol sym = symbolFromMarkedPositions(EVENTS_BLOCK, eventsBuf.toString());
         restoreState();
-        append(sym);
+        return sym;
     }
     .|\n { eventsBuf.append(yytext()); }
     <<EOF>> {
@@ -536,57 +532,53 @@ ValidEscape=\\[bfnrt\\\"]
 <YYINITIAL, CLASS> {
     //from matlab "iskeyword" function
     
-    case { maybeIncrNumEndsExpected(); append(symbol(CASE)); }
-    for { maybeIncrNumEndsExpected(); append(symbol(FOR)); }
-    function { maybeIncrNumEndsExpected(); append(symbol(FUNCTION)); }
-    if { maybeIncrNumEndsExpected(); append(symbol(IF)); }
-    parfor { maybeIncrNumEndsExpected(); append(symbol(PARFOR)); }
-    switch { maybeIncrNumEndsExpected(); append(symbol(SWITCH)); }
-    try { maybeIncrNumEndsExpected(); append(symbol(TRY)); }
-    while { maybeIncrNumEndsExpected(); append(symbol(WHILE)); }
+    case { maybeIncrNumEndsExpected(); return symbol(CASE); }
+    for { maybeIncrNumEndsExpected(); return symbol(FOR); }
+    function { maybeIncrNumEndsExpected(); return symbol(FUNCTION); }
+    if { maybeIncrNumEndsExpected(); return symbol(IF); }
+    parfor { maybeIncrNumEndsExpected(); return symbol(PARFOR); }
+    switch { maybeIncrNumEndsExpected(); return symbol(SWITCH); }
+    try { maybeIncrNumEndsExpected(); return symbol(TRY); }
+    while { maybeIncrNumEndsExpected(); return symbol(WHILE); }
     
-    break { append(symbol(BREAK)); }
-    catch { append(symbol(CATCH)); }
-    continue { append(symbol(CONTINUE)); }
-    else { append(symbol(ELSE)); }
-    elseif { append(symbol(ELSEIF)); }
-    end { append(symbol(END)); }
-    global { append(symbol(GLOBAL)); }
-    otherwise { append(symbol(OTHERWISE)); }
-    persistent { append(symbol(PERSISTENT)); }
-    return { append(symbol(RETURN)); }
+    break { return symbol(BREAK); }
+    catch { return symbol(CATCH); }
+    continue { return symbol(CONTINUE); }
+    else { return symbol(ELSE); }
+    elseif { return symbol(ELSEIF); }
+    end { return symbol(END); }
+    global { return symbol(GLOBAL); }
+    otherwise { return symbol(OTHERWISE); }
+    persistent { return symbol(PERSISTENT); }
+    return { return symbol(RETURN); }
     
     //NB: lower precedence than keywords
-    {Identifier} { append(symbol(IDENTIFIER)); }
+    {Identifier} { return symbol(IDENTIFIER); }
     
     //NB: lower precedence than ellipsis
     \. {
             //NB: have to change the state AFTER calling symbol
             Symbol result = symbol(DOT);
             saveStateAndTransition(FIELD_NAME);
-            append(result);
+            return result;
     }
 }
 
 //ignore keywords - we just saw a dot
 <FIELD_NAME> {
-    {Identifier} { append(symbol(IDENTIFIER)); }
+    {Identifier} { return symbol(IDENTIFIER); }
     
     //NB: lower precedence than ellipsis
-    \. { append(symbol(DOT)); }
+    \. { return symbol(DOT); }
 }
 
 /* error fallback */
-.|\n { append(symbol(MISC)); }
+.|\n { return symbol(MISC); }
 
 <<EOF>> {
     //don't need to check that we're in the initial state, because the
     //  xstates handle EOF and the non-xstates are acceptable when ending
     //don't need to check numEndsExpected since that's only used for changing
     //  states - the parser actually checks the bracketing
-    if(symQueue.isEmpty()) {
-        return symbol(EOF);
-    } else {
-        return symQueue.poll();
-    }
+    return symbol(EOF);
 }
