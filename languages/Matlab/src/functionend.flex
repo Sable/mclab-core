@@ -105,6 +105,10 @@ package natlab;
   }
   
   private void append(boolean transposeNext) {
+    append(transposeNext, yytext());
+  }
+  
+  private void append(boolean transposeNext, String text) {
     //if we return anything while in state FIELD_NAME, then restore state
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
@@ -113,7 +117,11 @@ package natlab;
     //if we saw something that forces the next single-quote to mean MTRANSPOSE, then set transposeNext
     this.transposeNext = transposeNext;
     
-    buf.append(yytext());
+    buf.append(text);
+  }
+  
+  private void insertEnd() {
+    append(false, "end\n");
   }
   
   //// Optional end ////////////////////////////////////////////////////////////
@@ -298,7 +306,7 @@ ShellCommand=[!].*
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    function { append(); startFunction(); blockStack.push(FUNCTION); }
+    function { insertEnd(); append(); startFunction(); blockStack.push(FUNCTION); }
     
     case { append(); blockStack.push(OTHER); }
     for { append(); blockStack.push(OTHER); }
@@ -343,6 +351,8 @@ ShellCommand=[!].*
 
 <<EOF>> {
     if(result == null) {
+        insertEnd();
+        
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
         } else if(unendedFunctions.size() == numFunctions) { //no function has an 'end'
