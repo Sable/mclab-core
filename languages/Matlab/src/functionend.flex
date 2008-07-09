@@ -192,7 +192,6 @@ package natlab;
 %}
 
 LineTerminator = \r|\n|\r\n
-OtherWhiteSpace = [ \t\f]
 
 //NB: acceptable to conflict with ... - matlab just treats .... as a comment containing .
 Ellipsis = \.\.\.
