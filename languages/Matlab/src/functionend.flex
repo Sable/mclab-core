@@ -285,7 +285,7 @@ CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
-BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
+KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
 
 //parsing the bit after a DOT
 %state FIELD_NAME
@@ -385,13 +385,13 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 }
 
 <YYINITIAL> {
-    classdef {
+    {KeywordPrefix} classdef {
         append();
         blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    {BlockEnd} {
+    {KeywordPrefix} end {
         append();
         if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
@@ -401,9 +401,9 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 }
 
 <INSIDE_CLASS> {
-    classdef { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
+    {KeywordPrefix} classdef { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
-    {BlockEnd} {
+    {KeywordPrefix} end {
         append();
         if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
@@ -413,9 +413,9 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
         blockStack.pop();
     }
     
-    methods { append(); blockStack.push(BlockType.OTHER); }
-    properties { append(); blockStack.push(BlockType.OTHER); }
-    events { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} methods { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} properties { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} events { append(); blockStack.push(BlockType.OTHER); }
 }
 
 //i.e. not in FIELD_NAME
@@ -424,23 +424,24 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
     
     function { startFunction(); append(); blockStack.push(BlockType.FUNCTION); }
     
-    case { append(); blockStack.push(BlockType.OTHER); }
-    for { append(); blockStack.push(BlockType.OTHER); }
-    if { append(); blockStack.push(BlockType.OTHER); }
-    parfor { append(); blockStack.push(BlockType.OTHER); }
-    switch { append(); blockStack.push(BlockType.OTHER); }
-    try { append(); blockStack.push(BlockType.OTHER); }
-    while { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} case { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} for { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} if { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} parfor { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} switch { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} try { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} while { append(); blockStack.push(BlockType.OTHER); }
     
-    break { append(); }
-    catch { append(); }
-    continue { append(); }
-    else { append(); }
-    elseif { append(); }
-    global { append(); }
-    otherwise { append(); }
-    persistent { append(); }
-    return { append(); }
+    //distinguish these from identifiers because their action is different
+    {KeywordPrefix} break { append(); }
+    {KeywordPrefix} catch { append(); }
+    {KeywordPrefix} continue { append(); }
+    {KeywordPrefix} else { append(); }
+    {KeywordPrefix} elseif { append(); }
+    {KeywordPrefix} global { append(); }
+    {KeywordPrefix} otherwise { append(); }
+    {KeywordPrefix} persistent { append(); }
+    {KeywordPrefix} return { append(); }
     
     //NB: lower precedence than keywords
     {Identifier} { appendTransposeNext(); }
