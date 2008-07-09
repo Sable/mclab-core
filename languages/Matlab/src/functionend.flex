@@ -1,4 +1,4 @@
-package natlab;
+package matlab;
 
 %%
 
@@ -20,13 +20,13 @@ package natlab;
   }
   
   public static class ProblemResult extends Result {
-      private final List<TranslationProblem> problems;
+      private final java.util.List<TranslationProblem> problems;
       
-      private ProblemResult(List<TranslationProblem> problems) {
+      private ProblemResult(java.util.List<TranslationProblem> problems) {
           this.problems = problems;
       }
       
-      public List<TranslationProblem> getProblems() {
+      public java.util.List<TranslationProblem> getProblems() {
           return problems;
       }
       
@@ -123,7 +123,7 @@ package natlab;
   }
   
   private void insertEnd() {
-    char prevChar = buf.charAt(buf.size() -1);
+    char prevChar = buf.charAt(buf.length() -1);
     if(prevChar == '\n' || prevChar == '\r') {
         //e
         offsetTracker.advanceToNewLine(1, 1);
@@ -175,17 +175,17 @@ package natlab;
         "  If any function has an explicit end, then all must.");
   }
   
-  private final List<TranslationProblem> unendedFunctions = new ArrayList<TranslationProblem>();
+  private final java.util.List<TranslationProblem> unendedFunctions = new java.util.ArrayList<TranslationProblem>();
   
   int numFunctions = 0;
   
   private void startFunction() {
     numFunctions++;
-    unendedFunctions.add(makeProblem);
+    unendedFunctions.add(makeProblem());
   }
   
   private void endFunction() {
-    start.remove(start.size() - 1);
+    unendedFunctions.remove(unendedFunctions.size() - 1);
   }
   
   private Result result = null;
@@ -314,13 +314,13 @@ ShellCommand=[!].*
 <YYINITIAL> {
     classdef {
         append();
-        blockStack.push(CLASS); 
+        blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
     }
     
     end {
         append();
-        if(blockStack.peek() == FUNCTION) {
+        if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
         }
         blockStack.pop();
@@ -328,36 +328,36 @@ ShellCommand=[!].*
 }
 
 <INSIDE_CLASS> {
-    classdef { append(); blockStack.push(OTHER); } //don't push CLASS or we won't know when to leave this state
+    classdef { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
     end {
         append();
-        if(blockStack.peek() == FUNCTION) {
+        if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
-        } else if(blockStack.peek() == CLASS) {
+        } else if(blockStack.peek() == BlockType.CLASS) {
             restoreState();
         }
         blockStack.pop();
     }
     
-    methods { append(); blockStack.push(OTHER); }
-    properties { append(); blockStack.push(OTHER); }
-    events { append(); blockStack.push(OTHER); }
+    methods { append(); blockStack.push(BlockType.OTHER); }
+    properties { append(); blockStack.push(BlockType.OTHER); }
+    events { append(); blockStack.push(BlockType.OTHER); }
 }
 
 //i.e. not in FIELD_NAME
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    function { insertEnd(); append(); startFunction(); blockStack.push(FUNCTION); }
+    function { insertEnd(); append(); startFunction(); blockStack.push(BlockType.FUNCTION); }
     
-    case { append(); blockStack.push(OTHER); }
-    for { append(); blockStack.push(OTHER); }
-    if { append(); blockStack.push(OTHER); }
-    parfor { append(); blockStack.push(OTHER); }
-    switch { append(); blockStack.push(OTHER); }
-    try { append(); blockStack.push(OTHER); }
-    while { append(); blockStack.push(OTHER); }
+    case { append(); blockStack.push(BlockType.OTHER); }
+    for { append(); blockStack.push(BlockType.OTHER); }
+    if { append(); blockStack.push(BlockType.OTHER); }
+    parfor { append(); blockStack.push(BlockType.OTHER); }
+    switch { append(); blockStack.push(BlockType.OTHER); }
+    try { append(); blockStack.push(BlockType.OTHER); }
+    while { append(); blockStack.push(BlockType.OTHER); }
     
     break { append(); }
     catch { append(); }
@@ -399,7 +399,7 @@ ShellCommand=[!].*
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
         } else if(unendedFunctions.size() == numFunctions) { //no function has an 'end'
-            result = new TranslationResult(offsetTracker.getPositionMap(), buf.toString());
+            result = new TranslationResult(offsetTracker.buildPositionMap(), buf.toString());
         } else {
             result = new ProblemResult(unendedFunctions);
         }
