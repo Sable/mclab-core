@@ -413,9 +413,7 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
         blockStack.pop();
     }
     
-    {KeywordPrefix} methods { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} properties { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} events { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} ( methods | properties | events ) { append(); blockStack.push(BlockType.OTHER); }
 }
 
 //i.e. not in FIELD_NAME
