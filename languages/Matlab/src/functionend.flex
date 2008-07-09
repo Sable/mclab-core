@@ -96,21 +96,23 @@ package matlab;
   //// Text ////////////////////////////////////////////////////////////////////
   
   private OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-  private StringBuffer buf = new StringBuffer();
+  private StringBuffer originalBuf = new StringBuffer();
+  private StringBuffer translatedBuf = new StringBuffer();
   
   //true for identifier, number, bracketed, transpose
   private boolean transposeNext = false;
   
   private void append() {
-    append(false);
-  }
-  
-  private void append(boolean transposeNext) {
-    appendHelper(transposeNext, yytext());
+    appendHelper(false, false, yytext());
     offsetTracker.advanceByTextSize(yytext());
   }
   
-  private void appendHelper(boolean transposeNext, String text) {
+  private void appendTransposeNext() {
+    appendHelper(true, false, yytext());
+    offsetTracker.advanceByTextSize(yytext());
+  }
+  
+  private void appendHelper(boolean transposeNext, boolean isInsertion, String text) {
     //if we return anything while in state FIELD_NAME, then restore state
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
@@ -119,18 +121,22 @@ package matlab;
     //if we saw something that forces the next single-quote to mean MTRANSPOSE, then set transposeNext
     this.transposeNext = transposeNext;
     
-    buf.append(text);
+    if(!isInsertion) {
+        originalBuf.append(text);
+    }
+    translatedBuf.append(text);
   }
   
   private void insertEnd() {
-    char prevChar = buf.charAt(buf.length() - 1);
+    int bufLength = originalBuf.length();
+    char prevChar = originalBuf.charAt(bufLength - 1);
     if(prevChar == '\n' || prevChar == '\r') {
         int prevLineLength = 1;
-        if(buf.length() > 1 && buf.charAt(buf.length() - 2) != '\n') { //i.e. allow '\r'
+        if(bufLength > 1 && originalBuf.charAt(bufLength - 2) != '\n') { //i.e. allow '\r'
             prevLineLength++;
         }
-        for(int i = buf.length() - 3; i >= 0; i--) {
-            if(buf.charAt(i) == '\n' || buf.charAt(i) == '\r') {
+        for(int i = bufLength - 3; i >= 0; i--) {
+            if(originalBuf.charAt(i) == '\n' || originalBuf.charAt(i) == '\r') {
                 break;
             }
             prevLineLength++;
@@ -174,18 +180,19 @@ package matlab;
         //following text
         offsetTracker.recordOffsetChange(-1, yycolumn); //yycolumn == prevLineLength - 1
     }
-    appendHelper(false, "end\n");
+    appendHelper(false, true, "end\n");
   }
   
   private void insertFinalEnd() {
-    char prevChar = buf.charAt(buf.length() - 1);
+    int bufLength = originalBuf.length();
+    char prevChar = originalBuf.charAt(bufLength - 1);
     if(prevChar == '\n' || prevChar == '\r') {
         int prevLineLength = 1;
-        if(buf.length() > 1 && buf.charAt(buf.length() - 2) != '\n') { //i.e. allow '\r'
+        if(bufLength > 1 && originalBuf.charAt(bufLength - 2) != '\n') { //i.e. allow '\r'
             prevLineLength++;
         }
-        for(int i = buf.length() - 3; i >= 0; i--) {
-            if(buf.charAt(i) == '\n' || buf.charAt(i) == '\r') {
+        for(int i = bufLength - 3; i >= 0; i--) {
+            if(originalBuf.charAt(i) == '\n' || originalBuf.charAt(i) == '\r') {
                 break;
             }
             prevLineLength++;
@@ -223,7 +230,7 @@ package matlab;
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceInLine(1);
     }
-    appendHelper(false, "\nend"); //NB: newline BEFORE 'end', not after
+    appendHelper(false, true, "\nend"); //NB: newline BEFORE 'end', not after
   }
   
   //// Optional end ////////////////////////////////////////////////////////////
@@ -304,13 +311,13 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 //bang (!) syntax
 {ShellCommand} { append(); }
 
-{Number} { append(true); }
+{Number} { appendTransposeNext(); }
 
 //MTRANSPOSE or STRING (start)
 "'" {
     //NB: cannot be a string if we're expecting a transpose - even if string is a longer match
     if(transposeNext) {
-        append(true);
+        appendTransposeNext();
     } else {
         append();
         saveStateAndTransition(INSIDE_STRING);
@@ -328,8 +335,8 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
     <<EOF>> { clearStateStack(); } //NB: let another pass handle this: unterminated string literal
 }
 
-//"'" { append(true); } //mixed with string rule above
-".'" { append(true); }
+//"'" { appendTransposeNext(); } //mixed with string rule above
+".'" { appendTransposeNext(); }
 
 //start multiline comment
 {OpenBracketComment} {
@@ -365,7 +372,7 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
     [^\(\)\{\}\[\]]+ { append(); }
     \( | \{ | \[ { append(); bracketNestingDepth++; }
     \) | \} | \] {
-        append(true);
+        appendTransposeNext();
         bracketNestingDepth--;
         if(bracketNestingDepth == 0) {
             restoreState();
@@ -433,7 +440,7 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
     return { append(); }
     
     //NB: lower precedence than keywords
-    {Identifier} { append(true); }
+    {Identifier} { appendTransposeNext(); }
     
     //NB: lower precedence than ellipsis
     \. {
@@ -445,7 +452,7 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 
 //ignore keywords - we just saw a dot
 <FIELD_NAME> {
-    {Identifier} { append(true); }
+    {Identifier} { appendTransposeNext(); }
     
     //to avoid transitioning to the same state
     \. { append(); }
@@ -461,7 +468,7 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
         } else if(unendedFunctions.size() == numFunctions) { //no function has an 'end'
-            result = new TranslationResult(offsetTracker.buildPositionMap(), buf.toString());
+            result = new TranslationResult(offsetTracker.buildPositionMap(), translatedBuf.toString());
         } else {
             result = new ProblemResult(unendedFunctions);
         }
