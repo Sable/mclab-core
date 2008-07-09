@@ -89,8 +89,9 @@ package natlab;
   
   //// End-bracketing //////////////////////////////////////////////////////////
   
-  //number of 'end's expected
-  private int endNestingDepth = 0;
+  private static enum BlockType { CLASS, FUNCTION, OTHER }
+  
+  private final java.util.Stack<BlockType> blockStack = new java.util.Stack<BlockType>();
   
   //// Text ////////////////////////////////////////////////////////////////////
   
@@ -115,7 +116,25 @@ package natlab;
     buf.append(yytext());
   }
   
+  //// Optional end ////////////////////////////////////////////////////////////
   
+  private FunctionEndTranslationProblem makeProblem() {
+    return new FunctionEndTranslationProblem(yyline + 1, yycol + 1, "Function lacks an explicit end." + 
+        "  If any function has an explicit end, then all must.");
+  }
+  
+  private final List<TranslationProblem> startedFunctions = new ArrayList<TranslationProblem>();
+  
+  int numFunctions = 0;
+  
+  private void startFunction() {
+    numFunctions++;
+    startedFunctions.add(makeProblem);
+  }
+  
+  private void endFunction() {
+    start.remove(start.size() - 1);
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -242,41 +261,42 @@ ShellCommand=[!].*
 <YYINITIAL> {
     classdef {
         append();
-        endNestingDepth++; 
+        blockStack.push(CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    end { endNestingDepth--; append(); }
+    end { append(); blockStack.pop(); }
 }
 
 <INSIDE_CLASS> {
-    classdef { append(); endNestingDepth++; }
+    classdef { append(); blockStack.push(OTHER); } //don't push CLASS or we won't know when to leave this state
     
     end {
         append();
-        endNestingDepth--;
-        if(endNestingDepth == 0) { //safe test since classdef must be top-level
+        if(blockStack.peek() == CLASS) { //safe test since classdef must be top-level
             restoreState();
         }
+        blockStack.pop();
     }
     
-    methods { append(); endNestingDepth++; }
-    properties { append(); endNestingDepth++; }
-    events { append(); endNestingDepth++; }
+    methods { append(); blockStack.push(OTHER); }
+    properties { append(); blockStack.push(OTHER); }
+    events { append(); blockStack.push(OTHER); }
 }
 
 //i.e. not in FIELD_NAME
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    case { append(); endNestingDepth++; }
-    for { append(); endNestingDepth++; }
-    function { append(); endNestingDepth++; }
-    if { append(); endNestingDepth++; }
-    parfor { append(); endNestingDepth++; }
-    switch { append(); endNestingDepth++; }
-    try { append(); endNestingDepth++; }
-    while { append(); endNestingDepth++; }
+    function { append(); blockStack.push(FUNCTION); }
+    
+    case { append(); blockStack.push(OTHER); }
+    for { append(); blockStack.push(OTHER); }
+    if { append(); blockStack.push(OTHER); }
+    parfor { append(); blockStack.push(OTHER); }
+    switch { append(); blockStack.push(OTHER); }
+    try { append(); blockStack.push(OTHER); }
+    while { append(); blockStack.push(OTHER); }
     
     break { append(); }
     catch { append(); }
