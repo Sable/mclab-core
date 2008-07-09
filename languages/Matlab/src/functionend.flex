@@ -123,18 +123,20 @@ package natlab;
         "  If any function has an explicit end, then all must.");
   }
   
-  private final List<TranslationProblem> startedFunctions = new ArrayList<TranslationProblem>();
+  private final List<TranslationProblem> unendedFunctions = new ArrayList<TranslationProblem>();
   
   int numFunctions = 0;
   
   private void startFunction() {
     numFunctions++;
-    startedFunctions.add(makeProblem);
+    unendedFunctions.add(makeProblem);
   }
   
   private void endFunction() {
     start.remove(start.size() - 1);
   }
+  
+  private Result result = null;
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -265,7 +267,13 @@ ShellCommand=[!].*
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    end { append(); blockStack.pop(); }
+    end {
+        append();
+        if(blockStack.peek() == FUNCTION) {
+            endFunction();
+        }
+        blockStack.pop();
+    }
 }
 
 <INSIDE_CLASS> {
@@ -273,7 +281,9 @@ ShellCommand=[!].*
     
     end {
         append();
-        if(blockStack.peek() == CLASS) { //safe test since classdef must be top-level
+        if(blockStack.peek() == FUNCTION) {
+            endFunction();
+        } else if(blockStack.peek() == CLASS) {
             restoreState();
         }
         blockStack.pop();
@@ -288,7 +298,7 @@ ShellCommand=[!].*
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    function { append(); blockStack.push(FUNCTION); }
+    function { append(); startFunction(); blockStack.push(FUNCTION); }
     
     case { append(); blockStack.push(OTHER); }
     for { append(); blockStack.push(OTHER); }
@@ -332,5 +342,14 @@ ShellCommand=[!].*
 .|\n { append(); }
 
 <<EOF>> {
-    //TODO-AC
+    if(result == null) {
+        if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
+            result = new NoChangeResult();
+        } else if(unendedFunctions.size() == numFunctions) { //no function has an 'end'
+            //TODO-AC: result = new TranslationResult();
+        } else {
+            result = new ProblemResult(unendedFunctions);
+        }
+    }
+    return result;
 }
