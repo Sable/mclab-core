@@ -530,7 +530,9 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 
 <<EOF>> {
     if(result == null) {
-        insertFinalEnd();
+        if(numFunctions > 0) {
+            insertFinalEnd();
+        }
         
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
