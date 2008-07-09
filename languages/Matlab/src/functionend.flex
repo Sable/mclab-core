@@ -63,16 +63,16 @@ package matlab;
   //this gives us a way to nest bracketing states
   private java.util.Stack<Integer> stateStack = new java.util.Stack<Integer>();
   
-  void saveStateAndTransition(int newState) {
+  private void saveStateAndTransition(int newState) {
     stateStack.push(yystate());
     yybegin(newState);
   }
   
-  void restoreState() {
+  private void restoreState() {
     yybegin(stateStack.pop());
   }
   
-  void clearStateStack() {
+  private void clearStateStack() {
     yybegin(YYINITIAL);
     stateStack.clear();
   }
@@ -177,7 +177,7 @@ package matlab;
   
   private final java.util.List<TranslationProblem> unendedFunctions = new java.util.ArrayList<TranslationProblem>();
   
-  int numFunctions = 0;
+  private int numFunctions = 0;
   
   private void startFunction() {
     numFunctions++;
