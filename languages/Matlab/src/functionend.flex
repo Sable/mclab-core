@@ -123,6 +123,9 @@ package matlab;
   }
   
   private void insertEnd() {
+    if(buf.length() == 0) {
+        return;
+    }
     char prevChar = buf.charAt(buf.length() -1);
     if(prevChar == '\n' || prevChar == '\r') {
         //e
