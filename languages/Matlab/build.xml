@@ -37,6 +37,10 @@
 
 	<!-- Extend and override parts of gen.xml -->
 
+	<target name="jflex.function.end" depends="def.jflex.task">
+		<jflex file="${src.dir}/${function.end.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
 	<target name="jflex.command" depends="def.jflex.task">
 		<jflex file="${src.dir}/${command.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
@@ -49,7 +53,7 @@
 		<jflex file="${test.dir}/${trivial.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
-	<target name="jflex" depends="Gen.jflex, jflex.command, jflex.length, jflex.trivial" />
+	<target name="jflex" depends="Gen.jflex, jflex.function.end, jflex.command, jflex.length, jflex.trivial" />
 
 	<target name="antlr.array" depends="def.antlr3.task">
 		<mkdir dir="${gen.dir}/${root.pkg}" />
@@ -107,16 +111,16 @@
 	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 
-    <target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
-        <junit fork="true" haltonerror="true">
-            <formatter type="plain" usefile="false" />
-            <classpath refid="junit.jar.path" />
-            <classpath refid="beaver.rt.jar.path" />
-            <classpath refid="antlr.jar.path" />
-            <classpath location="${bin.dir}" />
-            <test name="${test.suite.name}" />
-        </junit>
-    </target>
+	<target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
+		<junit fork="true" haltonerror="true">
+			<formatter type="plain" usefile="false" />
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<classpath refid="antlr.jar.path" />
+			<classpath location="${bin.dir}" />
+			<test name="${test.suite.name}" />
+		</junit>
+	</target>
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
