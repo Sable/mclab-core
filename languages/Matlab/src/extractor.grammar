@@ -182,7 +182,7 @@ input_params =
 
 //output parameter list for a function
 output_params =
-     MATRIX.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
+     t_MATRIX.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   |  IDENTIFIER.s1 nbf.s2* {: return new ListNode().add(s1).add(s2); :}
   ;
 
@@ -370,8 +370,8 @@ command_arg =
   |  NUMBER.s {: return new beaver.Symbol(s); :}
   |  STRING.s {: return new beaver.Symbol(s); :}
   |  PARENTHESIZED.s {: return new beaver.Symbol(s); :}
-  |  MATRIX.s {: return new beaver.Symbol(s); :}
-  |  CELL_ARRAY.s {: return new beaver.Symbol(s); :}
+  |  t_MATRIX.s {: return new beaver.Symbol(s); :}
+  |  t_CELL_ARRAY.s {: return new beaver.Symbol(s); :}
   //other tokens
   |  SHELL_COMMAND.s {: return new beaver.Symbol(s); :}
   |  BREAK.s {: return new beaver.Symbol(s); :}
@@ -522,8 +522,16 @@ expr_token_not_id =
   |  NUMBER
   |  STRING
   |  PARENTHESIZED
-  |  MATRIX.m {: return new MatrixExtract(m); :}
-  |  CELL_ARRAY.c {: return new CellArrayExtract(c); :}
+  |  t_MATRIX
+  |  t_CELL_ARRAY
+  ;
+
+t_MATRIX =
+     MATRIX.m {: return new MatrixExtract(m); :}
+  ;
+
+t_CELL_ARRAY =
+     CELL_ARRAY.c {: return new CellArrayExtract(c); :}
   ;
 
 nbf =

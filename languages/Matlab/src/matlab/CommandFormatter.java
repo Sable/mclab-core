@@ -8,6 +8,8 @@ import java.util.List;
 import matlab.CommandToken.Arg;
 import matlab.CommandToken.EllipsisComment;
 import matlab.ExtractionParser.Terminals;
+import matlab.ast.ArrayExtract;
+import matlab.ast.CellArrayExtract;
 import beaver.Symbol;
 
 /**
@@ -67,7 +69,11 @@ public class CommandFormatter {
     private void rescan() throws CommandScanner.Exception {
         StringBuffer textBuf = new StringBuffer();
         for(Symbol sym : originalSymbols) {
-            textBuf.append(sym.value);
+            if(sym instanceof ArrayExtract) {
+                textBuf.append(((ArrayExtract) sym).getText()); //NB: do NOT translate
+            } else {
+                textBuf.append(sym.value);
+            }
         }
 
         CommandScanner scanner = new CommandScanner(new StringReader(textBuf.toString()));
@@ -224,7 +230,11 @@ public class CommandFormatter {
             return true;
         }
 
-        switch(originalSymbols.get(0).getId()) {
+        Symbol firstSymbol = originalSymbols.get(0);
+        if(firstSymbol instanceof CellArrayExtract) {
+            return true;
+        }
+        switch(firstSymbol.getId()) {
         //transpose => no args => not a command
         case Terminals.MTRANSPOSE:
         case Terminals.ARRAYTRANSPOSE:

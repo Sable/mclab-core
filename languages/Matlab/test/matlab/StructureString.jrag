@@ -18,9 +18,13 @@ aspect StructureString {
         StringBuffer buf = new StringBuffer();
         buf.append(getCmd());
         for(beaver.Symbol node : getArgs()) {
-            String value = (String) node.value;
-            if(value != null) {
-                buf.append(value);
+            if(node instanceof ASTNode) {
+                buf.append(((ASTNode) node).getStructureString());
+            } else {
+                String value = (String) node.value;
+                if(value != null) {
+                    buf.append(value);
+                }
             }
         }
         return buf.toString();
