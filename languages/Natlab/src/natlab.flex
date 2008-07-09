@@ -349,7 +349,8 @@ ValidEscape=\\[bfnrt\\\"]
     {ValidEscape} { strBuf.append(yytext()); }
     \\ { error("Invalid escape sequence"); }
     . { strBuf.append(yytext()); }
-    <<EOF>> { 
+    <<EOF>> {
+        yybegin(YYINITIAL); 
         error("Unterminated string literal: '" + strBuf + "'");
     }
 }
@@ -382,11 +383,11 @@ ValidEscape=\\[bfnrt\\\"]
     % { bracketCommentBuf.append(yytext()); }
     {OpenBracketComment} { bracketCommentNestingDepth++; bracketCommentBuf.append(yytext()); }
     <<EOF>> {
+        yybegin(YYINITIAL);
         //don't finish scanning if there's an unclosed comment
         if(bracketCommentNestingDepth != 0) {
             error(bracketCommentNestingDepth + " levels of comments not closed");
         }
-        return symbol(EOF);
     }
 }
 
