@@ -424,24 +424,24 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
     
     function { startFunction(); append(); blockStack.push(BlockType.FUNCTION); }
     
-    {KeywordPrefix} case { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} for { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} if { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} parfor { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} switch { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} try { append(); blockStack.push(BlockType.OTHER); }
-    {KeywordPrefix} while { append(); blockStack.push(BlockType.OTHER); }
+    {KeywordPrefix} ( case
+                    | for
+                    | if
+                    | parfor
+                    | switch
+                    | try
+                    | while ) { append(); blockStack.push(BlockType.OTHER); }
     
     //distinguish these from identifiers because their action is different
-    {KeywordPrefix} break { append(); }
-    {KeywordPrefix} catch { append(); }
-    {KeywordPrefix} continue { append(); }
-    {KeywordPrefix} else { append(); }
-    {KeywordPrefix} elseif { append(); }
-    {KeywordPrefix} global { append(); }
-    {KeywordPrefix} otherwise { append(); }
-    {KeywordPrefix} persistent { append(); }
-    {KeywordPrefix} return { append(); }
+    {KeywordPrefix} ( break
+                    | catch
+                    | continue
+                    | else
+                    | elseif
+                    | global
+                    | otherwise
+                    | persistent
+                    | return ) { append(); }
     
     //NB: lower precedence than keywords
     {Identifier} { appendTransposeNext(); }
