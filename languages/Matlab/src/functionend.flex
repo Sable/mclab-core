@@ -398,6 +398,9 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 
 <<EOF>> {
     if(result == null) {
+        buf.append('\n');
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
         insertEnd();
         
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
