@@ -1,3 +1,6 @@
+//TODO-AC: if we want to do this without storing the whole file in memory (twice),
+//  we'll have to do two passes.
+
 package matlab;
 
 %%
