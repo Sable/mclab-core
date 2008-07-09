@@ -348,11 +348,11 @@ ValidEscape=\\[bfnrt\\\"]
     }
     {ValidEscape} { strBuf.append(yytext()); }
     \\ { error("Invalid escape sequence"); }
-    . { strBuf.append(yytext()); }
-    \n {
+    {LineTerminator} {
         yybegin(YYINITIAL); 
         error("Unterminated string literal: '" + strBuf + "'");
     }
+    . { strBuf.append(yytext()); }
     <<EOF>> {
         yybegin(YYINITIAL); 
         error("Unterminated string literal: '" + strBuf + "'");
