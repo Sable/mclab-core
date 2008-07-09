@@ -16,8 +16,8 @@ package matlab;
 %line
 %column
 
+//NB: start in START rather than YYINITIAL
 %init{
-    //blarg
     yybegin(START);
 %init}
 
