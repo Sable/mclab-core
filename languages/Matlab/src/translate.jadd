@@ -33,8 +33,8 @@ aspect Translate {
         offsetTracker.advanceByTextSize(cmd);
         java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker, problems);
         for(beaver.Symbol node : formattedArgSymbols) {
-            if(node instanceof ArrayExtract) {
-                buf.append(((ArrayExtract) node).getText());
+            if(node instanceof ASTNode) {
+                buf.append(((ASTNode) node).translate(offsetTracker, problems));
             } else {
                 String value = (String) node.value;
                 if(value != null) {
