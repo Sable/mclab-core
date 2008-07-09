@@ -16,6 +16,11 @@ package matlab;
 %line
 %column
 
+%init{
+    //blarg
+    yybegin(START);
+%init}
+
 %{
   //// Return type /////////////////////////////////////////////////////////////
   
@@ -130,7 +135,7 @@ package matlab;
     translatedBuf.append(text);
   }
   
-  private void insertEnd() {
+  private void insertEndBeforeFunction() {
     int bufLength = originalBuf.length();
     char prevChar = originalBuf.charAt(bufLength - 1);
     if(prevChar == '\n' || prevChar == '\r') {
@@ -164,6 +169,14 @@ package matlab;
         //following text
         offsetTracker.recordOffsetChange(0, 0);
     } else {
+        int prevLineLength = 1;
+        for(int i = bufLength - 1; i >= 0; i--) {
+            if(originalBuf.charAt(i) == '\n' || originalBuf.charAt(i) == '\r') {
+                break;
+            }
+            prevLineLength++;
+        }
+        
         //e
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceInLine(1);
@@ -181,7 +194,7 @@ package matlab;
         offsetTracker.advanceToNewLine(1, 1);
         
         //following text
-        offsetTracker.recordOffsetChange(-1, yycolumn); //yycolumn == prevLineLength - 1
+        offsetTracker.recordOffsetChange(-1, prevLineLength - 1);
     }
     appendHelper(false, true, "end\n");
   }
@@ -248,9 +261,26 @@ package matlab;
   private int numFunctions = 0;
   
   private void startFunction() {
-    if(numFunctions > 0) { //check before incrementing
-        insertEnd();
+    //assertion
+    if(!yytext().endsWith("function")) {
+        throw new RuntimeException("Programmer error: expected yytext() to end with 'function' - " + yytext());
     }
+    
+    //stmt separator and filler
+    int suffixLength = "function".length();
+    String prefix = yytext().substring(0, yylength() - suffixLength);
+    appendHelper(false, false, prefix);
+    offsetTracker.advanceByTextSize(prefix);
+    
+    //insert end if there is a preceding function
+    if(numFunctions > 0) { //check before incrementing
+        insertEndBeforeFunction();
+    }
+    
+    //function keyword
+    appendHelper(false, false, "function");
+    offsetTracker.advanceInLine(suffixLength);
+    
     numFunctions++;
     unendedFunctions.add(makeProblem());
   }
@@ -285,7 +315,9 @@ CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
-KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
+StmtTerminator = [\r\n,;]
+Filler = [\t\f ] | {EscapedLineTerminator}
+KeywordPrefix= {StmtTerminator} {Filler}*
 
 //parsing the bit after a DOT
 %state FIELD_NAME
@@ -297,6 +329,8 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
 %xstate INSIDE_BRACKETS
 //within a bracket comment (i.e. %{)
 %xstate INSIDE_BRACKET_COMMENT
+//initial state - used to catch initial keywords
+%xstate START
 
 %%
 
@@ -304,6 +338,33 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
 //  (e.g. comments) and the things needed to distinguish strings from transposes
 
 //TODO-AC: anything that doesn't call append might have to explicitly set transposeNext (probably to false)
+
+//this is a special state for catching keywords requiring end bracketing that appear at the beginning of the file
+//usually we require that they be preceded by a stmt separator, but these are preceded by the beginning of the file instead
+//leave this state as soon as any non-filler is encountered
+<START> {
+    {Filler} { append(); }
+    
+    classdef {
+        append();
+        blockStack.push(BlockType.CLASS); 
+        saveStateAndTransition(INSIDE_CLASS);
+    }
+    
+    function { startFunction(); blockStack.push(BlockType.FUNCTION); yybegin(YYINITIAL); }
+    
+    ( case
+    | for
+    | if
+    | parfor
+    | switch
+    | try
+    | while ) { append(); blockStack.push(BlockType.OTHER); yybegin(YYINITIAL); }
+    
+    . { yypushback(1); yybegin(YYINITIAL); }
+    
+    <<EOF>> { yybegin(YYINITIAL); }
+}
 
 //single-line comments
 {Comment} { append(); }
@@ -393,10 +454,12 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
     
     {KeywordPrefix} end {
         append();
-        if(blockStack.peek() == BlockType.FUNCTION) {
-            endFunction();
+        if(!blockStack.isEmpty()) {
+            if(blockStack.peek() == BlockType.FUNCTION) {
+                endFunction();
+            }
+            blockStack.pop();
         }
-        blockStack.pop();
     }
 }
 
@@ -405,12 +468,14 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
     
     {KeywordPrefix} end {
         append();
-        if(blockStack.peek() == BlockType.FUNCTION) {
-            endFunction();
-        } else if(blockStack.peek() == BlockType.CLASS) {
-            restoreState();
+        if(!blockStack.isEmpty()) {
+            if(blockStack.peek() == BlockType.FUNCTION) {
+                endFunction();
+            } else if(blockStack.peek() == BlockType.CLASS) {
+                restoreState();
+            }
+            blockStack.pop();
         }
-        blockStack.pop();
     }
     
     {KeywordPrefix} ( methods | properties | events ) { append(); blockStack.push(BlockType.OTHER); }
@@ -420,7 +485,7 @@ KeywordPrefix= [\r\n,;] ([\t\f ] | {EscapedLineTerminator})*
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    function { startFunction(); append(); blockStack.push(BlockType.FUNCTION); }
+    {KeywordPrefix} function { startFunction(); blockStack.push(BlockType.FUNCTION); }
     
     {KeywordPrefix} ( case
                     | for
