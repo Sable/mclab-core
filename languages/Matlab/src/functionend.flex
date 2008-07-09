@@ -123,49 +123,107 @@ package matlab;
   }
   
   private void insertEnd() {
-    char prevChar = buf.charAt(buf.length() -1);
+    char prevChar = buf.charAt(buf.length() - 1);
     if(prevChar == '\n' || prevChar == '\r') {
+        int prevLineLength = 1;
+        if(buf.length() > 1 && buf.charAt(buf.length() - 2) != '\n') { //i.e. allow '\r'
+            prevLineLength++;
+        }
+        for(int i = buf.length() - 3; i >= 0; i--) {
+            if(buf.charAt(i) == '\n' || buf.charAt(i) == '\r') {
+                break;
+            }
+            prevLineLength++;
+        }
+        
         //e
-        offsetTracker.advanceToNewLine(1, 1);
-        offsetTracker.recordOffsetChange(-1, yycolumn);
+        offsetTracker.recordOffsetChange(-1, prevLineLength - 1);
+        offsetTracker.advanceInLine(1);
         
         //n
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
         
         //d
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
         
         //\n
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceToNewLine(1, 1);
         
         //following text
-        offsetTracker.advanceToNewLine(1, 1);
         offsetTracker.recordOffsetChange(0, 0);
     } else {
         //e
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
         
         //n
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
         
         //d
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
         
         //\n
-        offsetTracker.advanceInLine(1);
         offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceToNewLine(1, 1);
         
         //following text
-        offsetTracker.advanceToNewLine(1, 1);
-        offsetTracker.recordOffsetChange(1, -1 * yycolumn);
+        offsetTracker.recordOffsetChange(-1, yycolumn); //yycolumn == prevLineLength - 1
     }
     appendHelper(false, "end\n");
+  }
+  
+  private void insertFinalEnd() {
+    char prevChar = buf.charAt(buf.length() - 1);
+    if(prevChar == '\n' || prevChar == '\r') {
+        int prevLineLength = 1;
+        if(buf.length() > 1 && buf.charAt(buf.length() - 2) != '\n') { //i.e. allow '\r'
+            prevLineLength++;
+        }
+        for(int i = buf.length() - 3; i >= 0; i--) {
+            if(buf.charAt(i) == '\n' || buf.charAt(i) == '\r') {
+                break;
+            }
+            prevLineLength++;
+        }
+        
+        //\n
+        offsetTracker.recordOffsetChange(-1, prevLineLength - 1);
+        offsetTracker.advanceToNewLine(1, 1);
+        
+        //e
+        offsetTracker.recordOffsetChange(-1, prevLineLength - 1);
+        offsetTracker.advanceInLine(1);
+        
+        //n
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
+        
+        //d
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
+    } else {
+        //\n
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceToNewLine(1, 1);
+        
+        //e
+        offsetTracker.recordOffsetChange(-1, yycolumn - 1); //yycolumn == prevLineLength - 1
+        offsetTracker.advanceInLine(1);
+        
+        //n
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
+        
+        //d
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceInLine(1);
+    }
+    appendHelper(false, "\nend"); //NB: newline BEFORE 'end', not after
   }
   
   //// Optional end ////////////////////////////////////////////////////////////
@@ -398,10 +456,7 @@ BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 
 <<EOF>> {
     if(result == null) {
-        buf.append('\n');
-        offsetTracker.advanceInLine(1);
-        offsetTracker.recordOffsetChange(0, -1);
-        insertEnd();
+        insertFinalEnd();
         
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
