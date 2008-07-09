@@ -123,9 +123,6 @@ package matlab;
   }
   
   private void insertEnd() {
-    if(buf.length() == 0) {
-        return;
-    }
     char prevChar = buf.charAt(buf.length() -1);
     if(prevChar == '\n' || prevChar == '\r') {
         //e
@@ -183,6 +180,9 @@ package matlab;
   private int numFunctions = 0;
   
   private void startFunction() {
+    if(numFunctions > 0) { //check before incrementing
+        insertEnd();
+    }
     numFunctions++;
     unendedFunctions.add(makeProblem());
   }
@@ -352,7 +352,7 @@ ShellCommand=[!].*
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    function { insertEnd(); append(); startFunction(); blockStack.push(BlockType.FUNCTION); }
+    function { startFunction(); append(); blockStack.push(BlockType.FUNCTION); }
     
     case { append(); blockStack.push(BlockType.OTHER); }
     for { append(); blockStack.push(BlockType.OTHER); }
