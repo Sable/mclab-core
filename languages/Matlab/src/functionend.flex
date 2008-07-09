@@ -217,6 +217,8 @@ CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
+BlockEnd = [\r\n,;][ \t\f]*end
+
 //parsing the bit after a DOT
 %state FIELD_NAME
 //within a classdef
@@ -321,7 +323,7 @@ ShellCommand=[!].*
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    end {
+    {BlockEnd} {
         append();
         if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
@@ -333,7 +335,7 @@ ShellCommand=[!].*
 <INSIDE_CLASS> {
     classdef { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
-    end {
+    {BlockEnd} {
         append();
         if(blockStack.peek() == BlockType.FUNCTION) {
             endFunction();
@@ -367,7 +369,6 @@ ShellCommand=[!].*
     continue { append(); }
     else { append(); }
     elseif { append(); }
-    end { append(); }
     global { append(); }
     otherwise { append(); }
     persistent { append(); }
