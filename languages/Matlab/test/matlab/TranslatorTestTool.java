@@ -44,6 +44,7 @@ public class TranslatorTestTool {
                 TranslationResult transResult = (TranslationResult) result;
                 in = new BufferedReader(new StringReader(transResult.getText()));
                 prePosMap = transResult.getPositionMap();
+                System.err.println(transResult.getText());
             }
 
             ExtractionScanner scanner = new ExtractionScanner(in);
