@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
+import matlab.FunctionEndScanner.*;
 import matlab.ast.Program;
 
 /** 
@@ -18,10 +19,28 @@ import matlab.ast.Program;
 class TranslatorTestBase extends TestCase {
     private static final String SEPARATOR = ">>>>";
     private static final Pattern DEST_TO_SOURCE_PATTERN = Pattern.compile("^\\s*\\[([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\]\\s*[-][>]\\s*\\(([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\)\\s*$");
+    private PositionMap prePosMap = null;
 
     /* Construct a scanner that will read from the specified file. */
-    static ExtractionScanner getScanner(String filename) throws FileNotFoundException {
-        return new ExtractionScanner(new BufferedReader(new FileReader(filename)));
+    ExtractionScanner getScanner(String filename) throws IOException {
+        BufferedReader in = new BufferedReader(new FileReader(filename));
+        FunctionEndScanner prescanner = new FunctionEndScanner(in);
+        FunctionEndScanner.Result result = prescanner.translate();
+        in.close();
+
+        if(result instanceof NoChangeResult) {
+            in = new BufferedReader(new FileReader(filename)); //just re-open original file
+        } else if(result instanceof ProblemResult) {
+            for(TranslationProblem prob : ((ProblemResult) result).getProblems()) {
+                System.err.println("~" + prob);
+            }
+            fail("Encountered problems while filling in optional function ends.");
+        } else if(result instanceof TranslationResult) {
+            TranslationResult transResult = (TranslationResult) result;
+            in = new BufferedReader(new StringReader(transResult.getText()));
+            prePosMap = transResult.getPositionMap();
+        }
+        return new ExtractionScanner(in);
     }
 
     /*
@@ -66,7 +85,7 @@ class TranslatorTestBase extends TestCase {
     }
 
     /* Check deep equality of an AST and the contents of the .out file. */
-    public static void assertEquiv(Program actual, Structure expected) {
+    public void assertEquiv(Program actual, Structure expected) {
         OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         try {
             BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getTranslatedText()));
@@ -112,6 +131,9 @@ class TranslatorTestBase extends TestCase {
         }
 
         PositionMap posMap = offsetTracker.buildPositionMap();
+        if(prePosMap != null) {
+            posMap = new CompositePositionMap(posMap, prePosMap);
+        }
         for(Map.Entry<TextPosition, TextPosition> entry : expected.getDestToSourceMap().entrySet()) {
             TextPosition destPos = entry.getKey();
             TextPosition expectedSourcePos = entry.getValue();

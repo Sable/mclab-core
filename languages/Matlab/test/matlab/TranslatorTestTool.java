@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
 import matlab.ast.Program;
 import beaver.Parser;
 import beaver.Symbol;
@@ -20,12 +23,32 @@ public class TranslatorTestTool {
         }
         String basename = args[0];
         try {
+            PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
+            
             BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
+            PositionMap prePosMap = null;
+            
+            FunctionEndScanner prescanner = new FunctionEndScanner(in);
+            FunctionEndScanner.Result result = prescanner.translate();
+            in.close();
+            
+            if(result instanceof NoChangeResult) {
+                in = new BufferedReader(new FileReader(basename + ".in")); //just re-open original file
+            } else if(result instanceof ProblemResult) {
+                for(TranslationProblem prob : ((ProblemResult) result).getProblems()) {
+                    out.println("~" + prob);
+                }
+                out.close();
+                System.exit(0); //terminate early since extraction parser can't work without balanced 'end's
+            } else if(result instanceof TranslationResult) {
+                TranslationResult transResult = (TranslationResult) result;
+                in = new BufferedReader(new StringReader(transResult.getText()));
+                prePosMap = transResult.getPositionMap();
+            }
 
             ExtractionScanner scanner = new ExtractionScanner(in);
             ExtractionParser parser = new ExtractionParser();
             Program actual = (Program) parser.parse(scanner);
-            PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
             if(parser.hasError()) {
                 for(TranslationProblem prob : parser.getErrors()) {
                     out.println("~" + prob);
@@ -37,6 +60,9 @@ public class TranslatorTestTool {
 
                 if(problems.isEmpty()) {
                     PositionMap posMap = offsetTracker.buildPositionMap();
+                    if(prePosMap != null) {
+                        posMap = new CompositePositionMap(posMap, prePosMap);
+                    }
 
                     out.println(">>>> Destination Language -> Source Language");
                     for(TextPosition destPos : getAllTextPositions(destText)) {

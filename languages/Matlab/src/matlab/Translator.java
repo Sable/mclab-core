@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import matlab.FunctionEndScanner.*;
 import matlab.ast.Program;
 import beaver.Parser;
 
@@ -25,6 +26,22 @@ public class Translator {
         String basename = args[0];
         try {
             BufferedReader in = new BufferedReader(new FileReader(basename + ".m"));
+
+            FunctionEndScanner prescanner = new FunctionEndScanner(in);
+            FunctionEndScanner.Result result = prescanner.translate();
+            in.close();
+
+            if(result instanceof NoChangeResult) {
+                in = new BufferedReader(new FileReader(basename + ".m")); //just re-open original file
+            } else if(result instanceof ProblemResult) {
+                for(TranslationProblem prob : ((ProblemResult) result).getProblems()) {
+                    System.err.println(prob);
+                }
+                System.exit(0); //terminate early since extraction parser can't work without balanced 'end's
+            } else if(result instanceof TranslationResult) {
+                TranslationResult transResult = (TranslationResult) result;
+                in = new BufferedReader(new StringReader(transResult.getText()));
+            }
 
             ExtractionScanner scanner = new ExtractionScanner(in);
             ExtractionParser parser = new ExtractionParser();
