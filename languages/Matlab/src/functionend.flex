@@ -217,7 +217,7 @@ CloseBracketComment = %\}
 
 ShellCommand=[!].*
 
-BlockEnd = [\r\n,;][ \t\f]*end
+BlockEnd = [\r\n,;] ([ \t\f] | {EscapedLineTerminator})* end
 
 //parsing the bit after a DOT
 %state FIELD_NAME
