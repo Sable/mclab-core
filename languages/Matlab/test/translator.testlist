@@ -11,3 +11,5 @@ translator_array_nested
 translator_array_comments
 translator_array_other
 translator_functionend_all
+translator_functionend_none
+translator_functionend_hidden
