@@ -95,6 +95,7 @@ package natlab;
   
   //// Text ////////////////////////////////////////////////////////////////////
   
+  private OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
   private StringBuffer buf = new StringBuffer();
   
   //true for identifier, number, bracketed, transpose
@@ -105,10 +106,11 @@ package natlab;
   }
   
   private void append(boolean transposeNext) {
-    append(transposeNext, yytext());
+    appendHelper(transposeNext, yytext());
+    offsetTracker.advanceByTextSize(yytext());
   }
   
-  private void append(boolean transposeNext, String text) {
+  private void appendHelper(boolean transposeNext, String text) {
     //if we return anything while in state FIELD_NAME, then restore state
     //i.e. only the first token after the dot is parsed specially
     if(yystate() == FIELD_NAME) {
@@ -121,13 +123,55 @@ package natlab;
   }
   
   private void insertEnd() {
-    append(false, "end\n");
+    char prevChar = buf.charAt(buf.size() -1);
+    if(prevChar == '\n' || prevChar == '\r') {
+        //e
+        offsetTracker.advanceToNewLine(1, 1);
+        offsetTracker.recordOffsetChange(-1, yycolumn);
+        
+        //n
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //d
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //\n
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //following text
+        offsetTracker.advanceToNewLine(1, 1);
+        offsetTracker.recordOffsetChange(0, 0);
+    } else {
+        //e
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //n
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //d
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //\n
+        offsetTracker.advanceInLine(1);
+        offsetTracker.recordOffsetChange(0, -1);
+        
+        //following text
+        offsetTracker.advanceToNewLine(1, 1);
+        offsetTracker.recordOffsetChange(1, -1 * yycolumn);
+    }
+    appendHelper(false, "end\n");
   }
   
   //// Optional end ////////////////////////////////////////////////////////////
   
   private FunctionEndTranslationProblem makeProblem() {
-    return new FunctionEndTranslationProblem(yyline + 1, yycol + 1, "Function lacks an explicit end." + 
+    return new FunctionEndTranslationProblem(yyline + 1, yycolumn + 1, "Function lacks an explicit end." + 
         "  If any function has an explicit end, then all must.");
   }
   
@@ -356,7 +400,7 @@ ShellCommand=[!].*
         if(numFunctions == 0 || unendedFunctions.isEmpty()) { //all functions have an 'end'
             result = new NoChangeResult();
         } else if(unendedFunctions.size() == numFunctions) { //no function has an 'end'
-            //TODO-AC: result = new TranslationResult();
+            result = new TranslationResult(offsetTracker.getPositionMap(), buf.toString());
         } else {
             result = new ProblemResult(unendedFunctions);
         }
