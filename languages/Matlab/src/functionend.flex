@@ -395,6 +395,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
         append();
         restoreState();
     }
+    {LineTerminator} { append(); restoreState(); } //NB: let another pass handle this: unterminated string literal
     . { append(); }
     <<EOF>> { clearStateStack(); } //NB: let another pass handle this: unterminated string literal
 }
