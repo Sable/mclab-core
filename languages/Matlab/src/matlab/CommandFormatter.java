@@ -47,7 +47,7 @@ public class CommandFormatter {
         }
         originalSymbols = new ArrayList<Symbol>(originalSymbols);
         if(isNotCmd(originalSymbols)) {
-            return originalSymbols;
+            return null;
         }
         if(offsetTracker == null) {
             //easier than checking for null everywhere

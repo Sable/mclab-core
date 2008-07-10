@@ -31,11 +31,24 @@ aspect Translate {
         String cmd = getCmd();
         buf.append(cmd);
         offsetTracker.advanceByTextSize(cmd);
-        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(getArgs(), offsetTracker, problems);
-        for(beaver.Symbol node : formattedArgSymbols) {
-            if(node instanceof ASTNode) {
-                buf.append(((ASTNode) node).translate(offsetTracker, problems));
-            } else {
+        java.util.List<beaver.Symbol> originalArgSymbols = getArgs();
+        java.util.List<beaver.Symbol> formattedArgSymbols = matlab.CommandFormatter.format(originalArgSymbols, offsetTracker, problems);
+        if(formattedArgSymbols == null) {
+            for(beaver.Symbol node : originalArgSymbols) {
+                if(node instanceof ASTNode) {
+                    buf.append(((ASTNode) node).translate(offsetTracker, problems));
+                    //translation handles offsetTracker
+                } else {
+                    String value = (String) node.value;
+                    if(value != null) {
+                        buf.append(value);
+                        offsetTracker.advanceByTextSize(value);
+                    }
+                }
+            }
+        } else {
+            //CommandFormatter already updated the OffsetTracker
+            for(beaver.Symbol node : formattedArgSymbols) {
                 String value = (String) node.value;
                 if(value != null) {
                     buf.append(value);
