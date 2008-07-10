@@ -100,6 +100,21 @@
 	<!-- NB: overrides target from gen.xml -->
 	<target name="gen" depends="compile.test.generators, Gen.gen, antlr, gen.tests" />
 
+	<!-- command-line compilation -->
+	<!-- NB: overrides target from compile.xml -->
+	<target name="compile" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<classpath refid="antlr.jar.path" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<src path="${test.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->
