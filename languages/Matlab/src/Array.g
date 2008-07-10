@@ -355,7 +355,7 @@ element :
 //non-empty
 element_separator_list :
      t_FILLER? t_COMMA t_FILLER? //just echo
-  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
+  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 //non-empty
