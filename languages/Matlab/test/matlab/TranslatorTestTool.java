@@ -61,6 +61,21 @@ public class TranslatorTestTool {
 
                 if(problems.isEmpty()) {
                     PositionMap posMap = offsetTracker.buildPositionMap();
+
+//                    out.println(">>>> Ends Added -> Matlab");
+//                    for(TextPosition destPos : getAllTextPositions(destText)) {
+//                        TextPosition sourcePos = prePosMap.getPreTranslationPosition(destPos);
+//                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//                                "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//                    }
+//
+//                    out.println(">>>> Natlab -> Ends Added");
+//                    for(TextPosition destPos : getAllTextPositions(destText)) {
+//                        TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
+//                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//                                "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//                    }
+                    
                     if(prePosMap != null) {
                         posMap = new CompositePositionMap(posMap, prePosMap);
                     }
