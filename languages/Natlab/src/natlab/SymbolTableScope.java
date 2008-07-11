@@ -4,14 +4,15 @@ import java.util.*;
 
 public class SymbolTableScope implements SymbolTableInterface{
     // hash map for lookup with symbol name
-    private HashMap<String, SymbolTableEntry> symTable;
+    public HashMap<String, SymbolTableEntry> symTable;
     // hash map for lookup with original name of symbol
     // contains hashmaps indexed by symbol names.
     // This is because each original name can have many symbol names associated
     // with it
-    private HashMap<String, HashMap<String, SymbolTableEntry>> onameTable;
+    public HashMap<String, HashMap<String, SymbolTableEntry>> onameTable;
 
-    SymbolTableScope() {
+    public SymbolTableScope() {
+    //SymbolTableScope() {
         symTable = new HashMap<String, SymbolTableEntry>();
         onameTable = new HashMap<String, HashMap<String, SymbolTableEntry>>();
     }

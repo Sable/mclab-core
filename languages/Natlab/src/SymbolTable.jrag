@@ -1,0 +1,170 @@
+//Symbol Table
+
+import natlab.SymbolTableScope;
+import natlab.SymbolTableEntry;
+
+aspect SymbolTableEntry {
+	syn java.util.List<SymbolTableEntry> LValueExpr.getSymbolTableEntry() { throw new UnsupportedOperationException(getClass().getName() + ".getSymbolTableEntry()"); }
+     
+	eq NameExpr.getSymbolTableEntry() {
+		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
+        symentlst.add(new SymbolTableEntry(getName().getID(), getName().getID()));
+		return symentlst;
+    }  
+    
+    eq ParameterizedExpr.getSymbolTableEntry() {
+		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
+		
+		Expr target = getTarget();
+		if(target instanceof LValueExpr) {
+			symentlst = ((LValueExpr)target).getSymbolTableEntry();
+		}
+		
+		return symentlst;
+    }  
+    
+    eq CellIndexExpr.getSymbolTableEntry() {
+		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
+		
+		Expr target = getTarget();
+		if(target instanceof LValueExpr) {
+			symentlst = ((LValueExpr)target).getSymbolTableEntry();
+		}
+		
+		return symentlst;
+    }  
+    
+    eq DotExpr.getSymbolTableEntry() {
+		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
+		
+		Expr target = getTarget();
+		if(target instanceof LValueExpr) {
+			symentlst = ((LValueExpr)target).getSymbolTableEntry();
+		}
+		
+		return symentlst;
+    } 
+    
+    eq MatrixExpr.getSymbolTableEntry() {
+		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
+		
+		Row row = getRows().getChild(0);
+		for(Expr exp : row.getElements()) {
+			if(exp instanceof LValueExpr) {
+				symentlst.addAll(((LValueExpr)exp).getSymbolTableEntry());
+			}
+		}
+		
+		return symentlst;
+    } 
+}
+
+aspect SymbolTableScope {
+    //default - exception
+    syn SymbolTableScope ASTNode.getSymbolTableScope() { throw new UnsupportedOperationException(getClass().getName() + ".getSymbolTableScope()"); }
+     
+    eq EmptyProgram.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        return symtbl; //TODO-TA return null?
+    }
+
+    eq Script.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        
+    	for(Stmt stmt : getStmts()) {
+    		if(stmt instanceof AssignStmt) {
+    			LValueExpr lhs = (LValueExpr)((AssignStmt)stmt).getLHS();
+    			java.util.List<SymbolTableEntry> symentlst = lhs.getSymbolTableEntry();
+				for(SymbolTableEntry syment : symentlst) {
+					symtbl.addSymbol(syment);
+    			}
+            } else if(stmt instanceof GlobalStmt) {
+            	for(Name name : ((GlobalStmt)stmt).getNames()) {
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+    			}
+            } else if(stmt instanceof PersistentStmt) {
+            	for(Name name : ((PersistentStmt)stmt).getNames()) {
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+    			}
+            }
+        }
+        
+    	return symtbl;
+    }
+    
+    eq FunctionList.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        
+/*      for(Function func : getFunctions()) {
+            symtbl = func.getSymbolTableScope();
+        }
+*/        
+        return symtbl;
+    }
+
+    eq Function.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        
+        for(Name param : getOutputParams()) {
+        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID()));
+        }
+        
+        for(Name param : getInputParams()) {
+        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID()));
+        }
+        
+    	for(Stmt stmt : getStmts()) {
+            if(stmt instanceof AssignStmt) {
+    			LValueExpr lhs = (LValueExpr)((AssignStmt)stmt).getLHS();
+    			java.util.List<SymbolTableEntry> symentlst = lhs.getSymbolTableEntry();
+				for(SymbolTableEntry syment : symentlst) {
+					symtbl.addSymbol(syment);
+    			}
+            } else if(stmt instanceof GlobalStmt) {
+            	for(Name name : ((GlobalStmt)stmt).getNames()) {
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+    			}
+            } else if(stmt instanceof PersistentStmt) {
+            	for(Name name : ((PersistentStmt)stmt).getNames()) {
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+    			}
+            }
+        }
+        
+/*      for(Function func : getNestedFunctions()) {
+            errors.addAll(func.getWeedingErrors());
+        }
+*/
+    	return symtbl;
+    }
+    
+    eq ClassDef.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        
+        for(Properties props : getPropertys()) {
+        	for(Property prop : props.getPropertys()) {
+        		symtbl.addSymbol(new SymbolTableEntry(prop.getName(), prop.getName()));
+        	}
+        }
+        
+        for(ClassEvents events : getClassEvents()) {
+            for(Event eve : events.getEvents()) {
+        		symtbl.addSymbol(new SymbolTableEntry(eve.getName(), eve.getName()));
+	        }
+        }
+        
+		for(Methods methods : getMethods()) {
+            for(Signature sign : methods.getSignatures()) {
+	            //errors.addAll(sign.getWeedingErrors());
+	        }
+	        for(PropertyAccess prop : methods.getPropAccs()) {
+	            //errors.addAll(prop.getWeedingErrors());
+	        }
+	        for(Function func : methods.getFunctions()) {
+	            //errors.addAll(func.getWeedingErrors());
+	        }
+        }
+        
+    	return symtbl;
+    }
+}

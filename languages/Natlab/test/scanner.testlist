@@ -16,3 +16,4 @@ scanner_transpose
 scanner_badtranspose
 scanner_ellipsistranspose
 scanner_class
+scanner_stateclosed
