@@ -81,7 +81,7 @@
 %terminals NUMBER, IDENTIFIER;
 %terminals DOT, STMT_TERMINATOR, ELEMENT_SEPARATOR, SIZE_OF, EQ, HAS_TYPE;
 %terminals LPAREN, RPAREN, LCURLY, RCURLY, LSQUARE, RSQUARE;
-%terminals VARARG_MODIFIER, TYPE_VAR_MODIFIER, UNKNOWN_TYPE, ARROW;
+%terminals VARARG_MODIFIER, HANDLE_MODIFIER, TYPE_VAR_MODIFIER, UNKNOWN_TYPE, ARROW;
 
 %typeof NUMBER = "Integer";
 %typeof IDENTIFIER = "String";
@@ -89,23 +89,8 @@
 %goal annotation;
 
 annotation =
-     NUMBER
-  |  IDENTIFIER
+     stmt*
   |  DOT
-  |  STMT_TERMINATOR
-  |  ELEMENT_SEPARATOR
-  |  SIZE_OF
-  |  EQ
-  |  HAS_TYPE
-  |  LPAREN
-  |  RPAREN
-  |  LCURLY
-  |  RCURLY
-  |  LSQUARE
-  |  RSQUARE
-  |  VARARG_MODIFIER
-  |  TYPE_VAR_MODIFIER
-  |  UNKNOWN_TYPE
   ;
 
 stmt =
@@ -167,7 +152,7 @@ base_type =
 
 base_type_list =
      base_type
-  |  type_list ELEMENT_SEPARATOR base_type
+  |  base_type_list ELEMENT_SEPARATOR base_type
   ;
 
 size_stmt_body =
