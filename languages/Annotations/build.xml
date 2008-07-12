@@ -1,6 +1,6 @@
-<project name="Natlab" default="build">
+<project name="Annotations" default="build">
 	<!-- load properties -->
-	<property file="natlab.properties" />
+	<property file="annotations.properties" />
 
 	<!-- useful paths -->
 	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
@@ -17,7 +17,6 @@
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
-        <import file="../shared/options.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
 
@@ -57,7 +56,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests, options" />
+	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
