@@ -73,25 +73,19 @@ Number = 0 | [1-9] {Digit}*
 
 Comment = [/][/] .*
 
-Dot = \.
-
 %%
 
 {Whitespace} { /* skip */ }
 {Comment} {/* skip */}
 
-{Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
+"." { return symbol(DOT); }
 
-{Identifier} { return symbol(IDENTIFIER, yytext()); }
+";" { return symbol(STMT_TERMINATOR); }
+"," { return symbol(ELEMENT_SEPARATOR); }
 
-{Dot} { return symbol(DOT); }
-
-; { return symbol(STMT_TERMINATOR); }
-, { return symbol(ELEMENT_SEPARATOR); }
-
-# { return symbol(SIZE_OF); }
-= { return symbol(EQ); }
-: { return symbol(HAS_TYPE); }
+"#" { return symbol(SIZE_OF); }
+"=" { return symbol(EQ); }
+":" { return symbol(HAS_TYPE); }
 
 \( { return symbol(LPAREN); }
 \) { return symbol(RPAREN); }
@@ -100,14 +94,16 @@ Dot = \.
 \[ { return symbol(LSQUARE); }
 \] { return symbol(RSQUARE); }
 
-\* { return symbol(VARARG_MODIFIER); }
-@ { return symbol(HANDLE_MODIFIER); }
-$ { return symbol(TYPE_VAR_MODIFIER); }
+"*" { return symbol(VARARG_MODIFIER); }
+"@" { return symbol(HANDLE_MODIFIER); }
+"$" { return symbol(TYPE_VAR_MODIFIER); }
 
--> { return symbol(ARROW); }
-\? { return symbol(UNKNOWN_TYPE); }
+"->" { return symbol(ARROW); }
+"?" { return symbol(UNKNOWN_TYPE); }
 
+{Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
 
+{Identifier} { return symbol(IDENTIFIER, yytext()); }
 
 /* error fallback */
 .|\n { error("Illegal character '" + yytext() + "'"); }
