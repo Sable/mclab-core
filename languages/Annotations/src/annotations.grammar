@@ -126,51 +126,43 @@ type_stmt_body =
   ;
 
 type =
+     vararg_type
+  |  list_type ARROW type //NB: not vararg_type on LHS
+  ;
+
+vararg_type =
+     list_type
+  |  list_type VARARG_MODIFIER
+  ;
+
+list_type =
      base_type
   |  tuple_type
   |  matrix_type
   |  cell_array_type
-  |  vararg_type
-  |  arrow_type
-  |  handle_type
-  |  unknown_type
+  ;
+
+tuple_type =
+     LPAREN base_type_list RPAREN
+  ;
+
+matrix_type =
+     LSQUARE base_type_list RSQUARE
+  ;
+
+cell_array_type =
+     LCURLY base_type_list RCURLY
   ;
 
 base_type =
      IDENTIFIER
+  |  UNKNOWN_TYPE
+  |  HANDLE_MODIFIER LPAREN type RPAREN
   ;
 
-tuple_type =
-     LPAREN type_list RPAREN
-  ;
-
-type_list =
-     type
-  |  type_list ELEMENT_SEPARATOR type
-  ;
-
-matrix_type =
-     LSQUARE type RSQUARE
-  ;
-
-cell_array_type =
-     LCURLY type RCURLY
-  ;
-
-vararg_type =
-     type VARARG_MODIFIER
-  ;
-
-arrow_type =
-     type ARROW type
-  ;
-
-handle_type =
-     HANDLE_MODIFIER type
-  ;
-
-unknown_type =
-     UNKNOWN_TYPE
+base_type_list =
+     base_type
+  |  type_list ELEMENT_SEPARATOR base_type
   ;
 
 size_stmt_body =
