@@ -127,7 +127,11 @@ type_stmt_body =
 
 type =
      vararg_type
-  |  list_type ARROW type //NB: not vararg_type on LHS
+  |  arrow_type
+  ;
+
+arrow_type =
+     list_type ARROW type //NB: not vararg_type on LHS
   ;
 
 vararg_type =
@@ -157,7 +161,7 @@ cell_array_type =
 base_type =
      IDENTIFIER
   |  TYPE_VAR_MODIFIER IDENTIFIER
-  |  HANDLE_MODIFIER LPAREN type RPAREN
+  |  HANDLE_MODIFIER LPAREN arrow_type RPAREN
   |  UNKNOWN_TYPE
   ;
 
