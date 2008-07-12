@@ -156,8 +156,9 @@ cell_array_type =
 
 base_type =
      IDENTIFIER
-  |  UNKNOWN_TYPE
+  |  TYPE_VAR_MODIFIER IDENTIFIER
   |  HANDLE_MODIFIER LPAREN type RPAREN
+  |  UNKNOWN_TYPE
   ;
 
 base_type_list =
