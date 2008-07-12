@@ -117,7 +117,7 @@ type =
   ;
 
 arrow_type =
-     list_type ARROW type //NB: not vararg_type on LHS
+     list_type ARROW vararg_type //NB: not vararg_type on LHS
   ;
 
 vararg_type =
