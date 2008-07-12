@@ -56,7 +56,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
+	<!-- <target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" /> -->
 
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
