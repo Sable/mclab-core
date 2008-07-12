@@ -90,7 +90,6 @@
 
 annotation =
      stmt*
-  |  DOT
   ;
 
 stmt =
@@ -104,6 +103,8 @@ stmt_body =
 
 entity =
      IDENTIFIER
+  |  entity LCURLY num_list RCURLY
+  |  entity DOT IDENTIFIER
   ;
 
 type_stmt_body =
