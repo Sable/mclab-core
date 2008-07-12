@@ -17,6 +17,9 @@ public class AllTests {
                 suite.addTestSuite(SymbolTablePassTests.class);
                 suite.addTestSuite(SymbolTableFailTests.class);
                 suite.addTestSuite(SymbolTableSanityTests.class);
+
+                suite.addTestSuite(LookupLValuePassTests.class);
+                suite.addTestSuite(LookupLValueFailTests.class);
 		//$JUnit-END$
 		return suite;
 	}

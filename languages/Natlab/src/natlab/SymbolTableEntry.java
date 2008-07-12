@@ -10,17 +10,14 @@ public class SymbolTableEntry
 
     private SymbolCount symbolCount;
 
-	public SymbolTableEntry(String s)
-	//SymbolTableEntry(String s)
+    public SymbolTableEntry(String s)
     {
         symbol = s;
         original = s;
 
         symbolCount = new SymbolCount();
     }
-    
     public SymbolTableEntry(String s, String o)
-    //SymbolTableEntry(String s, String o)
     {
         symbol = s;
         original = o;
