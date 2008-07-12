@@ -2,7 +2,7 @@
 
 %package "annotations";
 
-%class "AnnotationsParser";
+%class "AnnotationParser";
 
 %embed {:
     //// Errors ////////////////////////////////////////////////////////////////

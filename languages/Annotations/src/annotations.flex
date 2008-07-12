@@ -1,6 +1,6 @@
-package annotation;
+package annotations;
 
-import static annotation.AnnotationParser.Terminals.*;
+import static annotations.AnnotationParser.Terminals.*;
 
 import beaver.Symbol;
 import beaver.Scanner;
