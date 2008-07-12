@@ -86,10 +86,26 @@
 %typeof NUMBER = "Integer";
 %typeof IDENTIFIER = "String";
 
+%typeof annotation = "Annotation";
+%typeof stmt, stmt_body = "Stmt";
+%typeof entity = "Entity";
+%typeof type_stmt_body = "TypeStmt";
+%typeof type = "Type";
+%typeof arrow_type = "ArrowType";
+%typeof vararg_type = "Type";
+%typeof list_type = "Type";
+%typeof tuple_type = "TupleType";
+%typeof matrix_type = "MatrixType";
+%typeof cell_array_type = "CellArrayType";
+%typeof base_type = "BaseType";
+%typeof base_type_list = "List<BaseType>";
+%typeof size_stmt_body = "SizeStmt";
+%typeof size = "Size";
+
 %goal annotation;
 
 annotation =
-     stmt*
+     stmt.l* {: return new Annotation(nullToEmpty(makeListNode(_list_l))); :}
   ;
 
 stmt =
@@ -102,13 +118,13 @@ stmt_body =
   ;
 
 entity =
-     IDENTIFIER
-  |  entity LCURLY num_list RCURLY
-  |  entity DOT IDENTIFIER
+     IDENTIFIER.i {: return new Variable(i); :}
+  |  entity.e LCURLY num_list.l RCURLY {: return new Cell(e, (java.util.List<Integer>) l.value); :}
+  |  entity.e DOT IDENTIFIER.i {: return new Field(e, i); :}
   ;
 
 type_stmt_body =
-     entity HAS_TYPE type
+     entity.e HAS_TYPE type.t {: return new TypeStmt(e, t); :}
   ;
 
 type =
@@ -117,12 +133,13 @@ type =
   ;
 
 arrow_type =
-     list_type ARROW vararg_type //NB: not vararg_type on LHS
+    //NB: not vararg_type on LHS
+     list_type.t ARROW vararg_type.v {: return new ArrowType(t, v); :}
   ;
 
 vararg_type =
      list_type
-  |  list_type VARARG_MODIFIER
+  |  list_type.t VARARG_MODIFIER {: return new VarArgType(t); :}
   ;
 
 list_type =
@@ -133,38 +150,38 @@ list_type =
   ;
 
 tuple_type =
-     LPAREN base_type_list RPAREN
+     LPAREN base_type_list.l RPAREN {: return new TupleType(l); :}
   ;
 
 matrix_type =
-     LSQUARE base_type RSQUARE
+     LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
   ;
 
 cell_array_type =
-     LCURLY base_type RCURLY
+     LCURLY base_type.b RCURLY {: return new CellArrayType(b); :}
   ;
 
 base_type =
-     IDENTIFIER
-  |  TYPE_VAR_MODIFIER IDENTIFIER
-  |  HANDLE_MODIFIER LPAREN arrow_type RPAREN
-  |  UNKNOWN_TYPE
+     IDENTIFIER.i {: return new PrimitiveType(i); :}
+  |  TYPE_VAR_MODIFIER IDENTIFIER.i {: return new TypeVarType(i); :}
+  |  HANDLE_MODIFIER LPAREN arrow_type.a RPAREN {: return new HandleType(a); :}
+  |  UNKNOWN_TYPE {: return new UnknownType(); :}
   ;
 
 base_type_list =
-     base_type
-  |  base_type_list ELEMENT_SEPARATOR base_type
+     base_type.b {: return new List<BaseType>().add(b); :}
+  |  base_type_list.l ELEMENT_SEPARATOR base_type.b {: return l.add(b); :}
   ;
 
 size_stmt_body =
-     SIZE_OF entity EQ size
+     SIZE_OF entity.e EQ size.s {: return new SizeStmt(e, s); :}
   ;
 
 size =
-     LSQUARE num_list RSQUARE
+     LSQUARE num_list.l RSQUARE {: return new Size((java.util.List<Integer>) l.value); :}
   ;
 
 num_list =
-     NUMBER
-  |  num_list ELEMENT_SEPARATOR NUMBER
+     NUMBER.n {: java.util.List<Integer> nums = new java.util.ArrayList<Integer>(); nums.add(n); return new Symbol(nums); :}
+  |  num_list.l ELEMENT_SEPARATOR NUMBER.n {: ((java.util.List<Integer>) l.value).add(n); return l; :}
   ;
