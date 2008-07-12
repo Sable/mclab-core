@@ -13,44 +13,48 @@ import beaver.Parser;
  * The output file is named as: basename + ".tree" 
  */
 public class ParserTreeTool {
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("Usage: java natlab.ParserTreeTool {basename}");
-			System.exit(1);
-		}
-		String basename = args[0];
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
-			
-			CommentBuffer commentBuffer = new CommentBuffer();
-			NatlabScanner scanner = new NatlabScanner(in);
-			scanner.setCommentBuffer(commentBuffer);
-			NatlabParser parser = new NatlabParser();
-			parser.setCommentBuffer(commentBuffer);
-			Program actual = (Program) parser.parse(scanner);
-			PrintWriter out = new PrintWriter(new FileWriter(basename + ".tree"));
-			if(parser.hasError()) {
-				for(String error : parser.getErrors()) {
-					out.println(error);
-				}
-			} else {
-				int startPos = actual.getStart();
-				int endPos = actual.getEnd();
-				out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
-				out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
-				out.print(actual.getStructureString());
-				out.println();
-				out.print(actual.dumpTree());
-			}
-			out.close();
-			in.close();
-			System.exit(0);
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.exit(2);
-		} catch (Parser.Exception e) {
-			e.printStackTrace();
-			System.exit(3);
-		}
-	}
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: java natlab.ParserTreeTool {basename}");
+            System.exit(1);
+        }
+        String basename = args[0];
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
+
+            CommentBuffer commentBuffer = new CommentBuffer();
+            NatlabScanner scanner = new NatlabScanner(in);
+            scanner.setCommentBuffer(commentBuffer);
+            NatlabParser parser = new NatlabParser();
+            parser.setCommentBuffer(commentBuffer);
+            PrintWriter out = new PrintWriter(new FileWriter(basename + ".tree"));
+            try {
+                Program actual = (Program) parser.parse(scanner);
+                if(parser.hasError()) {
+                    for(String error : parser.getErrors()) {
+                        out.println(error);
+                    }
+                } else {
+                    int startPos = actual.getStart();
+                    int endPos = actual.getEnd();
+                    out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
+                    out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
+                    out.print(actual.getStructureString());
+                    out.println();
+                    out.print(actual.dumpTree());
+                }
+            } catch(Parser.Exception e) {
+                for(String error : parser.getErrors()) {
+                    out.println(error);
+                }
+                out.println(e.getMessage());
+            }
+            out.close();
+            in.close();
+            System.exit(0);
+        } catch(IOException e) {
+            e.printStackTrace();
+            System.exit(2);
+        }
+    }
 }

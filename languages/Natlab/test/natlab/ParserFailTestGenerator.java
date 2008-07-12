@@ -16,9 +16,10 @@ public class ParserFailTestGenerator extends AbstractTestGenerator {
 	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package natlab;");
 		testFileWriter.println();
+		testFileWriter.println("import java.util.ArrayList;");
 		testFileWriter.println("import java.util.List;");
 		testFileWriter.println();
-		testFileWriter.println("import beaver.Scanner;");
+		testFileWriter.println("import beaver.Parser;");
 		testFileWriter.println();
 		testFileWriter.println("public class NatlabParserFailTests extends ParserFailTestBase {");
 	}
@@ -35,9 +36,16 @@ public class ParserFailTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println("		scanner.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		NatlabParser parser = new NatlabParser();");
 		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
-		testFileWriter.println("		parser.parse(scanner);");
-		testFileWriter.println("		assertTrue(parser.hasError());");
-		testFileWriter.println("		assertEquals(expectedErrors, parser.getErrors());");
+		testFileWriter.println("		try {");
+		testFileWriter.println("			parser.parse(scanner);");
+		testFileWriter.println("			assertTrue(parser.hasError());");
+		testFileWriter.println("			assertEquals(expectedErrors, parser.getErrors());");
+		testFileWriter.println("		} catch(Parser.Exception e) {");
+		testFileWriter.println("			List<String> actualErrors = new ArrayList<String>();");
+		testFileWriter.println("			actualErrors.addAll(parser.getErrors());");
+		testFileWriter.println("			actualErrors.add(e.getMessage());");
+		testFileWriter.println("			assertEquals(expectedErrors, actualErrors);");
+		testFileWriter.println("		}");
 		testFileWriter.println("	}");
 	}
 
