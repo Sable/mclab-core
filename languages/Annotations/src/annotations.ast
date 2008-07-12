@@ -1,0 +1,26 @@
+Annotation ::= Stmt*;
+
+abstract Stmt;
+SizeStmt : Stmt ::= Entity Size;
+TypeStmt : Stmt ::= Entity Type;
+
+abstract Entity;
+Variable : Entity ::= <Name>;
+Field : Entity ::= Entity <FieldName>;
+Cell : Entity ::= Entity <Indices : java.util.List<Integer>>;
+
+Size ::= <Dims : java.util.List<Integer>>;
+
+//NB: types are more general then they need to be - see grammar for precise structure
+abstract Type;
+ArrowType : Type ::= ArgType : Type  ResultType : Type;
+VarArgType : Type ::= Type;
+TupleType : Type ::= ElementType : BaseType*;
+MatrixType : Type ::=  ElementType : BaseType;
+CellArrayType : Type ::= ElementType : BaseType;
+
+abstract BaseType : Type;
+PrimitiveType : BaseType ::= <Name>;
+TypeVarType : BaseType ::= <Name>;
+HandleType : BaseType ::= ArrowType;
+UnknownType : BaseType;
