@@ -24,14 +24,14 @@ public class TranslatorTestTool {
         String basename = args[0];
         try {
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
-            
+
             BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
             PositionMap prePosMap = null;
-            
+
             FunctionEndScanner prescanner = new FunctionEndScanner(in);
             FunctionEndScanner.Result result = prescanner.translate();
             in.close();
-            
+
             if(result instanceof NoChangeResult) {
                 in = new BufferedReader(new FileReader(basename + ".in")); //just re-open original file
             } else if(result instanceof ProblemResult) {
@@ -49,51 +49,58 @@ public class TranslatorTestTool {
 
             ExtractionScanner scanner = new ExtractionScanner(in);
             ExtractionParser parser = new ExtractionParser();
-            Program actual = (Program) parser.parse(scanner);
-            if(parser.hasError()) {
+            try {
+                Program actual = (Program) parser.parse(scanner);
+                if(parser.hasError()) {
+                    for(TranslationProblem prob : parser.getErrors()) {
+                        out.println("~" + prob);
+                    }
+                } else {
+                    List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+                    OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+                    String destText = actual.translate(offsetTracker, problems);
+
+                    if(problems.isEmpty()) {
+                        PositionMap posMap = offsetTracker.buildPositionMap();
+
+//                      out.println(">>>> Ends Added -> Matlab");
+//                      for(TextPosition destPos : getAllTextPositions(destText)) {
+//                      TextPosition sourcePos = prePosMap.getPreTranslationPosition(destPos);
+//                      out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//                      "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//                      }
+
+//                      out.println(">>>> Natlab -> Ends Added");
+//                      for(TextPosition destPos : getAllTextPositions(destText)) {
+//                      TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
+//                      out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//                      "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//                      }
+
+                        if(prePosMap != null) {
+                            posMap = new CompositePositionMap(posMap, prePosMap);
+                        }
+
+                        out.println(">>>> Destination Language -> Source Language");
+                        for(TextPosition destPos : getAllTextPositions(destText)) {
+                            TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
+                            out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+                                    "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+                        }
+
+                        out.println(">>>> Translated Text");
+                        out.print(destText);
+                    } else {
+                        for(TranslationProblem prob : problems) {
+                            out.println("~" + prob);
+                        }
+                    }
+                }
+            } catch(Parser.Exception e) {
                 for(TranslationProblem prob : parser.getErrors()) {
                     out.println("~" + prob);
                 }
-            } else {
-                List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-                OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-                String destText = actual.translate(offsetTracker, problems);
-
-                if(problems.isEmpty()) {
-                    PositionMap posMap = offsetTracker.buildPositionMap();
-
-//                    out.println(">>>> Ends Added -> Matlab");
-//                    for(TextPosition destPos : getAllTextPositions(destText)) {
-//                        TextPosition sourcePos = prePosMap.getPreTranslationPosition(destPos);
-//                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-//                                "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-//                    }
-//
-//                    out.println(">>>> Natlab -> Ends Added");
-//                    for(TextPosition destPos : getAllTextPositions(destText)) {
-//                        TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
-//                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-//                                "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-//                    }
-                    
-                    if(prePosMap != null) {
-                        posMap = new CompositePositionMap(posMap, prePosMap);
-                    }
-
-                    out.println(">>>> Destination Language -> Source Language");
-                    for(TextPosition destPos : getAllTextPositions(destText)) {
-                        TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
-                        out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-                                "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-                    }
-
-                    out.println(">>>> Translated Text");
-                    out.print(destText);
-                } else {
-                    for(TranslationProblem prob : problems) {
-                        out.println("~" + prob);
-                    }
-                }
+                out.println("~" + e.getMessage());
             }
             out.close();
             in.close();
@@ -101,9 +108,6 @@ public class TranslatorTestTool {
         } catch(IOException e) {
             e.printStackTrace();
             System.exit(2);
-        } catch (Parser.Exception e) {
-            e.printStackTrace();
-            System.exit(3);
         }
     }
 
