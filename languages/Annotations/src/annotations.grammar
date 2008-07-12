@@ -73,8 +73,8 @@
 
     //AST really doesn't like null nodes, but beaver returns null for empty optional lists
     //Create an appropriate empty node to replace the null
-    private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
-        return original == null ? new List<T>() : original;
+    private static <T extends ASTNode> annotations.ast.List<T> nullToEmpty(annotations.ast.List<T> original) {
+        return original == null ? new annotations.ast.List<T>() : original;
     }
 :};
 
