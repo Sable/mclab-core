@@ -17,7 +17,7 @@ ArrowType : Type ::= ArgType : Type  ResultType : Type;
 VarArgType : Type ::= Type;
 TupleType : Type ::= ElementType : BaseType*;
 MatrixType : Type ::=  ElementType : BaseType;
-CellArrayType : Type ::= ElementType : BaseType;
+CellArrayType : Type ::= DefaultElementType : BaseType;
 
 abstract BaseType : Type;
 PrimitiveType : BaseType ::= <Name>;
