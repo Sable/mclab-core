@@ -147,11 +147,11 @@ tuple_type =
   ;
 
 matrix_type =
-     LSQUARE base_type_list RSQUARE
+     LSQUARE base_type RSQUARE
   ;
 
 cell_array_type =
-     LCURLY base_type_list RCURLY
+     LCURLY base_type RCURLY
   ;
 
 base_type =
