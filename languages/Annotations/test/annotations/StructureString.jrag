@@ -1,0 +1,71 @@
+aspect StructureString {
+	syn String ASTNode.getStructureString() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureString()"); }
+	
+	eq Annotation.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		for(Stmt stmt : getStmts()) {
+			buf.append(stmt.getStructureString());
+		}
+		return buf.toString();
+	}
+	
+	eq SizeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getSize().getStructureString() + ";";
+	eq TypeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getType().getStructureString() + ";";
+	
+	eq Variable.getStructureString() = getName();
+	eq Field.getStructureString() = getEntity().getStructureString() + "." + getFieldName();
+	eq Cell.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append(getEntity().getStructureString());
+		buf.append("{");
+		boolean first = true;
+		for(Integer index: getIndices()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			first = false;
+			buf.append(index);
+		}
+		buf.append("}");
+		return buf.toString();
+	}
+	
+	eq Size.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("[");
+		boolean first = true;
+		for(Integer dim: getDims()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			first = false;
+			buf.append(dim);
+		}
+		buf.append("]");
+		return buf.toString();
+	}
+	
+	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
+	eq VarArgType.getStructureString() = getType() + "*"; //TODO-AC: parens?
+	eq TupleType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("(");
+		boolean first = true;
+		for(BaseType type: getElementTypes()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			first = false;
+			buf.append(type);
+		}
+		buf.append(")");
+		return buf.toString();
+	}
+	eq MatrixType.getStructureString() = "[" + getElementType().getStructureString() + "]";
+	eq CellArrayType.getStructureString() = "{" + getDefaultElementType().getStructureString() + "}";
+	
+	eq PrimitiveType.getStructureString() = getName();
+	eq TypeVarType.getStructureString() = "$" + getName();
+	eq HandleType.getStructureString() = "@(" + getArrowType() + ")";
+	eq UnknownType.getStructureString() = "?";
+}
