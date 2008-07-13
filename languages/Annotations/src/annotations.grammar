@@ -96,7 +96,7 @@
 %typeof list_type = "Type";
 %typeof tuple_type = "TupleType";
 %typeof cell_array_type = "CellArrayType";
-%typeof matrix_type = "MatrixType";
+%typeof matrix_type = "Type";
 %typeof matrix_type_list = "List<Type>";
 %typeof base_type = "BaseType";
 %typeof size_stmt_body = "SizeStmt";
@@ -109,7 +109,7 @@ annotation =
   ;
 
 stmt =
-     stmt_body STMT_TERMINATOR
+     stmt_body.s STMT_TERMINATOR
   ;
 
 stmt_body =
