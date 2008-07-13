@@ -114,7 +114,7 @@ stmt =
 
 stmt_body =
      type_stmt_body
-     size_stmt_body
+  |  size_stmt_body
   ;
 
 entity =
