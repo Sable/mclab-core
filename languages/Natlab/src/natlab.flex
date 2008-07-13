@@ -288,6 +288,12 @@ ShellCommand=[!].*
 
 ValidEscape=\\[bfnrt\\\"]
 
+//// ANNOTATION EXTENSION - START //////////////////////////////////////////////
+
+Annotation = "(*" ([^*] | [*][^)])* "*)"
+
+//// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
+
 //parsing the bit after a DOT
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
@@ -306,6 +312,16 @@ ValidEscape=\\[bfnrt\\\"]
 %%
 
 //TODO-AC: anything that doesn't call symbol might have to explicitly set transposeNext (probably to false)
+
+//// ANNOTATION EXTENSION - START //////////////////////////////////////////////
+
+{Annotation} {
+    String fullText = yytext();
+    String annotation = fullText.substring(2, fullText.length() - 2); //drop (* *)
+    return symbol(ANNOTATION, annotation);
+}
+
+//// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
 
 //... comment
 {EscapedLineTerminator} {
