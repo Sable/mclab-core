@@ -5,7 +5,7 @@ aspect NameResolution{
 
     syn lazy SymbolTableEntry Program.lookupLValue(String name) = null;
     syn lazy SymbolTableEntry Stmt.lookupLValue(String name) = null;
-    syn lazy SymbolTableEntry Expr.lookupLValue(String name) = null;
+    syn lazy SymbolTableEntry Expr.lookupSymbol(String name) = null;
 
     //eq EmptyProgram.lookupLValue( String name ) = null;
 
@@ -27,24 +27,24 @@ aspect NameResolution{
 
     //eq ClassDef.lookupLValue( String name ) = null;
         
-    eq AssignStmt.lookupLValue( String name ) = getLHS().lookupLValue( name );
+    eq AssignStmt.lookupLValue( String name ) = getLHS().lookupSymbol( name );
 
 
-    eq NameExpr.lookupLValue( String name ) 
+    eq NameExpr.lookupSymbol( String name ) 
     {
         if( getName().getID().equals( name ) )
             return new SymbolTableEntry( name );
         return null;
     }
-    eq ParameterizedExpr.lookupLValue( String name ) = getTarget().lookupLValue( name );
-    eq CellIndexExpr.lookupLValue( String name ) = getTarget().lookupLValue( name );
-    eq DotExpr.lookupLValue( String name ) = getTarget().lookupLValue( name );
-    eq MatrixExpr.lookupLValue( String name )
+    eq ParameterizedExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
+    eq CellIndexExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
+    eq DotExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
+    eq MatrixExpr.lookupSymbol( String name )
     {
         //return new SymbolTableEntry( getPrettyPrinted() );
         for( int i=0; i < getNumRow(); i++ ){
             for( int j=0; j < getRow(i).getNumElement(); j++ ){
-                SymbolTableEntry se = getRow(i).getElement(j).lookupLValue( name );
+                SymbolTableEntry se = getRow(i).getElement(j).lookupSymbol( name );
                 if( se != null )
                     return se;
             }

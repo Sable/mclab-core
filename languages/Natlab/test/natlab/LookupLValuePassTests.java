@@ -63,7 +63,7 @@ public class LookupLValuePassTests extends TestCase
         assertNotNull("lookup returned null",se);
         assertEquals("lookup returned wrong symbol", "a7", se.getSymbol() );
     }
-    public void test_lookuplvscriptpass_cell1() throws Exception
+    public void test_lookuplvscriptpass_array1() throws Exception
     {
         String sName = "a10";
         CommentBuffer commentBuffer = new CommentBuffer();
@@ -77,7 +77,7 @@ public class LookupLValuePassTests extends TestCase
         assertNotNull("lookup returned null",se);
         assertEquals("lookup returned wrong symbol", sName, se.getSymbol() );
     }
-    public void test_lookuplvscriptpass_cell2() throws Exception
+    public void test_lookuplvscriptpass_array2() throws Exception
     {
         String sName = "a11";
         CommentBuffer commentBuffer = new CommentBuffer();
