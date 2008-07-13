@@ -318,7 +318,22 @@ Annotation = "(*" ([^*] | [*][^)])* "*)"
 {Annotation} {
     String fullText = yytext();
     String annotation = fullText.substring(2, fullText.length() - 2); //drop (* *)
-    return symbol(ANNOTATION, annotation);
+    int startLine = yyline + 1;
+    int startCol = yycolumn + 1;
+    int endLine = startLine;
+    int endCol = startCol;
+    //TODO-AC: this is what LengthScanner is for, but we don't want the dependency
+    //  since this is a temporary change
+    for(int i = 1; i < fullText.length(); i++) {
+        char prevChar = fullText.charAt(i - 1);
+        if((prevChar == '\n') || (prevChar == '\r' && fullText.charAt(i) != '\n')) {
+            endLine++;
+            endCol = 1;
+        } else {
+            endCol++;
+        }
+    }
+    return symbol(ANNOTATION, annotation, startLine, startCol, endLine, endCol);
 }
 
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
