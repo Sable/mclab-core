@@ -21,7 +21,7 @@ class ScannerTestBase extends TestCase {
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile("^\\s*([_A-Z]+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?:\\s(\\d+))?\\s*(?:\\s=(.*))?$");
 
 	/* Compare the output of the scanner with a list of expected symbols and an optional exception. */
-	static void checkScan(AnnotationScanner scanner, List<Symbol> symbols, List<Symbol> comments, Scanner.Exception exception) 
+	static void checkScan(AnnotationScanner scanner, List<Symbol> symbols, Scanner.Exception exception) 
 			throws IOException, Scanner.Exception {
 		int tokenNum = 0;
 		for(Symbol expected : symbols) {
@@ -56,7 +56,7 @@ class ScannerTestBase extends TestCase {
 	 * Read symbols from the .out file.
 	 * Returns an exception if there is an exception line and null otherwise.
 	 */
-	static Scanner.Exception parseSymbols(String filename, /*OUT*/ List<Symbol> symbols, /*OUT*/ List<Symbol> comments) 
+	static Scanner.Exception parseSymbols(String filename, /*OUT*/ List<Symbol> symbols) 
 			throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		while(in.ready()) {
@@ -64,11 +64,7 @@ class ScannerTestBase extends TestCase {
 			if(isExceptionLine(line)) {
 				return parseException(line);
 			}
-			if(isCommentLine(line)) {
-				comments.add(parseComment(line));
-			} else {
-				symbols.add(parseSymbol(line));
-			}
+			symbols.add(parseSymbol(line));
 		}
 		in.close();
 		return null;
@@ -90,23 +86,6 @@ class ScannerTestBase extends TestCase {
 		int lineNum = Integer.parseInt(tokenizer.nextToken());
 		int colNum = Integer.parseInt(tokenizer.nextToken());
 		return new Scanner.Exception(lineNum, colNum, null);
-	}
-
-	/* Returns true if the line should be treated as a non-token comment line. */
-	private static boolean isCommentLine(String line) {
-		return line.charAt(0) == '#';
-	}
-
-	/*
-	 * Constructs a Symbol from a line of text.
-	 * Format:
-	 *   # TYPE start_line start_col length [=value]
-	 *   e.g. # FOR 2 1 3
-	 *        # IDENTIFIER 3 2 1 =x
-	 */
-	private static Symbol parseComment(String line) 
-			throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		return parseSymbol(line.substring(1));
 	}
 
 	/*

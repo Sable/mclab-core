@@ -28,11 +28,8 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		String outFileName = "test/" + testName + ".out";
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
-		testFileWriter.println("		CommentBuffer commentBuffer = new CommentBuffer();");
 		testFileWriter.println("		AnnotationScanner scanner = getScanner(\"" + inFileName + "\");");
-		testFileWriter.println("		scanner.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		AnnotationParser parser = new AnnotationParser();");
-		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		Program actual = (Program) parser.parse(scanner);");
 		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
