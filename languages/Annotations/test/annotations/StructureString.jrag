@@ -9,8 +9,8 @@ aspect StructureString {
 		return buf.toString();
 	}
 	
-	eq SizeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getSize().getStructureString() + ";";
-	eq TypeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getType().getStructureString() + ";";
+	eq SizeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getSize().getStructureString() + ";\n";
+	eq TypeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getType().getStructureString() + ";\n";
 	
 	eq Variable.getStructureString() = getName();
 	eq Field.getStructureString() = getEntity().getStructureString() + "." + getFieldName();
@@ -46,7 +46,7 @@ aspect StructureString {
 	}
 	
 	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
-	eq VarArgType.getStructureString() = getType() + "*"; //TODO-AC: parens?
+	eq VarArgType.getStructureString() = getType().getStructureString() + "*"; //TODO-AC: parens?
 	eq TupleType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("(");
@@ -56,7 +56,7 @@ aspect StructureString {
 				buf.append(", ");
 			}
 			first = false;
-			buf.append(type);
+			buf.append(type.getStructureString());
 		}
 		buf.append(")");
 		return buf.toString();
@@ -66,6 +66,6 @@ aspect StructureString {
 	
 	eq PrimitiveType.getStructureString() = getName();
 	eq TypeVarType.getStructureString() = "$" + getName();
-	eq HandleType.getStructureString() = "@(" + getArrowType() + ")";
+	eq HandleType.getStructureString() = "@(" + getArrowType().getStructureString() + ")";
 	eq UnknownType.getStructureString() = "?";
 }
