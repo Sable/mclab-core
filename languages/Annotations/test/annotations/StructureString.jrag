@@ -51,7 +51,7 @@ aspect StructureString {
 		StringBuffer buf = new StringBuffer();
 		buf.append("(");
 		boolean first = true;
-		for(BaseType type: getElementTypes()) {
+		for(Type type: getElementTypes()) {
 			if(!first) {
 				buf.append(", ");
 			}

@@ -15,9 +15,9 @@ Size ::= <Dims : java.util.List<Integer>>;
 abstract Type;
 ArrowType : Type ::= ArgType : Type  ResultType : Type;
 VarArgType : Type ::= Type;
-TupleType : Type ::= ElementType : BaseType*;
+TupleType : Type ::= ElementType : Type*;
+CellArrayType : Type ::= DefaultElementType : Type;
 MatrixType : Type ::=  ElementType : BaseType;
-CellArrayType : Type ::= DefaultElementType : BaseType;
 
 abstract BaseType : Type;
 PrimitiveType : BaseType ::= <Name>;

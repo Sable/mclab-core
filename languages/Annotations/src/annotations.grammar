@@ -95,10 +95,10 @@
 %typeof vararg_type = "Type";
 %typeof list_type = "Type";
 %typeof tuple_type = "TupleType";
-%typeof matrix_type = "MatrixType";
 %typeof cell_array_type = "CellArrayType";
+%typeof matrix_type = "MatrixType";
+%typeof matrix_type_list = "List<Type>";
 %typeof base_type = "BaseType";
-%typeof base_type_list = "List<BaseType>";
 %typeof size_stmt_body = "SizeStmt";
 %typeof size = "Size";
 
@@ -143,22 +143,27 @@ vararg_type =
   ;
 
 list_type =
-     base_type
+     matrix_type
   |  tuple_type
-  |  matrix_type
   |  cell_array_type
   ;
 
 tuple_type =
-     LPAREN base_type_list.l RPAREN {: return new TupleType(l); :}
-  ;
-
-matrix_type =
-     LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
+     LPAREN matrix_type_list.m RPAREN {: return new TupleType(m); :}
   ;
 
 cell_array_type =
-     LCURLY base_type.b RCURLY {: return new CellArrayType(b); :}
+     LCURLY matrix_type.m RCURLY {: return new CellArrayType(m); :}
+  ;
+
+matrix_type =
+     base_type
+  |  LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
+  ;
+
+matrix_type_list =
+     matrix_type.b {: return new List<Type>().add(b); :}
+  |  matrix_type_list.l ELEMENT_SEPARATOR matrix_type.b {: return l.add(b); :}
   ;
 
 base_type =
@@ -166,11 +171,6 @@ base_type =
   |  TYPE_VAR_MODIFIER IDENTIFIER.i {: return new TypeVarType(i); :}
   |  HANDLE_MODIFIER LPAREN arrow_type.a RPAREN {: return new HandleType(a); :}
   |  UNKNOWN_TYPE {: return new UnknownType(); :}
-  ;
-
-base_type_list =
-     base_type.b {: return new List<BaseType>().add(b); :}
-  |  base_type_list.l ELEMENT_SEPARATOR base_type.b {: return l.add(b); :}
   ;
 
 size_stmt_body =
