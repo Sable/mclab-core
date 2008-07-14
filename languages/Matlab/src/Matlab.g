@@ -234,10 +234,11 @@ comp_expr :
   ;
 
 colon_expr :
-     plus_expr  ;
-  
+     plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
+  ;
+
 plus_expr :
-     binary_expr
+     binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
   ;
 
 binary_expr :
