@@ -235,7 +235,7 @@ comp_expr :
 colon_expr :
      plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
   ;
-
+  
 plus_expr :
      binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
   ;
@@ -387,6 +387,26 @@ name :
 //TODO-AC: is it possible to attach these actions to the actual lexer rules?  I don't think the lexer and
 //  the parser are kept in sync (buffering, backtracking, etc)
 
+t_BREAK : BREAK { offsetTracker.advanceInLine(5); };
+t_CASE : CASE { offsetTracker.advanceInLine(4); };
+t_CATCH : CATCH { offsetTracker.advanceInLine(5); };
+t_CLASSDEF : CLASSDEF { offsetTracker.advanceInLine(8); };
+t_CONTINUE : CONTINUE { offsetTracker.advanceInLine(8); };
+t_ELSE : ELSE { offsetTracker.advanceInLine(4); };
+t_ELSEIF : ELSEIF { offsetTracker.advanceInLine(6); };
+t_END : END { offsetTracker.advanceInLine(3); };
+t_FOR : FOR { offsetTracker.advanceInLine(3); };
+t_FUNCTION : FUNCTION { offsetTracker.advanceInLine(8); };
+t_GLOBAL : GLOBAL { offsetTracker.advanceInLine(6); };
+t_IF : IF { offsetTracker.advanceInLine(2); };
+t_OTHERWISE : OTHERWISE { offsetTracker.advanceInLine(9); };
+t_PARFOR : PARFOR { offsetTracker.advanceInLine(6); };
+t_PERSISTENT : PERSISTENT { offsetTracker.advanceInLine(10); };
+t_RETURN : RETURN { offsetTracker.advanceInLine(6); };
+t_SWITCH : SWITCH { offsetTracker.advanceInLine(6); };
+t_TRY : TRY { offsetTracker.advanceInLine(3); };
+t_WHILE : WHILE { offsetTracker.advanceInLine(5); };
+
 t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
 t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
 t_MTIMES : MTIMES { offsetTracker.advanceInLine(1); };
@@ -416,6 +436,8 @@ t_SEMICOLON : SEMICOLON { offsetTracker.advanceInLine(1); };
 t_COLON : COLON { offsetTracker.advanceInLine(1); };
 t_AT : AT { offsetTracker.advanceInLine(1); };
 
+t_ASSIGN : ASSIGN { offsetTracker.advanceInLine(1); };
+
 t_LPAREN : LPAREN { offsetTracker.advanceInLine(1); bracketStack.push(LPAREN); };
 t_RPAREN : RPAREN { offsetTracker.advanceInLine(1); bracketStack.pop(); };
 t_LCURLY : LCURLY { offsetTracker.advanceInLine(1); bracketStack.push(LCURLY); };
@@ -430,6 +452,8 @@ t_STRING : STRING { offsetTracker.advanceByTextSize($text); };
 t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
 t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); };
 
+t_SHELL_COMMAND : SHELL_COMMAND { offsetTracker.advanceByTextSize($text); };
+
 t_FILLER : FILLER { offsetTracker.advanceByTextSize($text); };
 
 t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
@@ -442,8 +466,29 @@ dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * 
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
-//NB: not distinguishing between identifiers and keywords at this level - everything is an ID
 //NB: not distinguishing between decimal and hex numbers at this level
+
+//NB: only unconditional keywords - the rest will be treated as identifiers and handled in the parser
+
+BREAK: 'break';
+CASE: 'case';
+CATCH: 'catch';
+CLASSDEF: 'classdef';
+CONTINUE: 'continue';
+ELSE: 'else';
+ELSEIF: 'elseif';
+END: 'end';
+FOR: 'for';
+FUNCTION: 'function';
+GLOBAL: 'global';
+IF: 'if';
+OTHERWISE: 'otherwise';
+PARFOR: 'parfor';
+PERSISTENT: 'persistent';
+RETURN: 'return';
+SWITCH: 'switch';
+TRY: 'try';
+WHILE: 'while';
 
 fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
@@ -488,6 +533,8 @@ LCURLY : '{';
 RCURLY : '}';
 LSQUARE : '[';
 RSQUARE : ']';
+
+ASSIGN : '=';
  
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
@@ -498,6 +545,8 @@ BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
+
+SHELL_COMMAND : '!' NOT_LINE_TERMINATOR*;
 
 LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 
