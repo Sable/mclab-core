@@ -15,6 +15,7 @@ Size ::= <Dims : java.util.List<Integer>>;
 abstract Type;
 IntersectionType : Type ::= Type*;
 ArrowType : Type ::= ArgType : Type  ResultType : Type;
+ArgListType : Type ::= ArgType : Type*  [VarArgType];
 VarArgType : Type ::= Type;
 TupleType : Type ::= ElementType : Type*;
 CellArrayType : Type ::= DefaultElementType : Type;

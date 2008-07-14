@@ -1,4 +1,4 @@
 1 1
-2 69
+2 67
 #x.y{1} = [1, 2, 3];
-#x{1}.y = (int, $u, @([int] -> ((int, float), {{int}})), ?) -> {int}*;
+#x{1}.y = int, $u, @([int] -> ((int, float), {{int}})), ?* -> {int};

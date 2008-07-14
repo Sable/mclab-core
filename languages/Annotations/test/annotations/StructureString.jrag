@@ -46,7 +46,28 @@ aspect StructureString {
 	}
 	
 	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
+	
+	eq ArgListType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		boolean first = true;
+		for(Type type: getArgTypes()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			first = false;
+			buf.append(type.getStructureString());
+		}
+		if(hasVarArgType()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			buf.append(getVarArgType().getStructureString());
+		}
+		return buf.toString();
+	}
+	
 	eq VarArgType.getStructureString() = getType().getStructureString() + "*"; //TODO-AC: parens?
+	
 	eq TupleType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("(");

@@ -92,12 +92,13 @@
 %typeof type_stmt_body = "TypeStmt";
 %typeof type = "Type";
 %typeof arrow_type = "ArrowType";
-%typeof vararg_type = "Type";
+%typeof arg_list_type = "ArgListType";
+%typeof vararg_type = "VarArgType";
 %typeof list_type = "Type";
-%typeof tuple_type = "TupleType";
+%typeof list_type_list = "List<Type>";
 %typeof cell_array_type = "CellArrayType";
+%typeof tuple_type = "TupleType";
 %typeof matrix_type = "Type";
-%typeof list_type_list2 = "List<Type>";
 %typeof base_type = "BaseType";
 %typeof size_stmt_body = "SizeStmt";
 %typeof size = "Size";
@@ -128,41 +129,47 @@ type_stmt_body =
   ;
 
 type =
-     vararg_type
+     list_type
   |  arrow_type
   ;
 
 arrow_type =
-     vararg_type.v1 ARROW vararg_type.v2 {: return new ArrowType(v1, v2); :}
+     arg_list_type.a ARROW vararg_type.v {: return new ArrowType(a, v); :}
+  |  arg_list_type.a ARROW list_type.t {: return new ArrowType(a, t); :}
+  ;
+
+arg_list_type =
+     list_type.t {: return new ArgListType(new List<Type>().add(t), new Opt<VarArgType>()); :}
+  |  vararg_type.t {: return new ArgListType(new List<Type>(), new Opt<VarArgType>(t)); :}
+  |  list_type_list.l ELEMENT_SEPARATOR vararg_type.t {: return new ArgListType(l, new Opt<VarArgType>(t)); :}
   ;
 
 vararg_type =
-     list_type
-  |  list_type.t VARARG_MODIFIER {: return new VarArgType(t); :}
+     list_type.t VARARG_MODIFIER {: return new VarArgType(t); :}
   ;
 
 list_type =
-     matrix_type
+     base_type
   |  tuple_type
   |  cell_array_type
+  |  matrix_type
+  ;
+
+list_type_list =
+     list_type.t {: return new List<Type>().add(t); :}
+  |  list_type_list.l ELEMENT_SEPARATOR list_type.t {: return l.add(t); :}
   ;
 
 tuple_type =
-     LPAREN list_type_list2.l RPAREN {: return new TupleType(l); :}
+  |  LPAREN list_type_list.l ELEMENT_SEPARATOR list_type.t RPAREN {: return new TupleType(l.add(t)); :}
   ;
 
 cell_array_type =
      LCURLY list_type.t RCURLY {: return new CellArrayType(t); :}
   ;
 
-list_type_list2 =
-     list_type.t1 ELEMENT_SEPARATOR list_type.t2 {: return new List<Type>().add(t1).add(t2); :}
-  |  list_type_list2.l ELEMENT_SEPARATOR list_type.t {: return l.add(t); :}
-  ;
-
 matrix_type =
-     base_type
-  |  LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
+     LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
   ;
 
 base_type =

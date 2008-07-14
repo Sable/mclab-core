@@ -1,2 +1,2 @@
 [1, 6]  unexpected token RPAREN
-Cannot recover from the syntax error
+[1, 5]  try inserting ELEMENT_SEPARATOR
