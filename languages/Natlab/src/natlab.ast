@@ -61,6 +61,7 @@ ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
 CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
 DotExpr : LValueExpr ::= Target:Expr Field:Name;
 MatrixExpr : LValueExpr ::= Row*;
+
 CellArrayExpr : Expr ::= Row*;
 
 SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name;

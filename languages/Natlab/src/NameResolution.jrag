@@ -1,4 +1,5 @@
 import natlab.SymbolTableEntry;
+import java.util.HashMap;
 
 aspect NameResolution{
 
@@ -6,6 +7,10 @@ aspect NameResolution{
     syn lazy SymbolTableEntry Program.lookupLValue(String name) = null;
     syn lazy SymbolTableEntry Stmt.lookupLValue(String name) = null;
     syn lazy SymbolTableEntry Expr.lookupSymbol(String name) = null;
+
+    syn lazy HashMap<String, Name> Program.getLValues() = new HashMap<String, Name>();
+    syn lazy HashMap<String, Name> Stmt.getLValues() = new HashMap<String, Name>();
+    //inh HashMap<String, Name> Expr.getLValues();
 
     //eq EmptyProgram.lookupLValue( String name ) = null;
 
@@ -51,4 +56,25 @@ aspect NameResolution{
         }
         return null;
     }
+    syn HashMap<String, Name> Expr.getSymbols() = new HashMap<String,Name>();
+    syn HashMap<String, Name> Name.getSymbols()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        table.put( getID(), this );
+        return table;
+    }
+    eq NameExpr.getSymbols() = getName().getSymbols();
+    eq CellIndexExpr.getSymbols() = getTarget().getSymbols();
+    eq DotExpr.getSymbols() = getTarget().getSymbols();
+    eq MatrixExpr.getSymbols()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumRow(); i++ ){
+            for( int j=0; j< getRow(i).getNumElement(); j++ ){
+                table.putAll( getRow(i).getElement(j).getSymbols() );
+            }
+        }
+        return table;
+    }
+    //inh boolean Expr.isL
 }
