@@ -133,8 +133,7 @@ type =
   ;
 
 arrow_type =
-    //NB: not vararg_type on LHS
-     list_type.t ARROW vararg_type.v {: return new ArrowType(t, v); :}
+     vararg_type.v1 ARROW vararg_type.v2 {: return new ArrowType(v1, v2); :}
   ;
 
 vararg_type =
