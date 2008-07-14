@@ -48,29 +48,20 @@ aspect StructureString {
 	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
 	
 	eq UnitType.getStructureString() = "()";
-	eq ArgListType.getStructureString() {
+	eq ArgTupleType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
 		boolean first = true;
-		int numArgs = getArgTypes().getNumChild() + (hasVarArgType() ? 1 : 0);
-		if(numArgs > 1) {
-			buf.append("(");
-		}
-		for(Type type: getArgTypes()) {
+		buf.append("(");
+		for(Type type: getStaticArgTypes()) {
 			if(!first) {
 				buf.append(", ");
 			}
 			first = false;
 			buf.append(type.getStructureString());
 		}
-		if(hasVarArgType()) {
-			if(!first) {
-				buf.append(", ");
-			}
-			buf.append(getVarArgType().getStructureString());
-		}
-		if(numArgs > 1) {
-			buf.append(")");
-		}
+		buf.append(", ");
+		buf.append(getVarArgType().getStructureString());
+		buf.append(")");
 		return buf.toString();
 	}
 	

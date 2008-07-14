@@ -14,8 +14,8 @@ Size ::= <Dims : java.util.List<Integer>>;
 //NB: types are more general then they need to be - see grammar for precise structure
 abstract Type;
 IntersectionType : Type ::= Type*;
-ArrowType : Type ::= ArgType : ArgListType  ResultType : Type;
-ArgListType : Type ::= ArgType : Type*  [VarArgType];
+ArrowType : Type ::= ArgType : Type  ResultType : Type;
+ArgTupleType : Type ::= StaticArgType : Type*  VarArgType;
 UnitType : Type;
 VarArgType : Type ::= Type;
 TupleType : Type ::= ElementType : Type*;
