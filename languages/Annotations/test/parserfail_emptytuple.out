@@ -1,2 +1,2 @@
-[1, 6]  unexpected token RPAREN
-[1, 5]  try inserting ELEMENT_SEPARATOR
+[1, 7]  unexpected token STMT_TERMINATOR
+[1, 6]  try inserting ARROW

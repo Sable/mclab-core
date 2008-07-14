@@ -47,6 +47,7 @@ aspect StructureString {
 	
 	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
 	
+	eq UnitType.getStructureString() = "()";
 	eq ArgListType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
 		boolean first = true;
@@ -91,7 +92,6 @@ aspect StructureString {
 	}
 	eq MatrixType.getStructureString() = "[" + getElementType().getStructureString() + "]";
 	eq CellArrayType.getStructureString() = "{" + getDefaultElementType().getStructureString() + "}";
-	
 	eq PrimitiveType.getStructureString() = getName();
 	eq TypeVarType.getStructureString() = "$" + getName();
 	eq HandleType.getStructureString() = "@(" + getArrowType().getStructureString() + ")";
