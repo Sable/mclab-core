@@ -95,6 +95,7 @@
 %typeof type = "Type";
 %typeof arrow_type = "ArrowType";
 %typeof arg_list_type = "Type";
+%typeof result_type = "Type";
 %typeof unit_type = "UnitType";
 %typeof vararg_type = "VarArgType";
 %typeof list_type = "Type";
@@ -137,16 +138,18 @@ type =
   ;
 
 arrow_type =
-     arg_list_type.a ARROW vararg_type.v {: return new ArrowType(a, v); :}
-  |  arg_list_type.a ARROW unit_type.u {: return new ArrowType(a, u); :}
-  |  arg_list_type.a ARROW list_type.t {: return new ArrowType(a, t); :}
+     arg_list_type.a ARROW result_type.t {: return new ArrowType(a, t); :}
   ;
 
 arg_list_type =
+     result_type
+  |  LPAREN list_type_list.l ELEMENT_SEPARATOR vararg_type.t RPAREN {: return new ArgTupleType(l, t); :}
+  ;
+
+result_type =
      list_type
   |  vararg_type
   |  unit_type
-  |  LPAREN list_type_list.l ELEMENT_SEPARATOR vararg_type.t RPAREN {: return new ArgTupleType(l, t); :}
   ;
 
 vararg_type =
