@@ -141,7 +141,7 @@ arrow_type =
 arg_list_type =
      list_type.t {: return new ArgListType(new List<Type>().add(t), new Opt<VarArgType>()); :}
   |  vararg_type.t {: return new ArgListType(new List<Type>(), new Opt<VarArgType>(t)); :}
-  |  list_type_list.l ELEMENT_SEPARATOR vararg_type.t {: return new ArgListType(l, new Opt<VarArgType>(t)); :}
+  |  LPAREN list_type_list.l ELEMENT_SEPARATOR vararg_type.t RPAREN {: return new ArgListType(l, new Opt<VarArgType>(t)); :}
   ;
 
 vararg_type =

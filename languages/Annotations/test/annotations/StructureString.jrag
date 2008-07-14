@@ -50,6 +50,10 @@ aspect StructureString {
 	eq ArgListType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
 		boolean first = true;
+		int numArgs = getArgTypes().getNumChild() + (hasVarArgType() ? 1 : 0);
+		if(numArgs > 1) {
+			buf.append("(");
+		}
 		for(Type type: getArgTypes()) {
 			if(!first) {
 				buf.append(", ");
@@ -62,6 +66,9 @@ aspect StructureString {
 				buf.append(", ");
 			}
 			buf.append(getVarArgType().getStructureString());
+		}
+		if(numArgs > 1) {
+			buf.append(")");
 		}
 		return buf.toString();
 	}
