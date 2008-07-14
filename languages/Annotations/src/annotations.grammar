@@ -1,3 +1,5 @@
+//Inspired by the Diamondback Ruby annotation system
+
 %import "annotations.ast.*";
 
 %package "annotations";
