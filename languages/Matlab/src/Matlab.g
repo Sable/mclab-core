@@ -209,6 +209,7 @@ array :
 expr :
      short_or_expr
   |  t_AT t_FILLER? input_params t_FILLER? expr
+  |  t_COLON //really only applies in args, but let Natlab handle that
   ;
 
 short_or_expr :
@@ -233,11 +234,10 @@ comp_expr :
   ;
 
 colon_expr :
-     plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
-  ;
+     plus_expr  ;
   
 plus_expr :
-     binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
+     binary_expr
   ;
 
 binary_expr :
@@ -266,6 +266,7 @@ primary_expr :
   |  cell_array
   |  access
   |  t_AT t_FILLER? name
+  |  t_END //really only applies in args, but let Natlab handle that
   ;
 
 access :
@@ -283,12 +284,7 @@ cell_access :
   ;
 
 arg_list :  
-     (arg) (t_FILLER? t_COMMA t_FILLER? arg)*
-  ;
-  
-arg :
-     expr
-  |  t_COLON
+     expr (t_FILLER? t_COMMA t_FILLER? expr)*
   ;
 
 literal :
