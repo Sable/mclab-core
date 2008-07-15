@@ -270,12 +270,23 @@ stmt_or_function :
   |  function
   ;
 
+expr :
+     expr_or_arg[false]
+  ;
+
+arg :
+     expr_or_arg[true]
+  ;
+
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 //all binary operators are left associative so no special handling is required
-expr :
+expr_or_arg
+  [boolean p_isArg]
+  scope { boolean isArg; }
+  @init { $expr_or_arg::isArg = $p_isArg; } :
      short_or_expr
   |  t_AT t_FILLER? input_params t_FILLER? expr
-  //|  t_COLON //really only applies in args, but let Natlab handle that
+  |  {$expr_or_arg::isArg}? t_COLON
   ;
 
 short_or_expr :
@@ -335,7 +346,7 @@ primary_expr :
   |  cell_array
   |  access
   |  t_AT t_FILLER? name
-  //|  t_END //really only applies in args, but let Natlab handle that
+  //|  {$expr_or_arg::isArg}? t_END
   ;
 
 access :
@@ -353,7 +364,7 @@ cell_access :
   ;
 
 arg_list :  
-     expr (t_FILLER? t_COMMA t_FILLER? expr)*
+     arg (t_FILLER? t_COMMA t_FILLER? arg)*
   ;
 
 literal :
