@@ -202,7 +202,7 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 program :
      t_FILLER? //empty
   |  t_FILLER? script script_ending
-  |  t_FILLER? function_list
+  |  t_FILLER? function_list function_ending
   |  class_def
   ;
 
@@ -250,6 +250,10 @@ function_list :
 
 function :
      function_body t_FILLER? {input.LA(1) != EOF}? stmt_separator
+  ;
+  
+function_ending :
+     ((t_COMMENT | t_BRACKET_COMMENT) t_LINE_TERMINATOR)* (t_COMMENT | t_BRACKET_COMMENT)?
   ;
 
 function_body :
