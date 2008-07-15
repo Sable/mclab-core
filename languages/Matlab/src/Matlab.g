@@ -279,61 +279,65 @@ stmt_or_function :
   ;
 
 class_def :
-     t_CLASSDEF attributes? t_IDENTIFIER (t_LT superclass_list)? stmt_separator+ class_body* t_END 
+     t_CLASSDEF (t_FILLER? attributes)? t_FILLER? t_IDENTIFIER (t_FILLER? t_LT t_FILLER? superclass_list)? fill_sep+ (t_FILLER? class_body)* t_FILLER? t_END 
+  ;
+
+fill_sep :
+     t_FILLER? stmt_separator
   ;
 
 attributes :
-     t_LPAREN attribute (t_COMMA attribute)* t_RPAREN
+     t_LPAREN t_FILLER? attribute (t_FILLER? t_COMMA t_FILLER? attribute)* t_FILLER? t_RPAREN
   ;
 
 attribute :
      t_IDENTIFIER
-  |  t_NOT t_IDENTIFIER
-  |  t_IDENTIFIER ASSIGN expr
+  |  t_NOT t_FILLER? t_IDENTIFIER
+  |  t_IDENTIFIER t_FILLER? ASSIGN t_FILLER? expr
   ;
 
 superclass_list :
-     t_IDENTIFIER (t_AND t_IDENTIFIER)*
+     t_IDENTIFIER (t_FILLER? t_AND t_FILLER? t_IDENTIFIER)*
   ;
 
 class_body :
-     properties_block stmt_separator*
-  |  methods_block stmt_separator*
-  |  events_block stmt_separator*
+     properties_block fill_sep*
+  |  methods_block fill_sep*
+  |  events_block fill_sep*
   ;
 
 properties_block :
-     t_PROPERTIES attributes? stmt_separator+ properties_body* t_END
+     t_PROPERTIES (t_FILLER? attributes)? fill_sep+ (t_FILLER? properties_body)* t_FILLER? t_END
   ;
 
 properties_body :
-     t_IDENTIFIER (t_ASSIGN expr)? stmt_separator+
+     t_IDENTIFIER (t_FILLER? t_ASSIGN t_FILLER? expr)? fill_sep+
   ;
 
 methods_block :
-     t_METHODS attributes? stmt_separator+ methods_body* t_END
+     t_METHODS (t_FILLER? attributes)? fill_sep+ (t_FILLER? methods_body)* t_FILLER? t_END
   ;
 
 methods_body :
      function
   |  function_signature
-  |  property_access stmt_separator*
+  |  property_access fill_sep*
   ;
 
 events_block :
-     t_EVENTS attributes? stmt_separator+ events_body* t_END 
+     t_EVENTS (t_FILLER? attributes)? fill_sep+ (t_FILLER? events_body)* t_FILLER? t_END 
   ;
 
 events_body :
-     t_IDENTIFIER stmt_separator+
+     t_IDENTIFIER fill_sep+
   ;
 
 function_signature :
-     (output_params t_ASSIGN)? t_IDENTIFIER input_params? stmt_separator+
+     (output_params t_FILLER? t_ASSIGN t_FILLER?)? t_IDENTIFIER (t_FILLER? input_params)? fill_sep+
   ;
 
 property_access :
-     t_FUNCTION (output_params t_ASSIGN)? t_IDENTIFIER t_DOT t_IDENTIFIER input_params? stmt_separator stmt_or_function* t_END
+     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? t_IDENTIFIER t_FILLER? t_DOT t_FILLER? t_IDENTIFIER (t_FILLER? input_params)? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
   ;
 
 expr :
