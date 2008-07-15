@@ -84,6 +84,7 @@
 %terminals DOT, STMT_TERMINATOR, ELEMENT_SEPARATOR, SIZE_OF, EQ, HAS_TYPE;
 %terminals LPAREN, RPAREN, LCURLY, RCURLY, LSQUARE, RSQUARE;
 %terminals VARARG_MODIFIER, HANDLE_MODIFIER, TYPE_VAR_MODIFIER, UNKNOWN_TYPE, ARROW;
+%terminals UNION, INTERSECT;
 
 %typeof NUMBER = "Integer";
 %typeof IDENTIFIER = "String";
@@ -93,6 +94,11 @@
 %typeof entity = "Entity";
 %typeof type_stmt_body = "TypeStmt";
 %typeof type = "Type";
+%typeof list_or_arrow_type = "Type";
+%typeof union_type = "UnionType";
+%typeof union_op_type = "Type";
+%typeof intersection_type = "IntersectionType";
+%typeof intersection_op_type = "Type";
 %typeof arrow_type = "ArrowType";
 %typeof arg_list_type = "Type";
 %typeof result_type = "Type";
@@ -136,8 +142,34 @@ type_stmt_body =
   ;
 
 type =
+     list_or_arrow_type
+  |  union_type
+  |  intersection_type
+  ;
+
+list_or_arrow_type =
      list_type
   |  arrow_type
+  ;
+
+union_type =
+     union_op_type.t1 UNION union_op_type.t2 {: return new UnionType(new List<Type>().add(t1).add(t2)); :}
+  |  union_type.u UNION union_op_type.t {: u.getTypes().add(t); return u; :}
+  ;
+
+union_op_type =
+     list_or_arrow_type
+  |  LPAREN intersection_type.t RPAREN
+  ;
+
+intersection_type =
+     intersection_op_type.t1 INTERSECT intersection_op_type.t2 {: return new IntersectionType(new List<Type>().add(t1).add(t2)); :}
+  |  intersection_type.i INTERSECT intersection_op_type.t {: i.getTypes().add(t); return i; :}
+  ;
+
+intersection_op_type =
+     list_or_arrow_type
+  |  LPAREN union_type.t RPAREN
   ;
 
 arrow_type =

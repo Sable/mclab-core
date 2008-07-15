@@ -101,6 +101,9 @@ Comment = [/][/] .*
 "->" { return symbol(ARROW); }
 "?" { return symbol(UNKNOWN_TYPE); }
 
+"|" { return symbol(UNION); }
+"&" { return symbol(INTERSECT); }
+
 {Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
 
 {Identifier} { return symbol(IDENTIFIER, yytext()); }

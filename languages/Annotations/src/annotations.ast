@@ -13,6 +13,7 @@ Size ::= <Dims : java.util.List<Integer>>;
 
 //NB: types are more general then they need to be - see grammar for precise structure
 abstract Type;
+UnionType : Type ::= Type*;
 IntersectionType : Type ::= Type*;
 ArrowType : Type ::= ArgType : Type  ResultType : Type;
 ArgTupleType : Type ::= StaticArgType : Type*  VarArgType;
@@ -20,7 +21,6 @@ UnitType : Type;
 VarArgType : Type ::= Type;
 TupleType : Type ::= ElementType : Type*;
 CellArrayType : Type ::= DefaultElementType : Type;
-UnionType : Type ::= Type*;
 MatrixType : Type ::=  ElementType : BaseType;
 
 abstract BaseType : Type;
