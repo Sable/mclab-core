@@ -232,10 +232,6 @@ stmt_body :
   |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_FILLER? t_END
   ;
 
-name :
-     t_IDENTIFIER
-  ;
-
 sep_stmt_list :
      t_FILLER? stmt_separator (t_FILLER? stmt)*
   ;
