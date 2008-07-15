@@ -201,13 +201,17 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 //start symbol
 program :
      t_FILLER? //empty
-  |  t_FILLER? script
+  |  t_FILLER? script script_ending
   |  t_FILLER? function_list
   |  class_def
   ;
 
 script :
      (stmt t_FILLER?)+
+  ;
+
+script_ending :
+     (t_COMMENT | t_BRACKET_COMMENT)?
   ;
 
 stmt :
