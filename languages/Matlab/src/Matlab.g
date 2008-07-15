@@ -206,6 +206,10 @@ program :
   |  class_def
   ;
 
+stmt :
+     stmt_body t_FILLER? stmt_separator
+  ;
+
 stmt_separator :
      t_LINE_TERMINATOR
   |  t_SEMICOLON
@@ -213,19 +217,19 @@ stmt_separator :
   ;
 
 stmt_body :
-     expr
-  |  expr t_ASSIGN expr
-  |  t_GLOBAL name+
-  |  t_PERSISTENT name+
+     
+  |  expr
+  |  expr t_FILLER? t_ASSIGN t_FILLER? expr
+  |  (t_GLOBAL | t_PERSISTENT) (t_FILLER? name)+
   |  t_SHELL_COMMAND
-  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END
-  |  t_SWITCH expr stmt_separator (t_CASE expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END
-  |  t_IF expr sep_stmt_list (t_ELSEIF expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END
+  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_FILLER? t_END
+  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator (t_FILLER? t_CASE t_FILLER? expr sep_stmt_list)* (t_FILLER? t_OTHERWISE sep_stmt_list)? t_FILLER? t_END
+  |  t_IF t_FILLER? expr sep_stmt_list (t_FILLER? t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_FILLER? t_ELSE sep_stmt_list)? t_FILLER? t_END
   |  t_BREAK
   |  t_CONTINUE
   |  t_RETURN
-  |  t_WHILE expr sep_stmt_list t_END
-  |  t_FOR (name ASSIGN expr | LPAREN name ASSIGN expr RPAREN) sep_stmt_list t_END
+  |  t_WHILE t_FILLER? expr sep_stmt_list t_FILLER? t_END
+  |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_FILLER? t_END
   ;
 
 name :
@@ -233,7 +237,7 @@ name :
   ;
 
 sep_stmt_list :
-     stmt_separator stmt*
+     t_FILLER? stmt_separator (t_FILLER? stmt)*
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
