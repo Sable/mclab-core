@@ -143,23 +143,12 @@ type_stmt_body =
 
 type =
      list_or_arrow_type
-  |  union_type
   |  intersection_type
   ;
 
 list_or_arrow_type =
      list_type
   |  arrow_type
-  ;
-
-union_type =
-     union_op_type.t1 UNION union_op_type.t2 {: return new UnionType(new List<Type>().add(t1).add(t2)); :}
-  |  union_type.u UNION union_op_type.t {: u.getTypes().add(t); return u; :}
-  ;
-
-union_op_type =
-     list_or_arrow_type
-  |  LPAREN intersection_type.t RPAREN
   ;
 
 intersection_type =
@@ -169,7 +158,6 @@ intersection_type =
 
 intersection_op_type =
      list_or_arrow_type
-  |  LPAREN union_type.t RPAREN
   ;
 
 arrow_type =
@@ -199,6 +187,7 @@ list_type =
      base_type
   |  tuple_type
   |  cell_array_type
+  |  union_type
   |  matrix_type
   ;
 
@@ -213,6 +202,20 @@ tuple_type =
 
 cell_array_type =
      LCURLY list_type.t RCURLY {: return new CellArrayType(t); :}
+  ;
+
+union_type =
+     union_op_type.t1 UNION union_op_type.t2 {: return new UnionType(new List<Type>().add(t1).add(t2)); :}
+  |  union_type.u UNION union_op_type.t {: u.getTypes().add(t); return u; :}
+  ;
+
+union_op_type =
+     base_type
+  |  tuple_type
+  |  cell_array_type
+  |  matrix_type
+  |  LPAREN intersection_type.t RPAREN
+  |  LPAREN arrow_type.t RPAREN
   ;
 
 matrix_type =

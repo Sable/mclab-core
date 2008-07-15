@@ -10,7 +10,7 @@ aspect StructureString {
 	}
 	
 	eq SizeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getSize().getStructureString() + ";\n";
-	eq TypeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getType().getStructureString() + ";\n";
+	eq TypeStmt.getStructureString() = getEntity().getStructureString() + " : " + getType().getStructureString() + ";\n";
 	
 	eq Variable.getStructureString() = getName();
 	eq Field.getStructureString() = getEntity().getStructureString() + "." + getFieldName();
@@ -42,6 +42,19 @@ aspect StructureString {
 			buf.append(dim);
 		}
 		buf.append("]");
+		return buf.toString();
+	}
+	
+	eq IntersectionType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		boolean first = true;
+		for(Type type: getTypes()) {
+			if(!first) {
+				buf.append(" & ");
+			}
+			first = false;
+			buf.append(type.getStructureString());
+		}
 		return buf.toString();
 	}
 	
@@ -81,6 +94,26 @@ aspect StructureString {
 		buf.append(")");
 		return buf.toString();
 	}
+	
+	eq UnionType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		boolean first = true;
+		for(Type type: getTypes()) {
+			if(!first) {
+				buf.append(" | ");
+			}
+			first = false;
+			if(type instanceof ArrowType || type instanceof IntersectionType) {
+				buf.append("(");
+				buf.append(type.getStructureString());
+				buf.append(")");
+			} else {
+				buf.append(type.getStructureString());
+			}
+		}
+		return buf.toString();
+	}
+	
 	eq MatrixType.getStructureString() = "[" + getElementType().getStructureString() + "]";
 	eq CellArrayType.getStructureString() = "{" + getDefaultElementType().getStructureString() + "}";
 	eq PrimitiveType.getStructureString() = getName();
