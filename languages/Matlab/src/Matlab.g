@@ -203,7 +203,7 @@ program :
      t_FILLER? //empty
   |  t_FILLER? script
   |  t_FILLER? function_list
-  //|  class_def
+  |  class_def
   ;
 
 script :
@@ -268,6 +268,64 @@ param_list :
 stmt_or_function :
      stmt
   |  function
+  ;
+
+class_def :
+     t_CLASSDEF attributes? t_IDENTIFIER (t_LT superclass_list)? stmt_separator+ class_body* t_END 
+  ;
+
+attributes :
+     t_LPAREN attribute (t_COMMA attribute)* t_RPAREN
+  ;
+
+attribute :
+     t_IDENTIFIER
+  |  t_NOT t_IDENTIFIER
+  |  t_IDENTIFIER ASSIGN expr
+  ;
+
+superclass_list :
+     t_IDENTIFIER (t_AND t_IDENTIFIER)*
+  ;
+
+class_body :
+     properties_block stmt_separator*
+  |  methods_block stmt_separator*
+  |  events_block stmt_separator*
+  ;
+
+properties_block :
+     t_PROPERTIES attributes? stmt_separator+ properties_body* t_END
+  ;
+
+properties_body :
+     t_IDENTIFIER (t_ASSIGN expr)? stmt_separator+
+  ;
+
+methods_block :
+     t_METHODS attributes? stmt_separator+ methods_body* t_END
+  ;
+
+methods_body :
+     function
+  |  function_signature
+  |  property_access stmt_separator*
+  ;
+
+events_block :
+     t_EVENTS attributes? stmt_separator+ events_body* t_END 
+  ;
+
+events_body :
+     t_IDENTIFIER stmt_separator+
+  ;
+
+function_signature :
+     (output_params t_ASSIGN)? t_IDENTIFIER input_params? stmt_separator+
+  ;
+
+property_access :
+     t_FUNCTION (output_params t_ASSIGN)? t_IDENTIFIER t_DOT t_IDENTIFIER input_params? stmt_separator stmt_or_function* t_END
   ;
 
 expr :
