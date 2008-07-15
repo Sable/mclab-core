@@ -104,6 +104,9 @@
 %typeof tuple_type = "TupleType";
 %typeof matrix_type = "Type";
 %typeof base_type = "BaseType";
+%typeof struct_type = "StructType";
+%typeof field_entry = "FieldEntry";
+%typeof field_entry_list = "List<FieldEntry>";
 %typeof size_stmt_body = "SizeStmt";
 %typeof size = "Size";
 
@@ -189,6 +192,20 @@ base_type =
   |  TYPE_VAR_MODIFIER IDENTIFIER.i {: return new TypeVarType(i); :}
   |  HANDLE_MODIFIER LPAREN arrow_type.a RPAREN {: return new HandleType(a); :}
   |  UNKNOWN_TYPE {: return new UnknownType(); :}
+  |  struct_type
+  ;
+
+struct_type =
+     LCURLY field_entry_list.l RCURLY {: return new StructType(l); :}
+  ;
+
+field_entry =
+     IDENTIFIER.i HAS_TYPE type.t {: return new FieldEntry(i, t); :}
+  ;
+
+field_entry_list =
+     field_entry.e {: return new List<FieldEntry>().add(e); :}
+  |  field_entry_list.l ELEMENT_SEPARATOR field_entry.e {: return l.add(e); :}
   ;
 
 size_stmt_body =

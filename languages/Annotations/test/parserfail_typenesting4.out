@@ -1,2 +1,2 @@
-[1, 6]  unexpected token LCURLY
-Cannot recover from the syntax error
+[1, 8]  unexpected token RCURLY
+[1, 7]  try inserting HAS_TYPE

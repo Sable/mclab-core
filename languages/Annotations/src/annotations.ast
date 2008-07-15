@@ -28,3 +28,6 @@ PrimitiveType : BaseType ::= <Name>;
 TypeVarType : BaseType ::= <Name>;
 HandleType : BaseType ::= ArrowType;
 UnknownType : BaseType;
+StructType : BaseType ::= FieldEntry*;
+
+FieldEntry ::= <Name> Type;

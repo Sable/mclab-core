@@ -87,4 +87,20 @@ aspect StructureString {
 	eq TypeVarType.getStructureString() = "$" + getName();
 	eq HandleType.getStructureString() = "@(" + getArrowType().getStructureString() + ")";
 	eq UnknownType.getStructureString() = "?";
+	
+	eq StructType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("{");
+		boolean first = true;
+		for(FieldEntry entry: getFieldEntrys()) {
+			if(!first) {
+				buf.append(", ");
+			}
+			first = false;
+			buf.append(entry.getStructureString());
+		}
+		buf.append("}");
+		return buf.toString();
+	}
+	eq FieldEntry.getStructureString() = getName() + " : " + getType().getStructureString();
 }
