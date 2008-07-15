@@ -203,7 +203,7 @@ program :
      t_FILLER? //empty
   |  t_FILLER? script script_ending
   |  t_FILLER? function_list function_ending
-  |  class_def
+  |  class_def function_ending
   ;
 
 script :
