@@ -200,41 +200,74 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 
 //start symbol
 program :
-     //empty
-  |  script
-  |  function_list
-  |  class_def
+     t_FILLER? //empty
+  |  t_FILLER? script
+  |  t_FILLER? function_list
+  //|  class_def
+  ;
+
+script :
+     (stmt t_FILLER?)+
   ;
 
 stmt :
-     stmt_body t_FILLER? stmt_separator
+     (stmt_body t_FILLER?)? {input.LA(1) != EOF}? stmt_separator
   ;
 
 stmt_separator :
      t_LINE_TERMINATOR
+  |  t_COMMENT t_LINE_TERMINATOR
+  |  t_BRACKET_COMMENT t_LINE_TERMINATOR
   |  t_SEMICOLON
   |  t_COMMA
-  |  EOF
   ;
 
 stmt_body :
-     
-  |  expr
-  |  expr t_FILLER? t_ASSIGN t_FILLER? expr
+     expr (t_FILLER? t_ASSIGN t_FILLER? expr)?
   |  (t_GLOBAL | t_PERSISTENT) (t_FILLER? name)+
   |  t_SHELL_COMMAND
-  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_FILLER? t_END
-  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator (t_FILLER? t_CASE t_FILLER? expr sep_stmt_list)* (t_FILLER? t_OTHERWISE sep_stmt_list)? t_FILLER? t_END
-  |  t_IF t_FILLER? expr sep_stmt_list (t_FILLER? t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_FILLER? t_ELSE sep_stmt_list)? t_FILLER? t_END
+  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END
+  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator t_FILLER? (t_CASE t_FILLER? expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END
+  |  t_IF t_FILLER? expr sep_stmt_list (t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END
   |  t_BREAK
   |  t_CONTINUE
   |  t_RETURN
-  |  t_WHILE t_FILLER? expr sep_stmt_list t_FILLER? t_END
-  |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_FILLER? t_END
+  |  t_WHILE t_FILLER? expr sep_stmt_list t_END
+  |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END
   ;
 
 sep_stmt_list :
-     t_FILLER? stmt_separator (t_FILLER? stmt)*
+     t_FILLER? stmt_separator t_FILLER? (stmt t_FILLER?)*
+  ;
+
+function_list :
+     (function t_FILLER?)+
+  ;
+
+function :
+     function_body t_FILLER? {input.LA(1) != EOF}? stmt_separator
+  ;
+
+function_body :
+     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? input_params t_FILLER? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
+  ;
+
+input_params :
+     t_LPAREN (t_FILLER? param_list)? t_FILLER? t_RPAREN
+  ;
+
+output_params :
+     t_LSQUARE (t_FILLER? param_list)? t_FILLER? t_RSQUARE
+  |  name
+  ;
+
+param_list :
+     name (t_FILLER? t_COMMA t_FILLER? name)*
+  ;
+
+stmt_or_function :
+     stmt
+  |  function
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
@@ -242,7 +275,7 @@ sep_stmt_list :
 expr :
      short_or_expr
   |  t_AT t_FILLER? input_params t_FILLER? expr
-  |  t_COLON //really only applies in args, but let Natlab handle that
+  //|  t_COLON //really only applies in args, but let Natlab handle that
   ;
 
 short_or_expr :
@@ -266,12 +299,14 @@ comp_expr :
      colon_expr (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr)*
   ;
 
+//TODO-AC: uncomment
 colon_expr :
-     plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
+     plus_expr //(t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
   ;
 
+//TODO-AC: uncomment
 plus_expr :
-     binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
+     binary_expr //(t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
   ;
 
 binary_expr :
@@ -300,7 +335,7 @@ primary_expr :
   |  cell_array
   |  access
   |  t_AT t_FILLER? name
-  |  t_END //really only applies in args, but let Natlab handle that
+  //|  t_END //really only applies in args, but let Natlab handle that
   ;
 
 access :
@@ -396,14 +431,6 @@ quiet_element_separator_list :
 
 quiet_element_separator_comma :
      dt_COMMA -> template() "" //delete comma
-  ;
-
-input_params :
-     t_LPAREN t_FILLER? (param_list t_FILLER?)? t_RPAREN
-  ;
-
-param_list :
-     name (t_FILLER? t_COMMA t_FILLER? name)*
   ;
 
 name :
