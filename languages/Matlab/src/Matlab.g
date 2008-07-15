@@ -356,7 +356,7 @@ expr_or_arg
   @init { $expr_or_arg::isArg = $p_isArg; } :
      short_or_expr
   |  t_AT t_FILLER? input_params t_FILLER? expr
-  |  {$expr_or_arg::isArg}? t_COLON
+  |  {$expr_or_arg::isArg}?=> t_COLON
   ;
 
 short_or_expr :
@@ -416,7 +416,7 @@ primary_expr :
   |  cell_array
   |  access
   |  t_AT t_FILLER? name
-  //|  {$expr_or_arg::isArg}? t_END
+  //|  {$expr_or_arg::isArg}?=> t_END
   ;
 
 access :
