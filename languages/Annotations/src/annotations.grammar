@@ -94,7 +94,6 @@
 %typeof entity = "Entity";
 %typeof type_stmt_body = "TypeStmt";
 %typeof type = "Type";
-%typeof list_or_arrow_type = "Type";
 %typeof union_type = "UnionType";
 %typeof union_op_type = "Type";
 %typeof intersection_type = "IntersectionType";
@@ -104,7 +103,7 @@
 %typeof result_type = "Type";
 %typeof unit_type = "UnitType";
 %typeof vararg_type = "VarArgType";
-%typeof list_type = "Type";
+%typeof list_type, list_type_parenthesize_union = "Type";
 %typeof list_type_list = "List<Type>";
 %typeof cell_array_type = "CellArrayType";
 %typeof tuple_type = "TupleType";
@@ -142,13 +141,9 @@ type_stmt_body =
   ;
 
 type =
-     list_or_arrow_type
-  |  intersection_type
-  ;
-
-list_or_arrow_type =
      list_type
   |  arrow_type
+  |  intersection_type
   ;
 
 intersection_type =
@@ -157,7 +152,8 @@ intersection_type =
   ;
 
 intersection_op_type =
-     list_or_arrow_type
+     list_type_parenthesize_union
+  |  arrow_type
   ;
 
 arrow_type =
@@ -170,13 +166,13 @@ arg_list_type =
   ;
 
 result_type =
-     list_type
+     list_type_parenthesize_union
   |  vararg_type
   |  unit_type
   ;
 
 vararg_type =
-     list_type.t VARARG_MODIFIER {: return new VarArgType(t); :}
+     list_type_parenthesize_union.t VARARG_MODIFIER {: return new VarArgType(t); :}
   ;
 
 unit_type =
@@ -188,6 +184,14 @@ list_type =
   |  tuple_type
   |  cell_array_type
   |  union_type
+  |  matrix_type
+  ;
+
+list_type_parenthesize_union =
+     base_type
+  |  tuple_type
+  |  cell_array_type
+  |  LPAREN union_type.t RPAREN
   |  matrix_type
   ;
 

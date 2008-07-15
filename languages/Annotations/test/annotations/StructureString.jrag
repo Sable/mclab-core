@@ -53,12 +53,38 @@ aspect StructureString {
 				buf.append(" & ");
 			}
 			first = false;
-			buf.append(type.getStructureString());
+			if(type instanceof UnionType) {
+				buf.append("(");
+				buf.append(type.getStructureString());
+				buf.append(")");
+			} else {
+				buf.append(type.getStructureString());
+			}
 		}
 		return buf.toString();
 	}
 	
-	eq ArrowType.getStructureString() = getArgType().getStructureString() + " -> " + getResultType().getStructureString();
+	eq ArrowType.getStructureString() {
+		StringBuffer buf = new StringBuffer();
+		Type argType = getArgType();
+		if(argType instanceof UnionType) {
+			buf.append("(");
+			buf.append(argType.getStructureString());
+			buf.append(")");
+		} else {
+			buf.append(argType.getStructureString());
+		}
+		buf.append(" -> ");
+		Type resultType = getResultType();
+		if(resultType instanceof UnionType) {
+			buf.append("(");
+			buf.append(resultType.getStructureString());
+			buf.append(")");
+		} else {
+			buf.append(resultType.getStructureString());
+		}
+		return buf.toString();
+	}
 	
 	eq UnitType.getStructureString() = "()";
 	eq ArgTupleType.getStructureString() {
@@ -78,7 +104,9 @@ aspect StructureString {
 		return buf.toString();
 	}
 	
-	eq VarArgType.getStructureString() = getType().getStructureString() + "*"; //TODO-AC: parens?
+	eq VarArgType.getStructureString() {
+		return (getType() instanceof UnionType) ? "(" + getType().getStructureString() + ")*" : getType().getStructureString() + "*";
+	}
 	
 	eq TupleType.getStructureString() {
 		StringBuffer buf = new StringBuffer();
