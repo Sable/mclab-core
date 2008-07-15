@@ -1,0 +1,4 @@
+[1, 8]  unexpected token INTERSECT
+[1, 6]  try inserting RCURLY
+[1, 11]  unexpected token RCURLY
+[1, 11]  try deleting RCURLY
