@@ -199,9 +199,41 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
 }
 
 //start symbol
-array :
-     matrix
-  |  cell_array
+program :
+     //empty
+  |  script
+  |  function_list
+  |  class_def
+  ;
+
+stmt_separator :
+     t_LINE_TERMINATOR
+  |  t_SEMICOLON
+  |  t_COMMA
+  ;
+
+stmt_body :
+     expr
+  |  expr t_ASSIGN expr
+  |  t_GLOBAL name+
+  |  t_PERSISTENT name+
+  |  t_SHELL_COMMAND
+  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END
+  |  t_SWITCH expr stmt_separator (t_CASE expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END
+  |  t_IF expr sep_stmt_list (t_ELSEIF expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END
+  |  t_BREAK
+  |  t_CONTINUE
+  |  t_RETURN
+  |  t_WHILE expr sep_stmt_list t_END
+  |  t_FOR (name ASSIGN expr | LPAREN name ASSIGN expr RPAREN) sep_stmt_list t_END
+  ;
+
+name :
+     t_IDENTIFIER
+  ;
+
+sep_stmt_list :
+     stmt_separator stmt*
   ;
 
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
