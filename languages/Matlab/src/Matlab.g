@@ -214,6 +214,7 @@ stmt_separator :
      t_LINE_TERMINATOR
   |  t_SEMICOLON
   |  t_COMMA
+  |  EOF
   ;
 
 stmt_body :
