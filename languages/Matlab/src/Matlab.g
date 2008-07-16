@@ -245,9 +245,8 @@ maybe_cmd options{ backtrack=true; } :
   |  t_IDENTIFIER cmd_args
   ;
 
-//NB: use actual tokens, not t_ non-terminals
 cmd_args :
-     cmd_args_helper //TODO-AC: rewrite here
+     cmd_args_helper -> template(formatted={CommandFormatter.format($text, $cmd_args_helper.line, $cmd_args_helper.pos + 1, offsetTracker, problems)}) "<formatted>"
   ;
 
 //NB: use actual tokens, not t_ non-terminals
