@@ -215,7 +215,7 @@ script_ending :
   ;
 
 stmt :
-     (stmt_body t_FILLER?)? {input.LA(1) != EOF}? stmt_separator
+     stmt_body? {input.LA(1) != EOF}? stmt_separator
   ;
 
 stmt_separator :
@@ -227,17 +227,26 @@ stmt_separator :
   ;
 
 stmt_body :
+     maybe_cmd
+  |  (t_GLOBAL | t_PERSISTENT) (t_FILLER? name)+ t_FILLER?
+  |  t_SHELL_COMMAND t_FILLER?
+  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END t_FILLER?
+  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator t_FILLER? (t_CASE t_FILLER? expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END t_FILLER?
+  |  t_IF t_FILLER? expr sep_stmt_list (t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END t_FILLER?
+  |  t_BREAK t_FILLER?
+  |  t_CONTINUE t_FILLER?
+  |  t_RETURN t_FILLER?
+  |  t_WHILE t_FILLER? expr sep_stmt_list t_END t_FILLER?
+  |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
+  ;
+
+maybe_cmd options{ backtrack=true; } :
      expr (t_FILLER? t_ASSIGN t_FILLER? expr)?
-  |  (t_GLOBAL | t_PERSISTENT) (t_FILLER? name)+
-  |  t_SHELL_COMMAND
-  |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END
-  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator t_FILLER? (t_CASE t_FILLER? expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END
-  |  t_IF t_FILLER? expr sep_stmt_list (t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END
-  |  t_BREAK
-  |  t_CONTINUE
-  |  t_RETURN
-  |  t_WHILE t_FILLER? expr sep_stmt_list t_END
-  |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END
+  |  t_IDENTIFIER cmd_args
+  ;
+
+cmd_args :
+     (~(COMMA | SEMICOLON | LINE_TERMINATOR | COMMENT | BRACKET_COMMENT))+
   ;
 
 sep_stmt_list :
@@ -696,3 +705,5 @@ LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
 fragment ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 fragment OTHER_WHITESPACE : (' ' | '\t' | '\f')+;
 FILLER : ((('...')=> ELLIPSIS_COMMENT) | OTHER_WHITESPACE)+; //NB: putting the predicate on the fragment doesn't work
+
+MISC : .;
