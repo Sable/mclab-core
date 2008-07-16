@@ -5,6 +5,7 @@ package matlab;
 
 import matlab.CommandToken.Arg;
 import matlab.CommandToken.EllipsisComment;
+import matlab.CommandToken.InlineWhitespace;
 
 %%
 
@@ -123,8 +124,12 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
         arg.appendText(yytext());
         arg.appendArgText(yytext());
         markPotentialEnd();
-    } else if(!arg.isArgTextEmpty()) {
-        return getAndRestartArg();
+    } else {
+        CommandToken tok = new InlineWhitespace(yytext());
+        tok.setLine(yyline + baseLine);
+        tok.setStartCol(yycolumn + baseCol);
+        tok.setEndCol(yycolumn + baseCol + yylength() - 1);
+        return handleNonArg(tok);
     }
 }
 

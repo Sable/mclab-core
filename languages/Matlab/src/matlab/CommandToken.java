@@ -103,4 +103,18 @@ abstract class CommandToken {
             appendText(text);
         }
     }
+
+    /**
+     * Whitespace between arguments to a command style call.
+     * No linebreaks.
+     * Built up by CommandScanner.
+     */
+    static class InlineWhitespace extends CommandToken {
+        InlineWhitespace(String text) {
+            appendText(text);
+        }
+        public int getLength() {
+            return getEndCol() - getStartCol() + 1;
+        }
+    }
 }

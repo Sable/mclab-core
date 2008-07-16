@@ -7,10 +7,7 @@ import java.util.List;
 
 import matlab.CommandToken.Arg;
 import matlab.CommandToken.EllipsisComment;
-import matlab.ExtractionParser.Terminals;
-import matlab.ast.ArrayExtract;
-import matlab.ast.CellArrayExtract;
-import beaver.Symbol;
+import matlab.CommandToken.InlineWhitespace;
 
 /**
  * Translates a command style invocation into a function style invocation,
@@ -20,19 +17,25 @@ public class CommandFormatter {
     //keeping track of position changes
     private final OffsetTracker offsetTracker;
     //input
-    private final List<Symbol> originalSymbols;
+    private final String originalStr;
+    //first line number of originalStr
+    private final int baseLine;
+    //first col number of originalStr
+    private final int baseCol;
     //input after being concatenated and run through CommandScanner
     private final List<CommandToken> rescannedSymbols;
     //output
-    private final List<Symbol> formattedSymbols;
+    private final StringBuffer formattedStrBuf;
     //number of arguments after re-scanning
     private int numArgs;
 
-    private CommandFormatter(List<Symbol> originalSymbols, OffsetTracker offsetTracker) {
+    private CommandFormatter(String originalStr, int baseLine, int baseCol, OffsetTracker offsetTracker) {
         this.offsetTracker = offsetTracker;
-        this.originalSymbols = originalSymbols;
+        this.originalStr = originalStr;
+        this.baseLine = baseLine;
+        this.baseCol = baseCol;
         this.rescannedSymbols = new ArrayList<CommandToken>();
-        this.formattedSymbols = new ArrayList<Symbol>();
+        this.formattedStrBuf = new StringBuffer();
         this.numArgs = 0;
     }
 
@@ -41,45 +44,29 @@ public class CommandFormatter {
      * Output: Parenthesized, quoted, comma-delimited arguments or the input if
      *   no translation is necessary
      */
-    public static List<Symbol> format(List<Symbol> originalSymbols, OffsetTracker offsetTracker, List<TranslationProblem> problems) {
-        if(originalSymbols == null) {
-            return null;
-        }
-        originalSymbols = new ArrayList<Symbol>(originalSymbols);
-        if(isNotCmd(originalSymbols)) {
+    public static String format(String originalStr, int baseLine, int baseCol, OffsetTracker offsetTracker, List<TranslationProblem> problems) {
+        if(originalStr == null) {
             return null;
         }
         if(offsetTracker == null) {
             //easier than checking for null everywhere
             offsetTracker = new OffsetTracker(new TextPosition(1, 1));
         }
-        CommandFormatter cf = new CommandFormatter(originalSymbols, offsetTracker);
+        CommandFormatter cf = new CommandFormatter(originalStr, baseLine, baseCol, offsetTracker);
         try {
             cf.rescan();
             cf.format();
         } catch (CommandScanner.Exception e) {
             problems.add(e.getProblem());
         }
-        return cf.formattedSymbols;
+        return cf.formattedStrBuf.toString();
     }
 
     /*
      * Concatenates the input symbosl together and runs them through CommandScanner.
      */
     private void rescan() throws CommandScanner.Exception {
-        StringBuffer textBuf = new StringBuffer();
-        for(Symbol sym : originalSymbols) {
-            if(sym instanceof ArrayExtract) {
-                textBuf.append(((ArrayExtract) sym).getText()); //NB: do NOT translate
-            } else {
-                textBuf.append(sym.value);
-            }
-        }
-
-        CommandScanner scanner = new CommandScanner(new StringReader(textBuf.toString()));
-        int basePos = originalSymbols.get(0).getStart();
-        int baseLine = Symbol.getLine(basePos);
-        int baseCol = Symbol.getColumn(basePos);
+        CommandScanner scanner = new CommandScanner(new StringReader(originalStr));
         scanner.setBasePosition(baseLine, baseCol);
 
         while(true) {
@@ -94,7 +81,7 @@ public class CommandFormatter {
             if(curr == null) { //EOF
                 break;
             }
-            if(!isFiller(curr)) {
+            if(curr instanceof Arg) {
                 numArgs++;
             }
             rescannedSymbols.add(curr);
@@ -106,8 +93,8 @@ public class CommandFormatter {
      * the necessary changes to the OffsetTracker.
      */
     private void format() {
-        formattedSymbols.add(new Symbol("(")); //TODO-AC: id?
-        offsetTracker.recordOffsetChange(0, findPrecedingWhitespaceLength(0));
+        formattedStrBuf.append("(");
+        recordOffsetChangeIfWhitespace(0);
         offsetTracker.advanceInLine(1);
 
         int argsSeen = 0; //used to figure out when we're at the last arg
@@ -115,29 +102,31 @@ public class CommandFormatter {
             CommandToken tok = rescannedSymbols.get(i);
             if(tok instanceof Arg) {
                 formatArg(argsSeen, i, (Arg) tok);
-
                 if(argsSeen < numArgs - 1) {
-                    formattedSymbols.add(new Symbol(Terminals.COMMA, ","));
+                    formattedStrBuf.append(",");
                     offsetTracker.recordOffsetChange(0, -1);
                     offsetTracker.advanceInLine(1);
                 }
                 argsSeen++;
             } else if(tok instanceof EllipsisComment) {
-                int startPos = Symbol.makePosition(tok.getLine(), tok.getStartCol());
-                int endPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
-                formattedSymbols.add(new Symbol(Terminals.ELLIPSIS_COMMENT, startPos, endPos, tok.getText()));
+                formattedStrBuf.append(tok.getText());
                 offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(i));
                 offsetTracker.advanceToNewLine(1, 1);
             }
         }
 
-        formattedSymbols.add(new Symbol(")")); //TODO-AC: id?
+        formattedStrBuf.append(")");
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceInLine(1);
-        
-        CommandToken lastRescannedTok = rescannedSymbols.get(rescannedSymbols.size() - 1);
-        Symbol lastOriginalSym = originalSymbols.get(originalSymbols.size() - 1);
-        offsetTracker.recordOffsetChange(0, Symbol.getColumn(lastOriginalSym.getEnd()) - lastRescannedTok.getEndCol());
+
+        recordOffsetChangeIfWhitespace(rescannedSymbols.size() - 1);
+    }
+    
+    private void recordOffsetChangeIfWhitespace(int tokNum) {
+        CommandToken tok = rescannedSymbols.get(tokNum);
+        if(tok instanceof InlineWhitespace) {
+            offsetTracker.recordOffsetChange(0, ((InlineWhitespace) tok).getLength());
+        }
     }
 
     /*
@@ -147,7 +136,7 @@ public class CommandFormatter {
      *   If this changes, we won't be able to use indexOf and length to find positions.
      */
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
-        formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
+        formattedStrBuf.append("'");
         offsetTracker.recordOffsetChange(0, argsSeen == 0 ? -1 : findPrecedingWhitespaceLength(tokNum));
         offsetTracker.advanceInLine(1);
 
@@ -164,11 +153,8 @@ public class CommandFormatter {
             textIndex = newTextIndex;
         }
 
-        int argStartPos = Symbol.makePosition(tok.getLine(), tok.getStartCol());
-        int argEndPos = Symbol.makePosition(tok.getLine(), tok.getEndCol());
-        formattedSymbols.add(new Symbol(Terminals.STRING, argStartPos, argEndPos, argText));
-
-        formattedSymbols.add(new Symbol("'")); //TODO-AC: id?
+        formattedStrBuf.append(argText);
+        formattedStrBuf.append("'");
         offsetTracker.recordOffsetChange(0, (text.length() - 1) - textIndex - 1);
         offsetTracker.advanceInLine(1);
     }
@@ -178,114 +164,12 @@ public class CommandFormatter {
      * non-whitespace token.
      */
     private int findPrecedingWhitespaceLength(int rescannedSymbolNum) {
-        if(rescannedSymbolNum == 0) {
-            int firstNonFillerPos = 0;
-            for(Symbol sym : originalSymbols) {
-                if(!isFiller(sym)) {
-                    //must happen at least once - won't reach this point if there are no args
-                    break;
-                }
-                firstNonFillerPos++;
-            }
-            int length = 0;
-            for(int i = firstNonFillerPos - 1; i >= 0; i--) {
-                Symbol sym = originalSymbols.get(i);
-                if(sym.getId() != Terminals.OTHER_WHITESPACE) {
-                    break;
-                }
-                int startPos = sym.getStart();
-                int endPos = sym.getEnd();
-                length += Symbol.getColumn(endPos) - Symbol.getColumn(startPos) + 1;
-            }
-            return length;
-        } else {
-            CommandToken tok = rescannedSymbols.get(rescannedSymbolNum);
+        if(rescannedSymbolNum > 0) {
             CommandToken precedingTok = rescannedSymbols.get(rescannedSymbolNum - 1);
-            if(precedingTok instanceof EllipsisComment) {
-                //=> first arg on this line - just use pos
-                return tok.getStartCol() - 1;
-            } else {
-                //use distance from previous token
-                return tok.getStartCol() - precedingTok.getEndCol() - 1;
+            if(precedingTok instanceof InlineWhitespace) {
+                return ((InlineWhitespace) precedingTok).getLength();
             }
         }
-    }
-
-    private static boolean isFiller(CommandToken tok) {
-        return tok instanceof EllipsisComment;
-    }
-
-    private static boolean isFiller(Symbol sym) {
-        short type = sym.getId();
-        return (type == Terminals.OTHER_WHITESPACE) || (type == Terminals.ELLIPSIS_COMMENT);
-    }
-
-    /*
-     * Checks to determine whether or not the symbols are really arguments in
-     * a command style call
-     */
-    private static boolean isNotCmd(List<Symbol> originalSymbols) {
-        //no args => not a command
-        if(originalSymbols == null || originalSymbols.isEmpty()) {
-            return true;
-        }
-
-        Symbol firstSymbol = originalSymbols.get(0);
-        if(firstSymbol instanceof CellArrayExtract) {
-            return true;
-        }
-        switch(firstSymbol.getId()) {
-        //transpose => no args => not a command
-        case Terminals.MTRANSPOSE:
-        case Terminals.ARRAYTRANSPOSE:
-        //NB: no filler before cell_array => access / filler => command
-        case Terminals.CELL_ARRAY:
-            return true;
-        }
-
-        Symbol firstNonWhitespace = null;
-        for(Symbol sym : originalSymbols) {
-            if(!isFiller(sym)) {
-                if(firstNonWhitespace == null) {
-                    firstNonWhitespace = sym;
-                    switch(sym.getId()) {
-                    //paren or assign => definitely not a command
-                    case Terminals.PARENTHESIZED:
-                    case Terminals.ASSIGN:
-                        return true;
-                    //operator => command iff nothing important follows
-                    case Terminals.LT:
-                    case Terminals.GT:
-                    case Terminals.LE:
-                    case Terminals.GE:
-                    case Terminals.EQ:
-                    case Terminals.NE:
-                    case Terminals.AND:
-                    case Terminals.OR:
-                    case Terminals.SHORTAND:
-                    case Terminals.SHORTOR:
-                    case Terminals.COLON:
-                    case Terminals.MTIMES:
-                    case Terminals.ETIMES:
-                    case Terminals.MDIV:
-                    case Terminals.EDIV:
-                    case Terminals.MLDIV:
-                    case Terminals.ELDIV:
-                    case Terminals.PLUS:
-                    case Terminals.MINUS:
-                    case Terminals.MPOW:
-                    case Terminals.EPOW:
-                    case Terminals.DOT:
-                        break;
-                    //otherwise => definitely a command
-                    default:
-                        return false;
-                    }
-                } else {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return 0;
     }
 }
