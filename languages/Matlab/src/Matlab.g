@@ -36,9 +36,9 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     ANTLRStringStream in = new ANTLRStringStream(text);
     in.setLine(baseLine);
     in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
-    ArrayLexer lexer = new ArrayLexer(in);
+    MatlabLexer lexer = new MatlabLexer(in);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
-    ArrayParser parser = new ArrayParser(tokens);
+    MatlabParser parser = new MatlabParser(tokens);
     parser.offsetTracker = offsetTracker;
     try {
         parser.array();
