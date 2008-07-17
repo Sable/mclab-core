@@ -52,13 +52,13 @@ aspect Translate {
         int startPos = getStart();
         int startLine = beaver.Symbol.getLine(startPos);
         int startCol = beaver.Symbol.getColumn(startPos);
-        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker, problems);
+        return matlab.MatlabParser.translate(getText(), startLine, startCol, offsetTracker, problems);
     }
     
     public String CellArrayExtract.translate(matlab.OffsetTracker offsetTracker, java.util.List<matlab.TranslationProblem> problems) {
         int startPos = getStart();
         int startLine = beaver.Symbol.getLine(startPos);
         int startCol = beaver.Symbol.getColumn(startPos);
-        return matlab.ArrayParser.translate(getText(), startLine, startCol, offsetTracker, problems);
+        return matlab.MatlabParser.translate(getText(), startLine, startCol, offsetTracker, problems);
     }
 }
