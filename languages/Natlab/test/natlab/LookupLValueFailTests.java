@@ -2,7 +2,7 @@ package natlab;
 
 import java.io.*;
 import junit.framework.TestCase;
-import natlab.ast.Program;
+import natlab.ast.*;
 import natlab.SymbolTableEntry;
 
 public class LookupLValueFailTests extends TestCase
@@ -18,7 +18,7 @@ public class LookupLValueFailTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a6" );
+        Name se = script.lookupLValue( "a6" );
         assertNull("lookup did not returned null",se);
     }
     public void test_lookuplvscriptfail_nonexist() throws Exception
@@ -30,7 +30,7 @@ public class LookupLValueFailTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a0" );
+        Name se = script.lookupLValue( "a0" );
         assertNull("lookup did not returned null",se);
     }
 
@@ -43,7 +43,7 @@ public class LookupLValueFailTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a8" );
+        Name se = script.lookupLValue( "a8" );
         assertNull("lookup did not returned null",se);
     }
     public void test_lookuplvscriptfail_cellindex() throws Exception
@@ -55,7 +55,7 @@ public class LookupLValueFailTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a9" );
+        Name se = script.lookupLValue( "a9" );
         assertNull("lookup did not returned null",se);
     }
 }

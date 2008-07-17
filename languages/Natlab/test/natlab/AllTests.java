@@ -20,6 +20,7 @@ public class AllTests {
 
                 suite.addTestSuite(LookupLValuePassTests.class);
                 suite.addTestSuite(LookupLValueFailTests.class);
+                suite.addTestSuite(LookupLValueSanityTests.class);
 
 		//$JUnit-END$
 		return suite;

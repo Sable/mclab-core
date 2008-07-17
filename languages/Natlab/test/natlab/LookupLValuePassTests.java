@@ -2,7 +2,7 @@ package natlab;
 
 import java.io.*;
 import junit.framework.TestCase;
-import natlab.ast.Program;
+import natlab.ast.*;
 import natlab.SymbolTableEntry;
 
 public class LookupLValuePassTests extends TestCase
@@ -18,9 +18,9 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a1" );
+        Name se = script.lookupLValue( "a1" );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", se.getSymbol(), "a1" );
+        assertEquals("lookup returned wrong symbol", se.getID(), "a1" );
     }
 
     public void test_lookuplvscriptpass_dot() throws Exception
@@ -32,9 +32,9 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a2" );
+        Name se = script.lookupLValue( "a2" );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", "a2", se.getSymbol() );
+        assertEquals("lookup returned wrong symbol", "a2", se.getID() );
     }
 
     public void test_lookuplvscriptpass_paramaterized() throws Exception
@@ -46,9 +46,9 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a3" );
+        Name se = script.lookupLValue( "a3" );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", "a3", se.getSymbol() );
+        assertEquals("lookup returned wrong symbol", "a3", se.getID() );
     }
     public void test_lookuplvscriptpass_cell() throws Exception
     {
@@ -59,9 +59,9 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( "a7" );
+        Name se = script.lookupLValue( "a7" );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", "a7", se.getSymbol() );
+        assertEquals("lookup returned wrong symbol", "a7", se.getID() );
     }
     public void test_lookuplvscriptpass_array1() throws Exception
     {
@@ -73,9 +73,9 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( sName );
+        Name se = script.lookupLValue( sName );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", sName, se.getSymbol() );
+        assertEquals("lookup returned wrong symbol", sName, se.getID() );
     }
     public void test_lookuplvscriptpass_array2() throws Exception
     {
@@ -87,8 +87,8 @@ public class LookupLValuePassTests extends TestCase
         parser.setCommentBuffer(commentBuffer);
         Program script = (Program) parser.parse(scanner);
         
-        SymbolTableEntry se = script.lookupLValue( sName );
+        Name se = script.lookupLValue( sName );
         assertNotNull("lookup returned null",se);
-        assertEquals("lookup returned wrong symbol", sName, se.getSymbol() );
+        assertEquals("lookup returned wrong symbol", sName, se.getID() );
     }
 }

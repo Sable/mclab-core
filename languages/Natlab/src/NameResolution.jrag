@@ -4,25 +4,24 @@ import java.util.HashMap;
 aspect NameResolution{
 
 
-    syn lazy SymbolTableEntry Program.lookupLValue(String name) = null;
-    syn lazy SymbolTableEntry Stmt.lookupLValue(String name) = null;
-    syn lazy SymbolTableEntry Expr.lookupSymbol(String name) = null;
+    syn lazy Name Program.lookupLValue(String name) = null;
+    syn lazy Name Stmt.lookupLValue(String name) = null;
+    syn lazy Name Expr.lookupSymbol(String name) = null;
 
-    syn lazy HashMap<String, Name> Program.getLValues() = new HashMap<String, Name>();
-    syn lazy HashMap<String, Name> Stmt.getLValues() = new HashMap<String, Name>();
     //inh HashMap<String, Name> Expr.getLValues();
 
     //eq EmptyProgram.lookupLValue( String name ) = null;
 
     eq Script.lookupLValue( String name ) 
     {
-        SymbolTableEntry se = null;
+        /*SymbolTableEntry se = null;
         for( int i=0; i < getNumStmt(); i++ ){
             se = getStmt(i).lookupLValue( name );
             if( se != null )
                 return se;
         }
-        return se;
+        return se;*/
+        return getLValues().get(name);
     }
 
     eq FunctionList.lookupLValue( String name )
@@ -37,15 +36,18 @@ aspect NameResolution{
 
     eq NameExpr.lookupSymbol( String name ) 
     {
-        if( getName().getID().equals( name ) )
-            return new SymbolTableEntry( name );
-        return null;
+        /*if( getName().getID().equals( name ) )
+            return new getName();
+            return null;*/
+        return getSymbols().get(name);
     }
     eq ParameterizedExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq CellIndexExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq DotExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq MatrixExpr.lookupSymbol( String name )
     {
+        return getSymbols().get(name);
+        /*
         //return new SymbolTableEntry( getPrettyPrinted() );
         for( int i=0; i < getNumRow(); i++ ){
             for( int j=0; j < getRow(i).getNumElement(); j++ ){
@@ -54,16 +56,106 @@ aspect NameResolution{
                     return se;
             }
         }
-        return null;
+        return null;*/
     }
-    syn HashMap<String, Name> Expr.getSymbols() = new HashMap<String,Name>();
-    syn HashMap<String, Name> Name.getSymbols()
+
+    //getLValues methods, returns a Map of name to Name nodes of all L Value name nodes.
+
+    syn lazy Map<String, Name> Program.getLValues() = new HashMap<String, Name>();
+    syn lazy Map<String, Name> Stmt.getLValues() = new HashMap<String, Name>();
+    syn Map<String, Name> Expr.getSymbols() = new HashMap<String,Name>();
+
+    syn Map<String, Name> Name.getSymbols()
     {
         HashMap<String,Name> table = new HashMap<String,Name>();
         table.put( getID(), this );
         return table;
     }
+
+    eq Script.getLValues()
+    {
+        HashMap<String, Name> syms = new HashMap<String,Name>();
+        for( int i= getNumStmt()-1; i>=0; i-- ){
+            syms.putAll( getStmt(i).getLValues() );
+        }
+        return syms;
+    }
+
+    //getLValues equations for Statements
+    eq AssignStmt.getLValues() = getLHS().getSymbols();
+    eq GlobalStmt.getLValues() 
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumName(); i++ ){
+            table.put(getName(i).getID(),getName(i));
+        }
+        return table;
+    }
+    eq PersistentStmt.getLValues() 
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumName(); i++ ){
+            table.put(getName(i).getID(),getName(i));
+        }
+        return table;
+    }
+    eq ForStmt.getLValues()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        table.putAll( getAssignStmt().getLValues() );
+        for( int i=0; i<getNumStmt(); i++ )
+            table.putAll(getStmt(i).getLValues() );
+        return table;
+    }
+    eq WhileStmt.getLValues()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumStmt(); i++ )
+            table.putAll(getStmt(i).getLValues() );
+        return table;
+    }
+    eq IfStmt.getLValues()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumIfBlock(); i++ ){
+            for( int j=0; j<getIfBlock(i).getNumStmt(); j++ ){
+                table.putAll(getIfBlock(i).getStmt(j).getLValues());
+            }
+        }
+        if( hasElseBlock() )
+            for( int i=0; i<getElseBlock().getNumStmt(); i++ )
+                table.putAll(getElseBlock().getStmt(i).getLValues());
+        return table;
+    }
+    eq TryStmt.getLValues()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumTryStmt(); i++ )
+            table.putAll( getTryStmt(i).getLValues() );
+        for( int i=0; i<getNumCatchStmt(); i++ )
+            table.putAll( getCatchStmt(i).getLValues() );
+        return table;
+    }
+    eq SwitchStmt.getLValues()
+    {
+        HashMap<String,Name> table = new HashMap<String,Name>();
+        for( int i=0; i<getNumSwitchCaseBlock(); i++){
+            SwitchCaseBlock b = getSwitchCaseBlock(i);
+            for( int j=0; j<b.getNumStmt(); j++ )
+                table.putAll( b.getStmt(j).getLValues() );
+        }
+        if( hasDefaultCaseBlock() ){
+            DefaultCaseBlock b = getDefaultCaseBlock();
+            for( int i=0; i< b.getNumStmt(); i++ )
+                table.putAll( b.getStmt(i).getLValues() );
+        }
+        return table;
+    }
+   
+
+    //getSymbols equations for Expressions
     eq NameExpr.getSymbols() = getName().getSymbols();
+    eq ParameterizedExpr.getSymbols() = getTarget().getSymbols();
     eq CellIndexExpr.getSymbols() = getTarget().getSymbols();
     eq DotExpr.getSymbols() = getTarget().getSymbols();
     eq MatrixExpr.getSymbols()
@@ -76,5 +168,19 @@ aspect NameResolution{
         }
         return table;
     }
-    //inh boolean Expr.isL
+    //inh Map<String, Name> Expr.getLValues() = new HashMap<String,Name>();
+    inh boolean Name.isLValue();
+
+    //default value
+    eq Script.getStmt(int i).isLValue() = false;
+    eq ClassDef.getMethod(int i).isLValue() = false;
+    eq ClassDef.getClassEvent(int i).isLValue() = false;
+    eq FunctionList.getFunction(int i).isLValue() = false;    
+
+    //overides 
+    eq AssignStmt.getLHS().isLValue() = true;
+    eq AssignStmt.getRHS().isLValue() = true;
+    eq GlobalStmt.getName().isLValue() = true;
+    eq PersistentStmt.getName().isLValue() = true; //TODO-JD:is this true?
+
 }
