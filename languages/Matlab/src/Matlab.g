@@ -246,7 +246,7 @@ maybe_cmd options{ backtrack=true; } :
   ;
 
 cmd_args :
-     cmd_args_helper -> template(formatted={CommandFormatter.format($text, $cmd_args_helper.line, $cmd_args_helper.pos + 1, offsetTracker, problems)}) "<formatted>"
+     cmd_args_helper -> template(formatted={CommandFormatter.format($text, $cmd_args_helper.start.line, $cmd_args_helper.start.pos + 1, offsetTracker, problems)}) "<formatted>"
   ;
 
 //NB: use actual tokens, not t_ non-terminals
