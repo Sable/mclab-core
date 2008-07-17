@@ -1,4 +1,4 @@
-The Annotations language is a type-annotation language for Matlab.
+The Annotations language is a type-annotation language for Matlab.  It draws inspiration from the type annotations of Diamondback Ruby.
 
 Two types of statements are available:
 
