@@ -565,9 +565,9 @@ t_TRY : TRY { offsetTracker.advanceInLine(3); };
 t_WHILE : WHILE { offsetTracker.advanceInLine(5); };
 
 //class-specific keywords (IDENTIFIER + predicate)
-t_EVENTS : { input.LT(1).getText().equals("events") }? IDENTIFIER { offsetTracker.advanceInLine(6); };
-t_METHODS : { input.LT(1).getText().equals("methods") }? IDENTIFIER { offsetTracker.advanceInLine(7); };
-t_PROPERTIES : { input.LT(1).getText().equals("properties") }? IDENTIFIER { offsetTracker.advanceInLine(10); };
+t_EVENTS : { ((CommonTokenStream) input).LT(1).getText().equals("events") }? IDENTIFIER { offsetTracker.advanceInLine(6); };
+t_METHODS : { ((CommonTokenStream) input).LT(1).getText().equals("methods") }? IDENTIFIER { offsetTracker.advanceInLine(7); };
+t_PROPERTIES : { ((CommonTokenStream) input).LT(1).getText().equals("properties") }? IDENTIFIER { offsetTracker.advanceInLine(10); };
 
 t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
 t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
