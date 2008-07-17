@@ -41,7 +41,7 @@ public static String translate(String text, int baseLine, int baseCol, OffsetTra
     MatlabParser parser = new MatlabParser(tokens);
     parser.offsetTracker = offsetTracker;
     try {
-        parser.array();
+        parser.program();
     } catch (RecognitionException e) {
         parser.problems.add(parser.makeProblem(e));
     }
@@ -246,7 +246,7 @@ maybe_cmd options{ backtrack=true; } :
   ;
 
 cmd_args :
-     cmd_args_helper -> template(formatted={CommandFormatter.format($text, $cmd_args_helper.start.line, $cmd_args_helper.start.pos + 1, offsetTracker, problems)}) "<formatted>"
+     cmd_args_helper -> template(formatted={CommandFormatter.format($text, $cmd_args_helper.start.getLine(), $cmd_args_helper.start.getCharPositionInLine() + 1, offsetTracker, problems)}) "<formatted>"
   ;
 
 //NB: use actual tokens, not t_ non-terminals
@@ -565,9 +565,9 @@ t_TRY : TRY { offsetTracker.advanceInLine(3); };
 t_WHILE : WHILE { offsetTracker.advanceInLine(5); };
 
 //class-specific keywords (IDENTIFIER + predicate)
-t_EVENTS : { input.LT(1).getText.equals("events") }? IDENTIFIER { offsetTracker.advanceInLine(6); };
-t_METHODS : { input.LT(1).getText.equals("methods") }? IDENTIFIER { offsetTracker.advanceInLine(7); };
-t_PROPERTIES : { input.LT(1).getText.equals("properties") }? IDENTIFIER { offsetTracker.advanceInLine(10); };
+t_EVENTS : { input.LT(1).getText().equals("events") }? IDENTIFIER { offsetTracker.advanceInLine(6); };
+t_METHODS : { input.LT(1).getText().equals("methods") }? IDENTIFIER { offsetTracker.advanceInLine(7); };
+t_PROPERTIES : { input.LT(1).getText().equals("properties") }? IDENTIFIER { offsetTracker.advanceInLine(10); };
 
 t_PLUS : PLUS { offsetTracker.advanceInLine(1); };
 t_MINUS : MINUS { offsetTracker.advanceInLine(1); };
