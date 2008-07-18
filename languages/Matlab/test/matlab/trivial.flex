@@ -1,7 +1,5 @@
 package matlab;
 
-import beaver.Symbol;
-
 %%
 
 //general header info
@@ -10,8 +8,8 @@ import beaver.Symbol;
 %class TrivialScanner
 
 %unicode
-%function nextToken
-%type Symbol
+%function nextPos
+%type TextPosition
 
 //track line and column
 %line
@@ -19,5 +17,5 @@ import beaver.Symbol;
 
 %%
 
-. | \n { return new Symbol((short) 1, yyline + 1, yycolumn + 1, 1, yytext()); }
-<<EOF>> { return new Symbol((short) -1); }
+. | \n { return new TextPosition(yyline + 1, yycolumn + 1); }
+<<EOF>> { return null; }
