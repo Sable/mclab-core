@@ -152,7 +152,7 @@ private boolean isElementSeparator() {
 }
 
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
-private boolean inParens() { return bracketStack.peek() == LPAREN; }
+private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
 }
 
 @lexer::header {
