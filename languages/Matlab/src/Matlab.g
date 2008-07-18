@@ -388,9 +388,8 @@ comp_expr :
      colon_expr (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr)*
   ;
 
-//TODO-AC: uncomment
 colon_expr :
-     plus_expr //(t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
+     plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr (t_FILLER? t_COLON t_FILLER? plus_expr)?)?
   ;
 
 //TODO-AC: uncomment
@@ -455,9 +454,8 @@ comp_arg :
      colon_arg (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_arg)*
   ;
 
-//TODO-AC: uncomment
 colon_arg :
-     plus_arg //(t_FILLER? t_COLON t_FILLER? plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg)?)?
+     plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg)?)?
   ;
 
 //TODO-AC: uncomment
