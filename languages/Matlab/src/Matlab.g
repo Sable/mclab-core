@@ -27,13 +27,11 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
     return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
 }
 
-/**
- * Input: a matrix or cell array with missing or extraneous row and column delimiters.
- * Output: a matrix or cell array with a single comma separating consecutive elements
- * and a single semicolon and/or newline separating consecutive rows.
- */
 public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
-    ANTLRStringStream in = new ANTLRStringStream(text);
+    return translate(new ANTLRStringStream(text), baseLine, baseCol, offsetTracker, problems);
+}
+
+public static String translate(ANTLRStringStream in, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
     in.setLine(baseLine);
     in.setCharPositionInLine(baseCol - 1); //since antlr columns are 0-based
     MatlabLexer lexer = new MatlabLexer(in);
