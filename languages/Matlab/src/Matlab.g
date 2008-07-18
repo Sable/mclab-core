@@ -361,23 +361,11 @@ property_access :
      t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? t_IDENTIFIER t_FILLER? t_DOT t_FILLER? t_IDENTIFIER (t_FILLER? input_params)? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
   ;
 
-expr :
-     expr_or_arg[false]
-  ;
-
-arg :
-     expr_or_arg[true]
-  ;
-
 //precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
 //all binary operators are left associative so no special handling is required
-expr_or_arg
-  [boolean p_isArg]
-  scope { boolean isArg; }
-  @init { $expr_or_arg::isArg = $p_isArg; } :
+expr :
      short_or_expr
   |  t_AT t_FILLER? input_params t_FILLER? expr
-  |  {$expr_or_arg::isArg}?=> t_COLON
   ;
 
 short_or_expr :
@@ -386,7 +374,6 @@ short_or_expr :
 
 short_and_expr :
      or_expr (t_FILLER? t_SHORTAND t_FILLER? or_expr)*
-
   ;
 
 or_expr :
@@ -437,7 +424,74 @@ primary_expr :
   |  cell_array
   |  access
   |  t_AT t_FILLER? name
-  //|  {$expr_or_arg::isArg}?=> t_END
+  ;
+
+//TODO-AC: This is separate from expr because it allows t_COLON and t_END
+//  This shouldn't be necessary - dynamic scopes should handle this.
+//  See revision 709 for an implementation with dynamic scopes.
+arg :
+     short_or_arg
+  |  t_AT t_FILLER? input_params t_FILLER? arg
+  |  t_COLON
+  ;
+
+short_or_arg :
+     short_and_arg (t_FILLER? t_SHORTOR t_FILLER? short_and_arg)*
+  ;
+
+short_and_arg :
+     or_arg (t_FILLER? t_SHORTAND t_FILLER? or_arg)*
+  ;
+
+or_arg :
+     and_arg (t_FILLER? t_OR t_FILLER? and_arg)*
+  ;
+
+and_arg :
+     comp_arg (t_FILLER? t_AND t_FILLER? comp_arg)*
+  ;
+
+comp_arg :
+     colon_arg (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_arg)*
+  ;
+
+//TODO-AC: uncomment
+colon_arg :
+     plus_arg //(t_FILLER? t_COLON t_FILLER? plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg)?)?
+  ;
+
+//TODO-AC: uncomment
+plus_arg :
+     binary_arg //(t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_arg)*
+  ;
+
+binary_arg :
+     prefix_arg (t_FILLER? (t_MTIMES | t_ETIMES | t_MDIV | t_EDIV | t_MLDIV | t_ELDIV) t_FILLER? prefix_arg)*
+  ;
+
+prefix_arg :
+     pow_arg
+  |  t_NOT t_FILLER? prefix_arg
+  |  t_PLUS t_FILLER? prefix_arg
+  |  t_MINUS t_FILLER? prefix_arg
+  ;
+
+pow_arg :
+     postfix_arg (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_arg)*
+  ;
+
+postfix_arg :
+     primary_arg (t_FILLER? (t_ARRAYTRANSPOSE | t_MTRANSPOSE))*
+  ;
+
+primary_arg :
+     literal
+  |  t_LPAREN t_FILLER? arg t_FILLER? t_RPAREN
+  |  matrix
+  |  cell_array
+  |  access
+  |  t_AT t_FILLER? name
+  |  t_END
   ;
 
 access :
