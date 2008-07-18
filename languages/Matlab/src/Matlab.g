@@ -251,10 +251,11 @@ cmd_args :
 
 //NB: use actual tokens, not t_ non-terminals
 cmd_args_helper :
-     FILLER (~(LPAREN | ASSIGN) cmd_args_tail)?
-  |  ~(FILLER | MTRANSPOSE | ARRAYTRANSPOSE | LCURLY | LPAREN | ASSIGN) cmd_args_tail
+     FILLER (~(LPAREN | ASSIGN | COMMA | SEMICOLON | LINE_TERMINATOR | COMMENT | BRACKET_COMMENT) cmd_args_tail)?
+  |  ~(FILLER | MTRANSPOSE | ARRAYTRANSPOSE | LCURLY | LPAREN | ASSIGN | COMMA | SEMICOLON | LINE_TERMINATOR | COMMENT | BRACKET_COMMENT) cmd_args_tail
   ;
 
+//NB: use actual tokens, not t_ non-terminals
 cmd_args_tail :
      (~(COMMA | SEMICOLON | LINE_TERMINATOR | COMMENT | BRACKET_COMMENT))*
   ;
