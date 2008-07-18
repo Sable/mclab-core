@@ -55,12 +55,12 @@
 
 	<target name="jflex" depends="Gen.jflex, jflex.function.end, jflex.command, jflex.length, jflex.trivial" />
 
-	<target name="antlr.array" depends="def.antlr3.task">
+	<target name="antlr.matlab" depends="def.antlr3.task">
 		<mkdir dir="${gen.dir}/${root.pkg}" />
-		<antlr3 target="${src.dir}/${array.mixed.spec}" outputdirectory="${gen.dir}/${root.pkg}" />
+		<antlr3 target="${src.dir}/${matlab.mixed.spec}" outputdirectory="${gen.dir}/${root.pkg}" />
 	</target>
 
-	<target name="antlr" depends="antlr.array" />
+	<target name="antlr" depends="antlr.matlab" />
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
