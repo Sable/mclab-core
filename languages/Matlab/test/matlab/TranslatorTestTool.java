@@ -7,9 +7,8 @@ import java.util.List;
 import matlab.FunctionEndScanner.NoChangeResult;
 import matlab.FunctionEndScanner.ProblemResult;
 import matlab.FunctionEndScanner.TranslationResult;
-import matlab.ast.Program;
-import beaver.Parser;
-import beaver.Symbol;
+
+import org.antlr.runtime.ANTLRReaderStream;
 
 /**
  * A utility for producing the output file corresponding to a given input file.
@@ -47,60 +46,44 @@ public class TranslatorTestTool {
                 System.err.println(transResult.getText());
             }
 
-            ExtractionScanner scanner = new ExtractionScanner(in);
-            ExtractionParser parser = new ExtractionParser();
-            try {
-                Program actual = (Program) parser.parse(scanner);
-                if(parser.hasError()) {
-                    for(TranslationProblem prob : parser.getErrors()) {
-                        out.println("~" + prob);
-                    }
-                } else {
-                    List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-                    OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-                    String destText = actual.translate(offsetTracker, problems);
+            OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+            List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+            String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
 
-                    if(problems.isEmpty()) {
-                        PositionMap posMap = offsetTracker.buildPositionMap();
+            if(problems.isEmpty()) {
+                PositionMap posMap = offsetTracker.buildPositionMap();
 
-//                      out.println(">>>> Ends Added -> Matlab");
-//                      for(TextPosition destPos : getAllTextPositions(destText)) {
-//                      TextPosition sourcePos = prePosMap.getPreTranslationPosition(destPos);
-//                      out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-//                      "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-//                      }
+//              out.println(">>>> Ends Added -> Matlab");
+//              for(TextPosition destPos : getAllTextPositions(destText)) {
+//              TextPosition sourcePos = prePosMap.getPreTranslationPosition(destPos);
+//              out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//              "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//              }
 
-//                      out.println(">>>> Natlab -> Ends Added");
-//                      for(TextPosition destPos : getAllTextPositions(destText)) {
-//                      TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
-//                      out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-//                      "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-//                      }
+//              out.println(">>>> Natlab -> Ends Added");
+//              for(TextPosition destPos : getAllTextPositions(destText)) {
+//              TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
+//              out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+//              "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+//              }
 
-                        if(prePosMap != null) {
-                            posMap = new CompositePositionMap(posMap, prePosMap);
-                        }
-
-                        out.println(">>>> Destination Language -> Source Language");
-                        for(TextPosition destPos : getAllTextPositions(destText)) {
-                            TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
-                            out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
-                                    "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
-                        }
-
-                        out.println(">>>> Translated Text");
-                        out.print(destText);
-                    } else {
-                        for(TranslationProblem prob : problems) {
-                            out.println("~" + prob);
-                        }
-                    }
+                if(prePosMap != null) {
+                    posMap = new CompositePositionMap(posMap, prePosMap);
                 }
-            } catch(Parser.Exception e) {
-                for(TranslationProblem prob : parser.getErrors()) {
+
+                out.println(">>>> Destination Language -> Source Language");
+                for(TextPosition destPos : getAllTextPositions(destText)) {
+                    TextPosition sourcePos = posMap.getPreTranslationPosition(destPos);
+                    out.println("[" + destPos.getLine() + ", " + destPos.getColumn() + "] -> " +
+                            "(" + sourcePos.getLine() + ", " + sourcePos.getColumn() + ")");
+                }
+
+                out.println(">>>> Translated Text");
+                out.print(destText);
+            } else {
+                for(TranslationProblem prob : problems) {
                     out.println("~" + prob);
                 }
-                out.println("~" + e.getMessage());
             }
             out.close();
             in.close();
@@ -117,12 +100,11 @@ public class TranslatorTestTool {
         TrivialScanner scanner = new TrivialScanner(reader);
         try {
             while(true) {
-                Symbol sym = scanner.nextToken();
-                if(sym.getId() < 0) {
+                TextPosition sym = scanner.nextPos();
+                if(sym == null) {
                     break;
                 }
-                int pos = sym.getStart();
-                allPositions.add(new TextPosition(Symbol.getLine(pos), Symbol.getColumn(pos)));
+                allPositions.add(sym);
             }
             reader.close();
         } catch(IOException e) {
