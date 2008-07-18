@@ -270,7 +270,7 @@ function_list :
   ;
 
 function :
-     function_body t_FILLER? {input.LA(1) != EOF}? stmt_separator
+     function_body (EOF | t_FILLER? stmt_separator)
   ;
   
 function_ending :
