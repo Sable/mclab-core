@@ -708,12 +708,11 @@ WHILE: 'while';
 
 fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
-fragment HEX_DIGIT : DIGIT | 'a'..'f' | 'A'..'F';
 IDENTIFIER : ('_' | '$' | LETTER) ('_' | '$' | LETTER | DIGIT)*;
-fragment HEX_NUMBER : HEX_DIGIT+;
+fragment INT_NUMBER : DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
-fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+) SCI_EXP?;
-NUMBER : (HEX_NUMBER | FP_NUMBER) ('i' | 'I' | 'j' | 'J')?;
+fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+);
+NUMBER : (INT_NUMBER | FP_NUMBER) SCI_EXP? ('i' | 'I' | 'j' | 'J')?;
 
 PLUS : '+';
 MINUS : '-';
