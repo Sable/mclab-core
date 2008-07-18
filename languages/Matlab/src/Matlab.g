@@ -280,16 +280,20 @@ function_body :
   ;
 
 input_params :
-     t_LPAREN (t_FILLER? param_list)? t_FILLER? t_RPAREN
+     t_LPAREN param_list t_RPAREN
   ;
 
 output_params :
-     t_LSQUARE (t_FILLER? param_list)? t_FILLER? t_RSQUARE
+     t_LSQUARE param_list t_RSQUARE
   |  name
   ;
 
 param_list :
-     name (t_FILLER? t_COMMA t_FILLER? name)*
+     quiet_element_separator_list? name_list quiet_element_separator_list?
+  ;
+
+name_list :
+     name (element_separator_list name)*
   ;
 
 stmt_or_function :
