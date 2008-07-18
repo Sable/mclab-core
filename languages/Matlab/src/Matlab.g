@@ -458,9 +458,9 @@ colon_arg :
      plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg (t_FILLER? t_COLON t_FILLER? plus_arg)?)?
   ;
 
-//TODO-AC: uncomment
+//TODO-AC: antlr periodically has trouble with this (because of unary plus?)
 plus_arg :
-     binary_arg //(t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_arg)*
+     binary_arg (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_arg)*
   ;
 
 binary_arg :
