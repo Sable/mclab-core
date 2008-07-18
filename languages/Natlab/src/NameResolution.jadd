@@ -1,0 +1,7 @@
+import natlab.LocalFunctionLookupInterface;
+
+aspect NameResolutionAdditions
+{
+    FunctionList implements LocalFunctionLookupInterface;
+    Function implements LocalFunctionLookupInterface;
+}

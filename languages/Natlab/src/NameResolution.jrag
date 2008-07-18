@@ -175,7 +175,8 @@ aspect NameResolution{
     eq Script.getStmt(int i).isLValue() = false;
     eq ClassDef.getMethod(int i).isLValue() = false;
     eq ClassDef.getClassEvent(int i).isLValue() = false;
-    eq FunctionList.getFunction(int i).isLValue() = false;    
+    eq ClassDef.getProperty(int i).isLValue() = false;
+    eq FunctionList.getFunction(int i).isLValue() = false;
 
     //overides 
     eq AssignStmt.getLHS().isLValue() = true;
@@ -183,4 +184,34 @@ aspect NameResolution{
     eq GlobalStmt.getName().isLValue() = true;
     eq PersistentStmt.getName().isLValue() = true; //TODO-JD:is this true?
 
+
+    //function lookup structure definition
+    //inh Function.get
+
+    syn lazy Map<String,Function> FunctionList.getSiblings() = new HashMap<String,Function>();
+    syn lazy Map<String,Function> FunctionList.getNested()
+    {
+        HashMap<String,Function> table = new HashMap<String,Function>();
+        for( int i=0; i<getNumFunction(); i++ ){
+            table.put( getFunction(i).getName(), getFunction(i) );
+        }
+        return table;
+    }
+    syn LocalFunctionLookupInterface FunctionList.getParentFunction() = null;
+
+    syn lazy Map<String,Function> Function.getNested()
+    {
+        HashMap<String, Function> table = new HashMap<String,Function>();
+        for( int i=0; i<getNumNestedFunction(); i++ ){
+            table.put( getNestedFunction(i).getName(), getNestedFunction(i) );
+        }
+        return table;
+    }
+    inh Map Function.getSiblingsInh();    
+    eq FunctionList.getFunction(int i).getSiblingsInh() = getNested();
+    eq Function.getNestedFunction(int i).getSiblingsInh() = getNested();
+    eq ClassDef.getMethod(int i).getSiblingsInh() = new HashMap<String,Function>();
+
+    syn lazy Map<String,Function> Function.getSiblings() = (Map<String,Function>)getSiblingsInh();
+        
 }
