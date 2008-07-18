@@ -12,6 +12,7 @@ import org.antlr.runtime.Token;
  * Note that the output should be checked manually before using it as a test.
  */
 public class ScannerTestTool {
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java matlab.ScannerTestTool {basename}");
