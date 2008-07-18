@@ -394,7 +394,7 @@ colon_expr :
 
 //TODO-AC: antlr periodically has trouble with this (because of unary plus?)
 plus_expr :
-     binary_expr //(t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
+     binary_expr (t_FILLER? (t_PLUS | t_MINUS) t_FILLER? binary_expr)*
   ;
 
 binary_expr :
@@ -404,8 +404,7 @@ binary_expr :
 prefix_expr :
      pow_expr
   |  t_NOT t_FILLER? prefix_expr
-  |  t_PLUS t_FILLER? prefix_expr
-  |  t_MINUS t_FILLER? prefix_expr
+  |  (t_PLUS | t_MINUS) t_FILLER? prefix_expr //NB: plus_expr breaks if this is written as two rules
   ;
 
 pow_expr :
@@ -470,8 +469,7 @@ binary_arg :
 prefix_arg :
      pow_arg
   |  t_NOT t_FILLER? prefix_arg
-  |  t_PLUS t_FILLER? prefix_arg
-  |  t_MINUS t_FILLER? prefix_arg
+  |  (t_PLUS | t_MINUS) t_FILLER? prefix_arg //NB: plus_arg may break if this is written as two rules
   ;
 
 pow_arg :
