@@ -23,8 +23,19 @@ public class ScannerTestTool {
             MatlabLexer lexer = new MatlabLexer(new ANTLRReaderStream(in));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
-            for(Token tok : (List<Token>) tokens.getTokens()) {
-                printToken(out, tok);
+            List<TranslationProblem> problems = lexer.getProblems();
+            if(problems.isEmpty()) {
+                for(Token tok : (List<Token>) tokens.getTokens()) {
+                    printToken(out, tok);
+                }
+            } else {
+                for(TranslationProblem prob : problems) {
+                    out.print('~');
+                    out.print(' ');
+                    out.print(prob.getLine());
+                    out.print(' ');
+                    out.println(prob.getColumn());
+                }
             }
             out.close();
             in.close();
