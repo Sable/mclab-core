@@ -215,7 +215,8 @@ script_ending :
   ;
 
 stmt :
-     stmt_body? {input.LA(1) != EOF}? stmt_separator
+     stmt_body (stmt_separator | EOF)
+  |  stmt_separator
   ;
 
 stmt_separator :
