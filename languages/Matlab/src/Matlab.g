@@ -762,7 +762,7 @@ fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';
 
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
-COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
+COMMENT : '%' | '%' ~('{' | '\r' | '\n') NOT_LINE_TERMINATOR*;
 
 SHELL_COMMAND : '!' NOT_LINE_TERMINATOR* { couldBeFieldName = false; };
 
