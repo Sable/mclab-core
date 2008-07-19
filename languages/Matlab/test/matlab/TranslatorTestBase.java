@@ -1,6 +1,9 @@
 package matlab;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,23 +12,29 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
-import matlab.FunctionEndScanner.*;
-import matlab.ast.Program;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
+
+import org.antlr.runtime.ANTLRReaderStream;
 
 /** 
- * Parent class of the generated ExtractionTranslatorTests class.
- * Provides helper methods to keep ExtractionTranslatorTests short.
+ * Parent class of the generated MatlabTranslatorTests class.
+ * Provides helper methods to keep MatlabTranslatorTests short.
  */
 class TranslatorTestBase extends TestCase {
     private static final String SEPARATOR = ">>>>";
     private static final Pattern DEST_TO_SOURCE_PATTERN = Pattern.compile("^\\s*\\[([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\]\\s*[-][>]\\s*\\(([-]?\\d+)\\s*[,]\\s*([-]?\\d+)\\s*\\)\\s*$");
-    private PositionMap prePosMap = null;
 
-    /* Construct a scanner that will read from the specified file. */
-    ExtractionScanner getScanner(String filename) throws IOException {
+    /*
+     * Returns an ActualTranslation containing the contents of the .in file
+     * Format: Matlab
+     */
+    static ActualTranslation parseActualTranslation(String filename) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(filename));
         FunctionEndScanner prescanner = new FunctionEndScanner(in);
         FunctionEndScanner.Result result = prescanner.translate();
+        PositionMap prePosMap = null;
         in.close();
 
         if(result instanceof NoChangeResult) {
@@ -40,18 +49,36 @@ class TranslatorTestBase extends TestCase {
             in = new BufferedReader(new StringReader(transResult.getText()));
             prePosMap = transResult.getPositionMap();
         }
-        return new ExtractionScanner(in);
+
+        OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+        List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+        String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
+
+        PositionMap posMap = offsetTracker.buildPositionMap();
+        if(prePosMap != null) {
+            posMap = new CompositePositionMap(posMap, prePosMap);
+        }
+
+        if(problems.isEmpty()) {
+            return new ActualTranslation(posMap, destText);
+        } else {
+            StringBuffer failureStringBuffer = new StringBuffer();
+            for(TranslationProblem prob : problems) {
+                failureStringBuffer.append("~" + prob + "\n"); //TODO-AC: cross-platform?
+            }
+            return new ActualTranslation(posMap, failureStringBuffer.toString());
+        }
     }
 
     /*
-     * Returns a structure containing the contents of the .out file
+     * Returns an ExpectedTranslation containing the contents of the .out file
      * Format:
      *   >>>> blah
      *   [dest line, dest col] -> (source line, source col)
      *   >>>> blah 
      *   {translated text - see translate.jrag}
      */
-    static Structure parseStructure(String filename) throws IOException {
+    static ExpectedTranslation parseExpectedTranslation(String filename) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(filename));
 
         while(in.ready() && !in.readLine().startsWith(SEPARATOR)) {}
@@ -81,15 +108,14 @@ class TranslatorTestBase extends TestCase {
 
         in.close();
 
-        return new Structure(destToSourceMap, translateBuf.toString());
+        return new ExpectedTranslation(destToSourceMap, translateBuf.toString());
     }
 
     /* Check deep equality of an AST and the contents of the .out file. */
-    public void assertEquiv(Program actual, Structure expected) {
-        OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+    public void assertEquiv(ActualTranslation actual, ExpectedTranslation expected) {
         try {
             BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getTranslatedText()));
-            BufferedReader actualReader = new BufferedReader(new StringReader(buildActualString(actual, offsetTracker)));
+            BufferedReader actualReader = new BufferedReader(new StringReader(actual.getTranslatedText()));
             while(true) {
                 String expectedLine = expectedReader.readLine();
                 String actualLine = actualReader.readLine();
@@ -130,10 +156,7 @@ class TranslatorTestBase extends TestCase {
             e.printStackTrace();
         }
 
-        PositionMap posMap = offsetTracker.buildPositionMap();
-        if(prePosMap != null) {
-            posMap = new CompositePositionMap(posMap, prePosMap);
-        }
+        PositionMap posMap = actual.getDestToSourceMap();
         for(Map.Entry<TextPosition, TextPosition> entry : expected.getDestToSourceMap().entrySet()) {
             TextPosition destPos = entry.getKey();
             TextPosition expectedSourcePos = entry.getValue();
@@ -143,20 +166,6 @@ class TranslatorTestBase extends TestCase {
                         "(" + actualSourcePos.getLine() + ", " + actualSourcePos.getColumn() + ") instead of " +
                         "(" + expectedSourcePos.getLine() + ", " + expectedSourcePos.getColumn() + ")");
             }
-        }
-    }
-
-    private static String buildActualString(Program actual, OffsetTracker offsetTracker) {
-        List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-        String successString = actual.translate(offsetTracker, problems);
-        if(problems.isEmpty()) {
-            return successString;
-        } else {
-            StringBuffer failureStringBuffer = new StringBuffer();
-            for(TranslationProblem prob : problems) {
-                failureStringBuffer.append("~" + prob + "\n"); //TODO-AC: cross-platform?
-            }
-            return failureStringBuffer.toString();
         }
     }
 
@@ -182,16 +191,34 @@ class TranslatorTestBase extends TestCase {
     }
 
     /* struct for storing .out file contents. */
-    static class Structure {
+    static class ExpectedTranslation {
         private final Map<TextPosition, TextPosition> destToSourceMap;
         private final String translatedText;
 
-        private Structure(Map<TextPosition, TextPosition> destToSourceMap, String translatedText) {
+        private ExpectedTranslation(Map<TextPosition, TextPosition> destToSourceMap, String translatedText) {
             this.destToSourceMap = destToSourceMap;
             this.translatedText = translatedText;
         }
 
         public Map<TextPosition, TextPosition> getDestToSourceMap() {
+            return destToSourceMap;
+        }
+
+        public String getTranslatedText() {
+            return translatedText;
+        }
+    }
+
+    static class ActualTranslation {
+        private final PositionMap destToSourceMap;
+        private final String translatedText;
+
+        private ActualTranslation(PositionMap destToSourceMap, String translatedText) {
+            this.destToSourceMap = destToSourceMap;
+            this.translatedText = translatedText;
+        }
+
+        public PositionMap getDestToSourceMap() {
             return destToSourceMap;
         }
 

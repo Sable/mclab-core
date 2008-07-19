@@ -3,10 +3,10 @@ package matlab;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-/** Generates matlab.ExtractionTranslatorTests from the provided list file. */
+/** Generates matlab.MatlabTranslatorTests from the provided list file. */
 public class TranslatorTestGenerator extends AbstractTestGenerator {
 	private TranslatorTestGenerator() {
-		super("/matlab/ExtractionTranslatorTests.java");
+		super("/matlab/MatlabTranslatorTests.java");
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -18,7 +18,7 @@ public class TranslatorTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println();
 		testFileWriter.println("import matlab.ast.Program;");
 		testFileWriter.println();
-		testFileWriter.println("public class ExtractionTranslatorTests extends TranslatorTestBase {");
+		testFileWriter.println("public class MatlabTranslatorTests extends TranslatorTestBase {");
 	}
 
 	protected void printMethod(PrintWriter testFileWriter, String testName) {
@@ -27,10 +27,8 @@ public class TranslatorTestGenerator extends AbstractTestGenerator {
 		String outFileName = "test/" + testName + ".out";
 		testFileWriter.println();
 		testFileWriter.println("	public void " + methodName + "() throws Exception {");
-		testFileWriter.println("		ExtractionScanner scanner = getScanner(\"" + inFileName + "\");");
-		testFileWriter.println("		ExtractionParser parser = new ExtractionParser();");
-		testFileWriter.println("		Program actual = (Program) parser.parse(scanner);");
-		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
+		testFileWriter.println("		ActualTranslation actual = parseActualTranslation(\"" + inFileName + "\");");
+		testFileWriter.println("		ExpectedTranslation expected = parseExpectedTranslation(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
 		testFileWriter.println("	}");
 	}
