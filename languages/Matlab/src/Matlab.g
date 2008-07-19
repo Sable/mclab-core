@@ -131,7 +131,7 @@ private static boolean isRParen(Token op) {
  * to be a column delimiter.
  */
 private boolean isElementSeparator() {
-    if(inParens()) {
+    if(!(inCurly() || inSquare())) {
         return false;
     }
     Token prevToken = input.LT(-1);
@@ -153,6 +153,8 @@ private boolean isElementSeparator() {
 
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
 private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
+private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
+private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
 }
 
 @lexer::header {
@@ -194,6 +196,8 @@ private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionEx
     //change column to 1-based
     return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, "LEXER: " + getErrorMessage(e, tokenNames));
 }
+
+private boolean couldBeFieldName = false;
 }
 
 //start symbol
@@ -502,8 +506,8 @@ paren_access :
 
 cell_access :
      name (t_FILLER? t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
-  |  {inParens()}? name t_FILLER? t_AT t_FILLER? name
-  |  {!inParens()}? name t_AT name //TODO-AC: fix error message for name AT FILLER name case
+  |  {!(inSquare() || inCurly())}? name t_FILLER? t_AT t_FILLER? name
+  |  {inSquare() || inCurly()}? name t_AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
 
 arg_list :  
@@ -618,6 +622,7 @@ t_SWITCH : SWITCH { offsetTracker.advanceInLine(6); };
 t_TRY : TRY { offsetTracker.advanceInLine(3); };
 t_WHILE : WHILE { offsetTracker.advanceInLine(5); };
 
+//TODO-AC: technically there should also be a condition that we're in a class and the preceding non-filler wasn't DOT
 //class-specific keywords (IDENTIFIER + predicate)
 t_EVENTS : { ((CommonTokenStream) input).LT(1).getText().equals("events") }? IDENTIFIER { offsetTracker.advanceInLine(6); };
 t_METHODS : { ((CommonTokenStream) input).LT(1).getText().equals("methods") }? IDENTIFIER { offsetTracker.advanceInLine(7); };
@@ -684,74 +689,74 @@ dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * 
 
 //NB: only unconditional keywords - the rest will be treated as identifiers and handled in the parser
 
-BREAK: 'break';
-CASE: 'case';
-CATCH: 'catch';
-CLASSDEF: 'classdef';
-CONTINUE: 'continue';
-ELSE: 'else';
-ELSEIF: 'elseif';
-END: 'end';
-FOR: 'for';
-FUNCTION: 'function';
-GLOBAL: 'global';
-IF: 'if';
-OTHERWISE: 'otherwise';
-PARFOR: 'parfor';
-PERSISTENT: 'persistent';
-RETURN: 'return';
-SWITCH: 'switch';
-TRY: 'try';
-WHILE: 'while';
+BREAK: { !couldBeFieldName }?=> 'break';
+CASE: { !couldBeFieldName }?=> 'case';
+CATCH: { !couldBeFieldName }?=> 'catch';
+CLASSDEF: { !couldBeFieldName }?=> 'classdef';
+CONTINUE: { !couldBeFieldName }?=> 'continue';
+ELSE: { !couldBeFieldName }?=> 'else';
+ELSEIF: { !couldBeFieldName }?=> 'elseif';
+END: { !couldBeFieldName }?=> 'end';
+FOR: { !couldBeFieldName }?=> 'for';
+FUNCTION: { !couldBeFieldName }?=> 'function';
+GLOBAL: { !couldBeFieldName }?=> 'global';
+IF: { !couldBeFieldName }?=> 'if';
+OTHERWISE: { !couldBeFieldName }?=> 'otherwise';
+PARFOR: { !couldBeFieldName }?=> 'parfor';
+PERSISTENT: { !couldBeFieldName }?=> 'persistent';
+RETURN: { !couldBeFieldName }?=> 'return';
+SWITCH: { !couldBeFieldName }?=> 'switch';
+TRY: { !couldBeFieldName }?=> 'try';
+WHILE: { !couldBeFieldName }?=> 'while';
 
 fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
-IDENTIFIER : ('_' | '$' | LETTER) ('_' | '$' | LETTER | DIGIT)*;
+IDENTIFIER : ('_' | '$' | LETTER) ('_' | '$' | LETTER | DIGIT)* { couldBeFieldName = false; };
 fragment INT_NUMBER : DIGIT+;
 fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+);
-NUMBER : (INT_NUMBER | FP_NUMBER) SCI_EXP? ('i' | 'I' | 'j' | 'J')?;
+NUMBER : (INT_NUMBER | FP_NUMBER) SCI_EXP? ('i' | 'I' | 'j' | 'J')? { couldBeFieldName = false; };
 
-PLUS : '+';
-MINUS : '-';
-MTIMES : '*';
-ETIMES : '.*';
-MDIV : '/';
-EDIV : './';
-MLDIV : '\\';
-ELDIV : '.\\';
-MPOW : '^';
-EPOW : '.^';
-MTRANSPOSE : {isPreTransposeChar(input.LA(-1))}? '\'';
-ARRAYTRANSPOSE : '.\'';
-LE : '<=';
-GE : '>=';
-LT : '<';
-GT : '>';
-EQ : '==';
-NE : '~=';
-AND : '&';
-OR : '|';
-NOT : '~';
-SHORTAND : '&&';
-SHORTOR : '||';
-DOT : '.';
-COMMA : ',';
-SEMICOLON : ';';
-COLON : ':';
-AT : '@';
-LPAREN : '(';
-RPAREN : ')';
-LCURLY : '{';
-RCURLY : '}';
-LSQUARE : '[';
-RSQUARE : ']';
+PLUS : '+' { couldBeFieldName = false; };
+MINUS : '-' { couldBeFieldName = false; };
+MTIMES : '*' { couldBeFieldName = false; };
+ETIMES : '.*' { couldBeFieldName = false; };
+MDIV : '/' { couldBeFieldName = false; };
+EDIV : './' { couldBeFieldName = false; };
+MLDIV : '\\' { couldBeFieldName = false; };
+ELDIV : '.\\' { couldBeFieldName = false; };
+MPOW : '^' { couldBeFieldName = false; };
+EPOW : '.^' { couldBeFieldName = false; };
+MTRANSPOSE : {isPreTransposeChar(input.LA(-1))}? '\'' { couldBeFieldName = false; };
+ARRAYTRANSPOSE : '.\'' { couldBeFieldName = false; };
+LE : '<=' { couldBeFieldName = false; };
+GE : '>=' { couldBeFieldName = false; };
+LT : '<' { couldBeFieldName = false; };
+GT : '>' { couldBeFieldName = false; };
+EQ : '==' { couldBeFieldName = false; };
+NE : '~=' { couldBeFieldName = false; };
+AND : '&' { couldBeFieldName = false; };
+OR : '|' { couldBeFieldName = false; };
+NOT : '~' { couldBeFieldName = false; };
+SHORTAND : '&&' { couldBeFieldName = false; };
+SHORTOR : '||' { couldBeFieldName = false; };
+DOT : '.' { couldBeFieldName = true; }; //NB: TRUE
+COMMA : ',' { couldBeFieldName = false; };
+SEMICOLON : ';' { couldBeFieldName = false; };
+COLON : ':' { couldBeFieldName = false; };
+AT : '@' { couldBeFieldName = false; };
+LPAREN : '(' { couldBeFieldName = false; };
+RPAREN : ')' { couldBeFieldName = false; };
+LCURLY : '{' { couldBeFieldName = false; };
+RCURLY : '}' { couldBeFieldName = false; };
+LSQUARE : '[' { couldBeFieldName = false; };
+RSQUARE : ']' { couldBeFieldName = false; };
 
-ASSIGN : '=';
+ASSIGN : '=' { couldBeFieldName = false; };
  
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
-STRING : '\'' STRING_CHAR* '\'';
+STRING : '\'' STRING_CHAR* '\'' { couldBeFieldName = false; };
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';
@@ -759,12 +764,12 @@ BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_
 fragment NOT_LINE_TERMINATOR : ~('\r' | '\n');
 COMMENT : '%' | '%' ~'{' NOT_LINE_TERMINATOR*;
 
-SHELL_COMMAND : '!' NOT_LINE_TERMINATOR*;
+SHELL_COMMAND : '!' NOT_LINE_TERMINATOR* { couldBeFieldName = false; };
 
-LINE_TERMINATOR : '\r' '\n' | '\r' | '\n';
+LINE_TERMINATOR : '\r' '\n' | '\r' | '\n' { couldBeFieldName = false; };
 
 fragment ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 fragment OTHER_WHITESPACE : (' ' | '\t' | '\f')+;
 FILLER : ((('...')=> ELLIPSIS_COMMENT) | OTHER_WHITESPACE)+; //NB: putting the predicate on the fragment doesn't work
 
-MISC : .;
+MISC : . { couldBeFieldName = false; };
