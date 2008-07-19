@@ -66,7 +66,7 @@ public class ScannerTestTool {
             out.print(' ');
             out.print(startLine + lastPos.getLine() - 1);
             out.print(' ');
-            out.print(startCol + lastPos.getColumn() - 1);
+            out.print(lastPos.getColumn());
         }
         out.print(' ');
         out.print('=');
