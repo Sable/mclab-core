@@ -153,7 +153,7 @@ class ScannerTestBase extends TestCase {
         final int expectedEndCol = expected.getEndCol();
         TextPosition lastPos = ScannerTestTool.getLastPosition(actual.getText());
         final int actualEndLine = actualStartLine + lastPos.getLine() - 1;
-        final int actualEndCol = actualStartCol + lastPos.getColumn() - 1;
+        final int actualEndCol = (lastPos.getLine() == 1) ? actualStartCol + lastPos.getColumn() - 1 : lastPos.getColumn();
         if(expectedEndLine != actualEndLine || expectedEndCol != actualEndCol) {
             fail(msg + " - " + getTokenString(actual) + ": incorrect end position - " +
                     "expected: line " + expectedEndLine + " col " + expectedEndCol + " " +
