@@ -128,14 +128,14 @@ class ScannerTestBase extends TestCase {
         final int actualId = actual.getType();
         if(actualId != expectedId) {
             fail(msg + ": incorrect token type - " +
-                    "expected: " + expectedId + " (" + ExtractionParser.Terminals.NAMES[expectedId] + ") " +
-                    "but was: " + actualId + " (" + ExtractionParser.Terminals.NAMES[actualId] + ")");
+                    "expected: " + expectedId + " (" + MatlabParser.tokenNames[expectedId] + ") " +
+                    "but was: " + actualId + " (" + MatlabParser.tokenNames[actualId] + ")");
         }
         final String expectedValue = expected.getText();
         final String actualValue = ScannerTestTool.stringifyValue(actual.getText());
         if(((actualValue == null || expectedValue == null) && (actualValue != expectedValue)) || 
                 (actualValue != null && !actualValue.equals(expectedValue))) {
-            fail(msg + " - " + ExtractionParser.Terminals.NAMES[actualId] + ": incorrect token value - " +
+            fail(msg + " - " + MatlabParser.tokenNames[actualId] + ": incorrect token value - " +
                     "expected: " + expectedValue + " " +
                     "but was: " + actualValue);
 
