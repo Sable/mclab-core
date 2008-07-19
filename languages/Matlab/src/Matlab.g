@@ -727,7 +727,7 @@ MLDIV : '\\' { couldBeFieldName = false; };
 ELDIV : '.\\' { couldBeFieldName = false; };
 MPOW : '^' { couldBeFieldName = false; };
 EPOW : '.^' { couldBeFieldName = false; };
-MTRANSPOSE : {isPreTransposeChar(input.LA(-1))}? '\'' { couldBeFieldName = false; };
+MTRANSPOSE : {isPreTransposeChar(input.LA(-1))}?=> '\'' { couldBeFieldName = false; };
 ARRAYTRANSPOSE : '.\'' { couldBeFieldName = false; };
 LE : '<=' { couldBeFieldName = false; };
 GE : '>=' { couldBeFieldName = false; };
@@ -756,7 +756,7 @@ ASSIGN : '=' { couldBeFieldName = false; };
  
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
-STRING : '\'' STRING_CHAR* '\'' { couldBeFieldName = false; };
+STRING : {!isPreTransposeChar(input.LA(-1))}?=>'\'' STRING_CHAR* '\'' { couldBeFieldName = false; };
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';
