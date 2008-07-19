@@ -772,4 +772,11 @@ fragment ELLIPSIS_COMMENT : '...' NOT_LINE_TERMINATOR* LINE_TERMINATOR;
 fragment OTHER_WHITESPACE : (' ' | '\t' | '\f')+;
 FILLER : ((('...')=> ELLIPSIS_COMMENT) | OTHER_WHITESPACE)+; //NB: putting the predicate on the fragment doesn't work
 
+//TODO-AC: this is a huge hack to get around an antlr issue.
+//  When the lexer sees lookahead '..', it attempts to match FILLER, regardless of whether or not there's a third '.'
+//  If there isn't, it simply fails instead of falling back to match DOT.
+//  This prevents that from happening.  It is safe to return a nonsense token because '..' is never a valid sequence in matlab.
+//TODO-AC: getting this rule to emit two DOT tokens would be much more satisfactory.
+DOUBLE_DOT : '..' { couldBeFieldName = false; };
+
 MISC : . { couldBeFieldName = false; };
