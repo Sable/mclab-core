@@ -280,7 +280,7 @@ function_ending :
   ;
 
 function_body :
-     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? input_params t_FILLER? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
+     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? (input_params t_FILLER?)? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
   ;
 
 input_params :
