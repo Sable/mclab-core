@@ -41,7 +41,7 @@ class ScannerTestBase extends TestCase {
             int actualType = tokens.get(tokenNum).getType();
             int expectedType = MatlabParser.EOF;
             fail("Token #" + tokenNum + ": incorrect token type - " +
-                    "expected: " + expectedType + " (" + MatlabParser.tokenNames[expectedType] + ") " +
+                    "expected: " + expectedType + " (EOF) " +
                     "but was: " + actualType + " (" + MatlabParser.tokenNames[actualType] + ")");
         }
         if(lexer.hasProblem()) {
