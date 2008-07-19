@@ -682,8 +682,6 @@ dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * 
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
-//NB: not distinguishing between decimal and hex numbers at this level
-
 //NB: only unconditional keywords - the rest will be treated as identifiers and handled in the parser
 
 BREAK: 'break';
