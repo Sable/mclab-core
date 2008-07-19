@@ -24,7 +24,7 @@ private matlab.TranslationProblem makeProblem(RecognitionException e) {
 /* Convert a RecognitionException into a TranslationException. */
 private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionException e) {
     //change column to 1-based
-    return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
+    return new matlab.TranslationProblem(e.line, e.charPositionInLine + 1, getErrorMessage(e, tokenNames));
 }
 
 public static String translate(String text, int baseLine, int baseCol, OffsetTracker offsetTracker, List<matlab.TranslationProblem> problems) {
@@ -194,7 +194,7 @@ public void displayRecognitionError(String[] tokenNames, RecognitionException e)
 
 private matlab.TranslationProblem makeProblem(String[] tokenNames, RecognitionException e) {
     //change column to 1-based
-    return new matlab.ArrayTranslationProblem(e.line, e.charPositionInLine + 1, "LEXER: " + getErrorMessage(e, tokenNames));
+    return new matlab.TranslationProblem(e.line, e.charPositionInLine + 1, "LEXER: " + getErrorMessage(e, tokenNames));
 }
 
 private boolean couldBeFieldName = false;
