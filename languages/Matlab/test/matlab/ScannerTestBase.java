@@ -37,7 +37,7 @@ class ScannerTestBase extends TestCase {
                 return;
             }
         }
-        if(tokenNum < actualTokens.size()) {
+        if(exceptionPos == null && tokenNum < actualTokens.size()) {
             int actualType = tokens.get(tokenNum).getType();
             int expectedType = MatlabParser.EOF;
             fail("Token #" + tokenNum + ": incorrect token type - " +
@@ -48,6 +48,8 @@ class ScannerTestBase extends TestCase {
             TranslationProblem prob = lexer.getProblems().get(0);
             assertEquals(prob.getMessage(), new TextPosition(prob.getLine(), prob.getColumn()), exceptionPos);
             return;
+        } else if(exceptionPos != null) {
+            fail("Expected exception at " + exceptionPos);
         }
     }
 
