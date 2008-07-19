@@ -34,6 +34,7 @@ public class ScannerTestTool {
                         out.print(prob.getLine());
                         out.print(' ');
                         out.println(prob.getColumn());
+                        System.err.println(prob);
                         break;
                     }
                     printToken(out, tok);
