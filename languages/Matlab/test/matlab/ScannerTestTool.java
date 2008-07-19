@@ -23,19 +23,24 @@ public class ScannerTestTool {
             BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
             MatlabLexer lexer = new MatlabLexer(new ANTLRReaderStream(in));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+            List<Token> tokenList = tokens.getTokens();
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".out"));
-            List<TranslationProblem> problems = lexer.getProblems();
-            if(problems.isEmpty()) {
-                for(Token tok : (List<Token>) tokens.getTokens()) {
+            if(lexer.hasProblem()) {
+                TranslationProblem prob = lexer.getProblems().get(0);
+                for(Token tok : tokenList) {
+                    if(tok.getLine() > prob.getLine() || (tok.getLine() == prob.getLine() && tok.getCharPositionInLine() + 1 >= prob.getColumn())) {
+                        out.print('~');
+                        out.print(' ');
+                        out.print(prob.getLine());
+                        out.print(' ');
+                        out.println(prob.getColumn());
+                        break;
+                    }
                     printToken(out, tok);
                 }
             } else {
-                for(TranslationProblem prob : problems) {
-                    out.print('~');
-                    out.print(' ');
-                    out.print(prob.getLine());
-                    out.print(' ');
-                    out.println(prob.getColumn());
+                for(Token tok : tokenList) {
+                    printToken(out, tok);
                 }
             }
             out.close();
@@ -80,7 +85,7 @@ public class ScannerTestTool {
         }
         return value.toString().replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
     }
-    
+
     public static TextPosition getLastPosition(String text) throws IOException {
         TrivialScanner scanner = new TrivialScanner(new StringReader(text));
         TextPosition lastPos = null;
