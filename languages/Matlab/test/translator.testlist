@@ -2,7 +2,7 @@ translator_command_ellipses
 translator_command_quotes
 translator_command_hard
 translator_command_tabs
-#translator_command_other
+translator_command_other
 translator_array_plus
 translator_array_simple
 translator_array_colsep
@@ -19,8 +19,8 @@ translator_functionend_insertion2
 translator_functionend_insertion3
 translator_functionend_insertion4
 translator_mixed_empty
-#translator_mixed_notcmd
-#translator_mixed_all1
-#translator_mixed_all2
-#translator_mixed_all3
-#translator_mixed_all4
+translator_mixed_notcmd
+translator_mixed_all1
+translator_mixed_all2
+translator_mixed_all3
+translator_mixed_all4
