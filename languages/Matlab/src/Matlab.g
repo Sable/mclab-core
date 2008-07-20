@@ -276,7 +276,7 @@ function :
   ;
   
 function_ending :
-     ((t_COMMENT | t_BRACKET_COMMENT) t_LINE_TERMINATOR)* (t_COMMENT | t_BRACKET_COMMENT)?
+     (t_COMMENT | t_BRACKET_COMMENT)?
   ;
 
 function_body :
@@ -306,7 +306,7 @@ name_list :
 
 stmt_or_function :
      stmt
-  |  function
+  |  function_body
   ;
 
 class_def :
