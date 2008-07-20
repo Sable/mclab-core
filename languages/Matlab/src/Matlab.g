@@ -272,7 +272,7 @@ function_list :
   ;
 
 function :
-     function_body (EOF | t_FILLER? stmt_separator)
+     function_body (t_FILLER? stmt_separator)*
   ;
   
 function_ending :
