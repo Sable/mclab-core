@@ -131,9 +131,6 @@ private static boolean isRParen(Token op) {
  * to be a column delimiter.
  */
 private boolean isElementSeparator() {
-    if(!(inCurly() || inSquare())) {
-        return false;
-    }
     Token prevToken = input.LT(-1);
     Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
     switch(nextToken.getType()) {
@@ -150,11 +147,6 @@ private boolean isElementSeparator() {
              isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
              isLParen(prevToken) || isRParen(nextToken));
 }
-
-private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
-private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
-private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
-private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
 }
 
 @lexer::header {
@@ -245,7 +237,7 @@ stmt_body :
 
 maybe_cmd options{ backtrack=true; } :
      expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
-  //|  t_IDENTIFIER cmd_args //TODO-AC: re-enable once I figure out side-effects/backtracking
+  |  t_IDENTIFIER cmd_args //TODO-AC: re-enable once I figure out side-effects/backtracking
   ;
 
 cmd_args :
@@ -434,6 +426,159 @@ primary_expr :
   |  t_AT t_FILLER? name
   ;
 
+access :
+     paren_access (t_FILLER? t_DOT t_FILLER? paren_access)*
+  ;
+
+paren_access :
+     cell_access (t_FILLER? t_LPAREN t_FILLER? (arg_list t_FILLER?)? t_RPAREN)?
+  ;
+
+cell_access :
+     name (t_FILLER? t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
+  |  name t_FILLER? t_AT t_FILLER? name
+  ;
+
+//Same as non-array versions but point to _in_array accesses
+expr_in_array :
+     short_or_expr_in_array
+  |  t_AT t_FILLER? input_params t_FILLER? expr_in_array
+  ;
+
+short_or_expr_in_array :
+     short_and_expr_in_array (t_FILLER? t_SHORTOR t_FILLER? short_and_expr_in_array)*
+  ;
+
+short_and_expr_in_array :
+     or_expr_in_array (t_FILLER? t_SHORTAND t_FILLER? or_expr_in_array)*
+  ;
+
+or_expr_in_array :
+     and_expr_in_array (t_FILLER? t_OR t_FILLER? and_expr_in_array)*
+  ;
+
+and_expr_in_array :
+     comp_expr_in_array (t_FILLER? t_AND t_FILLER? comp_expr_in_array)*
+  ;
+
+comp_expr_in_array :
+     colon_expr_in_array (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr_in_array)*
+  ;
+
+colon_expr_in_array :
+     plus_expr_in_array (t_FILLER? t_COLON t_FILLER? plus_expr_in_array (t_FILLER? t_COLON t_FILLER? plus_expr_in_array)?)?
+  ;
+
+//TODO-AC: antlr periodically has trouble with this (because of unary plus?)
+plus_expr_in_array :
+     binary_expr_in_array (t_FILLER (t_PLUS | t_MINUS) t_FILLER binary_expr_in_array | (t_PLUS | t_MINUS) t_FILLER? binary_expr_in_array)*
+  ;
+
+binary_expr_in_array :
+     prefix_expr_in_array (t_FILLER? (t_MTIMES | t_ETIMES | t_MDIV | t_EDIV | t_MLDIV | t_ELDIV) t_FILLER? prefix_expr_in_array)*
+  ;
+
+prefix_expr_in_array :
+     pow_expr_in_array
+  |  t_NOT t_FILLER? prefix_expr_in_array
+  |  t_PLUS t_FILLER? prefix_expr_in_array
+  |  t_MINUS t_FILLER? prefix_expr_in_array
+  ;
+
+pow_expr_in_array :
+     postfix_expr_in_array (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_expr_in_array)*
+  ;
+
+postfix_expr_in_array :
+     primary_expr_in_array (t_FILLER? (t_ARRAYTRANSPOSE | t_MTRANSPOSE))*
+  ;
+
+primary_expr_in_array :
+     literal
+  |  t_LPAREN t_FILLER? expr t_FILLER? t_RPAREN //NB: expr, not expr_in_array
+  |  matrix
+  |  cell_array
+  |  access_in_array
+  |  t_AT t_FILLER? name
+  ;
+
+//Accesses actually differ from non-array versions
+access_in_array :
+     paren_access_in_array (t_FILLER? t_DOT t_FILLER? paren_access_in_array)*
+  ;
+
+paren_access_in_array :
+     cell_access_in_array (t_LPAREN t_FILLER? (arg_list t_FILLER?)? t_RPAREN)?
+  ;
+
+cell_access_in_array :
+     name (t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
+  |  name t_AT name
+  ;
+
+//same as _in_array except that no filler is allowed between unary plus and its arg
+expr_in_array2 :
+     short_or_expr_in_array2
+  |  t_AT t_FILLER? input_params t_FILLER? expr_in_array2
+  ;
+
+short_or_expr_in_array2 :
+     short_and_expr_in_array2 (t_FILLER? t_SHORTOR t_FILLER? short_and_expr_in_array2)*
+  ;
+
+short_and_expr_in_array2 :
+     or_expr_in_array2 (t_FILLER? t_SHORTAND t_FILLER? or_expr_in_array2)*
+  ;
+
+or_expr_in_array2 :
+     and_expr_in_array2 (t_FILLER? t_OR t_FILLER? and_expr_in_array2)*
+  ;
+
+and_expr_in_array2 :
+     comp_expr_in_array2 (t_FILLER? t_AND t_FILLER? comp_expr_in_array2)*
+  ;
+
+comp_expr_in_array2 :
+     colon_expr_in_array2 (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr_in_array2)*
+  ;
+
+colon_expr_in_array2 :
+     plus_expr_in_array2 (t_FILLER? t_COLON t_FILLER? plus_expr_in_array2 (t_FILLER? t_COLON t_FILLER? plus_expr_in_array2)?)?
+  ;
+
+//TODO-AC: antlr periodically has trouble with this (because of unary plus?)
+plus_expr_in_array2 :
+     binary_expr_in_array2 (t_FILLER (t_PLUS | t_MINUS) t_FILLER binary_expr_in_array2 | (t_PLUS | t_MINUS) t_FILLER? binary_expr_in_array2)*
+  ;
+
+binary_expr_in_array2 :
+     prefix_expr_in_array2 (t_FILLER? (t_MTIMES | t_ETIMES | t_MDIV | t_EDIV | t_MLDIV | t_ELDIV) t_FILLER? prefix_expr_in_array2)*
+  ;
+
+prefix_expr_in_array2 :
+     pow_expr_in_array2
+  |  t_NOT t_FILLER? prefix_expr_in_array2
+  |  t_PLUS prefix_expr_in_array2
+  |  t_MINUS prefix_expr_in_array2
+  ;
+
+pow_expr_in_array2 :
+     postfix_expr_in_array2 (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_expr_in_array2)*
+  ;
+
+postfix_expr_in_array2 :
+     primary_expr_in_array2 (t_FILLER? (t_ARRAYTRANSPOSE | t_MTRANSPOSE))*
+  ;
+
+primary_expr_in_array2 :
+     literal
+  |  t_LPAREN t_FILLER? expr t_FILLER? t_RPAREN //NB: expr, not expr_in_array2
+  |  matrix
+  |  cell_array
+  |  access_in_array
+  |  t_AT t_FILLER? name
+  ;
+
 //TODO-AC: This is separate from expr because it allows t_COLON and t_END
 //  This shouldn't be necessary - dynamic scopes should handle this.
 //  See revision 709 for an implementation with dynamic scopes.
@@ -500,20 +645,6 @@ primary_arg :
   |  t_END
   ;
 
-access :
-     paren_access (t_FILLER? t_DOT t_FILLER? paren_access)*
-  ;
-
-paren_access :
-     cell_access (t_FILLER? t_LPAREN t_FILLER? (arg_list t_FILLER?)? t_RPAREN)?
-  ;
-
-cell_access :
-     name (t_FILLER? t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
-  |  {!(inSquare() || inCurly())}? name t_FILLER? t_AT t_FILLER? name
-  |  {inSquare() || inCurly()}? name t_AT name //TODO-AC: fix error message for name AT FILLER name case
-  ;
-
 arg_list :  
      arg (t_FILLER? t_COMMA t_FILLER? arg)*
   ;
@@ -572,11 +703,15 @@ quiet_row_separator : //match and delete row_separator
   ;
 
 element_list :
-     element (element_separator_list element)*
+     element (element_separator_list element2)*
   ;
 
 element :
-     expr
+     expr_in_array
+  ;
+
+element2 :
+     expr_in_array2
   ;
 
 //non-empty
@@ -663,12 +798,12 @@ t_AT : AT { offsetTracker.advanceInLine(1); };
 
 t_ASSIGN : ASSIGN { offsetTracker.advanceInLine(1); };
 
-t_LPAREN : LPAREN { offsetTracker.advanceInLine(1); bracketStack.push(LPAREN); };
-t_RPAREN : RPAREN { offsetTracker.advanceInLine(1); bracketStack.pop(); };
-t_LCURLY : LCURLY { offsetTracker.advanceInLine(1); bracketStack.push(LCURLY); };
-t_RCURLY : RCURLY { offsetTracker.advanceInLine(1); bracketStack.pop(); };
-t_LSQUARE : LSQUARE { offsetTracker.advanceInLine(1); bracketStack.push(LSQUARE); };
-t_RSQUARE : RSQUARE { offsetTracker.advanceInLine(1); bracketStack.pop(); };
+t_LPAREN : LPAREN { offsetTracker.advanceInLine(1); };
+t_RPAREN : RPAREN { offsetTracker.advanceInLine(1); };
+t_LCURLY : LCURLY { offsetTracker.advanceInLine(1); };
+t_RCURLY : RCURLY { offsetTracker.advanceInLine(1); };
+t_LSQUARE : LSQUARE { offsetTracker.advanceInLine(1); };
+t_RSQUARE : RSQUARE { offsetTracker.advanceInLine(1); };
 
 t_IDENTIFIER : IDENTIFIER { offsetTracker.advanceByTextSize($text); };
 t_NUMBER : NUMBER { offsetTracker.advanceByTextSize($text); };
