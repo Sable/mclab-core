@@ -406,7 +406,8 @@ binary_expr :
 prefix_expr :
      pow_expr
   |  t_NOT t_FILLER? prefix_expr
-  |  (t_PLUS | t_MINUS) t_FILLER? prefix_expr //NB: plus_expr breaks if this is written as two rules
+  |  t_PLUS t_FILLER? prefix_expr
+  |  t_MINUS t_FILLER? prefix_expr
   ;
 
 pow_expr :
@@ -471,7 +472,7 @@ colon_expr_in_array :
 
 //TODO-AC: antlr periodically has trouble with this (because of unary plus?)
 plus_expr_in_array :
-     binary_expr_in_array (t_FILLER (t_PLUS | t_MINUS) t_FILLER binary_expr_in_array | (t_PLUS | t_MINUS) t_FILLER? binary_expr_in_array)*
+     binary_expr_in_array ((t_FILLER (t_PLUS | t_MINUS) t_FILLER | (t_PLUS | t_MINUS) t_FILLER?) binary_expr_in_array)*
   ;
 
 binary_expr_in_array :
@@ -479,10 +480,7 @@ binary_expr_in_array :
   ;
 
 prefix_expr_in_array :
-     pow_expr_in_array
-  |  t_NOT t_FILLER? prefix_expr_in_array
-  |  t_PLUS t_FILLER? prefix_expr_in_array
-  |  t_MINUS t_FILLER? prefix_expr_in_array
+     ((t_NOT | t_PLUS | t_MINUS) t_FILLER?)* pow_expr_in_array
   ;
 
 pow_expr_in_array :
@@ -514,69 +512,6 @@ paren_access_in_array :
 cell_access_in_array :
      name (t_LCURLY t_FILLER? arg_list t_FILLER? t_RCURLY)*
   |  name t_AT name
-  ;
-
-//same as _in_array except that no filler is allowed between unary plus and its arg
-expr_in_array2 :
-     short_or_expr_in_array2
-  |  t_AT t_FILLER? input_params t_FILLER? expr_in_array2
-  ;
-
-short_or_expr_in_array2 :
-     short_and_expr_in_array2 (t_FILLER? t_SHORTOR t_FILLER? short_and_expr_in_array2)*
-  ;
-
-short_and_expr_in_array2 :
-     or_expr_in_array2 (t_FILLER? t_SHORTAND t_FILLER? or_expr_in_array2)*
-  ;
-
-or_expr_in_array2 :
-     and_expr_in_array2 (t_FILLER? t_OR t_FILLER? and_expr_in_array2)*
-  ;
-
-and_expr_in_array2 :
-     comp_expr_in_array2 (t_FILLER? t_AND t_FILLER? comp_expr_in_array2)*
-  ;
-
-comp_expr_in_array2 :
-     colon_expr_in_array2 (t_FILLER? (t_LT | t_GT | t_LE | t_GE | t_EQ | t_NE) t_FILLER? colon_expr_in_array2)*
-  ;
-
-colon_expr_in_array2 :
-     plus_expr_in_array2 (t_FILLER? t_COLON t_FILLER? plus_expr_in_array2 (t_FILLER? t_COLON t_FILLER? plus_expr_in_array2)?)?
-  ;
-
-//TODO-AC: antlr periodically has trouble with this (because of unary plus?)
-plus_expr_in_array2 :
-     binary_expr_in_array2 (t_FILLER (t_PLUS | t_MINUS) t_FILLER binary_expr_in_array2 | (t_PLUS | t_MINUS) t_FILLER? binary_expr_in_array2)*
-  ;
-
-binary_expr_in_array2 :
-     prefix_expr_in_array2 (t_FILLER? (t_MTIMES | t_ETIMES | t_MDIV | t_EDIV | t_MLDIV | t_ELDIV) t_FILLER? prefix_expr_in_array2)*
-  ;
-
-prefix_expr_in_array2 :
-     pow_expr_in_array2
-  |  t_NOT t_FILLER? prefix_expr_in_array2
-  |  t_PLUS prefix_expr_in_array2
-  |  t_MINUS prefix_expr_in_array2
-  ;
-
-pow_expr_in_array2 :
-     postfix_expr_in_array2 (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_expr_in_array2)*
-  ;
-
-postfix_expr_in_array2 :
-     primary_expr_in_array2 (t_FILLER? (t_ARRAYTRANSPOSE | t_MTRANSPOSE))*
-  ;
-
-primary_expr_in_array2 :
-     literal
-  |  t_LPAREN t_FILLER? expr t_FILLER? t_RPAREN //NB: expr, not expr_in_array2
-  |  matrix
-  |  cell_array
-  |  access_in_array
-  |  t_AT t_FILLER? name
   ;
 
 //TODO-AC: This is separate from expr because it allows t_COLON and t_END
@@ -624,7 +559,8 @@ binary_arg :
 prefix_arg :
      pow_arg
   |  t_NOT t_FILLER? prefix_arg
-  |  (t_PLUS | t_MINUS) t_FILLER? prefix_arg //NB: plus_arg may break if this is written as two rules
+  |  t_PLUS t_FILLER? prefix_arg
+  |  t_MINUS t_FILLER? prefix_arg
   ;
 
 pow_arg :
@@ -703,15 +639,11 @@ quiet_row_separator : //match and delete row_separator
   ;
 
 element_list :
-     element (element_separator_list element2)*
+     element (element_separator_list element)*
   ;
 
 element :
      expr_in_array
-  ;
-
-element2 :
-     expr_in_array2
   ;
 
 //non-empty
