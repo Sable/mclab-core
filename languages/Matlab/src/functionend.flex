@@ -361,7 +361,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
     | try
     | while ) { append(); blockStack.push(BlockType.OTHER); yybegin(YYINITIAL); }
     
-    . { yypushback(1); yybegin(YYINITIAL); }
+    . | \n { yypushback(1); yybegin(YYINITIAL); }
     
     <<EOF>> { yybegin(YYINITIAL); }
 }
