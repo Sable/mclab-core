@@ -4,9 +4,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import matlab.FunctionEndScanner.*;
-import matlab.ast.Program;
-import beaver.Parser;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
+
+import org.antlr.runtime.ANTLRReaderStream;
 
 /**
  * A utility for translating from Matlab source to Natlab source.
@@ -43,19 +45,16 @@ public class Translator {
                 in = new BufferedReader(new StringReader(transResult.getText()));
             }
 
-            ExtractionScanner scanner = new ExtractionScanner(in);
-            ExtractionParser parser = new ExtractionParser();
-            Program actual = (Program) parser.parse(scanner);
+            OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+            List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+            String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
+            
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".n"));
-            if(parser.hasError()) {
-                for(TranslationProblem prob : parser.getErrors()) {
-                    System.err.println(prob);
-                }
+            if(problems.isEmpty()) {
+                out.print(destText);
             } else {
-                List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-                out.print(actual.translate(new OffsetTracker(new TextPosition(1, 1)), problems));
                 for(TranslationProblem prob : problems) {
-                    System.err.println(prob);
+                    System.err.println("~" + prob);
                 }
             }
             out.close();
@@ -64,9 +63,6 @@ public class Translator {
         } catch(IOException e) {
             e.printStackTrace();
             System.exit(2);
-        } catch (Parser.Exception e) {
-            e.printStackTrace();
-            System.exit(3);
         }
     }
 }
