@@ -284,15 +284,19 @@ function_body :
   ;
 
 input_params :
-     t_LPAREN param_list t_RPAREN
+     t_LPAREN t_FILLER? (input_param_list t_FILLER?)? t_RPAREN
+  ;
+
+input_param_list :
+     name (t_FILLER? t_COMMA t_FILLER? name)*
   ;
 
 output_params :
-     t_LSQUARE param_list t_RSQUARE
+     t_LSQUARE output_param_list t_RSQUARE
   |  name
   ;
 
-param_list :
+output_param_list :
      quiet_element_separator_list? name_list quiet_element_separator_list?
   ;
 
