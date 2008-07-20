@@ -535,7 +535,7 @@ optional_row_list :
      
   |  quiet_element_separator_list
   |  (quiet_element_separator_list? quiet_row_separator)+ quiet_element_separator_list?
-  |  (quiet_element_separator_list? quiet_row_separator)* row_list quiet_row_separator_list?
+  |  (quiet_element_separator_list? quiet_row_separator)* row_list (quiet_row_separator_list quiet_element_separator_list?)?
   ;
 
 row_list :
