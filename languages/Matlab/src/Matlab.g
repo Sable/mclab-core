@@ -244,7 +244,7 @@ stmt_body :
   ;
 
 maybe_cmd options{ backtrack=true; } :
-     expr (t_FILLER? t_ASSIGN t_FILLER? expr)?
+     expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
   //|  t_IDENTIFIER cmd_args //TODO-AC: re-enable once I figure out side-effects/backtracking
   ;
 
