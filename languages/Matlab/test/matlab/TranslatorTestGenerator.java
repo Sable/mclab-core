@@ -16,8 +16,6 @@ public class TranslatorTestGenerator extends AbstractTestGenerator {
 	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package matlab;");
 		testFileWriter.println();
-		testFileWriter.println("import matlab.ast.Program;");
-		testFileWriter.println();
 		testFileWriter.println("public class MatlabTranslatorTests extends TranslatorTestBase {");
 	}
 

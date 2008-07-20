@@ -4,8 +4,6 @@
 
 	<!-- useful paths -->
 	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
-	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
-	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
 	<path id="antlr.jar.path">
@@ -24,7 +22,6 @@
 	<!-- creates JFlex Ant task -->
 
 	<import file="../shared/taskdef.xml" />
-	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
 
@@ -35,7 +32,7 @@
 		<property name="antlr3.available" value="yes" />
 	</target>
 
-	<!-- Extend and override parts of gen.xml -->
+	<!-- Generation (instead of gen.xml) -->
 
 	<target name="jflex.function.end" depends="def.jflex.task">
 		<jflex file="${src.dir}/${function.end.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
@@ -53,7 +50,7 @@
 		<jflex file="${test.dir}/${trivial.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
-	<target name="jflex" depends="Gen.jflex, jflex.function.end, jflex.command, jflex.length, jflex.trivial" />
+	<target name="jflex" depends="jflex.function.end, jflex.command, jflex.length, jflex.trivial" />
 
 	<target name="antlr.matlab" depends="def.antlr3.task">
 		<mkdir dir="${gen.dir}/${root.pkg}" />
@@ -78,14 +75,6 @@
 		</java>
 	</target>
 
-	<target name="gen.parser.pass.tests" depends="set.bin.dir">
-		<echo message="Generating parser pass tests" />
-		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${parser.pass.test.list.file}" />
-			<arg value="${gen.dir}" />
-		</java>
-	</target>
-
 	<target name="gen.translator.tests" depends="set.bin.dir">
 		<echo message="Generating translator tests" />
 		<java classname="${translator.test.generator.class}" classpath="${bin.dir}">
@@ -94,11 +83,18 @@
 		</java>
 	</target>
 
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.translator.tests" />
+	<target name="gen.tests" depends="gen.scanner.tests, gen.translator.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, antlr, gen.tests" />
+	<target name="gen" depends="compile.test.generators, jflex, antlr, gen.tests" />
+
+	<!-- remove files created by gen -->
+	<target name="clean.gen">
+		<delete includeemptydirs="true">
+			<fileset dir="${gen.dir}" includes="**/*" />
+		</delete>
+	</target>
 
 	<!-- command-line compilation -->
 	<!-- NB: overrides target from compile.xml -->
@@ -106,7 +102,6 @@
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
 			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
 			<classpath refid="antlr.jar.path" />
 			<src path="${src.dir}" />
 			<src path="${gen.dir}" />
@@ -130,7 +125,6 @@
 		<junit fork="true" haltonerror="true">
 			<formatter type="plain" usefile="false" />
 			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
 			<classpath refid="antlr.jar.path" />
 			<classpath location="${bin.dir}" />
 			<test name="${test.suite.name}" />

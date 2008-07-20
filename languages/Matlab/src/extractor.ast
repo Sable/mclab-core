@@ -1,9 +1,0 @@
-Program ::= ListNode; //root node - purely because JastAdd requires one
-abstract Node;
-ListNode : Node ::= Node*;
-SymbolNode : Node ::= <Text>;
-ExtractNode : Node;
-MaybeCmdExtract : ExtractNode ::= <Cmd> <Args : java.util.List<beaver.Symbol>>;
-ArrayExtract : ExtractNode ::= <Text>;
-MatrixExtract : ArrayExtract;
-CellArrayExtract : ArrayExtract;
