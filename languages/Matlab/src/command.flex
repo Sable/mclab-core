@@ -14,13 +14,12 @@ import matlab.CommandToken.InlineWhitespace;
 %final
 %class CommandScanner
 
-//required for beaver compatibility
 %unicode
 %function nextToken
 %type CommandToken
 %yylexthrow CommandScanner.Exception
 
-//for debugging - track line and column
+//track line and column
 %line
 %column
 
@@ -67,6 +66,8 @@ import matlab.CommandToken.InlineWhitespace;
   
   //// Command-style call arguments ////////////////////////////////////////////
   
+  private int bracketDepth = 0;
+  
   private Arg arg = new Arg();
   
   //populate the line and start column fields of the Arg with values from JFlex
@@ -76,9 +77,25 @@ import matlab.CommandToken.InlineWhitespace;
     arg.setStartCol(yycolumn + baseCol);
   }
   
+  //populate the start line and column fields of the Arg with values from JFlex
+  private void markStartIfStart() {
+    if(arg.getText().length() == 0) {
+        markStart();
+    }
+  }
+  
   //populate the end column field of the Arg with values from JFlex
   private void markPotentialEnd() {
     arg.setEndCol((yycolumn + baseCol) + yylength() - 1);
+  }
+  
+  private void appendText() {
+    arg.appendText(yytext());
+  }
+  
+  private void appendTextAndArgText() {
+    appendText();
+    arg.appendArgText(yytext());
   }
   
   private CommandToken getAndRestartArg() {
@@ -88,17 +105,13 @@ import matlab.CommandToken.InlineWhitespace;
   }
   
   private CommandToken handleNonArg(CommandToken nonArg) throws Exception {
-    if(arg.isQuoteCountOdd()) {
-        error("Unterminated command-style call argument: '" + arg.getText() + "'");
-        return null; //unreachable, but Java can't tell that error always throws an exception
-    } else {
-        if(!arg.isArgTextEmpty()) {
-            yypushback(yylength()); //will rematch after we return the arg
-            return getAndRestartArg();
-        }
-        return nonArg;
+    if(!arg.isArgTextEmpty()) {
+        yypushback(yylength()); //will rematch after we return the arg
+        return getAndRestartArg();
     }
+    return nonArg;
   }
+  
 %}
 
 LineTerminator = \r|\n|\r\n
@@ -106,11 +119,19 @@ OtherWhiteSpace = [ \t\f]
 
 //NB: acceptable to conflict with ... - matlab just treats .... as a comment containing .
 Ellipsis = \.\.\.
-EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
+EllipsisComment = {Ellipsis}.*{LineTerminator}
+
+LBracket = \{ | \[
+RBracket = \} | \]
+Quote = \'
+
+%xstate QUOTED
+%xstate LBRACKETED
+%xstate RBRACKETED
 
 %%
 
-{EscapedLineTerminator} {
+{EllipsisComment} {
     CommandToken tok = new EllipsisComment(yytext());
     tok.setLine(yyline + baseLine);
     tok.setStartCol(yycolumn + baseCol);
@@ -120,32 +141,104 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 }
 
 {OtherWhiteSpace}+ {
-    if(arg.isQuoteCountOdd()) {
-        arg.appendText(yytext());
-        arg.appendArgText(yytext());
+    CommandToken tok = new InlineWhitespace(yytext());
+    tok.setLine(yyline + baseLine);
+    tok.setStartCol(yycolumn + baseCol);
+    tok.setEndCol(yycolumn + baseCol + yylength() - 1);
+    return handleNonArg(tok);
+}
+
+{Quote} {
+    markStartIfStart();
+    //don't append arg text
+    appendText();
+    yybegin(QUOTED);
+}
+
+<QUOTED> {
+    {Quote}{Quote} {
+        appendTextAndArgText();
+    }
+    {Quote} {
+        //don't append arg text
+        appendText();
         markPotentialEnd();
-    } else {
-        CommandToken tok = new InlineWhitespace(yytext());
-        tok.setLine(yyline + baseLine);
-        tok.setStartCol(yycolumn + baseCol);
-        tok.setEndCol(yycolumn + baseCol + yylength() - 1);
-        return handleNonArg(tok);
+        yybegin(YYINITIAL);
+    }
+    {LineTerminator} {
+        yybegin(YYINITIAL); 
+        error("Unterminated string literal: '" + arg.getText() + "'");
+    }
+    . {
+        appendTextAndArgText();
+    }
+    <<EOF>> {
+        yybegin(YYINITIAL); 
+        error("Unterminated string literal: '" + arg.getText() + "'");
     }
 }
 
-. {
-    if(arg.getText().length() == 0) {
-        markStart();
+{LBracket} {
+    markStartIfStart();
+    appendTextAndArgText();
+    markPotentialEnd();
+    bracketDepth++;
+    yybegin(LBRACKETED);
+}
+
+<LBRACKETED> {
+    {LBracket} {
+        appendTextAndArgText();
+        markPotentialEnd();
+        bracketDepth++;
     }
-    if(yytext().equals("'")) {
-        arg.incrQuoteCount();
-        if(arg.isPrevTextCharQuote() && arg.isQuoteCountOdd()) {
-            arg.appendArgText("''");
+    {RBracket} {
+        appendTextAndArgText();
+        markPotentialEnd();
+        bracketDepth--;
+        if(bracketDepth == 0) {
+            yybegin(YYINITIAL);
         }
-    } else {
-        arg.appendArgText(yytext());
     }
-    arg.appendText(yytext());
+    {LineTerminator} { yybegin(YYINITIAL); }
+    . {
+        appendTextAndArgText();
+    }
+    <<EOF>> { yybegin(YYINITIAL); }
+}
+
+{RBracket} {
+    markStartIfStart();
+    appendTextAndArgText();
+    markPotentialEnd();
+    bracketDepth++;
+    yybegin(RBRACKETED);
+}
+
+<RBRACKETED> {
+    {RBracket} {
+        appendTextAndArgText();
+        markPotentialEnd();
+        bracketDepth++;
+    }
+    {LBracket} {
+        appendTextAndArgText();
+        markPotentialEnd();
+        bracketDepth--;
+        if(bracketDepth == 0) {
+            yybegin(YYINITIAL);
+        }
+    }
+    {LineTerminator} { yybegin(YYINITIAL); }
+    . {
+        appendTextAndArgText();
+    }
+    <<EOF>> { yybegin(YYINITIAL); }
+}
+
+. {
+    markStartIfStart();
+    appendTextAndArgText();
     markPotentialEnd();
 }
 

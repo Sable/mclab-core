@@ -58,11 +58,9 @@ abstract class CommandToken {
      */
     static class Arg extends CommandToken {
         private StringBuffer argBuf;
-        private int quoteCount;
 
         Arg() {
             this.argBuf = new StringBuffer();
-            this.quoteCount = 0;
         }
 
         public void appendArgText(String argText) {
@@ -79,18 +77,6 @@ abstract class CommandToken {
 
         public boolean isArg() {
             return true;
-        }
-
-        public void incrQuoteCount() {
-            quoteCount++;
-        }
-
-        public boolean isQuoteCountOdd() {
-            return (quoteCount % 2) == 1;
-        }
-
-        public boolean isPrevTextCharQuote() {
-            return getText().endsWith("'");
         }
     }
 
