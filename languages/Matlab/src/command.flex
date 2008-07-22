@@ -137,6 +137,7 @@ Quote = \'
     tok.setStartCol(yycolumn + baseCol);
     tok.setEndCol(yycolumn + baseCol + yylength() - 1);
     baseCol = 1; //NB: reset base col after the first line break
+    bracketDepth = 0;
     return handleNonArg(tok);
 }
 
@@ -165,16 +166,20 @@ Quote = \'
         markPotentialEnd();
         yybegin(YYINITIAL);
     }
-    {LineTerminator} {
-        yybegin(YYINITIAL); 
-        error("Unterminated string literal: '" + arg.getText() + "'");
+    {EllipsisComment} | {LineTerminator} {
+        yybegin(YYINITIAL);
+        String text = arg.getText();
+        arg = null; //so that we don't return it as if it were complete
+        error("Unterminated string literal: '" + text + "'");
     }
     . {
         appendTextAndArgText();
     }
     <<EOF>> {
-        yybegin(YYINITIAL); 
-        error("Unterminated string literal: '" + arg.getText() + "'");
+        yybegin(YYINITIAL);
+        String text = arg.getText();
+        arg = null; //so that we don't return it as if it were complete
+        error("Unterminated string literal: '" + text + "'");
     }
 }
 
@@ -200,10 +205,11 @@ Quote = \'
             yybegin(YYINITIAL);
         }
     }
-    {LineTerminator} { yybegin(YYINITIAL); }
-    . {
-        appendTextAndArgText();
+    {EllipsisComment} | {LineTerminator} {
+        yypushback(yylength());
+        yybegin(YYINITIAL);
     }
+    . { appendTextAndArgText(); }
     <<EOF>> { yybegin(YYINITIAL); }
 }
 
@@ -229,12 +235,15 @@ Quote = \'
             yybegin(YYINITIAL);
         }
     }
-    {LineTerminator} { yybegin(YYINITIAL); }
-    . {
-        appendTextAndArgText();
+    {EllipsisComment} | {LineTerminator} {
+        yypushback(yylength());
+        yybegin(YYINITIAL);
     }
+    . { appendTextAndArgText(); }
     <<EOF>> { yybegin(YYINITIAL); }
 }
+
+{LineTerminator} { return handleNonArg(null); } //really shouldn't happen - could put an error here
 
 . {
     markStartIfStart();
