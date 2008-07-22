@@ -168,18 +168,14 @@ Quote = \'
     }
     {EllipsisComment} | {LineTerminator} {
         yybegin(YYINITIAL);
-        String text = arg.getText();
-        arg = null; //so that we don't return it as if it were complete
-        error("Unterminated string literal: '" + text + "'");
+        error("Unterminated string literal: '" + arg.getText() + "'");
     }
     . {
         appendTextAndArgText();
     }
     <<EOF>> {
         yybegin(YYINITIAL);
-        String text = arg.getText();
-        arg = null; //so that we don't return it as if it were complete
-        error("Unterminated string literal: '" + text + "'");
+        error("Unterminated string literal: '" + arg.getText() + "'");
     }
 }
 
