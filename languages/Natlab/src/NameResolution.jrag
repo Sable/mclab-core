@@ -213,5 +213,22 @@ aspect NameResolution{
     eq ClassDef.getMethod(int i).getSiblingsInh() = new HashMap<String,Function>();
 
     syn lazy Map<String,Function> Function.getSiblings() = (Map<String,Function>)getSiblingsInh();
+
+    inh LocalFunctionLookupInterface Function.getParentFunction();
+    eq FunctionList.getFunction(int i).getParentFunction() = this;
+    eq Function.getNestedFunction(int i).getParentFunction() = this;
+    eq ClassDef.getMethod(int i).getParentFunction() = null; //TODO-JD: fix this
+
+    syn Function Function.lookupFunction( String name )
+    {
+        Function f = getNested().get(name);
+        if( f != null )
+            return f;
+        return getParentFunction().lookupFunction( name );
+    }
+    syn Function FunctionList.lookupFunction( String name )
+    {
+        return getNested().get(name);
+    }
         
 }

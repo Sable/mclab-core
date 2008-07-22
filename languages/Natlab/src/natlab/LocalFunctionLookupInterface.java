@@ -7,5 +7,6 @@ public interface LocalFunctionLookupInterface
 {
     public Map<String, Function> getNested();
     public Map<String, Function> getSiblings();
-    //public LocalFunctionLookupInterface getParent();
+    public LocalFunctionLookupInterface getParentFunction();
+    public Function lookupFunction(String name);
 }
