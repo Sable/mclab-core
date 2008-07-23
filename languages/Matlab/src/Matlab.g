@@ -833,7 +833,7 @@ ASSIGN : '=' { couldBeFieldName = false; };
  
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
-STRING : {!isPreTransposeChar(input.LA(-1))}?=>'\'' STRING_CHAR* '\'' { couldBeFieldName = false; };
+STRING : {!isPreTransposeChar(input.LA(-1))}?=>'\'' STRING_CHAR* ('\'' | (LINE_TERMINATOR)=> { $type = MISC; }) { couldBeFieldName = false; };
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';
