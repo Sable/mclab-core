@@ -16,8 +16,4 @@ public abstract class PositionMap {
     public TextPosition getPreTranslationPosition(int destLine, int destCol) {
         return getPreTranslationPosition(new TextPosition(destLine, destCol));
     }
-
-    public TextPosition getPreTranslationPosition(int destPos) {
-        return getPreTranslationPosition(new TextPosition(destPos));
-    }
 }

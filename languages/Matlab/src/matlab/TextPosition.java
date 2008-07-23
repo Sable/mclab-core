@@ -1,7 +1,5 @@
 package matlab;
 
-import beaver.Symbol;
-
 /**
  * A position in a block of text: line and column number.
  * Comparable to non-null TextPositions.
@@ -13,11 +11,6 @@ public class TextPosition implements Comparable<TextPosition> {
     public TextPosition(int line, int col) {
         this.line = line;
         this.col = col;
-    }
-
-    public TextPosition(int pos) {
-        this.line = Symbol.getLine(pos);
-        this.col = Symbol.getColumn(pos);
     }
 
     public int getLine() {
