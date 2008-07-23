@@ -17,7 +17,7 @@
 	<import file="../shared/gen.xml" />
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
-        <import file="../shared/options.xml" />
+	<import file="../shared/options.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
 
