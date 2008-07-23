@@ -1,0 +1,13 @@
+cmd a{'}a
+cmd a'{'}a'
+cmd a'{'{a
+cmd a'{'{a'
+cmd '('
+cmd ')'
+cmd {(}
+cmd {)}
+cmd 'a { a'
+cmd { ' }
+cmd { a'a'a'a'''
+cmd '{a} {b}'
+cmd ]a{ {b]
