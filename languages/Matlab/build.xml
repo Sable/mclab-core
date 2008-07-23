@@ -19,18 +19,22 @@
 	<!-- Private Targets                                                     -->
 	<!--=====================================================================-->
 
-	<!-- creates JFlex Ant task -->
+	<!-- Task Definition (instead of taskdef.xml) -->
 
-	<import file="../shared/taskdef.xml" />
-	<import file="../shared/compile.xml" />
-	<import file="../shared/bindir.xml" />
+	<!-- creates JFlex Ant task -->
+	<target name="def.jflex.task" unless="jflex.available">
+		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />
+		<property name="jflex.available" value="yes" />
+	</target>
 
 	<!-- creates Antlr3 Ant task -->
-	<!-- TODO-AC: figure out why this warns that the class can't be found -->
 	<target name="def.antlr3.task" unless="antlr3.available">
 		<taskdef name="antlr3" classname="org.apache.tools.ant.antlr.ANTLR3" classpathref="antlr.jar.path" />
 		<property name="antlr3.available" value="yes" />
 	</target>
+
+	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
 
 	<!-- Generation (instead of gen.xml) -->
 
