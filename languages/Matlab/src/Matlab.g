@@ -244,8 +244,8 @@ stmt_body :
   ;
 
 maybe_cmd options { k=1; } : //TODO-AC: correct value of k? 3?
-     (~IDENTIFIER)=> expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
-  |  t_IDENTIFIER cmd_args
+     (not_cmd_lookahead)=> expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER? //{ System.err.println("Non-command: " + $text); }
+  |  t_IDENTIFIER cmd_args { System.err.println("Command: " + $text); }
   ;
 
 //TODO-AC: official doc suggests that this list is not complete but does not elaborate
