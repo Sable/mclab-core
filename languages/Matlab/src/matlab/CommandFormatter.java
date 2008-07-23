@@ -154,6 +154,7 @@ public class CommandFormatter {
             offsetTracker.recordOffsetChange(0, newTextIndex - textIndex - 1);
             offsetTracker.advanceInLine(1);
             textIndex = newTextIndex;
+            formattedStrBuf.append(ch);
             if(ch == '\'') {
                 //will cause this to point at the doubled-up quote, even if there is a corresponding quote in the text
                 formattedStrBuf.append("'");
@@ -162,7 +163,6 @@ public class CommandFormatter {
             }
         }
 
-        formattedStrBuf.append(argText);
         formattedStrBuf.append("'");
         offsetTracker.recordOffsetChange(0, (text.length() - 1) - textIndex - 1);
         offsetTracker.advanceInLine(1);
