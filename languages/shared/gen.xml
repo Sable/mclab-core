@@ -18,7 +18,7 @@
 	<!-- generates Java files from JastAdd specs -->
 	<target name="jastadd" depends="def.jastadd.task">
 		<mkdir dir="${gen.dir}/${ast.pkg}" />
-		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${gen.dir}">
+		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
 			<fileset dir="${src.dir}">
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />

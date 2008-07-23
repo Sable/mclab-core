@@ -8,7 +8,7 @@
 	<!-- command-line compilation -->
 	<target name="compile" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${ant.bin.dir}">
+		<javac destdir="${basedir}/${ant.bin.dir}">
 			<classpath refid="junit.jar.path" />
 			<classpath refid="beaver.rt.jar.path" />
 			<src path="${src.dir}" />
