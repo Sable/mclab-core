@@ -243,9 +243,82 @@ stmt_body :
   |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
   ;
 
-maybe_cmd options{ backtrack=true; } :
-     expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
-  //|  t_IDENTIFIER cmd_args //TODO-AC: re-enable once I figure out side-effects/backtracking
+maybe_cmd options { k=1; } : //TODO-AC: correct value of k? 3?
+     (~IDENTIFIER)=> expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
+  |  t_IDENTIFIER cmd_args
+  ;
+
+//TODO-AC: official doc suggests that this list is not complete but does not elaborate
+//lookahead only
+not_cmd_lookahead :
+     ~IDENTIFIER
+  |  IDENTIFIER ~FILLER
+  |  IDENTIFIER FILLER LPAREN
+  |  IDENTIFIER FILLER ASSIGN
+  |  IDENTIFIER FILLER op FILLER after_op
+  ;
+
+//lookahead only
+op :
+     PLUS
+  |  MINUS
+  |  MTIMES
+  |  ETIMES
+  |  MDIV
+  |  EDIV
+  |  MLDIV
+  |  ELDIV
+  |  MPOW
+  |  EPOW
+  //not MTRANSPOSE
+  //not ARRAYTRANSPOSE
+  |  LE
+  |  GE
+  |  LT
+  |  GT
+  |  EQ
+  |  NE
+  |  AND
+  |  OR
+  // not NOT
+  |  SHORTAND
+  |  SHORTOR
+  |  AT //NB
+  |  COLON
+  // not DOT
+  ;
+
+//lookahead only
+after_op :
+     IDENTIFIER //includes PROPERTIES, METHODS, EVENTS
+  |  NUMBER
+  |  LPAREN
+  |  LSQUARE
+  |  LCURLY
+  |  BREAK
+  |  CASE
+  |  CATCH
+  |  CLASSDEF
+  |  CONTINUE
+  |  ELSE
+  |  ELSEIF
+  |  END
+  |  FOR
+  |  FUNCTION
+  |  GLOBAL
+  |  IF
+  |  OTHERWISE
+  |  PARFOR
+  |  PERSISTENT
+  |  RETURN
+  |  SWITCH
+  |  TRY
+  |  WHILE
+  |  PLUS
+  |  MINUS
+  |  NOT
+  //not AT
+  |  STRING //NB
   ;
 
 cmd_args :
