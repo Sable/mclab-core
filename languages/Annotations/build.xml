@@ -58,6 +58,19 @@
 	<!-- NB: overrides target from gen.xml -->
 	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
 
+	<!-- Overriding to define classpaths (may depend on bin.dir) -->
+	<target name="set.bin.dir" depends="BinDir.set.bin.dir">
+		<path id="compile.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="beaver.rt.jar.path" />
+		</path>
+		<path id="test.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="beaver.rt.jar.path" />
+			<path location="${basedir}/${bin.dir}" />
+		</path>
+	</target>
+
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->

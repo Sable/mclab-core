@@ -1,7 +1,7 @@
 <!--
     Requires:
         Properties: ant.bin.dir, src.dir, gen.dir, test.dir
-        Paths: junit.jar.path, beaver.rt.jar.path
+        Paths: compile.classpath
         Targets: n/a
 -->
 <project name="Compile">
@@ -9,8 +9,7 @@
 	<target name="compile" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${basedir}/${ant.bin.dir}">
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
+			<classpath refid="compile.classpath" />
 			<src path="${src.dir}" />
 			<src path="${gen.dir}" />
 			<src path="${test.dir}" />

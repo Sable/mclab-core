@@ -1,7 +1,7 @@
 <!--
     Requires:
         Properties: bin.dir, test.suite.name
-        Paths: junit.jar.path, beaver.rt.jar.path
+        Paths: test.classpath
         Targets: set.bin.dir, gen, compile, clean.gen, clean.compile
 -->
 <project name="CommandLineInterface">
@@ -13,9 +13,7 @@
 	<target name="test" depends="set.bin.dir, build">
 		<junit fork="true" haltonerror="true">
 			<formatter type="plain" usefile="false" />
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
-			<classpath location="${bin.dir}" />
+			<classpath refid="test.classpath" />
 			<test name="${test.suite.name}" />
 		</junit>
 	</target>

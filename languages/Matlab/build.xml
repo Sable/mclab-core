@@ -96,18 +96,17 @@
 		</delete>
 	</target>
 
-	<!-- command-line compilation -->
-	<!-- NB: overrides target from compile.xml -->
-	<target name="compile" unless="inside.eclipse">
-		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${ant.bin.dir}">
-			<classpath refid="junit.jar.path" />
-			<classpath refid="antlr.jar.path" />
-			<src path="${src.dir}" />
-			<src path="${gen.dir}" />
-			<src path="${test.dir}" />
-			<include name="**/*.java" />
-		</javac>
+	<!-- Overriding to define classpaths (may depend on bin.dir) -->
+	<target name="set.bin.dir" depends="BinDir.set.bin.dir">
+		<path id="compile.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="antlr.jar.path" />
+		</path>
+		<path id="test.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="antlr.jar.path" />
+			<path location="${basedir}/${bin.dir}" />
+		</path>
 	</target>
 
 	<!--=====================================================================-->
@@ -120,16 +119,7 @@
 	<!-- public versions of cli.xml targets -->
 	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-
-	<target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
-		<junit fork="true" haltonerror="true">
-			<formatter type="plain" usefile="false" />
-			<classpath refid="junit.jar.path" />
-			<classpath refid="antlr.jar.path" />
-			<classpath location="${bin.dir}" />
-			<test name="${test.suite.name}" />
-		</junit>
-	</target>
+	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />

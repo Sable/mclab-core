@@ -63,16 +63,6 @@
 	<!-- Annotations Targets                                                 -->
 	<!--=====================================================================-->
 
-	<target name="set.annotations.bin.dir.no.eclipse" unless="inside.eclipse">
-		<property name="annotations.bin.dir" value="${annotations.ant.bin.dir}" />
-	</target>
-
-	<target name="set.annotations.bin.dir.eclipse" if="inside.eclipse">
-		<property name="annotations.bin.dir" value="${annotations.eclipse.bin.dir}" />
-	</target>
-
-	<target name="set.annotations.bin.dir" depends="set.annotations.bin.dir.no.eclipse, set.annotations.bin.dir.eclipse" />
-
 	<target name="annotations.build" description="call build in the Annotations language">
 		<ant dir="${annotations.dir}" target="build" inheritall="false" />
 	</target>
@@ -87,22 +77,28 @@
 		<ant dir="${annotations.dir}" target="eclipse.clean" inheritall="false" />
 	</target>
 
-	<!-- Overriding to trigger set.annotations.bin.dir -->
-	<target name="set.bin.dir" depends="set.annotations.bin.dir, BinDir.set.bin.dir" />
+	<target name="set.annotations.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="annotations.bin.dir" value="${annotations.ant.bin.dir}" />
+	</target>
 
-	<!-- Overriding to include Annotations in classpath -->
-	<target name="compile" unless="inside.eclipse">
-		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${ant.bin.dir}">
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
-			<!--<classpath location="${annotations.bin.dir}" />-->
-			<classpath location="${annotations.bin.dir}" />
-			<src path="${src.dir}" />
-			<src path="${gen.dir}" />
-			<src path="${test.dir}" />
-			<include name="**/*.java" />
-		</javac>
+	<target name="set.annotations.bin.dir.eclipse" if="inside.eclipse">
+		<property name="annotations.bin.dir" value="${annotations.eclipse.bin.dir}" />
+	</target>
+
+	<target name="set.annotations.bin.dir" depends="set.annotations.bin.dir.no.eclipse, set.annotations.bin.dir.eclipse" />
+
+	<!-- Overriding to trigger set.annotations.bin.dir and to define classpaths (may depend on bin.dir) -->
+	<target name="set.bin.dir" depends="set.annotations.bin.dir, BinDir.set.bin.dir">
+		<path id="compile.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="beaver.rt.jar.path" />
+		</path>
+		<path id="test.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="beaver.rt.jar.path" />
+			<path location="${basedir}/${bin.dir}" />
+			<path location="${basedir}/${annotations.bin.dir}" />
+		</path>
 	</target>
 
 	<!--=====================================================================-->
@@ -115,18 +111,7 @@
 	<!-- public versions of cli.xml targets -->
 	<target name="build" depends="annotations.build, CommandLineInterface.build" description="generate and build all files (including annotations)" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-
-	<!-- Overriding to include Annotations in classpath -->
-	<target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
-		<junit fork="true" haltonerror="true">
-			<formatter type="plain" usefile="false" />
-			<classpath refid="junit.jar.path" />
-			<classpath refid="beaver.rt.jar.path" />
-			<classpath location="${bin.dir}" />
-			<classpath location="${annotations.bin.dir}" />
-			<test name="${test.suite.name}" />
-		</junit>
-	</target>
+	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="annotations.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations), let Eclipse build" />
