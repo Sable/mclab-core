@@ -134,6 +134,7 @@ public class CommandFormatter {
      * that the translation entails.
      * TODO-AC: JFlex seems to give every character length 1 (even tab).
      *   If this changes, we won't be able to use indexOf and length to find positions.
+     * NB: assumes that inserted characters are not in consecutive positions
      */
     private void formatArg(int argsSeen, int tokNum, Arg tok) {
         formattedStrBuf.append("'");
@@ -143,14 +144,22 @@ public class CommandFormatter {
         String argText = tok.getArgText();
         String text = tok.getText();
         int textIndex = -1;
-        for(char ch : argText.toCharArray()) {
+        char[] chars = argText.toCharArray();
+        for(int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
             int newTextIndex = text.indexOf(ch, textIndex + 1);
-            if(textIndex < 0) {
+            if(textIndex < 0) { //i.e. first iteration
                 textIndex = 0;
             }
             offsetTracker.recordOffsetChange(0, newTextIndex - textIndex - 1);
             offsetTracker.advanceInLine(1);
             textIndex = newTextIndex;
+            if(ch == '\'') {
+                //will cause this to point at the doubled-up quote, even if there is a corresponding quote in the text
+                formattedStrBuf.append("'");
+                offsetTracker.recordOffsetChange(0, -1);
+                offsetTracker.advanceInLine(1);
+            }
         }
 
         formattedStrBuf.append(argText);

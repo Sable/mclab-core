@@ -158,7 +158,8 @@ Quote = \'
 
 <QUOTED> {
     {Quote}{Quote} {
-        appendTextAndArgText();
+        arg.appendArgText("'"); //let CommandFormatter double it up
+        appendText();
     }
     {Quote} {
         //don't append arg text
