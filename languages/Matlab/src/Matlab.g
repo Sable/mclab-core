@@ -243,7 +243,7 @@ stmt_body :
   |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
   ;
 
-maybe_cmd options { k=1; } : //TODO-AC: correct value of k? 3?
+maybe_cmd options { k=1; } : //k = 1 forces reliance on the syntactic predicate
      (not_cmd_lookahead)=> expr (t_FILLER? t_ASSIGN t_FILLER? expr)? t_FILLER?
   |  t_IDENTIFIER cmd_args
   ;
