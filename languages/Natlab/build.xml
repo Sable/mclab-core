@@ -60,6 +60,52 @@
 	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests, options" />
 
 	<!--=====================================================================-->
+	<!-- Annotations Targets                                                 -->
+	<!--=====================================================================-->
+
+	<target name="set.annotations.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="annotations.bin.dir" value="${annotations.ant.bin.dir}" />
+	</target>
+
+	<target name="set.annotations.bin.dir.eclipse" if="inside.eclipse">
+		<property name="annotations.bin.dir" value="${annotations.eclipse.bin.dir}" />
+	</target>
+
+	<target name="set.annotations.bin.dir" depends="set.annotations.bin.dir.no.eclipse, set.annotations.bin.dir.eclipse" />
+
+	<target name="annotations.build" description="call build in the Annotations language">
+		<ant dir="${annotations.dir}" target="build" inheritall="false" />
+	</target>
+	<target name="annotations.clean" description="call clean in the Annotations language">
+		<ant dir="${annotations.dir}" target="clean" inheritall="false" />
+	</target>
+
+	<target name="annotations.eclipse.build" description="call eclipse.build in the Annotations language">
+		<ant dir="${annotations.dir}" target="eclipse.build" inheritall="false" />
+	</target>
+	<target name="annotations.eclipse.clean" description="call eclipse.clean in the Annotations language">
+		<ant dir="${annotations.dir}" target="eclipse.clean" inheritall="false" />
+	</target>
+
+	<!-- Overriding to trigger set.annotations.bin.dir -->
+	<target name="set.bin.dir" depends="set.annotations.bin.dir, BinDir.set.bin.dir" />
+
+	<!-- Overriding to include Annotations in classpath -->
+	<target name="compile" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<!--<classpath location="${annotations.bin.dir}" />-->
+			<classpath location="${annotations.bin.dir}" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<src path="${test.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->
 
@@ -67,12 +113,23 @@
 	<import file="../shared/eclipse.xml" />
 
 	<!-- public versions of cli.xml targets -->
-	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
+	<target name="build" depends="annotations.build, CommandLineInterface.build" description="generate and build all files (including annotations)" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+
+	<!-- Overriding to include Annotations in classpath -->
+	<target name="test" depends="set.bin.dir, build" description="runs all JUnit tests">
+		<junit fork="true" haltonerror="true">
+			<formatter type="plain" usefile="false" />
+			<classpath refid="junit.jar.path" />
+			<classpath refid="beaver.rt.jar.path" />
+			<classpath location="${bin.dir}" />
+			<classpath location="${annotations.bin.dir}" />
+			<test name="${test.suite.name}" />
+		</junit>
+	</target>
 
 	<!-- public versions of eclipse.xml targets -->
-	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
+	<target name="eclipse.build" depends="annotations.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
 </project>
