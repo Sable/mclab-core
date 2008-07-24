@@ -12,8 +12,8 @@ aspect NameResolution{
 
     //eq EmptyProgram.lookupLValue( String name ) = null;
 
-    eq Script.lookupLValue( String name ) 
-    {
+    eq Script.lookupLValue( String name ) = null;
+    //{
         /*SymbolTableEntry se = null;
         for( int i=0; i < getNumStmt(); i++ ){
             se = getStmt(i).lookupLValue( name );
@@ -21,135 +21,134 @@ aspect NameResolution{
                 return se;
         }
         return se;*/
-        return getLValues().get(name);
-    }
+    //return getLValues().get(name);
+    //}
 
-    eq FunctionList.lookupLValue( String name )
+    /*eq FunctionList.lookupLValue( String name )
     {
         return null;
-    }
+        }*/
 
     //eq ClassDef.lookupLValue( String name ) = null;
         
-    eq AssignStmt.lookupLValue( String name ) = getLHS().lookupSymbol( name );
+    //eq AssignStmt.lookupLValue( String name ) = getLHS().lookupSymbol( name );
 
 
-    eq NameExpr.lookupSymbol( String name ) 
+    /*eq NameExpr.lookupSymbol( String name ) 
     {
-        /*if( getName().getID().equals( name ) )
-            return new getName();
-            return null;*/
+        //if( getName().getID().equals( name ) )
+        //    return new getName();
+        //    return null;
         return getSymbols().get(name);
-    }
-    eq ParameterizedExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
+    }*/
+    /*eq ParameterizedExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq CellIndexExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq DotExpr.lookupSymbol( String name ) = getTarget().lookupSymbol( name );
     eq MatrixExpr.lookupSymbol( String name )
     {
         return getSymbols().get(name);
-        /*
+        
         //return new SymbolTableEntry( getPrettyPrinted() );
-        for( int i=0; i < getNumRow(); i++ ){
-            for( int j=0; j < getRow(i).getNumElement(); j++ ){
-                SymbolTableEntry se = getRow(i).getElement(j).lookupSymbol( name );
-                if( se != null )
-                    return se;
-            }
-        }
-        return null;*/
-    }
+        //for( int i=0; i < getNumRow(); i++ ){
+        //    for( int j=0; j < getRow(i).getNumElement(); j++ ){
+        //        SymbolTableEntry se = getRow(i).getElement(j).lookupSymbol( name );
+        //        if( se != null )
+        //            return se;
+        //    }
+        // }
+        //return null;
+    }*/
 
     //getLValues methods, returns a Map of name to Name nodes of all L Value name nodes.
 
-    syn lazy Map<String, Name> Program.getLValues() = new HashMap<String, Name>();
-    syn lazy Map<String, Name> Stmt.getLValues() = new HashMap<String, Name>();
-    syn Map<String, Name> Expr.getSymbols() = new HashMap<String,Name>();
+    syn lazy Set<String> Program.getLValues() = new LinkedHashSet<String>();
+    syn lazy Set<String> Stmt.getLValues() = new LinkedHashSet<String>();
+    syn Set<String> Expr.getSymbols() = new LinkedHashSet<String>();
 
-    syn Map<String, Name> Name.getSymbols()
+    syn Set<String> Name.getSymbols()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
-        table.put( getID(), this );
-        return table;
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.add( getID() );
+        return names;
     }
 
     eq Script.getLValues()
     {
-        HashMap<String, Name> syms = new HashMap<String,Name>();
-        for( int i= getNumStmt()-1; i>=0; i-- ){
-            syms.putAll( getStmt(i).getLValues() );
-        }
-        return syms;
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        for( int i=0; i<getNumStmt(); i++ )
+            names.addAll( getStmt(i).getLValues() );
+        return names;
     }
 
     //getLValues equations for Statements
     eq AssignStmt.getLValues() = getLHS().getSymbols();
     eq GlobalStmt.getLValues() 
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumName(); i++ ){
-            table.put(getName(i).getID(),getName(i));
+            names.add(getName(i).getID());
         }
-        return table;
+        return names;
     }
     eq PersistentStmt.getLValues() 
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumName(); i++ ){
-            table.put(getName(i).getID(),getName(i));
+            names.add(getName(i).getID());
         }
-        return table;
+        return names;
     }
     eq ForStmt.getLValues()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
-        table.putAll( getAssignStmt().getLValues() );
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.addAll( getAssignStmt().getLValues() );
         for( int i=0; i<getNumStmt(); i++ )
-            table.putAll(getStmt(i).getLValues() );
-        return table;
+            names.addAll(getStmt(i).getLValues() );
+        return names;
     }
     eq WhileStmt.getLValues()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumStmt(); i++ )
-            table.putAll(getStmt(i).getLValues() );
-        return table;
+            names.addAll(getStmt(i).getLValues() );
+        return names;
     }
     eq IfStmt.getLValues()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumIfBlock(); i++ ){
             for( int j=0; j<getIfBlock(i).getNumStmt(); j++ ){
-                table.putAll(getIfBlock(i).getStmt(j).getLValues());
+                names.addAll(getIfBlock(i).getStmt(j).getLValues());
             }
         }
         if( hasElseBlock() )
             for( int i=0; i<getElseBlock().getNumStmt(); i++ )
-                table.putAll(getElseBlock().getStmt(i).getLValues());
-        return table;
+                names.addAll(getElseBlock().getStmt(i).getLValues());
+        return names;
     }
     eq TryStmt.getLValues()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumTryStmt(); i++ )
-            table.putAll( getTryStmt(i).getLValues() );
+            names.addAll( getTryStmt(i).getLValues() );
         for( int i=0; i<getNumCatchStmt(); i++ )
-            table.putAll( getCatchStmt(i).getLValues() );
-        return table;
+            names.addAll( getCatchStmt(i).getLValues() );
+        return names;
     }
     eq SwitchStmt.getLValues()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumSwitchCaseBlock(); i++){
             SwitchCaseBlock b = getSwitchCaseBlock(i);
             for( int j=0; j<b.getNumStmt(); j++ )
-                table.putAll( b.getStmt(j).getLValues() );
+                names.addAll( b.getStmt(j).getLValues() );
         }
         if( hasDefaultCaseBlock() ){
             DefaultCaseBlock b = getDefaultCaseBlock();
             for( int i=0; i< b.getNumStmt(); i++ )
-                table.putAll( b.getStmt(i).getLValues() );
+                names.addAll( b.getStmt(i).getLValues() );
         }
-        return table;
+        return names;
     }
    
 
@@ -160,13 +159,13 @@ aspect NameResolution{
     eq DotExpr.getSymbols() = getTarget().getSymbols();
     eq MatrixExpr.getSymbols()
     {
-        HashMap<String,Name> table = new HashMap<String,Name>();
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
         for( int i=0; i<getNumRow(); i++ ){
             for( int j=0; j< getRow(i).getNumElement(); j++ ){
-                table.putAll( getRow(i).getElement(j).getSymbols() );
+                names.addAll( getRow(i).getElement(j).getSymbols() );
             }
         }
-        return table;
+        return names;
     }
     //inh Map<String, Name> Expr.getLValues() = new HashMap<String,Name>();
     inh boolean Name.isLValue();
@@ -186,7 +185,7 @@ aspect NameResolution{
 
 
     //function lookup structure definition
-    //inh Function.get
+    syn Function FunctionList.getMainFunction() = getFunction(0);
 
     syn lazy Map<String,Function> FunctionList.getSiblings() = new HashMap<String,Function>();
     syn lazy Map<String,Function> FunctionList.getNested()
@@ -229,6 +228,22 @@ aspect NameResolution{
     syn Function FunctionList.lookupFunction( String name )
     {
         return getNested().get(name);
+    }
+
+    //helper function to get all visible functions from a given Function
+    //this probably won't be called often
+    syn Map<String,Function> FunctionList.getVisible()
+    {
+        /*HashMap<String,Function> table = new HashMap<String,Function>();
+        table.put(getMainFunction().getName(), getMainFunction());
+        return table;*/
+        return getNested();
+    }
+    syn Map<String,Function> Function.getVisible()
+    {
+        Map<String,Function> table = getParentFunction().getVisible();
+        table.putAll(getNested());
+        return table;
     }
         
 }
