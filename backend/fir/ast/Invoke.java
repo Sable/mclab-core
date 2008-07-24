@@ -1,6 +1,6 @@
 package fir.ast;
 
-import fir.builtin.Builtin;
+import fir.builtin.matlabBuiltins.Builtin;
 import fir.table.Variable;
 import fir.type.*;
 

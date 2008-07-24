@@ -27,6 +27,7 @@ public class CodeGenInterfacer {
 	public void insertStmt(Stmt statment){};
 	public void insertStmt(String text){};
 	
+	
 	public Procedure getCurrentProcedure(){return null;};
 	public Program getCurrentProgram(){return null;};
 	HashMap<Object,Object> getMap(){return null;}; //a map for Builtins to dump data in, which is the same for all interfacer gernerated by one codeGen

@@ -1,14 +1,23 @@
 package fir.builtin.matlabBuiltins;
 
 import fir.ast.Constant;
+import fir.type.*;
+
 
 public class Sin extends Transcendental {
 	@Override
-	public String getName() {return "sin";}
+	public String getName() {
+		if (inputType[0].getIntrisic() instanceof Double)
+			{return "dsin";
+			}
+		if(inputTypes[0].getIntrisinc() instanceof Complex){
+			return "csin";
+		}
+		return "sin";
+			}
 
 	@Override
 	public Constant getResult(Constant[] inputs) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

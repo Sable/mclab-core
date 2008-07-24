@@ -19,9 +19,11 @@ import fir.type.*;
 public class Signature {
 	SignatureType signatureType;
 	Vector<VarData> inputVars;
-	Vector<VarData> ouputVars;
+	Vector<VarData> outputVars;
 	Vector<InternalVar> internalVars;
 	InternalVar outputVar; //may be null
 	boolean isFunction;
 	public boolean isFunction(){return isFunction;};
+	
+	public  String getarg(){return null;}
 }

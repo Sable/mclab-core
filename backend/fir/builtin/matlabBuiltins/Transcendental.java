@@ -8,9 +8,9 @@ public abstract class Transcendental extends MatlabBuiltin {
 	@Override
 	public void generate(CodeGenInterfacer interfacer, Signature signature) {
 		if (interfacer.haveToInsertExpression()){ //we only need to insert expression
-			interfacer.insertExpression(getName()+"("+signature.getarg()[0].fortranName+")")
+			interfacer.insertExpression(getName()+"("+signature.getarg()+")");
 		} else {
-			System.err.println("Transcendal (class Transcendental) cannot generate subrotine!"); ///TODO
+			System.err.println("Transcendal (class Transcendental) cannot generate subroutine!"); ///TODO
 		}
 	}
 
