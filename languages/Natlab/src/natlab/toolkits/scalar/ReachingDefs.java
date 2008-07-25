@@ -22,7 +22,7 @@ import java.util.TreeSet;
 import java.util.Comparator;
 
 /**
- *   Analysis that provides an implementation of the LiveLocals  interface.
+ *   Reaching Definitions Analysis based on StructuralForwardFlowAnalysis
  */
 public class ReachingDefs extends StructuralForwardFlowAnalysis<ASTNode, FlowSet> 
 {
