@@ -319,6 +319,7 @@ aspect ASTVisitor {
 	// Nodes that don't traverse into their child-nodes
     public void AssignStmt.dumpCodeTreeAllChild(StringBuffer s, int j) {}
     public void Expr.dumpCodeTreeAllChild(StringBuffer s, int j) {}
+    public void ExprStmt.dumpCodeTreeAllChild(StringBuffer s, int j) {}
 
 	// Nodes don't have code 
 	// internal nodes
@@ -334,19 +335,6 @@ aspect ASTVisitor {
 
 	// Special nodes     
     public String ForStmt.dumpCode() { return " [<" + getNodeID() + ">]" + getClass().getName();}
-    /*
-    public void ForStmt.dumpCodeTreeAll(StringBuffer s, int j) {
-        for(int i = 0; i < j; i++) {
-            s.append("  ");
-        }
-        s.append(dumpCode() + "\n");
-        s.append("for ");
-        s.append(getAssignStmt().dumpCode());
-        s.append('\n');
-        dumpCodeTreeAllChild(s, j);
-        s.append("end");
-    }    
-    */
     public String WhileStmt.dumpCode() { return " [<" + getNodeID() + ">]" + getClass().getName();}
     public String TryStmt.dumpCode() { return " [<" + getNodeID() + ">]" + getClass().getName();}
     public String SwitchStmt.dumpCode() { return " [<" + getNodeID() + ">]" + getClass().getName();}		
@@ -370,6 +358,7 @@ aspect ASTVisitor {
 	// Nodes that don't traverse into their child-nodes
     public void AssignStmt.applyAllChild(natlab.toolkits.analysis.ASTVisitor visitor) {}
     public void Expr.applyAllChild(natlab.toolkits.analysis.ASTVisitor visitor) {}
+    public void ExprStmt.applyAllChild(natlab.toolkits.analysis.ASTVisitor visitor) {}
 
     // Nodes that don't need apply
     public void EmptyStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {}

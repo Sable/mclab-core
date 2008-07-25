@@ -65,7 +65,7 @@ public class StructuralFlowAnalysisTool {
 						
 			out.println("--- Reaching-Definition Analysis ----------------------------");
 			// Set the debug flag and out
-			// AbstractFlowAnalysis.setDebug(true, (PrintStream) out);
+			AbstractFlowAnalysis.setDebug(true, (PrintStream) out);
 			
 			// [2] Calling Reaching Defs directly  
 			ReachingDefs defsAnalysis = new ReachingDefs(actual);
@@ -75,7 +75,7 @@ public class StructuralFlowAnalysisTool {
 		    Map<ASTNode, FlowSet> defsMap = defsAnalysis.getResult(); 
 			for(ASTNode node: defsAnalysis.getNodeList()) {
 				FlowSet flowset = defsMap.get(node);
-				out.println("doAnalysis on: " + node.dumpCode());
+				out.println("doAnalysis on: " + node.getNodeID());	// node.dumpCode());
 				out.println("\t After-Flow: " + flowset);
 			}
 
