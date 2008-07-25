@@ -8,7 +8,8 @@ package natlab.toolkits.scalar;
  *  	- Implement ASTVisitor interface
  *  	- Adding fix-point structural flow-analysis, 
  *  	- Adding getNodeList(), getResult()
- *  
+ *  - 2008.07 by Jun Li
+ *		- Adding data class LoopFlowsetList<A>, caseSwitchStmt()
  */
 import natlab.ast.*;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.Comparator;
+import java.util.Stack;
 
 /**
  * Abstract class that provides the fixed point iteration functionality required
@@ -34,6 +36,11 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
     
     A currentAfterFlow;
     int numComputations = 0;
+    
+    // Stack of loop statements, for match break/continue statement
+    // Stack<ASTNode> loopStack = new Stack<ASTNode>();
+    
+    Stack<LoopFlowsetList<A>> loopStack = new Stack<LoopFlowsetList<A>>();
     
 	/**
 	 * Construct the analysis from a DirectedGraph representation of a Body.
@@ -77,13 +84,14 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 				N s = (N) node;
 				
 				beforeFlow = currentAfterFlow;
-			/*				
+			/*	// unitToBeforeFlow never initialized			
 				beforeFlow = unitToBeforeFlow.get(s);
 				if(beforeFlow == null) {
 					unitToBeforeFlow.put(s, currentAfterFlow);
 					beforeFlow = currentAfterFlow;
 				}
 			 */
+
 				afterFlow = unitToAfterFlow.get(s);
 				if(afterFlow == null) {					
 					unitToAfterFlow.put(s, newInitialFlow());
@@ -91,8 +99,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 				}
 				copy(afterFlow, previousAfterFlow);
 
-		if (DEBUG) out.println(" [<"+node.getNodeID()+">]-before :" + beforeFlow);
-		
+				if (DEBUG) out.println(" [<"+node.getNodeID()+">]-before :" + beforeFlow);		
 				// Traverse the node,  
 				{
 					// Compute afterFlow and store it.
@@ -101,11 +108,34 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 					unitToAfterFlow.put(s, afterFlow);
 					numComputations++;
 				}
-		if (DEBUG) out.println(" [<"+node.getNodeID()+">]-after :" + afterFlow);
+				if (DEBUG) out.println(" [<"+node.getNodeID()+">]-after :" + afterFlow);
 			}
 		}
     }
 
+	// special cases for branching nodes: BreakStmt, ContinueStmt, ReturnStmt
+	public void caseBranchingStmt(ASTNode node)
+	{
+		// Add it into visited node list  
+		if(!NodeList.contains(node)) 	
+			NodeList.add(node);
+
+		// The branching statement doesn't change the flow sets			
+		A afterFlow = newInitialFlow();
+		copy(currentAfterFlow, afterFlow);
+		unitToAfterFlow.put((N) node, afterFlow);
+
+		// Get the current break/continue flow-set list, add to it
+		LoopFlowsetList<A> loopNode = loopStack.peek();
+		if(node instanceof BreakStmt) {
+			loopNode.BreakFlowsetList.add(afterFlow);
+		} else if(node instanceof ContinueStmt) {
+			loopNode.ContinueFlowsetList.add(afterFlow);
+		} else if(node instanceof ReturnStmt) {
+			// ToDo ...
+		}			
+	}
+	
 	// special cases for WhileStmt, ForStmt 
 	public void caseLoopStmt(ASTNode node) 
 	{
@@ -115,7 +145,10 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		
 		if (DEBUG) 
 			out.println("ASTWalker: caseLoopStmt " + node.dumpCode());
-		
+
+		// push the node into stack, so inside statements can know which loop current in
+		loopStack.push(new LoopFlowsetList<A>(node));
+			
 		// Save initial after set
 		A previousAfterFlow = newInitialFlow();
 		A savedAfterFlow = newInitialFlow();
@@ -134,23 +167,36 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 	        
 			numComputations++;
 			
-			
 			merge(currentAfterFlow, previousAfterFlow, previousAfterFlow);
 
 			if (DEBUG) out.println(" [caseLoopStmt]-curr :" + currentAfterFlow);
 			if (DEBUG) out.println(" [caseLoopStmt]-after:" + previousAfterFlow);
+			
+			// Merge with continue FlowSet lists
+			for(A flowset: loopStack.peek().ContinueFlowsetList) {
+				merge(flowset, previousAfterFlow, previousAfterFlow);
+			}
 
 			// Using new after flow to recompute
 			copy(previousAfterFlow, currentAfterFlow);
 			
 		} while (!previousAfterFlow.equals(savedAfterFlow));
-		
+
+		// Update the loop-node's after set
+		unitToAfterFlow.put((N) node, previousAfterFlow);
+
 		// Updating the current after flow-set
 		copy(previousAfterFlow, currentAfterFlow);
-		unitToAfterFlow.put((N) node, previousAfterFlow);
+		
+		// The current after flow-set merges with break FlowSet lists
+		for(A flowset: loopStack.peek().BreakFlowsetList) {
+			merge(flowset, currentAfterFlow, currentAfterFlow);
+		}
+		
+		loopStack.pop();
 	}
 	
-	// special cases for branching statement 
+	// special cases for If statement 
 	public void caseIfStmt(IfStmt node) 
 	{	
 		// Add it into visited node list  
@@ -183,14 +229,62 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
     		copy(previousBeforeFlow, currentAfterFlow);
             node.getElseBlock().apply(this);
 			merge(currentAfterFlow, previousAfterFlow, previousAfterFlow);
+        } else {
+        	// Merge with initial in-set  
+			merge(previousBeforeFlow, previousAfterFlow, previousAfterFlow);
         }
 			
 		// Updating the current after flow-set
 		copy(previousAfterFlow, currentAfterFlow);
-		// Don't update the IfStmt's after-set, there is not back edge.
+		// Don't update the IfStmt with the after-set of END, there is not back edge.
 		// unitToAfterFlow.put((N) node, previousAfterFlow);	
 	}
 	
+	// special cases for Switch statement 
+	// SwitchStmt : Stmt ::= Expr SwitchCaseBlock* [DefaultCaseBlock];
+	public void caseSwitchStmt(SwitchStmt node)
+	{	
+		// Add it into visited node list  
+		if(!NodeList.contains(node)) 	
+			NodeList.add(node);
+			
+		if (DEBUG) 
+			out.println("ASTWalker: caseSwitchStmt  " + node.getNodeID());
+		
+		// Save initial after set
+		A previousBeforeFlow = newInitialFlow();
+		A previousAfterFlow = newInitialFlow();
+		
+		copy(currentAfterFlow, previousBeforeFlow);
+		
+		// Save the current after flow-set
+		A NodeAfterFlow = newInitialFlow();
+		copy(currentAfterFlow, NodeAfterFlow);
+		unitToAfterFlow.put((N) node, NodeAfterFlow);	
+
+		// Get after-set from each branch 
+        for(SwitchCaseBlock block : node.getSwitchCaseBlocks()) {
+        	// using same before set for each branch
+    		copy(previousBeforeFlow, currentAfterFlow);
+            block.apply(this);
+            // merge the result flow sets 
+			merge(currentAfterFlow, previousAfterFlow, previousAfterFlow);
+        }
+        if(node.hasDefaultCaseBlock()) {
+    		copy(previousBeforeFlow, currentAfterFlow);
+            node.getDefaultCaseBlock().apply(this);
+			merge(currentAfterFlow, previousAfterFlow, previousAfterFlow);
+        } else {
+        	// Merge with initial in-set  
+			merge(previousBeforeFlow, previousAfterFlow, previousAfterFlow);
+        }
+			
+		// Updating the current after flow-set
+		copy(previousAfterFlow, currentAfterFlow);
+		// Don't update the node with the after-set of END, there is not back edge.
+		// unitToAfterFlow.put((N) node, previousAfterFlow);	
+	}
+
 	// Overload function, accepts the user-defined analysis class,
 	// so the tree-walker can add data on it
 	protected void doAnalysis(FlowAnalysis analysis) 
@@ -231,4 +325,14 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
     public Map<N, A> getResult() {
     	return unitToAfterFlow; 
     }
+}
+
+// Data class includs Break and Continue Flowset List
+class LoopFlowsetList<A> {
+	List<A> BreakFlowsetList = new ArrayList<A>();
+	List<A> ContinueFlowsetList = new ArrayList<A>();
+	ASTNode loopNode;
+	public LoopFlowsetList (ASTNode node) {
+		loopNode = node;
+	}
 }

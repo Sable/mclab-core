@@ -375,4 +375,19 @@ aspect ASTVisitor {
     public void IfStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
         visitor.caseIfStmt(this);
     }
+	// Switch nodes
+    public void SwitchStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
+        visitor.caseSwitchStmt(this);
+    }
+
+	// branching nodes : BreakStmt, ContinueStmt, ReturnStmt
+    public void BreakStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
+        visitor.caseBranchingStmt(this);
+    }
+    public void ContinueStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
+        visitor.caseBranchingStmt(this);
+    }    
+    public void ReturnStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
+        visitor.caseBranchingStmt(this);
+    }    
 }
