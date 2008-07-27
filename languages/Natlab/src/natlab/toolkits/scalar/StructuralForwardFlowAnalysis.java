@@ -37,9 +37,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
     A currentAfterFlow;
     int numComputations = 0;
     
-    // Stack of loop statements, for match break/continue statement
-    // Stack<ASTNode> loopStack = new Stack<ASTNode>();
-    
+    // Stack of loop statements, for recording the current loop, used by break/continue statement
     Stack<LoopFlowsetList<A>> loopStack = new Stack<LoopFlowsetList<A>>();
     
 	/**
@@ -124,16 +122,21 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		A afterFlow = newInitialFlow();
 		copy(currentAfterFlow, afterFlow);
 		unitToAfterFlow.put((N) node, afterFlow);
+		
+		// The flowset will not flow to next statement, so it becomes empty
+		copy(newInitialFlow(), currentAfterFlow);
 
 		// Get the current break/continue flow-set list, add to it
-		LoopFlowsetList<A> loopNode = loopStack.peek();
-		if(node instanceof BreakStmt) {
-			loopNode.BreakFlowsetList.add(afterFlow);
-		} else if(node instanceof ContinueStmt) {
-			loopNode.ContinueFlowsetList.add(afterFlow);
-		} else if(node instanceof ReturnStmt) {
-			// ToDo ...
-		}			
+		if(!loopStack.empty()) {
+			LoopFlowsetList<A> loopNode = loopStack.peek();		
+			if(node instanceof BreakStmt) {
+				loopNode.BreakFlowsetList.add(afterFlow);
+			} else if(node instanceof ContinueStmt) {
+				loopNode.ContinueFlowsetList.add(afterFlow);
+			} else if(node instanceof ReturnStmt) {
+				// ToDo ...
+			}			
+		}
 	}
 	
 	// special cases for WhileStmt, ForStmt 
@@ -173,8 +176,10 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 			if (DEBUG) out.println(" [caseLoopStmt]-after:" + previousAfterFlow);
 			
 			// Merge with continue FlowSet lists
-			for(A flowset: loopStack.peek().ContinueFlowsetList) {
-				merge(flowset, previousAfterFlow, previousAfterFlow);
+			if(!loopStack.empty() && loopStack.peek()!=null) {
+				for(A flowset: loopStack.peek().ContinueFlowsetList) {
+					merge(flowset, previousAfterFlow, previousAfterFlow);
+				}
 			}
 
 			// Using new after flow to recompute
@@ -189,10 +194,11 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		copy(previousAfterFlow, currentAfterFlow);
 		
 		// The current after flow-set merges with break FlowSet lists
-		for(A flowset: loopStack.peek().BreakFlowsetList) {
-			merge(flowset, currentAfterFlow, currentAfterFlow);
-		}
-		
+		if(!loopStack.empty() && loopStack.peek()!=null) {
+			for(A flowset: loopStack.peek().BreakFlowsetList) {
+				merge(flowset, currentAfterFlow, currentAfterFlow);
+			}
+		}		
 		loopStack.pop();
 	}
 	
