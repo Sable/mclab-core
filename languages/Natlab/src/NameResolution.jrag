@@ -167,7 +167,7 @@ aspect NameResolution{
         }
         return names;
     }
-    //inh Map<String, Name> Expr.getLValues() = new HashMap<String,Name>();
+
     inh boolean Name.isLValue();
 
     //default value
@@ -206,6 +206,10 @@ aspect NameResolution{
         }
         return table;
     }
+    //TODO-JD: This inh attribute should return Map<String,Function> but JastAdd
+    //does not currently support inh attributes with generics like that (it's a 
+    //bug). When this is fixed, need to change this and remove the syn wrapper
+    //below
     inh Map Function.getSiblingsInh();    
     eq FunctionList.getFunction(int i).getSiblingsInh() = getNested();
     eq Function.getNestedFunction(int i).getSiblingsInh() = getNested();
@@ -244,6 +248,18 @@ aspect NameResolution{
         Map<String,Function> table = getParentFunction().getVisible();
         table.putAll(getNested());
         return table;
+    }
+    rewrite Script{
+        to Script{
+            Script s = new Script();
+            s.setHelpCommentList(getHelpCommentList());
+            for( String symbol : getLValues() )
+                s.addStmt( new Decl(symbol) );
+            for( int i=0; i<getNumStmt(); i++ ){
+                s.addStmt( getStmt(i) );
+            }
+            return s;
+        }
     }
         
 }
