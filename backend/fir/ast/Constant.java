@@ -1,5 +1,7 @@
 package fir.ast;
 
+import fir.type.*;
+
 public class Constant extends Expr {
 	/* dunno how to do this yet...
 	 * i guess there are several different types of constants,
@@ -8,4 +10,5 @@ public class Constant extends Expr {
 	 * cell arrays
 	 * functions ... etc
 	 */
+	public Type getType(){return null;} //TODO
 }

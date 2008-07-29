@@ -1,11 +1,15 @@
 package fir.builtin.matlabBuiltins;
+import java.util.Vector;
+
 import fir.ast.Constant;
 import fir.codegen.CodeGenInterfacer;
+import fir.codegen.ExpressionInterfacer;
+import fir.codegen.StatementInterfacer;
 import fir.table.*;
 import fir.type.*;
 
 public abstract class Transcendental extends MatlabBuiltin {
-	@Override
+	/*@Override
 	public void generate(CodeGenInterfacer interfacer, Signature signature) {
 		if (interfacer.haveToInsertExpression()){ //we only need to insert expression
 			interfacer.insertExpression(getName()+"("+signature.getarg()+")");
@@ -18,8 +22,13 @@ public abstract class Transcendental extends MatlabBuiltin {
 	public void generateWithConstants(CodeGenInterfacer interfacer,
 			Signature signature, Constant[] constants) {
 		generate(interfacer,signature);
-	}
+	} */
+	public void generate(ExpressionInterfacer interfacer,Signature signature,Vector<InternalVar> variable){} //a created expression has a known type
+	public void generate(StatementInterfacer interfacer,Signature signature,Vector<InternalVar> variable){}
+	public void generateWithConstants(ExpressionInterfacer interfacer,Signature signature,Vector<InternalVar> variable,Constant[] constants){}	
+	public void generateWithConstants(StatementInterfacer interfacer,Signature signature,Vector<InternalVar> variable,Constant[] constants){}	
 
+	
 	@Override
 	public Constant[] getResults(Constant[] inputs, int numberOfOutputs) {
 		if (inputs.length > 1 || inputs.length < 1 || numberOfOutputs > 1){
@@ -62,7 +71,7 @@ public abstract class Transcendental extends MatlabBuiltin {
 	}
 	
 	@Override
-	public boolean isDefined(SignatureType signature) {
+	public boolean isDefined(Signature signature) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -1,6 +1,7 @@
 package fir.ast;
 
 import fir.table.*;
+import fir.type.Signature;
 
 /* either a function or subroutine */
 

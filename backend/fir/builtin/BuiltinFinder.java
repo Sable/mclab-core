@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import fir.builtin.matlabBuiltins.Builtin;
 import fir.type.*;
 
 /* given the name of a function, and the in/out types, will
@@ -53,8 +52,8 @@ public abstract class BuiltinFinder {
 	
 	//helper function - given a builtin class, returns a builtin object -- but only one for
 	//each Builtin class per BuiltinFinder object
-	HashMap<Class,Builtin> builtins = new HashMap<Class,Builtin>();
-	Builtin getUnique(Class aClass){
+	private HashMap<Class,Builtin> builtins = new HashMap<Class,Builtin>();
+	private Builtin getUnique(Class aClass){
 		if (builtins.containsKey(aClass)){
 			return builtins.get(aClass);
 		}

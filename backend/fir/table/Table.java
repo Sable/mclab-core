@@ -10,12 +10,12 @@ public class Table {
 	
 	public int getVarCount(){ return variables.size();}
 	public Iterator<Variable> getVarIterator(){ return variables.iterator();}
-	public void AddVar(Variable var){ variables.add(var);}
-	public void removeVar(Variable var){ variables.remove(var);}
+//	public void AddVar(Variable var){ variables.add(var);} should be done by the constructors
+	public void removeVar(Variable var){ } // TODO -- need return ?
 	
 	public int getInternalVarCount(){ return variables.size();}
 	public Iterator<InternalVar> getInternalVarIterator(){ return internalVariables.iterator();}
-	public void AddInternalVar(InternalVar var){ internalVariables.add(var);}
-	public void removeInternalVar(InternalVar var){ internalVariables.remove(var);}
+//	public void AddInternalVar(InternalVar var){ internalVariables.add(var);} should be done by the constructors
+	public void removeInternalVar(InternalVar var){ internalVariables.remove(var);}  //TODO -- need return?
 }
 
