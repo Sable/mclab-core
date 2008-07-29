@@ -636,6 +636,8 @@ primary_expr =
   |  cell_array.c
   |  access.a
   |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  |  name.f AT name.c {: return new SuperClassMethodExpr(f, c, new List<Expr>()); :}
+  |  name.f AT name.c LPAREN arg_list.l? RPAREN {: return new SuperClassMethodExpr(f, c, nullToEmpty(l)); :}
   ;
 
 access =
@@ -646,7 +648,6 @@ access =
 
 cell_access =
      name.n {: return new NameExpr(n); :}
-  |  name.f AT name.c {: return new SuperClassMethodExpr(f, c); :}
   |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
   |  access.v DOT name.n {: return new DotExpr(v, n); :}
   ;

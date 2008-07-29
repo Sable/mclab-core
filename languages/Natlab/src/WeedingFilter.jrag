@@ -1,0 +1,61 @@
+//Weeding Filter for unsupported stuff in pass 1
+
+aspect WeedingFilter {
+    //default - exception
+    syn boolean ASTNode.getWeedingFilter() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingFilter()"); }
+     
+    eq EmptyProgram.getWeedingFilter() {
+       	return true;
+    }
+
+    eq Script.getWeedingFilter() {
+    	for(Stmt stmt : getStmts())
+    		stmt.getWeedingFilter();
+
+    	return true;
+    }
+    
+    eq FunctionList.getWeedingFilter() {
+        for(Function func : getFunctions())
+    		func.getWeedingFilter();
+    		
+        return true;
+    }
+    
+    eq Function.getWeedingFilter() {       
+    	for(Stmt stmt : getStmts())
+    		stmt.getWeedingFilter();
+        
+        if(getNumNestedFunction() > 0)
+			error(getNestedFunction(0).getPosString(), "Nested functions are not supported");
+
+        return true;
+    }
+
+    eq ClassDef.getWeedingFilter() {
+		error(getPosString(), "Classes are not supported");
+        return true;
+    }
+   
+    eq Stmt.getWeedingFilter() { 	
+		if(this instanceof TryStmt)
+			error(getPosString(), "Try statements are not supported");
+		
+		for(int i = 0; i < getNumChild(); i++) {
+			ASTNode obj = getChild(i);
+			if(obj instanceof Stmt)
+				obj.getWeedingFilter();
+			else if(obj instanceof Expr) {
+				Expr exp = (Expr)obj;
+				if(exp instanceof FunctionHandleExpr)
+					error(exp.getPosString(), "Function handles are not supported");
+				else if(exp instanceof LambdaExpr)
+					error(exp.getPosString(), "Anonymous functions are not supported");
+				else if(exp instanceof SuperClassMethodExpr)
+					error(exp.getPosString(), "Superclass method calls are not supported");
+	    	}
+    	}
+    	
+        return true;
+    }
+}

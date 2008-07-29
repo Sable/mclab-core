@@ -39,18 +39,8 @@ public class Interpreter {
 					for(String error : parser.getErrors()) {
 						System.out.println(error);
 					}
-				} else {
-					java.util.List<String> weedingErrors = original.getWeedingErrors();
-					if(!weedingErrors.isEmpty()) {
-						System.out.println("Weeding Error(s):");
-						for(String error : weedingErrors) {
-							System.out.println(error);
-						}
-					} else
-					// Using Pretty print
-					//System.out.println(original.getPrettyPrinted());
+				} else if(!original.errorCheck()) {
 					System.out.println(original.getStructureString());
-					//SymbolTableScope symtbl = original.getSymbolTableScope();
 					// System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {

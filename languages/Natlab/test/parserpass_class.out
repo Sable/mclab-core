@@ -12,7 +12,7 @@ end
 function [] = set.abc()
 end
 function [obj] = myClass(a, b)
-obj@double;
+obj@double();
 obj.abc = a
 obj.xyz = b
 end

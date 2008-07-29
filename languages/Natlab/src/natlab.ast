@@ -64,7 +64,7 @@ MatrixExpr : LValueExpr ::= Row*;
 
 CellArrayExpr : Expr ::= Row*;
 
-SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name;
+SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name Arg:Expr*;
 
 Row ::= Element:Expr*;
 
@@ -112,6 +112,7 @@ LambdaExpr : Expr ::= InputParam:Name* Body:Expr;
 
 //// ANNOTATION EXTENSION - START //////////////////////////////////////////////
 Annotation : Stmt ::= <Text>;
+ExpandedAnnotation : Stmt ::= <anno : annotations.ast.Annotation>;
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
 
 //// DECLARATION EXTENSION - START /////////////////////////////////////////////

@@ -1,103 +1,86 @@
 //Weeding Errors
 
-aspect ErrorHelper {
-	public String ASTNode.getPosString() {
-        return "[" + getLine(getStart()) + ", " + getColumn(getStart()) + "]  ";
-    }
-}
-
 aspect WeedingErrors {
     //default - exception
-    syn java.util.List<String> ASTNode.getWeedingErrors() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingErrors()"); }
+    syn boolean ASTNode.getWeedingErrors() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingErrors()"); }
      
     eq EmptyProgram.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        return errors;
+        return true;
     }
 
     eq Script.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-    	for(Stmt stmt : getStmts()) {
-    		if(stmt instanceof AssignStmt) {
-            	errors.addAll(stmt.getWeedingErrors());
-            }
-        }
-    	return errors;
+        for(Stmt stmt : getStmts())
+    		if(stmt instanceof AssignStmt)
+            	stmt.getWeedingErrors();
+            	
+    	return true;
     }
     
     eq FunctionList.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        for(Function func : getFunctions()) {
-            errors.addAll(func.getWeedingErrors());
-        }
-        return errors;
+        for(Function func : getFunctions())
+           func.getWeedingErrors();
+       
+        return true;
     }
     
-    eq Function.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        
+    eq Function.getWeedingErrors() {       
         if(getParent().getParent() instanceof Methods) {
         	String name = getName();
         	ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
         	
 	  		if(grandParent.getName().compareTo(getName()) == 0) {
 		  		if(getOutputParams().getNumChild() == 0) {
-	               	errors.add(getPosString() + "A class constructor must at least return an object constructed as output");
+	               	error(getPosString(), "A class constructor must at least return an object constructed as output");
 				}
 			}
         }
         
-    	for(Stmt stmt : getStmts()) {
-            if(stmt instanceof AssignStmt) {
-            	errors.addAll(stmt.getWeedingErrors());
-            }
-        }
-        for(Function func : getNestedFunctions()) {
-            errors.addAll(func.getWeedingErrors());
-        }
-    	return errors;
+    	for(Stmt stmt : getStmts())
+            if(stmt instanceof AssignStmt)
+            	stmt.getWeedingErrors();
+
+        for(Function func : getNestedFunctions())
+            func.getWeedingErrors();
+
+    	return true;
     }
 
     eq ClassDef.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-
 		String classAttributes = "ConstructOnLoad,InferiorClasses,Hidden,Sealed,";
 		String match = "";
 			
         for(Attribute attr : getAttributes()) {
         	if(classAttributes.indexOf(attr.getKey()+",") == -1) {
-            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid class attribute");
+            	error(attr.getPosString(), attr.getKey() + " is not a valid class attribute");
            	} else if(match.indexOf(attr.getKey()) >= 0) {
-           		errors.add(attr.getPosString() + attr.getKey() + " has already been defined as class attribute");
+           		error(attr.getPosString(), attr.getKey() + " has already been defined as class attribute");
            	} else {
            		match = match + attr.getKey() + ",";
            	}
         }
 
-		for(Properties prop : getPropertys()) {
-            errors.addAll(prop.getWeedingErrors());
-        }
-        for(Methods methods : getMethods()) {
-            errors.addAll(methods.getWeedingErrors());
-        }
-        for(ClassEvents events : getClassEvents()) {
-            errors.addAll(events.getWeedingErrors());
-        }
-        return errors;
+		for(Properties prop : getPropertys())
+            prop.getWeedingErrors();
+        
+        for(Methods methods : getMethods())
+            methods.getWeedingErrors();
+        
+        for(ClassEvents events : getClassEvents())
+            events.getWeedingErrors();
+        
+        return true;
     }
    
-    eq Properties.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        
+    eq Properties.getWeedingErrors() {       
         Boolean constExists = false, depExists = false;
         String propertyAttributes = "Abstract,Constant,Dependent,GetAccess,SetAccess,GetObservable,SetObservable,Hidden,Transient,";	
         String match = "";
         
         for(Attribute attr : getAttributes()) {
         	if(propertyAttributes.indexOf(attr.getKey()+",") == -1) {
-            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid property attribute");            	
+            	error(attr.getPosString(), attr.getKey() + " is not a valid property attribute");            	
            	} else if(match.indexOf(attr.getKey()) >= 0) {
-           		errors.add(attr.getPosString() + attr.getKey() + " has already been defined as property attribute");
+           		error(attr.getPosString(), attr.getKey() + " has already been defined as property attribute");
            	} else {
            		match = match + attr.getKey() + ",";
            	}
@@ -109,22 +92,21 @@ aspect WeedingErrors {
 		            for(PropertyAccess pty : mthd.getPropAccs()) {
 		            	for(Property prop : getPropertys()) {
 			            	if(prop.getName().compareTo(pty.getName()) == 0) {
-			            		errors.add(pty.getPosString() + "Property access methods can not be defined for abstract property: " + prop.getName());
+			            		error(pty.getPosString(), "Property access methods can not be defined for abstract property: " + prop.getName());
 			            	}
 		            	}
 		            }
 		        }
 		        
-		        for(Property prop : getPropertys()) {
-		        	if(prop.getExpr().getPrettyPrintedLessComments().compareTo("[]") != 0) {
-		        		errors.add(prop.getExpr().getPosString() + "Initial value can not be specified for abstract property: " + prop.getName());            			
-		        	} 
-		        }
+		        for(Property prop : getPropertys())
+		        	if(prop.getExpr().getPrettyPrintedLessComments().compareTo("[]") != 0)
+		        		error(prop.getExpr().getPosString(), "Initial value can not be specified for abstract property: " + prop.getName());            			
+		        
 		        
 		        for(Attribute pAttr : parent.getAttributes()) {
 		        	//ToDo-TA: also add value=true condition below
 		        	if(pAttr.getKey().compareTo("Sealed") == 0 && pAttr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
-		            	errors.add(attr.getPosString() + "Abstract properties are not allowed in a sealed class");		            	
+		            	error(attr.getPosString(), "Abstract properties are not allowed in a sealed class");		            	
 		           	}
 		        }
 			}
@@ -137,7 +119,7 @@ aspect WeedingErrors {
         }
         
         if(constExists && depExists) {
-        	errors.add(getPosString() + "Constant properties can not be Dependent and vice-versa");        	
+        	error(getPosString(), "Constant properties can not be Dependent and vice-versa");        	
        	}
         
         for(Property prop : getPropertys()) {
@@ -145,84 +127,76 @@ aspect WeedingErrors {
             ClassDef grandParent = (ClassDef) getParent().getParent();
             
   			if(grandParent.getName().compareTo(name) == 0) {
-        		errors.add(prop.getPosString() + "A property may not use the same name as the name of the class");				
+        		error(prop.getPosString(), "A property may not use the same name as the name of the class");				
 			}
         }
 
-        return errors;
+        return true;
     } 
     
-    eq Methods.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        
+    eq Methods.getWeedingErrors() {       
         String methodAttributes = "Abstract,Access,Hidden,Sealed,Static,";
         String match = "";
         	
         for(Attribute attr : getAttributes()) {
         	if(methodAttributes.indexOf(attr.getKey()+",") == -1) {
-            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid method attribute");            	
+            	error(attr.getPosString(), attr.getKey() + " is not a valid method attribute");            	
            	} else if(match.indexOf(attr.getKey()) >= 0) {
-           		errors.add(attr.getPosString() + attr.getKey() + " has already been defined as method attribute");
+           		error(attr.getPosString(), attr.getKey() + " has already been defined as method attribute");
            	} else {
            		match = match + attr.getKey() + ",";
            	}
            	
            	if(attr.getKey().compareTo("Abstract") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
             	if(getPropAccs().getNumChild() > 0 || getFunctions().getNumChild() > 0) {
-            		errors.add(attr.getPosString() + "Only function signatures are valid inside abstract methods block");            		
+            		error(attr.getPosString(), "Only function signatures are valid inside abstract methods block");            		
             	}
            	}
         }
         
-        for(Signature sign : getSignatures()) {
-            errors.addAll(sign.getWeedingErrors());
-        }
-        for(PropertyAccess prop : getPropAccs()) {
-            errors.addAll(prop.getWeedingErrors());
-        }
-        for(Function func : getFunctions()) {
-            errors.addAll(func.getWeedingErrors());
-        }
+        for(Signature sign : getSignatures())
+            sign.getWeedingErrors();
         
-        return errors;
+        for(PropertyAccess prop : getPropAccs())
+            prop.getWeedingErrors();
+        
+        for(Function func : getFunctions())
+            func.getWeedingErrors();
+        
+        return true;
     }
     
     eq Signature.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        
  		String name = getName();
   		ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
   		
-  		if(grandParent.getName().compareTo(getName()) == 0) {
-        	errors.add(getPosString() + "A class constructor must not be external");			
-		}
+  		if(grandParent.getName().compareTo(getName()) == 0)
+        	error(getPosString(), "A class constructor must not be external");			
 		
-    	return errors;
+    	return true;
     }
     
     eq PropertyAccess.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-       
 		Methods parent = (Methods) getParent().getParent();
 		if(parent.getAttributes().getNumChild() > 0){
-			errors.add(getPosString() + "Property access method should be in a methods block with no attributes");			
+			error(getPosString(), "Property access method should be in a methods block with no attributes");			
 		}
 		
 		String access = getAccess();
 		if(access.compareTo("set") != 0 && access.compareTo("get") != 0) {
-			errors.add(getPosString() + access + " is neither get or set in property access method");			
+			error(getPosString(), access + " is neither get or set in property access method");			
         }
         else if(access.compareTo("set") == 0){
         	if(getInputParams().getNumChild() < 2) {
-               	errors.add(getPosString() + "A property set method must have an object and its value as input");				
+               	error(getPosString(), "A property set method must have an object and its value as input");				
 			}
         }
         else if(access.compareTo("get") == 0){
         	if(getInputParams().getNumChild() < 1) {
-               	errors.add(getPosString() + "A property get method must have an object as input");				
+               	error(getPosString(), "A property get method must have an object as input");				
 			}
 			if(getOutputParams().getNumChild() < 1) {
-               	errors.add(getPosString() + "A property get method must return its value as output");				
+               	error(getPosString(), "A property get method must return its value as output");				
 			}
         }
         
@@ -238,33 +212,28 @@ aspect WeedingErrors {
             }
         }
         if(!match) {
-        	errors.add(getPosString() + name + " is not a valid property in property access method");			
+        	error(getPosString() + name + " is not a valid property in property access method");			
         }
                 
-        for(Stmt stmt : getStmts()) {
-            if(stmt instanceof AssignStmt) {
-            	errors.addAll(stmt.getWeedingErrors());            	
-            }
-        }
+        for(Stmt stmt : getStmts())
+            if(stmt instanceof AssignStmt)
+            	stmt.getWeedingErrors();
         
-        for(Function func : getNestedFunctions()) {
-            errors.addAll(func.getWeedingErrors());            
-        }
+        for(Function func : getNestedFunctions())
+            func.getWeedingErrors();
 
-        return errors;
+        return true;
     }
     
-    eq ClassEvents.getWeedingErrors() {
-        java.util.List<String> errors = new java.util.ArrayList<String>();
-        
+    eq ClassEvents.getWeedingErrors() {     
         String eventAttributes = "Hidden,ListenAccess,NotifyAccess,";
         String match = "";
         
         for(Attribute attr : getAttributes()) {
         	if(eventAttributes.indexOf(attr.getKey()+",") == -1) {
-            	errors.add(attr.getPosString() + attr.getKey() + " is not a valid event attribute");            	
+            	error(attr.getPosString(), attr.getKey() + " is not a valid event attribute");            	
            	} else if(match.indexOf(attr.getKey()) >= 0) {
-           		errors.add(attr.getPosString() + attr.getKey() + " has already been defined as event attribute");
+           		error(attr.getPosString(), attr.getKey() + " has already been defined as event attribute");
            	} else {
            		match = match + attr.getKey() + ",";
            	}
@@ -275,49 +244,46 @@ aspect WeedingErrors {
             ClassDef grandParent = (ClassDef) getParent().getParent();
   			
   			if(grandParent.getName().compareTo(name) == 0) {
-        		errors.add(eve.getPosString() + "An event may not use the same name as the name of the class");				
+        		error(eve.getPosString(), "An event may not use the same name as the name of the class");				
 			}
         }
         
-        return errors;
+        return true;
     }
 
     eq AssignStmt.getWeedingErrors() {
-    	java.util.List<String> errors = new java.util.ArrayList<String>();
     	Expr lhs = getLHS();
     	
 		if(lhs instanceof LValueExpr) {
 			if(lhs instanceof MatrixExpr){
-				errors.addAll(lhs.getWeedingErrors());
+				lhs.getWeedingErrors();
 			}
     	} else {
-    		errors.add(lhs.getPosString() + "Left hand side of assignment statement is not a valid expression");			
+    		error(lhs.getPosString(), "Left hand side of assignment statement is not a valid expression");			
     	}  	   
-    	return errors;
+    	return true;
     }  
     
-	eq MatrixExpr.getWeedingErrors() {
-    	java.util.List<String> errors = new java.util.ArrayList<String>();
-    	
+	eq MatrixExpr.getWeedingErrors() {    	
 		Integer noOfRows = 0;
 		for(Row row : getRows()) {
 			noOfRows++;
 			if(noOfRows > 1) {
-	        	errors.add(row.getPosString() + "Left hand side of assignment statement can only have a single-row matrix");						
+	        	error(row.getPosString(), "Left hand side of assignment statement can only have a single-row matrix");						
 				break;
 	        }
 			
 			for(Expr exp : row.getElements()) {
 				if(exp instanceof LValueExpr) {
 					if(exp instanceof MatrixExpr) {
-						errors.addAll(exp.getWeedingErrors());
+						exp.getWeedingErrors();
 					}
 				} else {
-					errors.add(exp.getPosString() + "Left hand side of assignment statement is not a valid expression");			
+					error(exp.getPosString(), "Left hand side of assignment statement is not a valid expression");			
 				}  	   
 			}
         }
         
-    	return errors;
+    	return true;
     }  
 }

@@ -1,0 +1,20 @@
+
+aspect Annotations {
+
+	rewrite Annotation {
+		to ExpandedAnnotation {
+			ExpandedAnnotation exAnno = new ExpandedAnnotation();
+			
+			try {
+			annotations.AnnotationScanner scanner = new annotations.AnnotationScanner(new java.io.StringReader(getText()));
+			annotations.AnnotationParser parser = new annotations.AnnotationParser();
+			annotations.ast.Annotation anno = (annotations.ast.Annotation) parser.parse(scanner);
+			exAnno.setanno(anno);
+			} catch(Exception e) {
+				System.out.println(e.getMessage());
+			}
+			
+			return exAnno;
+		}
+	}
+}

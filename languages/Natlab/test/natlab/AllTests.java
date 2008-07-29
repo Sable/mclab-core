@@ -22,6 +22,7 @@ public class AllTests {
                 suite.addTestSuite(LookupLValueFailTests.class);
                 suite.addTestSuite(LookupLValueSanityTests.class);
 
+                suite.addTestSuite(ErrorCheckTest.class);
 		//$JUnit-END$
 		return suite;
 	}

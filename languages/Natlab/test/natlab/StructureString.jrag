@@ -1,5 +1,6 @@
 //TODO-AC: point at PrettyPrint once it stabilizes
 //NB: output may not re-parse as same AST (esp comments, empty stmts)
+
 aspect StructureString {
     syn String ASTNode.getStructureString() {
         StringBuffer buf = new StringBuffer();
@@ -285,6 +286,16 @@ aspect StructureString {
         buf.append(getFuncName().getStructureString());
         buf.append("@");
         buf.append(getClassName().getStructureString());
+        buf.append('(');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append(')');
         return buf.toString();
     }
     
@@ -613,6 +624,7 @@ aspect StructureString {
     //// ANNOTATION EXTENSION - START //////////////////////////////////////////
 
     eq Annotation.getStructureStringLessComments() = "(*" + getText()  + "*)";
-
+	eq ExpandedAnnotation.getStructureStringLessComments() = getanno().getStructureString();
+	
     //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
 }

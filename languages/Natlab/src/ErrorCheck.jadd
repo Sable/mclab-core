@@ -1,0 +1,53 @@
+//Static semantics error collection
+
+aspect ErrorCheck {
+
+  	public java.util.List<String> Program.errors = new java.util.ArrayList<String>();
+
+  	public boolean Program.errorCheck() {
+	    collectErrors();
+	    
+	    if(errors.isEmpty())
+	    	return false;
+	    	
+		System.out.println("Error(s):");
+		for(String error : errors) {
+			System.out.println(error);
+		}
+	    
+	    return true;
+	}
+  
+  	private void Program.collectErrors() {
+  		//nameCheck();
+    	//typeCheck();
+    	//accessControl();
+    	//exceptionHandling();
+    	//checkUnreachableStmt();
+    	//definiteAssignment();
+    	//checkModifiers();
+    	//for(int i = 0; i < getNumChild(); i++)
+      	//	getChild(i).collectErrors(c);
+      	
+      	getWeedingErrors();
+      	getWeedingFilter();
+  	}
+
+  	public void ASTNode.error(String msg) {
+  		error(getPosString(), msg);
+  	}
+  	
+  	public void ASTNode.error(String position, String msg) {
+  		ASTNode node = this;
+	    while(node != null && !(node instanceof Program))
+	    	node = node.getParent();
+	    
+	    Program prog = (Program)node;
+    	prog.errors.add(position + msg);
+  	}
+  
+	public String ASTNode.getPosString() {
+    	return "[" + getLine(getStart()) + ", " + getColumn(getStart()) + "]  ";
+	}
+	
+}
