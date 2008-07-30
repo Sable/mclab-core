@@ -286,7 +286,7 @@ aspect NameResolution{
             return s;
         }
     }
-    rewrite Function{
+    /*rewrite Function{
         to FunctionDecl{
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
@@ -305,9 +305,9 @@ aspect NameResolution{
                     f.addStmt( new VariableDecl(symbol) );
             //add Parameter declarations
             for( String symbol : getParamSet() )
-                f.addParamDecl( new VariableDecl(symbol) );
+              f.addParamDecl( new VariableDecl(symbol) );
             return f;
         }
-    }
+    }*/
 
 }

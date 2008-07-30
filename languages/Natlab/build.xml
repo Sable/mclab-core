@@ -92,6 +92,7 @@
 		<path id="compile.classpath">
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
+			<path location="${basedir}/${annotations.bin.dir}" />
 		</path>
 		<path id="test.classpath">
 			<path refid="junit.jar.path" />
@@ -109,7 +110,8 @@
 	<import file="../shared/eclipse.xml" />
 
 	<!-- public versions of cli.xml targets -->
-	<target name="build" depends="annotations.build, CommandLineInterface.build" description="generate and build all files (including annotations)" />
+	<target name="build" depends="annotations.build, CommandLineInterface.build" description="generate and build all files (including annotations)">
+        </target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 
