@@ -23,12 +23,14 @@ public abstract class Builtin {
 	public abstract String getName();
 	//..need more here?
 	
-	//get return type, type propagation, type checking
-	public abstract Type getReturnType(Type[] inputTypes); //null if complicated, or not possible
-	public abstract Type[] getReturnTypes(Type[] inputTypes,int numberOfOutputs);
+	//is this function defined for this input?
 	public abstract boolean isDefined(Type[] inputTypes); //false if input is not possible (i.e. sin(logical))
 	public abstract boolean isDefined(Type[] inputTypes,int numberOfOutputs);
 	public abstract boolean isDefined(Signature signature); //also includes output types
+	
+	//get return type, type propagation, type checking
+	public abstract Type getReturnType(Type[] inputTypes); //null if complicated, or not possible
+	public abstract Type[] getReturnTypes(Type[] inputTypes,int numberOfOutputs);
 	
 	//constant propagation -- returns null if propagation not possible
 	public abstract Constant getResult(Constant[] inputs);

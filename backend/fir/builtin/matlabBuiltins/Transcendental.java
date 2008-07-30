@@ -9,8 +9,8 @@ import fir.table.*;
 import fir.type.*;
 
 public abstract class Transcendental extends MatlabBuiltin {
-	/*@Override
-	public void generate(CodeGenInterfacer interfacer, Signature signature) {
+	@Override
+	public void generate(ExpressionInterfacer interfacer, Signature signature) {
 		if (interfacer.haveToInsertExpression()){ //we only need to insert expression
 			interfacer.insertExpression(getName()+"("+signature.getarg()+")");
 		} else {
@@ -22,7 +22,7 @@ public abstract class Transcendental extends MatlabBuiltin {
 	public void generateWithConstants(CodeGenInterfacer interfacer,
 			Signature signature, Constant[] constants) {
 		generate(interfacer,signature);
-	} */
+	} 
 	public void generate(ExpressionInterfacer interfacer,Signature signature,Vector<InternalVar> variable){} //a created expression has a known type
 	public void generate(StatementInterfacer interfacer,Signature signature,Vector<InternalVar> variable){}
 	public void generateWithConstants(ExpressionInterfacer interfacer,Signature signature,Vector<InternalVar> variable,Constant[] constants){}	
