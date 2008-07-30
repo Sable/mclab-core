@@ -40,5 +40,9 @@ public abstract class Type {
 		return minRank;
 	}
 	
+	//query
+	public boolean isShapeKnown(){
+		return true; //TODO
+	}
 	
 }

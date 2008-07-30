@@ -21,6 +21,14 @@ import fir.type.*;
  * the mapping should be in the Signature itself, no extra map needed
  * a function needs at least one return, otherwise there will be errors.
  * 
+ * i.e. one might represent the call of a function foo, which in matlab looks like
+ * [a,b] = foo(c,d,e)
+ * and in fortran it will look like
+ * foo(a_data,b_data,c_data,d_data,e_data,a_rank,a_size1,a_size2,a_size3,e_size1)
+ * 
+ * for a call where the shape of a,e is unknown.
+ * Note there is mapping between a and a_data,a_rank,a_size1,a_size2, which can be queried.
+ * 
  */
 
 public class Signature {
@@ -106,14 +114,37 @@ public class Signature {
 	}
 	
 	/* query **********************************************************/
-	public boolean isFunction(){return isFunction;};
-	
+	//query info
 	//is canonical
+	public boolean isFunction(){return isFunction;};
 	public boolean isCanonical(){
 		return !(new Signature(this)).makeCanonical();		
 	}
+	public boolean allShapesKnown(){
+		boolean test=true;
+		for (Type t:inputVars){test &= t.isShapeKnown();}
+		for (Type t:outputVars){test &= t.isShapeKnown();}
+		return test;
+	}
 	
+	//get types (the stored 'data')
+	public int  getInputArgumentCount(){return inputVars.size();}
+	public Type getInputArgumentType(int position){return inputVars.get(position);} //we start couting at 0
+	public int  getOutputArgumentCount(){return outputVars.size();}
+	public Type getOutputArgumentType(int position){return outputVars.get(position);} //we start couting at 0
+	public int  getInternalCount(){return internalVars.size();}
+	public InternalType getInternalType(int position){return internalVars.get(position);}
+	public InternalType getInternalReturnType(){return internalReturn;}
 	
+	//get corresponding internal types (get mapping)
+	//the returned positions are in the internal type lists
+	//TODO
+	public int getInputDataPosition(int inputVarPosition){return -1;}
+	public int getInputRankPosition(int inputVarPosition){return -1;}
+	public int getInputShapePosition(int inputVarPosition,int dimension){return -1;}
+	public int getOutputDataPosition(int inputVarPosition){return -1;}
+	public int getOutputRankPosition(int inputVarPosition){return -1;}
+	public int getOutputShapePosition(int inputVarPosition,int dimension){return -1;}
 	
 }
 
