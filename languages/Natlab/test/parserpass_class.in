@@ -9,7 +9,7 @@ end
 methods (~abc,xyz)
 p = q(s,t)
 function obj = myClass(a,b)
-obj@double;
+obj@double(a,b);
 obj.abc = a
 obj.xyz = b
 end

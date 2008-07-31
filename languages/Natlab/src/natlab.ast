@@ -63,8 +63,7 @@ DotExpr : LValueExpr ::= Target:Expr Field:Name;
 MatrixExpr : LValueExpr ::= Row*;
 
 CellArrayExpr : Expr ::= Row*;
-
-SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name Arg:Expr*;
+SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name;
 
 Row ::= Element:Expr*;
 
