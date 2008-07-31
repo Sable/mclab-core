@@ -21,7 +21,7 @@ public abstract class Builtin {
 	public boolean isElemental(){return false;}
 	public boolean isFortranIntrinsic(){return false;}
 	public abstract String getName();
-	//..need more here?
+	//..need more here? TODO
 	
 	//is this function defined for this input?
 	public abstract boolean isDefined(Type[] inputTypes); //false if input is not possible (i.e. sin(logical))

@@ -1,5 +1,7 @@
 package fir.ast;
 //TODO - type propagation
+import fir.type.*;
+
 public enum BinaryOperator implements ASTnode {
 	ADD{public String toString(){return "+";}},
 	MUL{public String toString(){return "*";}},
@@ -23,6 +25,12 @@ public enum BinaryOperator implements ASTnode {
 		if (operator.equals("<")) return LT;
 		if (operator.equals("<=")) return LTE;
 		return INVALID;
+	}
+	
+	//propagates types for the operator, i.e. the type of a binary expression given the types
+	//returns null as invalid types
+	public Type propagate(Type left,Type right){
+		return null; //TODO
 	}
 
 }

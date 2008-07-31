@@ -1,5 +1,5 @@
 package fir.ast;
-
+//done4now
 import java.util.Vector;
 
 public class Block extends Stmt {
@@ -21,7 +21,10 @@ public class Block extends Stmt {
 	public void insertStatement(int index,Stmt stmt){
 		stmts.insertElementAt(stmt,index);
 	}
-	public int lastIndex(){
-		return stmts.lastIndexOf(stmts.lastElement());
+	public void removeStatment(int index){
+		stmts.remove(index);
+	}
+	public int count(){
+		return stmts.lastIndexOf(stmts.size());
 	}
 }

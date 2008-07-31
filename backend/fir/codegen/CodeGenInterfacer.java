@@ -6,7 +6,7 @@ package fir.codegen;
 import java.util.*;
 import fir.ast.*;
 import fir.table.*;
-import fir.type.Signature;
+import fir.type.*;
 
 public abstract class CodeGenInterfacer {
 	public Uid getUid(String name){return null;};
@@ -23,4 +23,11 @@ public abstract class CodeGenInterfacer {
 	public Program getCurrentProgram(){return null;};
 	public Table getCurrentTable(){return null;} //this returns
 	HashMap<Object,Object> getMap(){return null;}; //a map for Builtins to dump data in, which is the same for all interfacer gernerated by one codeGen
+	
+	//constructors for special AST nodes, using CodeComponents
+	public Expr CreateCodeComponentExpression(Type type,Vector<CodeComponent> code){return null;};
+	public Expr CreateCodeComponentFunctionCall(Type type,String name,Vector<CodeComponent> arguments){return null;}
+	public Stmt CreateCodeComponentStatement(Vector<CodeComponent> code){return null;}
+	public Stmt CreateCodeComponentCall(String name,Vector<CodeComponent> arguments){return null;}
 }
+

@@ -45,4 +45,6 @@ public abstract class Type {
 		return true; //TODO
 	}
 	
+	/** type propagation *****************************************************/
+	
 }

@@ -1,5 +1,5 @@
 package fir.ast;
-
+//done4now
 public class Assign extends Stmt {
 	LValue lvalue;
 	Expr expr;

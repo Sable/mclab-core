@@ -15,4 +15,10 @@ public class CodeGen {
 	//generates code
 	public CodeGen(Program program,BuiltinFinder builtinFinder,CodeGenOptions options){ 
 	}
+	
+	//protected
+	int number = 0;
+	int getUniqueNumber(){ //returns a different number every time
+		return number++;
+	}
 }

@@ -4,6 +4,11 @@ package fir.codegen;
 public class Uid {
 	String uid;
 	public String getString(){return uid;};
-	Uid(CodeGen codeGen,String name){}
-	
+	public Uid(CodeGen codeGen,String name){
+		uid = name+"_"+codeGen.getUniqueNumber(); //TODO - check whether '_' is allowed		
+	}
+	public Uid(CodeGen codeGen){
+		uid = new Uid(codeGen,"uid").uid;		
+	}
+
 }

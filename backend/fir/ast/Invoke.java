@@ -11,18 +11,20 @@ public class Invoke extends Expr {
 	Function function;
 	Builtin builtin;
 	Variable[] arguments;
-		
+
 	Invoke(Function function,Variable[] arguments){
 		callsBuiltin = false;
 		this.function = function;
 		this.builtin = null;
 		this.arguments = arguments;
+		//TODO check whether arguments fit function?
 	}
 	Invoke(Builtin function,Variable[] arguments){
 		callsBuiltin = true;
 		this.function = null;
 		this.builtin = function;
 		this.arguments = arguments;
+		//TODO check whether arguments fit function
 	}
 	
 	public Type getType(){
