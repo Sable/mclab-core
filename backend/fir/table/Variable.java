@@ -20,7 +20,7 @@ public class Variable implements LValue {
 	Table table;
 	InternalVar data; //at the moment no shadow variables supported
 	InternalVar rank;
-	InternalVar shape;
+	InternalVar dim[]; //gives a reference for the size of every reference
 	
 	
 	public Type getType(){return type;}
@@ -37,6 +37,22 @@ public class Variable implements LValue {
 		Vector<InternalVar> list = new Vector<InternalVar>();
 		list.add(data);
 		return list;
+	}
+	public InternalVar getRankRef(){ //returns the (a) reference variable, or null if nonexistent
+		return rank;		
+	}
+	//note the first dim is 0! - returns the reference to that dim size, returns null if nonexistent
+	public InternalVar getShapeRef(int dim_index){
+		if (dim == null) return null;
+		if (dim_index >= dim.length) return null;
+		return dim[dim_index];
+	}
+	// returns the highest index for which there exists a dim reference, 0 if nonexistent
+	public int getMaxDimReferenceIndex(){
+		if (dim == null) return 0;
+		int index = 0;
+		for (int i=0;i<dim.length;i++){ if (dim[i] != null) index = i;}
+		return index;
 	}
 	
 	/* create ******************************************************/

@@ -36,6 +36,12 @@ public class Signature {
 	Vector<Type> outputVars;
 	Vector<InternalType> internalVars;
 	InternalType internalReturn; //may be null - internal
+	int[][] inputDimMap; //for every variable, for every dim, an index in InternalType
+	int[]   inputRankMap; //-1 means that there is no corresponding internal map
+	int[]   inputDataMap;
+	int[][] outputDimMap;
+	int[]	outputRankMap;
+	int[]   outputDataMap;
 	boolean isFunction;
 	/* construction of signature ****************************************/
 	//constructors - will not add any mapping
@@ -47,52 +53,108 @@ public class Signature {
 	
 	//returns signature as it is defined by the given variables
 	//the ordering of the internal variables is such that the mapping is canonical
+	//elements in the given vectors should not be null, otherwise behavior is undefined
 	public Signature(Vector<Variable> inputs,Vector<Variable> outputs,boolean isFunction){
 		//TODO - make work with union types
 		inputVars = new Vector<Type>();
 		outputVars = new Vector<Type>();
-		//put types
-		for (Variable v:inputs){
-			inputVars.add(v.getType());
+		internalVars = new Vector<InternalType>();
+		//create mapping arrays
+		inputDimMap = new int[inputs.size()][];
+		inputRankMap = new int[inputs.size()]; set(inputRankMap,-1);
+		inputDataMap = new int[inputs.size()]; set(inputDataMap,-1);
+		outputDimMap = new int[outputs.size()][];
+		outputRankMap = new int[outputs.size()]; set(outputRankMap,-1);
+		outputDataMap = new int[outputs.size()]; set(outputDataMap,-1);
+		
+		//put types - create second dimension for dimension maps
+		Variable vv;
+		for (int i = 0;i<inputs.size();i++){
+			vv = inputs.get(i);
+			inputVars.add(vv.getType());
+			inputDimMap[i] = new int[vv.getMaxDimReferenceIndex()+1];
+			set(inputDimMap[i],-1);
 		}
-		for (Variable v:outputs){
-			outputVars.add(v.getType());
+		for (int i = 0;i<inputs.size();i++){
+			vv = outputs.get(i);
+			outputVars.add(vv.getType());
+			outputDimMap[i] = new int[vv.getMaxDimReferenceIndex()+1];
+			set(outputDimMap[i],-1);
 		}
 		this.isFunction = isFunction;
 		//add mapping -- first add data info -- first list all actual variables
 		Vector<InternalVar> internalActualVars = new Vector<InternalVar>();
 		InternalVar actualReturn = null;
 		//go through all inputs
-		for (Variable v:inputs){
+		for (int i=0;i<inputs.size();i++){
+			Variable v = inputs.get(i);
 			if (!internalActualVars.contains(v.getData())){
 				internalActualVars.add(v.getData()); //add the internal only if not there already
+				inputDataMap[i] = internalActualVars.indexOf(v);
 			}
 		}
 		//if we have a function, we put the the first return as the actual return
-		if (isFunction){
+		if (isFunction){ //if we have a function, there has to be a data;
 			actualReturn = outputs.firstElement().getData();
+			//map?
 		} else {
 			if (outputs.size()>0){
 				if (!internalActualVars.contains(outputs.firstElement().getData())){
 					internalActualVars.add(outputs.firstElement().getData());
+					outputDataMap[0] = internalActualVars.indexOf(outputs.firstElement().getData());
 				}
 			}
 		}
-		//go through all remaining output and insert
+		//go through all remaining output and insert data
 		for (int i = 1;i<outputs.size();i++){
 			if (!internalActualVars.contains(outputs.firstElement().getData())){
-				internalActualVars.add(outputs.firstElement().getData());
+				internalActualVars.add(outputs.get(i).getData());
+				outputDataMap[i] = internalActualVars.indexOf(outputs.get(i));
 			}
 		}
 		//go through input again, now add all rank, shape variables
 		for (Variable v:inputs){
-			if (!v.getType().isFixedRank()){
-				
-				
+			if (!v.getType().isFixedRank() && v.getRankRef() != null){
+				internalActualVars.add(v.getRankRef());
+				for (int i=0;i<v.getMaxDimReferenceIndex();i++){
+					if (v.getShapeRef(i) != null){
+						internalActualVars.add(v.getShapeRef(i));
+					}
+				}
 			}
 		}
-		//TODO
+		//go through input again, now add all rank, shape variables
+		for (Variable v:inputs){
+			if (!v.getType().isFixedRank() && v.getRankRef() != null){
+				internalActualVars.add(v.getRankRef());
+				for (int i=0;i<v.getMaxDimReferenceIndex();i++){
+					if (v.getShapeRef(i) != null){
+						internalActualVars.add(v.getShapeRef(i));
+					}
+				}
+			}
+		}
+		//go through output, now add all rank, shape variables
+		for (Variable v:outputs){
+			if (!v.getType().isFixedRank() && v.getRankRef() != null){
+				internalActualVars.add(v.getRankRef());
+				for (int i=0;i<v.getMaxDimReferenceIndex();i++){
+					if (v.getShapeRef(i) != null){
+						internalActualVars.add(v.getShapeRef(i));
+					}
+				}
+			}
+		}
+		//now we have all internal variables in 'internalActualVars' in the right order
+		for (InternalVar v:internalActualVars){ //put the types
+			internalVars.add(v.getInternalType());
+		}
 	}
+	//auxiliary function sets all values of array to given value
+	private void set(int[] array,int value){
+		for (int i =0; i<array.length;i++) array[i] = value;
+	}
+	
 	
 	//copy constructor
 	public Signature(Signature anotherSignature){
@@ -137,6 +199,7 @@ public class Signature {
 	
 	//get corresponding internal types (get mapping)
 	//the returned positions are in the internal type lists
+	//-1 is returned if there is no such reference
 	//TODO
 	public int getInputDataPosition(int inputVarPosition){return -1;}
 	public int getInputRankPosition(int inputVarPosition){return -1;}

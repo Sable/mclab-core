@@ -13,7 +13,7 @@ public abstract class CodeGenInterfacer {
 	public Uid getUid(){return null;}
 	
 	public void addFunction(Function function){}
-	public void addSubroutine(Subroutine subroutine){}
+	//public void addSubroutine(Subroutine subroutine){} TODO
 	public void addFunction(Signature signature,String text,Uid name){}
 	public void addSubroutine(Signature signature,String text,Uid name){}
 	//public void addNewInternalVariable(InternalVar var,Uid varName){} //? -- variables are added with the constructors

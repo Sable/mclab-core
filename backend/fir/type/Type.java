@@ -45,6 +45,14 @@ public abstract class Type {
 		return true; //TODO
 	}
 	
+	/** cast *****************************************************************/
+	//returns the type as a partiallyKnownType if possible, else null (i.e. if type not partially known)
+	public PartiallyKnownType getPartiallyKnownType(){
+		return null;
+	}
+	
 	/** type propagation *****************************************************/
+	
+	
 	
 }

@@ -27,6 +27,7 @@ public class Program implements ASTnode {
 	
 	public Procedure getMain(){ return main;}
 	public void setMain(Procedure main){ this.main = main;}
-	
-	
+	public Table getGlobals(){return globals;}
 }
+
+
