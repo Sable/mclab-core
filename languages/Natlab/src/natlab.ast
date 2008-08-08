@@ -1,4 +1,5 @@
 // AST for Natlab grammar
+CompilationUnits ::= Program*;
 abstract Program;
 Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;

@@ -614,7 +614,9 @@ aspect StructureString {
     //// ANNOTATION EXTENSION - START //////////////////////////////////////////
 
     eq Annotation.getStructureStringLessComments() = "(*" + getText()  + "*)";
-	eq ExpandedAnnotation.getStructureStringLessComments() = getanno().getStructureString();
+    eq ExpandedAnnotation.getStructureStringLessComments() = getanno().getStructureString();
 	
     //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
+
+    eq VariableDecl.getStructureStringLessComments() = "Declare " + getID();
 }

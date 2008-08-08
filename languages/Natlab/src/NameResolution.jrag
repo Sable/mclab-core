@@ -275,7 +275,9 @@ aspect NameResolution{
     // Adding Declaration nodes
     
     rewrite Script{
+        when( doRewrite() )
         to Script{
+            System.out.println("yo");
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
             for( String symbol : getLValues() )
@@ -286,8 +288,11 @@ aspect NameResolution{
             return s;
         }
     }
-    /*rewrite Function{
+
+    rewrite Function{
+        when( doRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
+            System.out.println("hello");
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
             //except for the stmt list
@@ -308,6 +313,12 @@ aspect NameResolution{
               f.addParamDecl( new VariableDecl(symbol) );
             return f;
         }
-    }*/
+    }
+    //syn boolean ASTNode.doRewrite() = getParent().doRewrite();
+    //eq Program.doRewrite() = canDoRewrites;
+    inh boolean ASTNode.doRewrite();
+
+    eq Program.getChild(int i).doRewrite() = canDoRewrites;
+        
 
 }

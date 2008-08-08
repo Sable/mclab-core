@@ -18,10 +18,10 @@ public class AllTests {
                 suite.addTestSuite(SymbolTableFailTests.class);
                 suite.addTestSuite(SymbolTableSanityTests.class);
 
-                suite.addTestSuite(LookupLValuePassTests.class);
-                suite.addTestSuite(LookupLValueFailTests.class);
-                suite.addTestSuite(LookupLValueSanityTests.class);
-
+                //suite.addTestSuite(LookupLValuePassTests.class);
+                //suite.addTestSuite(LookupLValueFailTests.class);
+                //suite.addTestSuite(LookupLValueSanityTests.class);
+                
                 suite.addTestSuite(ErrorCheckTest.class);
 		//$JUnit-END$
 		return suite;

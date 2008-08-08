@@ -29,7 +29,7 @@ public class ParserTreeTool {
             parser.setCommentBuffer(commentBuffer);
             PrintWriter out = new PrintWriter(new FileWriter(basename + ".tree"));
             try {
-                Program actual = (Program) parser.parse(scanner);
+                Program actual = (Program)((Program) parser.parse(scanner));//.rewriteTo();
                 if(parser.hasError()) {
                     for(String error : parser.getErrors()) {
                         out.println(error);

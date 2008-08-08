@@ -4,4 +4,6 @@ aspect NameResolutionAdditions
 {
     FunctionList implements LocalFunctionLookupInterface;
     Function implements LocalFunctionLookupInterface;
+
+    public boolean Program.canDoRewrites = false;
 }
