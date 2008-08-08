@@ -277,7 +277,7 @@ aspect NameResolution{
     rewrite Script{
         when( doRewrite() )
         to Script{
-            System.out.println("yo");
+            //System.out.println("yo");
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
             for( String symbol : getLValues() )
@@ -292,7 +292,7 @@ aspect NameResolution{
     rewrite Function{
         when( doRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
-            System.out.println("hello");
+            //System.out.println("hello");
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
             //except for the stmt list
