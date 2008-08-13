@@ -40,7 +40,8 @@ public class Interpreter {
 						System.out.println(error);
 					}
 				} else if(!original.errorCheck()) {
-					System.out.println(original.getStructureString());
+                                        //pass true to get transformed ast
+					System.out.println(original.getStructureString( true ));
 					// System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {

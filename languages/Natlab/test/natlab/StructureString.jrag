@@ -2,81 +2,124 @@
 //NB: output may not re-parse as same AST (esp comments, empty stmts)
 
 aspect StructureString {
-    syn String ASTNode.getStructureString() {
+    syn String ASTNode.getStructureString( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
         for(beaver.Symbol comment : getComments()) {
             buf.append(comment.value);
             buf.append('\n');
         }
-        buf.append(getStructureStringLessComments());
+        buf.append(getStructureStringLessComments( doRewrites ));
         return buf.toString();
     }
 
     //default - exception
-    syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
+    syn String ASTNode.getStructureStringLessComments( boolean doRewrites ) { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
     
     //program
-    eq EmptyProgram.getStructureStringLessComments() {
+    eq EmptyProgram.getStructureStringLessComments( boolean doRewrites ) {
         return "";
     }
     
-    eq Script.getStructureStringLessComments() {
+    eq Script.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureString());
+        List<HelpComment> helpComments;
+        List<Stmt> stmts;
+        if( doRewrites ){
+            helpComments = getHelpComments();
+            stmts = getStmts();
+        }
+        else{
+            helpComments = getHelpCommentsNoTransform();
+            stmts = getStmtsNoTransform();
+        }
+
+        for(HelpComment comment : helpComments) {
+            buf.append(comment.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getStructureString());
+        for(Stmt stmt : stmts ) {
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
         return buf.toString();
     }
     
-    eq FunctionList.getStructureStringLessComments() {
+    eq FunctionList.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
-        for(Function func : getFunctions()) {
-            buf.append(func.getStructureString());
+        List<Function> funcs;
+        if( doRewrites ){
+            System.out.println("hello");
+            funcs = getFunctions();
+        }
+        else{
+            System.out.println("you");
+            funcs = getFunctionsNoTransform();
+            System.out.println("you1");
+        }
+        for(Function func : funcs) {
+            System.out.println("you2");
+            buf.append(func.getStructureString( doRewrites ));
+            System.out.println("you3");
             buf.append('\n');
         }
         return buf.toString();
     }
     
-    eq Function.getStructureStringLessComments() {
+    eq Function.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> outParams;
+        List<Name> inParams;
+        List<HelpComment> helpComments;
+        List<Stmt> stmts;
+        List<Function> nestedFuncs;
+        if( doRewrites ){
+            outParams = getOutputParams();
+            inParams = getInputParams();
+            helpComments = getHelpComments();
+            stmts = getStmts();
+            nestedFuncs = getNestedFunctions();
+        }
+        else{
+            outParams = getOutputParamsNoTransform();
+            inParams = getInputParamsNoTransform();
+            helpComments = getHelpCommentsNoTransform();
+            stmts = getStmtsNoTransform();
+            nestedFuncs = getNestedFunctionsNoTransform();
+        }
+
         buf.append("function ");
         buf.append("[");
         boolean first = true;
-        for(Name param : getOutputParams()) {
+        for(Name param : outParams) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append("] = ");
         buf.append(getName());
         buf.append("(");
         first = true;
-        for(Name param : getInputParams()) {
+        for(Name param : inParams) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(")");
         buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureString());
+        for(HelpComment comment : helpComments) {
+            buf.append(comment.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getStructureString());
+        for(Stmt stmt : stmts) {
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Function func : getNestedFunctions()) {
-            buf.append(func.getStructureString());
+        for(Function func : nestedFuncs) {
+            buf.append(func.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
@@ -85,133 +128,211 @@ aspect StructureString {
     
     // Class
     
-    eq ClassDef.getStructureStringLessComments() {
+    eq ClassDef.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Attribute> attrs;
+        List<SuperClass> supClasses;
+        List<HelpComment> helpComments;
+        List<Properties> props;
+        List<Methods> methods;
+        List<ClassEvents> events;
+        if( doRewrites ){
+            attrs = getAttributes();
+            supClasses = getSuperClasss();
+            helpComments = getHelpComments();
+            props = getPropertys();
+            methods = getMethods();
+            events = getClassEvents();
+        }
+        else{
+            attrs = getAttributesNoTransform();
+            supClasses = getSuperClasssNoTransform();
+            helpComments = getHelpCommentsNoTransform();
+            props = getPropertysNoTransform();
+            methods = getMethodsNoTransform();
+            events = getClassEventsNoTransform();
+        }
+
         buf.append("classdef ");
 		boolean first = true;
-        for(Attribute attr : getAttributes()) {
+        for(Attribute attr : attrs) {
             if(first)
             	buf.append("(");            
             else
                 buf.append(", ");
-            buf.append(attr.getStructureString());
+            buf.append(attr.getStructureString( doRewrites ));
             first = false;
         }
         if(!first)
         	buf.append(") ");
         buf.append(getName());
         first = true;
-        for(SuperClass sup : getSuperClasss()) {
+        for(SuperClass sup : supClasses) {
             if(first)
             	buf.append(" < ");
             else
                 buf.append(" & ");
-            buf.append(sup.getStructureString());
+            buf.append(sup.getStructureString( doRewrites ));
             first = false;
         }
         buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureString());
+        for(HelpComment comment : helpComments) {
+            buf.append(comment.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Properties prop : getPropertys()) {
-            buf.append(prop.getStructureString());
+        for(Properties prop : props) {
+            buf.append(prop.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Methods methods : getMethods()) {
-            buf.append(methods.getStructureString());
+        for(Methods method : methods) {
+            buf.append(method.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(ClassEvents events : getClassEvents()) {
-            buf.append(events.getStructureString());
+        for(ClassEvents event : events) {
+            buf.append(event.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     }
     
-    eq Properties.getStructureStringLessComments() {
+    eq Properties.getStructureStringLessComments( boolean doRewrites) {
         StringBuffer buf = new StringBuffer();
+        List<Attribute> attrs;
+        List<Property> props;
+        if( doRewrites ){
+            attrs = getAttributes();
+            props = getPropertys();
+        }
+        else{
+            attrs = getAttributesNoTransform();
+            props = getPropertysNoTransform();
+        }
+
         buf.append("properties ");
 		boolean first = true;
-        for(Attribute attr : getAttributes()) {
+        for(Attribute attr : attrs) {
             if(first)
             	buf.append("(");            
             else
                 buf.append(", ");
-            buf.append(attr.getStructureString());
+            buf.append(attr.getStructureString( doRewrites ));
             first = false;
         }
         if(!first)
         	buf.append(") ");
         buf.append('\n');
-        for(Property prop : getPropertys()) {
-            buf.append(prop.getStructureString());
+        for(Property prop : props) {
+            buf.append(prop.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     } 
     
-    eq Methods.getStructureStringLessComments() {
+    eq Methods.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Attribute> attrs;
+        List<Signature> signatures;
+        List<PropertyAccess> propAccs;
+        List<Function> functions;
+
+        if( doRewrites ){
+            attrs = getAttributes();
+            signatures = getSignatures();
+            propAccs = getPropAccs();
+            functions = getFunctions();
+        }
+        else{
+            attrs = getAttributesNoTransform();
+            signatures = getSignaturesNoTransform();
+            propAccs = getPropAccsNoTransform();
+            functions = getFunctionsNoTransform();
+        }
         buf.append("methods ");
 		boolean first = true;
-        for(Attribute attr : getAttributes()) {
+        for(Attribute attr : attrs) {
             if(first)
             	buf.append("(");            
             else
                 buf.append(", ");
-            buf.append(attr.getStructureString());
+            buf.append(attr.getStructureString( doRewrites ));
             first = false;
         }
         if(!first)
         	buf.append(") ");
         buf.append('\n');
-        for(Signature sign : getSignatures()) {
-            buf.append(sign.getStructureString());
+        for(Signature sign : signatures) {
+            buf.append(sign.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(PropertyAccess prop : getPropAccs()) {
-            buf.append(prop.getStructureString());
+        for(PropertyAccess prop : propAccs) {
+            buf.append(prop.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Function func : getFunctions()) {
-            buf.append(func.getStructureString());
+        for(Function func : functions) {
+            buf.append(func.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     }
     
-    eq Signature.getStructureStringLessComments() {
+    eq Signature.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> outParams;
+        List<Name> inParams;
+        if( doRewrites ){
+            outParams = getOutputParams();
+            inParams = getInputParams();
+        }
+        else{
+            outParams = getOutputParamsNoTransform();
+            inParams = getInputParamsNoTransform();
+        }
         buf.append("[");
         boolean first = true;
-        for(Name param : getOutputParams()) {
+        for(Name param : outParams) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append("] = ");
         buf.append(getName());
         buf.append("(");
         first = true;
-        for(Name param : getInputParams()) {
+        for(Name param : inParams) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(")");
         return buf.toString();
     }
     
-    eq PropertyAccess.getStructureStringLessComments() {
+    eq PropertyAccess.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> inParams;
+        List<HelpComment> helpComments;
+        List<Stmt> stmts;
+        List<Function> nestedFuncs;
+        if( doRewrites ){
+            inParams = getInputParams();
+            helpComments = getHelpComments();
+            stmts = getStmts();
+            nestedFuncs = getNestedFunctions();
+        }
+        else{
+            inParams = getInputParamsNoTransform();
+            helpComments = getHelpCommentsNoTransform();
+            stmts = getStmtsNoTransform();
+            nestedFuncs = getNestedFunctionsNoTransform();
+        }            
+
         buf.append("function ");
         buf.append("[");
         boolean first = true;
@@ -219,7 +340,7 @@ aspect StructureString {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append("] = ");
@@ -228,127 +349,149 @@ aspect StructureString {
         buf.append(getName());
         buf.append("(");
         first = true;
-        for(Name param : getInputParams()) {
+        for(Name param : inParams) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(")");
         buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getStructureString());
+        for(HelpComment comment : helpComments) {
+            buf.append(comment.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getStructureString());
+        for(Stmt stmt : stmts) {
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        for(Function func : getNestedFunctions()) {
-            buf.append(func.getStructureString());
+        for(Function func : nestedFuncs) {
+            buf.append(func.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     }
     
-    eq ClassEvents.getStructureStringLessComments() {
+    eq ClassEvents.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Attribute> attributes;
+        List<Event> events;
+        if( doRewrites ){
+            attributes = getAttributes();
+            events = getEvents();
+        }
+        else{
+            attributes = getAttributesNoTransform();
+            events = getEventsNoTransform();
+        }
+
         buf.append("events ");
 		boolean first = true;
-        for(Attribute attr : getAttributes()) {
+        for(Attribute attr : attributes ) {
             if(first)
             	buf.append("(");            
             else
                 buf.append(", ");
-            buf.append(attr.getStructureString());
+            buf.append(attr.getStructureString( doRewrites ));
             first = false;
         }
         if(!first)
         	buf.append(") ");
         buf.append('\n');
-        for(Event eve : getEvents()) {
-            buf.append(eve.getStructureString());
+        for(Event eve : events) {
+            buf.append(eve.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     }
     
-    eq Attribute.getStructureStringLessComments() = getKey() + " = " + getExpr().getStructureString();
-    eq SuperClass.getStructureStringLessComments() = getName();
-    eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString();
-    eq Event.getStructureStringLessComments() = getName();
+    eq Attribute.getStructureStringLessComments( boolean doRewrites ) = 
+        getKey() + " = " + (doRewrites ? getExpr() : getExprNoTransform() ).getStructureString(doRewrites);
+    eq SuperClass.getStructureStringLessComments( boolean doRewrites ) = getName();
+    eq Property.getStructureStringLessComments( boolean doRewrites ) = 
+        getName() + " = " + (doRewrites ? getExpr() : getExprNoTransform() ).getStructureString(doRewrites);
+    eq Event.getStructureStringLessComments( boolean doRewrites ) = getName();
     
-    eq SuperClassMethodExpr.getStructureStringLessComments() {
+    eq SuperClassMethodExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
-        buf.append(getFuncName().getStructureString());
+        buf.append( (doRewrites ? getFuncName() : getFuncNameNoTransform()).getStructureString( doRewrites ));
         buf.append("@");
-        buf.append(getClassName().getStructureString());
-		return buf.toString();
+        buf.append( (doRewrites ? getClassName() : getClassNameNoTransform()).getStructureString( doRewrites ));
+        return buf.toString();
     }
     
     //help comments
     
-    eq HelpComment.getStructureStringLessComments() = getText();
+    eq HelpComment.getStructureStringLessComments( boolean doRewrites ) = getText();
     
     //stmts
-    eq EmptyStmt.getStructureStringLessComments() = "";
-    eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
-    eq AssignStmt.getStructureStringLessComments() = getLHS().getStructureString() + " = " + getRHS().getStructureString() + (isOutputSuppressed() ? ";" : "");
-    eq GlobalStmt.getStructureStringLessComments() {
+    eq EmptyStmt.getStructureStringLessComments( boolean doRewrites ) = "";
+    eq ExprStmt.getStructureStringLessComments( boolean doRewrites ) = 
+        (doRewrites ? getExpr() : getExprNoTransform()).getStructureString( doRewrites ) + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getStructureStringLessComments( boolean doRewrites ) = 
+        (doRewrites ? getLHS() : getLHSNoTransform()).getStructureString(doRewrites) + " = " 
+        + (doRewrites ? getRHS() : getRHSNoTransform()).getStructureString(doRewrites) 
+        + (isOutputSuppressed() ? ";" : "");
+    eq GlobalStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> names = doRewrites ? getNames() : getNamesNoTransform();
         buf.append("global");
-        for(Name name : getNames()) {
+        for(Name name : names) {
             buf.append(" ");
-            buf.append(name.getStructureString());
+            buf.append(name.getStructureString( doRewrites ));
         }
         if(isOutputSuppressed()) {
             buf.append(";");
         }
         return buf.toString();
     }
-    eq PersistentStmt.getStructureStringLessComments() {
+    eq PersistentStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> names = doRewrites ? getNames() : getNamesNoTransform();
         buf.append("persistent");
-        for(Name name : getNames()) {
+        for(Name name : names) {
             buf.append(" ");
-            buf.append(name.getStructureString());
+            buf.append(name.getStructureString( doRewrites ));
         }
         if(isOutputSuppressed()) {
             buf.append(";");
         }
         return buf.toString();
     }
-    eq ShellCommandStmt.getStructureStringLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
+    eq ShellCommandStmt.getStructureStringLessComments( boolean doRewrites ) = 
+        "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
     
-    eq BreakStmt.getStructureStringLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
-    eq ContinueStmt.getStructureStringLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
-    eq ReturnStmt.getStructureStringLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
+    eq BreakStmt.getStructureStringLessComments( boolean doRewrites ) = "break" + (isOutputSuppressed() ? ";" : "");
+    eq ContinueStmt.getStructureStringLessComments( boolean doRewrites ) = "continue" + (isOutputSuppressed() ? ";" : "");
+    eq ReturnStmt.getStructureStringLessComments( boolean doRewrites ) = "return" + (isOutputSuppressed() ? ";" : "");
 
-    eq ForStmt.getStructureStringLessComments() {
+    eq ForStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
         buf.append("for ");
-        buf.append(getAssignStmt().getStructureString());
+        buf.append((doRewrites ? getAssignStmt() : getAssignStmtNoTransform()).getStructureString( doRewrites ));
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
         buf.append("end");
         return buf.toString();
     }
 
-    eq WhileStmt.getStructureStringLessComments() {
+    eq WhileStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
         buf.append("while ");
-        buf.append(getExpr().getStructureString());
+        buf.append((doRewrites ? getExpr() : getExprNoTransform()).getStructureString(doRewrites));
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString(doRewrites));
             buf.append('\n');
         }
         buf.append("end");
@@ -356,104 +499,121 @@ aspect StructureString {
     }
 
     // if-elseif-else
-    eq IfStmt.getStructureStringLessComments() {
+    eq IfStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<IfBlock> ifBlocks = doRewrites ? getIfBlocks() : getIfBlocksNoTransform();
         boolean first = true;
-        for(IfBlock block : getIfBlocks()) {
+        for(IfBlock block : ifBlocks) {
             if(!first) {
                 buf.append("else");
             }
-            buf.append(block.getStructureString());
+            buf.append(block.getStructureString(doRewrites));
             first = false;
         }
         if(hasElseBlock()) {
-            buf.append(getElseBlock().getStructureString());
+            buf.append(getElseBlock().getStructureString( doRewrites ));
         }
         buf.append("end");
         return buf.toString();
     }
 
-    eq IfBlock.getStructureStringLessComments() {
+    eq IfBlock.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
         buf.append("if ");
-        buf.append(getCondition().getStructureString());
+        buf.append((doRewrites ? getCondition() : getConditionNoTransform()).getStructureString(doRewrites));
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString(doRewrites));
             buf.append('\n');
         }
         return buf.toString();
     }
 
-    eq ElseBlock.getStructureStringLessComments() {
+    eq ElseBlock.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
         buf.append("else ");
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString(doRewrites));
             buf.append('\n');
         }
         return buf.toString();
     }
 
     // switch-case
-    eq SwitchStmt.getStructureStringLessComments() {
+    eq SwitchStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<SwitchCaseBlock> switchCaseBlocks = doRewrites ? getSwitchCaseBlocks() : getSwitchCaseBlocksNoTransform();
         buf.append("switch ");
-        buf.append(getExpr().getStructureString());
+        buf.append((doRewrites ? getExpr() : getExprNoTransform()).getStructureString( doRewrites ));
         buf.append('\n');
-        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
-            buf.append(scase.getStructureString());
+        for(SwitchCaseBlock scase : switchCaseBlocks) {
+            buf.append(scase.getStructureString( doRewrites ));
         }
         if(hasDefaultCaseBlock()) {
-            buf.append(getDefaultCaseBlock().getStructureString());
+            buf.append(getDefaultCaseBlock().getStructureString( doRewrites ));
         }
         buf.append("end");
         return buf.toString();
     }
-    eq SwitchCaseBlock.getStructureStringLessComments() {
+    eq SwitchCaseBlock.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
+
         buf.append("case ");
-        buf.append(getExpr().getStructureString());
+        buf.append((doRewrites ? getExpr() : getExprNoTransform()).getStructureString( doRewrites ));
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
         return buf.toString();
     }
-    eq DefaultCaseBlock.getStructureStringLessComments() {
+    eq DefaultCaseBlock.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> stmts = doRewrites ? getStmts() : getStmtsNoTransform();
+
         buf.append("otherwise ");
         buf.append('\n');
-        for(Stmt stmt : getStmts()) {
+        for(Stmt stmt : stmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
         return buf.toString();
     }
 
     // try-catch
-    eq TryStmt.getStructureStringLessComments() {
+    eq TryStmt.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Stmt> tryStmts;
+        List<Stmt> catchList;
+        if( doRewrites ){
+            tryStmts = getTryStmts();
+            catchList = getCatchStmts();
+        }
+        else{
+            tryStmts = getTryStmtsNoTransform();
+            catchList = getCatchStmtsNoTransform();
+        }
         buf.append("try ");
         buf.append('\n');
-        for(Stmt stmt : getTryStmts()) {
+        for(Stmt stmt : tryStmts) {
             buf.append('\t');
-            buf.append(stmt.getStructureString());
+            buf.append(stmt.getStructureString( doRewrites ));
             buf.append('\n');
         }
-        List<Stmt> catchList = getCatchStmts();
         if (catchList.getNumChild()>0) {
 	        buf.append("catch ");
 	        buf.append('\n');        
 	        for(Stmt stmt : catchList) {
 	            buf.append('\t');
-	            buf.append(stmt.getStructureString());
+	            buf.append(stmt.getStructureString( doRewrites ));
 	            buf.append('\n');
 	        }
 	    }
@@ -463,160 +623,243 @@ aspect StructureString {
 
     //exprs
     
-    eq RangeExpr.getStructureStringLessComments() {
+    eq RangeExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
-        buf.append(getLower().getStructureString());
+        buf.append((doRewrites ? getLower() : getLowerNoTransform()).getStructureString(doRewrites));
         buf.append(" : ");
         if(hasIncr()) {
-            buf.append(getIncr().getStructureString());
+            buf.append(getIncr().getStructureString(doRewrites));
             buf.append(" : ");
         }
-        buf.append(getUpper().getStructureString());
+        buf.append((doRewrites ? getUpper() : getUpperNoTransform()).getStructureString(doRewrites));
         buf.append(')');
         return buf.toString();
     }
-    eq ColonExpr.getStructureStringLessComments() = ":";
-    eq EndExpr.getStructureStringLessComments() = "end";
+    eq ColonExpr.getStructureStringLessComments( boolean doRewrites ) = ":";
+    eq EndExpr.getStructureStringLessComments( boolean doRewrites ) = "end";
     
-    eq Name.getStructureStringLessComments() = getID();
+    eq Name.getStructureStringLessComments( boolean doRewrites ) = getID();
 
     //accesses
-    eq NameExpr.getStructureStringLessComments() = getName().getStructureString();
-    eq DotExpr.getStructureStringLessComments() = getTarget().getStructureString() + "." + getField().getStructureString();
-    eq ParameterizedExpr.getStructureStringLessComments() {
+    eq NameExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        (doRewrites ? getName() : getNameNoTransform()).getStructureString( doRewrites );
+    eq DotExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        (doRewrites ? getTarget() : getTargetNoTransform()).getStructureString( doRewrites ) + "." 
+        + (doRewrites ? getField() : getFieldNoTransform()).getStructureString( doRewrites );
+    eq ParameterizedExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
-        buf.append(getTarget().getStructureString());
+        List<Expr> args = doRewrites ? getArgs() : getArgsNoTransform();
+
+        buf.append((doRewrites ? getTarget() : getTargetNoTransform()).getStructureString( doRewrites ));
         buf.append('(');
         boolean first = true;
-        for(Expr arg : getArgs()) {
+        for(Expr arg : args) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(arg.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(')');
         return buf.toString();
     }
-    eq CellIndexExpr.getStructureStringLessComments() {
+    eq CellIndexExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
-        buf.append(getTarget().getStructureString());
+        List<Expr> args = doRewrites ? getArgs() : getArgsNoTransform();
+
+        buf.append((doRewrites ? getTarget() : getTargetNoTransform()).getStructureString( doRewrites ));
         buf.append('{');
         boolean first = true;
-        for(Expr arg : getArgs()) {
+        for(Expr arg : args) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(arg.getStructureString());
+            buf.append(arg.getStructureString( doRewrites ));
             first = false;
         }
         buf.append('}');
         return buf.toString();
     }
 
-    eq MatrixExpr.getStructureStringLessComments() {
+    eq MatrixExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Row> rows = doRewrites ? getRows() : getRowsNoTransform();
+
         buf.append('[');
         boolean first = true;
-        for(Row row : getRows()) {
+        for(Row row : rows) {
             if(!first) {
                 buf.append("; ");
             }
-            buf.append(row.getStructureString());
+            buf.append(row.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(']');
         return buf.toString();
     }
-    eq CellArrayExpr.getStructureStringLessComments() {
+    eq CellArrayExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Row> rows = doRewrites ? getRows() : getRowsNoTransform();
+
         buf.append('{');
         boolean first = true;
-        for(Row row : getRows()) {
+        for(Row row : rows) {
             if(!first) {
                 buf.append("; ");
             }
-            buf.append(row.getStructureString());
+            buf.append(row.getStructureString( doRewrites ));
             first = false;
         }
         buf.append('}');
         return buf.toString();
     }
-    eq Row.getStructureStringLessComments() {
+    eq Row.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Expr> elements = doRewrites ? getElements() : getElementsNoTransform();
+
         boolean first = true;
-        for(Expr element : getElements()) {
+        for(Expr element : elements) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(element.getStructureString());
+            buf.append(element.getStructureString( doRewrites ));
             first = false;
         }
         return buf.toString();
     }
     
-    eq FunctionHandleExpr.getStructureStringLessComments() = "@" + getName().getStructureString();
-    eq LambdaExpr.getStructureStringLessComments() {
+    eq FunctionHandleExpr.getStructureStringLessComments( boolean doRewrites) = 
+        "@" + (doRewrites ? getName() : getNameNoTransform()).getStructureString( doRewrites );
+    eq LambdaExpr.getStructureStringLessComments( boolean doRewrites ) {
         StringBuffer buf = new StringBuffer();
+        List<Name> inParams = doRewrites ? getInputParams() : getInputParamsNoTransform();
         buf.append("(@(");
         boolean first = true;
-        for(Name param : getInputParams()) {
+        for(Name param : inParams ) {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getStructureString());
+            buf.append(param.getStructureString( doRewrites ));
             first = false;
         }
         buf.append(") ");
-        buf.append(getBody().getStructureString());
+        buf.append((doRewrites ? getBody() : getBodyNoTransform()).getStructureString( doRewrites ));
         buf.append(")");
         return buf.toString();
     }
     
     //literals
-    eq IntLiteralExpr.getStructureStringLessComments() = getValue().getText();
-    eq FPLiteralExpr.getStructureStringLessComments() = getValue().getText();
-    eq StringLiteralExpr.getStructureStringLessComments() = "'" + getValue() + "'";
+    eq IntLiteralExpr.getStructureStringLessComments( boolean doRewrites ) = getValue().getText();
+    eq FPLiteralExpr.getStructureStringLessComments( boolean doRewrites ) = getValue().getText();
+    eq StringLiteralExpr.getStructureStringLessComments( boolean doRewrites ) = "'" + getValue() + "'";
     
-    eq UMinusExpr.getStructureStringLessComments() = "(-" + getOperand().getStructureString() + ")";
-    eq UPlusExpr.getStructureStringLessComments() = "(+" + getOperand().getStructureString() + ")";
-    eq NotExpr.getStructureStringLessComments() = "(~" + getOperand().getStructureString() + ")";
-    eq MTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + "')";
-    eq ArrayTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + ".')";
+    eq UMinusExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        "(-" + (doRewrites ? getOperand() : getOperandNoTransform()).getStructureString( doRewrites ) + ")";
+    eq UPlusExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        "(+" + (doRewrites ? getOperand() : getOperandNoTransform()).getStructureString( doRewrites ) + ")";
+    eq NotExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        "(~" + (doRewrites ? getOperand() : getOperandNoTransform()).getStructureString( doRewrites ) + ")";
+    eq MTransposeExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        "(" + (doRewrites ? getOperand() : getOperandNoTransform()).getStructureString( doRewrites ) + "')";
+    eq ArrayTransposeExpr.getStructureStringLessComments( boolean doRewrites ) = 
+        "(" + (doRewrites ? getOperand() : getOperandNoTransform()).getStructureString( doRewrites ) + ".')";
     
-    syn String BinaryExpr.getStructureStringLessComments(String op) = "(" + getLHS().getStructureString() + " " + op + " " + getRHS().getStructureString() + ")";
+    syn String BinaryExpr.getStructureStringLessComments( boolean doRewrites, String op) = 
+        "(" + (doRewrites ? getLHS() : getLHSNoTransform()).getStructureString( doRewrites ) + " " 
+        + op + " " + (doRewrites ? getRHS() : getRHSNoTransform()).getStructureString( doRewrites ) + ")";
     
-    eq PlusExpr.getStructureStringLessComments() = getStructureStringLessComments("+");
-    eq MinusExpr.getStructureStringLessComments() = getStructureStringLessComments("-");
+    eq PlusExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "+");
+    eq MinusExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "-");
     
-    eq MTimesExpr.getStructureStringLessComments() = getStructureStringLessComments("*");
-    eq MDivExpr.getStructureStringLessComments() = getStructureStringLessComments("/");
-    eq MLDivExpr.getStructureStringLessComments() = getStructureStringLessComments("\\");
-    eq MPowExpr.getStructureStringLessComments() = getStructureStringLessComments("^");
+    eq MTimesExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "*");
+    eq MDivExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "/");
+    eq MLDivExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "\\");
+    eq MPowExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "^");
     
-    eq ETimesExpr.getStructureStringLessComments() = getStructureStringLessComments(".*");
-    eq EDivExpr.getStructureStringLessComments() = getStructureStringLessComments("./");
-    eq ELDivExpr.getStructureStringLessComments() = getStructureStringLessComments(".\\");
-    eq EPowExpr.getStructureStringLessComments() = getStructureStringLessComments(".^");
+    eq ETimesExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, ".*");
+    eq EDivExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "./");
+    eq ELDivExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, ".\\");
+    eq EPowExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, ".^");
     
-    eq AndExpr.getStructureStringLessComments() = getStructureStringLessComments("&");
-    eq OrExpr.getStructureStringLessComments() = getStructureStringLessComments("|");
-    eq ShortCircuitAndExpr.getStructureStringLessComments() = getStructureStringLessComments("&&");
-    eq ShortCircuitOrExpr.getStructureStringLessComments() = getStructureStringLessComments("||");
-    eq LTExpr.getStructureStringLessComments() = getStructureStringLessComments("<");
-    eq GTExpr.getStructureStringLessComments() = getStructureStringLessComments(">");
-    eq LEExpr.getStructureStringLessComments() = getStructureStringLessComments("<=");
-    eq GEExpr.getStructureStringLessComments() = getStructureStringLessComments(">=");
-    eq EQExpr.getStructureStringLessComments() = getStructureStringLessComments("==");
-    eq NEExpr.getStructureStringLessComments() = getStructureStringLessComments("~=");
+    eq AndExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "&");
+    eq OrExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "|");
+    eq ShortCircuitAndExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "&&");
+    eq ShortCircuitOrExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "||");
+    eq LTExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "<");
+    eq GTExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, ">");
+    eq LEExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "<=");
+    eq GEExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, ">=");
+    eq EQExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "==");
+    eq NEExpr.getStructureStringLessComments( boolean doRewrites ) = getStructureStringLessComments(doRewrites, "~=");
     
     //// ANNOTATION EXTENSION - START //////////////////////////////////////////
 
-    eq Annotation.getStructureStringLessComments() = "(*" + getText()  + "*)";
-    eq ExpandedAnnotation.getStructureStringLessComments() = getanno().getStructureString();
+    eq Annotation.getStructureStringLessComments( boolean doRewrites ) = "(*" + getText()  + "*)";
+    eq ExpandedAnnotation.getStructureStringLessComments( boolean doRewrites ) = getanno().getStructureString();
+    //(doRewrites ? getanno() : getannoNoTransform()).getStructureString();
 	
     //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
 
-    eq VariableDecl.getStructureStringLessComments() = "Declare " + getID();
+    eq VariableDecl.getStructureStringLessComments( boolean doRewrites ) = "Declare " + getID();
+    eq FunctionDecl.getStructureStringLessComments( boolean doRewrites ){
+        StringBuffer buf = new StringBuffer();
+        List<Name> outParams;
+        List<Name> inParams;
+        List<HelpComment> helpComments;
+        List<Stmt> stmts;
+        List<Function> nestedFuncs;
+        if( doRewrites ){
+            outParams = getOutputParams();
+            inParams = getInputParams();
+            helpComments = getHelpComments();
+            stmts = getStmts();
+            nestedFuncs = getNestedFunctions();
+        }
+        else{
+            outParams = getOutputParamsNoTransform();
+            inParams = getInputParamsNoTransform();
+            helpComments = getHelpCommentsNoTransform();
+            stmts = getStmtsNoTransform();
+            nestedFuncs = getNestedFunctionsNoTransform();
+        }
+
+        buf.append("decl function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : outParams) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString( doRewrites ));
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : inParams) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString( doRewrites ));
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : helpComments) {
+            buf.append(comment.getStructureString( doRewrites ));
+            buf.append('\n');
+        }
+        for(Stmt stmt : stmts) {
+            buf.append(stmt.getStructureString( doRewrites ));
+            buf.append('\n');
+        }
+        for(Function func : nestedFuncs) {
+            buf.append(func.getStructureString( doRewrites ));
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
 }

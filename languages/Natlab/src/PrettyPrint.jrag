@@ -160,7 +160,7 @@ aspect PrettyPrint {
             first = false;
         }
         if(hasElseBlock()) {
-            buf.append(getElseBlock().getStructureString());
+            buf.append(getElseBlock().getStructureString( true ));
         }
         buf.append("end");
         return buf.toString();
@@ -348,7 +348,7 @@ aspect PrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getStructureString();
+    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getStructureString(true);
     eq LambdaExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         buf.append("(@(");

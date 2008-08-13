@@ -292,7 +292,7 @@ aspect NameResolution{
     rewrite Function{
         when( doRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
-            //System.out.println("hello");
+            System.out.println("this should not be happening");
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
             //except for the stmt list
@@ -308,6 +308,10 @@ aspect NameResolution{
                 //only add decls for non parameters
                 if( !params.contains( symbol ) )
                     f.addStmt( new VariableDecl(symbol) );
+            //add original stmts
+            for( int i=0; i<getNumStmt(); i++ ){
+                f.addStmt( getStmt(i) );
+            }
             //add Parameter declarations
             for( String symbol : getParamSet() )
               f.addParamDecl( new VariableDecl(symbol) );

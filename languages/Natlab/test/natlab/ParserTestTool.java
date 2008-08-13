@@ -36,7 +36,8 @@ public class ParserTestTool {
                     int endPos = actual.getEnd();
                     out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
                     out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
-                    out.print(actual.getStructureString());
+                    //pass false to get raw ast, since parser test
+                    out.print(actual.getStructureString( false ));
                 }
             } catch(Parser.Exception e) {
                 for(String error : parser.getErrors()) {

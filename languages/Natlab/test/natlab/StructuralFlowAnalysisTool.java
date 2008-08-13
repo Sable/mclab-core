@@ -42,7 +42,7 @@ public class StructuralFlowAnalysisTool {
 				int endPos = actual.getEnd();
 				out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
 				out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
-				out.print(actual.getStructureString());
+				out.print(actual.getStructureString( true )); //true to get transformed ast, false for raw
 				out.println();
 				out.print(actual.dumpTree());
 			}

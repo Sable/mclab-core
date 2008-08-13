@@ -12,7 +12,7 @@ aspect ASTPrint {
   
   public String ASTNode.getNodeString() {
     StringBuffer s = new StringBuffer();
-    s.append(getStructureString());
+    s.append(getStructureString( true ));
     return s.toString().trim();
   }
   
@@ -55,10 +55,10 @@ aspect ASTPrint {
   eq FPLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq StringLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
   eq NameExpr.dumpString() = getClass().getName() + " [" + getName().getID() + "]";
-  eq ParameterizedExpr.dumpString() = getClass().getName() + " [" + getTarget().getStructureStringLessComments() + "]";
+  eq ParameterizedExpr.dumpString() = getClass().getName() + " [" + getTarget().getStructureStringLessComments( true ) + "]";
 
   eq FunctionHandleExpr.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
-  eq LambdaExpr.dumpString() = getClass().getName() + " [" + getStructureStringLessComments() + "]";
+  eq LambdaExpr.dumpString() = getClass().getName() + " [" + getStructureStringLessComments( true ) + "]";
 
   public String Script.dumpTree() {
     StringBuffer s = new StringBuffer();
