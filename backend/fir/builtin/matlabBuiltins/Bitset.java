@@ -41,8 +41,7 @@ public class Bitset extends MatlabBuiltin {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "ibset";
 	}
 
 	@Override
