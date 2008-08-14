@@ -1,6 +1,7 @@
 package fir.builtin.matlabBuiltins;
 import java.util.Vector;
 
+import fir.ast.Call;
 import fir.ast.Constant;
 import fir.codegen.CodeGenInterfacer;
 import fir.codegen.ExpressionInterfacer;
@@ -10,9 +11,9 @@ import fir.type.*;
 
 public abstract class Transcendental extends MatlabBuiltin {
 	@Override
-	public void generate(ExpressionInterfacer interfacer, Signature signature) {
+	public void generate(ExpressionInterfacer interfacer,Call call) {
 		if (interfacer.haveToInsertExpression()){ //we only need to insert expression
-			interfacer.insertExpression(getName()+"("+signature.getarg()+")");
+			interfacer.insertExpression(getName()+"("+call.getSignature().getArg()+")");
 		} else {
 			System.err.println("Transcendal (class Transcendental) cannot generate subroutine!"); ///TODO
 		}
