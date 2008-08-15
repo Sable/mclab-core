@@ -1,0 +1,29 @@
+aspect RewriteControl{
+
+
+    public boolean ASTNode.rawAST = false;
+    //inh boolean ASTNode.useRawAST();
+    //eq Program.getChild(int i).useRawAST() = return rawAST;
+    //syn boolean Program.useRawAST() = rawAST;
+    public boolean ASTNode.useRawAST(){
+        if( getParent() == null ){
+            return rawAST;
+        }
+        else
+            return getParent().useRawAST();
+    }
+    refine ASTNode public static ASTNode ASTNode.getChild(ASTNode that, int i){
+        
+        //System.out.println("boo " + that.getClass());
+        //System.out.println("null? " + ((that.getParent()==null)?"yes":"no"));
+        //System.out.println("blah " + that.getParent().getClass());
+        //System.out.println("bl");
+        //that.doDeclRewrite();
+        if( that.useRawAST() )
+            return that.getChildNoTransform(i);
+        else{
+            //System.out.println("this is fun?");
+            return ASTNode.ASTNode.getChild(that, i);
+        }
+    }
+}

@@ -275,7 +275,7 @@ aspect NameResolution{
     // Adding Declaration nodes
     
     rewrite Script{
-        when( doRewrite() )
+        when( doDeclRewrite() )
         to Script{
             //System.out.println("yo");
             Script s = new Script();
@@ -290,7 +290,7 @@ aspect NameResolution{
     }
 
     rewrite Function{
-        when( doRewrite() && !(this instanceof FunctionDecl) )
+        when( doDeclRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
             System.out.println("this should not be happening");
             FunctionDecl f = new FunctionDecl();
@@ -320,9 +320,10 @@ aspect NameResolution{
     }
     //syn boolean ASTNode.doRewrite() = getParent().doRewrite();
     //eq Program.doRewrite() = canDoRewrites;
-    inh boolean ASTNode.doRewrite();
+    inh boolean ASTNode.doDeclRewrite();
 
-    eq Program.getChild(int i).doRewrite() = canDoRewrites;
+    eq Program.getChild(int i).doDeclRewrite() = canDoDeclRewrites;
+    syn boolean Program.doDeclRewrite() = canDoDeclRewrites;
         
 
 }
