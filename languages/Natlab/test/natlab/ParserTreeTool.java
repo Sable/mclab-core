@@ -39,8 +39,7 @@ public class ParserTreeTool {
                     int endPos = actual.getEnd();
                     out.println(Program.getLine(startPos) + " " + Program.getColumn(startPos));
                     out.println(Program.getLine(endPos) + " " + Program.getColumn(endPos));
-                    //pass false to get raw ast since parser test
-                    out.print(actual.getStructureString( false ));
+                    out.print(actual.getStructureString());
                     out.println();
                     out.print(actual.dumpTree());
                 }

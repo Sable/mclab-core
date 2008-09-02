@@ -249,7 +249,7 @@ aspect ASTVisitor {
 
     // Expr Node
     public void Expr.generateUseBoxes() {
-        valueBoxes.add(new natlab.toolkits.ASTValueBox(getStructureString( true )));
+        valueBoxes.add(new natlab.toolkits.ASTValueBox(getStructureString()));
     }
     
     // Name Node: is covered by the Expr...			// Delete it later ...
@@ -279,7 +279,7 @@ aspect ASTVisitor {
     // Dumping every thing of the Node, including use/def sets
     public String ASTNode.dumpStringAll() {
         try {
-            return " [<" + getNodeID() + ">]" + getClass().getName() + " [" + getStructureString( true ) + "]"
+            return " [<" + getNodeID() + ">]" + getClass().getName() + " [" + getStructureString() + "]"
                    + getDefBoxes() + getUseBoxes();
 
         } catch (Exception e) {

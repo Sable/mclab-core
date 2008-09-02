@@ -292,7 +292,6 @@ aspect NameResolution{
     rewrite Function{
         when( doDeclRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
-            System.out.println("this should not be happening");
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
             //except for the stmt list

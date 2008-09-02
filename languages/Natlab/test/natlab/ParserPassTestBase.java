@@ -50,9 +50,9 @@ class ParserPassTestBase extends TestCase {
 	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Program actual, Structure expected) {
 		try {
-                    //passing false to getStructureString to get untransformed tree
-			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString( false )));
-			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString( false )));
+                        actual.rawAST = true;
+			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString()));
+			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString()));
 			while(true) {
 				String expectedLine = expectedReader.readLine();
 				String actualLine = actualReader.readLine();
@@ -143,7 +143,7 @@ class ParserPassTestBase extends TestCase {
 			this.endCol = endCol;
 		}
 
-		public String getStructureString( boolean doRewrites ) {
+		public String getStructureString() {
 			return structureString;
 		}
 
