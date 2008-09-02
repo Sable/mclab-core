@@ -48,18 +48,13 @@ aspect StructureString {
         StringBuffer buf = new StringBuffer();
         List<Function> funcs;
         if( doRewrites ){
-            System.out.println("hello");
             funcs = getFunctions();
         }
         else{
-            System.out.println("you");
             funcs = getFunctionsNoTransform();
-            System.out.println("you1");
         }
         for(Function func : funcs) {
-            System.out.println("you2");
             buf.append(func.getStructureString( doRewrites ));
-            System.out.println("you3");
             buf.append('\n');
         }
         return buf.toString();
