@@ -264,8 +264,8 @@
 %typeof stmt_list = "List<Stmt>";
 %typeof stmt, stmt_body, last_stmt, stmt_body_before_comments = "Stmt";
 %typeof for_assign = "AssignStmt";
-%typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, primary_expr = "Expr";
-%typeof arg, logic_arg, binary_arg, colon_arg, prefix_arg, postfix_arg, pow_arg, primary_arg = "Expr";
+%typeof expr, logic_expr, binary_expr, colon_expr, prefix_expr, postfix_expr, pow_expr, prefix_exp_expr, primary_expr = "Expr";
+%typeof arg, logic_arg, binary_arg, colon_arg, prefix_arg, postfix_arg, pow_arg, prefix_exp_arg, primary_arg = "Expr";
 %typeof arg_list = "List<Expr>";
 %typeof element_list = "List<Expr>";
 %typeof element = "Expr";
@@ -619,8 +619,15 @@ prefix_expr =
 
 pow_expr =
      postfix_expr.e
-  |  pow_expr.e1 MPOW pow_expr.e2    {: return new MPowExpr(e1, e2); :}
-  |  pow_expr.e1 EPOW pow_expr.e2    {: return new EPowExpr(e1, e2); :}
+  |  pow_expr.e1 MPOW prefix_exp_expr.e2    {: return new MPowExpr(e1, e2); :}
+  |  pow_expr.e1 EPOW prefix_exp_expr.e2    {: return new EPowExpr(e1, e2); :}
+  ;
+
+prefix_exp_expr =
+     postfix_expr.e
+  |  NOT prefix_exp_expr.e {: return new NotExpr(e); :}
+  |  PLUS prefix_exp_expr.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_exp_expr.e {: return new UMinusExpr(e); :}
   ;
 
 postfix_expr =
@@ -753,8 +760,15 @@ prefix_arg =
 
 pow_arg =
      postfix_arg.e
-  |  pow_arg.e1 MPOW pow_arg.e2    {: return new MPowExpr(e1, e2); :}
-  |  pow_arg.e1 EPOW pow_arg.e2    {: return new EPowExpr(e1, e2); :}
+  |  pow_arg.e1 MPOW prefix_exp_arg.e2    {: return new MPowExpr(e1, e2); :}
+  |  pow_arg.e1 EPOW prefix_exp_arg.e2    {: return new EPowExpr(e1, e2); :}
+  ;
+
+prefix_exp_arg =
+     postfix_arg.e
+  |  NOT prefix_exp_arg.e {: return new NotExpr(e); :}
+  |  PLUS prefix_exp_arg.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_exp_arg.e {: return new UMinusExpr(e); :}
   ;
 
 postfix_arg =
