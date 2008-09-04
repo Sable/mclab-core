@@ -497,7 +497,12 @@ prefix_expr :
   ;
 
 pow_expr :
-     postfix_expr (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_expr)*
+     postfix_expr (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? prefix_postfix_expr)*
+  ;
+
+prefix_postfix_expr :
+     postfix_expr
+  |  (t_NOT | t_PLUS | t_MINUS) t_FILLER? prefix_postfix_expr
   ;
 
 postfix_expr :
@@ -562,7 +567,12 @@ prefix_arg :
   ;
 
 pow_arg :
-     postfix_arg (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? postfix_arg)*
+     postfix_arg (t_FILLER? (t_MPOW | t_EPOW) t_FILLER? prefix_postfix_arg)*
+  ;
+
+prefix_postfix_arg :
+     postfix_arg
+  |  (t_NOT | t_PLUS | t_MINUS) t_FILLER? prefix_postfix_arg
   ;
 
 postfix_arg :
