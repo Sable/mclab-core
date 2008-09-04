@@ -25,6 +25,7 @@ translator_mixed_all1
 translator_mixed_all2
 translator_mixed_all3
 translator_mixed_all4
+translator_leadingnl_newlinefunction
 parserpasstest1
 parserpasstest2
 parserpass_unary
@@ -117,4 +118,3 @@ parserpass_access
 parserpass_class
 parserpass_command
 parserpass_end
-parserpass_newlinefunction

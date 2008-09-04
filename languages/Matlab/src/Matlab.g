@@ -349,7 +349,7 @@ function :
   ;
 
 function_beginning :
-     (t_FILLER | t_LINE_TERMINATOR)*
+     (t_FILLER | dt_LINE_TERMINATOR -> template() "")*
   ;
 
 function_ending :
