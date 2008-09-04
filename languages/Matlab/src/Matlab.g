@@ -204,8 +204,8 @@ private boolean couldBeFieldName = false;
 program :
      t_FILLER? EOF //empty
   |  t_FILLER? script script_ending EOF
-  |  t_FILLER? function_list function_ending EOF
-  |  class_def function_ending EOF
+  |  function_beginning function_list function_ending EOF
+  |  function_beginning class_def function_ending EOF
   ;
 
 script :
@@ -347,7 +347,11 @@ function_list :
 function :
      function_body (t_FILLER? stmt_separator)*
   ;
-  
+
+function_beginning :
+     (t_FILLER | t_LINE_TERMINATOR)*
+  ;
+
 function_ending :
      (t_COMMENT | t_BRACKET_COMMENT)?
   ;

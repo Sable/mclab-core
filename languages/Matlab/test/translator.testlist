@@ -117,3 +117,4 @@ parserpass_access
 parserpass_class
 parserpass_command
 parserpass_end
+parserpass_newlinefunction
