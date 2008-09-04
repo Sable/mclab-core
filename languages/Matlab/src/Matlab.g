@@ -202,10 +202,10 @@ private boolean couldBeFieldName = false;
 
 //start symbol
 program :
-     t_FILLER? //empty
-  |  t_FILLER? script script_ending
-  |  t_FILLER? function_list function_ending
-  |  class_def function_ending
+     t_FILLER? EOF //empty
+  |  t_FILLER? script script_ending EOF
+  |  t_FILLER? function_list function_ending EOF
+  |  class_def function_ending EOF
   ;
 
 script :
