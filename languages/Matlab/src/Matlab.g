@@ -248,7 +248,7 @@ stmt_body :
   |  (t_GLOBAL | t_PERSISTENT) (t_FILLER? name)+ t_FILLER?
   |  t_SHELL_COMMAND t_FILLER?
   |  t_TRY sep_stmt_list (t_CATCH sep_stmt_list)? t_END t_FILLER?
-  |  t_SWITCH t_FILLER? expr t_FILLER? stmt_separator t_FILLER? (t_CASE t_FILLER? expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END t_FILLER?
+  |  t_SWITCH t_FILLER? expr {wantCompoundStmtHeaderSeparator = true;} compound_stmt_header_sep {wantCompoundStmtHeaderSeparator = false;} (t_CASE t_FILLER? expr sep_stmt_list)* (t_OTHERWISE sep_stmt_list)? t_END t_FILLER?
   |  t_IF t_FILLER? expr sep_stmt_list (t_ELSEIF t_FILLER? expr sep_stmt_list)* (t_ELSE sep_stmt_list)? t_END t_FILLER?
   |  t_BREAK t_FILLER?
   |  t_CONTINUE t_FILLER?
