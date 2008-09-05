@@ -26,6 +26,7 @@ translator_mixed_all2
 translator_mixed_all3
 translator_mixed_all4
 translator_leadingnl_newlinefunction
+translator_csheader_if
 parserpasstest1
 parserpasstest2
 parserpass_unary
