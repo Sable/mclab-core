@@ -151,8 +151,11 @@ private boolean isElementSeparator() {
              isLParen(prevToken) || isRParen(nextToken));
 }
 
+//flag so that Antlr doesn't test all fillers with isCompoundStmtHeaderSeparator()
+private boolean wantCompoundStmtHeaderSeparator = false;
+
 private boolean isCompoundStmtHeaderSeparator() {
-    if(input.LA(1) != FILLER) {
+    if(!wantCompoundStmtHeaderSeparator || input.LA(1) != FILLER) {
         return false;
     }
     Token prevToken = input.LT(-1);
@@ -349,12 +352,12 @@ cmd_args_tail :
 
 compound_stmt_header_sep :
      stmt_separator t_FILLER?
-  |  (FILLER)=> t_FILLER stmt_separator t_FILLER? 
-  //|  {isCompoundStmtHeaderSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
+  |  (FILLER stmt_separator)=> t_FILLER stmt_separator t_FILLER? //don't insert a comma if we don't have to
+  |  {isCompoundStmtHeaderSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); System.err.println("Inserting comma"); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 sep_stmt_list :
-     compound_stmt_header_sep (stmt t_FILLER?)*
+     {wantCompoundStmtHeaderSeparator = true;} compound_stmt_header_sep {wantCompoundStmtHeaderSeparator = false;} (stmt t_FILLER?)*
   ;
 
 function_list :
