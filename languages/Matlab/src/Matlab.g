@@ -151,6 +151,17 @@ private boolean isElementSeparator() {
              isLParen(prevToken) || isRParen(nextToken));
 }
 
+private boolean isCompoundStmtHeaderSeparator() {
+    if(input.LA(1) != FILLER) {
+        return false;
+    }
+    Token prevToken = input.LT(-1);
+    Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
+    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
+             isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
+             isLParen(prevToken) || isRParen(nextToken));
+}
+
 private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Integer>();
 private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
 private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
@@ -336,8 +347,14 @@ cmd_args_tail :
      (~(COMMA | SEMICOLON | LINE_TERMINATOR | COMMENT | BRACKET_COMMENT))*
   ;
 
+compound_stmt_header_sep :
+     stmt_separator t_FILLER?
+  |  (FILLER)=> t_FILLER stmt_separator t_FILLER? 
+  //|  {isCompoundStmtHeaderSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
+  ;
+
 sep_stmt_list :
-     t_FILLER? stmt_separator t_FILLER? (stmt t_FILLER?)*
+     compound_stmt_header_sep (stmt t_FILLER?)*
   ;
 
 function_list :
