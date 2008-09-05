@@ -131,7 +131,7 @@ private static boolean isRParen(Token op) {
  * to be a column delimiter.
  */
 private boolean isElementSeparator() {
-    if(!(notInBrackets() || inCurly() || inSquare())) {
+    if(!(inCurly() || inSquare())) {
         return false;
     }
     Token prevToken = input.LT(-1);
@@ -155,7 +155,6 @@ private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Intege
 private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
 private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
 private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
-private boolean notInBrackets() { return bracketStack.isEmpty(); }
 }
 
 @lexer::header {
@@ -339,7 +338,6 @@ cmd_args_tail :
 
 sep_stmt_list :
      t_FILLER? stmt_separator t_FILLER? (stmt t_FILLER?)*
-  //|  element_separator_filler (stmt t_FILLER?)*
   ;
 
 function_list :
@@ -671,11 +669,7 @@ element :
 //non-empty
 element_separator_list :
      t_FILLER? t_COMMA t_FILLER? //just echo
-  |  element_separator_filler //insert comma
-  ;
-
-element_separator_filler :
-     {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
+  |  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } t_FILLER -> template(filler={$text}) ",<filler>" //insert comma
   ;
 
 //non-empty
