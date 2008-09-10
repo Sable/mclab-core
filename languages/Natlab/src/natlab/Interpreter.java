@@ -40,8 +40,9 @@ public class Interpreter {
 						System.out.println(error);
 					}
 				} else if(!original.errorCheck()) {
-                                        //pass true to get transformed ast
+                    //pass true to get transformed ast
 					System.out.println(original.getStructureString( ));
+					System.out.println(original.ASTtoXML());
 					// System.out.println(original.dumpTree());
 				}
 			} catch(Parser.Exception e) {

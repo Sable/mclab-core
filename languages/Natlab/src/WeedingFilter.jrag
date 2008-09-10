@@ -4,14 +4,13 @@ aspect WeedingFilter {
     //default - exception
     syn boolean ASTNode.getWeedingFilter() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingFilter()"); }
      
-    eq EmptyProgram.getWeedingFilter() {
-       	return true;
-    }
+    eq EmptyProgram.getWeedingFilter() = true;
 
     eq Script.getWeedingFilter() {
     	for(Stmt stmt : getStmts()) {
     		stmt.getWeedingFilter();
 		}
+		
 		return true;
     }
     
@@ -19,6 +18,7 @@ aspect WeedingFilter {
         for(Function func : getFunctions()) {
     		func.getWeedingFilter();
     	}
+    	
         return true;
     }
     
@@ -26,9 +26,11 @@ aspect WeedingFilter {
     	for(Stmt stmt : getStmts()) {
     		stmt.getWeedingFilter();
         }
+        
         if(getNumNestedFunction() > 0) {
 			error(getNestedFunction(0).getPosString(), "Nested functions are not supported");
 		}
+		
         return true;
     }
 
@@ -37,35 +39,123 @@ aspect WeedingFilter {
         return true;
     }
    
-    eq Stmt.getWeedingFilter() { 	
-		if(this instanceof TryStmt) {
-			error(getPosString(), "Try statements are not supported");
-		}
-		for(int i = 0; i < getNumChild(); i++) {
-			ASTNode obj = getChild(i);
-			if(obj instanceof Stmt) {
-				obj.getWeedingFilter();
-			}
-			else if(obj instanceof Expr) {
-				Expr exp = (Expr)obj;
-				if(exp instanceof FunctionHandleExpr) {
-					error(exp.getPosString(), "Function handles are not supported");
-				}
-				else if(exp instanceof LambdaExpr) {
-					error(exp.getPosString(), "Anonymous functions are not supported");
-				}
-				else if(exp instanceof SuperClassMethodExpr) {
-					error(exp.getPosString(), "Superclass method calls are not supported");
-				}
-				else if(exp instanceof ParameterizedExpr) {
-					ParameterizedExpr pe = (ParameterizedExpr)exp;
-					Expr te = pe.getTarget();
-					if(te instanceof SuperClassMethodExpr) {
-						error(te.getPosString(), "Superclass method calls are not supported");
-					}
-				}	
-	    	}
-    	}
+    //////////////
+    //Statements//
+    //////////////
+    
+    eq EmptyStmt.getWeedingFilter() = true;
+    eq GlobalStmt.getWeedingFilter() = true;
+    eq PersistentStmt.getWeedingFilter() = true;
+    eq ShellCommandStmt.getWeedingFilter() = true;
+    eq ReturnStmt.getWeedingFilter() = true;
+    eq Annotation.getWeedingFilter() = true;
+	eq ExpandedAnnotation.getWeedingFilter() = true;
+	eq VariableDecl.getWeedingFilter() = true;
+	eq BreakStmt.getWeedingFilter()  = true;
+    eq ContinueStmt.getWeedingFilter()  = true;
+    
+    eq ExprStmt.getWeedingFilter() {
+    	getExpr().getWeedingFilter();
+    	return true;
+    }
+    
+    eq AssignStmt.getWeedingFilter() {
+    	getLHS().getWeedingFilter();
+    	getRHS().getWeedingFilter();
+    	
+    	return true;
+    }
+    
+    eq ForStmt.getWeedingFilter() {
+	   	getAssignStmt().getWeedingFilter();
+	   	for(Stmt stmt : getStmts()) {
+           	stmt.getWeedingFilter();
+        }
+        
         return true;
+    } 
+    
+    eq WhileStmt.getWeedingFilter() {
+    	getExpr().getWeedingFilter();
+    	
+	   	for(Stmt stmt : getStmts()) {
+           	stmt.getWeedingFilter();
+        }
+        
+        return true;
+    } 
+    
+    eq TryStmt.getWeedingFilter() {
+	   	for(Stmt stmt : getTryStmts()) {
+           	stmt.getWeedingFilter();
+        }
+        for(Stmt stmt : getCatchStmts()) {
+           	stmt.getWeedingFilter();
+        }
+        
+        return true;
+    } 
+    
+    eq SwitchStmt.getWeedingFilter() {
+    	getExpr().getWeedingFilter();
+    	
+	   	for(SwitchCaseBlock sb : getSwitchCaseBlocks()) {
+	   		sb.getExpr().getWeedingFilter();
+	   	
+           	for(Stmt stmt : sb.getStmts()) {
+	           	stmt.getWeedingFilter();
+	        }
+        }
+        
+        if(hasDefaultCaseBlock()) {
+	        for(Stmt stmt : getDefaultCaseBlock().getStmts()) {
+		        stmt.getWeedingFilter();
+		    }
+	    }
+	    
+	    return true;
+    } 
+    
+    eq IfStmt.getWeedingFilter() {
+	   	for(IfBlock ib : getIfBlocks()) {
+	   		ib.getCondition().getWeedingFilter();
+	   		
+           	for(Stmt stmt : ib.getStmts()) {
+	           	stmt.getWeedingFilter();
+	        }
+        }
+        
+        if(hasElseBlock()) {
+	        for(Stmt stmt : getElseBlock().getStmts()) {
+		        stmt.getWeedingFilter();
+		    }
+	    }
+	    
+	    return true;
+    } 
+    
+    ///////////////
+    //Expressions//
+    ///////////////
+    
+    eq Expr.getWeedingFilter() {
+    	if(this instanceof FunctionHandleExpr) {
+			error(getPosString(), "Function handles are not supported");
+		}
+		else if(this instanceof LambdaExpr) {
+			error(getPosString(), "Anonymous functions are not supported");
+		}
+		else if(this instanceof SuperClassMethodExpr) {
+			error(getPosString(), "Superclass method calls are not supported");
+		}
+		else if(this instanceof ParameterizedExpr) {
+			ParameterizedExpr pe = (ParameterizedExpr)this;
+			Expr te = pe.getTarget();
+			if(te instanceof SuperClassMethodExpr) {
+				error(te.getPosString(), "Superclass method calls are not supported");
+			}
+		}
+		
+		return true;	
     }
 }

@@ -4,22 +4,21 @@ aspect WeedingErrors {
     //default - exception
     syn boolean ASTNode.getWeedingErrors() { throw new UnsupportedOperationException(getClass().getName() + ".getWeedingErrors()"); }
      
-    eq EmptyProgram.getWeedingErrors() {
-        return true;
-    }
+    eq EmptyProgram.getWeedingErrors() = true;
 
     eq Script.getWeedingErrors() {
-        for(Stmt stmt : getStmts())
-    		if(stmt instanceof AssignStmt)
-            	stmt.getWeedingErrors();
-            	
+        for(Stmt stmt : getStmts()) {
+    		stmt.getWeedingErrors();
+        }
+        
     	return true;
     }
     
     eq FunctionList.getWeedingErrors() {
-        for(Function func : getFunctions())
+        for(Function func : getFunctions()) {
            func.getWeedingErrors();
-       
+       	}
+       	
         return true;
     }
     
@@ -30,18 +29,19 @@ aspect WeedingErrors {
         	
 	  		if(grandParent.getName().compareTo(getName()) == 0) {
 		  		if(getOutputParams().getNumChild() == 0) {
-	               	error(getPosString(), "A class constructor must at least return an object constructed as output");
+	               	error(getPosString(), "CLASS constructor must return the object constructed as output");
 				}
 			}
         }
         
-    	for(Stmt stmt : getStmts())
-            if(stmt instanceof AssignStmt)
-            	stmt.getWeedingErrors();
-
-        for(Function func : getNestedFunctions())
+    	for(Stmt stmt : getStmts()) {
+          	stmt.getWeedingErrors();
+		}
+		
+        for(Function func : getNestedFunctions()) {
             func.getWeedingErrors();
-
+		}
+		
     	return true;
     }
 
@@ -59,14 +59,17 @@ aspect WeedingErrors {
            	}
         }
 
-		for(Properties prop : getPropertys())
+		for(Properties prop : getPropertys()) {
             prop.getWeedingErrors();
+        }
         
-        for(Methods methods : getMethods())
+        for(Methods methods : getMethods()) {
             methods.getWeedingErrors();
+        }
         
-        for(ClassEvents events : getClassEvents())
+        for(ClassEvents events : getClassEvents()) {
             events.getWeedingErrors();
+        }
         
         return true;
     }
@@ -92,7 +95,7 @@ aspect WeedingErrors {
 		            for(PropertyAccess pty : mthd.getPropAccs()) {
 		            	for(Property prop : getPropertys()) {
 			            	if(prop.getName().compareTo(pty.getName()) == 0) {
-			            		error(pty.getPosString(), "Property access methods can not be defined for abstract property: " + prop.getName());
+			            		error(pty.getPosString(), "Property access methods can not be defined for ABSTRACT property: " + prop.getName());
 			            	}
 		            	}
 		            }
@@ -100,26 +103,29 @@ aspect WeedingErrors {
 		        
 		        for(Property prop : getPropertys())
 		        	if(prop.getExpr().getPrettyPrintedLessComments().compareTo("[]") != 0)
-		        		error(prop.getExpr().getPosString(), "Initial value can not be specified for abstract property: " + prop.getName());            			
+		        		error(prop.getExpr().getPosString(), "Initial value can not be specified for ABSTRACT property: " + prop.getName());            			
 		        
 		        
 		        for(Attribute pAttr : parent.getAttributes()) {
 		        	//ToDo-TA: also add value=true condition below
 		        	if(pAttr.getKey().compareTo("Sealed") == 0 && pAttr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
-		            	error(attr.getPosString(), "Abstract properties are not allowed in a sealed class");		            	
+		            	error(attr.getPosString(), "ABSTRACT properties are not allowed in a SEALED class");		            	
 		           	}
 		        }
 			}
            	
            	//ToDo-TA: also add value=true conditions below
-           	if(attr.getKey().compareTo("Constant") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) 
+           	if(attr.getKey().compareTo("Constant") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
            		constExists = true;
-           	if(attr.getKey().compareTo("Dependent") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) 
+           	}
+           	
+           	if(attr.getKey().compareTo("Dependent") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) { 
            		depExists = true;
+           	}
         }
         
         if(constExists && depExists) {
-        	error(getPosString(), "Constant properties can not be Dependent and vice-versa");        	
+        	error(getPosString(), "CONSTANT properties can not be DEPENDENT and vice-versa");        	
        	}
         
         for(Property prop : getPropertys()) {
@@ -127,7 +133,7 @@ aspect WeedingErrors {
             ClassDef grandParent = (ClassDef) getParent().getParent();
             
   			if(grandParent.getName().compareTo(name) == 0) {
-        		error(prop.getPosString(), "A property may not use the same name as the name of the class");				
+        		error(prop.getPosString(), "A property may not use the same name as the name of the CLASS");				
 			}
         }
 
@@ -149,7 +155,7 @@ aspect WeedingErrors {
            	
            	if(attr.getKey().compareTo("Abstract") == 0 && attr.getExpr().getPrettyPrintedLessComments().compareTo("true") == 0) {
             	if(getPropAccs().getNumChild() > 0 || getFunctions().getNumChild() > 0) {
-            		error(attr.getPosString(), "Only function signatures are valid inside abstract methods block");            		
+            		error(attr.getPosString(), "Only function signatures are valid inside ABSTRACT methods block");            		
             	}
            	}
         }
@@ -215,13 +221,14 @@ aspect WeedingErrors {
         	error(getPosString() + name + " is not a valid property in property access method");			
         }
                 
-        for(Stmt stmt : getStmts())
-            if(stmt instanceof AssignStmt)
-            	stmt.getWeedingErrors();
+        for(Stmt stmt : getStmts()) {
+           	stmt.getWeedingErrors();
+        }
         
-        for(Function func : getNestedFunctions())
+        for(Function func : getNestedFunctions()) {
             func.getWeedingErrors();
-
+		}
+		
         return true;
     }
     
@@ -244,13 +251,27 @@ aspect WeedingErrors {
             ClassDef grandParent = (ClassDef) getParent().getParent();
   			
   			if(grandParent.getName().compareTo(name) == 0) {
-        		error(eve.getPosString(), "An event may not use the same name as the name of the class");				
+        		error(eve.getPosString(), "An event may not use the same name as the name of the CLASS");				
 			}
         }
         
         return true;
     }
 
+	//////////////
+    //Statements//
+    //////////////
+    
+    eq EmptyStmt.getWeedingErrors() = true;
+    eq ExprStmt.getWeedingErrors() = true;
+    eq GlobalStmt.getWeedingErrors() = true;
+    eq PersistentStmt.getWeedingErrors() = true;
+    eq ShellCommandStmt.getWeedingErrors() = true;
+    eq ReturnStmt.getWeedingErrors() = true;
+    eq Annotation.getWeedingErrors() = true;
+	eq ExpandedAnnotation.getWeedingErrors() = true;
+	eq VariableDecl.getWeedingErrors() = true;
+	
     eq AssignStmt.getWeedingErrors() {
     	Expr lhs = getLHS();
     	
@@ -260,9 +281,100 @@ aspect WeedingErrors {
 			}
     	} else {
     		error(lhs.getPosString(), "Left hand side of assignment statement is not a valid expression");			
-    	}  	   
+    	}
+    	
     	return true;
-    }  
+    }
+    
+    eq BreakStmt.getWeedingErrors() {
+    	ASTNode node = this;
+	    while(node != null && !(node instanceof ForStmt || node instanceof WhileStmt || node instanceof Script)) {
+	    	node = node.getParent();
+	    }
+	    	
+		if(node == null) {
+    		error(getPosString(), "BREAK can only be used in FOR, WHILE or a script");			
+		}
+		
+    	return true;
+    }
+    
+    eq ContinueStmt.getWeedingErrors() {
+    	ASTNode node = this;
+	    while(node != null && !(node instanceof ForStmt || node instanceof WhileStmt || node instanceof Script)) {
+	    	node = node.getParent();
+	    }
+	    
+		if(node == null) {
+    		error(getPosString(), "CONTINUE can only be used in FOR, WHILE or a script");			
+		}
+		
+    	return true;
+    }
+    
+    eq ForStmt.getWeedingErrors() {
+	   	getAssignStmt().getWeedingErrors();
+	   	for(Stmt stmt : getStmts()) {
+           	stmt.getWeedingErrors();
+        }
+        
+        return true;
+    } 
+    
+    eq WhileStmt.getWeedingErrors() {
+	   	for(Stmt stmt : getStmts()) {
+           	stmt.getWeedingErrors();
+        }
+        
+        return true;
+    } 
+    
+    eq TryStmt.getWeedingErrors() {
+	   	for(Stmt stmt : getTryStmts()) {
+           	stmt.getWeedingErrors();
+        }
+        for(Stmt stmt : getCatchStmts()) {
+           	stmt.getWeedingErrors();
+        }
+        
+        return true;
+    } 
+    
+    eq SwitchStmt.getWeedingErrors() {
+	   	for(SwitchCaseBlock sb : getSwitchCaseBlocks()) {
+           	for(Stmt stmt : sb.getStmts()) {
+	           	stmt.getWeedingErrors();
+	        }
+        }
+        
+        if(hasDefaultCaseBlock()) {
+	        for(Stmt stmt : getDefaultCaseBlock().getStmts()) {
+		        stmt.getWeedingErrors();
+		    }
+	    }
+	    
+	    return true;
+    } 
+    
+    eq IfStmt.getWeedingErrors() {
+	   	for(IfBlock ib : getIfBlocks()) {
+           	for(Stmt stmt : ib.getStmts()) {
+	           	stmt.getWeedingErrors();
+	        }
+        }
+        
+        if(hasElseBlock()) {
+	        for(Stmt stmt : getElseBlock().getStmts()) {
+		        stmt.getWeedingErrors();
+		    }
+	    }
+	    
+	    return true;
+    } 
+    
+    ///////////////
+    //Expressions//
+    ///////////////
     
 	eq MatrixExpr.getWeedingErrors() {    	
 		Integer noOfRows = 0;

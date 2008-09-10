@@ -2,6 +2,7 @@
 aspect Annotations {
 
 	rewrite Annotation {
+		when (!(this instanceof ExpandedAnnotation))
 		to ExpandedAnnotation {
 			ExpandedAnnotation exAnno = new ExpandedAnnotation();
 			

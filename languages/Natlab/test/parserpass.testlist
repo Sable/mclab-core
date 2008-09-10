@@ -91,3 +91,4 @@ parserpass_class
 parserpass_end
 parserpass_powprefix
 annotation_parser
+parserpass_unreachable

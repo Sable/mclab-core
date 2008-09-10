@@ -112,7 +112,7 @@ LambdaExpr : Expr ::= InputParam:Name* Body:Expr;
 
 //// ANNOTATION EXTENSION - START //////////////////////////////////////////////
 Annotation : Stmt ::= <Text>;
-ExpandedAnnotation : Stmt ::= <anno : annotations.ast.Annotation>;
+ExpandedAnnotation : Annotation ::= <anno : annotations.ast.Annotation>;
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
 
 //// DECLARATION EXTENSION - START /////////////////////////////////////////////
