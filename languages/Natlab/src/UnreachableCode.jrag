@@ -1,6 +1,8 @@
 
 aspect UnreachableCode {
 
+/*	TODO: uncomment after rewriting scheduling issue is resolved! (also add 'parserpass_unreachable' in 'parserpass.testlist')
+
 	private boolean Stmt.canCompleteNormally = true;
 	syn boolean Stmt.canCompleteNormally() = canCompleteNormally;
     public void Stmt.setCanCompleteNormally(boolean canCompleteNormally) {
@@ -442,4 +444,7 @@ aspect UnreachableCode {
 			return fun;
 		}
 	}
+
+*/
+
 }
