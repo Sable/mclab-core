@@ -146,6 +146,25 @@ aspect ASTVisitor {
     		return false;
     }
 
+    // Remove the UD/DU boxes
+    public void ASTNode.clearUseDefBoxes()
+    {
+    	valueBoxes.clear();
+        for(int i = 0; i < getNumChild(); i++) {
+            if (getChild(i)!=null)
+                getChild(i).clearUseDefBoxes();
+        }
+    }
+    public void AssignStmt.clearUseDefBoxes()
+    {
+    	defBoxes.clear();
+    	super.clearUseDefBoxes();
+    }
+
+	// Nested level, starting from the Stmt
+	public static int ASTNode.nestedLevelCounter = 0;
+	public int ASTNode.nestedLevel = 0;
+
     //---------------------------------------------------------------------
     // Flow-Analysis related implementation
     //---------------------------------------------------------------------
@@ -159,10 +178,15 @@ aspect ASTVisitor {
 
 	// AssignStmt: doesn't generate new use-boxes
     public void AssignStmt.collectUseBoxesList() {
-    	defBoxes = getLHS().getUseBoxes();
-    	valueBoxes.addAll(getRHS().getUseBoxes());
     	leftBox  = (natlab.toolkits.ValueBox) getLHS().getUseBoxes().get(0);
     	rightBox = (natlab.toolkits.ValueBox) getRHS().getUseBoxes().get(0);
+    	if(getLHS() instanceof ParameterizedExpr) {
+    		defBoxes = new java.util.ArrayList();
+    		defBoxes.add(leftBox);
+    	} else {
+    		defBoxes = getLHS().getUseBoxes();
+    	}
+    	valueBoxes.addAll(getRHS().getUseBoxes());
     }
 
     // implements Unit interface
@@ -190,6 +214,7 @@ aspect ASTVisitor {
     public void ASTNode.generateUseBoxesList() {
     	// set the node ID first
     	setNodeID();
+    	nestedLevel = nestedLevelCounter;	// Set the nested-level 
     	// Generate the uses boxes  
     	generateUseBoxes();
         for(int i = 0; i < getNumChild(); i++) {
@@ -199,6 +224,36 @@ aspect ASTVisitor {
         // Collecting the uses boxes 
         collectUseBoxesList();
     }
+
+	// Set the nested-level for each node
+	// ExprStmt, AssignStmt, ParameterizedExpr, BinaryExpr, MatrixExpr 
+    public void ExprStmt.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+    public void AssignStmt.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+    
+    public void ParameterizedExpr.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+    public void BinaryExpr.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+    public void MatrixExpr.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+
 
 	// Generate function for collecting all its child-nodes' use-boxes
     public void ASTNode.collectUseBoxesListAll() {
@@ -232,6 +287,28 @@ aspect ASTVisitor {
     public void SwitchStmt.collectUseBoxesList() {}		//??? There is use-box in Expr
     public void SwitchCaseBlock.collectUseBoxesList() {}
     public void DefaultCaseBlock.collectUseBoxesList() {}
+
+    public void ParameterizedExpr.collectUseBoxesList() {
+        java.util.List childUseBoxes = null;
+        // Collecting the uses boxes : ParameterizedExpr ::= Target:Expr Arg:Expr*;
+        childUseBoxes = getTarget().getUseBoxes();
+        if( !childUseBoxes.isEmpty() ) {
+            valueBoxes.addAll(childUseBoxes);
+        }
+        
+        List<Expr> args = getArgs();
+        for(Expr arg : args) {
+	        childUseBoxes = arg.getUseBoxes();
+	        if( !childUseBoxes.isEmpty() ) {
+	            valueBoxes.addAll(childUseBoxes);
+	        }
+        }
+    }
+
+    public String ForStmt.getIndexVariable() {
+    	AssignStmt  idxStmt = getAssignStmt();
+    	return idxStmt.leftBox.getValue();
+    }
     
     // Default behavior for creating new use-boxes
     public void ASTNode.generateUseBoxes() {
@@ -259,10 +336,15 @@ aspect ASTVisitor {
     
     //---------------------------------------------------------------------
     // Dumping all the nodes of the tree, with their use/def sets
-    public String ASTNode.dumpTreeAll() {
+    public static boolean ASTNode.bDumpCode=true;
+    public String ASTNode.dumpTreeAll(boolean bWithCode) {
+		bDumpCode = bWithCode;
         StringBuffer s = new StringBuffer();
         dumpTreeAll(s, 0);
         return s.toString();
+    }
+    public String ASTNode.dumpTreeAll() {
+		return dumpTreeAll(true);
     }
 
     public void ASTNode.dumpTreeAll(StringBuffer s, int j) {
@@ -278,14 +360,18 @@ aspect ASTVisitor {
 
     // Dumping every thing of the Node, including use/def sets
     public String ASTNode.dumpStringAll() {
-        try {
-            return " [<" + getNodeID() + ">]" + getClass().getName() + " [" + getStructureString() + "]"
-                   + getDefBoxes() + getUseBoxes();
-
-        } catch (Exception e) {
-            return " [<" + getNodeID() + ">]" + getClass().getName() + " [" + toString() + "]"
-                   + getDefBoxes() + getUseBoxes();
-        }
+		if(bDumpCode) {
+			try {
+				return " [<" + getNodeID() + ">]" + getClass().getName() 
+					+ " [" + getStructureString() + "]"
+					+ getDefBoxes() + getUseBoxes() + nestedLevel ; 
+			} catch (Exception e) {
+				return " [<" + getNodeID() + ">]" + getClass().getName() + " [" + toString() + "]"
+					+ getDefBoxes() + getUseBoxes() + nestedLevel ;
+			}
+		} else { 
+			return " [<" + getNodeID() + ">]" + getClass().getName();
+		}
       
     }
     
@@ -293,6 +379,7 @@ aspect ASTVisitor {
     // Dumping limited number of the nodes, that each of them contains only
     // one line of code (a single stmt), let's call it code-tree
     public String ASTNode.dumpCodeTree() {
+		bDumpCode = true;
         StringBuffer s = new StringBuffer();
         dumpCodeTreeAll(s, 0);
         return s.toString();
