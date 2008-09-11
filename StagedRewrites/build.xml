@@ -1,0 +1,52 @@
+<!--
+ Targets for working from terminal window:
+       build (default) - generates java files and compiles them
+       clean           - removes all generated files and class files
+ Targets for working from Eclipse:
+       gen             - generates java files
+       genClean        - removes all generated files and their class files
+-->
+<project name="Java1.5Frontend" default="build">
+
+<!-- "package" is the directory where generated files will be stored -->
+<property name="package" value="AST"/>
+
+<!-- "tools" is the directory where generators and libraries are located. -->
+<property name="tools" value="tools"/>
+	
+<!-- "jastadd" is an ant task class in jastadd2.jar -->
+<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools}/jastadd2.jar"/>
+
+<!-- compile sources -->
+<target name="build" depends="gen">
+	<javac debug="true" nowarn="true" srcdir="." includes="**/*.java" excludes="*test*/**" 
+         classpath="."/>
+</target>
+
+<!-- generate compiler source files -->
+<target name="gen">
+  <!-- create AST node types and weave aspect modules -->
+  <jastadd package="${package}" rewrite="true" beaver="true" novisitcheck="true" noCacheCycle="true" outdir="${basedir}" refineLegacy="false" stagedRewrites="true">
+		<fileset dir=".">
+			<include name="**/*.ast"/>
+			<include name="**/*.jrag"/>
+			<include name="**/*.jadd"/>      
+		</fileset>
+  </jastadd>
+</target>
+
+<!-- remove generated source files and .class files -->
+<target name="clean" depends="cleanGen">
+    <!-- delete all .class files recursively -->
+    <delete>
+      <fileset dir="." includes="**/*.class"/>
+    </delete>
+</target>
+
+<!-- remove generated source files -->
+<target name="cleanGen">
+    <delete dir="${package}"/>
+</target>
+
+</project>
+

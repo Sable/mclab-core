@@ -1,0 +1,6 @@
+Program ::= Stmt;
+abstract Stmt;
+A : Stmt;
+B : Stmt;
+C : Stmt;
+D : Stmt;

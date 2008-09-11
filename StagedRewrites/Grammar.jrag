@@ -1,0 +1,24 @@
+aspect Grammar {
+  rewrite A {
+    to B new B();
+  }
+
+  rewrite B {
+    when(inRewritePhase(2))
+    to C new C();
+  }
+
+  rewrite C {
+    when(inRewritePhase(3))
+    to D new D();
+  }
+
+  syn String Stmt.string() = getClass().getName();
+  syn lazy String Program.string() = getStmt().string();
+
+  public void ASTNode.flushCaches() {
+    flushCache();
+    for(int i = 0; i < getNumChild(); i++)
+      getChild(i).flushCache();
+  }
+}
