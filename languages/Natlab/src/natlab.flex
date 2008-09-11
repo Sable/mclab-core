@@ -23,6 +23,10 @@ import beaver.Scanner;
 %line
 %column
 
+%init{
+  yybegin(CONSUME_LEADING_WHITESPACE);
+%init}
+
 %{
   //// Returning symbols ///////////////////////////////////////////////////////
 
@@ -294,6 +298,8 @@ Annotation = "(*" ([^*] | [*][^)])* "*)"
 
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
 
+//start state - consumes whitespace, transitions on anything else
+%xstate CONSUME_LEADING_WHITESPACE
 //parsing the bit after a DOT
 %state FIELD_NAME
 //within a bracket comment (i.e. %{)
@@ -337,6 +343,13 @@ Annotation = "(*" ([^*] | [*][^)])* "*)"
 }
 
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
+
+<CONSUME_LEADING_WHITESPACE> {
+    {LineTerminator} { /* ignore */ }
+    {OtherWhiteSpace} { /* ignore */ }
+    
+    . | \n { yypushback(1); yybegin(YYINITIAL); }
+}
 
 //... comment
 {EscapedLineTerminator} {
