@@ -281,7 +281,7 @@ aspect NameResolution{
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
             for( String symbol : getLValues() )
-                s.addStmt( new VariableDecl(symbol) );
+                s.addStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
             for( int i=0; i<getNumStmt(); i++ ){
                 s.addStmt( getStmt(i) );
             }
@@ -306,14 +306,14 @@ aspect NameResolution{
             for( String symbol : getLValues() )
                 //only add decls for non parameters
                 if( !params.contains( symbol ) )
-                    f.addStmt( new VariableDecl(symbol) );
+                    f.addStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
             //add original stmts
             for( int i=0; i<getNumStmt(); i++ ){
                 f.addStmt( getStmt(i) );
             }
             //add Parameter declarations
             for( String symbol : getParamSet() )
-              f.addParamDecl( new VariableDecl(symbol) );
+              f.addParamDecl( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
             return f;
         }
     }
