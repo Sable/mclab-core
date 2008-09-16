@@ -1,5 +1,7 @@
 //Symbol Table
 
+//import java.io.StringBuffer;
+
 import natlab.SymbolTableScope;
 import natlab.SymbolTableEntry;
 
@@ -166,5 +168,47 @@ aspect SymbolTableScope {
         }
         
     	return symtbl;
+    }
+}
+
+aspect SymbolTableToXML{
+
+    syn String Program.getSymbolTableXML( int indent ){
+
+        HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
+        
+        StringBuffer buf = new StringBuffer();
+
+        buf.append(getXMLindented(indent));
+        buf.append("<symboltable>");
+
+        for( SymbolTableEntry e : table.values() ){
+            buf.append( getXMLindented(indent+1) );
+            buf.append( e.getXML() );
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</symboltable>");
+
+        return buf.toString();
+    }
+
+    syn String Function.getSymbolTableXML( int indent ){
+        HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
+        
+        StringBuffer buf = new StringBuffer();
+
+        buf.append(getXMLindented(indent));
+        buf.append("<symboltable>");
+
+        for( SymbolTableEntry e : table.values() ){
+            buf.append( getXMLindented(indent+1) );
+            buf.append( e.getXML() );
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</symboltable>");
+
+        return buf.toString();
     }
 }

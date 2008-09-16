@@ -1,6 +1,7 @@
 package natlab;
 
 import natlab.ast.*;
+//import java.io.StringBuffer;
 
 public class SymbolTableEntry
 {
@@ -42,4 +43,14 @@ public class SymbolTableEntry
     public String getSymbol(){return symbol;}
     public String getOriginal(){return original;}
     public ASTNode getDeclLocation(){return declLocation;}
+    
+    public String getXML(){
+        StringBuffer buf = new StringBuffer();
+        long uid = -1;
+        if( declLocation != null )
+            uid = declLocation.getuID();
+
+        buf.append("<entry symbol=\""+symbol+"\" original=\""+original+"\" decl=\""+ uid + "\" />");
+        return buf.toString();
+    }
 }
