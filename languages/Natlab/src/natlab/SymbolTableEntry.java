@@ -50,7 +50,7 @@ public class SymbolTableEntry
         if( declLocation != null )
             uid = declLocation.getuID();
 
-        buf.append("<entry symbol=\""+symbol+"\" original=\""+original+"\" decl=\""+ uid + "\" />");
+        buf.append("<Entry symbol=\""+symbol+"\" original=\""+original+"\" decl=\""+ uid + "\" />");
         return buf.toString();
     }
 }

@@ -1,7 +1,5 @@
 //Symbol Table
 
-//import java.io.StringBuffer;
-
 import natlab.SymbolTableScope;
 import natlab.SymbolTableEntry;
 
@@ -10,7 +8,7 @@ aspect SymbolTableEntry {
      
 	eq NameExpr.getSymbolTableEntry() {
 		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
-        symentlst.add(new SymbolTableEntry(getName().getID(), getName().getID()));
+        symentlst.add(new SymbolTableEntry(getName().getID())); //TODO: How to deal with new & old names?
 		return symentlst;
     }  
     
@@ -88,7 +86,13 @@ aspect SymbolTableScope {
             	for(Name name : ((PersistentStmt)stmt).getNames()) {
 					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
     			}
-            }
+            } else if(stmt instanceof ForStmt) {    	
+            	LValueExpr lhs = (LValueExpr)((ForStmt)stmt).getAssignStmt().getLHS();
+    			java.util.List<SymbolTableEntry> symentlst = lhs.getSymbolTableEntry();
+				for(SymbolTableEntry syment : symentlst) {
+					symtbl.addSymbol(syment);
+    			}
+            } 
         }
         
     	return symtbl;
@@ -97,10 +101,10 @@ aspect SymbolTableScope {
     eq FunctionList.getSymbolTableScope() {
         SymbolTableScope symtbl = new SymbolTableScope();
         
-/*      for(Function func : getFunctions()) {
-            symtbl = func.getSymbolTableScope();
+        for(Function func : getFunctions()) {
+            //TODO
         }
-*/        
+       
         return symtbl;
     }
 
@@ -133,10 +137,10 @@ aspect SymbolTableScope {
             }
         }
         
-/*      for(Function func : getNestedFunctions()) {
-            errors.addAll(func.getWeedingErrors());
+      	for(Function func : getNestedFunctions()) {
+            //TODO
         }
-*/
+
     	return symtbl;
     }
     
@@ -157,13 +161,13 @@ aspect SymbolTableScope {
         
 		for(Methods methods : getMethods()) {
             for(Signature sign : methods.getSignatures()) {
-	            //errors.addAll(sign.getWeedingErrors());
+	            //TODO
 	        }
 	        for(PropertyAccess prop : methods.getPropAccs()) {
-	            //errors.addAll(prop.getWeedingErrors());
+	            //TODO
 	        }
 	        for(Function func : methods.getFunctions()) {
-	            //errors.addAll(func.getWeedingErrors());
+	            //TODO
 	        }
         }
         
@@ -180,7 +184,7 @@ aspect SymbolTableToXML{
         StringBuffer buf = new StringBuffer();
 
         buf.append(getXMLindented(indent));
-        buf.append("<symboltable>");
+        buf.append("<Symboltable>");
 
         for( SymbolTableEntry e : table.values() ){
             buf.append( getXMLindented(indent+1) );
@@ -188,7 +192,7 @@ aspect SymbolTableToXML{
         }
         
         buf.append(getXMLindented(indent));
-        buf.append("</symboltable>");
+        buf.append("</Symboltable>");
 
         return buf.toString();
     }
