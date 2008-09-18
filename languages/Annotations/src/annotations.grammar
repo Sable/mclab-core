@@ -81,7 +81,7 @@
 :};
 
 %terminals NUMBER, IDENTIFIER;
-%terminals DOT, STMT_TERMINATOR, ELEMENT_SEPARATOR, SIZE_OF, EQ, HAS_TYPE;
+%terminals DOT, STMT_TERMINATOR, ELEMENT_SEPARATOR, SIZE_OF, EQ, HAS_TYPE, IS_SCALAR, IS_NOT_SCALAR;
 %terminals LPAREN, RPAREN, LCURLY, RCURLY, LSQUARE, RSQUARE;
 %terminals VARARG_MODIFIER, HANDLE_MODIFIER, TYPE_VAR_MODIFIER, UNKNOWN_TYPE, ARROW;
 %terminals UNION, INTERSECT;
@@ -114,6 +114,7 @@
 %typeof field_entry_list = "List<FieldEntry>";
 %typeof size_stmt_body = "SizeStmt";
 %typeof size = "Size";
+%typeof scalar_stmt_body = "ScalarStmt";
 
 %goal annotation;
 
@@ -128,6 +129,7 @@ stmt =
 stmt_body =
      type_stmt_body
   |  size_stmt_body
+  |  scalar_stmt_body
   ;
 
 entity =
@@ -258,4 +260,9 @@ size =
 num_list =
      NUMBER.n {: java.util.List<Integer> nums = new java.util.ArrayList<Integer>(); nums.add(n); return new Symbol(nums); :}
   |  num_list.l ELEMENT_SEPARATOR NUMBER.n {: ((java.util.List<Integer>) l.value).add(n); return l; :}
+  ;
+
+scalar_stmt_body =
+     IS_SCALAR entity.e {: return new ScalarStmt(e, true); :}
+  |  IS_NOT_SCALAR entity.e {: return new ScalarStmt(e, false); :}
   ;

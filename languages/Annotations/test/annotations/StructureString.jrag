@@ -11,6 +11,7 @@ aspect StructureString {
 	
 	eq SizeStmt.getStructureString() = "#" + getEntity().getStructureString() + " = " + getSize().getStructureString() + ";\n";
 	eq TypeStmt.getStructureString() = getEntity().getStructureString() + " : " + getType().getStructureString() + ";\n";
+	eq ScalarStmt.getStructureString() = (getScalar() ? "+" : "-") + getEntity().getStructureString() + ";\n";
 	
 	eq Variable.getStructureString() = getName();
 	eq Field.getStructureString() = getEntity().getStructureString() + "." + getFieldName();

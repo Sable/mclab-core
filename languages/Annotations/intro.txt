@@ -1,9 +1,11 @@
 The Annotations language is a type-annotation language for Matlab.  It draws inspiration from the type annotations of Diamondback Ruby.
 
-Two types of statements are available:
+Four types of statements are available:
 
 #x = [2, 3, 1]; //x has size [2, 3, 1]
 x : T; //x has type T
++x; //x is definitely a scalar
+-x; //x is definitely not a scalar
 
 The following entities may appear on the LHS:
 

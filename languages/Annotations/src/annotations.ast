@@ -3,6 +3,7 @@ Annotation ::= Stmt*;
 abstract Stmt;
 SizeStmt : Stmt ::= Entity Size;
 TypeStmt : Stmt ::= Entity Type;
+ScalarStmt : Stmt ::= Entity <Scalar:boolean>;
 
 abstract Entity;
 Variable : Entity ::= <Name>;
