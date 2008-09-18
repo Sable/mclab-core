@@ -65,7 +65,7 @@ aspect SymbolTableScope {
      
     eq EmptyProgram.getSymbolTableScope() {
         SymbolTableScope symtbl = new SymbolTableScope();
-        return symtbl; //TODO-TA return null?
+        return symtbl;
     }
 
     eq Script.getSymbolTableScope() {
@@ -102,7 +102,7 @@ aspect SymbolTableScope {
         SymbolTableScope symtbl = new SymbolTableScope();
         
         for(Function func : getFunctions()) {
-            //TODO
+            symtbl.addSymbol(new SymbolTableEntry(func.getName(), func.getName()));
         }
        
         return symtbl;
@@ -134,7 +134,13 @@ aspect SymbolTableScope {
             	for(Name name : ((PersistentStmt)stmt).getNames()) {
 					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
     			}
-            }
+            } else if(stmt instanceof ForStmt) {    	
+            	LValueExpr lhs = (LValueExpr)((ForStmt)stmt).getAssignStmt().getLHS();
+    			java.util.List<SymbolTableEntry> symentlst = lhs.getSymbolTableEntry();
+				for(SymbolTableEntry syment : symentlst) {
+					symtbl.addSymbol(syment);
+    			}
+            } 
         }
         
       	for(Function func : getNestedFunctions()) {
@@ -203,7 +209,7 @@ aspect SymbolTableToXML{
         StringBuffer buf = new StringBuffer();
 
         buf.append(getXMLindented(indent));
-        buf.append("<symboltable>");
+        buf.append("<Symboltable>");
 
         for( SymbolTableEntry e : table.values() ){
             buf.append( getXMLindented(indent+1) );
@@ -211,7 +217,7 @@ aspect SymbolTableToXML{
         }
         
         buf.append(getXMLindented(indent));
-        buf.append("</symboltable>");
+        buf.append("</Symboltable>");
 
         return buf.toString();
     }
