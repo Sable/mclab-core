@@ -1,0 +1,22 @@
+import java.util.*;
+
+aspect Annotations{
+    
+    syn String Entity.string();
+
+    eq Variable.string() = getName();
+    eq Field.string() = getEntity().string() + "." + getFieldName();
+    eq Cell.string(){
+        StringBuffer buf = new StringBuffer();
+        buf.append( getEntity().string() );
+        boolean first = true;
+        for( Integer i : getIndices() ){
+            if( !first )
+                buf.append(", ");
+            buf.append( i.toString() );
+            first = false;
+        }
+        return buf.toString();
+    }
+}
+                

@@ -12,6 +12,7 @@ public class AllTests {
 		suite.addTestSuite(AnnotationScannerTests.class);
 		suite.addTestSuite(AnnotationParserPassTests.class);
 		suite.addTestSuite(AnnotationParserFailTests.class);
+                suite.addTestSuite(AnnotationTypeQueryPassTests.class);
 		//$JUnit-END$
 		return suite;
 	}

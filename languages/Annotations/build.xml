@@ -51,8 +51,17 @@
 			<arg value="${basedir}/${gen.dir}" />
 		</java>
 	</target>
+        <target name="gen.typequery.pass.tests" depends="set.bin.dir">
+          <echo message="Generating type query pass test" />
+          <java classname="${typequery.pass.test.generator.class}"
+                classpath="${bin.dir}">
+            <arg value="${typequery.pass.test.list.file}" />
+            <arg value="${basedir}/${gen.dir}" />
+          </java>
+        </target>
 
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
+	<target name="gen.tests" depends="gen.scanner.tests,
+	gen.parser.pass.tests, gen.parser.fail.tests, gen.typequery.pass.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
