@@ -1,0 +1,47 @@
+import annotations.ast.Type;
+
+aspect TypeInference{
+
+    //fake type inference that depends on annotations
+
+    //localGetType searches for a type of a name in the given subtree
+    syn Type Program.localGetType( Name n ) = null;
+
+    eq Script.localGetType( Name n ){
+        Type t = null;
+        for( Stmt stmt : getStmts() ){
+            t = stmt.localGetType( n );
+            if( t != null )
+                return t;
+        }
+        return t;
+    }
+    //syn Type Function.localGetType( Name n ){
+        
+
+
+    syn Type Stmt.localGetType( Name n ) = null;
+
+    eq ExpandedAnnotation.localGetType( Name n ) =
+        getanno().getTypeInfo(new annotations.ast.Variable( n.getID() ));
+
+    //TODO-JD: write eqs for all nesting stmts 
+
+    inh Type Stmt.getType( Name n );
+
+    eq Script.getStmt(int i).getType( Name n ) = localGetType( n );
+    eq ClassDef.getMethod(int i).getType( Name n ) = localGetType( n );
+    eq ClassDef.getClassEvent(int i).getType( Name n ) = localGetType( n );
+    eq ClassDef.getProperty(int i).getType( Name n ) = localGetType( n );
+    eq FunctionList.getFunction(int i).getType( Name n ) = localGetType( n );
+
+    private boolean VariableDecl.isRefined = false;
+    rewrite VariableDecl{
+        when( !isRefined )
+        to VariableDecl{
+            VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID())));
+            decl.isRefined = true;
+            return decl;
+        }
+    }
+}
