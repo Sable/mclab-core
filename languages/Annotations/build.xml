@@ -55,7 +55,7 @@
           <echo message="Generating type query pass test" />
           <java classname="${typequery.pass.test.generator.class}"
                 classpath="${bin.dir}">
-            <arg value="${typequery.pass.test.list.file}" />
+            <arg value="${basedir}/${typequery.pass.test.list.file}" />
             <arg value="${basedir}/${gen.dir}" />
           </java>
         </target>
