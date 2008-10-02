@@ -1,6 +1,13 @@
 import annotations.ast.Type;
+import annotations.ast.Size;
 
 aspect TypeInference{
+
+    /*VariableDecl new(String id, Type t){
+        setID = id;
+        setType = t;
+        setOldID = id;
+        }*/
 
     //fake type inference that depends on annotations
 
@@ -35,11 +42,42 @@ aspect TypeInference{
     eq ClassDef.getProperty(int i).getType( Name n ) = localGetType( n );
     eq FunctionList.getFunction(int i).getType( Name n ) = localGetType( n );
 
+    syn Size Program.localGetSize( String s ) = localGetSize( new Name(s) );
+    syn Size Program.localGetSize( Name n) = null;
+
+    eq Script.localGetSize( Name n ){
+        Size s = null;
+        for( Stmt stmt : getStmts() ) {
+            s = stmt.localGetSize( n );
+            if( s != null )
+                return s;
+        }
+        return s;
+    }
+    //TODO-JD: for other program nodes
+
+    syn Size Stmt.localGetSize( String s ) = localGetSize( new Name( s ) );
+    syn Size Stmt.localGetSize( Name n ) = null;
+
+    eq ExpandedAnnotation.localGetSize( Name n ) =
+        getanno().getSizeInfo( new annotations.ast.Variable( n.getID() ));
+
+    //TODO-JD: write for all nesting stmts
+
+    syn Size Stmt.getSize( String s ) = getSize( new Name(s) );
+    inh Size Stmt.getSize( Name n );
+
+    eq Script.getStmt(int i).getSize( Name n ) = localGetSize( n );
+    eq ClassDef.getMethod(int i).getSize( Name n ) = localGetSize( n );
+    eq ClassDef.getClassEvent(int i).getSize( Name n ) = localGetSize( n );
+    eq ClassDef.getProperty(int i).getSize( Name n ) = localGetSize( n );
+    eq FunctionList.getFunction(int i).getSize( Name n ) = localGetSize( n );
+
     private boolean VariableDecl.isRefined = false;
     rewrite VariableDecl{
         when( !isRefined )
         to VariableDecl{
-            VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID())));
+            VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID())), getOriginalID());
             decl.isRefined = true;
             return decl;
         }
