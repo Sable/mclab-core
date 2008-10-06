@@ -99,6 +99,26 @@ public class OffsetTracker {
     }
 
     /**
+     * Record a change to the cumulative offset, beginning at the current position.
+     */
+    public void recordOffsetChange(String text) {
+        StringReader reader = new StringReader(text);
+        LengthScanner scanner = new LengthScanner(reader);
+        TextPosition eofPos = null;
+        try {
+            eofPos = scanner.getEOFPosition();
+            reader.close();
+        } catch(IOException e) {
+            //can't happen since StringReader
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        int lineOffsetChange = eofPos.getLine() - 1;
+        int colOffsetChange = eofPos.getColumn() - currPos.getColumn();
+        recordOffsetChange(lineOffsetChange, colOffsetChange);
+    }
+
+    /**
      * Convert the list of changes to the cumulative offset into a list of
      * cumulative offsets and build a map from them.
      */

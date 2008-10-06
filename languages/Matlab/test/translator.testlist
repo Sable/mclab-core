@@ -30,6 +30,8 @@ translator_csheader_if_body
 translator_csheader_if_nobody
 translator_csheader_switch_body
 translator_csheader_switch_nobody
+translator_comment_class
+translator_comment_function
 parserpasstest1
 parserpasstest2
 parserpass_unary

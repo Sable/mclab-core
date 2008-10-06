@@ -169,6 +169,8 @@ private final java.util.Stack<Integer> bracketStack = new java.util.Stack<Intege
 private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek() == LPAREN; }
 private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
 private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
+
+private String leadingComments = null;
 }
 
 @lexer::header {
@@ -369,7 +371,7 @@ function :
   ;
 
 function_beginning :
-     (t_FILLER | dt_LINE_TERMINATOR -> template() "")*
+     ((dt_FILLER | dt_LINE_TERMINATOR | dt_COMMENT | dt_BRACKET_COMMENT) -> template() "")* { leadingComments = $text; }
   ;
 
 function_ending :
@@ -795,6 +797,9 @@ t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
 dt_COMMA : COMMA { offsetTracker.recordOffsetChange(0, 1); };
 dt_SEMICOLON : SEMICOLON { offsetTracker.recordOffsetChange(0, 1); };
 dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * $LINE_TERMINATOR.pos); }; //NB: end pos of newline is 0-based
+dt_COMMENT : COMMENT { offsetTracker.recordOffsetChange($text); };
+dt_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.recordOffsetChange($text); };
+dt_FILLER : FILLER { offsetTracker.recordOffsetChange($text); };
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
