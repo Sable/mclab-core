@@ -808,10 +808,10 @@ t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
 
 dt_COMMA : COMMA { offsetTracker.recordOffsetChange(0, 1); };
 dt_SEMICOLON : SEMICOLON { offsetTracker.recordOffsetChange(0, 1); };
-dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange($text, $LINE_TERMINATOR.pos + 1); };
-dt_COMMENT : COMMENT { offsetTracker.recordOffsetChange($text, $COMMENT.pos + 1); };
-dt_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.recordOffsetChange($text, $BRACKET_COMMENT.pos + 1); };
-dt_FILLER : FILLER { offsetTracker.recordOffsetChange($text, $FILLER.pos + 1); };
+dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange($text, $LINE_TERMINATOR.pos + 1, false); };
+dt_COMMENT : COMMENT { offsetTracker.recordOffsetChange($text, $COMMENT.pos + 1, false); };
+dt_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.recordOffsetChange($text, $BRACKET_COMMENT.pos + 1, false); };
+dt_FILLER : FILLER { offsetTracker.recordOffsetChange($text, $FILLER.pos + 1, false); };
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 
