@@ -375,15 +375,15 @@ function_beginning :
   ;
 
 function_separator :
-     //function_beginning { offsetTracker.advanceToNewLine(2, 1); } -> template(gap={"\n\n"}) "<gap>"
-     function_separator_blob* { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } -> template(gap={"\n\n"}) " "
+     //TODO-AC: linebreaks instead
+     (function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } -> template(gap={"\n\n"}) " "
   ;
 
 function_separator_blob :
-     dt_FILLER -> template() ""
-  |  dt_LINE_TERMINATOR -> template() ""
-  |  dt_COMMENT dt_LINE_TERMINATOR -> template() ""
-  |  dt_BRACKET_COMMENT dt_LINE_TERMINATOR -> template() ""
+     dt_FILLER
+  |  dt_LINE_TERMINATOR
+  |  dt_COMMENT dt_LINE_TERMINATOR
+  |  dt_BRACKET_COMMENT dt_LINE_TERMINATOR
   ;
 
 function_ending :
