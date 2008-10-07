@@ -363,19 +363,31 @@ sep_stmt_list :
   ;
 
 function_list :
-     (function t_FILLER?)+
+     function (function_separator function)*
   ;
 
 function :
-     function_body (t_FILLER? stmt_separator)*
+     function_body
   ;
 
 function_beginning :
      ((dt_FILLER | dt_LINE_TERMINATOR | dt_COMMENT | dt_BRACKET_COMMENT) -> template() "")* { leadingComments = $text; }
   ;
 
+function_separator :
+     //function_beginning { offsetTracker.advanceToNewLine(2, 1); } -> template(gap={"\n\n"}) "<gap>"
+     function_separator_blob*// { offsetTracker.advanceToNewLine(2, 1); } -> template(gap={"\n\n"}) "<gap>"
+  ;
+
+function_separator_blob :
+     dt_FILLER -> template() ""
+  |  dt_LINE_TERMINATOR -> template() ""
+  |  dt_COMMENT dt_LINE_TERMINATOR -> template() ""
+  |  dt_BRACKET_COMMENT dt_LINE_TERMINATOR -> template() ""
+  ;
+
 function_ending :
-     (t_COMMENT | t_BRACKET_COMMENT)?
+     (t_FILLER? stmt_separator)* (t_COMMENT | t_BRACKET_COMMENT)?
   ;
 
 function_body :
@@ -796,10 +808,10 @@ t_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.advanceToNewLine(1, 1); };
 
 dt_COMMA : COMMA { offsetTracker.recordOffsetChange(0, 1); };
 dt_SEMICOLON : SEMICOLON { offsetTracker.recordOffsetChange(0, 1); };
-dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange(1, -1 * $LINE_TERMINATOR.pos); }; //NB: end pos of newline is 0-based
-dt_COMMENT : COMMENT { offsetTracker.recordOffsetChange($text); };
-dt_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.recordOffsetChange($text); };
-dt_FILLER : FILLER { offsetTracker.recordOffsetChange($text); };
+dt_LINE_TERMINATOR : LINE_TERMINATOR { offsetTracker.recordOffsetChange($text, $LINE_TERMINATOR.pos + 1); };
+dt_COMMENT : COMMENT { offsetTracker.recordOffsetChange($text, $COMMENT.pos + 1); };
+dt_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.recordOffsetChange($text, $BRACKET_COMMENT.pos + 1); };
+dt_FILLER : FILLER { offsetTracker.recordOffsetChange($text, $FILLER.pos + 1); };
 
 //// LEXER /////////////////////////////////////////////////////////////////////
 

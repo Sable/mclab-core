@@ -101,7 +101,7 @@ public class OffsetTracker {
     /**
      * Record a change to the cumulative offset, beginning at the current position.
      */
-    public void recordOffsetChange(String text) {
+    public void recordOffsetChange(String text, int startPos) {
         StringReader reader = new StringReader(text);
         LengthScanner scanner = new LengthScanner(reader);
         TextPosition eofPos = null;
@@ -113,9 +113,15 @@ public class OffsetTracker {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        int lineOffsetChange = eofPos.getLine() - 1;
-        int colOffsetChange = eofPos.getColumn() - currPos.getColumn();
-        recordOffsetChange(lineOffsetChange, colOffsetChange);
+        if(eofPos.getLine() == 1) {
+            int lineOffsetChange = 0;
+            int colOffsetChange = eofPos.getColumn() - 1;
+            recordOffsetChange(lineOffsetChange, colOffsetChange);
+        } else {
+            int lineOffsetChange = eofPos.getLine() - 1;
+            int colOffsetChange = eofPos.getColumn() - startPos;
+            recordOffsetChange(lineOffsetChange, colOffsetChange);
+        }
     }
 
     /**
