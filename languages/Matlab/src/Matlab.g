@@ -375,8 +375,36 @@ function_beginning :
   ;
 
 function_separator :
-     //TODO-AC: linebreaks instead
-     (function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } -> template(gap={"\n\n"}) " "
+     {
+        //first inserted newline
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceToNewLine(1, 1);
+        
+        java.io.StringReader reader = new java.io.StringReader(input.LT(-1).getText());
+        LengthScanner scanner = new LengthScanner(reader);
+        TextPosition eofPos = null;
+        try {
+            eofPos = scanner.getEOFPosition();
+            reader.close();
+        } catch(java.io.IOException e) {
+            //can't happen since StringReader
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        
+        //second inserted newline
+        int startCol = eofPos.getLine() == 1 ? input.LT(-1).getCharPositionInLine() : 0;
+        int lineLength = eofPos.getColumn() - 1 + startCol;
+        offsetTracker.recordOffsetChange(-1, lineLength - 1);
+        offsetTracker.advanceToNewLine(1, 1);
+        
+        //fudge factor to point following stuff back to location preceding inserted newlines
+        offsetTracker.recordOffsetChange(-1, lineLength);
+     }
+     (function_separator_blob -> template() "")*
+     -> template(gap={"\n\n"}) "<gap>"
+     //(function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.advanceToNewLine(2, 1); offsetTracker.recordOffsetChange("\n\n", $start.getCharPositionInLine() + 1, true); } -> template(gap={"\n\n"}) "<gap>"
+     //(function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.recordOffsetChange("\n\n", input.LT(-1).getCharPositionInLine() + 1, true); offsetTracker.advanceToNewLine(2, 1); } -> template(gap={"\n\n"}) "<gap>"
   ;
 
 function_separator_blob :
