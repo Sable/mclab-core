@@ -171,6 +171,15 @@ private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek(
 private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
 
 private String leadingComments = null;
+
+private String getCommentStringToInsert() {
+    if(leadingComments == null) {
+        return "";
+    }
+    String commentString = leadingComments + "\n";
+    leadingComments = null;
+    return commentString;
+}
 }
 
 @lexer::header {
@@ -401,10 +410,8 @@ function_separator :
         //fudge factor to point following stuff back to location preceding inserted newlines
         offsetTracker.recordOffsetChange(-1, lineLength);
      }
-     (function_separator_blob -> template() "")*
+     (function_separator_blob -> template() "")* { leadingComments = $text; }
      -> template(gap={"\n\n"}) "<gap>"
-     //(function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.advanceToNewLine(2, 1); offsetTracker.recordOffsetChange("\n\n", $start.getCharPositionInLine() + 1, true); } -> template(gap={"\n\n"}) "<gap>"
-     //(function_separator_blob -> template() "")* { leadingComments = $text; offsetTracker.recordOffsetChange("\n\n", input.LT(-1).getCharPositionInLine() + 1, true); offsetTracker.advanceToNewLine(2, 1); } -> template(gap={"\n\n"}) "<gap>"
   ;
 
 function_separator_blob :
@@ -419,7 +426,10 @@ function_ending :
   ;
 
 function_body :
-     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? (input_params t_FILLER?)? stmt_separator (t_FILLER? stmt_or_function)* t_FILLER? t_END
+     t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? (input_params t_FILLER?)?
+     (stmt_separator -> template(original={$text}, extra={getCommentStringToInsert()}) "<original><extra>")
+     (t_FILLER? stmt_or_function)* t_FILLER? 
+     t_END
   ;
 
 input_params :
