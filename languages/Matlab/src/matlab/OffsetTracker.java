@@ -64,17 +64,7 @@ public class OffsetTracker {
      * NB: slower than specifying directly using advanceInLine or advanceToNewLine
      */
     public void advanceByTextSize(String text) {
-        StringReader reader = new StringReader(text);
-        LengthScanner scanner = new LengthScanner(reader);
-        TextPosition eofPos = null;
-        try {
-            eofPos = scanner.getEOFPosition();
-            reader.close();
-        } catch(IOException e) {
-            //can't happen since StringReader
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        TextPosition eofPos = LengthScanner.getLength(text);
         if(eofPos.getLine() == 1) {
             advanceInLine(eofPos.getColumn() - 1);
         } else {
@@ -89,6 +79,7 @@ public class OffsetTracker {
         if(lineOffsetChange == 0 && colOffsetChange == 0) {
             return;
         }
+        //System.err.println(currPos + ": recordOffsetChange(" + lineOffsetChange + ", " + colOffsetChange + ")");
         OffsetChange existingOC = offsetChangeMap.get(currPos);
         OffsetChange newOC = new OffsetChange(lineOffsetChange, colOffsetChange);
         if(existingOC == null) {
@@ -102,17 +93,7 @@ public class OffsetTracker {
      * Record a change to the cumulative offset, beginning at the current position.
      */
     public void recordOffsetChange(String text, int startPos, boolean insert) {
-        StringReader reader = new StringReader(text);
-        LengthScanner scanner = new LengthScanner(reader);
-        TextPosition eofPos = null;
-        try {
-            eofPos = scanner.getEOFPosition();
-            reader.close();
-        } catch(IOException e) {
-            //can't happen since StringReader
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        TextPosition eofPos = LengthScanner.getLength(text);
         int lineOffsetChange = -1;
         int colOffsetChange = -1;
         if(eofPos.getLine() == 1) {
