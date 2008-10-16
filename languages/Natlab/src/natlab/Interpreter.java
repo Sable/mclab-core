@@ -41,7 +41,7 @@ public class Interpreter {
 					}
 				} else if(!original.errorCheck()) {
                     //pass true to get transformed ast
-					System.out.println(original.getStructureString( ));
+					//System.out.println(original.getStructureString( ));
 					System.out.println(original.ASTtoXML());
 					// System.out.println(original.dumpTree());
 				}

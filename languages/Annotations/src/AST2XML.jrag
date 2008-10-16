@@ -97,13 +97,13 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<Variable id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Variable id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" />");
 
-        buf.append(getXMLindented(indent+1));
-		buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
         
-        buf.append(getXMLindented(indent));
-        buf.append("</Variable>");
+        //buf.append(getXMLindented(indent));
+        //buf.append("</Variable>");
 		
 		return buf.toString();
 	}
@@ -114,12 +114,12 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<Field id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Field id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getFieldName()+"\">");
 
 		buf.append(getEntity().getXML(indent+1));
 
-        buf.append(getXMLindented(indent+1));
-		buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"FieldName\" value=\""+getFieldName()+"\" />");
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"FieldName\" value=\""+getFieldName()+"\" />");
         
         buf.append(getXMLindented(indent));
         buf.append("</Field>");
@@ -325,13 +325,13 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<PrimitiveType id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<PrimitiveType id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" />");
 
-        buf.append(getXMLindented(indent+1));
-		buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
         
-        buf.append(getXMLindented(indent));
-        buf.append("</PrimitiveType>");
+        //buf.append(getXMLindented(indent));
+        //buf.append("</PrimitiveType>");
 		
 		return buf.toString();
 	}
@@ -342,13 +342,13 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<TypeVarType id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<TypeVarType id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" />");
 
-        buf.append(getXMLindented(indent+1));
-		buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
         
-        buf.append(getXMLindented(indent));
-        buf.append("</TypeVarType>");
+        //buf.append(getXMLindented(indent));
+        //buf.append("</TypeVarType>");
 		
 		return buf.toString();
 	}
@@ -404,10 +404,10 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<TypeVarType id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<TypeVarType id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");
 
-        buf.append(getXMLindented(indent+1));
-		buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
         
         buf.append(getType().getXML(indent+1));
         
