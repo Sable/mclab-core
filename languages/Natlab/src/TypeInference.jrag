@@ -77,7 +77,11 @@ aspect TypeInference{
     rewrite VariableDecl{
         when( !isRefined )
         to VariableDecl{
-            VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID())), getOriginalID());
+            // VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID()))); //, getOriginalID());
+            // Do not need to create new node, just update this 	-JL 10.04
+            // This method is just link the type-annotation with decl-node
+			VariableDecl decl =  this;
+			decl.setType(getType(new Name(getID()))); 
             decl.isRefined = true;
             return decl;
         }

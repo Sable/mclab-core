@@ -1,0 +1,188 @@
+/*
+ *  Collecting type from each sub-nodes
+ *  Used when inferring a variable's type from its AssignStmt node 
+ *  It will be called from outside, i.e.
+ *		varType = ((AssignStmt) parentNode).getRHS().collectType(stScope, varNode);
+ */
+import java.util.*;
+
+aspect TypeCollection {
+
+	public static natlab.TypeInferenceEngine ASTNode.TIEngine;
+	public void ASTNode.setTypeInferenceEngine(natlab.TypeInferenceEngine tie) {
+		TIEngine = tie;
+	}
+	
+	public annotations.ast.Type ASTNode.collectType(SymbolTableScope stScope, ASTNode varNode) {
+		annotations.ast.Type childType = null;
+		for(int i = 0; i < getNumChild(); i++) {
+			childType = getChild(i).collectType(stScope, varNode);
+			// Do sth to use children's type
+		}
+		if(getNumChild()>1)
+			System.err.println("[ASTNode.collectType] This node has "+getNumChild()+" children");
+		return null;
+	}
+/***
+	// Starting from ExprStmt, AssignStmt
+	public annotations.ast.Type ExprStmt.collectType(SymbolTableScope stScope, ASTNode varNode) {
+		if(nestedLevel==1) {
+			if(getParent() instanceof List) {
+				List list = (List)getParent();
+				this.childLocation = list.getIndexOfChild(this);
+				for(int i = 0; i < getNumChild(); i++) {
+					if (getChild(i)!=null) {
+						annotations.ast.Type childType = getChild(i).collectType(list, 2);
+						if(replacementNode != null) 
+							setChild(replacementNode,i);
+					}
+		        }
+			} else {
+			}
+		}	
+		return null;
+	}
+	public annotations.ast.Type AssignStmt.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		if(nestedLevel==1) {
+			if(getParent() instanceof List) {
+				List list = (List)getParent();
+				this.childLocation = list.getIndexOfChild(this);
+				for(int i = 0; i < getNumChild(); i++) {
+					if (getChild(i)!=null) {
+						annotations.ast.Type childType = getChild(i).collectType(list, 2);
+						if(replacementNode != null) 
+							setChild(replacementNode,i);
+					}
+		        }
+			} else {
+			}
+		}	
+		return null;
+	}
+
+	// Public Function, for performing simplification tranformation.
+	// It only can be called by several kind of Expr, assert(this instanceof Expr);
+	public annotations.ast.Type Expr.simplifyTranform(SymbolTableScope stScope, ASTNode varNode) {		
+		if(nestedLevel>level) {
+			// (1). Create new temporary variable, by Symbol-Table interface
+			// VariableDeclaration varDecl = createTempVar(type());
+			String tmpName = "tmpvar_" + getNodeID();
+			
+			// (2). Create NameExpr node
+			NameExpr tmpNameExpr = new NameExpr(new Name(tmpName));
+			
+			// (3). Create AssignStmt, add to the top Stmt-List, just before current node			
+			stmtList.insertChild(new AssignStmt(tmpNameExpr, (Expr)this), this.childLocation);
+			this.childLocation++;
+			
+			// (4) return new replacement node
+			return tmpNameExpr;
+		} else {
+			return null;
+		}
+	}
+**/	
+	// stmtList: stmt-list from the top of the subtree, where we can add stmt on it
+	// level : the level, all node deeper than this level need to be simplified.
+	// RETURN : null, if there is no collectType need to do.
+	//		    otherwise, new replacement node, 
+	public annotations.ast.Type BinaryExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// 1. Calling to next level 
+		annotations.ast.Type lhsType = getLHS().collectType(stScope, varNode);
+		annotations.ast.Type rhsType = getRHS().collectType(stScope, varNode);
+
+		// 2. Calling type inference engine to get the type
+		return TIEngine.inferType(stScope, this, lhsType, rhsType, varNode);
+	}
+	
+	public annotations.ast.Type NameExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// 1. Calling to next level 
+		
+		// 2. Calling type inference engine to get the type
+		return TIEngine.inferType(stScope, this, varNode);
+	}
+	public boolean ParameterizedExpr.isVariable = false;
+	public annotations.ast.Type ParameterizedExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		return TIEngine.inferType(stScope, this, varNode);
+	}
+	
+	public annotations.ast.Type IntLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		return new annotations.ast.PrimitiveType("int");
+	}
+	public annotations.ast.Type FPLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		return new annotations.ast.PrimitiveType("double");
+	}
+	public annotations.ast.Type StringLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		return new annotations.ast.PrimitiveType("character("+(getValue().length()+1)+")");
+	}
+
+	//	(1) First KNOWN element's type is the element type
+	//	(2) Calculate the #Row and #column
+	// 	(3) #column may should be the maximum one
+	public annotations.ast.Type MatrixExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		annotations.ast.Type elementType=null;
+		// 1. Calling to next level 
+        List<Row> rows = getRows();
+		int maxColumn=0;
+        for(Row row : rows) {
+        	// TODO: this one may not check all row, because the 'break' below
+        	if(maxColumn < row.getElements().getNumChild())
+        		maxColumn = row.getElements().getNumChild();
+        		
+			// Return First KNOWN element's type
+			elementType = row.collectType(stScope, varNode);
+			if(elementType!=null)	
+				break;
+        }
+        // TODO: The elementType should be a kind of PrimitiveType
+        if(elementType!=null) {
+			annotations.ast.MatrixType varType = new annotations.ast.MatrixType(
+					new annotations.ast.PrimitiveType(elementType.getName()));
+			java.util.List<Integer> dim = new java.util.ArrayList<Integer>();
+			for(int i=0; i<rows.getNumChild(); i++) {
+				dim.add(maxColumn);
+			}
+			varType.setSize(new annotations.ast.Size(dim));
+			return varType;
+        } else {
+        	return null;
+        }
+	}
+	public annotations.ast.Type Row.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		annotations.ast.Type elementType=null;
+		// 1. Calling to next level 
+        List<Expr> elements = getElements();
+        for(Expr element : elements) {
+			elementType = element.collectType(stScope, varNode);
+			if(elementType != null)
+				break;
+        }
+		// 2. Don't change the row itself 
+		return elementType;
+	}
+	
+	// i.e.  for i=(1:runs) in an integer
+	// i.e.  var =(1:runs)  is an array
+	public annotations.ast.Type RangeExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// 1. get element type
+		annotations.ast.Type typeLower = getLower().collectType(stScope, varNode);
+		annotations.ast.Type typeUpper = getUpper().collectType(stScope, varNode);
+
+		// 2. Choose one of them
+        ASTNode parentAssign = getParent();
+        // Only try less 10 time
+        for(int i = 1; i<10;i++) {
+        	if(parentAssign instanceof AssignStmt) 
+        		break;
+        	else
+        		parentAssign = parentAssign.getParent();
+        }
+        if ((parentAssign instanceof AssignStmt)
+        		&& parentAssign.getParent() instanceof ForStmt) {
+			// TODO, which way is better? typeLower or typeUpper
+			return (typeLower!=null?typeLower:typeUpper);
+		} else {
+			return TIEngine.inferType(stScope, this, varNode);
+		}
+	}
+}

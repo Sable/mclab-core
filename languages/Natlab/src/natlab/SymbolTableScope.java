@@ -27,12 +27,12 @@ public class SymbolTableScope implements SymbolTableInterface{
         // check if symbol already had an entry associated with it
         // if it did, revert back to old symbol and return false
         // TODO-JD Maybe throwing an error would be better?
+
         SymbolTableEntry old = symTable.put(symbol, e);
         if (old != null) {
-            symTable.put(symbol, e);
+        	symTable.put(symbol, old);	// put back the old one.	
             return false;
         }
-
         // Since we did not return, assume safe to insert into onameTable
         onameEntries = onameTable.get(oname);
         if (onameEntries == null) {

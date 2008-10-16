@@ -271,6 +271,22 @@ aspect NameResolution{
         names.addAll(getOutParamSet());
         return names;
     }
+    // Extra function to help save list of VariableDecl node	-JL 10.03
+	private static int Script.lastDeclLocation=0;
+    private List Script.declStmtList=null;
+    private java.util.List<VariableDecl> Script.varDeclList = new ArrayList<VariableDecl>();
+    public  java.util.List<VariableDecl> Script.getDeclList() { return varDeclList;}
+	public void Script.addDeclStmt(VariableDecl node) {
+		if(declStmtList == null) {
+			declStmtList = getStmtList();
+			declStmtList.addChild(node);
+			lastDeclLocation = declStmtList.numChildren();
+		} else {
+			declStmtList.insertChild(node, lastDeclLocation++);
+		} 
+        // Save info of last adding new VariableDecl()     	
+    	varDeclList.add((VariableDecl) node);
+	}
     
     // Adding Declaration nodes
     
@@ -282,7 +298,7 @@ aspect NameResolution{
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
             for( String symbol : getLValues() )
-                s.addStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
+                s.addDeclStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
             for( int i=0; i<getNumStmt(); i++ ){
                 s.addStmt( getStmt(i) );
             }

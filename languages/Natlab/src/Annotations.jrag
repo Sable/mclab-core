@@ -11,6 +11,7 @@ aspect Annotations {
 			annotations.AnnotationParser parser = new annotations.AnnotationParser();
 			annotations.ast.Annotation anno = (annotations.ast.Annotation) parser.parse(scanner);
 			exAnno.setanno(anno);
+			anno.setMatrixSize();
 			} catch(Exception e) {
 				System.out.println(e.getMessage());
 			}

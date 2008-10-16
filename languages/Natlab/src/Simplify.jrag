@@ -1,0 +1,204 @@
+/*
+ *  Simplify complex expression to several small assignment.
+ *  (Not purely 3-address code)
+ */
+import java.util.*;
+
+aspect Simplify {
+
+	//-------------------------------------------------------------------------
+	// Notes: This is an extra funcition temporarily put here!
+	// After adding decl-stmt, appends statements for special value 
+	// Testing: call it before/after Script.getSymbolTableScope();
+	// TODO: move to proper file
+	public void Script.addDefaultStmt() {	 
+		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
+		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_toc")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		for(Stmt stmtNode: stmtList) { 
+			if(declStmtList == null) {
+				declStmtList = getStmtList();
+				declStmtList.addChild(stmtNode);
+			} else {
+				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
+			} 
+		}
+	}
+	// Used to disable "Refine" rewrite defined in TypeInference.jrag 
+    public void VariableDecl.setRefine(boolean b) {
+    	isRefined = b;
+    }
+
+	//-------------------------------------------------------------------------
+	// int childLocation: The child-index in the stmt-list, at which location 
+	// the new assign-stmt (splited from complex expression) will be added.
+	// Because every time, when a new assign-stmt added to it, this child-index 
+	// need to points to next location, so next adding will follow the prior one.
+	// (not before the prior one)
+	public static int ASTNode.childLocation = 0;
+	
+	// A global flag for BinaryExpr to decide whether it needs to be simplified, 
+	// (>0:simplify, <=0:not), it is a global flag! Method calls could be nested!
+	public static int ASTNode.inMethodCall = 0;
+
+	// Return: Expr: the new temporary variable node, used for replacing current
+	//				simplified (complex) expression
+	public Expr ASTNode.simplify(List stmtList, int level) {		
+		for(int i = 0; i < getNumChild(); i++) {
+			Expr replacementNode = getChild(i).simplify(stmtList, level);
+			if(replacementNode != null) 
+				setChild((T)replacementNode,i);
+		}
+		return null;
+	}
+
+	// Starting from ExprStmt, AssignStmt
+	public Expr ExprStmt.simplify(List stmtList, int level)  {
+		if(nestedLevel==1) {
+			if(getParent() instanceof List) {
+				List list = (List)getParent();
+				this.childLocation = list.getIndexOfChild(this);
+				for(int i = 0; i < getNumChild(); i++) {
+					if (getChild(i)!=null) {
+						Expr replacementNode = getChild(i).simplify(list, 2);
+						if(replacementNode != null) 
+							setChild(replacementNode,i);
+					}
+		        }
+			} else {
+			}
+		}	
+		return null;
+	}
+	public Expr AssignStmt.simplify(List stmtList, int level)  {
+		if(nestedLevel==1) {
+			if(getParent() instanceof List) {
+				List list = (List)getParent();
+				this.childLocation = list.getIndexOfChild(this);
+				for(int i = 0; i < getNumChild(); i++) {
+					if (getChild(i)!=null) {
+						Expr replacementNode = getChild(i).simplify(list, 2);
+						if(replacementNode != null) 
+							setChild(replacementNode,i);
+					}
+		        }
+			} else {
+			}
+		}	
+		return null;
+	}
+
+	// Public Function, for performing simplification tranformation.
+	// It only can be called by several kind of Expr, assert(this instanceof Expr);
+	public Expr Expr.simplifyTranform(List stmtList, int level) {		
+		if(nestedLevel>level) {
+			// (1). Create new temporary variable, by Symbol-Table interface
+			// VariableDeclaration varDecl = createTempVar(type());
+			String tmpName = "tmpvar_" + getNodeID();
+			
+			// (2). Create NameExpr node
+			NameExpr tmpNameExpr = new NameExpr(new Name(tmpName));
+			
+			// (3). Create AssignStmt, add to the top Stmt-List, just before current node			
+			stmtList.insertChild(new AssignStmt(tmpNameExpr, (Expr)this), this.childLocation);
+			this.childLocation++;
+			
+			// (4) return new replacement node (another copy of NameExpr)
+			return new NameExpr(new Name(tmpName));
+		} else {
+			return null;
+		}
+	}
+	
+	// stmtList: stmt-list from the top of the subtree, where we can add stmt on it
+	// level : the level, all node deeper than this level need to be simplified.
+	// RETURN : null, if there is no simplify need to do.
+	//		    otherwise, new replacement node, 
+	public Expr BinaryExpr.simplify(List stmtList, int level)  {
+		// 1. Calling to next level 
+		Expr lhsExpr = getLHS().simplify(stmtList, level);
+		Expr rhsExpr = getRHS().simplify(stmtList, level);
+		if(lhsExpr != null)
+			setLHS(lhsExpr);
+		if(rhsExpr != null)
+			setRHS(rhsExpr);
+		
+		// 2. Rewrite this level
+		if(inMethodCall>0)
+			return simplifyTranform(stmtList, level);
+		else 
+			return this;
+	}
+	public Expr ParameterizedExpr.simplify(List stmtList, int level)  {
+		inMethodCall++;
+		// 1. Calling to next level 
+        List<Expr> args = getArgs();	// get the updated tree
+		int i=0;
+		for(Expr arg : args) {
+			Expr argExpr = arg.simplify(stmtList, level);
+			if(argExpr != null)
+				setArg(argExpr, i);
+			i++;
+		}
+		inMethodCall--;
+		// 2. Rewrite this level, split into a single assignment
+		return simplifyTranform(stmtList, level);
+	}
+	
+	// (1) Matrix, should be split from the BinaryExpr, ParameterizedExpr
+	// (2) Inside the matrix, just split the elements of each row, the row itself
+	// 		will not change
+	public Expr MatrixExpr.simplify(List stmtList, int level)  {
+		// 1. Calling to next level 
+        List<Row> rows = getRows();
+		int i=0;
+        for(Row row : rows) {
+			// Row simplification will NOT change the row itself 
+			row.simplify(stmtList, level);
+        }
+		// 2. Rewrite this level, split into a single assignment
+		return simplifyTranform(stmtList, level);
+	}
+	public Expr Row.simplify(List stmtList, int level)  {
+		// 1. Calling to next level 
+        List<Expr> elements = getElements();
+		int i=0;
+        for(Expr element : elements) {
+			Expr expr = element.simplify(stmtList, level);
+			if(expr != null)
+				setElement(expr, i);
+			i++;
+        }
+		// 2. Don't change the row itself 
+		return null;
+	}
+	
+	//-------------------------------------------------------------------------
+	// Constant Propagation
+	// TODO: move to proper file; Temporarily save here
+	// Return: 
+	//		Expr: when a node found itself should be replaced, 
+	//			return the new expr(lExpr)
+	//			Otherwise: return null
+	public Expr ASTNode.constantPropagation(String varName, LiteralExpr lExpr) {		
+		for(int i = 0; i < getNumChild(); i++) {
+			Expr replacementNode = getChild(i).constantPropagation(varName, lExpr);
+			if(replacementNode != null) 
+				setChild((T)replacementNode,i);
+		}
+		return null;
+	}
+	
+	public Expr NameExpr.constantPropagation(String varName, LiteralExpr lExpr) {
+		if (varName.equals(this.getName().getID())) {
+			return lExpr;
+		}
+		return null;
+	}
+}

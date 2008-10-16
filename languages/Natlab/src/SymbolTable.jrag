@@ -8,7 +8,7 @@ aspect SymbolTableEntry {
      
 	eq NameExpr.getSymbolTableEntry() {
 		java.util.List<SymbolTableEntry> symentlst = new java.util.ArrayList<SymbolTableEntry>();
-        symentlst.add(new SymbolTableEntry(getName().getID())); //TODO: How to deal with new & old names?
+        symentlst.add(new SymbolTableEntry(getName().getID(), this)); //TODO: How to deal with new & old names?
 		return symentlst;
     }  
     
@@ -68,23 +68,28 @@ aspect SymbolTableScope {
         return symtbl;
     }
 
-    eq Script.getSymbolTableScope() {
-        SymbolTableScope symtbl = new SymbolTableScope();
-        
-    	for(Stmt stmt : getStmts()) {
+	// Collecting LHS symbols from statement list		-JL 10.04
+	// Call nestedly by ForStmt
+ 	private void Script.addAllSymbols(List<Stmt> stmtList, SymbolTableScope symtbl) {
+    	for(Stmt stmt : stmtList) {
     		if(stmt instanceof AssignStmt) {
     			LValueExpr lhs = (LValueExpr)((AssignStmt)stmt).getLHS();
     			java.util.List<SymbolTableEntry> symentlst = lhs.getSymbolTableEntry();
+    			
+    			ASTNode rhs = ((AssignStmt)stmt).getRHS();
+    			boolean bIsConstant = (rhs instanceof LiteralExpr);
+    			
 				for(SymbolTableEntry syment : symentlst) {
-					symtbl.addSymbol(syment);
+					if(bIsConstant)	syment.setValue((LiteralExpr) rhs);
+					symtbl.addSymbol(syment);					
     			}
             } else if(stmt instanceof GlobalStmt) {
             	for(Name name : ((GlobalStmt)stmt).getNames()) {
-					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID(), name));
     			}
             } else if(stmt instanceof PersistentStmt) {
             	for(Name name : ((PersistentStmt)stmt).getNames()) {
-					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID(), name));
     			}
             } else if(stmt instanceof ForStmt) {    	
             	LValueExpr lhs = (LValueExpr)((ForStmt)stmt).getAssignStmt().getLHS();
@@ -92,8 +97,38 @@ aspect SymbolTableScope {
 				for(SymbolTableEntry syment : symentlst) {
 					symtbl.addSymbol(syment);
     			}
+				addAllSymbols(((ForStmt) stmt).getStmts(), symtbl);
             } 
         }
+ 	}
+
+    eq Script.getSymbolTableScope() {
+        SymbolTableScope symtbl = new SymbolTableScope();
+        
+    	// Collect all symbol from stmt-list,				-JL 10.04
+        addAllSymbols(getStmts(), symtbl);
+
+    	// Finding the VariableDecl node for each entry,	-JL 10.03
+    	// if not found, create one,
+    	boolean found = false;
+	    for( SymbolTableEntry e : symtbl.symTable.values() ) {
+	    	if(e.getDeclLocation()==null) {
+	    		found = false;
+		    	for(VariableDecl decl: varDeclList) {
+		    		if(decl.getID().equals(e.getSymbol())) {
+		    			e.setDeclLocation(decl);
+		    			found = true;
+		    			break;
+		    		}
+		    	}
+		    	if(!found) {
+		    		VariableDecl decl = new VariableDecl(e.getSymbol(), 
+		    				new annotations.ast.UnknownType() );
+		    		addDeclStmt( decl );
+		    		e.setDeclLocation(decl);
+		    	}
+	    	}
+    	}
         
     	return symtbl;
     }
@@ -102,7 +137,7 @@ aspect SymbolTableScope {
         SymbolTableScope symtbl = new SymbolTableScope();
         
         for(Function func : getFunctions()) {
-            symtbl.addSymbol(new SymbolTableEntry(func.getName(), func.getName()));
+            symtbl.addSymbol(new SymbolTableEntry(func.getName(), func.getName(), func));
         }
        
         return symtbl;
@@ -112,11 +147,11 @@ aspect SymbolTableScope {
         SymbolTableScope symtbl = new SymbolTableScope();
         
         for(Name param : getOutputParams()) {
-        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID()));
+        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID(), param));
         }
         
         for(Name param : getInputParams()) {
-        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID()));
+        	symtbl.addSymbol(new SymbolTableEntry(param.getID(), param.getID(), param));
         }
         
     	for(Stmt stmt : getStmts()) {
@@ -128,11 +163,11 @@ aspect SymbolTableScope {
     			}
             } else if(stmt instanceof GlobalStmt) {
             	for(Name name : ((GlobalStmt)stmt).getNames()) {
-					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID(), name));
     			}
             } else if(stmt instanceof PersistentStmt) {
             	for(Name name : ((PersistentStmt)stmt).getNames()) {
-					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID()));
+					symtbl.addSymbol(new SymbolTableEntry(name.getID(), name.getID(), name));
     			}
             } else if(stmt instanceof ForStmt) {    	
             	LValueExpr lhs = (LValueExpr)((ForStmt)stmt).getAssignStmt().getLHS();
@@ -155,13 +190,13 @@ aspect SymbolTableScope {
         
         for(Properties props : getPropertys()) {
         	for(Property prop : props.getPropertys()) {
-        		symtbl.addSymbol(new SymbolTableEntry(prop.getName(), prop.getName()));
+        		symtbl.addSymbol(new SymbolTableEntry(prop.getName(), prop.getName(), prop));
         	}
         }
         
         for(ClassEvents events : getClassEvents()) {
             for(Event eve : events.getEvents()) {
-        		symtbl.addSymbol(new SymbolTableEntry(eve.getName(), eve.getName()));
+        		symtbl.addSymbol(new SymbolTableEntry(eve.getName(), eve.getName(), eve));
 	        }
         }
         

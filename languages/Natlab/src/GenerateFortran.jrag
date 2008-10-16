@@ -1,0 +1,886 @@
+/*
+ *  Generate Fortran code from modified AST
+ *
+ */
+
+aspect GenerateFortran {
+    syn String ASTNode.getFortran() {
+        StringBuffer buf = new StringBuffer();
+        for(beaver.Symbol comment : getComments()) {
+            buf.append("! ");
+            buf.append(comment.value);
+            buf.append('\n');
+        }
+        buf.append(getFortranLessComments());
+        return buf.toString();
+    }
+
+    //default - exception
+    syn String ASTNode.getFortranLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getFortranLessComments()"); }
+    
+    //program
+    eq EmptyProgram.getFortranLessComments() {
+        return "";
+    }
+    
+    eq Script.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        String progName = "Benchmark2";
+        buf.append("PROGRAM ");
+        buf.append(progName);
+        buf.append('\n');
+		buf.append("IMPLICIT NONE\n");
+
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getFortran());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        buf.append("END PROGRAM ");
+        buf.append(progName);
+        buf.append('\n');
+        return buf.toString();
+    }
+    
+    eq FunctionList.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Function func : getFunctions()) {
+            buf.append(func.getFortran());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq Function.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getFortran());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    // Class
+    
+    eq ClassDef.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("classdef ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getFortran());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append(getName());
+        first = true;
+        for(SuperClass sup : getSuperClasss()) {
+            if(first)
+            	buf.append(" < ");
+            else
+                buf.append(" & ");
+            buf.append(sup.getFortran());
+            first = false;
+        }
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getFortran());
+            buf.append('\n');
+        }
+        for(Properties prop : getPropertys()) {
+            buf.append(prop.getFortran());
+            buf.append('\n');
+        }
+        for(Methods methods : getMethods()) {
+            buf.append(methods.getFortran());
+            buf.append('\n');
+        }
+        for(ClassEvents events : getClassEvents()) {
+            buf.append(events.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Properties.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("properties ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getFortran());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Property prop : getPropertys()) {
+            buf.append(prop.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    } 
+    
+    eq Methods.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("methods ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getFortran());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Signature sign : getSignatures()) {
+            buf.append(sign.getFortran());
+            buf.append('\n');
+        }
+        for(PropertyAccess prop : getPropAccs()) {
+            buf.append(prop.getFortran());
+            buf.append('\n');
+        }
+        for(Function func : getFunctions()) {
+            buf.append(func.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Signature.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    eq PropertyAccess.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getAccess());
+        buf.append(".");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getFortran());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq ClassEvents.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("events ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getFortran());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Event eve : getEvents()) {
+            buf.append(eve.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Attribute.getFortranLessComments() = getKey() + " = " + getExpr().getFortran();
+    eq SuperClass.getFortranLessComments() = getName();
+    eq Property.getFortranLessComments() = getName() + " = " + getExpr().getFortran();
+    eq Event.getFortranLessComments() = getName();
+    
+    eq SuperClassMethodExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getFuncName().getFortran());
+        buf.append("@");
+        buf.append(getClassName().getFortran());
+		return buf.toString();
+    }
+    
+    //help comments
+    
+    eq HelpComment.getFortranLessComments() = getText();
+    
+    //stmts
+    eq EmptyStmt.getFortranLessComments() = "";
+    eq ExprStmt.getFortranLessComments() {
+    	String str = getExpr().getFortran() + (isOutputSuppressed() ? ";" : "");
+        return str;
+    }
+    eq AssignStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+    	String lhs = getLHS().getFortran();
+    	String rhs = getRHS().getFortran();
+    	
+    	// 1. Matching {template} (subtree pattern)
+    	// 2. Ouput Fortran Code {action}
+		// TODO: may should change to     	
+    	// Marching x=toc;  x=toc();
+    	// if(rhs instanceof ParameterizedExpr)
+    	// Need to check the NameExpr
+    	if(rhs.equalsIgnoreCase("toc") || rhs.equalsIgnoreCase("toc()")) {
+            // TODO: Adding new variable to Symbol table:  timing_toc:real; 
+    		buf.append("CALL CPU_TIME(timing_toc); ");
+    		buf.append(lhs);
+    		buf.append(" = timing_toc - timing_tic;");
+    	} else if(isCall) {	
+	    	// This is CallExprStmt type
+	        String str = rhs + (isOutputSuppressed() ? ";" : "");
+    		buf.append(str);
+    	} else {	
+	    	// This is default output: getStructureStringLessComments()
+	        String str = lhs + " = " + rhs + (isOutputSuppressed() ? ";" : "");
+    		buf.append(str);
+	    }
+        return buf.toString();
+    }
+    eq GlobalStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("global");
+        for(Name name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getFortran());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq PersistentStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("persistent");
+        for(Name name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getFortran());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq ShellCommandStmt.getFortranLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
+    
+    eq BreakStmt.getFortranLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
+    eq ContinueStmt.getFortranLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
+    eq ReturnStmt.getFortranLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
+
+    eq ForStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("DO ");
+        buf.append(getAssignStmt().getFortran());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        buf.append("END DO");
+        return buf.toString();
+    }
+
+    eq WhileStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("while ");
+        buf.append(getExpr().getFortran());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    // if-elseif-else
+    eq IfStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for(IfBlock block : getIfBlocks()) {
+            if(!first) {
+                buf.append("else");
+            }
+            buf.append(block.getFortran());
+            first = false;
+        }
+        if(hasElseBlock()) {
+            buf.append(getElseBlock().getFortran());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq IfBlock.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("if ");
+        buf.append(getCondition().getFortran());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    eq ElseBlock.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("else ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // switch-case
+    eq SwitchStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("switch ");
+        buf.append(getExpr().getFortran());
+        buf.append('\n');
+        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
+            buf.append(scase.getFortran());
+        }
+        if(hasDefaultCaseBlock()) {
+            buf.append(getDefaultCaseBlock().getFortran());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    eq SwitchCaseBlock.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("case ");
+        buf.append(getExpr().getFortran());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    eq DefaultCaseBlock.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("otherwise ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // try-catch
+    eq TryStmt.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("try ");
+        buf.append('\n');
+        for(Stmt stmt : getTryStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getFortran());
+            buf.append('\n');
+        }
+        List<Stmt> catchList = getCatchStmts();
+        if (catchList.getNumChild()>0) {
+	        buf.append("catch ");
+	        buf.append('\n');        
+	        for(Stmt stmt : catchList) {
+	            buf.append('\t');
+	            buf.append(stmt.getFortran());
+	            buf.append('\n');
+	        }
+	    }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    //exprs
+    
+    eq RangeExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        ASTNode parentAssign = getParent();
+        // Only try less 10 time
+        for(int i = 1; i<10;i++) {
+        	if(parentAssign instanceof AssignStmt) 
+        		break;
+        	else
+        		parentAssign = parentAssign.getParent();
+        }
+        if ((parentAssign instanceof AssignStmt)
+        		&& parentAssign.getParent() instanceof ForStmt) {
+        	// i=1:2:5  => i=1,5,2
+	        buf.append(getLower().getFortran());
+	        buf.append(" , ");
+	        buf.append(getUpper().getFortran());
+	        if(hasIncr()) {
+	            buf.append(" , ");
+	            buf.append(getIncr().getFortran());
+	        }
+        } else {
+	        buf.append("(/(I, I=");
+	        buf.append(getLower().getFortran());
+	        buf.append(" , ");
+	        if(hasIncr()) {
+	            buf.append(getIncr().getFortran());
+	            buf.append(" , ");
+	        }
+	        buf.append(getUpper().getFortran());
+	        buf.append(")/)");
+        }
+        return buf.toString();
+    }
+    eq ColonExpr.getFortranLessComments() = ":";
+    eq EndExpr.getFortranLessComments() = "end";
+    
+    eq Name.getFortranLessComments() = getID();
+
+    //accesses
+    eq NameExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+    	String str;
+    	str = getName().getFortran();
+    	if (str.equalsIgnoreCase("clc")) {
+    		buf.append("! clc  !! Doesn't support.");
+    	} else if (str.equalsIgnoreCase("tic")) {
+            // TODO: Adding new variable to Symbol table:  timing_tic:real; 
+    		buf.append("CALL CPU_TIME(timing_tic)  ! tic");
+    	} else {
+    		buf.append(str);
+    	}
+   	
+    	return buf.toString();
+    }
+    eq DotExpr.getFortranLessComments() = getTarget().getFortran() + "." + getField().getFortran();
+
+	// Transform AssignStmt to CallExprStmt
+	public boolean AssignStmt.isCall = false;
+    
+    eq ParameterizedExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        List<Expr> args = getArgs();
+        String fname = getTarget().getFortran();
+        boolean bParenthesis = true;
+        if(fname.equalsIgnoreCase("zeros")) {
+        	buf.append("0; !");
+        } else if(fname.equalsIgnoreCase("ones")) {
+        	buf.append("1; !");
+        } else if(fname.equalsIgnoreCase("fprintf")) {	// TODO: support it
+        	buf.append("! fprintf");
+        } else if(fname.equalsIgnoreCase("disp")) {
+        	buf.append("PRINT *,");
+        	bParenthesis = false;
+        } else if(fname.equalsIgnoreCase("reshape")) {
+        	// Specific output
+        	// MATLAB:  a = reshape(b, 750, 3000);  
+    		// FORTRAN: a = RESHAPE(b, (/750, 3000/)); 
+        	buf.append("RESHAPE");
+	        buf.append("(");
+	        boolean first = true, second = false;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            if(second) {
+	                buf.append("(/");
+	            }
+	            buf.append(arg.getFortran());
+	            if(second) 	second = false;
+	            if(first) {
+	            	second = true;
+	            	first = false;
+	            }
+	        }
+	        buf.append("/)");	
+	        buf.append(")");
+	        return buf.toString();	// End of reshape() function
+
+        } else if(fname.equalsIgnoreCase("randn")) {
+        	// Transfor AssignStmt to CallExprStmt
+        	// assert(getParent() instanceof AssignStmt);
+        	AssignStmt assignStmt = (AssignStmt) getParent();
+        	assignStmt.isCall = true;
+        	String varName = assignStmt.getLHS().getStructureString();
+        	int num = getNumArg();
+        	buf.append("CALL RANDOM_NUMBER(");
+	        buf.append(varName);
+	        buf.append("(");	// variable brackets
+	        boolean first = true;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(":");
+	            first = false;
+	        }
+	        buf.append(")");	// variable brackets
+	        buf.append(")");	// function brackets
+	        return buf.toString();
+	        
+        } else if(fname.equalsIgnoreCase("num2str")) {
+			//Integer x
+			//Character(50)  xstring
+			// x = 12345
+			// Write( xstring, '(i10)' )  x
+			// f = 7.12345
+			// Write( xstring, '(f12.6)' )  f
+        	// Transfor AssignStmt to CallExprStmt
+        	// assert(getParent() instanceof AssignStmt);
+        	AssignStmt assignStmt = (AssignStmt) getParent();
+        	assignStmt.isCall = true;
+        	String varName = assignStmt.getLHS().getStructureString();
+        	int num = getNumArg();
+        	buf.append("WRITE(");
+	        buf.append(varName);
+	        buf.append(", ");	
+	        // if(varName type is Integer)
+	        buf.append("'(i10)'");	
+	        // else if(varName type is Real/float/double)
+	        // buf.append("'(F10.5)'");	
+	        buf.append(" ) ");		// function close brackets
+	        boolean first = true;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(arg.getFortran());
+	            first = false;
+	        }
+	        return buf.toString();
+        
+        // For logial operator functions, and(A,B), or(A,B),xor(A,B), not(A)
+        } else if(fname.equalsIgnoreCase("and")) {
+        	return generateLogicalFunction(" .AND. ");
+        } else if(fname.equalsIgnoreCase("or")) {
+        	return generateLogicalFunction(" .OR. ");
+        } else if(fname.equalsIgnoreCase("xor")) {
+        	return generateLogicalFunction(" .NEQV. ");
+        } else if(fname.equalsIgnoreCase("not")) {
+	        buf.append(" (");		
+        	buf.append(" .NOT. ");
+	        for(Expr arg : args) {
+	            buf.append(arg.getFortran()); // Only take one parameter
+	            break;
+	        }
+	        buf.append(")");
+	        return buf.toString();
+        } else {
+        	buf.append(fname);
+        }
+        // Regualar way to generate parameter code.
+        if(bParenthesis) buf.append("(");
+        boolean first = true;
+        for(Expr arg : args) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getFortran());
+            first = false;
+        }
+        if(bParenthesis) buf.append(")");
+        return buf.toString();
+    }
+    // Only take 2 parameters
+    syn String ParameterizedExpr.generateLogicalFunction(String op) {
+        StringBuffer buf = new StringBuffer();
+        List<Expr> args = getArgs();
+        
+	        buf.append(" ( ");		// function close brackets
+	        boolean first = true, second = false;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(op);
+	            } 
+	            buf.append(arg.getFortran());
+	            if(second)	
+	            	break;
+	            first = false; second = true;
+	        }
+	        buf.append(")");
+	        return buf.toString();
+    }
+    eq CellIndexExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getTarget().getFortran());
+        buf.append('{');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getFortran());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+
+    eq MatrixExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('[');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getFortran());
+            first = false;
+        }
+        buf.append(']');
+        return buf.toString();
+    }
+    eq CellArrayExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('{');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getFortran());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+    eq Row.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for(Expr element : getElements()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(element.getFortran());
+            first = false;
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionHandleExpr.getFortranLessComments() = "@" + getName().getFortran();
+    eq LambdaExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("(@(");
+        boolean first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getFortran());
+            first = false;
+        }
+        buf.append(") ");
+        buf.append(getBody().getFortran());
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    //literals
+    eq IntLiteralExpr.getFortranLessComments() = getValue().getText();
+    eq FPLiteralExpr.getFortranLessComments() = getValue().getText();
+    eq StringLiteralExpr.getFortranLessComments() = "'" + getValue() + "'";
+    
+    eq UMinusExpr.getFortranLessComments() = "(-" + getOperand().getFortran() + ")";
+    eq UPlusExpr.getFortranLessComments() = "(+" + getOperand().getFortran() + ")";
+    eq NotExpr.getFortranLessComments() = "(.NOT. " + getOperand().getFortran() + ")";
+    eq MTransposeExpr.getFortranLessComments() {
+    	// According to "Simplify" assumption
+    	return "TRANSPOSE(" + ((NameExpr) getOperand()).getName().getID() + ")";
+    }
+    eq ArrayTransposeExpr.getFortranLessComments() = "(" + getOperand().getFortran() + ".')";
+    
+    syn String BinaryExpr.getFortranLessComments(String op) = "(" + getLHS().getFortran() + " " + op + " " + getRHS().getFortran() + ")";
+    
+    // getFortranLessComments("+") is calling back to parent-class BinaryExpr
+    // on BinaryExpr.getFortranLessComments(String op)
+    eq PlusExpr.getFortranLessComments() = getFortranLessComments("+");
+    eq MinusExpr.getFortranLessComments() = getFortranLessComments("-");
+    
+    eq MTimesExpr.getFortranLessComments() = getFortranLessComments("*");
+    eq MDivExpr.getFortranLessComments() = getFortranLessComments("/");
+    eq MLDivExpr.getFortranLessComments() = getFortranLessComments("\\");
+    eq MPowExpr.getFortranLessComments() = getFortranLessComments("**");	// TODO: how parser handles MPowExpr,EPowExpr?
+    
+    eq ETimesExpr.getFortranLessComments() = getFortranLessComments("*");
+    eq EDivExpr.getFortranLessComments() = getFortranLessComments("/");
+    eq ELDivExpr.getFortranLessComments() {
+    	return "(" + getRHS().getFortran() + " " + "/" + " " + getLHS().getFortran() + ")";
+    }
+    eq EPowExpr.getFortranLessComments() = getFortranLessComments("**");
+    
+    eq AndExpr.getFortranLessComments() = getFortranLessComments(".AND.");
+    eq OrExpr.getFortranLessComments() = getFortranLessComments(".OR.");
+    eq ShortCircuitAndExpr.getFortranLessComments() = getFortranLessComments(".AND.");
+    eq ShortCircuitOrExpr.getFortranLessComments() = getFortranLessComments(".OR.");
+    eq LTExpr.getFortranLessComments() = getFortranLessComments("<");
+    eq GTExpr.getFortranLessComments() = getFortranLessComments(">");
+    eq LEExpr.getFortranLessComments() = getFortranLessComments("<=");
+    eq GEExpr.getFortranLessComments() = getFortranLessComments(">=");
+    eq EQExpr.getFortranLessComments() = getFortranLessComments("==");
+    eq NEExpr.getFortranLessComments() = getFortranLessComments("/=");
+    
+    //// ANNOTATION EXTENSION - START //////////////////////////////////////////
+// NOT Support in FORTRAN
+    eq Annotation.getFortranLessComments() = "(*" + getText()  + "*)";
+    eq ExpandedAnnotation.getFortranLessComments() = ""; // getanno().getStructureString();
+	
+    //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
+//INTEGER :: runs
+// INTEGER,DIMENSION(5, 3) :: times
+
+    syn String VariableDecl.getFortranLessComments() {
+    	// Variable name:  "Declare " + getID();
+		StringBuffer buf = new StringBuffer();
+        annotations.ast.Type varType = getType();
+		String typeName;
+		if(varType!=null && !(varType instanceof annotations.ast.UnknownType)) {
+			typeName= getType().getName();
+			if(typeName.equalsIgnoreCase("int")) {
+	         	buf.append("INTEGER");
+	   		} else if(typeName.equalsIgnoreCase("double")) {
+	         	buf.append("REAL(8)");
+	   		} else if(typeName.length()>=9 &&
+	   				typeName.substring(0,9).equalsIgnoreCase("character")) {
+	         	buf.append(typeName.toUpperCase());
+	        } else { 	// Special case, user defined type, or BASETYPE
+	         	buf.append(typeName.toUpperCase());
+	         	System.err.println("[VariableDecl]:("+getID()+") type = "+typeName.toUpperCase());
+	        }
+		} else {
+			// by default it's double
+			buf.append("REAL(8)");
+		}
+        if(varType!= null && varType instanceof annotations.ast.MatrixType) {
+        	// Handle know size of matrix
+        	annotations.ast.Size varSize = ((annotations.ast.MatrixType) varType).getSize(); 
+        	if(varSize != null) {
+	        	buf.append(", DIMENSION(");
+				boolean first = true;
+				for(Integer dim: varSize.getDims()) {
+					if(!first) {
+						buf.append(", ");
+					}
+					first = false;
+					buf.append(dim);
+				}
+	        	buf.append(")");
+			} else {
+	        	buf.append(", DIMENSION(");
+	        	// TODO: should be able to know the dimension
+	        	buf.append(":");
+	        	buf.append(")");
+	        	buf.append(", ALLOCATABLE");  // defined as pointer
+			}
+        }
+     	buf.append(" :: ");
+     	buf.append(getID());
+     	return buf.toString();
+    }
+    	 
+}
