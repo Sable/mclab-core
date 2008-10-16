@@ -170,15 +170,53 @@ private boolean inParens() { return !bracketStack.isEmpty() && bracketStack.peek
 private boolean inCurly() { return !bracketStack.isEmpty() && bracketStack.peek() == LCURLY; }
 private boolean inSquare() { return !bracketStack.isEmpty() && bracketStack.peek() == LSQUARE; }
 
-private String leadingComments = null;
+private final StringBuffer leadingComments = new StringBuffer();
+private int leadingCommentsPos = -1;
 
-private String getCommentStringToInsert() {
-    if(leadingComments == null) {
+private void appendToLeadingComments(String text, int pos) {
+    if(leadingComments.length() == 0) {
+        leadingCommentsPos = pos;
+    }
+    leadingComments.append(text);
+}
+
+private String insertDeletedComments() {
+    if(leadingComments.length() == 0) {
+        //no offset changes or advancement
         return "";
     }
-    String commentString = leadingComments + "\n";
-    leadingComments = null;
-    return commentString;
+
+//    boolean endsWithNewline = false;
+//
+//    String leadingComments_chomp = leadingComments.toString();
+//    if(leadingComments_chomp.endsWith("\r\n")) {
+//        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 2);
+//        endsWithNewline = true;
+//    } else if(leadingComments_chomp.endsWith("\r") || leadingComments_chomp.endsWith("\n")) {
+//        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 1);
+//        endsWithNewline = true;
+//    }
+//
+//    TextPosition eofPos = LengthScanner.getLength(leadingComments_chomp);
+//    
+//    offsetTracker.recordOffsetChange(-1 * eofPos.getLine(), Math.max(0, leadingCommentsPos));
+//    offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+//
+//    if(endsWithNewline) {
+//        offsetTracker.recordOffsetChange(-1, eofPos.getColumn() - 2);
+//        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
+//        offsetTracker.recordOffsetChange(1, 0);
+//    } else {
+//        offsetTracker.recordOffsetChange(0, -1);
+//        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
+//        offsetTracker.recordOffsetChange(0, 0);
+//    }
+//
+//    String commentString = leadingComments + "\n";
+//    leadingComments.setLength(0);
+//    return commentString;
+
+    return "";
 }
 }
 
@@ -380,7 +418,7 @@ function :
   ;
 
 function_beginning :
-     ((dt_FILLER | dt_LINE_TERMINATOR | dt_COMMENT | dt_BRACKET_COMMENT) -> template() "")* { leadingComments = $text; }
+     (((dt_FILLER | dt_LINE_TERMINATOR | dt_COMMENT | dt_BRACKET_COMMENT) { appendToLeadingComments($text, $start.getCharPositionInLine()); }) -> template() "")*
   ;
 
 function_separator :
@@ -410,7 +448,7 @@ function_separator :
         //fudge factor to point following stuff back to location preceding inserted newlines
         offsetTracker.recordOffsetChange(-1, lineLength);
      }
-     (function_separator_blob -> template() "")* { leadingComments = $text; }
+     ((function_separator_blob { appendToLeadingComments($text, $start.getCharPositionInLine()); }) -> template() "")*
      -> template(gap={"\n\n"}) "<gap>"
   ;
 
@@ -427,7 +465,7 @@ function_ending :
 
 function_body :
      t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? (input_params t_FILLER?)?
-     (stmt_separator -> template(original={$text}, extra={getCommentStringToInsert()}) "<original><extra>")
+     (stmt_separator -> template(original={$text}, extra={insertDeletedComments()}) "<original><extra>")
      (t_FILLER? stmt_or_function)* t_FILLER? 
      t_END
   ;
