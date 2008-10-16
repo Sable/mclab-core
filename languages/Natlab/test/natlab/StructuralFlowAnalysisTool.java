@@ -23,8 +23,15 @@ public class StructuralFlowAnalysisTool {
 			System.exit(1);
 		}
 		String basename = args[0];
+		String filename = StaticFortranTool.getAbslouteName(basename);
+		System.out.println("Converting 2 Fortran : "+filename);
+		basename = filename;
+        if(basename.substring(basename.length()-2).equals(".m")
+        		|| basename.substring(basename.length()-2).equals(".n")) {
+        	basename = basename.substring(0,basename.length()-2);
+        } 
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(basename + ".in"));
+			BufferedReader in = new BufferedReader(new FileReader(filename));
 			
 			CommentBuffer commentBuffer = new CommentBuffer();
 			NatlabScanner scanner = new NatlabScanner(in);
@@ -71,7 +78,7 @@ public class StructuralFlowAnalysisTool {
 			ReachingDefs defsAnalysis = new ReachingDefs(actual);
 
 			// [3] Retrieve the result	
-			// Sample code for outputing the result flow-set (after set)
+			// Sample code for outputting the result flow-set (after set)
 		    Map<ASTNode, FlowSet> defsMap = defsAnalysis.getResult(); 
 			for(ASTNode node: defsAnalysis.getNodeList()) {
 				FlowSet flowset = defsMap.get(node);
