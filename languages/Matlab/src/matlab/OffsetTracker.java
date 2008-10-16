@@ -1,7 +1,5 @@
 package matlab;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
