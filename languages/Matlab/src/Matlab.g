@@ -186,8 +186,8 @@ private String insertDeletedComments() {
         return "";
     }
 
-//    boolean endsWithNewline = false;
-//
+    boolean endsWithNewline = false;
+
 //    String leadingComments_chomp = leadingComments.toString();
 //    if(leadingComments_chomp.endsWith("\r\n")) {
 //        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 2);
@@ -196,26 +196,28 @@ private String insertDeletedComments() {
 //        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 1);
 //        endsWithNewline = true;
 //    }
-//
-//    TextPosition eofPos = LengthScanner.getLength(leadingComments_chomp);
 //    
-//    offsetTracker.recordOffsetChange(-1 * eofPos.getLine(), Math.max(0, leadingCommentsPos));
-//    offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
-//
+//    TextPosition eofPos = LengthScanner.getLength(leadingComments_chomp);
 //    if(endsWithNewline) {
+//        offsetTracker.recordOffsetChange(-1 * (eofPos.getLine() + 1), Math.max(0, leadingCommentsPos));
+//        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+//    
 //        offsetTracker.recordOffsetChange(-1, eofPos.getColumn() - 2);
 //        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
 //        offsetTracker.recordOffsetChange(1, 0);
 //    } else {
+//        offsetTracker.recordOffsetChange(-1 * eofPos.getLine(), Math.max(0, leadingCommentsPos));
+//        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+//    
 //        offsetTracker.recordOffsetChange(0, -1);
 //        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
 //        offsetTracker.recordOffsetChange(0, 0);
 //    }
-//
+//    
 //    String commentString = leadingComments + "\n";
 //    leadingComments.setLength(0);
 //    return commentString;
-
+    
     return "";
 }
 }
