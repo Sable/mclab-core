@@ -186,55 +186,53 @@ private String insertDeletedComments() {
         return "";
     }
     
-    return "";
+    TextPosition missingNewlineAdjustment = new TextPosition(0, 0);
     
-//    TextPosition missingNewlineAdjustment = new TextPosition(0, 0);
-//    
-//    Token prevTok = input.LT(-1);
-//    if(prevTok.getType() != LINE_TERMINATOR) {
-//        TextPosition chompedPrecedingEOFPos = LengthScanner.getLength(prevTok.getText());
-//        int line = -1;
-//        int col = chompedPrecedingEOFPos.getColumn() - 1;
-//        if(chompedPrecedingEOFPos.getLine() == 1) {
-//            col += input.LT(-1).getCharPositionInLine();
-//        }
-//        missingNewlineAdjustment = new TextPosition(line, col);
-//    }
-//    
-//    boolean leadingCommentsEndWithNewline = true;
-//    String leadingCommentsString = leadingComments.toString();
-//    String chompedLeadingComments = chomp(leadingCommentsString);
-//    if(chompedLeadingComments == null) {
-//        leadingCommentsEndWithNewline = false;
-//        chompedLeadingComments = leadingCommentsString;
-//    }
-//    TextPosition chompedLeadingCommentsEOFPos = LengthScanner.getLength(chompedLeadingComments);
-//    
-//    //introduce fudge factor
-//    offsetTracker.recordOffsetChange(-1 * missingNewlineAdjustment.getLine(), -1 * missingNewlineAdjustment.getColumn());
-//    
-//    if(leadingCommentsEndWithNewline) {
-//        offsetTracker.recordOffsetChange(-1 * (chompedLeadingCommentsEOFPos.getLine() + 1), Math.max(0, leadingCommentsPos));
-//        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
-//    
-//        offsetTracker.recordOffsetChange(-1, chompedLeadingCommentsEOFPos.getColumn() - 1);
-//        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
-//        offsetTracker.recordOffsetChange(1, 0);
-//    } else {
-//        offsetTracker.recordOffsetChange(-1 * chompedLeadingCommentsEOFPos.getLine(), Math.max(0, leadingCommentsPos));
-//        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
-//    
-//        offsetTracker.recordOffsetChange(0, -1);
-//        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
-//        offsetTracker.recordOffsetChange(0, 0);
-//    }
-//    
-//    //cancel fudge factor
-//    offsetTracker.recordOffsetChange(missingNewlineAdjustment.getLine(), missingNewlineAdjustment.getColumn());
-//    
-//    String commentString = leadingComments + "\n";
-//    leadingComments.setLength(0);
-//    return commentString;
+    Token prevTok = input.LT(-1);
+    if(prevTok.getType() != LINE_TERMINATOR) {
+        TextPosition chompedPrecedingEOFPos = LengthScanner.getLength(prevTok.getText());
+        int line = -1;
+        int col = chompedPrecedingEOFPos.getColumn() - 1;
+        if(chompedPrecedingEOFPos.getLine() == 1) {
+            col += input.LT(-1).getCharPositionInLine();
+        }
+        missingNewlineAdjustment = new TextPosition(line, col);
+    }
+    
+    boolean leadingCommentsEndWithNewline = true;
+    String leadingCommentsString = leadingComments.toString();
+    String chompedLeadingComments = chomp(leadingCommentsString);
+    if(chompedLeadingComments == null) {
+        leadingCommentsEndWithNewline = false;
+        chompedLeadingComments = leadingCommentsString;
+    }
+    TextPosition chompedLeadingCommentsEOFPos = LengthScanner.getLength(chompedLeadingComments);
+    
+    //introduce fudge factor
+    offsetTracker.recordOffsetChange(-1 * missingNewlineAdjustment.getLine(), -1 * missingNewlineAdjustment.getColumn());
+    
+    if(leadingCommentsEndWithNewline) {
+        offsetTracker.recordOffsetChange(-1 * (chompedLeadingCommentsEOFPos.getLine() + 1), Math.max(0, leadingCommentsPos));
+        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+    
+        offsetTracker.recordOffsetChange(-1, chompedLeadingCommentsEOFPos.getColumn() - 1);
+        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
+        offsetTracker.recordOffsetChange(1, 0);
+    } else {
+        offsetTracker.recordOffsetChange(-1 * chompedLeadingCommentsEOFPos.getLine(), Math.max(0, leadingCommentsPos));
+        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+    
+        offsetTracker.recordOffsetChange(0, -1);
+        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
+        offsetTracker.recordOffsetChange(0, 0);
+    }
+    
+    //cancel fudge factor
+    offsetTracker.recordOffsetChange(missingNewlineAdjustment.getLine(), missingNewlineAdjustment.getColumn());
+    
+    String commentString = leadingComments + "\n";
+    leadingComments.setLength(0);
+    return commentString;
 }
 
 private static String chomp(String original) {

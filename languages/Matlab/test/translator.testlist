@@ -33,6 +33,7 @@ translator_csheader_switch_nobody
 translator_comment_class
 translator_comment_function
 translator_comment_functionlist
+translator_comment_functionend
 parserpasstest1
 parserpasstest2
 parserpass_unary
