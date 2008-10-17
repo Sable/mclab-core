@@ -213,14 +213,14 @@ private String insertDeletedComments() {
     
     if(leadingCommentsEndWithNewline) {
         offsetTracker.recordOffsetChange(-1 * (chompedLeadingCommentsEOFPos.getLine() + 1), Math.max(0, leadingCommentsPos));
-        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+        offsetTracker.advanceByTextSize(leadingCommentsString); //for text (NB: not chomped)
     
         offsetTracker.recordOffsetChange(-1, chompedLeadingCommentsEOFPos.getColumn() - 1);
         offsetTracker.advanceToNewLine(1, 1); //for inserted newline
         offsetTracker.recordOffsetChange(1, 0);
     } else {
         offsetTracker.recordOffsetChange(-1 * chompedLeadingCommentsEOFPos.getLine(), Math.max(0, leadingCommentsPos));
-        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
+        offsetTracker.advanceByTextSize(leadingCommentsString); //for text (NB: not chomped)
     
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceToNewLine(1, 1); //for inserted newline
@@ -230,7 +230,7 @@ private String insertDeletedComments() {
     //cancel fudge factor
     offsetTracker.recordOffsetChange(missingNewlineAdjustment.getLine(), missingNewlineAdjustment.getColumn());
     
-    String commentString = leadingComments + "\n";
+    String commentString = leadingCommentsString + "\n";
     leadingComments.setLength(0);
     return commentString;
 }
