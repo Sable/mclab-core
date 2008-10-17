@@ -185,28 +185,43 @@ private String insertDeletedComments() {
         //no offset changes or advancement
         return "";
     }
-
-    boolean endsWithNewline = false;
-
-//    String leadingComments_chomp = leadingComments.toString();
-//    if(leadingComments_chomp.endsWith("\r\n")) {
-//        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 2);
-//        endsWithNewline = true;
-//    } else if(leadingComments_chomp.endsWith("\r") || leadingComments_chomp.endsWith("\n")) {
-//        leadingComments_chomp = leadingComments_chomp.substring(0, leadingComments_chomp.length() - 1);
-//        endsWithNewline = true;
+    
+    return "";
+    
+//    TextPosition missingNewlineAdjustment = new TextPosition(0, 0);
+//    
+//    Token prevTok = input.LT(-1);
+//    if(prevTok.getType() != LINE_TERMINATOR) {
+//        TextPosition chompedPrecedingEOFPos = LengthScanner.getLength(prevTok.getText());
+//        int line = -1;
+//        int col = chompedPrecedingEOFPos.getColumn() - 1;
+//        if(chompedPrecedingEOFPos.getLine() == 1) {
+//            col += input.LT(-1).getCharPositionInLine();
+//        }
+//        missingNewlineAdjustment = new TextPosition(line, col);
 //    }
 //    
-//    TextPosition eofPos = LengthScanner.getLength(leadingComments_chomp);
-//    if(endsWithNewline) {
-//        offsetTracker.recordOffsetChange(-1 * (eofPos.getLine() + 1), Math.max(0, leadingCommentsPos));
+//    boolean leadingCommentsEndWithNewline = true;
+//    String leadingCommentsString = leadingComments.toString();
+//    String chompedLeadingComments = chomp(leadingCommentsString);
+//    if(chompedLeadingComments == null) {
+//        leadingCommentsEndWithNewline = false;
+//        chompedLeadingComments = leadingCommentsString;
+//    }
+//    TextPosition chompedLeadingCommentsEOFPos = LengthScanner.getLength(chompedLeadingComments);
+//    
+//    //introduce fudge factor
+//    offsetTracker.recordOffsetChange(-1 * missingNewlineAdjustment.getLine(), -1 * missingNewlineAdjustment.getColumn());
+//    
+//    if(leadingCommentsEndWithNewline) {
+//        offsetTracker.recordOffsetChange(-1 * (chompedLeadingCommentsEOFPos.getLine() + 1), Math.max(0, leadingCommentsPos));
 //        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
 //    
-//        offsetTracker.recordOffsetChange(-1, eofPos.getColumn() - 2);
+//        offsetTracker.recordOffsetChange(-1, chompedLeadingCommentsEOFPos.getColumn() - 1);
 //        offsetTracker.advanceToNewLine(1, 1); //for inserted newline
 //        offsetTracker.recordOffsetChange(1, 0);
 //    } else {
-//        offsetTracker.recordOffsetChange(-1 * eofPos.getLine(), Math.max(0, leadingCommentsPos));
+//        offsetTracker.recordOffsetChange(-1 * chompedLeadingCommentsEOFPos.getLine(), Math.max(0, leadingCommentsPos));
 //        offsetTracker.advanceByTextSize(leadingComments.toString()); //for text (NB: not chomped)
 //    
 //        offsetTracker.recordOffsetChange(0, -1);
@@ -214,11 +229,22 @@ private String insertDeletedComments() {
 //        offsetTracker.recordOffsetChange(0, 0);
 //    }
 //    
+//    //cancel fudge factor
+//    offsetTracker.recordOffsetChange(missingNewlineAdjustment.getLine(), missingNewlineAdjustment.getColumn());
+//    
 //    String commentString = leadingComments + "\n";
 //    leadingComments.setLength(0);
 //    return commentString;
-    
-    return "";
+}
+
+private static String chomp(String original) {
+    if(original.endsWith("\r\n")) {
+        return original.substring(0, original.length() - 2);
+    } else if(original.endsWith("\r") || original.endsWith("\n")) {
+        return original.substring(0, original.length() - 1);
+    } else {
+        return null;
+    }
 }
 }
 
@@ -429,17 +455,7 @@ function_separator :
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceToNewLine(1, 1);
         
-        java.io.StringReader reader = new java.io.StringReader(input.LT(-1).getText());
-        LengthScanner scanner = new LengthScanner(reader);
-        TextPosition eofPos = null;
-        try {
-            eofPos = scanner.getEOFPosition();
-            reader.close();
-        } catch(java.io.IOException e) {
-            //can't happen since StringReader
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        TextPosition eofPos = LengthScanner.getLength(input.LT(-1).getText());
         
         //second inserted newline
         int startCol = eofPos.getLine() == 1 ? input.LT(-1).getCharPositionInLine() : 0;
