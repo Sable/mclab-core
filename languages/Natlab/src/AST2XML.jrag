@@ -51,12 +51,12 @@ aspect ASTtoXML {
     
     //program
     eq EmptyProgram.getXML(int indent) {
-        long id = nodeCounter();
-        setuID(id);
+        //long id = nodeCounter();
+        //setuID(id);
         StringBuffer buf = new StringBuffer();
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<EmptyProgram id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		//buf.append(getXMLindented(indent));
+		//buf.append("<EmptyProgram id=\""+id+"\"/>");
         
         return buf.toString();
     }
@@ -67,7 +67,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<Script id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Script id=\""+id+"\">");
 
 		buf.append(getSymbolTableXML(indent+1));
 		
@@ -90,7 +90,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();     
         
         buf.append(getXMLindented(indent));
-		buf.append("<FunctionList id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<FunctionList id=\""+id+"\">");
 		
 		buf.append(getSymbolTableXML(indent+1));
 		
@@ -110,7 +110,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();       
         
         buf.append(getXMLindented(indent));
-		buf.append("<Function id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");
+		buf.append("<Function id=\""+id+"\" name=\""+getName()+"\">");
 		
 		buf.append(getSymbolTableXML(indent+1)); 
         
@@ -157,7 +157,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();       
         
         buf.append(getXMLindented(indent));
-		buf.append("<ClassDef id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");
+		buf.append("<ClassDef id=\""+id+"\" name=\""+getName()+"\">");
         
         buf.append(getSymbolTableXML(indent+1));
         
@@ -197,7 +197,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();       
         
         buf.append(getXMLindented(indent));
-		buf.append("<Properties id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Properties id=\""+id+"\" >");
         
         for(Attribute attr : getAttributes()) {
             buf.append(attr.getXML(indent+1));
@@ -218,7 +218,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();       
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<Methods id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Methods id=\""+id+"\">");
 		
         for(Attribute attr : getAttributes()) {
             buf.append(attr.getXML(indent+1));
@@ -245,7 +245,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<Signature id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");
+		buf.append("<Signature id=\""+id+"\" name=\""+getName()+"\">");
        
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
@@ -278,7 +278,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<PropertyAccess id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" access=\""+getAccess()+"\">");
+		buf.append("<PropertyAccess id=\""+id+"\" name=\""+getName()+"\" access=\""+getAccess()+"\">");
          		       
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
@@ -324,7 +324,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<ClassEvents id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ClassEvents id=\""+id+"\">");
 		
         for(Attribute attr : getAttributes()) {
             buf.append(attr.getXML(indent+1));
@@ -346,7 +346,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<Attribute id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getKey()+"\">");		
+		buf.append("<Attribute id=\""+id+"\" name=\""+getKey()+"\">");		
         
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Key\" value=\""+getKey()+"\" />");
@@ -365,7 +365,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<SuperClass id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" />");
+		buf.append("<SuperClass id=\""+id+"\" name=\""+getName()+"\"/>");
 		       
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
@@ -382,7 +382,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<Property id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");		
+		buf.append("<Property id=\""+id+"\" name=\""+getName()+"\">");		
         
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
@@ -401,7 +401,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<Property id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\" />");
+		buf.append("<Property id=\""+id+"\" name=\""+getName()+"\" />");
 	       
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
@@ -418,7 +418,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();       
         
         buf.append(getXMLindented(indent));
-		buf.append("<SuperClassMethodExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<SuperClassMethodExpr id=\""+id+"\">");
 		
         buf.append(getFuncName().getXML(indent+1));
         buf.append(getClassName().getXML(indent+1));
@@ -436,7 +436,7 @@ aspect ASTtoXML {
     	String name = getClass().getName();
     			
 		buf.append(getXMLindented(indent));
-		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\" class=\""+name+"\" text=\""+getText()+"\" />");    
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\" text=\""+getText()+"\" />");    
 				
 		//buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Text\" value=\""+getText()+"\" />");
@@ -449,12 +449,12 @@ aspect ASTtoXML {
     
     //stmts
     eq EmptyStmt.getXML(int indent) {
-    	long id = nodeCounter();
-        setuID(id);
+    	//long id = nodeCounter();
+        //setuID(id);
         StringBuffer buf = new StringBuffer();
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<EmptyStmt id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		//buf.append(getXMLindented(indent));
+		//buf.append("<EmptyStmt id=\""+id+"\"/>");
                 
         return buf.toString();
     }
@@ -465,7 +465,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<ExprStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ExprStmt id=\""+id+"\">");
         
         buf.append(getExpr().getXML(indent+1));
         
@@ -481,7 +481,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<AssignStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<AssignStmt id=\""+id+"\">");
         
         buf.append(getLHS().getXML(indent+1));
         buf.append(getRHS().getXML(indent+1));
@@ -498,7 +498,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<GlobalStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<GlobalStmt id=\""+id+"\">");
 		
         for(Name name : getNames()) {
             buf.append(name.getXML(indent+1));
@@ -516,7 +516,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<PersistentStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<PersistentStmt id=\""+id+"\">");
 		
         for(Name name : getNames()) {
             buf.append(name.getXML(indent+1));
@@ -534,7 +534,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<ShellCommandStmt id=\""+id+"\" class=\""+getClass().getName()+"\" command=\""+getCommand()+"\" />");
+		buf.append("<ShellCommandStmt id=\""+id+"\" command=\""+getCommand()+"\" />");
 		        
         //buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Command\" value=\""+getCommand()+"\" />");
@@ -551,7 +551,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<BreakStmt id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		buf.append("<BreakStmt id=\""+id+"\"/>");
                
         return buf.toString();
     }
@@ -562,7 +562,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<ContinueStmt id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		buf.append("<ContinueStmt id=\""+id+"\"/>");
                
         return buf.toString();
     }
@@ -573,7 +573,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
 		
 		buf.append(getXMLindented(indent));
-		buf.append("<ReturnStmt id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		buf.append("<ReturnStmt id=\""+id+"\"/>");
                
         return buf.toString();
     }
@@ -584,7 +584,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
         
         buf.append(getXMLindented(indent));
-		buf.append("<ForStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ForStmt id=\""+id+"\">");
 		
         buf.append(getAssignStmt().getXML(indent+1));
 
@@ -604,7 +604,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                 
         buf.append(getXMLindented(indent));
-		buf.append("<WhileStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<WhileStmt id=\""+id+"\">");
 		
         buf.append(getExpr().getXML(indent+1));
 
@@ -624,7 +624,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<IfStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<IfStmt id=\""+id+"\">");
 		
         for(IfBlock block : getIfBlocks()) {
             buf.append(block.getXML(indent+1));
@@ -645,7 +645,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<IfBlock id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<IfBlock id=\""+id+"\">");
 
         buf.append(getCondition().getXML(indent+1));
 
@@ -665,7 +665,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                 
         buf.append(getXMLindented(indent));
-		buf.append("<ElseBlock id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ElseBlock id=\""+id+"\">");
 		
         for(Stmt stmt : getStmts()) {
             buf.append(stmt.getXML(indent+1));
@@ -683,7 +683,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                 
         buf.append(getXMLindented(indent));
-		buf.append("<SwitchStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<SwitchStmt id=\""+id+"\">");
         
         buf.append(getExpr().getXML(indent+1));
 
@@ -706,7 +706,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<SwitchCaseBlock id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<SwitchCaseBlock id=\""+id+"\">");
         
         buf.append(getExpr().getXML(indent+1));
 
@@ -726,7 +726,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();        
         
         buf.append(getXMLindented(indent));
-		buf.append("<DefaultCaseBlock id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<DefaultCaseBlock id=\""+id+"\">");
 		
         for(Stmt stmt : getStmts()) {
             buf.append(stmt.getXML(indent+1));
@@ -744,7 +744,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<TryStmt id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<TryStmt id=\""+id+"\">");
 		
         for(Stmt stmt : getTryStmts()) {
             buf.append(stmt.getXML(indent+1));
@@ -771,7 +771,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<RangeExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<RangeExpr id=\""+id+"\">");
 		
         buf.append(getLower().getXML(indent+1));
 
@@ -793,7 +793,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
        		
 		buf.append(getXMLindented(indent));
-		buf.append("<ColonExpr id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		buf.append("<ColonExpr id=\""+id+"\"/>");
                
         return buf.toString();
     }
@@ -804,7 +804,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
        		
 		buf.append(getXMLindented(indent));
-		buf.append("<EndExpr id=\""+id+"\" class=\""+getClass().getName()+"\" />");
+		buf.append("<EndExpr id=\""+id+"\"/>");
                
         return buf.toString();
     }
@@ -815,7 +815,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<Name id=\""+id+"\" class=\""+getClass().getName()+"\" id=\""+getID()+"\" />");
+		buf.append("<Name id=\""+id+"\" nameId=\""+getID()+"\" />");
                
         return buf.toString();
     }
@@ -827,7 +827,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<NameExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<NameExpr id=\""+id+"\">");
 		
         buf.append(getName().getXML(indent+1));
 
@@ -843,7 +843,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<DotExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<DotExpr id=\""+id+"\">");
 		
         buf.append(getTarget().getXML(indent+1));
 		buf.append(getField().getXML(indent+1));
@@ -860,7 +860,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<ParameterizedExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ParameterizedExpr id=\""+id+"\">");
 		
         buf.append(getTarget().getXML(indent+1));
 
@@ -880,7 +880,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<CellIndexExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<CellIndexExpr id=\""+id+"\">");
 		
         buf.append(getTarget().getXML(indent+1));
 
@@ -900,7 +900,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
         		
 		buf.append(getXMLindented(indent));
-		buf.append("<MatrixExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<MatrixExpr id=\""+id+"\">");
 		
         for(Row row : getRows()) {
             buf.append(row.getXML(indent+1));
@@ -918,7 +918,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                	
        	buf.append(getXMLindented(indent));
-		buf.append("<CellArrayExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<CellArrayExpr id=\""+id+"\">");
 
         for(Row row : getRows()) {
             buf.append(row.getXML(indent+1));
@@ -936,7 +936,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                 
         buf.append(getXMLindented(indent));
-		buf.append("<Row id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<Row id=\""+id+"\">");
 		
         for(Expr element : getElements()) {
             buf.append(element.getXML(indent+1));
@@ -954,7 +954,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
               
         buf.append(getXMLindented(indent));
-		buf.append("<FunctionHandleExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<FunctionHandleExpr id=\""+id+"\">");
 		
         buf.append(getName().getXML(indent+1));
 
@@ -970,7 +970,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
               
         buf.append(getXMLindented(indent));
-		buf.append("<LambdaExpr id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<LambdaExpr id=\""+id+"\">");
 		
         for(Name param : getInputParams()) {
             buf.append(param.getXML(indent+1));
@@ -991,7 +991,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<IntLiteralExpr id=\""+id+"\" class=\""+getClass().getName()+"\" value=\""+getValue().getText()+"\" />");
+		buf.append("<IntLiteralExpr id=\""+id+"\" value=\""+getValue().getText()+"\" />");
               
         return buf.toString();
     }
@@ -1002,7 +1002,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<FPLiteralExpr id=\""+id+"\" class=\""+getClass().getName()+"\" value=\""+getValue().getText()+"\" />");
+		buf.append("<FPLiteralExpr id=\""+id+"\" value=\""+getValue().getText()+"\" />");
                
         return buf.toString();
     }
@@ -1013,7 +1013,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<StringLiteralExpr id=\""+id+"\" class=\""+getClass().getName()+"\" value=\""+getValue()+"\" />");
+		buf.append("<StringLiteralExpr id=\""+id+"\" value=\""+getValue()+"\" />");
                
         return buf.toString();
     }
@@ -1025,7 +1025,7 @@ aspect ASTtoXML {
     	String name = getClass().getName();
     		
 		buf.append(getXMLindented(indent));
-		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\" class=\""+name+"\">");  
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\">");  
 
         buf.append(getOperand().getXML(indent+1));
         
@@ -1042,7 +1042,7 @@ aspect ASTtoXML {
     	String name = getClass().getName();
     		
 		buf.append(getXMLindented(indent));
-		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\" class=\""+name+"\">");  
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\">");  
 
         buf.append(getLHS().getXML(indent+1));
         buf.append(getRHS().getXML(indent+1));
@@ -1061,7 +1061,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
               
         buf.append(getXMLindented(indent));
-		buf.append("<Annotation id=\""+id+"\" class=\""+getClass().getName()+"\" text=\""+getText()+"\" />");
+		buf.append("<Annotation id=\""+id+"\" text=\""+getText()+"\" />");
 				
 		//buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Text\" value=\""+getText()+"\" />");
@@ -1078,7 +1078,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<ExpandedAnnotation id=\""+id+"\" class=\""+getClass().getName()+"\">");
+		buf.append("<ExpandedAnnotation id=\""+id+"\">");
 
 		buf.append(getanno().getXML(nodeCounter(), indent+1));
         setNodeCounter(getanno().getNodeCounter());
@@ -1097,7 +1097,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<VariableDecl id=\""+id+"\" class=\""+getClass().getName()+"\" id=\""+getID()+"\" />");
+		buf.append("<VariableDecl id=\""+id+"\" varId=\""+getID()+"\" />");
 		
 		//buf.append(getXMLindented(indent+1));
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"ID\" value=\""+getID()+"\" />");
@@ -1114,7 +1114,7 @@ aspect ASTtoXML {
         StringBuffer buf = new StringBuffer();
                
         buf.append(getXMLindented(indent));
-		buf.append("<FunctionDecl id=\""+id+"\" class=\""+getClass().getName()+"\" name=\""+getName()+"\">");
+		buf.append("<FunctionDecl id=\""+id+"\" name=\""+getName()+"\">");
 
 		buf.append(getSymbolTableXML(indent+1));
 		
@@ -1122,28 +1122,28 @@ aspect ASTtoXML {
 		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
 		
 		buf.append(getXMLindented(indent+1));
-		buf.append("<ParamDecl>");
+		buf.append("<ParamDeclList>");
         for(VariableDecl vd : getParamDecls()) {
             buf.append(vd.getXML(indent+2));
         }
         buf.append(getXMLindented(indent+1));
-		buf.append("</ParamDecl>");
+		buf.append("</ParamDeclList>");
 		
 		buf.append(getXMLindented(indent+1));
-		buf.append("<InputParam>");
+		buf.append("<InputParamList>");
         for(Name param : getInputParams()) {
             buf.append(param.getXML(indent+2));
         }
         buf.append(getXMLindented(indent+1));
-		buf.append("</InputParam>");
+		buf.append("</InputParamList>");
 		
 		buf.append(getXMLindented(indent+1));
-		buf.append("<OutputParam>");
+		buf.append("<OutputParamList>");
         for(Name param : getOutputParams()) {
             buf.append(param.getXML(indent+2));
         }
         buf.append(getXMLindented(indent+1));
-		buf.append("</OutputParam>");
+		buf.append("</OutputParamList>");
         
         for(HelpComment comment : getHelpComments()) {
             buf.append(comment.getXML(indent+1));
