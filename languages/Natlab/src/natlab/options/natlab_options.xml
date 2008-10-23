@@ -22,7 +22,7 @@ furthur processing.
       <short_desc>file list is exhaustive</short_desc>
       <long_desc>
 The Provided list of files represents all files that will be in the execution 
-environment
+environment.
       </long_desc>
     </boolopt>
     <boolopt>
@@ -32,6 +32,21 @@ environment
       <long_desc>
 No static linking is done.
       </long_desc>
+    </boolopt>
+    <boolopt>
+      <name>Prettyprint</name>
+      <alias>pretty</alias>
+      <short_desc>Prettyprint the files</short_desc>
+      <long_desc>Prettyprints the input files. Overides all other
+      options.</long_desc>
+    </boolopt>
+    <boolopt>
+      <name>XML IR</name>
+      <alias>x</alias>
+      <alias>xml</alias>
+      <short_desc>Prints the xml IR</short_desc>
+      <long_desc>Print the XML IR after performing various
+      transformations.</long_desc>
     </boolopt>
   </section>
 </options>
