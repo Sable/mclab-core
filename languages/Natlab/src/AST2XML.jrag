@@ -9,14 +9,22 @@ aspect ASTtoXML {
 		return uID;
 	}
 	
+	public long CompilationUnits.nodeCounter = 0;
 	public long Program.nodeCounter = 0;
-  	public long ASTNode.nodeCounter() {
-  		ASTNode node = this;
-	    while(node != null && !(node instanceof Program))
+	public long ASTNode.nodeCounter() {
+	    long counter = 0;
+	    ASTNode node = this;
+	    while(node != null)// && !(node instanceof Program))
 	    	node = node.getParent();
 	    
-	    Program prog = (Program)node;
-    	return prog.nodeCounter++;
+	    if( node instanceof Program ){
+		Program prog = (Program)node;
+		counter =  prog.nodeCounter++;
+	    }
+	    if( node instanceof CompilationUnits ){
+		counter =  ((CompilationUnits)node).nodeCounter++;
+	    }
+	    return counter;
   	}
 	public void Annotation.setNodeCounter(long count){
 		ASTNode node = this;
@@ -61,6 +69,23 @@ aspect ASTtoXML {
         return buf.toString();
     }
     
+    eq CompilationUnits.getXML( int indent ){
+
+	long id = nodeCounter();
+	setuID(id);
+	StringBuffer buf = new StringBuffer();
+
+	buf.append(getXMLindented(indent));
+	buf.append("<CompilationUnits id=\""+id+"\">");
+	for(Program p : getPrograms()){
+	    buf.append(p.getXML(indent+1));
+	}
+	buf.append(getXMLindented(indent));
+	buf.append("</CompilationUnits>");
+
+	return buf.toString();
+    }
+	
     eq Script.getXML(int indent) {
         long id = nodeCounter();
         setuID(id);

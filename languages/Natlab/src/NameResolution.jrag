@@ -294,7 +294,6 @@ aspect NameResolution{
     rewrite Script{
         when( doDeclRewrite() && !doneDeclRewrite )
         to Script{
-            System.out.println("yo");
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
             for( String symbol : getLValues() )

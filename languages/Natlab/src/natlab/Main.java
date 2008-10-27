@@ -21,14 +21,14 @@ public class Main
         if( processCmdLine( args ) ){
 
             if( options.help() ){
-                System.out.println(options.getUsage());
+                System.err.println(options.getUsage());
             }
             else{
                 if( options.e() ){
-                    System.out.println("exhaustive list");
+                    System.err.println("exhaustive list");
                 }
                 if( options.d() ){
-                    System.out.println("dynamic linking");
+                    System.err.println("dynamic linking");
                 }
                 if( options.getFiles().size() == 0 ){
                     System.err.println("No files provided, must have at least one file.");
@@ -37,9 +37,19 @@ public class Main
 		    LinkedList<Program> programs = new LinkedList<Program>();
                     for( Object o : options.getFiles() ){
                         String file = (String) o;
-                        System.out.println("Parsing: " + file);
+                        System.err.println("Parsing: " + file);
 			programs.add( parseFile( file ) );
                     }
+		    CompilationUnits cu = new CompilationUnits();
+		    for( Program p : programs ){
+			cu.addProgram( p );
+		    }
+		    if( options.xml() ){
+			System.out.println(cu.ASTtoXML());
+		    }
+		    /*else if( options.pretty() ){
+			System.out.println(cu.getPrettyPrinted());
+                        }*/
                 }
             }
         }
