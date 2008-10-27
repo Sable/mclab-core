@@ -34,19 +34,21 @@ public class Main
                     System.err.println("No files provided, must have at least one file.");
                 }
                 else{
+		    LinkedList<Program> programs = new LinkedList<Program>();
                     for( Object o : options.getFiles() ){
                         String file = (String) o;
-                        System.out.println(file);
+                        System.out.println("Parsing: " + file);
+			programs.add( parseFile( file ) );
                     }
                 }
             }
         }
     }
 
-    private static Program parseFile(String fName) throws IOException
+    //Parse a given file and return a Program ast node
+    //if file does not exist or other problems, exit program
+    private static Program parseFile(String fName)
     {
-        //Parse a given file and return a Program ast node
-        //if file does not exist, exit program
         NatlabParser parser = new NatlabParser();
         NatlabScanner scanner;
         CommentBuffer cb = new CommentBuffer();
@@ -71,6 +73,14 @@ public class Main
             System.err.println("File "+fName+" not found!\nAborting");
             System.exit(1);
         }
+	catch(IOException e){
+	    System.err.println("Problem parsing "+fName);
+	    if( e.getMessage() != null )
+		System.err.println( e.getMessage() );
+	    System.err.println("Aborting");
+	    System.exit(1);
+	}
+	    
         //should be dead due to exit calls
         return null;
     }
