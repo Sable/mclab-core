@@ -2,9 +2,24 @@ package natlab;
 
 import natlab.options.Options;
 import natlab.ast.*;
+
+/*import matlab.MatlabParser;
+import matlab.TranslationProblem;
+import matlab.OffsetTracker;
+import matlab.TextPosition;*/
+import matlab.*;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
+
+import org.antlr.runtime.ANTLRReaderStream;
+
+
 import beaver.Parser;
 import java.io.*;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -37,8 +52,55 @@ public class Main
 		    LinkedList<Program> programs = new LinkedList<Program>();
                     for( Object o : options.getFiles() ){
                         String file = (String) o;
+                        Reader fileReader = new StringReader("");
+                        if( options.matlab() ){
+                            try{
+                                System.err.println("Translating "+file+" to Natlab");
+                                
+                                BufferedReader in = new BufferedReader( new FileReader( file ) );
+                                
+                                FunctionEndScanner prescanner = new FunctionEndScanner(in);
+                                FunctionEndScanner.Result result = prescanner.translate();
+                                in.close();
+                                
+                                if(result instanceof NoChangeResult){
+                                    in = new BufferedReader(new FileReader(file) ); //just re-open original file
+                                }else if(result instanceof ProblemResult){
+                                    for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
+                                        System.err.println(prob);
+                                    }
+                                    System.exit(0); //terminate early since extraction parser can't work without balanced 'end's
+                                } else if(result instanceof TranslationResult){
+                                    TranslationResult transResult = (TranslationResult) result;
+                                    in = new BufferedReader(new StringReader(transResult.getText()));
+                                }
+                                
+                                OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+                                List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+                                String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
+                                
+                                
+                                fileReader = new StringReader(destText);                            
+                            }catch(FileNotFoundException e){
+                                System.err.println("File "+file+" not found!\nAborting");
+                                System.exit(1);
+                            }
+                            catch(IOException e){
+                                System.err.println("Error translating "+file);
+                                System.err.println(e.getMessage());
+                                System.err.println("\n\nAborting");
+                            }
+                        }
+                        else{
+                            try{
+                                fileReader = new FileReader( file );
+                            }catch(FileNotFoundException e){
+                                System.err.println("File "+file+" not found!\nAborting");
+                                System.exit(1);
+                            }
+                        }
                         System.err.println("Parsing: " + file);
-			programs.add( parseFile( file ) );
+                        programs.add( parseFile( file,  fileReader ) );
                     }
 		    CompilationUnits cu = new CompilationUnits();
 		    for( Program p : programs ){
@@ -57,7 +119,7 @@ public class Main
 
     //Parse a given file and return a Program ast node
     //if file does not exist or other problems, exit program
-    private static Program parseFile(String fName)
+    private static Program parseFile(String fName, Reader file)
     {
         NatlabParser parser = new NatlabParser();
         NatlabScanner scanner;
@@ -66,7 +128,7 @@ public class Main
         parser.setCommentBuffer(cb);
 
         try{
-            scanner = new NatlabScanner(new FileReader( fName ) );
+            scanner = new NatlabScanner( file );
             scanner.setCommentBuffer( cb );
             try{
                 return (Program)parser.parse(scanner);        
@@ -78,7 +140,7 @@ public class Main
                 }
                 System.err.println("Aborting");
                 System.exit(1);
-            }            
+            } 
         }catch(FileNotFoundException e){
             System.err.println("File "+fName+" not found!\nAborting");
             System.exit(1);

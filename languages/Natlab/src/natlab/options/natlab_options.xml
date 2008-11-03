@@ -48,5 +48,12 @@ No static linking is done.
       <long_desc>Print the XML IR after performing various
       transformations.</long_desc>
     </boolopt>
+    <boolopt>
+      <name>Matlab Input</name>
+      <alias>m</alias>
+      <alias>matlab</alias>
+      <short_desc>Use Matlab files as input</short_desc>
+      <long_desc>Use Matlab files as input rather than Natlab ones.</long_desc>
+    </boolopt>
   </section>
 </options>

@@ -8,6 +8,14 @@
 	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+	<path id="antlr.jar.path">
+		<fileset dir="${lib.dir}">
+			<include name="${antlr.task.jar.path.prop}" />
+			<include name="${antlr3.jar.path.prop}" />
+			<include name="${string.template.jar.path.prop}" />
+			<include name="${antlr2.jar.path.prop}" />
+		</fileset>
+	</path>
 
 	<!--=====================================================================-->
 	<!-- Private Targets                                                     -->
@@ -87,18 +95,55 @@
 
 	<target name="set.annotations.bin.dir" depends="set.annotations.bin.dir.no.eclipse, set.annotations.bin.dir.eclipse" />
 
+
+
+        <!--=====================================================================-->
+        <!-- Matlab Targets                                                      -->
+        <!--=====================================================================-->
+
+        <target name="matlab.build" description="call build in the Matlab language">
+          <echo message="BLAH: ${matlab.dir}" />
+          <ant dir="${matlab.dir}" target="build" inheritall="false" />
+          <!--ant antfile="${matlab.dir}/build.xml" target="build" inheritall="false" /-->
+        </target>
+
+        <target name="matlab.clean" description="call clean in the Matlab language">
+		<ant dir="${matlab.dir}" target="clean" inheritall="false" />
+	</target>
+
+	<target name="matlab.eclipse.build" description="call eclipse.build in the Matlab language">
+		<ant dir="${matlab.dir}" target="eclipse.build" inheritall="false" />
+	</target>
+	<target name="matlab.eclipse.clean" description="call eclipse.clean in the Matlab language">
+		<ant dir="${matlab.dir}" target="eclipse.clean" inheritall="false" />
+	</target>
+
+	<target name="set.matlab.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="matlab.bin.dir" value="${matlab.ant.bin.dir}" />
+	</target>
+
+	<target name="set.matlab.bin.dir.eclipse" if="inside.eclipse">
+		<property name="matlab.bin.dir" value="${matlab.eclipse.bin.dir}" />
+	</target>
+
+	<target name="set.matlab.bin.dir" depends="set.matlab.bin.dir.no.eclipse, set.matlab.bin.dir.eclipse" />
+
+
 	<!-- Overriding to trigger set.annotations.bin.dir and to define classpaths (may depend on bin.dir) -->
-	<target name="set.bin.dir" depends="set.annotations.bin.dir, BinDir.set.bin.dir">
+	<target name="set.bin.dir" depends="set.annotations.bin.dir, set.matlab.bin.dir, BinDir.set.bin.dir">
 		<path id="compile.classpath">
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
+                        <path refid="antlr.jar.path" />
 			<path location="${basedir}/${annotations.bin.dir}" />
+			<path location="${basedir}/${matlab.bin.dir}" />
 		</path>
 		<path id="test.classpath">
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
+                        <path refid="antlr.jar.path" />
 			<path location="${basedir}/${bin.dir}" />
-			<path location="${basedir}/${annotations.bin.dir}" />
+			<path location="${basedir}/${matlab.bin.dir}" />
 		</path>
 	</target>
 
@@ -110,13 +155,22 @@
 	<import file="../shared/eclipse.xml" />
 
 	<!-- public versions of cli.xml targets -->
-	<target name="build" depends="annotations.build, CommandLineInterface.build" description="generate and build all files (including annotations)">
+	<target name="build" depends="annotations.build, matlab.build, CommandLineInterface.build" description="generate and build all files (including annotations and matlab)">
         </target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+        <target name="jar" depends="clean, gen, compile" description="creates an executable release jar">
+          <jar destfile="${jarname}">
+            <manifest>
+              <attribute name="Main-Class" value="${entrypoint.class}" />
+              <attribute name="Class-Path" value="${lib.dir}/${beaver.rt.jar.path.prop} ${annotations.bin.dir}/ ${lib.dir}/${jflex.jar.path.prop} ${lib.dir}/${beaver.jar.path.prop} ${matlab.bin.dir}/ ${lib.dir}/${antlr.task.jar.path.prop} ${lib.dir}/${antlr3.jar.path.prop} ${lib.dir}/${string.template.jar.path.prop} ${lib.dir}/${antlr2.jar.path.prop}" />
+            </manifest>
+            <fileset dir="${basedir}/${bin.dir}" includes="**/*.class" />
+          </jar>
+        </target>
 
 	<!-- public versions of eclipse.xml targets -->
-	<target name="eclipse.build" depends="annotations.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations), let Eclipse build" />
+	<target name="eclipse.build" depends="annotations.eclipse.build, matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations and matlab), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
 </project>
