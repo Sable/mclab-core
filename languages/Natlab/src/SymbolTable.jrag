@@ -1,5 +1,11 @@
 //Symbol Table
 
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 import natlab.SymbolTableScope;
 import natlab.SymbolTableEntry;
 
@@ -218,42 +224,30 @@ aspect SymbolTableScope {
 
 aspect SymbolTableToXML{
 
-    syn String Program.getSymbolTableXML( int indent ){
+    syn boolean Program.getSymbolTableXML(Document doc, Element parent){
 
         HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
         
-        StringBuffer buf = new StringBuffer();
-
-        buf.append(getXMLindented(indent));
-        buf.append("<Symboltable>");
-
-        for( SymbolTableEntry e : table.values() ){
-            buf.append( getXMLindented(indent+1) );
-            buf.append( e.getXML() );
+		Element e = doc.createElement("Symboltable");
+		
+        for( SymbolTableEntry ent : table.values() ){
+            ent.getXML(doc, e);
         }
-        
-        buf.append(getXMLindented(indent));
-        buf.append("</Symboltable>");
 
-        return buf.toString();
+		parent.appendChild(e);
+        return true;
     }
 
-    syn String Function.getSymbolTableXML( int indent ){
+    syn boolean Function.getSymbolTableXML(Document doc, Element parent){
         HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
         
-        StringBuffer buf = new StringBuffer();
-
-        buf.append(getXMLindented(indent));
-        buf.append("<Symboltable>");
-
-        for( SymbolTableEntry e : table.values() ){
-            buf.append( getXMLindented(indent+1) );
-            buf.append( e.getXML() );
+		Element e = doc.createElement("Symboltable");
+		
+        for( SymbolTableEntry ent : table.values() ){
+            ent.getXML(doc, e);
         }
-        
-        buf.append(getXMLindented(indent));
-        buf.append("</Symboltable>");
 
-        return buf.toString();
+		parent.appendChild(e);
+        return true;
     }
 }

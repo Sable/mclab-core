@@ -107,7 +107,8 @@ public class Main
 			cu.addProgram( p );
 		    }
 		    if( options.xml() ){
-			System.out.println(cu.ASTtoXML());
+		    	//System.out.println(cu.ASTtoXML());
+		    	System.out.println(cu.XMLtoString(cu.ASTtoXML()));
 		    }
 		    /*else if( options.pretty() ){
 			System.out.println(cu.getPrettyPrinted());

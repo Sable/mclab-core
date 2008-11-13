@@ -1,0 +1,1189 @@
+
+aspect ASTtoXML {
+
+	private long ASTNode.uID = -1;
+	public void ASTNode.setuID(long id) {
+		uID = id;
+	}
+	public long ASTNode.getuID() {
+		return uID;
+	}
+	
+	public long CompilationUnits.nodeCounter = 0;
+	public long Program.nodeCounter = 0;
+	public long ASTNode.nodeCounter() {
+	    long counter = 0;
+	    ASTNode node = this;
+	    while(node != null)// && !(node instanceof Program))
+	    	node = node.getParent();
+	    
+	    if( node instanceof Program ){
+		Program prog = (Program)node;
+		counter =  prog.nodeCounter++;
+	    }
+	    if( node instanceof CompilationUnits ){
+		counter =  ((CompilationUnits)node).nodeCounter++;
+	    }
+	    return counter;
+  	}
+	public void Annotation.setNodeCounter(long count){
+		ASTNode node = this;
+	    while(node != null && !(node instanceof Program))
+	    	node = node.getParent();
+	    
+	    Program prog = (Program)node;
+    	prog.nodeCounter = count;
+	}
+  	
+  	syn String ASTNode.getXMLindented(int indent) {
+        StringBuffer buf = new StringBuffer();
+        
+        buf.append('\n');
+        for(int i=0; i<indent; i++) {
+        	buf.append('\t');
+        }
+        
+        return buf.toString();
+    }
+    
+  	syn String ASTNode.ASTtoXML() {
+        StringBuffer buf = new StringBuffer();
+        
+        buf.append("<?xml version=\"1.0\"?>");
+        buf.append(getXML(0));
+        
+        return buf.toString();
+    }
+    
+    syn String ASTNode.getXML(int indent) { throw new UnsupportedOperationException(getClass().getName() + ".getXML()"); }
+    
+    //program
+    eq EmptyProgram.getXML(int indent) {
+        //long id = nodeCounter();
+        //setuID(id);
+        StringBuffer buf = new StringBuffer();
+		
+		//buf.append(getXMLindented(indent));
+		//buf.append("<EmptyProgram id=\""+id+"\"/>");
+        
+        return buf.toString();
+    }
+    
+    eq CompilationUnits.getXML( int indent ){
+
+	long id = nodeCounter();
+	setuID(id);
+	StringBuffer buf = new StringBuffer();
+
+	buf.append(getXMLindented(indent));
+	buf.append("<CompilationUnits id=\""+id+"\">");
+	for(Program p : getPrograms()){
+	    buf.append(p.getXML(indent+1));
+	}
+	buf.append(getXMLindented(indent));
+	buf.append("</CompilationUnits>");
+
+	return buf.toString();
+    }
+	
+    eq Script.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<Script id=\""+id+"\">");
+
+		buf.append(getSymbolTableXML(indent+1));
+		
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getXML(indent+1));
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Script>");       
+        
+        return buf.toString();
+    }
+    
+    eq FunctionList.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();     
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<FunctionList id=\""+id+"\">");
+		
+		buf.append(getSymbolTableXML(indent+1));
+		
+        for(Function func : getFunctions()) {
+            buf.append(func.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</FunctionList>");        
+        
+        return buf.toString();
+    }
+    
+    eq Function.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();       
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<Function id=\""+id+"\" name=\""+getName()+"\">");
+		
+		buf.append(getSymbolTableXML(indent+1)); 
+        
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");		
+        
+        buf.append(getXMLindented(indent+1));
+		buf.append("<InputParam>");
+        for(Name param : getInputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</InputParam>");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<OutputParam>");
+        for(Name param : getOutputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</OutputParam>");
+        
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getXML(indent+1));
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));;
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Function>");       
+        
+        return buf.toString();
+    }
+    
+    //Class
+    
+    eq ClassDef.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();       
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<ClassDef id=\""+id+"\" name=\""+getName()+"\">");
+        
+        buf.append(getSymbolTableXML(indent+1));
+        
+        for(Attribute attr : getAttributes()) {
+            buf.append(attr.getXML(indent+1));
+        }        
+        
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");		
+		
+        for(SuperClass sup : getSuperClasss()) {
+            buf.append(sup.getXML(indent+1));
+        }
+        
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getXML(indent+1));
+        }
+        for(Properties prop : getPropertys()) {
+            buf.append(prop.getXML(indent+1));
+        }
+        for(Methods methods : getMethods()) {
+            buf.append(methods.getXML(indent+1));
+        }
+        for(ClassEvents events : getClassEvents()) {
+            buf.append(events.getXML(indent+1));
+        }
+
+		buf.append(getXMLindented(indent));
+		buf.append("</ClassDef>");
+        
+        return buf.toString();
+    }
+    
+    eq Properties.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();       
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<Properties id=\""+id+"\" >");
+        
+        for(Attribute attr : getAttributes()) {
+            buf.append(attr.getXML(indent+1));
+        }
+        for(Property prop : getPropertys()) {
+            buf.append(prop.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Properties>");
+               
+        return buf.toString();
+    } 
+    
+    eq Methods.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();       
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<Methods id=\""+id+"\">");
+		
+        for(Attribute attr : getAttributes()) {
+            buf.append(attr.getXML(indent+1));
+        }
+        for(Signature sign : getSignatures()) {
+            buf.append(sign.getXML(indent+1));
+        }
+        for(PropertyAccess prop : getPropAccs()) {
+            buf.append(prop.getXML(indent+1));
+        }
+        for(Function func : getFunctions()) {
+            buf.append(func.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+		buf.append("</Methods>");
+       
+        return buf.toString();
+    }
+    
+    eq Signature.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<Signature id=\""+id+"\" name=\""+getName()+"\">");
+       
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		     
+		buf.append(getXMLindented(indent+1));
+		buf.append("<InputParam>");
+        for(Name param : getInputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</InputParam>");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<OutputParam>");
+        for(Name param : getOutputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</OutputParam>");
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Signature>");
+               
+        return buf.toString();
+    }
+    
+    eq PropertyAccess.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<PropertyAccess id=\""+id+"\" name=\""+getName()+"\" access=\""+getAccess()+"\">");
+         		       
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		      
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Access\" value=\""+getAccess()+"\" />");
+				
+		buf.append(getXMLindented(indent+1));
+		buf.append("<InputParam>");
+        for(Name param : getInputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</InputParam>");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<OutputParam>");
+        for(Name param : getOutputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</OutputParam>");
+
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getXML(indent+1));
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</PropertyAccess>");
+               
+        return buf.toString();
+    }
+    
+    eq ClassEvents.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<ClassEvents id=\""+id+"\">");
+		
+        for(Attribute attr : getAttributes()) {
+            buf.append(attr.getXML(indent+1));
+        }
+
+        for(Event eve : getEvents()) {
+            buf.append(eve.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</ClassEvents>");
+               
+        return buf.toString();
+    }
+     
+    eq Attribute.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<Attribute id=\""+id+"\" name=\""+getKey()+"\">");		
+        
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Key\" value=\""+getKey()+"\" />");
+		
+        buf.append(getExpr().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Attribute>");
+              
+        return buf.toString();
+    }
+    
+    eq SuperClass.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<SuperClass id=\""+id+"\" name=\""+getName()+"\"/>");
+		       
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		       
+        //buf.append(getXMLindented(indent));
+        //buf.append("</SuperClass>");
+                
+        return buf.toString();
+    }
+    
+    eq Property.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<Property id=\""+id+"\" name=\""+getName()+"\">");		
+        
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		
+        buf.append(getExpr().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Property>");
+               
+        return buf.toString();
+    }
+
+    eq Event.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<Property id=\""+id+"\" name=\""+getName()+"\" />");
+	       
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		        
+        //buf.append(getXMLindented(indent));
+        //buf.append("</Event>");
+        
+        return buf.toString();
+    }
+    
+    eq SuperClassMethodExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();       
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<SuperClassMethodExpr id=\""+id+"\">");
+		
+        buf.append(getFuncName().getXML(indent+1));
+        buf.append(getClassName().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</SuperClassMethodExpr>");
+                
+		return buf.toString();
+    }
+    
+    eq HelpComment.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+    	String name = getClass().getName();
+    			
+		buf.append(getXMLindented(indent));
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\" text=\""+getText()+"\" />");    
+				
+		//buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Text\" value=\""+getText()+"\" />");
+				
+		//buf.append(getXMLindented(indent));
+        //buf.append("</"+name.substring(name.lastIndexOf('.')+1)+">");
+               
+        return buf.toString();
+    }
+    
+    //stmts
+    eq EmptyStmt.getXML(int indent) {
+    	//long id = nodeCounter();
+        //setuID(id);
+        StringBuffer buf = new StringBuffer();
+		
+		//buf.append(getXMLindented(indent));
+		//buf.append("<EmptyStmt id=\""+id+"\"/>");
+                
+        return buf.toString();
+    }
+    
+    eq ExprStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<ExprStmt id=\""+id+"\">");
+        
+        buf.append(getExpr().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</ExprStmt>");
+                
+        return buf.toString();
+    }
+    
+    eq AssignStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<AssignStmt id=\""+id+"\">");
+        
+        buf.append(getLHS().getXML(indent+1));
+        buf.append(getRHS().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</AssignStmt>");
+                
+        return buf.toString();
+    }
+     
+    eq GlobalStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<GlobalStmt id=\""+id+"\">");
+		
+        for(Name name : getNames()) {
+            buf.append(name.getXML(indent+1));
+        }
+
+		buf.append(getXMLindented(indent));
+        buf.append("</GlobalStmt>");
+                
+        return buf.toString();
+    }
+    
+    eq PersistentStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<PersistentStmt id=\""+id+"\">");
+		
+        for(Name name : getNames()) {
+            buf.append(name.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</PersistentStmt>");
+                
+        return buf.toString();
+    }
+    
+    eq ShellCommandStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<ShellCommandStmt id=\""+id+"\" command=\""+getCommand()+"\" />");
+		        
+        //buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Command\" value=\""+getCommand()+"\" />");
+		        
+        //buf.append(getXMLindented(indent));
+        //buf.append("</ShellCommandStmt>");
+                
+        return buf.toString();
+    }
+    
+    eq BreakStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<BreakStmt id=\""+id+"\"/>");
+               
+        return buf.toString();
+    }
+    
+    eq ContinueStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<ContinueStmt id=\""+id+"\"/>");
+               
+        return buf.toString();
+    }
+    
+    eq ReturnStmt.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+		
+		buf.append(getXMLindented(indent));
+		buf.append("<ReturnStmt id=\""+id+"\"/>");
+               
+        return buf.toString();
+    }
+
+    eq ForStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<ForStmt id=\""+id+"\">");
+		
+        buf.append(getAssignStmt().getXML(indent+1));
+
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</ForStmt>");
+                
+        return buf.toString();
+    }
+
+    eq WhileStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+                
+        buf.append(getXMLindented(indent));
+		buf.append("<WhileStmt id=\""+id+"\">");
+		
+        buf.append(getExpr().getXML(indent+1));
+
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</WhileStmt>");        
+        
+        return buf.toString();
+    }
+
+    eq IfStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<IfStmt id=\""+id+"\">");
+		
+        for(IfBlock block : getIfBlocks()) {
+            buf.append(block.getXML(indent+1));
+        }
+        if(hasElseBlock()) {
+            buf.append(getElseBlock().getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</IfStmt>");       
+        
+        return buf.toString();
+    }
+
+    eq IfBlock.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<IfBlock id=\""+id+"\">");
+
+        buf.append(getCondition().getXML(indent+1));
+
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</IfBlock>");
+               
+        return buf.toString();
+    }
+
+    eq ElseBlock.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+                
+        buf.append(getXMLindented(indent));
+		buf.append("<ElseBlock id=\""+id+"\">");
+		
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+       	
+       	buf.append(getXMLindented(indent));
+       	buf.append("</ElseBlock>");
+                
+        return buf.toString();
+    }
+
+    eq SwitchStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+                
+        buf.append(getXMLindented(indent));
+		buf.append("<SwitchStmt id=\""+id+"\">");
+        
+        buf.append(getExpr().getXML(indent+1));
+
+        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
+            buf.append(scase.getXML(indent+1));
+        }
+        if(hasDefaultCaseBlock()) {
+            buf.append(getDefaultCaseBlock().getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+       	buf.append("</SwitchStmt>");        
+
+        return buf.toString();
+    }
+    
+    eq SwitchCaseBlock.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<SwitchCaseBlock id=\""+id+"\">");
+        
+        buf.append(getExpr().getXML(indent+1));
+
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</SwitchCaseBlock>");
+               
+        return buf.toString();
+    }
+    
+    eq DefaultCaseBlock.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();        
+        
+        buf.append(getXMLindented(indent));
+		buf.append("<DefaultCaseBlock id=\""+id+"\">");
+		
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</DefaultCaseBlock>");       
+        
+        return buf.toString();
+    }
+
+    eq TryStmt.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<TryStmt id=\""+id+"\">");
+		
+        for(Stmt stmt : getTryStmts()) {
+            buf.append(stmt.getXML(indent+1));
+        }
+        
+        List<Stmt> catchList = getCatchStmts();
+        if (catchList.getNumChild()>0) {      
+	        for(Stmt stmt : catchList) {
+	            buf.append(stmt.getXML(indent+1));
+	        }
+	    }
+	    
+	    buf.append(getXMLindented(indent));
+       	buf.append("</TryStmt>");
+               
+        return buf.toString();
+    }
+
+    //exprs
+    
+    eq RangeExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<RangeExpr id=\""+id+"\">");
+		
+        buf.append(getLower().getXML(indent+1));
+
+        if(hasIncr()) {
+            buf.append(getIncr().getXML(indent+1));
+        }
+        
+        buf.append(getUpper().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</RangeExpr>");
+               
+        return buf.toString();
+    }
+    
+    eq ColonExpr.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+       		
+		buf.append(getXMLindented(indent));
+		buf.append("<ColonExpr id=\""+id+"\"/>");
+               
+        return buf.toString();
+    }
+    
+    eq EndExpr.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+       		
+		buf.append(getXMLindented(indent));
+		buf.append("<EndExpr id=\""+id+"\"/>");
+               
+        return buf.toString();
+    }
+    
+    eq Name.getXML(int indent) {
+    	long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<Name id=\""+id+"\" nameId=\""+getID()+"\" />");
+               
+        return buf.toString();
+    }
+
+    //accesses
+    eq NameExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<NameExpr id=\""+id+"\">");
+		
+        buf.append(getName().getXML(indent+1));
+
+		buf.append(getXMLindented(indent));
+        buf.append("</NameExpr>");
+              
+        return buf.toString();
+    }
+    
+    eq DotExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<DotExpr id=\""+id+"\">");
+		
+        buf.append(getTarget().getXML(indent+1));
+		buf.append(getField().getXML(indent+1));
+		
+		buf.append(getXMLindented(indent));
+        buf.append("</DotExpr>");
+              
+        return buf.toString();
+    }
+    
+    eq ParameterizedExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<ParameterizedExpr id=\""+id+"\">");
+		
+        buf.append(getTarget().getXML(indent+1));
+
+        for(Expr arg : getArgs()) {
+            buf.append(arg.getXML(indent+1));
+        }
+		
+		buf.append(getXMLindented(indent));
+		buf.append("</ParameterizedExpr>");      
+
+        return buf.toString();
+    }
+    
+    eq CellIndexExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<CellIndexExpr id=\""+id+"\">");
+		
+        buf.append(getTarget().getXML(indent+1));
+
+        for(Expr arg : getArgs()) {
+            buf.append(arg.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</CellIndexExpr>");
+               
+        return buf.toString();
+    }
+
+    eq MatrixExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+        		
+		buf.append(getXMLindented(indent));
+		buf.append("<MatrixExpr id=\""+id+"\">");
+		
+        for(Row row : getRows()) {
+            buf.append(row.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</MatrixExpr>");
+               
+        return buf.toString();
+    }
+    
+    eq CellArrayExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               	
+       	buf.append(getXMLindented(indent));
+		buf.append("<CellArrayExpr id=\""+id+"\">");
+
+        for(Row row : getRows()) {
+            buf.append(row.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</CellArrayExpr>");
+                
+        return buf.toString();
+    }
+    
+    eq Row.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+                
+        buf.append(getXMLindented(indent));
+		buf.append("<Row id=\""+id+"\">");
+		
+        for(Expr element : getElements()) {
+            buf.append(element.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</Row>");
+               
+        return buf.toString();
+    }
+    
+    eq FunctionHandleExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+              
+        buf.append(getXMLindented(indent));
+		buf.append("<FunctionHandleExpr id=\""+id+"\">");
+		
+        buf.append(getName().getXML(indent+1));
+
+		buf.append(getXMLindented(indent));
+        buf.append("</FunctionHandleExpr>");
+               
+        return buf.toString();
+    }
+
+    eq LambdaExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+              
+        buf.append(getXMLindented(indent));
+		buf.append("<LambdaExpr id=\""+id+"\">");
+		
+        for(Name param : getInputParams()) {
+            buf.append(param.getXML(indent+1));
+        }
+
+        buf.append(getBody().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</LambdaExpr>");
+               
+        return buf.toString();
+    }
+    
+    //literals
+    eq IntLiteralExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<IntLiteralExpr id=\""+id+"\" value=\""+getValue().getText()+"\" />");
+              
+        return buf.toString();
+    }
+
+    eq FPLiteralExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<FPLiteralExpr id=\""+id+"\" value=\""+getValue().getText()+"\" />");
+               
+        return buf.toString();
+    }
+    
+    eq StringLiteralExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<StringLiteralExpr id=\""+id+"\" value=\""+getValue()+"\" />");
+               
+        return buf.toString();
+    }
+    
+    eq UnaryExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+    	String name = getClass().getName();
+    		
+		buf.append(getXMLindented(indent));
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\">");  
+
+        buf.append(getOperand().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</"+name.substring(name.lastIndexOf('.')+1)+">");
+              
+        return buf.toString();
+    }
+    
+    eq BinaryExpr.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+    	String name = getClass().getName();
+    		
+		buf.append(getXMLindented(indent));
+		buf.append("<"+name.substring(name.lastIndexOf('.')+1)+" id=\""+id+"\">");  
+
+        buf.append(getLHS().getXML(indent+1));
+        buf.append(getRHS().getXML(indent+1));
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</"+name.substring(name.lastIndexOf('.')+1)+">");
+               
+        return buf.toString();
+    }
+    
+    //// ANNOTATION EXTENSION - START //////////////////////////////////////////
+
+    eq Annotation.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+              
+        buf.append(getXMLindented(indent));
+		buf.append("<Annotation id=\""+id+"\" text=\""+getText()+"\" />");
+				
+		//buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Text\" value=\""+getText()+"\" />");
+               
+        //buf.append(getXMLindented(indent));
+        //buf.append("</Annotation>");
+              
+        return buf.toString();
+    }
+    
+    eq ExpandedAnnotation.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<ExpandedAnnotation id=\""+id+"\">");
+
+		buf.append(getanno().getXML(nodeCounter(), indent+1));
+        setNodeCounter(getanno().getNodeCounter());
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</ExpandedAnnotation>");
+               
+        return buf.toString();
+    }
+	
+    //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
+
+    eq VariableDecl.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<VariableDecl id=\""+id+"\" varId=\""+getID()+"\" />");
+		
+		//buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"ID\" value=\""+getID()+"\" />");
+               
+        //buf.append(getXMLindented(indent));
+        //buf.append("</VariableDecl>");
+               
+        return buf.toString();
+    }
+
+	eq FunctionDecl.getXML(int indent) {
+        long id = nodeCounter();
+        setuID(id);
+        StringBuffer buf = new StringBuffer();
+               
+        buf.append(getXMLindented(indent));
+		buf.append("<FunctionDecl id=\""+id+"\" name=\""+getName()+"\">");
+
+		buf.append(getSymbolTableXML(indent+1));
+		
+		//buf.append(getXMLindented(indent+1));
+		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<ParamDeclList>");
+        for(VariableDecl vd : getParamDecls()) {
+            buf.append(vd.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</ParamDeclList>");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<InputParamList>");
+        for(Name param : getInputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</InputParamList>");
+		
+		buf.append(getXMLindented(indent+1));
+		buf.append("<OutputParamList>");
+        for(Name param : getOutputParams()) {
+            buf.append(param.getXML(indent+2));
+        }
+        buf.append(getXMLindented(indent+1));
+		buf.append("</OutputParamList>");
+        
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getXML(indent+1));
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getXML(indent+1));;
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getXML(indent+1));
+        }
+        
+        buf.append(getXMLindented(indent));
+        buf.append("</FunctionDecl>");
+               
+        return buf.toString();
+    }
+
+}

@@ -1,5 +1,11 @@
 package natlab;
 
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 import natlab.ast.*;
 //import java.io.StringBuffer;
 
@@ -70,13 +76,18 @@ public class SymbolTableEntry
     	return value!=null;
     }
    
-    public String getXML(){
-        StringBuffer buf = new StringBuffer();
+    public boolean getXML(Document doc, Element parent)
+    {   
         long uid = -1;
         if( declLocation != null )
             uid = declLocation.getuID();
 
-        buf.append("<Entry symbol=\""+symbol+"\" original=\""+original+"\" decl=\""+ uid + "\" />\n");
-        return buf.toString();
+    	Element e = doc.createElement("Entry");
+    	e.setAttribute("symbol", symbol);
+    	e.setAttribute("original", original);
+    	e.setAttribute("decl", Long.toString(uid));
+    	
+		parent.appendChild(e);
+        return true;
     }
 }

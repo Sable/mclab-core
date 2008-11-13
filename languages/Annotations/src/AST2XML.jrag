@@ -1,4 +1,10 @@
 
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 aspect ASTtoXML {
 	
 	private long ASTNode.uID = -1;
@@ -13,9 +19,9 @@ aspect ASTtoXML {
 	public long Annotation.getNodeCounter(){
 		return nodeCounter;
 	}
-	public String Annotation.getXML(long count, int indent){
+	public void Annotation.getXML(Document doc, Element parent, long count){
 		nodeCounter = count;
-		return getXML(indent);
+		getXML(doc, parent);
 	}
   	public long ASTNode.nodeCounter() {
   		ASTNode node = this;
@@ -25,395 +31,322 @@ aspect ASTtoXML {
 	    Annotation anno = (Annotation)node;
     	return anno.nodeCounter++;
   	}
-  	
-  	syn String ASTNode.getXMLindented(int indent) {
-        StringBuffer buf = new StringBuffer();
-        
-        buf.append('\n');
-        for(int i=0; i<indent; i++) {
-        	buf.append('\t');
-        }
-        
-        return buf.toString();
-    }
     
-	syn String ASTNode.getXML(int indent) { throw new UnsupportedOperationException(getClass().getName() + ".getXML()"); }
+	syn boolean ASTNode.getXML(Document doc, Element parent) { throw new UnsupportedOperationException(getClass().getName() + ".getXML()"); }
 	
-	eq Annotation.getXML(int indent) {
+	eq Annotation.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<Annotation id=\""+id+"\">");
+        
+		Element e = doc.createElement("Annotation");
+		e.setAttribute("id", Long.toString(id));
 
         for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getXML(indent+1));
+            stmt.getXML(doc, e);
         }
-        
-        buf.append(getXMLindented(indent));
-        buf.append("</Annotation>");
-		
-		return buf.toString();
+
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq SizeStmt.getXML(int indent) {
+	eq SizeStmt.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<SizeStmt id=\""+id+"\">");
-
-        buf.append(getEntity().getXML(indent+1));
-        buf.append(getSize().getXML(indent+1));
         
-        buf.append(getXMLindented(indent));
-        buf.append("</SizeStmt>");
+        Element e = doc.createElement("SizeStmt");
+		e.setAttribute("id", Long.toString(id));
+
+        getEntity().getXML(doc, e);
+        getSize().getXML(doc, e);
 		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq TypeStmt.getXML(int indent) {
+	eq TypeStmt.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<TypeStmt id=\""+id+"\">");
-
-        buf.append(getEntity().getXML(indent+1));
-        buf.append(getType().getXML(indent+1));
         
-        buf.append(getXMLindented(indent));
-        buf.append("</TypeStmt>");
+        Element e = doc.createElement("TypeStmt");
+		e.setAttribute("id", Long.toString(id));
+
+        getEntity().getXML(doc, e);
+        getType().getXML(doc, e);
 		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq Variable.getXML(int indent) {
+	eq Variable.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<Variable id=\""+id+"\" name=\""+getName()+"\" />");
-
-        //buf.append(getXMLindented(indent+1));
-		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
         
-        //buf.append(getXMLindented(indent));
-        //buf.append("</Variable>");
+        Element e = doc.createElement("Variable");
+		e.setAttribute("id", Long.toString(id));
+		e.setAttribute("name", getName());
 		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq Field.getXML(int indent) {
+	eq Field.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<Field id=\""+id+"\" name=\""+getFieldName()+"\">");
-
-		buf.append(getEntity().getXML(indent+1));
-
-        //buf.append(getXMLindented(indent+1));
-		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"FieldName\" value=\""+getFieldName()+"\" />");
         
-        buf.append(getXMLindented(indent));
-        buf.append("</Field>");
+        Element e = doc.createElement("Field");
+		e.setAttribute("id", Long.toString(id));
+		e.setAttribute("name", getFieldName());
 		
-		return buf.toString();
+		getEntity().getXML(doc, e);
+		
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq Cell.getXML(int indent) {
+	eq Cell.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<Cell id=\""+id+"\">");
-
-		buf.append(getEntity().getXML(indent+1));
         
-		for(Integer index: getIndices()) {	
-		    buf.append('\n');
-		    buf.append(getXMLindented(indent+1));
-			buf.append("<Integer id=\""+nodeCounter()+"\" class=\"Integer\" name=\"Index\" value=\""+index+"\" />");	
+        Element e = doc.createElement("Cell");
+		e.setAttribute("id", Long.toString(id));
+
+		getEntity().getXML(doc, e);
+        
+		for(Integer index: getIndices()) {
+			Element e1 = doc.createElement("Integer");
+			
+			e1.setAttribute("id", Long.toString(nodeCounter()));
+			e1.setAttribute("name", "Index");
+			e1.setAttribute("value", Integer.toString(index));
+			
+			e.appendChild(e1);
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</Cell>");
         
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq Size.getXML(int indent) {
+	eq Size.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<Size id=\""+id+"\">");
+		Element e = doc.createElement("Size");
+		e.setAttribute("id", Long.toString(id));
         
 		for(Integer dim: getDims()) {	
-		    buf.append('\n');
-		    buf.append(getXMLindented(indent+1));
-			buf.append("<Integer id=\""+nodeCounter()+"\" class=\"Integer\" name=\"Dim\" value=\""+dim+"\" />");	
+		    Element e1 = doc.createElement("Integer");
+			
+			e1.setAttribute("id", Long.toString(nodeCounter()));
+			e1.setAttribute("name", "Dim");
+			e1.setAttribute("value", Integer.toString(dim));
+			
+			e.appendChild(e1);	
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</Size>");
         
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq IntersectionType.getXML(int indent) {
+	eq IntersectionType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<IntersectionType id=\""+id+"\">");
+        
+        Element e = doc.createElement("IntersectionType");
+		e.setAttribute("id", Long.toString(id));
 		
 		for(Type type: getTypes()) {
-			buf.append(type.getXML(indent+1));
+			type.getXML(doc, e);
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</IntersectionType>");
         
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq ArrowType.getXML(int indent) {
+	eq ArrowType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<ArrowType id=\""+id+"\">");
-		
-		buf.append(getArgType().getXML(indent+1));
-		buf.append(getResultType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</ArrowType>");
         
-		return buf.toString();
+        Element e = doc.createElement("ArrowType");
+		e.setAttribute("id", Long.toString(id));
+		
+		getArgType().getXML(doc, e);
+		getResultType().getXML(doc, e);
+        
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq UnitType.getXML(int indent) {
+	eq UnitType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<UnitType id=\""+id+"\" />");
         
-		return buf.toString();
+        Element e = doc.createElement("UnitType");
+		e.setAttribute("id", Long.toString(id));
+        
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq ArgTupleType.getXML(int indent) {
+	eq ArgTupleType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<ArgTupleType id=\""+id+"\">");
+        
+        Element e = doc.createElement("ArgTupleType");
+		e.setAttribute("id", Long.toString(id));
 		
 		for(Type type: getStaticArgTypes()) {
-			buf.append(type.getXML(indent+1));
+			type.getXML(doc, e);
 		}
 		
-		buf.append(getVarArgType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</ArgTupleType>");
+		getVarArgType().getXML(doc, e);
         
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq VarArgType.getXML(int indent) {
+	eq VarArgType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<VarArgType id=\""+id+"\">");
-		
-		buf.append(getType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</VarArgType>");
         
-		return buf.toString();
+        Element e = doc.createElement("VarArgType");
+		e.setAttribute("id", Long.toString(id));
+		
+		getType().getXML(doc, e);
+
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq TupleType.getXML(int indent) {
+	eq TupleType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<TupleType id=\""+id+"\">");
+        
+        Element e = doc.createElement("TupleType");
+		e.setAttribute("id", Long.toString(id));
 		
 		for(Type type: getElementTypes()) {
-			buf.append(type.getXML(indent+1));
+			type.getXML(doc, e);
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</TupleType>");
-        
-		return buf.toString();
+
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq UnionType.getXML(int indent) {
+	eq UnionType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<UnionType id=\""+id+"\">");
+        
+        Element e = doc.createElement("UnionType");
+		e.setAttribute("id", Long.toString(id));
 		
 		for(Type type: getTypes()) {
-			buf.append(type.getXML(indent+1));
+			type.getXML(doc, e);
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</UnionType>");
-        
-		return buf.toString();
-	}
-	
-	eq MatrixType.getXML(int indent) {
-		long id = nodeCounter();
-        setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<MatrixType id=\""+id+"\">");
-		
-		buf.append(getElementType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</MatrixType>");
-        
-		return buf.toString();
-	}
-	
-	eq CellArrayType.getXML(int indent) {
-		long id = nodeCounter();
-        setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<CellArrayType id=\""+id+"\">");
-		
-		buf.append(getDefaultElementType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</CellArrayType>");
-        
-		return buf.toString();
-	}
-	
-	eq PrimitiveType.getXML(int indent) {
-		long id = nodeCounter();
-        setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<PrimitiveType id=\""+id+"\" name=\""+getName()+"\" />");
 
-        //buf.append(getXMLindented(indent+1));
-		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
-        
-        //buf.append(getXMLindented(indent));
-        //buf.append("</PrimitiveType>");
-		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq TypeVarType.getXML(int indent) {
+	eq MatrixType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
+        
+        Element e = doc.createElement("MatrixType");
+		e.setAttribute("id", Long.toString(id));
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<TypeVarType id=\""+id+"\" name=\""+getName()+"\" />");
+		getElementType().getXML(doc, e);
 
-        //buf.append(getXMLindented(indent+1));
-		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
-        
-        //buf.append(getXMLindented(indent));
-        //buf.append("</TypeVarType>");
-		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq HandleType.getXML(int indent) {
+	eq CellArrayType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<HandleType id=\""+id+"\">");
-		
-		buf.append(getArrowType().getXML(indent+1));
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</HandleType>");
         
-		return buf.toString();
+        Element e = doc.createElement("CellArrayType");
+		e.setAttribute("id", Long.toString(id));
+		
+		getDefaultElementType().getXML(doc, e);
+        
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq UnknownType.getXML(int indent) {
+	eq PrimitiveType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
-		
-		buf.append(getXMLindented(indent));
-		buf.append("<UnknownType id=\""+id+"\" />");
         
-		return buf.toString();
+        Element e = doc.createElement("PrimitiveType");
+		e.setAttribute("id", Long.toString(id));
+		e.setAttribute("name", getName());
+
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq StructType.getXML(int indent) {
+	eq TypeVarType.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
+        
+        Element e = doc.createElement("TypeVarType");
+		e.setAttribute("id", Long.toString(id));
+		e.setAttribute("name", getName());
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<StructType id=\""+id+"\">");
+		parent.appendChild(e);
+        return true;
+	}
+	
+	eq HandleType.getXML(Document doc, Element parent) {
+		long id = nodeCounter();
+        setuID(id);
+        
+        Element e = doc.createElement("HandleType");
+		e.setAttribute("id", Long.toString(id));
+		
+		getArrowType().getXML(doc, e);
+
+		parent.appendChild(e);
+        return true;
+	}
+	
+	eq UnknownType.getXML(Document doc, Element parent) {
+		long id = nodeCounter();
+        setuID(id);
+        
+        Element e = doc.createElement("UnknownType");
+		e.setAttribute("id", Long.toString(id));
+		
+		parent.appendChild(e);
+        return true;
+	}
+	
+	eq StructType.getXML(Document doc, Element parent) {
+		long id = nodeCounter();
+        setuID(id);
+        
+        Element e = doc.createElement("StructType");
+		e.setAttribute("id", Long.toString(id));
 		
 		for(FieldEntry entry: getFieldEntrys()) {
-			buf.append(entry.getXML(indent+1));
+			entry.getXML(doc, e);
 		}
-		
-		buf.append(getXMLindented(indent));
-		buf.append("</StructType>");
-        
-		return buf.toString();
+
+		parent.appendChild(e);
+        return true;
 	}
 	
-	eq FieldEntry.getXML(int indent) {
+	eq FieldEntry.getXML(Document doc, Element parent) {
 		long id = nodeCounter();
         setuID(id);
-        StringBuffer buf = new StringBuffer();
+        
+        Element e = doc.createElement("FieldEntry");
+		e.setAttribute("id", Long.toString(id));
+		e.setAttribute("name", getName());
 		
-		buf.append(getXMLindented(indent));
-		buf.append("<TypeVarType id=\""+id+"\" name=\""+getName()+"\">");
+        getType().getXML(doc, e);
 
-        //buf.append(getXMLindented(indent+1));
-		//buf.append("<String id=\""+nodeCounter()+"\" class=\"String\" name=\"Name\" value=\""+getName()+"\" />");
-        
-        buf.append(getType().getXML(indent+1));
-        
-        buf.append(getXMLindented(indent));
-        buf.append("</FieldEntry>");
-		
-		return buf.toString();
+		parent.appendChild(e);
+        return true;
 	}
 }
