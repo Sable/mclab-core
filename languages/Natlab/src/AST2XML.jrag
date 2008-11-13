@@ -5,7 +5,7 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-
+ 
 aspect ASTtoXML {
 
 	private long ASTNode.uID = -1;
@@ -70,7 +70,9 @@ aspect ASTtoXML {
 	        Transformer trans = transfac.newTransformer();
 	        trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 	        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-	
+			trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			trans.setOutputProperty(XalanOutputKeys.OUTPUT_PROP_INDENT_AMOUNT, "2");
+			
 	        StringWriter sw = new StringWriter();
 	        StreamResult result = new StreamResult(sw);
 	        DOMSource source = new DOMSource(doc);

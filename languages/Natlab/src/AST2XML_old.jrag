@@ -1,6 +1,6 @@
 
 aspect ASTtoXML {
-
+/*
 	private long ASTNode.uID = -1;
 	public void ASTNode.setuID(long id) {
 		uID = id;
@@ -1185,5 +1185,5 @@ aspect ASTtoXML {
                
         return buf.toString();
     }
-
+*/
 }
