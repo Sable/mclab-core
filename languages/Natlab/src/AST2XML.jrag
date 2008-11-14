@@ -106,9 +106,12 @@ aspect ASTtoXML {
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
+        
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
         
 		parent.appendChild(e);
         return true;
@@ -154,9 +157,13 @@ aspect ASTtoXML {
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
+        
+        Element e3 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e3);
         }
+        e.appendChild(e3);
+        
         for(Function func : getNestedFunctions()) {
             func.getXML(doc, e);
         }
@@ -290,9 +297,13 @@ aspect ASTtoXML {
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
+        
+        Element e3 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e3);
         }
+        e.appendChild(e3);
+        
         for(Function func : getNestedFunctions()) {
             func.getXML(doc, e);
         }
@@ -514,9 +525,11 @@ aspect ASTtoXML {
 
         getAssignStmt().getXML(doc, e);
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
         
         parent.appendChild(e);
         return true;
@@ -531,9 +544,11 @@ aspect ASTtoXML {
 
         getExpr().getXML(doc, e);
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
               
         parent.appendChild(e);
         return true;
@@ -566,9 +581,11 @@ aspect ASTtoXML {
 
         getCondition().getXML(doc, e);
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
 
         parent.appendChild(e);
         return true;
@@ -581,9 +598,11 @@ aspect ASTtoXML {
 		Element e = doc.createElement("ElseBlock");
 		e.setAttribute("id", Long.toString(id));
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
        	
         parent.appendChild(e); 
         return true;
@@ -618,9 +637,11 @@ aspect ASTtoXML {
 
         getExpr().getXML(doc, e);
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
+        e.appendChild(e1);
 
         parent.appendChild(e);
         return true;
@@ -633,9 +654,11 @@ aspect ASTtoXML {
 	      Element e = doc.createElement("DefaultCaseBlock");
 		e.setAttribute("id", Long.toString(id));	
 
+        Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);
-        } 
+            stmt.getXML(doc, e1);
+        }
+        e.appendChild(e1); 
      
         parent.appendChild(e);
         return true;
@@ -648,15 +671,19 @@ aspect ASTtoXML {
 		Element e = doc.createElement("TryStmt");
 		e.setAttribute("id", Long.toString(id));	
 
+		Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getTryStmts()) {
-            stmt.getXML(doc, e);
+            stmt.getXML(doc, e1);
         }
-        
+        e.appendChild(e1);
+       
         List<Stmt> catchList = getCatchStmts();
         if (catchList.getNumChild()>0) {      
+	        Element e2 = doc.createElement("StmtList");
 	        for(Stmt stmt : catchList) {
-	            stmt.getXML(doc, e);
+	            stmt.getXML(doc, e2);
 	        }
+	        e.appendChild(e2);
 	    }
 
         parent.appendChild(e);
@@ -985,9 +1012,13 @@ aspect ASTtoXML {
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
+        
+        Element e4 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e);;
+            stmt.getXML(doc, e4);
         }
+        e.appendChild(e4);
+        
         for(Function func : getNestedFunctions()) {
             func.getXML(doc, e);
         }
