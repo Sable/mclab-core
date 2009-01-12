@@ -22,6 +22,22 @@ aspect PrettyPrint {
     //default - exception
     syn String ASTNode.getPrettyPrintedLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()"); }
     
+
+    eq CompilationUnits.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+
+        boolean first = true;
+        for( Program p : getPrograms() ){
+            if( first )
+                first = false;
+            else
+                buf.append("\n\n");
+            
+            buf.append( p.getPrettyPrinted() );
+        }
+        return buf.toString();
+    }
+
     //program
     eq EmptyProgram.getPrettyPrintedLessComments() {
         return "";
