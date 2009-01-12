@@ -110,9 +110,10 @@ public class Main
 		    	//System.out.println(cu.ASTtoXML());
 		    	System.out.println(cu.XMLtoString(cu.ASTtoXML()));
 		    }
-		    /*else if( options.pretty() ){
+		    else if( options.pretty() ){
+                        System.err.println("Pretty Printing");
 			System.out.println(cu.getPrettyPrinted());
-                        }*/
+                    }
                 }
             }
         }
