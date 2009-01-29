@@ -1,0 +1,176 @@
+aspect Typing{
+    
+    //helper methods for dealing with natlab types, including 
+    //annotation->natlab type conversion
+
+    public abstract Extents Shape.getExtents();
+    public abstract Rank Shape.getRank();
+
+    public Rank KnownExtentsShape.getRank()
+    {
+        Rank r;
+        int dims;
+
+        dims = getExtents().getDims().size();
+
+        r = new KnownRank(dims);
+
+        return r;
+    }
+
+
+    public static Type Type.convertAnnotation( annotations.ast.Type annType )
+    {
+        Type natType = null;
+        if( annType == null ){
+            natType = null;
+        }
+        else if( annType instanceof annotations.ast.UnionType ){
+            //Just convert all elements in uninon to natlab types and add to 
+            //the new natlab union
+            UnionType ut = new UnionType();
+            for( annotations.ast.Type t : ((annotations.ast.UnionType)annType).getTypes() ){
+                ut.addType( convertAnnotation( t ) );
+            }
+            natType = ut;
+        }
+        else if( annType instanceof annotations.ast.IntersectionType ){
+            //Just convert all elements in intersection to natlab types and add
+            //to the new natlab intersection
+            IntersectionType it = new IntersectionType();
+            for( annotations.ast.Type t : ((annotations.ast.IntersectionType)annType).getTypes() ){
+                it.addType( convertAnnotation( t ) );
+            }
+            natType = it;
+        }
+        else if( annType instanceof annotations.ast.ArrowType ){
+            //Convert the arg and result types to natlab types and set in new 
+            //arrow type
+            annotations.ast.ArrowType t = (annotations.ast.ArrowType)annType;
+            natType = new ArrowType( convertAnnotation(t.getArgType()), convertAnnotation(t.getResultType()) );
+        }
+        else if( annType instanceof annotations.ast.ArgTupleType ){
+            //Convert the StaticArgTypes and the VarArgType and add to new
+            //type
+            annotations.ast.ArgTupleType annTuple = (annotations.ast.ArgTupleType)annType;
+            ArgTupleType att = new ArgTupleType();
+
+            for( annotations.ast.Type t : annTuple.getStaticArgTypes() ){
+                att.addStaticArgType( convertAnnotation( t ) );
+            }
+            att.setVarArgType( (VarArgType)convertAnnotation( annTuple.getVarArgType() ) );
+            natType = att;
+        }
+        else if( annType instanceof annotations.ast.UnitType ){
+            natType = new UnitType();
+        }
+        else if( annType instanceof annotations.ast.VarArgType ){
+            annotations.ast.VarArgType t = (annotations.ast.VarArgType)annType;
+            natType = new VarArgType( convertAnnotation(t.getType()) );
+        }
+        else if( annType instanceof annotations.ast.TupleType ){
+            annotations.ast.TupleType annTuple = (annotations.ast.TupleType) annType;
+            TupleType tt = new TupleType();
+            for( annotations.ast.Type t : annTuple.getElementTypes() ){
+                tt.addElementType( convertAnnotation( t ) );
+            }
+            natType = tt;
+        }
+        else if( annType instanceof annotations.ast.CellArrayType ){
+            annotations.ast.CellArrayType annCell = (annotations.ast.CellArrayType)annType;
+
+            CellArrayType cat = new CellArrayType( convertAnnotation( annCell.getDefaultElementType() ));
+            natType = cat;
+        }
+        else if( annType instanceof annotations.ast.MatrixType ){
+            annotations.ast.MatrixType annMatrix = (annotations.ast.MatrixType)annType;
+            
+            MatrixType mt = new MatrixType( (BaseType)convertAnnotation( annMatrix.getElementType() ));
+            natType = mt;
+        }
+        else if( annType instanceof annotations.ast.PrimitiveType ){
+            annotations.ast.PrimitiveType annPrim = (annotations.ast.PrimitiveType)annType;
+
+            PrimitiveType pt = null;
+            String typeName = annPrim.getName();
+
+            // signed ints
+            if( typeName.equalsIgnoreCase("int8") )
+                pt = new Int8(true, false);
+            if( typeName.equalsIgnoreCase("int16") )
+                pt = new Int16(true, false);
+            if( typeName.equalsIgnoreCase("int32") )
+                pt = new Int32(true, false);
+            if( typeName.equalsIgnoreCase("int64") )
+                pt = new Int64(true, false);
+            // unsigned ints
+            if( typeName.equalsIgnoreCase("uint8") )
+                pt = new Int8(false, false);
+            if( typeName.equalsIgnoreCase("uint16") )
+                pt = new Int16(false, false);
+            if( typeName.equalsIgnoreCase("uint32") )
+                pt = new Int32(false, false);
+            if( typeName.equalsIgnoreCase("uint64") )
+                pt = new Int64(false, false);
+            // complex ints
+            if( typeName.equalsIgnoreCase("cint8") )
+                pt = new Int8(true, true);
+            if( typeName.equalsIgnoreCase("cint16") )
+                pt = new Int16(true, true);
+            if( typeName.equalsIgnoreCase("cint32") )
+                pt = new Int32(true, true);
+            if ( typeName.equalsIgnoreCase("cint64") )
+                pt = new Int64(true, true);
+            //floats
+            if( typeName.equalsIgnoreCase("single") )
+                pt = new Float32(true, false);
+            if( typeName.equalsIgnoreCase("double") )
+                pt = new Float64(true, false);
+            //complex floats
+            if( typeName.equalsIgnoreCase("csingle") )
+                pt = new Float32(true, true);
+            if( typeName.equalsIgnoreCase("cdouble") )
+                pt = new Float64(true, true);
+            //character
+            if( typeName.equalsIgnoreCase("char") )
+                pt = new CharType();
+            //boolean
+            if( typeName.equalsIgnoreCase("logical") )
+                pt = new BoolType();
+
+            natType = pt;
+        }
+        else if( annType instanceof annotations.ast.TypeVarType ){
+            annotations.ast.TypeVarType annTVar = (annotations.ast.TypeVarType)annType;
+
+            TypeVarType tvt = new TypeVarType( annTVar.getName() );
+            natType = tvt;
+        }
+        else if( annType instanceof annotations.ast.HandleType ){
+            annotations.ast.HandleType annHandle = (annotations.ast.HandleType)annType;
+
+            HandleType ht = new HandleType( (ArrowType)convertAnnotation( annHandle.getArrowType() ));
+            natType = ht;
+        }
+        else if( annType instanceof annotations.ast.UnknownType ){
+            annotations.ast.UnknownType annUT = (annotations.ast.UnknownType)annType;
+
+            natType = new UnknownType();
+        }
+        else if( annType instanceof annotations.ast.StructType ){
+            annotations.ast.StructType annStruct = (annotations.ast.StructType)annType;
+
+            StructType st = new StructType();
+            FieldEntry natFE;
+
+            for( annotations.ast.FieldEntry fe : annStruct.getFieldEntrys() ){
+                natFE = new FieldEntry( fe.getName(), convertAnnotation( fe.getType() ));
+                st.addFieldEntry( natFE );
+            }
+            natType = st;
+        }
+
+        return natType;
+
+    }
+}

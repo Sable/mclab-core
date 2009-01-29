@@ -1,9 +1,9 @@
-import annotations.ast.Type;
-import annotations.ast.Size;
+/*import annotations.ast.Type;
+  import annotations.ast.Size;*/
 
 aspect TypeInference{
 
-    /*VariableDecl new(String id, Type t){
+    /*VariableDecl new(String id, annotations.ast.Type t){
         setID = id;
         setType = t;
         setOldID = id;
@@ -23,14 +23,14 @@ aspect TypeInference{
         }
         return t;
     }
-    //syn Type Function.localGetType( Name n ){
+    //syn annotations.ast.Type Function.localGetType( Name n ){
         
 
 
     syn Type Stmt.localGetType( Name n ) = null;
 
     eq ExpandedAnnotation.localGetType( Name n ) =
-        getanno().getTypeInfo(new annotations.ast.Variable( n.getID() ));
+        Type.convertAnnotation(getanno().getTypeInfo(new annotations.ast.Variable( n.getID() )));
 
     //TODO-JD: write eqs for all nesting stmts 
 
@@ -42,11 +42,11 @@ aspect TypeInference{
     eq ClassDef.getProperty(int i).getType( Name n ) = localGetType( n );
     eq FunctionList.getFunction(int i).getType( Name n ) = localGetType( n );
 
-    syn Size Program.localGetSize( String s ) = localGetSize( new Name(s) );
-    syn Size Program.localGetSize( Name n) = null;
+    syn annotations.ast.Size Program.localGetSize( String s ) = localGetSize( new Name(s) );
+    syn annotations.ast.Size Program.localGetSize( Name n) = null;
 
     eq Script.localGetSize( Name n ){
-        Size s = null;
+        annotations.ast.Size s = null;
         for( Stmt stmt : getStmts() ) {
             s = stmt.localGetSize( n );
             if( s != null )
@@ -56,16 +56,16 @@ aspect TypeInference{
     }
     //TODO-JD: for other program nodes
 
-    syn Size Stmt.localGetSize( String s ) = localGetSize( new Name( s ) );
-    syn Size Stmt.localGetSize( Name n ) = null;
+    syn annotations.ast.Size Stmt.localGetSize( String s ) = localGetSize( new Name( s ) );
+    syn annotations.ast.Size Stmt.localGetSize( Name n ) = null;
 
     eq ExpandedAnnotation.localGetSize( Name n ) =
         getanno().getSizeInfo( new annotations.ast.Variable( n.getID() ));
 
     //TODO-JD: write for all nesting stmts
 
-    syn Size Stmt.getSize( String s ) = getSize( new Name(s) );
-    inh Size Stmt.getSize( Name n );
+    syn annotations.ast.Size Stmt.getSize( String s ) = getSize( new Name(s) );
+    inh annotations.ast.Size Stmt.getSize( Name n );
 
     eq Script.getStmt(int i).getSize( Name n ) = localGetSize( n );
     eq ClassDef.getMethod(int i).getSize( Name n ) = localGetSize( n );
@@ -73,15 +73,21 @@ aspect TypeInference{
     eq ClassDef.getProperty(int i).getSize( Name n ) = localGetSize( n );
     eq FunctionList.getFunction(int i).getSize( Name n ) = localGetSize( n );
 
-    private boolean VariableDecl.isRefined = false;
+    //TODO JD:UPDATE TYPES  change value back to false
+    private boolean VariableDecl.isRefined = true;
     rewrite VariableDecl{
         when( !isRefined )
         to VariableDecl{
             // VariableDecl decl =  new VariableDecl(getID(), getType(new Name(getID()))); //, getOriginalID());
             // Do not need to create new node, just update this 	-JL 10.04
             // This method is just link the type-annotation with decl-node
-			VariableDecl decl =  this;
-			decl.setType(getType(new Name(getID()))); 
+            VariableDecl decl =  this;
+            Type t = getType(new Name(getID() ));
+            // if the infered type is not null, update; otherwise leave it how it was
+            // (NOTE: VariableDecls are instanciated with UnknownType in NameResolution)
+            //TODO JD:UPDATE TYPES uncomment the if block
+            /*if( t != null )
+              decl.setType(t); */
             decl.isRefined = true;
             return decl;
         }

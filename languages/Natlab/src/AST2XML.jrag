@@ -10,15 +10,32 @@ aspect ASTtoXML {
 
 	private long ASTNode.uID = -1;
 	public void ASTNode.setuID(long id) {
-		uID = id;
+            uID = id;
 	}
+        /*
 	public long ASTNode.getuID() {
 		return uID;
-	}
-	
+        }
+        */
+        inh long ASTNode.makeUId();
+
+        eq ASTNode.getChild(int i).makeUId(){
+            long m = getuID();
+            
+            if( i > 0 ){
+                long uid = getChild( i-1 ).getuID();
+                m = uid > m ? uid : m;
+            }
+            uID = m+1;
+            return m+1;
+        }
+
+        syn lazy long ASTNode.getuID();
+        eq ASTNode.getuID() = makeUId();
+        syn long CompilationUnits.makeUId() = 0;
 	public long CompilationUnits.nodeCounter = 0;
 
-	public long ASTNode.nodeCounter() {
+	/*public long ASTNode.nodeCounter() {
 	    long counter = 0;
 	    ASTNode node = this;
 		while(node != null && !(node instanceof CompilationUnits))
@@ -28,7 +45,10 @@ aspect ASTtoXML {
 			counter =  ((CompilationUnits)node).nodeCounter++;
 	    }
 	    return counter;
-  	}
+            }*/
+
+        syn long ASTNode.nodeCounter() = getuID();
+
 	public void Annotation.setNodeCounter(long count){
 		ASTNode node = this;
 		while(node != null && !(node instanceof CompilationUnits))
@@ -961,8 +981,8 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("ExpandedAnnotation");
 		e.setAttribute("id", Long.toString(id));
-
-		getanno().getXML(doc, e, nodeCounter());
+                //TODO-JD: Should we even include the annotations in the XML?
+		//getanno().getXML(doc, e, nodeCounter());
         setNodeCounter(getanno().getNodeCounter());
 
         parent.appendChild(e);
@@ -976,42 +996,53 @@ aspect ASTtoXML {
 		Element e = doc.createElement("VariableDecl");
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("varId", getID());
+                if( getType() == null )
+                    System.err.println("UH OH " + getID() + " is null in xml printing");
+                else{
+                    e.setAttribute("type", getType().dumpString());
+                }
 
         parent.appendChild(e);
         return true;
     }
 
-	eq FunctionDecl.getXML(Document doc, Element parent) {
+    eq FunctionDecl.getXML(Document doc, Element parent) {
         long id = nodeCounter();
         setuID(id);
-
-		Element e = doc.createElement("FunctionDecl");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
-
-		getSymbolTableXML(doc, e);
-
-		Element e1 = doc.createElement("ParamDeclList");
-        	for(VariableDecl vd : getParamDecls()) {
-            	vd.getXML(doc, e1);
-        	}
-		e.appendChild(e1);
-
-		Element e2 = doc.createElement("InputParamList");
-        	for(Name param : getInputParams()) {
-            	param.getXML(doc, e2);
-        	}
-		e.appendChild(e2);
-
-		Element e3 = doc.createElement("OutputParamList");
-        	for(Name param : getOutputParams()) {
-            	param.getXML(doc, e3);
-        	}
-		e.appendChild(e3);
+        
+        Element e = doc.createElement("FunctionDecl");
+        e.setAttribute("id", Long.toString(id));
+        e.setAttribute("name", getName());
+        
+        getSymbolTableXML(doc, e);
+        
+        Element e1 = doc.createElement("ParamDeclList");
+        for(VariableDecl vd : getParamDecls()) {
+            vd.getXML(doc, e1);
+        }
+        e.appendChild(e1);
+        
+        Element e2 = doc.createElement("InputParamList");
+        for(Name param : getInputParams()) {
+            param.getXML(doc, e2);
+        }
+        e.appendChild(e2);
+        
+        Element e3 = doc.createElement("OutputParamList");
+        for(Name param : getOutputParams()) {
+            param.getXML(doc, e3);
+        }
+        e.appendChild(e3);
         
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
+
+        Element eNested = doc.createElement("NestedFunctionList");
+        for(Function func : getNestedFunctions()) {
+            func.getXML(doc, eNested);
+        }
+        e.appendChild(eNested);
         
         Element e4 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
@@ -1019,10 +1050,6 @@ aspect ASTtoXML {
         }
         e.appendChild(e4);
         
-        for(Function func : getNestedFunctions()) {
-            func.getXML(doc, e);
-        }
-
         parent.appendChild(e);
         return true;
     }

@@ -1,0 +1,8 @@
+//// DECLARATION EXTENSION - START /////////////////////////////////////////////
+//TODO JD:UPDATE TYPES
+//new version
+//VariableDecl : Stmt ::= <ID> <Type : annotations.ast.Type> <OriginalID>;
+//old version
+VariableDecl : Stmt ::= <ID> <Type : annotations.ast.Type> <OriginalID>;
+FunctionDecl : Function ::= ParamDecl:VariableDecl*;
+//// DECLARATION EXTENSION - END ///////////////////////////////////////////////

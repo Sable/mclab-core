@@ -166,6 +166,7 @@ aspect NameResolution{
     eq ClassDef.getMethod(int i).isLValue() = false;
     eq ClassDef.getClassEvent(int i).isLValue() = false;
     eq ClassDef.getProperty(int i).isLValue() = false;
+    eq ClassDef.getAttribute(int i).isLValue() = false;
     eq FunctionList.getFunction(int i).isLValue() = false;
 
     //overides 
@@ -296,8 +297,18 @@ aspect NameResolution{
         to Script{
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
-            for( String symbol : getLValues() )
-                s.addDeclStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
+            for( String symbol : getLValues() ){
+                //TODO JD:UPDATE TYPES
+                //New version
+                //VariableDecl d = new VariableDecl(symbol, new UnknownType(), symbol );
+                //Old version
+                VariableDecl d = new VariableDecl(symbol, new annotations.ast.UnknownType(), symbol );
+                s.addDeclStmt( d );
+                if( d.getType() == null )
+                    System.out.println(symbol + "'s type is null after instanciation");
+                else
+                    System.out.println(symbol + "'s type is not null after instanciation");
+            }
             for( int i=0; i<getNumStmt(); i++ ){
                 s.addStmt( getStmt(i) );
             }
@@ -323,14 +334,19 @@ aspect NameResolution{
             for( String symbol : getLValues() )
                 //only add decls for non parameters
                 if( !params.contains( symbol ) )
-                    f.addStmt( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
+                    f.addStmt( new VariableDecl(symbol, new annotations.ast.UnknownType(), symbol) );
             //add original stmts
             for( int i=0; i<getNumStmt(); i++ ){
-                f.addStmt( getStmt(i) );
+                Stmt s = getStmt(i);
+                f.addStmt( s );
             }
             //add Parameter declarations
             for( String symbol : getParamSet() )
-              f.addParamDecl( new VariableDecl(symbol, new annotations.ast.UnknownType() ) );
+                //TODO JD:UPDATE TYPES
+                //new version
+                //f.addParamDecl( new VariableDecl(symbol, new UnknownType(), symbol ) );
+                //old version
+                f.addParamDecl( new VariableDecl(symbol, new annotations.ast.UnknownType(), symbol ) );
             return f;
         }
     }

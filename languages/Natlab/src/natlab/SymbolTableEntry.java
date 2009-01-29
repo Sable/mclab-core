@@ -36,13 +36,13 @@ public class SymbolTableEntry
     {
         this(s, s, n);
     }
-    public SymbolTableEntry(String s, String o, ASTNode n)
+    public SymbolTableEntry(String s, String o, ASTNode declNode)
     {
         symbol = s;
         original = o;
 
         symbolCount = new SymbolCount(); //TODO-JD: perhaps change this to search for other symbols with same original
-        nodeLocation=n;
+        declLocation=declNode;
     }
 
     public SymbolTableEntry split()
@@ -79,8 +79,9 @@ public class SymbolTableEntry
     public boolean getXML(Document doc, Element parent)
     {   
         long uid = -1;
-        if( declLocation != null )
+        if( declLocation != null ){
             uid = declLocation.getuID();
+        }
 
     	Element e = doc.createElement("Entry");
     	e.setAttribute("symbol", symbol);

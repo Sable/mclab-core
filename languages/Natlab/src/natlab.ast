@@ -115,7 +115,3 @@ Annotation : Stmt ::= <Text>;
 ExpandedAnnotation : Annotation ::= <anno : annotations.ast.Annotation>;
 //// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
 
-//// DECLARATION EXTENSION - START /////////////////////////////////////////////
-VariableDecl : Stmt ::= <ID> <Type : annotations.ast.Type>;
-FunctionDecl : Function ::= ParamDecl:VariableDecl*;
-//// DECLARATION EXTENSION - END ///////////////////////////////////////////////

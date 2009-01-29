@@ -1,0 +1,46 @@
+abstract Type;
+UnionType : Type ::= Type*;
+IntersectionType : Type ::= Type*;
+ArrowType : Type ::= ArgType : Type  ResultType : Type;
+ArgTupleType : Type ::= StaticArgType : Type*  VarArgType;
+UnitType : Type;
+VarArgType : Type ::= Type;
+TupleType : Type ::= ElementType : Type*;
+CellArrayType : Type ::= DefaultElementType : Type;
+MatrixType : Type ::=  ElementType : BaseType;
+
+abstract BaseType : Type;
+abstract PrimitiveType : BaseType;
+TypeVarType : BaseType ::= <Name>;
+HandleType : BaseType ::= ArrowType;
+UnknownType : BaseType;
+StructType : BaseType ::= FieldEntry*;
+
+
+abstract IntType : PrimitiveType;
+Int8 : IntType ::= <Signed:boolean> <Complex:boolean>;
+Int16 : IntType ::= <Signed:boolean> <Complex:boolean>;
+Int32 : IntType ::= <Signed:boolean> <Complex:boolean>;
+Int64 : IntType ::= <Signed:boolean> <Complex:boolean>;
+
+
+abstract FloatType : PrimitiveType;
+Float32 : FloatType ::= <Signed:boolean> <Complex:boolean>;
+Float64 : FloatType ::= <Signed:boolean> <Complex:boolean>;
+
+CharType : PrimitiveType;
+BoolType : PrimitiveType;
+
+
+FieldEntry ::= <Name> Type;
+
+
+abstract Shape;
+
+KnownExtentsShape : Shape ::= Extents:KnownExtents;
+
+abstract Rank;
+KnownRank : Rank ::= <Dims : int>;
+
+abstract Extents;
+KnownExtents :Extents ::= <Dims : java.util.List<Integer>>;

@@ -128,8 +128,16 @@ aspect SymbolTableScope {
 		    		}
 		    	}
 		    	if(!found) {
+                            //TODO JD:UPDATE TYPES
+                            //new version
+                            /*VariableDecl decl = new VariableDecl(e.getSymbol(), 
+                              new UnknownType(),
+                              e.getSymbol());
+                            */
+                                //old version
 		    		VariableDecl decl = new VariableDecl(e.getSymbol(), 
-		    				new annotations.ast.UnknownType() );
+                                                                     new annotations.ast.UnknownType(),
+                                                                     e.getSymbol());
 		    		addDeclStmt( decl );
 		    		e.setDeclLocation(decl);
 		    	}
@@ -237,6 +245,18 @@ aspect SymbolTableToXML{
 		parent.appendChild(e);
         return true;
     }
+    syn boolean Script.getSymbolTableXML(Document doc, Element parent){
+        HashMap<String, SymbolTableEntry> table = symbolTable().symTable;
+
+        Element e = doc.createElement("Symboltable");
+
+        for( SymbolTableEntry ent : table.values() ){
+            ent.getXML(doc, e);
+        }
+        parent.appendChild(e);
+
+        return true;
+    }
 
     syn boolean Function.getSymbolTableXML(Document doc, Element parent){
         HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
@@ -250,4 +270,24 @@ aspect SymbolTableToXML{
 		parent.appendChild(e);
         return true;
     }
+}
+
+aspect SymbolTableFill{
+
+    //attributes to get enclosing scope of a decl
+    inh ASTNode VariableDecl.getScope();
+
+    eq Methods.getPropAcc(int i).getScope() = this;
+
+    eq Script.getStmt(int i).getScope() = this;
+
+    eq Function.getStmt(int i).getScope() = this;
+    eq FunctionDecl.getParamDecl(int i).getScope() = this;
+
+    coll SymbolTableScope Script.symbolTable() [new SymbolTableScope()] with addSymbol;
+
+    VariableDecl contributes
+        new SymbolTableEntry( getID(), getOriginalID(), this ) 
+    to Script.symbolTable()
+    for getScope();
 }
