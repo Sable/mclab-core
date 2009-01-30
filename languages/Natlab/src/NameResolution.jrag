@@ -304,10 +304,11 @@ aspect NameResolution{
                 //Old version
                 VariableDecl d = new VariableDecl(symbol, new annotations.ast.UnknownType(), symbol );
                 s.addDeclStmt( d );
-                if( d.getType() == null )
+                /*if( d.getType() == null )
                     System.out.println(symbol + "'s type is null after instanciation");
                 else
                     System.out.println(symbol + "'s type is not null after instanciation");
+                */
             }
             for( int i=0; i<getNumStmt(); i++ ){
                 s.addStmt( getStmt(i) );
