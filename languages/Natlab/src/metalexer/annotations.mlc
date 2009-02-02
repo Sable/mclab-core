@@ -45,9 +45,10 @@ Comment = [/][/] .*
 "+" {: append(yytext()); :}
 "-" {: append(yytext()); :}
 
+\r\n {: /* TODO-AC: skip */ append(yytext()); :}
+
 %:
 
-\r\n {: /* TODO-AC: skip */ append(yytext()); :}
 {Whitespace} {: /* TODO-AC: skip */ append(yytext()); :}
 {Comment} {: /* TODO-AC: skip */ append(yytext()); :}
 
