@@ -111,14 +111,14 @@ import beaver.Scanner;
 
 %%embed
 %name comma_terminator
-%host base, class
+%host base, class, class_bracketed
 %guest comma_terminator
 %start START_COMMA_TERMINATOR
 %end END_COMMA_TERMINATOR
 
 %%embed
 %name semicolon_terminator
-%host base, class
+%host base, class, class_bracketed
 %guest semicolon_terminator
 %start START_SEMICOLON_TERMINATOR
 %end END_SEMICOLON_TERMINATOR
