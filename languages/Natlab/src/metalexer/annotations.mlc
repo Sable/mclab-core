@@ -1,8 +1,7 @@
 %component annotations
 
 %append{
-    //TODO-AC: hackish to add delimiter
-    return symbol(ANNOTATION, "(*" + text, startLine, startCol, endLine, endCol);
+    return symbol(ANNOTATION, text, startLine, startCol, endLine, endCol);
 %append}
 
 Whitespace = [ \t\f\r\n]+
@@ -48,8 +47,9 @@ Comment = [/][/] .*
 
 %:
 
-{Whitespace} {: /* skip */ :}
-{Comment} {: /* skip */ :}
+\r\n {: /* TODO-AC: skip */ append(yytext()); :}
+{Whitespace} {: /* TODO-AC: skip */ append(yytext()); :}
+{Comment} {: /* TODO-AC: skip */ append(yytext()); :}
 
 {Number} {: append(yytext()); :}
 
