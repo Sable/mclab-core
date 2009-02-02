@@ -10,7 +10,7 @@
 %%inherit comment_start
 
 {OtherWhiteSpace} {: /* ignore */ :}
-{LineTerminator} {: return symbol(SEMICOLON_LINE_TERMINATOR, null, storedLine + 1, storedCol + 1, yyline + 1, yycolumn + 1); :} END_SEMICOLON_TERMINATOR
+{LineTerminator} {: return symbol(SEMICOLON_LINE_TERMINATOR, null, storedLine + 1, storedCol + 1, yyline + 1, yycolumn + yylength()); :} END_SEMICOLON_TERMINATOR
 
 %:
 %:
