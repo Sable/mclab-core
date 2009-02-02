@@ -3,8 +3,8 @@
 	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/test"/>
 	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/src"/>
 	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/gen"/>
-	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/gen"/>
-	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/src"/>
+	<classpathentry excluding="metalexer/" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/gen"/>
+	<classpathentry excluding="metalexer/" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/src"/>
 	<classpathentry kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/test"/>
 	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/src"/>
 	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/gen"/>
