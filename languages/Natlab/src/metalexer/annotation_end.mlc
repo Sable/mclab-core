@@ -5,4 +5,4 @@
 
 %%
 
-"*)" {: return symbol(CLOSE_ANNOTATION); :} END_ANNOTATION
+"*)" {: append(yytext()); :} END_ANNOTATION

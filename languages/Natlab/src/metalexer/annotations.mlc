@@ -1,5 +1,10 @@
 %component annotations
 
+%append{
+    //TODO-AC: hackish to add delimiter
+    return symbol(ANNOTATION, "(*" + text, startLine, startCol, endLine, endCol);
+%append}
+
 Whitespace = [ \t\f\r\n]+
 
 Letter = [a-zA-Z]
@@ -12,45 +17,45 @@ Comment = [/][/] .*
 
 %%
 
-"." {: return symbol(Terminals.DOT); :}
+"." {: append(yytext()); :}
 
-";" {: return symbol(Terminals.STMT_TERMINATOR); :}
-"," {: return symbol(Terminals.ELEMENT_SEPARATOR); :}
+";" {: append(yytext()); :}
+"," {: append(yytext()); :}
 
-"#" {: return symbol(Terminals.SIZE_OF); :}
-"=" {: return symbol(Terminals.EQ); :}
-":" {: return symbol(Terminals.HAS_TYPE); :}
+"#" {: append(yytext()); :}
+"=" {: append(yytext()); :}
+":" {: append(yytext()); :}
 
-\( {: return symbol(Terminals.LPAREN); :}
-\) {: return symbol(Terminals.RPAREN); :}
-\{ {: return symbol(Terminals.LCURLY); :}
-\} {: return symbol(Terminals.RCURLY); :}
-\[ {: return symbol(Terminals.LSQUARE); :}
-\] {: return symbol(Terminals.RSQUARE); :}
+\( {: append(yytext()); :}
+\) {: append(yytext()); :}
+\{ {: append(yytext()); :}
+\} {: append(yytext()); :}
+\[ {: append(yytext()); :}
+\] {: append(yytext()); :}
 
-"*" {: return symbol(Terminals.VARARG_MODIFIER); :}
-"@" {: return symbol(Terminals.HANDLE_MODIFIER); :}
-"$" {: return symbol(Terminals.TYPE_VAR_MODIFIER); :}
+"*" {: append(yytext()); :}
+"@" {: append(yytext()); :}
+"$" {: append(yytext()); :}
 
-"->" {: return symbol(Terminals.ARROW); :}
-"?" {: return symbol(Terminals.UNKNOWN_TYPE); :}
+"->" {: append(yytext()); :}
+"?" {: append(yytext()); :}
 
-"|" {: return symbol(Terminals.UNION); :}
-"&" {: return symbol(Terminals.INTERSECT); :}
+"|" {: append(yytext()); :}
+"&" {: append(yytext()); :}
 
-"+" {: return symbol(Terminals.IS_SCALAR); :}
-"-" {: return symbol(Terminals.IS_NOT_SCALAR); :}
+"+" {: append(yytext()); :}
+"-" {: append(yytext()); :}
 
 %:
 
 {Whitespace} {: /* skip */ :}
 {Comment} {: /* skip */ :}
 
-{Number} {: return symbol(Terminals.NUMBER, Integer.parseInt(yytext())); :} //NumberFormatException not possible
+{Number} {: append(yytext()); :}
 
-{Identifier} {: return symbol(Terminals.IDENTIFIER, yytext()); :}
+{Identifier} {: append(yytext()); :}
 
 %:
 
 <<ANY>> {: error("Illegal character '" + yytext() + "'"); :}
-<<EOF>> {: return symbol(Terminals.EOF); :}
+<<EOF>> {: error("Unterminated annotation"); :}

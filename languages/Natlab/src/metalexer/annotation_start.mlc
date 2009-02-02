@@ -5,4 +5,4 @@
 
 %%
 
-"(*" {: return symbol(OPEN_ANNOTATION); :} START_ANNOTATION
+"(*" {: :} START_ANNOTATION
