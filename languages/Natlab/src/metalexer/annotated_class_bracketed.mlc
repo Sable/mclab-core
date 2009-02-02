@@ -1,0 +1,4 @@
+%component annotated_class_bracketed
+%%
+%%inherit annotation_start
+%%inherit class_bracketed

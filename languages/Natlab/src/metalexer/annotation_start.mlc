@@ -1,0 +1,8 @@
+%component annotation_start
+%helper
+
+%extern "Symbol symbol(short)"
+
+%%
+
+"(*" {: return symbol(OPEN_ANNOTATION); :} START_ANNOTATION

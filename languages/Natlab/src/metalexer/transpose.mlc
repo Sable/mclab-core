@@ -1,0 +1,11 @@
+%component transpose
+
+%extern "Symbol symbol(short)"
+
+%%
+
+"'" {: return symbol(MTRANSPOSE); :} //NB: don't leave component on matching MTRANSPOSE (just in case there's another one next)
+%:
+%:
+<<ANY>> {: yypushback(1); :} END_TRANSPOSE
+<<EOF>> {: :} END_TRANSPOSE

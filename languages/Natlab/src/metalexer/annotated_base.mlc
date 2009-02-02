@@ -1,0 +1,4 @@
+%component annotated_base
+%%
+%%inherit annotation_start
+%%inherit base

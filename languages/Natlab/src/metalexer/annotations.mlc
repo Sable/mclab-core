@@ -1,0 +1,56 @@
+%component annotations
+
+Whitespace = [ \t\f\r\n]+
+
+Letter = [a-zA-Z]
+Digit = [0-9]
+Identifier = ([_$] | {Letter}) ([_$] | {Letter} | {Digit})*
+
+Number = 0 | [1-9] {Digit}*
+
+Comment = [/][/] .*
+
+%%
+
+"." {: return symbol(Terminals.DOT); :}
+
+";" {: return symbol(Terminals.STMT_TERMINATOR); :}
+"," {: return symbol(Terminals.ELEMENT_SEPARATOR); :}
+
+"#" {: return symbol(Terminals.SIZE_OF); :}
+"=" {: return symbol(Terminals.EQ); :}
+":" {: return symbol(Terminals.HAS_TYPE); :}
+
+\( {: return symbol(Terminals.LPAREN); :}
+\) {: return symbol(Terminals.RPAREN); :}
+\{ {: return symbol(Terminals.LCURLY); :}
+\} {: return symbol(Terminals.RCURLY); :}
+\[ {: return symbol(Terminals.LSQUARE); :}
+\] {: return symbol(Terminals.RSQUARE); :}
+
+"*" {: return symbol(Terminals.VARARG_MODIFIER); :}
+"@" {: return symbol(Terminals.HANDLE_MODIFIER); :}
+"$" {: return symbol(Terminals.TYPE_VAR_MODIFIER); :}
+
+"->" {: return symbol(Terminals.ARROW); :}
+"?" {: return symbol(Terminals.UNKNOWN_TYPE); :}
+
+"|" {: return symbol(Terminals.UNION); :}
+"&" {: return symbol(Terminals.INTERSECT); :}
+
+"+" {: return symbol(Terminals.IS_SCALAR); :}
+"-" {: return symbol(Terminals.IS_NOT_SCALAR); :}
+
+%:
+
+{Whitespace} {: /* skip */ :}
+{Comment} {: /* skip */ :}
+
+{Number} {: return symbol(Terminals.NUMBER, Integer.parseInt(yytext())); :} //NumberFormatException not possible
+
+{Identifier} {: return symbol(Terminals.IDENTIFIER, yytext()); :}
+
+%:
+
+<<ANY>> {: error("Illegal character '" + yytext() + "'"); :}
+<<EOF>> {: return symbol(Terminals.EOF); :}
