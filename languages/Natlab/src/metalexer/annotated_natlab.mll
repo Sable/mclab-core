@@ -14,8 +14,6 @@ package natlab;
 
 %%inherit helper_beaver
 
-%replace annotations, annotations_end
-
 %%embed
 %name annotations
 %host annotated_base, annotated_class, annotated_class_bracketed
