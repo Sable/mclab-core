@@ -1,4 +1,4 @@
-package test.jflex.natlab;
+package natlab;
 %%
 import static natlab.NatlabParser.Terminals.*;
 
