@@ -307,6 +307,6 @@ end
 function fcn6
 
 
-  %%helpcomment1
+  % helpcomment1
 end
 %extracomment

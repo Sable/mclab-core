@@ -29,5 +29,5 @@
 [3, 3] -> (3, 3)
 >>>> Translated Text
 function f
-%%helpcomment
+% helpcomment
 end

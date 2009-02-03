@@ -23,7 +23,7 @@
 [5, 2] -> (5, 2)
 [6, 1] -> (6, 1)
 >>>> Translated Text
-%%help1
+% help1
 %{
 help2
 %}

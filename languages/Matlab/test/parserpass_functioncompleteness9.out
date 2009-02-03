@@ -39,6 +39,6 @@
 [4, 3] -> (4, 3)
 >>>> Translated Text
 function f(x)
-%%helpcomment
+% helpcomment
 y = x;
 end

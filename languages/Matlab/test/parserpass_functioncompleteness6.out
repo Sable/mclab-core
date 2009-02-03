@@ -35,5 +35,5 @@
 [3, 3] -> (3, 3)
 >>>> Translated Text
 function y = f()
-%%helpcomment
+% helpcomment
 end

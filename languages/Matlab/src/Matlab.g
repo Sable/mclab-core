@@ -888,7 +888,9 @@ t_NUMBER : NUMBER { offsetTracker.advanceByTextSize($text); };
 t_STRING : STRING { offsetTracker.advanceByTextSize($text); };
 
 t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
-t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); };
+t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); } -> 
+    template(revised={$text.startsWith("\%\%") ? ("\% " + $text.substring(2)) : $text}) "<revised>";
+    //NB: it's safe to do this here because the offsets don't change
 
 t_SHELL_COMMAND : SHELL_COMMAND { offsetTracker.advanceByTextSize($text); };
 
