@@ -28,9 +28,10 @@ public class Interpreter {
 			CommentBuffer commentBuffer = new CommentBuffer();
 			NatlabParser parser = new NatlabParser();
 			parser.setCommentBuffer(commentBuffer);
+			NatlabScanner scanner = null;
 			try {
 				// Temporarily changed to accept a file name - JL 2008.05.27 
-				NatlabScanner scanner = new NatlabScanner(new FileReader(line));
+				scanner = new NatlabScanner(new FileReader(line));
 				scanner.setCommentBuffer(commentBuffer);
 				//NatlabScanner scanner = new NatlabScanner(new StringReader(line));
 				Program original = (Program) parser.parse(scanner);
@@ -45,12 +46,17 @@ public class Interpreter {
 					//System.out.println(original.XMLtoString(original.ASTtoXML()));
 					// System.out.println(original.dumpTree());
 				}
+				scanner.stop();
 			} catch(Parser.Exception e) {
 				System.out.println("**ERROR**");
 				System.out.println(e.getMessage());
 				for(String error : parser.getErrors()) {
 					System.out.println(error);
 				}
+			} finally {
+			    if(scanner != null) {
+			        scanner.stop();
+			    }
 			}
 		}
 		System.out.println("Goodbye!");

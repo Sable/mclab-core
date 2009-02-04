@@ -124,7 +124,7 @@ public class Main
     private static Program parseFile(String fName, Reader file)
     {
         NatlabParser parser = new NatlabParser();
-        NatlabScanner scanner;
+        NatlabScanner scanner = null;
         CommentBuffer cb = new CommentBuffer();
 
         parser.setCommentBuffer(cb);
@@ -147,14 +147,19 @@ public class Main
             System.err.println("File "+fName+" not found!\nAborting");
             System.exit(1);
         }
-	catch(IOException e){
-	    System.err.println("Problem parsing "+fName);
-	    if( e.getMessage() != null )
-		System.err.println( e.getMessage() );
-	    System.err.println("Aborting");
-	    System.exit(1);
-	}
-	    
+        catch(IOException e){
+            System.err.println("Problem parsing "+fName);
+            if( e.getMessage() != null )
+                System.err.println( e.getMessage() );
+            System.err.println("Aborting");
+            System.exit(1);
+        }
+        finally{
+            if(scanner != null) {
+                scanner.stop();
+            }
+        }
+
         //should be dead due to exit calls
         return null;
     }
