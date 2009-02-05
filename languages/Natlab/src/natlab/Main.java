@@ -30,7 +30,7 @@ public class Main
     public static void main(String[] args)
     {
 
-        
+        StringBuffer errors = new StringBuffer();
         options = new Options();
 
         if( processCmdLine( args ) ){
@@ -100,7 +100,15 @@ public class Main
                             }
                         }
                         System.err.println("Parsing: " + file);
-                        programs.add( parseFile( file,  fileReader ) );
+                        Program prog = parseFile( file,  fileReader, errors );
+
+                        System.err.println( errors.toString() );
+                        
+                        if( prog == null ){
+                            System.err.println("\nSkipping " + file);
+                            break;
+                        }
+                        programs.add( prog );
                     }
 		    CompilationUnits cu = new CompilationUnits();
 		    for( Program p : programs ){
@@ -121,7 +129,7 @@ public class Main
 
     //Parse a given file and return a Program ast node
     //if file does not exist or other problems, exit program
-    private static Program parseFile(String fName, Reader file)
+    private static Program parseFile(String fName, Reader file, StringBuffer errBuf )
     {
         NatlabParser parser = new NatlabParser();
         NatlabScanner scanner = null;
@@ -133,35 +141,37 @@ public class Main
             scanner = new NatlabScanner( file );
             scanner.setCommentBuffer( cb );
             try{
-                return (Program)parser.parse(scanner);        
-            }catch(Parser.Exception e){
-                System.err.println("**ERROR**");
-                System.err.println(e.getMessage());
-                for(String error : parser.getErrors()) {
-                    System.err.println(error);
+                
+                Program prog = (Program)parser.parse(scanner);
+                if( parser.hasError() ){
+                    for( String error : parser.getErrors())
+                        errBuf.append(error + "\n");
+                    prog = null;
                 }
-                System.err.println("Aborting");
-                System.exit(1);
+                return prog;
+
+            }catch(Parser.Exception e){
+                errBuf.append(e.getMessage());
+                for(String error : parser.getErrors()) {
+                    errBuf.append(error + "\n");
+                }
+                return null;
             } 
         }catch(FileNotFoundException e){
-            System.err.println("File "+fName+" not found!\nAborting");
-            System.exit(1);
+            errBuf.append( "File "+fName+" not found!\n" );
+            return null;
         }
-        catch(IOException e){
-            System.err.println("Problem parsing "+fName);
-            if( e.getMessage() != null )
-                System.err.println( e.getMessage() );
-            System.err.println("Aborting");
-            System.exit(1);
-        }
+	catch(IOException e){
+	    errBuf.append( "Problem parsing "+fName + "\n");
+	    if( e.getMessage() != null )
+		errBuf.append( e.getMessage() + "\n");
+            return null;
+	}
         finally{
             if(scanner != null) {
                 scanner.stop();
             }
         }
-
-        //should be dead due to exit calls
-        return null;
     }
     private static boolean processCmdLine(String[] args)
     {
@@ -179,5 +189,5 @@ public class Main
             throw e;
         }
     }
-
+    
 }
