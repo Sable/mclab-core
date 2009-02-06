@@ -55,5 +55,11 @@ No static linking is done.
       <short_desc>Use Matlab files as input</short_desc>
       <long_desc>Use Matlab files as input rather than Natlab ones.</long_desc>
     </boolopt>
+    <boolopt>
+      <name>Quiet mode</name>
+      <alias>quiet</alias>
+      <short_desc>Suppress all information messages</short_desc>
+      <long_desc>All messages will be suppressed, unless an error occurs. </long_desc>
+    </boolopt>
   </section>
 </options>

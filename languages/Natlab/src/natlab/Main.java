@@ -29,7 +29,7 @@ public class Main
     
     public static void main(String[] args)
     {
-
+        boolean quiet; //controls the suppression of messages
         StringBuffer errors = new StringBuffer();
         options = new Options();
 
@@ -39,6 +39,8 @@ public class Main
                 System.err.println(options.getUsage());
             }
             else{
+                quiet = options.quiet();  //check if quiet mode is active
+
                 if( options.e() ){
                     System.err.println("exhaustive list");
                 }
@@ -55,7 +57,8 @@ public class Main
                         Reader fileReader = new StringReader("");
                         if( options.matlab() ){
                             try{
-                                System.err.println("Translating "+file+" to Natlab");
+                                if( !quiet )
+                                    System.err.println("Translating "+file+" to Natlab");
                                 
                                 BufferedReader in = new BufferedReader( new FileReader( file ) );
                                 
@@ -99,7 +102,8 @@ public class Main
                                 System.exit(1);
                             }
                         }
-                        System.err.println("Parsing: " + file);
+                        if( !quiet )
+                            System.err.println("Parsing: " + file);
                         Program prog = parseFile( file,  fileReader, errors );
 
                         System.err.println( errors.toString() );
@@ -119,7 +123,8 @@ public class Main
 		    	System.out.println(cu.XMLtoString(cu.ASTtoXML()));
 		    }
 		    else if( options.pretty() ){
-                        System.err.println("Pretty Printing");
+                        if( !quiet )
+                            System.err.println("Pretty Printing");
 			System.out.println(cu.getPrettyPrinted());
                     }
                 }
