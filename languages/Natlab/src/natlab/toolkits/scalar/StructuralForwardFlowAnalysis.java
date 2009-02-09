@@ -120,6 +120,9 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		A afterFlow = newInitialFlow();
 		copy(currentAfterFlow, afterFlow);
 		unitToAfterFlow.put((N) node, afterFlow);
+		A previousBeforeFlow = newInitialFlow();
+		copy(currentAfterFlow, previousBeforeFlow);
+		unitToBeforeFlow.put((N)node, previousBeforeFlow);
 		
 		// The flowset will not flow to next statement, so it becomes empty
 		copy(newInitialFlow(), currentAfterFlow);
@@ -221,6 +224,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		A previousAfterFlow = newInitialFlow();
 		
 		copy(currentAfterFlow, previousBeforeFlow);
+		unitToBeforeFlow.put((N)node, previousBeforeFlow);
 		
 		// Save the current after flow-set
 		A NodeAfterFlow = newInitialFlow();
@@ -266,6 +270,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		A previousAfterFlow = newInitialFlow();
 		
 		copy(currentAfterFlow, previousBeforeFlow);
+		unitToBeforeFlow.put((N)node, previousBeforeFlow);
 		
 		// Save the current after flow-set
 		A NodeAfterFlow = newInitialFlow();
