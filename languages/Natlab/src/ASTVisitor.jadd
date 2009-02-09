@@ -157,7 +157,7 @@ aspect ASTVisitor {
     }
     public void AssignStmt.clearUseDefBoxes()
     {
-    	defBoxes.clear();
+    	if(defBoxes!=null)	defBoxes.clear();
     	super.clearUseDefBoxes();
     }
 
@@ -167,6 +167,7 @@ aspect ASTVisitor {
 
     //---------------------------------------------------------------------
     // Flow-Analysis related implementation
+    // TODO: use-boxes have duplicated value-boxes
     //---------------------------------------------------------------------
     // AssignStmt: create Def-boxes
     //---------------------------------------------------------------------
@@ -177,12 +178,20 @@ aspect ASTVisitor {
     java.util.List AssignStmt.defBoxes;
 
 	// AssignStmt: doesn't generate new use-boxes
+    // Notes: get(0) is created in Expr.generateUseBoxes() 
+    //     valueBoxes.add(new natlab.toolkits.ASTValueBox(getStructureString()));
     public void AssignStmt.collectUseBoxesList() {
+    	java.util.List leftBoxes = getLHS().getUseBoxes();
     	leftBox  = (natlab.toolkits.ValueBox) getLHS().getUseBoxes().get(0);
     	rightBox = (natlab.toolkits.ValueBox) getRHS().getUseBoxes().get(0);
     	if(getLHS() instanceof ParameterizedExpr) {
     		defBoxes = new java.util.ArrayList();
+    		if(leftBoxes.size()>=2)
+    			leftBox = (natlab.toolkits.ValueBox) leftBoxes.get(1);
     		defBoxes.add(leftBox);
+    		for(int i=2; i<leftBoxes.size(); i++) {
+    			valueBoxes.add(leftBoxes.get(i));
+    		}
     	} else {
     		defBoxes = getLHS().getUseBoxes();
     	}
@@ -250,7 +259,38 @@ aspect ASTVisitor {
     }
     public void MatrixExpr.generateUseBoxesList() {
     	nestedLevelCounter++;
-    	super.generateUseBoxesList();
+    	// Following code is taken from 
+    	// ASTNode.generateUseBoxesList();	
+    	setNodeID();
+    	nestedLevel = nestedLevelCounter;	// Set the nested-level 
+    	getRowList().generateUseBoxesList();
+		
+        // Collecting the uses boxes - special need to handle it locally !
+		// TODO: handle [a,b]=func()
+        for(Row row : getRows()) {
+        	java.util.List childUseBoxes = row.getUseBoxes();
+            if( !childUseBoxes.isEmpty() ) {
+                valueBoxes.addAll(childUseBoxes);
+            }
+        }
+    	nestedLevelCounter--;
+    }
+    
+    public void Row.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	// Following code is taken from 
+    	// ASTNode.generateUseBoxesList();	
+    	setNodeID();
+    	nestedLevel = nestedLevelCounter;	// Set the nested-level 
+    	getElementList().generateUseBoxesList();
+   
+        // Collecting the uses boxes - special need to handle it locally !
+        for(Expr element : getElements()) {
+        	java.util.List childUseBoxes = element.getUseBoxes();
+            if( !childUseBoxes.isEmpty() ) {
+                valueBoxes.addAll(childUseBoxes);
+            }
+        }
     	nestedLevelCounter--;
     }
 
@@ -324,7 +364,8 @@ aspect ASTVisitor {
 	//		(*) list of stmt: i.g. TryStmt, ... 
 	//		(*) 1-to-1 node: i.g. NameExpr::=Name
 
-    // Expr Node
+    // Expr Node: includes NameExpr,
+    // TODO: replace getStructureString()
     public void Expr.generateUseBoxes() {
         valueBoxes.add(new natlab.toolkits.ASTValueBox(getStructureString()));
     }
