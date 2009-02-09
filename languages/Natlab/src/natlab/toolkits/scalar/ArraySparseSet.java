@@ -107,6 +107,10 @@ public class ArraySparseSet extends AbstractFlowSet
    */
     public void add(Object e) 
     {
+    	// Null object doesn't allow
+    	if(e==null)	
+    		return;
+    	
 		/* Expand only if necessary! and removes one if too:) */
 		// Add element
 		if (!contains(e)) {
@@ -260,13 +264,23 @@ public class ArraySparseSet extends AbstractFlowSet
     }
     
     /**
-	 * @deprecated This method uses linear-time lookup. For better performance, consider using a
-	 *             {@link HashSet} instead, if you require this operation.
+	 * TODO: This method uses linear-time lookup. For better performance, consider using a
+	 *  {@link HashSet} instead, if you require this operation.
 	 */
     public boolean contains(Object obj)
     {
+    	if(obj==null)
+    		return false;
         for(int i = 0; i < numElements; i++)
             if(elements[i].equals(obj))
+                return true;
+                
+        return false;
+    }
+    public boolean contains(int nID)
+    {
+        for(int i = 0; i < numElements; i++)
+            if(((ASTNode)elements[i]).getNodeID()==nID)
                 return true;
                 
         return false;
@@ -324,8 +338,12 @@ public class ArraySparseSet extends AbstractFlowSet
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("{");
 		// buffer.append("["+ numElements+"]");
-        for(int i = 0; i < numElements; i++) {
-			buffer.append(", " + ((natlab.ast.ASTNode)elements[i]).getNodeID());
+		if(!isEmpty()) {
+			if(elements[0] instanceof natlab.ast.ASTNode) {
+		        for(int i = 0; i < numElements; i++) {
+					buffer.append(((natlab.ast.ASTNode)elements[i]).getNodeID()+", ");
+				}
+			}
 		}
 		buffer.append("}");
 		return buffer.toString();

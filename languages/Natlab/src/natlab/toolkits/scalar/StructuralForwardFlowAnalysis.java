@@ -14,8 +14,6 @@ package natlab.toolkits.scalar;
 import natlab.ast.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Collection;
@@ -80,15 +78,15 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 
 				//  working on current node
 				N s = (N) node;
-				
-				beforeFlow = currentAfterFlow;
-			/*	// unitToBeforeFlow never initialized			
-				beforeFlow = unitToBeforeFlow.get(s);
-				if(beforeFlow == null) {
-					unitToBeforeFlow.put(s, currentAfterFlow);
-					beforeFlow = currentAfterFlow;
-				}
-			 */
+								
+				// Before-Flow-set will be equal to currentAfterFlow, 
+				// because in case of a loop, 2nd iteration should use the
+				// changed flow-set of 1st iteration.
+				// unitToBeforeFlow initialized in AbstractFlowAnalysis()
+				// NOT: beforeFlow = unitToBeforeFlow.get(s);
+				beforeFlow = newInitialFlow();
+				copy(currentAfterFlow, beforeFlow);
+				unitToBeforeFlow.put(s, beforeFlow);
 
 				afterFlow = unitToAfterFlow.get(s);
 				if(afterFlow == null) {					
@@ -97,7 +95,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 				}
 				copy(afterFlow, previousAfterFlow);
 
-				if (DEBUG) out.println(" [<"+node.getNodeID()+">]-before :" + beforeFlow);		
+				if (DEBUG) out.println(" [<"+node.getNodeID()+">]-before:" + beforeFlow);		
 				// Traverse the node,  
 				{
 					// Compute afterFlow and store it.
@@ -147,7 +145,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 			NodeList.add(node);
 		
 		if (DEBUG) 
-			out.println("ASTWalker: caseLoopStmt " + node.dumpCode());
+			out.println("ASTWalker: caseLoopStmt " + node.getNodeID());
 
 		// push the node into stack, so inside statements can know which loop current in
 		loopStack.push(new LoopFlowsetList<A>(node));
@@ -157,13 +155,18 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		A savedAfterFlow = newInitialFlow();
 		
 		copy(currentAfterFlow, previousAfterFlow);
-		if (DEBUG) out.println(" [caseLoopStmt]-curr :" + currentAfterFlow);
-		
+		if (DEBUG) out.println(" [caseLoopStmt]-curr  :" + currentAfterFlow);
+
+		A previousBeforeFlow = newInitialFlow();
+		copy(currentAfterFlow, previousBeforeFlow);
+		unitToBeforeFlow.put((N)node, previousBeforeFlow);
+
 		// Perform fixed point flow analysis
 		do {
 			// save the original flow-set, for later comparison
 			copy(previousAfterFlow, savedAfterFlow);
 			if (DEBUG) out.println(" [caseLoopStmt]-before:" + previousAfterFlow);
+			if (DEBUG) out.println(" [caseLoopStmt]-bef-cur:" + currentAfterFlow);
 
 			// flow through all child-nods
 			node.applyAllChild(this);
@@ -172,8 +175,8 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 			
 			merge(currentAfterFlow, previousAfterFlow, previousAfterFlow);
 
-			if (DEBUG) out.println(" [caseLoopStmt]-curr :" + currentAfterFlow);
-			if (DEBUG) out.println(" [caseLoopStmt]-after:" + previousAfterFlow);
+			if (DEBUG) out.println(" [caseLoopStmt]-curr  :" + currentAfterFlow);
+			if (DEBUG) out.println(" [caseLoopStmt]-after :" + previousAfterFlow);
 			
 			// Merge with continue FlowSet lists
 			if(!loopStack.empty() && loopStack.peek()!=null) {
@@ -189,6 +192,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 
 		// Update the loop-node's after set
 		unitToAfterFlow.put((N) node, previousAfterFlow);
+		if (DEBUG) out.println(" [caseLoopStmt]-loop:" + previousAfterFlow);
 
 		// Updating the current after flow-set
 		copy(previousAfterFlow, currentAfterFlow);
@@ -327,9 +331,13 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 	public List<ASTNode> getNodeList() {
 		return NodeList;
 	}
-	// Return result of analysis
+	// Return result of analysis, After-flow
     public Map<N, A> getResult() {
     	return unitToAfterFlow; 
+    }
+	// Return result of analysis, before-flow
+    public Map<N, A> getBeforeFlow() {
+    	return unitToBeforeFlow; 
     }
 }
 

@@ -53,7 +53,7 @@ public class ReachingDefs extends StructuralForwardFlowAnalysis<ASTNode, FlowSet
         doAnalysis(this);
         
     }
-    
+
     protected FlowSet newInitialFlow()
     {
         return emptySet.clone();
@@ -98,5 +98,9 @@ public class ReachingDefs extends StructuralForwardFlowAnalysis<ASTNode, FlowSet
     protected void copy(FlowSet source, FlowSet dest)
     {
     	source.copy(dest);
+    }
+
+    public FlowSet getEmptySet() {
+    	return new ArraySparseSet();
     }
 }
