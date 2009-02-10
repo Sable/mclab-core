@@ -15,7 +15,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
 	<classpathentry kind="lib" path="lib/jastadd2-R20080423/jastadd2.jar"/>
-	<classpathentry kind="lib" path="lib/beaver-0.9.6.1/lib/beaver.jar" sourcepath="lib/beaver-0.9.6.1/src"/>
+	<classpathentry kind="lib" path="lib/beaver-0.9.6.2/lib/beaver.jar" sourcepath="lib/beaver-0.9.6.2/src"/>
 	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-3.0.1.jar" sourcepath="lib/antlr-3.0.1/runtime/Java/src"/>
 	<classpathentry kind="lib" path="lib/antlr3-task-20071115/antlr3-task.jar" sourcepath="lib/antlr3-task-20071115/antlr3-src.jar"/>
