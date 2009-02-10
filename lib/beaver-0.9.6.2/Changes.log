@@ -1,3 +1,7 @@
+0.9.6.2
+
+  o grow simulation buffer if it would be overrun during an insertion
+
 0.9.6.1
 
   o issue warnings when shift-reduce conflict is resolved by

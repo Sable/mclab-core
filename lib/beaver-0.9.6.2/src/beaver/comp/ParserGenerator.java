@@ -39,7 +39,7 @@ import beaver.spec.parser.GrammarScanner;
  */
 public class ParserGenerator
 {
-	static public final String VERSION = "0.9.6.1";
+	static public final String VERSION = "0.9.6.2";
 	static public final String SOURCE_FILE_EXT = ".java";
 	static public final String SERIALIZED_PARSER_TABLES_FILE_EXT = ".spec";
 	static public final String PARSER_ACTIONS_REPORT_FILE_EXT = ".stat";
