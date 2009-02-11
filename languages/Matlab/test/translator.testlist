@@ -4,6 +4,7 @@ translator_command_brackets
 translator_command_hard
 translator_command_tabs
 translator_command_other
+translator_command_eof
 translator_array_plus
 translator_array_simple
 translator_array_colsep

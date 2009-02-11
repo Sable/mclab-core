@@ -345,6 +345,7 @@ not_cmd_lookahead :
   |  IDENTIFIER FILLER LPAREN
   |  IDENTIFIER FILLER ASSIGN
   |  IDENTIFIER FILLER op FILLER after_op
+  |  IDENTIFIER EOF
   ;
 
 //lookahead only
