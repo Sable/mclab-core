@@ -329,6 +329,7 @@ aspect NameResolution{
             f.setInputParamList( getInputParamList() );
             f.setHelpCommentList( getHelpCommentList() );
             f.setNestedFunctionList( getNestedFunctionList() );
+            f.setComments( getComments() );
 
             //add DeclStmts
             Set<String> params = getParamSet();
