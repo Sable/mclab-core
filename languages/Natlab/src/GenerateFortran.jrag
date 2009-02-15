@@ -363,7 +363,6 @@ aspect GenerateFortran {
         		buf.append("(1,:) = [0.0,0.0,0.0,0.0,0.0,timing_clock];");
 
     	} else if(isCall) {	
-    		System.err.println("isCall - AssignStmt.java");
 	    	// This is CallExprStmt type
 	        String str = rhs + (isOutputSuppressed() ? ";" : "");
     		buf.append(str);
@@ -602,7 +601,7 @@ aspect GenerateFortran {
     	String str;
     	str = getName().getID();
 		if((getParent() instanceof ParameterizedExpr)) {
-			System.err.println("[Error] NameExpr <"+str+"> handles getFortran() from a ParameterizedExpr.");
+			// System.err.println("[Error] NameExpr <"+str+"> handles getFortran() from a ParameterizedExpr.");
 			// throw  new UnsupportedOperationException("[Error] NameExpr <"+str);
 		}
 	 	// Handle command form of function call
