@@ -8,11 +8,17 @@ import java.util.*;
 
 aspect TypeCollection {
 
-	public static natlab.TypeInferenceEngine ASTNode.TIEngine;
-	public void ASTNode.setTypeInferenceEngine(natlab.TypeInferenceEngine tie) {
-		TIEngine = tie;
+	// TODO: TIEngine should be replace by "natlab.TypeInferenceEngine", since we only call its static methods
+	//public static natlab.TypeInferenceEngine ASTNode.TIEngine;
+	//public void ASTNode.setTypeInferenceEngine(natlab.TypeInferenceEngine tie) {
+	//	TIEngine = tie;
+	//}
+	public static natlab.SymbolTableScope ASTNode.gstScope;
+	public void ASTNode.setSymbolTableScope(natlab.SymbolTableScope scope) {
+		gstScope = scope;
 	}
-	
+
+	// varNode : the variable definition node of that symbol entry
 	public annotations.ast.Type ASTNode.collectType(SymbolTableScope stScope, ASTNode varNode) {
 		annotations.ast.Type childType = null;
 		for(int i = 0; i < getNumChild(); i++) {
@@ -92,18 +98,25 @@ aspect TypeCollection {
 		annotations.ast.Type rhsType = getRHS().collectType(stScope, varNode);
 
 		// 2. Calling type inference engine to get the type
-		return TIEngine.inferType(stScope, this, lhsType, rhsType, varNode);
+		return natlab.TypeInferenceEngine.inferType(stScope, this, lhsType, rhsType, varNode);
+	}
+	public annotations.ast.Type UnaryExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// 1. Calling to next level 
+		annotations.ast.Type opType = getOperand().collectType(stScope, varNode);
+
+		// 2. Calling type inference engine to get the type
+		return natlab.TypeInferenceEngine.inferType(stScope, this, opType, varNode);
 	}
 	
 	public annotations.ast.Type NameExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
 		// 1. Calling to next level 
 		
 		// 2. Calling type inference engine to get the type
-		return TIEngine.inferType(stScope, this, varNode);
+		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
 	}
 	public boolean ParameterizedExpr.isVariable = false;
 	public annotations.ast.Type ParameterizedExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
-		return TIEngine.inferType(stScope, this, varNode);
+		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
 	}
 	
 	public annotations.ast.Type IntLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
@@ -113,56 +126,127 @@ aspect TypeCollection {
 		return new annotations.ast.PrimitiveType("double");
 	}
 	public annotations.ast.Type StringLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
-		return new annotations.ast.PrimitiveType("character("+(getValue().length()+1)+")");
+		return new annotations.ast.PrimitiveType("character("+(getValue().length())+")");
 	}
 
 	//	(1) First KNOWN element's type is the element type
 	//	(2) Calculate the #Row and #column
 	// 	(3) #column may should be the maximum one
 	public annotations.ast.Type MatrixExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// #. Calling type inference engine to get the type
+		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
+/*		
 		annotations.ast.Type elementType=null;
+		annotations.ast.Type tmpType=null;
 		// 1. Calling to next level 
         List<Row> rows = getRows();
 		int maxColumn=0;
+		int rowElem, totalNum=0;
         for(Row row : rows) {
         	// TODO: this one may not check all row, because the 'break' below
-        	if(maxColumn < row.getElements().getNumChild())
-        		maxColumn = row.getElements().getNumChild();
+        	rowElem = row.getElements().getNumChild();
+        	if(maxColumn < rowElem)
+        		maxColumn = rowElem;
         		
-			// Return First KNOWN element's type
-			elementType = row.collectType(stScope, varNode);
-			if(elementType!=null)	
-				break;
-        }
-        // TODO: The elementType should be a kind of PrimitiveType
-        if(elementType!=null) {
-			annotations.ast.MatrixType varType = new annotations.ast.MatrixType(
-					new annotations.ast.PrimitiveType(elementType.getName()));
-			java.util.List<Integer> dim = new java.util.ArrayList<Integer>();
-			for(int i=0; i<rows.getNumChild(); i++) {
-				dim.add(maxColumn);
+			tmpType = row.collectType(stScope, varNode);
+
+			// Return biggest KNOWN element's type
+			// TODO: currently just support matrix with primary type
+			// 	and maximum type is DOUBLE! (which should be COMPLEX)
+			if(tmpType!=null) {
+				if(elementType == null)	{
+					elementType = tmpType;
+				} 
+				if(elementType.getName().equals("double")) {
+					break;
+				} else if(tmpType.getName().equals("double")) {
+					elementType = tmpType;
+					break;
+				} else if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
+					// Add each row's length 
+					int loc1= tmpType.getName().indexOf("(");
+					int loc2= tmpType.getName().indexOf(")");					
+					totalNum += (new Integer(tmpType.getName().substring(loc1+1,loc2))).intValue();
+				}
+			} else {
+				elementType = null;
 			}
-			varType.setSize(new annotations.ast.Size(dim));
+			// System.err.println("MatrixExpr-Row:[<"+getNodeID()+">] " + elementType.getName()+"("+totalNum);
+        }
+        // The elementType should be a kind of PrimitiveType, here adding the dimensions
+        if(elementType!=null) {
+			java.util.List<Integer> dim = new java.util.ArrayList<Integer>();
+			annotations.ast.Type varType; 
+			
+			// Doing string concatenation ['ab','cd'] ='abcd', generate Primitive-Type
+	        // MATLAB doesn't allow vertical concatenation, ['ab';'cd'] is illegal!
+	        if(natlab.TypeInferenceEngine.isCharacterType(elementType)) {
+				// System.err.println("MatrixExpr collectType:[<"+getNodeID()+">] " + elementType.getName()+"("+totalNum);
+				varType = new annotations.ast.PrimitiveType("character("+(totalNum)+")");
+				// The whole string concatenation is happened in Row.getFortran() 
+			} else {
+				// Normal matrix type
+				for(int i=0; i<rows.getNumChild(); i++) {
+					dim.add(maxColumn);
+				}
+				varType = new annotations.ast.MatrixType(
+						new annotations.ast.PrimitiveType(elementType.getName()));
+				((annotations.ast.MatrixType) varType).setSize(new annotations.ast.Size(dim));
+			}
 			return varType;
         } else {
         	return null;
         }
+*/
 	}
+
 	public annotations.ast.Type Row.collectType(SymbolTableScope stScope, ASTNode varNode)  {
+		// #. Calling type inference engine to get the type
+		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
+/*		
 		annotations.ast.Type elementType=null;
+		annotations.ast.Type tmpType=null;
+		int totalNum = 0;
 		// 1. Calling to next level 
         List<Expr> elements = getElements();
         for(Expr element : elements) {
-			elementType = element.collectType(stScope, varNode);
-			if(elementType != null)
-				break;
-        }
+			tmpType = element.collectType(stScope, varNode);
+			// Return biggest KNOWN element's type
+			// TODO: currently just support matrix with primary type
+			// 	and maximum type is DOUBLE! (which should be COMPLEX)
+			if(tmpType!=null) {
+				if(elementType == null)	{
+					elementType = tmpType;
+				} 
+				if(elementType.getName().equals("double")) {
+					break;
+				} else if(tmpType.getName().equals("double")) {
+					elementType = tmpType;
+					break;
+				} else if(natlab.TypeInferenceEngine.isCharacterType(tmpType)){ 
+					// Doing string concatenation ['ab','cdf'] ='abcdf'
+					// And need to know length of each of them
+					int loc1= tmpType.getName().indexOf("(");
+					int loc2= tmpType.getName().indexOf(")");					
+					totalNum += (new Integer(tmpType.getName().substring(loc1+1,loc2))).intValue();
+				}
+			} else {
+				elementType = null;
+			}
+         }
+        if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
+			// Doing string concatenation ['ab','cdf'] ='abcdf'
+			// And need to know length of each of them
+			elementType = new annotations.ast.PrimitiveType("character("+(totalNum)+")");
+		}
+        
 		// 2. Don't change the row itself 
 		return elementType;
+*/		
 	}
 	
-	// i.e.  for i=(1:runs) in an integer
-	// i.e.  var =(1:runs)  is an array
+	// i.e.  for i=(1:runs) in an integer, handle here.
+	// i.e.  var =(1:runs)  is an array, call into natlab.TypeInferenceEngine.inferType()
 	public annotations.ast.Type RangeExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
 		// 1. get element type
 		annotations.ast.Type typeLower = getLower().collectType(stScope, varNode);
@@ -177,12 +261,156 @@ aspect TypeCollection {
         	else
         		parentAssign = parentAssign.getParent();
         }
-        if ((parentAssign instanceof AssignStmt)
-        		&& parentAssign.getParent() instanceof ForStmt) {
-			// TODO, which way is better? typeLower or typeUpper
-			return (typeLower!=null?typeLower:typeUpper);
-		} else {
-			return TIEngine.inferType(stScope, this, varNode);
-		}
+//        if ((parentAssign instanceof AssignStmt)
+//        		&& parentAssign.getParent() instanceof ForStmt) {
+//			return new annotations.ast.PrimitiveType("int");
+//		} else {
+			return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
+//		}
 	}
+
+}
+
+//-----------------------------------------------------------------------------
+// For updating symbol table scope, adding decl nodes
+//-----------------------------------------------------------------------------
+aspect UpdateSymbolTableScope {
+
+	//-------------------------------------------------------------------------
+	// Symbol Table Scope : This will be implemented in Script, Function, FunctionDecl
+	//-------------------------------------------------------------------------
+    public SymbolTableScope ASTNode.updateSymbolTableScope(SymbolTableScope symtbl) {
+    	return symtbl;
+    }
+    
+    private boolean Function.bParamDeclAdded = false;
+    public SymbolTableScope Function.updateSymbolTableScope(SymbolTableScope symtbl) {
+    	// Finding the VariableDecl node for each entry,	
+    	if(!bParamDeclAdded) {
+	    	List<VariableDecl> pDeclList = getParamDeclList();
+	    	for(VariableDecl decl: pDeclList) {
+	    		addDeclStmt(decl);
+	    	}
+    	}
+
+    	// If decl-node not found, create one,
+    	boolean found = false;
+	    for( SymbolTableEntry e : symtbl.symTable.values() ) {
+	    	if(e.getDeclLocation()==null) {
+	    		found = false;
+		    	for(VariableDecl decl: varDeclList) {
+		    		if(decl.getID().equals(e.getSymbol())) {
+		    			e.setDeclLocation(decl);
+		    			found = true;
+		    			break;
+		    		}
+		    	}
+		    	if(!found) {
+		    		VariableDecl decl = new VariableDecl(e.getSymbol(), 
+		    				new annotations.ast.UnknownType() );
+		    		addDeclStmt( decl );
+		    		e.setDeclLocation(decl);
+		    	}
+	    	}
+    	}
+	    // Make sure all decl node has symbol table entry, 
+	    // for those don't, create entry for them. 
+	    // (this is designed for function parameter list)
+    	for(VariableDecl decl: varDeclList) {
+    		String name = decl.getID();
+    		SymbolTableEntry stEntry = symtbl.getSymbolById(name);
+    		if(stEntry == null) {
+    			stEntry = new SymbolTableEntry(name, name, decl);
+    			stEntry.setDeclLocation(decl);
+    			symtbl.addSymbol(stEntry);
+    		}
+    	}
+	    
+    	return symtbl;
+    }
+    
+    public SymbolTableScope Script.updateSymbolTableScope(SymbolTableScope symtbl) {
+
+    	// Finding the VariableDecl node for each entry,	-JL 10.03
+    	// if not found, create one,
+    	boolean found = false;
+	    for( SymbolTableEntry e : symtbl.symTable.values() ) {
+	    	if(e.getDeclLocation()==null) {
+	    		found = false;
+		    	for(VariableDecl decl: varDeclList) {
+		    		if(decl.getID().equals(e.getSymbol())) {
+		    			e.setDeclLocation(decl);
+		    			found = true;
+		    			break;
+		    		}
+		    	}
+		    	if(!found) {
+		    		VariableDecl decl = new VariableDecl(e.getSymbol(), 
+		    				new annotations.ast.UnknownType() );
+		    		addDeclStmt( decl );
+		    		e.setDeclLocation(decl);
+		    	}
+	    	}
+    	}
+        
+    	return symtbl;
+    }
+    
+
+    // ----------------------------------------------------------------------------
+	// List function's declarations for input/output parameters 
+	// Same functionality as the one in FunctionDecl
+	private List<VariableDecl> Function.paramDeclStmtList=null;	
+	public List<VariableDecl> Function.getParamDeclList()
+	{
+		if(paramDeclStmtList==null) {
+			paramDeclStmtList=new List<VariableDecl>();
+			VariableDecl paramDecl;
+			for(Name param: getInputParamList()) {
+				paramDecl = new VariableDecl(param.getID(), new annotations.ast.UnknownType() );
+				paramDeclStmtList.add(paramDecl);
+			}
+			for(Name param: getOutputParamList()) {
+				paramDecl = new VariableDecl(param.getID(), new annotations.ast.UnknownType() );
+				paramDeclStmtList.add(paramDecl);
+			}
+		}
+		return paramDeclStmtList;
+	}
+	
+    // ----------------------------------------------------------------------------
+    // Following code are taken from NameResolution.jrag, which is used 
+    // to help creating declaration node, with symbol table
+    
+    // Extra function to help save list of VariableDecl node, same as those in Script	-JL 
+    private int Function.lastDeclLocation=0;
+    private List Function.declStmtList=null;
+    protected java.util.List<VariableDecl> Function.varDeclList = new ArrayList<VariableDecl>();
+    public  java.util.List<VariableDecl> Function.getDeclList() { return varDeclList;}
+	public void Function.addDeclStmt(VariableDecl node) {
+		if(declStmtList == null) {
+			declStmtList = getStmtList();
+			lastDeclLocation = 0;
+		} 
+		declStmtList.insertChild(node, lastDeclLocation++);
+        // Save info of last adding new VariableDecl()     	
+    	varDeclList.add((VariableDecl) node);
+	}
+
+    // For Script
+    private int Script.lastDeclLocation=0;
+    private List Script.declStmtList=null;
+    private java.util.List<VariableDecl> Script.varDeclList = new ArrayList<VariableDecl>();
+    public  java.util.List<VariableDecl> Script.getDeclList() { return varDeclList;}
+	public void Script.addDeclStmt(VariableDecl node) {
+		if(declStmtList == null) {
+			declStmtList = getStmtList();
+			lastDeclLocation = 0;
+		} 
+		declStmtList.insertChild(node, lastDeclLocation++);
+        // Save info of last adding new VariableDecl()     	
+    	varDeclList.add((VariableDecl) node);
+	}
+    // ----------------------------------------------------------------------------
+    
 }

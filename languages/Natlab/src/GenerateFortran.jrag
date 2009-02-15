@@ -22,10 +22,15 @@ aspect GenerateFortran {
     eq EmptyProgram.getFortranLessComments() {
         return "";
     }
+
+    // Program name
+    static public String ASTNode.FortranProgramName= "matlab_2_fortran";
     
+    public boolean Function.mainFunc= false;
+
     eq Script.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        String progName = "Benchmark2";
+        String progName = FortranProgramName;
         buf.append("PROGRAM ");
         buf.append(progName);
         buf.append('\n');
@@ -47,52 +52,70 @@ aspect GenerateFortran {
     
     eq FunctionList.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
+        boolean first = true;
         for(Function func : getFunctions()) {
+        	if(first) {
+        		func.mainFunc = true;
+        	}
             buf.append(func.getFortran());
             buf.append('\n');
+            func.mainFunc = false;
         }
         return buf.toString();
     }
     
     eq Function.getFortranLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("function ");
-        buf.append("[");
-        boolean first = true;
-        for(Name param : getOutputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getFortran());
-            first = false;
-        }
-        buf.append("] = ");
-        buf.append(getName());
-        buf.append("(");
-        first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getFortran());
-            first = false;
-        }
-        buf.append(")");
-        buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getFortran());
-            buf.append('\n');
-        }
-        for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getFortran());
-            buf.append('\n');
-        }
-        for(Function func : getNestedFunctions()) {
-            buf.append(func.getFortran());
-            buf.append('\n');
-        }
-        buf.append("end");
-        return buf.toString();
+		StringBuffer buf = new StringBuffer();
+		String progName = FortranProgramName;
+		if(mainFunc) {
+		    buf.append("PROGRAM ");
+		    buf.append(getName());
+		    buf.append('\n');
+			buf.append("IMPLICIT NONE\n");			
+		} else {
+			buf.append("SUBROUTINE ");
+			boolean first = true;
+			buf.append(getName());
+			buf.append("(");
+			first = true;
+			for (Name param : getInputParams()) {
+				if (!first) {
+					buf.append(", ");
+				}
+				buf.append(param.getFortran());
+				first = false;
+			}
+			// The return value will become the parameters
+			for (Name param : getOutputParams()) {
+				if (!first) {
+					buf.append(", ");
+				}
+				buf.append(param.getFortran());
+				first = false;
+			}
+			buf.append(")");
+			buf.append('\n');
+		}
+		for (HelpComment comment : getHelpComments()) {
+			buf.append(comment.getFortran());
+			buf.append('\n');
+		}
+		for (Stmt stmt : getStmts()) {
+			buf.append(stmt.getFortran());
+			buf.append('\n');
+		}
+		for (Function func : getNestedFunctions()) {
+			buf.append(func.getFortran());
+			buf.append('\n');
+		}
+		if(mainFunc) {
+		    buf.append("END PROGRAM ");
+		} else {
+			buf.append("END SUBROUTINE ");
+		}
+		buf.append(getName());
+		buf.append('\n');
+		return buf.toString();
     }
     
     // Class
@@ -303,16 +326,21 @@ aspect GenerateFortran {
     
     //help comments
     
-    eq HelpComment.getFortranLessComments() = getText();
+    eq HelpComment.getFortranLessComments() = "";	// getText();  //TODO: how to print out correctly?
     
     //stmts
     eq EmptyStmt.getFortranLessComments() = "";
     eq ExprStmt.getFortranLessComments() {
     	String str = getExpr().getFortran() + (isOutputSuppressed() ? ";" : "");
+    	if(getExpr() instanceof LiteralExpr)	// StringLiteralExpr
+    		str = "WRITE (*,*) " + str;
         return str;
     }
+    
+    
     eq AssignStmt.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
+        // Translate each side into Fortran code 
     	String lhs = getLHS().getFortran();
     	String rhs = getRHS().getFortran();
     	
@@ -323,11 +351,19 @@ aspect GenerateFortran {
     	// if(rhs instanceof ParameterizedExpr)
     	// Need to check the NameExpr
     	if(rhs.equalsIgnoreCase("toc") || rhs.equalsIgnoreCase("toc()")) {
-            // TODO: Adding new variable to Symbol table:  timing_toc:real; 
+            // Using default variable timing_toc:real; 
     		buf.append("CALL CPU_TIME(timing_toc); ");
     		buf.append(lhs);
     		buf.append(" = timing_toc - timing_tic;");
+    	} else if(rhs.equalsIgnoreCase("clock") || rhs.equalsIgnoreCase("clock()")) {
+                // Using default variable"  timing_clock; 
+        		buf.append("CALL CPU_TIME(timing_clock); ");
+        		buf.append(lhs);
+        		// buf.append("(1,6) = timing_clock;");
+        		buf.append("(1,:) = [0.0,0.0,0.0,0.0,0.0,timing_clock];");
+
     	} else if(isCall) {	
+    		System.err.println("isCall - AssignStmt.java");
 	    	// This is CallExprStmt type
 	        String str = rhs + (isOutputSuppressed() ? ";" : "");
     		buf.append(str);
@@ -364,7 +400,7 @@ aspect GenerateFortran {
     }
     eq ShellCommandStmt.getFortranLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
     
-    eq BreakStmt.getFortranLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
+    eq BreakStmt.getFortranLessComments() = "EXIT" + (isOutputSuppressed() ? ";" : "");
     eq ContinueStmt.getFortranLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
     eq ReturnStmt.getFortranLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
 
@@ -384,15 +420,16 @@ aspect GenerateFortran {
 
     eq WhileStmt.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("while ");
-        buf.append(getExpr().getFortran());
-        buf.append('\n');
+	// While (cond) ==> DO   ...if(cond) ...
+        buf.append("DO ");
+        // buf.append(getExpr().getFortran());
+        buf.append(" \n");
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
             buf.append(stmt.getFortran());
             buf.append('\n');
         }
-        buf.append("end");
+        buf.append("END DO");
         return buf.toString();
     }
 
@@ -402,7 +439,7 @@ aspect GenerateFortran {
         boolean first = true;
         for(IfBlock block : getIfBlocks()) {
             if(!first) {
-                buf.append("else");
+                buf.append("ELSE");
             }
             buf.append(block.getFortran());
             first = false;
@@ -410,15 +447,17 @@ aspect GenerateFortran {
         if(hasElseBlock()) {
             buf.append(getElseBlock().getFortran());
         }
-        buf.append("end");
+        buf.append("END IF");
         return buf.toString();
     }
 
     eq IfBlock.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("if ");
-        buf.append(getCondition().getFortran());
-        buf.append('\n');
+        buf.append("IF (");
+         // Make sure the Condition expression is an logical expression
+        transformCondition();
+       buf.append(getCondition().getFortran());
+        buf.append(") THEN \n");
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
             buf.append(stmt.getFortran());
@@ -426,10 +465,25 @@ aspect GenerateFortran {
         }
         return buf.toString();
     }
+	public void IfBlock.transformCondition()  {
+		// 1. Calling to next level 
+		if(ASTNode.gstScope!=null) {
+			Expr exprCond = getCondition();
+			annotations.ast.Type condType = exprCond.collectType(ASTNode.gstScope, getCondition());
+	        if(!natlab.TypeInferenceEngine.isLogicalType(condType)) {
+	        	Expr newCond = natlab.TypeInferenceEngine.transform2LogicalOnly(exprCond, condType);
+	        	if(newCond != null) {
+	        		setCondition(newCond);
+	        	}
+	        }
+		}
+		// 2. Guarantee return a logical type
+		// return new PrimitiveType(natlab.TypeInferenceEngine.TYPENAME_LOGICAL);
+	}
 
     eq ElseBlock.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("else ");
+        buf.append("ELSE ");
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
@@ -442,23 +496,23 @@ aspect GenerateFortran {
     // switch-case
     eq SwitchStmt.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("switch ");
+        buf.append("SELECT CASE (");
         buf.append(getExpr().getFortran());
-        buf.append('\n');
+        buf.append(")\n");
         for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
             buf.append(scase.getFortran());
         }
         if(hasDefaultCaseBlock()) {
             buf.append(getDefaultCaseBlock().getFortran());
         }
-        buf.append("end");
+        buf.append("END SELECT");
         return buf.toString();
     }
     eq SwitchCaseBlock.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("case ");
+        buf.append("CASE (");
         buf.append(getExpr().getFortran());
-        buf.append('\n');
+        buf.append(")\n");
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
             buf.append(stmt.getFortran());
@@ -525,14 +579,14 @@ aspect GenerateFortran {
 	            buf.append(getIncr().getFortran());
 	        }
         } else {
-	        buf.append("(/(I, I=");
+	        buf.append("(/(III, III=");
 	        buf.append(getLower().getFortran());
 	        buf.append(" , ");
-	        if(hasIncr()) {
-	            buf.append(getIncr().getFortran());
-	            buf.append(" , ");
-	        }
 	        buf.append(getUpper().getFortran());
+	        if(hasIncr()) {
+	            buf.append(" , ");
+	            buf.append(getIncr().getFortran());
+	        }
 	        buf.append(")/)");
         }
         return buf.toString();
@@ -546,11 +600,15 @@ aspect GenerateFortran {
     eq NameExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
     	String str;
-    	str = getName().getFortran();
+    	str = getName().getID();
+		if((getParent() instanceof ParameterizedExpr)) {
+			System.err.println("[Error] NameExpr <"+str+"> handles getFortran() from a ParameterizedExpr.");
+			// throw  new UnsupportedOperationException("[Error] NameExpr <"+str);
+		}
+	 	// Handle command form of function call
     	if (str.equalsIgnoreCase("clc")) {
-    		buf.append("! clc  !! Doesn't support.");
+    		buf.append(" ! clc  !! Doesn't support.");
     	} else if (str.equalsIgnoreCase("tic")) {
-            // TODO: Adding new variable to Symbol table:  timing_tic:real; 
     		buf.append("CALL CPU_TIME(timing_tic)  ! tic");
     	} else {
     		buf.append(str);
@@ -566,14 +624,37 @@ aspect GenerateFortran {
     eq ParameterizedExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
         List<Expr> args = getArgs();
-        String fname = getTarget().getFortran();
+        // Get the name of the ParameterizedExpr
+        String fname;
+        if(getTarget() instanceof NameExpr) {
+        	fname = ((NameExpr)getTarget()).getName().getID();
+        } else {
+           	System.err.println("[getFortranLess-UNKNOWN]"+getTarget().getStructureString()+"]="+getTarget()+"]");
+        	
+        	fname = "UNKNOWN" ;
+        }
         boolean bParenthesis = true;
+        
         if(fname.equalsIgnoreCase("zeros")) {
         	buf.append("0; !");
         } else if(fname.equalsIgnoreCase("ones")) {
         	buf.append("1; !");
-        } else if(fname.equalsIgnoreCase("fprintf")) {	// TODO: support it
-        	buf.append("! fprintf");
+        } else if(fname.equalsIgnoreCase("fprintf")) {	// TODO: fprintf 
+        	buf.append("PRINT ");
+	        boolean first = true;
+	        for(Expr arg : args) {
+	        	// TODO: Skip the dimension which size is 1
+	        	// column matrix/row matrix, corresponding to solution in  
+	        	// TypeInferenceEngine.createMatrixType(String PrimitiveTypeName, ParameterizedExpr expr)
+	            if(!first) {
+	                buf.append(", ");
+		            buf.append(arg.getFortran());
+	            } else {
+		            buf.append("*");
+	            }
+	            first = false;
+	        }
+	        return buf.toString();
         } else if(fname.equalsIgnoreCase("disp")) {
         	buf.append("PRINT *,");
         	bParenthesis = false;
@@ -602,7 +683,7 @@ aspect GenerateFortran {
 	        buf.append(")");
 	        return buf.toString();	// End of reshape() function
 
-        } else if(fname.equalsIgnoreCase("randn")) {
+        } else if(fname.equalsIgnoreCase("randn") || fname.equalsIgnoreCase("rand")) {
         	// Transfor AssignStmt to CallExprStmt
         	// assert(getParent() instanceof AssignStmt);
         	AssignStmt assignStmt = (AssignStmt) getParent();
@@ -614,16 +695,64 @@ aspect GenerateFortran {
 	        buf.append("(");	// variable brackets
 	        boolean first = true;
 	        for(Expr arg : args) {
-	            if(!first) {
-	                buf.append(", ");
-	            }
-	            buf.append(":");
-	            first = false;
+	        	// TODO: Skip the dimension which size is 1
+	        	// column matrix/row matrix, corresponding to solution in  
+	        	// TypeInferenceEngine.createMatrixType(String PrimitiveTypeName, ParameterizedExpr expr)
+	        	// if(! arg.getFortranLessComments().equals("1")) {
+		            if(!first) {
+		                buf.append(", ");
+		            }
+		            buf.append(":");
+		            first = false;
+	        	// }
 	        }
 	        buf.append(")");	// variable brackets
 	        buf.append(")");	// function brackets
 	        return buf.toString();
 	        
+        } else if(fname.equalsIgnoreCase("mean")) {
+	        buf.append(" SUM(");		
+	        for(Expr arg : args) {
+	            buf.append(arg.getFortran()); // Only take one parameter
+	            break;
+	        }
+	        buf.append(")/SIZE(");
+	        for(Expr arg : args) {
+	            buf.append(arg.getFortran()); // Only take one parameter
+	            break;
+	        }
+	        buf.append(")");
+	        return buf.toString();
+        	 
+        } else if(fname.equalsIgnoreCase("nargin")) {
+	        buf.append("IARGC");
+        	
+        } else if(fname.equalsIgnoreCase("log2")) {
+        	buf.append("LOG(");
+	        for(Expr arg : args) {
+	            buf.append(arg.getFortran());
+	            break;
+	        }
+	        buf.append(")/LOG(2.0)");
+	        return buf.toString();
+        
+        } else if(fname.equalsIgnoreCase("str2num")) {
+	    	// scale = str2num(arg_buffer)
+	        // => READ(arg_buffer,*) scale
+        	if(getParent() instanceof AssignStmt) {
+	        	AssignStmt assignStmt = (AssignStmt) getParent();
+	        	assignStmt.isCall = true;
+	        	String varName = assignStmt.getLHS().getStructureString();
+	        	buf.append("READ(");
+		        for(Expr arg : args) {
+		            buf.append(arg.getFortran());
+		            break;
+		        }
+	        	buf.append(", *) ");
+	        	buf.append(varName);
+        	}
+	        return buf.toString();
+
         } else if(fname.equalsIgnoreCase("num2str")) {
 			//Integer x
 			//Character(50)  xstring
@@ -631,31 +760,59 @@ aspect GenerateFortran {
 			// Write( xstring, '(i10)' )  x
 			// f = 7.12345
 			// Write( xstring, '(f12.6)' )  f
-        	// Transfor AssignStmt to CallExprStmt
-        	// assert(getParent() instanceof AssignStmt);
-        	AssignStmt assignStmt = (AssignStmt) getParent();
-        	assignStmt.isCall = true;
-        	String varName = assignStmt.getLHS().getStructureString();
-        	int num = getNumArg();
-        	buf.append("WRITE(");
-	        buf.append(varName);
-	        buf.append(", ");	
-	        // if(varName type is Integer)
-	        buf.append("'(i10)'");	
-	        // else if(varName type is Real/float/double)
-	        // buf.append("'(F10.5)'");	
-	        buf.append(" ) ");		// function close brackets
-	        boolean first = true;
-	        for(Expr arg : args) {
-	            if(!first) {
-	                buf.append(", ");
-	            }
-	            buf.append(arg.getFortran());
-	            first = false;
-	        }
+        	
+        	// MUST simplify before this translation.
+        	// Transform AssignStmt to CallExprStmt
+        	if(getParent() instanceof AssignStmt) {
+	        	AssignStmt assignStmt = (AssignStmt) getParent();
+	        	assignStmt.isCall = true;
+	        	String varName = assignStmt.getLHS().getStructureString();
+	        	// int num = getNumArg();
+	        	// Using temperary variable 'output_real', change it to REAL
+	        	buf.append("output_real_tmp = ");
+		        boolean first = true;
+		        for(Expr arg : args) {
+		            if(!first) {
+		                buf.append(", ");
+		            }
+		            buf.append(arg.getFortran());
+		            first = false;
+		        }
+		        buf.append("\n");
+	        	buf.append("WRITE(");
+		        buf.append(varName);
+		        buf.append(", ");	
+		        // if(varName type is Integer)
+		        // buf.append("'(i10)'");	
+		        // else if(varName type is Real/float/double)
+		        buf.append("'(F12.6)'");	
+		        buf.append(" ) ");		// function close brackets
+	        	buf.append(" output_real_tmp");
+        	}
 	        return buf.toString();
         
-        // For logial operator functions, and(A,B), or(A,B),xor(A,B), not(A)
+        // , and(A,B), or(A,B),xor(A,B), not(A)
+        /*
+         For bitwise functions bitand(A,B)
+         	bitcmp, bitget, bitmax, bitor, bitset, bitshift, bitxor
+         	
+         Fortran Intrinsic Functions: 
+			21 BTEST (I, POS) Bit testing
+			22 IAND (I, J) Bitwise AND
+			23 IBCLR (I, POS) Clear bit
+			24 IBITS (I, POS, LEN) Bit extraction
+			25 IBSET (I, POS) Set bit
+			26 IEOR (I, J) Exclusive OR
+			27 IOR (I, J) Inclusive OR
+			28 ISHFT (I, SHIFT) Logical shift
+			29 ISHFTC (I, SHIFT [, SIZE]) Circular shift
+			30 MVBITS (FROM, FROMPOS, LEN, TO, TOPOS)			
+				Copies bits from one integer to another
+			31 NOT (I) Bitwise complement
+         */
+        } else if(fname.equalsIgnoreCase("bitand")) {
+        	buf.append("IAND");
+        // For logical operator functions, and(A,B), or(A,B),xor(A,B), not(A)
         } else if(fname.equalsIgnoreCase("and")) {
         	return generateLogicalFunction(" .AND. ");
         } else if(fname.equalsIgnoreCase("or")) {
@@ -671,10 +828,53 @@ aspect GenerateFortran {
 	        }
 	        buf.append(")");
 	        return buf.toString();
-        } else {
+    	} else if (fname.equalsIgnoreCase("tic")) {
+    		buf.append("CALL CPU_TIME(timing_tic)  ! tic");
+    	} else if (fname.equalsIgnoreCase("clc")) {
+    		buf.append(" ! clc  !! Not support.");
+    		
+    	} else if (fname.equalsIgnoreCase("round")) {
+    		buf.append("floor");
+    	} else if (fname.equalsIgnoreCase("ALLOCATE")
+    			|| fname.equalsIgnoreCase("DEALLOCATE")
+    			|| fname.equalsIgnoreCase("NULLIFY")
+    			|| fname.equalsIgnoreCase("ALLOCATED")	
+    			|| fname.equalsIgnoreCase("ASSOCIATED")	// usually used in assignment
+    			) {
         	buf.append(fname);
+
+	    // TODO: For subroutine, translate into CALL func(p1,p2,...,r1,r2);
+        } else if(getParent() instanceof ExprStmt) {
+        	buf.append("CALL " + fname);
+        	
+        } else {
+            natlab.SymbolTableEntry stEntry = ASTNode.gstScope.getSymbolById(fname);
+            if(stEntry!=null && stEntry.getDeclLocation()!=null) {
+	            annotations.ast.Type varType = ((VariableDecl) stEntry.getDeclLocation()).getType();
+	            if(natlab.TypeInferenceEngine.isCharacterType(varType)) {
+	            	// ch = str(1) => ch=str(1:1)
+	            	buf.append(fname);
+	                buf.append("(");
+	                boolean first = true;
+	                for(Expr arg : args) {
+	                    if(!first) {
+	                        buf.append(", ");
+	                    }
+	                    buf.append(arg.getFortran());
+	                    buf.append(":");
+	                    buf.append(arg.getFortran());
+	                    first = false;
+	                }
+	                buf.append(")");
+	                return buf.toString();
+	            } else {            
+	            	buf.append(fname);
+	            }
+            } else {
+            	buf.append(fname);
+            }
         }
-        // Regualar way to generate parameter code.
+        // Regular way to generate parameter code.
         if(bParenthesis) buf.append("(");
         boolean first = true;
         for(Expr arg : args) {
@@ -708,32 +908,97 @@ aspect GenerateFortran {
     }
     eq CellIndexExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append(getTarget().getFortran());
-        buf.append('{');
-        boolean first = true;
-        for(Expr arg : getArgs()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(arg.getFortran());
-            first = false;
+        String cName = ((NameExpr) getTarget()).getVarName();
+        // Handle command line arguments 
+    	if((getParent() instanceof AssignStmt) 
+    			&& (cName.equalsIgnoreCase("varargin")) ){
+        	AssignStmt assignStmt = (AssignStmt) getParent();
+        	assignStmt.isCall = true;
+        	String varName = assignStmt.getLHS().getStructureString();
+        	buf.append("CALL GETARG(");
+	        for(Expr arg : getArgs()) {
+	            buf.append(arg.getFortran());
+	            break;
+	        }
+        	buf.append(", ");
+        	buf.append(varName);
+        	buf.append(") ");
+        
+        } else {
+	        buf.append(cName);
+	        buf.append('{');
+	        boolean first = true;
+	        for(Expr arg : getArgs()) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(arg.getFortran());
+	            first = false;
+	        }
+	        buf.append('}');
         }
-        buf.append('}');
         return buf.toString();
     }
 
     eq MatrixExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append('[');
-        boolean first = true;
+        annotations.ast.Type tmpType=null;
+		// Concatenating string
         for(Row row : getRows()) {
-            if(!first) {
-                buf.append("; ");
-            }
-            buf.append(row.getFortran());
-            first = false;
+        	tmpType = row.collectType(ASTNode.gstScope, this);
+        	if(tmpType!=null)
+        		break;
         }
-        buf.append(']');
+        if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
+        	// There should only one row, ['ab';'cd'] is illegal
+            boolean first = true;
+            for(Row row : getRows()) {
+                if(!first) {
+                    buf.append("; ");
+                }
+                String rowStr = row.getFortran();
+                // Chop the long string into small lines, require by Fortran
+                int lineMax =  70;
+                if(rowStr.length()>lineMax) {
+                    int start = 0, end=lineMax;
+                    boolean firstLine = true;
+                    while(true) {// 
+                    	String shortStr = rowStr.substring(start, end);
+                    	if(!firstLine) {
+                        	buf.append("&");
+                        	buf.append("\n");
+                        	buf.append("&");
+                    	}
+                    	firstLine = false;
+                    	buf.append(shortStr);
+                    	start = end;
+                    	if(end>=rowStr.length())
+                    			break;
+                    	end += lineMax;
+                    	if(end>rowStr.length())
+                    		end = rowStr.length();
+                    	
+                    }
+                } else {
+                	buf.append(rowStr);
+                }
+                first = false;
+            }
+        	
+        } else {
+    		// Normal Matrix
+            buf.append('[');
+            boolean first = true;
+            for(Row row : getRows()) {
+                if(!first) {
+                    buf.append("; ");
+                }
+                buf.append(row.getFortran());
+                first = false;
+            }
+            buf.append(']');
+        }
+        
         return buf.toString();
     }
     eq CellArrayExpr.getFortranLessComments() {
@@ -752,14 +1017,34 @@ aspect GenerateFortran {
     }
     eq Row.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        boolean first = true;
+        // TODO: when it's a string, the whole string concatenation
+        annotations.ast.Type tmpType=null;
         for(Expr element : getElements()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(element.getFortran());
-            first = false;
+        	tmpType = element.collectType(ASTNode.gstScope, this);
+        	if(tmpType!=null)
+        		break;
         }
+        if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
+			// Generate concatenated string 
+	        boolean first = true;
+	        int loc = 0; 
+	        for(Expr element : getElements()) {
+	            if(!first) {
+	                buf.append("//");
+	            }
+	            buf.append(element.getFortran());
+	            first = false;
+	        }
+		} else {
+	        boolean first = true;
+	        for(Expr element : getElements()) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(element.getFortran());
+	            first = false;
+	        }
+		}
         return buf.toString();
     }
     
@@ -802,7 +1087,35 @@ aspect GenerateFortran {
     eq PlusExpr.getFortranLessComments() = getFortranLessComments("+");
     eq MinusExpr.getFortranLessComments() = getFortranLessComments("-");
     
-    eq MTimesExpr.getFortranLessComments() = getFortranLessComments("*");
+    eq MTimesExpr.getFortranLessComments() {
+        StringBuffer buf = new StringBuffer(); 
+        // TODO: currently, skip the case A(1,2)*B(2,3) 
+        
+        boolean bLHSMatrix = !(getLHS() instanceof ParameterizedExpr) &&
+        	((getLHS() instanceof RangeExpr) ||
+        	 (getLHS().collectType(ASTNode.gstScope, getLHS()) instanceof annotations.ast.MatrixType) );
+
+        if(bLHSMatrix) {
+            boolean bRHSMatrix = !(getRHS() instanceof ParameterizedExpr) &&
+        	((getRHS() instanceof RangeExpr) ||
+        	 (getRHS().collectType(ASTNode.gstScope, getRHS()) instanceof annotations.ast.MatrixType) );
+        	if(bRHSMatrix) {
+        		// LHS and RHS are matrix, 
+    			buf.append("MATMUL(");
+    			buf.append(getLHS().getFortran());
+    			buf.append(", ");
+    			buf.append(getRHS().getFortran());
+    			buf.append(")");
+    			return buf.toString();
+        	}
+        }
+		buf.append(getLHS().getFortran());
+		buf.append(" * ");
+		buf.append(getRHS().getFortran());
+		return buf.toString();
+    }
+	
+
     eq MDivExpr.getFortranLessComments() = getFortranLessComments("/");
     eq MLDivExpr.getFortranLessComments() = getFortranLessComments("\\");
     eq MPowExpr.getFortranLessComments() = getFortranLessComments("**");	// TODO: how parser handles MPowExpr,EPowExpr?
@@ -827,24 +1140,27 @@ aspect GenerateFortran {
     
     //// ANNOTATION EXTENSION - START //////////////////////////////////////////
 // NOT Support in FORTRAN
-    eq Annotation.getFortranLessComments() = "(*" + getText()  + "*)";
+    eq Annotation.getFortranLessComments() = "";	//"(*" + getText()  + "*)";
     eq ExpandedAnnotation.getFortranLessComments() = ""; // getanno().getStructureString();
 	
     //// ANNOTATION EXTENSION - END ////////////////////////////////////////////
 //INTEGER :: runs
 // INTEGER,DIMENSION(5, 3) :: times
 
+    public boolean VariableDecl.bAdjustDynamic = false;	
     syn String VariableDecl.getFortranLessComments() {
     	// Variable name:  "Declare " + getID();
 		StringBuffer buf = new StringBuffer();
-        annotations.ast.Type varType = getType();
+		annotations.ast.Type varType = getType();
 		String typeName;
 		if(varType!=null && !(varType instanceof annotations.ast.UnknownType)) {
 			typeName= getType().getName();
 			if(typeName.equalsIgnoreCase("int")) {
 	         	buf.append("INTEGER");
-	   		} else if(typeName.equalsIgnoreCase("double")) {
-	         	buf.append("REAL(8)");
+	   		} else if(typeName.equalsIgnoreCase("double")) {	// using single instead!
+	         	buf.append("REAL");	
+	   		} else if(typeName.equalsIgnoreCase("logical")) {
+				buf.append("LOGICAL");
 	   		} else if(typeName.length()>=9 &&
 	   				typeName.substring(0,9).equalsIgnoreCase("character")) {
 	         	buf.append(typeName.toUpperCase());
@@ -853,21 +1169,35 @@ aspect GenerateFortran {
 	         	System.err.println("[VariableDecl]:("+getID()+") type = "+typeName.toUpperCase());
 	        }
 		} else {
-			// by default it's double
-			buf.append("REAL(8)");
+			// by default it's double // using single instead!
+			buf.append("REAL");
 		}
-        if(varType!= null && varType instanceof annotations.ast.MatrixType) {
+		if(varType!= null && varType instanceof annotations.ast.MatrixType) {
         	// Handle know size of matrix
         	annotations.ast.Size varSize = ((annotations.ast.MatrixType) varType).getSize(); 
         	if(varSize != null) {
 	        	buf.append(", DIMENSION(");
 				boolean first = true;
-				for(Integer dim: varSize.getDims()) {
-					if(!first) {
-						buf.append(", ");
+				if(varSize.getDims()!=null) {
+					for(Integer dim: varSize.getDims()) {
+						if(!first) {
+							buf.append(", ");
+						}
+						first = false;
+						buf.append(dim);
 					}
-					first = false;
-					buf.append(dim);
+				} else if(varSize.getDynamicDims()!=null) {
+					for (String dim : varSize.getDynamicDims()) {
+						if (!first) {
+							buf.append(", ");
+						}
+						first = false;
+						if(bAdjustDynamic) {
+							buf.append(":");							
+						} else {
+							buf.append(dim);							
+						}
+					}
 				}
 	        	buf.append(")");
 			} else {
@@ -875,12 +1205,164 @@ aspect GenerateFortran {
 	        	// TODO: should be able to know the dimension
 	        	buf.append(":");
 	        	buf.append(")");
-	        	buf.append(", ALLOCATABLE");  // defined as pointer
+	        	buf.append(", ALLOCATABLE");  // defined as dynamic allocatable variable
 			}
-        }
+		}
+		if(bAdjustDynamic) {
+        	buf.append(", ALLOCATABLE");  
+		}
      	buf.append(" :: ");
      	buf.append(getID());
      	return buf.toString();
-    }
+        }
     	 
+	//-------------------------------------------------------------------------
+	// This will be implemented in Script, Function
+	public void ASTNode.addDefaultStmt() {
+	}
+
+	public void Function.addDefaultStmt() {	 
+		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
+		stmtList.add(new EmptyStmt());
+		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_toc")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_clock")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("III")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		// temporary variable for output num2str()
+		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		// for command line arguments
+		stmtList.add(new AssignStmt(new NameExpr(new Name("int_tmpvar")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("arg_buffer")), 
+				new StringLiteralExpr("0000000000")));
+		
+		// adding tmpvar(1,1)=0.0
+		//natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		//list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		//list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		//ParameterizedExpr arrayExpr = new ParameterizedExpr(new NameExpr(new Name("tmpvar_1_1")), list);
+		//stmtList.add(new AssignStmt(arrayExpr, 
+		//		new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		for(Stmt stmtNode: stmtList) { 
+			if(declStmtList == null) {
+				declStmtList = getStmtList();
+				declStmtList.addChild(stmtNode);
+			} else {
+				declStmtList.insertChild(stmtNode, lastDeclLocation);
+			} 
+		}
+	}
+	/*  function foo(scale) => adding following 
+		for int_tmpvar=1:nargin()
+		    arg_buffer = varargin{int_tmpvar};
+		    if (int_tmpvar==1) 
+		    	scale = str2num(arg_buffer)
+		   end 
+		end
+	 
+	 */
+	public void Function.addCommandLineArgs() {	 
+		ForStmt argFor = new ForStmt();
+		AssignStmt idxAsg = new AssignStmt();
+		idxAsg.setLHS(new NameExpr(new Name("int_tmpvar")));
+		idxAsg.setRHS(new RangeExpr(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")), 
+				new Opt<Expr>(), 
+				new ParameterizedExpr(new NameExpr(new Name("nargin")),
+						new natlab.ast.List<Expr>()) ));
+		argFor.setAssignStmt(idxAsg);
+
+		// Statement list of For
+		natlab.ast.List<Stmt> forList = new natlab.ast.List<Stmt>();
+		
+		AssignStmt bufAsg = new AssignStmt();
+		bufAsg.setLHS(new NameExpr(new Name("arg_buffer")));
+		natlab.ast.List<Expr> clist = new natlab.ast.List<Expr>();
+		clist.add(new NameExpr(new Name("int_tmpvar")));
+		bufAsg.setRHS(new CellIndexExpr(new NameExpr(new Name("varargin")), clist) );
+		
+		natlab.ast.List<Expr> str2numList = new natlab.ast.List<Expr>();
+		str2numList.add(new NameExpr(new Name("arg_buffer")));
+
+		forList.add(bufAsg);
+		
+		// The if(...)
+		int i = 1;
+		for(Name var: getInputParams()) {
+			String varName = var.getID();
+			natlab.ast.List<Stmt> listIf1 = new natlab.ast.List<Stmt>();
+			listIf1.add(new AssignStmt((new NameExpr(new Name(varName))),
+					new ParameterizedExpr(new NameExpr(new Name("str2num")),
+							str2numList) ) );
+			
+			IfBlock asgIf1= new IfBlock(
+					new EQExpr(new NameExpr(new Name("int_tmpvar")), 
+							new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+i))),
+					listIf1);
+			natlab.ast.List<IfBlock> ifBlockList = new natlab.ast.List<IfBlock>();
+			ifBlockList.add(asgIf1);
+			forList.add(new IfStmt(ifBlockList, new Opt<ElseBlock>()));
+			++i;
+		}
+		// form the For statement
+		argFor.setStmtList(forList);
+
+		if(declStmtList == null) {
+			declStmtList = getStmtList();
+			declStmtList.addChild(argFor);
+		} else {
+			declStmtList.insertChild(argFor, lastDeclLocation);
+		} 
+	}
+	//-------------------------------------------------------------------------
+	// After adding decl-stmt, appends statements for special value 
+	// Testing: call it before/after Script.getSymbolTableScope();
+	// It should be similar to the one in Function
+	public void Script.addDefaultStmt() {	 
+		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
+		stmtList.add(new EmptyStmt());
+		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_toc")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_clock")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("III")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		// temporary variable for output num2str()
+		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		// adding tmpvar(1,1)=0.0
+		//natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		//list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		//list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		//ParameterizedExpr arrayExpr = new ParameterizedExpr(new NameExpr(new Name("tmpvar_1_1")), list);
+		//stmtList.add(new AssignStmt(arrayExpr, 
+		//		new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		for(Stmt stmtNode: stmtList) { 
+			if(declStmtList == null) {
+				declStmtList = getStmtList();
+				declStmtList.addChild(stmtNode);
+			} else {
+				declStmtList.insertChild(stmtNode, lastDeclLocation);
+			} 
+		}
+	}
+
 }

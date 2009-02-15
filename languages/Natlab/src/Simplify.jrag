@@ -8,32 +8,10 @@ aspect Simplify {
 
 	//-------------------------------------------------------------------------
 	// Notes: This is an extra funcition temporarily put here!
-	// After adding decl-stmt, appends statements for special value 
-	// Testing: call it before/after Script.getSymbolTableScope();
-	// TODO: move to proper file
-	public void Script.addDefaultStmt() {	 
-		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
-		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
-		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
-		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
-		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_toc")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
-		for(Stmt stmtNode: stmtList) { 
-			if(declStmtList == null) {
-				declStmtList = getStmtList();
-				declStmtList.addChild(stmtNode);
-			} else {
-				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
-			} 
-		}
-	}
 	// Used to disable "Refine" rewrite defined in TypeInference.jrag 
-    public void VariableDecl.setRefine(boolean b) {
-    	isRefined = b;
-    }
+  //  public void VariableDecl.setRefine(boolean b) {
+  //  	isRefined = b;
+  //  }
 
 	//-------------------------------------------------------------------------
 	// int childLocation: The child-index in the stmt-list, at which location 
@@ -47,6 +25,7 @@ aspect Simplify {
 	// (>0:simplify, <=0:not), it is a global flag! Method calls could be nested!
 	public static int ASTNode.inMethodCall = 0;
 
+	// Default behavior is calling all children to do simplify.
 	// Return: Expr: the new temporary variable node, used for replacing current
 	//				simplified (complex) expression
 	public Expr ASTNode.simplify(List stmtList, int level) {		
@@ -67,8 +46,9 @@ aspect Simplify {
 				for(int i = 0; i < getNumChild(); i++) {
 					if (getChild(i)!=null) {
 						Expr replacementNode = getChild(i).simplify(list, 2);
-						if(replacementNode != null) 
+						if(replacementNode != null) {
 							setChild(replacementNode,i);
+						}
 					}
 		        }
 			} else {
@@ -97,19 +77,33 @@ aspect Simplify {
 	// Public Function, for performing simplification tranformation.
 	// It only can be called by several kind of Expr, assert(this instanceof Expr);
 	public Expr Expr.simplifyTranform(List stmtList, int level) {		
+		return simplifyTranform(stmtList, level, this, this);
+	}
+	public Expr Expr.simplifyTranform(List stmtList, int level, ASTNode curExpr, ASTNode curNode) {		
 		if(nestedLevel>level) {
 			// (1). Create new temporary variable, by Symbol-Table interface
 			// VariableDeclaration varDecl = createTempVar(type());
-			String tmpName = "tmpvar_" + getNodeID();
+			String tmpName = "tmpvar_" + curExpr.getNodeID();
 			
 			// (2). Create NameExpr node
 			NameExpr tmpNameExpr = new NameExpr(new Name(tmpName));
 			
 			// (3). Create AssignStmt, add to the top Stmt-List, just before current node			
-			stmtList.insertChild(new AssignStmt(tmpNameExpr, (Expr)this), this.childLocation);
-			this.childLocation++;
+			AssignStmt newAsgStmt = new AssignStmt(tmpNameExpr, (Expr)curExpr);
+			stmtList.insertChild(newAsgStmt, childLocation);
+			childLocation++;
+			int bakLocation = childLocation;
+
+			// (4). Simplify the new AssignStmt
+			newAsgStmt.clearUseDefBoxes();
+			newAsgStmt.generateUseBoxesList();
+			newAsgStmt.simplify(stmtList, level);
+			// (5). Restore the current childLocation
+			// Notes: childLocation is static variable, changed along with stmtList,  
+			// it will be changed in AssignStmt, IfBlock, WhileStmt, ... those has its own stmtlist
+			childLocation = bakLocation;
 			
-			// (4) return new replacement node (another copy of NameExpr)
+			// (6) return new replacement node (another copy of NameExpr)
 			return new NameExpr(new Name(tmpName));
 		} else {
 			return null;
@@ -138,7 +132,7 @@ aspect Simplify {
 	public Expr ParameterizedExpr.simplify(List stmtList, int level)  {
 		inMethodCall++;
 		// 1. Calling to next level 
-        List<Expr> args = getArgs();	// get the updated tree
+	        List<Expr> args = getArgs();	// get the updated tree
 		int i=0;
 		for(Expr arg : args) {
 			Expr argExpr = arg.simplify(stmtList, level);
@@ -156,37 +150,198 @@ aspect Simplify {
 	// 		will not change
 	public Expr MatrixExpr.simplify(List stmtList, int level)  {
 		// 1. Calling to next level 
-        List<Row> rows = getRows();
+		int bOld = inMethodCall;
+		inMethodCall = 1;
+		List<Row> rows = getRows();
 		int i=0;
-        for(Row row : rows) {
+		for(Row row : rows) {
 			// Row simplification will NOT change the row itself 
 			row.simplify(stmtList, level);
-        }
+		}
+		inMethodCall = bOld;
 		// 2. Rewrite this level, split into a single assignment
 		return simplifyTranform(stmtList, level);
 	}
 	public Expr Row.simplify(List stmtList, int level)  {
 		// 1. Calling to next level 
-        List<Expr> elements = getElements();
+		List<Expr> elements = getElements();
 		int i=0;
-        for(Expr element : elements) {
+		for(Expr element : elements) {
 			Expr expr = element.simplify(stmtList, level);
 			if(expr != null)
 				setElement(expr, i);
 			i++;
-        }
+		}
 		// 2. Don't change the row itself 
 		return null;
 	}
+	// Don't simplify the condition of IfBlock, While 
+ 	public Expr IfStmt.simplify(List stmtList, int level)  {
+		// Create temporary assignment statement for condition expr
+		if(getParent() instanceof List) {
+			stmtList = (List)getParent();
+			List list = (List)getParent();
+		        for(IfBlock block : getIfBlocks()) {	        	
+		        	Expr condExpr = block.getCondition();
+	
+		     		if(condExpr.getNodeID()>0) {
+		     			this.childLocation = list.getIndexOfChild(this);
+			     		Expr tmpCondExpr =  condExpr.simplifyTranform(list,-1,condExpr,this);
+			    		block.setCondition(tmpCondExpr);
+		     		}
+		        }
+		}
+
+		for(IfBlock block : getIfBlocks()) {
+			block.simplify(stmtList, level);
+		}
+		if(hasElseBlock()) {
+			getElseBlock().simplify(stmtList, level);
+		}
+		
+		return null;
+	}
+ 
+ 	public Expr IfBlock.simplify(List stmtList, int level)  {
+		// Skip the condition expression 
+		// Restart the count of level and stmt-list for following stmt
+		for(Stmt stmt : getStmts()) {
+			stmt.simplify(getStmtList(), 0);
+		}
+		return null;
+	}
+
+	public Expr WhileStmt.simplify(List stmtList, int level)  {
+		stmtList = (List)getStmtList();
+		Expr condExpr = getExpr();
+
+ 		if(condExpr.getNodeID()>0) {
+ 			// set condition to true (1)
+ 			this.childLocation = 0;
+ 			// While (cond) ==> DO ; if(cond) ...
+ 			// (1>0)
+ 			setExpr(new GTExpr(
+ 					new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")),
+ 					new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")))
+ 			);
+
+ 			// Create new if statement to handle the condition
+ 			List tmpList = new List<Stmt>();
+			Expr tmpCondExpr =  condExpr.simplifyTranform(tmpList,-1,condExpr,this);
+			IfStmt tmpIfStmt  = new IfStmt();
+			IfBlock tmpIfBlock = new IfBlock(tmpCondExpr, getStmtList());
+			ElseBlock tmpElseBlock = new ElseBlock(new List<Stmt>().add(new BreakStmt()));
+			tmpIfStmt.setIfBlockList(new List<IfBlock>().add(tmpIfBlock));
+			tmpIfStmt.setElseBlock(tmpElseBlock);
+			tmpList.add(tmpIfStmt);
+			setStmtList(tmpList);
+ 		}
+		for(Stmt stmt : getStmts()) {
+			stmt.simplify(getStmtList(), 0);
+		}
+		return null;
+	}
+	public Expr RangeExpr.simplify(List stmtList, int level)  {
+		// If there is binary express in any of low:inc:upp,
+		// then simplify it.
+		// 1. Calling to next level 
+		int bOld = inMethodCall;
+		inMethodCall = 1;
+		Expr lowExpr = getLower().simplify(stmtList, level);
+		Expr upExpr = getUpper().simplify(stmtList, level);
+		if(lowExpr != null)
+			setLower(lowExpr);
+		if(upExpr != null)
+			setUpper(upExpr);
+        if(hasIncr()) {
+        	Expr incrExpr = getIncr().simplify(stmtList, level);
+    		if(incrExpr != null)
+    			setIncr(incrExpr);
+        }
+		
+        inMethodCall = bOld;
+		// 2. Rewrite this level
+		if(inMethodCall>0)
+			return simplifyTranform(stmtList, level);
+		else 
+			return this;
+	}
+
+	//-------------------------------------------------------------------------
+	// Get constant R-Value, LiteralExpr: FPLiteralExpr, IntLiteralExpr, StringLiteralExpr
+	// Currently only suppot FP/Int constant
+	public Expr ASTNode.getRValue() {
+		return null;
+	}
+	
+	public Expr Expr.getRValue() {
+		if(this instanceof FPLiteralExpr || this instanceof IntLiteralExpr)	{
+			return this;
+		} else {		
+			return null;
+		}
+	}
+	public Expr BinaryExpr.getRValue() {
+		// 1. Calling to next level 
+		Expr lhsExpr = getLHS().getRValue();
+		Expr rhsExpr = getRHS().getRValue();
+		if(lhsExpr != null  && rhsExpr != null) {
+			// For floating point calculation
+			if(lhsExpr instanceof IntLiteralExpr 
+				&& rhsExpr instanceof IntLiteralExpr) {
+				if(this instanceof PlusExpr) {
+					return new IntLiteralExpr(
+							new natlab.DecIntNumericLiteralValue(
+							((IntLiteralExpr)lhsExpr).getValue().getValue().add(((IntLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MinusExpr) {
+					return new IntLiteralExpr(
+							new natlab.DecIntNumericLiteralValue(
+							((IntLiteralExpr)lhsExpr).getValue().getValue().subtract(((IntLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MTimesExpr) {
+					return new IntLiteralExpr(
+							new natlab.DecIntNumericLiteralValue(
+							((IntLiteralExpr)lhsExpr).getValue().getValue().multiply(((IntLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MDivExpr) {
+					return new IntLiteralExpr(
+							new natlab.DecIntNumericLiteralValue(
+							((IntLiteralExpr)lhsExpr).getValue().getValue().divide(((IntLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				}
+				
+			} else {	// TODO: Need splite different type of FPLiteralExpr, IntLiteralExpr
+				// Perform calculation
+				if(this instanceof PlusExpr) {
+					return new FPLiteralExpr(
+						new natlab.FPNumericLiteralValue(
+						((FPLiteralExpr)lhsExpr).getValue().getValue().add(((FPLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MinusExpr) {
+					return new FPLiteralExpr(
+							new natlab.FPNumericLiteralValue(
+							((FPLiteralExpr)lhsExpr).getValue().getValue().subtract(((FPLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MTimesExpr) {
+					return new FPLiteralExpr(
+							new natlab.FPNumericLiteralValue(
+							((FPLiteralExpr)lhsExpr).getValue().getValue().multiply(((FPLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} else if(this instanceof MDivExpr) {
+					return new FPLiteralExpr(
+							new natlab.FPNumericLiteralValue(
+							((FPLiteralExpr)lhsExpr).getValue().getValue().divide(((FPLiteralExpr)rhsExpr).getValue().getValue()).toString()));
+				} 
+			}
+				
+		} 
+		return null;
+	}
+	
 	
 	//-------------------------------------------------------------------------
 	// Constant Propagation
-	// TODO: move to proper file; Temporarily save here
+	// TODO: move to proper file; temporarily save here
+	// Expr lExpr: could be LiteralExpr, NameExpr, 
 	// Return: 
-	//		Expr: when a node found itself should be replaced, 
-	//			return the new expr(lExpr)
-	//			Otherwise: return null
-	public Expr ASTNode.constantPropagation(String varName, LiteralExpr lExpr) {		
+	//	Expr: when a node found itself should be replaced, 
+	//		return the new expr(lExpr)
+	//		Otherwise: return null
+	public Expr ASTNode.constantPropagation(String varName, Expr lExpr) {		
 		for(int i = 0; i < getNumChild(); i++) {
 			Expr replacementNode = getChild(i).constantPropagation(varName, lExpr);
 			if(replacementNode != null) 
@@ -195,10 +350,21 @@ aspect Simplify {
 		return null;
 	}
 	
-	public Expr NameExpr.constantPropagation(String varName, LiteralExpr lExpr) {
+	public Expr NameExpr.constantPropagation(String varName, Expr lExpr) {
 		if (varName.equals(this.getName().getID())) {
 			return lExpr;
 		}
+		return null;
+	}
+	// Avoid LHS variable name being change
+	public Expr AssignStmt.constantPropagation(String varName,  Expr lExpr) {
+		Expr lhs = getLHS();
+		if(lhs instanceof ParameterizedExpr) {
+	        for(Expr arg : ((ParameterizedExpr) lhs).getArgs()) {
+		        arg.constantPropagation(varName, lExpr);
+	        }
+		}
+		getRHS().constantPropagation(varName, lExpr);
 		return null;
 	}
 }
