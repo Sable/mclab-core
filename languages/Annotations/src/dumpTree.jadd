@@ -73,4 +73,48 @@ aspect dumpTree{
 	return null;
   }
 
+
+	// ------------------------------------------------------------------
+	// Adding name field, and using ArgTupleType as function signature type
+	// ------------------------------------------------------------------
+	public String Type.name="Type";
+
+	public void ArgTupleType.setName(String name) {
+		this.name = name;
+	}
+	public String ArgTupleType.getName() {
+		return this.name;
+	}
+
+     // Add a list of arguments (variable name) used in the function call	
+     java.util.ArrayList<String> ArgTupleType.argList = new java.util.ArrayList<String>();
+     public String ArgTupleType.getStaticArgName(int i) {
+         return argList.get(i);
+     }     
+     public void ArgTupleType.addStaticArgType(Type node, String name) {
+    	 addStaticArgType(node);
+    	 argList.add(name);
+     }
+
+
+	// ------------------------------------------------------------------
+	// Support dynamic indexes, in Size. class
+	// ------------------------------------------------------------------
+	protected java.util.List<String> Size.String__Dims;
+	protected java.util.List<ASTNode> Size.ASTNode__Dims;	// keep the index-node
+	public void Size.setDynamicDims(java.util.List<String> value) {
+		String__Dims = value;
+	}
+	public void Size.setNodeDims(java.util.List<ASTNode> value) {
+		ASTNode__Dims = value;
+	}
+	public java.util.List<String> Size.getDynamicDims() {
+		return String__Dims;
+	}
+	public java.util.List<ASTNode> Size.getNodeDims() {
+		return ASTNode__Dims;
+	}
+
+
+	
 }
