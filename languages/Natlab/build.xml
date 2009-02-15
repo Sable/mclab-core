@@ -26,6 +26,7 @@
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
 	<import file="../shared/options.xml" />
+	<import file="../shared/CodeGen.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
 
@@ -66,6 +67,9 @@
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
 	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests, options" />
+
+	<!-- Special target for building MATLAB2Fortran Code-Gen -->
+	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
 
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">
@@ -189,4 +193,7 @@
 	<target name="eclipse.build" depends="annotations.eclipse.build, matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations and matlab), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
-</project>
+
+	<!-- Special target for building MATLAB2Fortran Code-Gen -->
+	<target name="build_codegen" depends="annotations.build, codegen, compile2" description="CodeGen: generate and build all files (including annotations)" />
+ </project>
