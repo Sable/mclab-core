@@ -1,0 +1,46 @@
+<!--
+    Requires:
+        Properties: src.dir, lexer.spec, parser.spec, gen.dir, ast.pkg
+        Paths: n/a
+        Targets: def.jflex.task, def.beaver.task, def.jastadd.task
+-->
+<project name="CodeGen">
+
+	<!-- generates Java files from JastAdd specs -->
+	<target name="jastadd2" depends="def.jastadd.task">
+		<mkdir dir="${gen.dir}/${ast.pkg}" />
+		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+				<exclude name="**/Annotations.jrag" />
+				<exclude name="**/NameResolution.jrag" />
+				<exclude name="**/NameResolution.jadd" />
+				<!--<exclude name="**/SymbolTable.jrag" /> -->
+				<exclude name="**/TypeInference.jrag" />
+			</fileset>
+			<fileset dir="${test.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset>
+		</jastadd>
+	</target>
+
+	<!-- jflex, beaver, jastadd, and options -->
+	<target name="gen2" depends="jflex, beaver, jastadd2" />
+	
+	<target name="compile2" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${basedir}/${ant.bin.dir}">
+			<classpath refid="compile.classpath" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<src path="${test.dir}" />
+			<include name="**/*.java" />
+			<exclude name="**/LookupLValue*.java" />
+		</javac>
+	</target>
+	
+</project>
