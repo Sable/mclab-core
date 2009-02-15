@@ -413,4 +413,13 @@ aspect UpdateSymbolTableScope {
 	}
     // ----------------------------------------------------------------------------
     
+	
+    // ----------------------------------------------------------------------------
+    // Extra constructor for VariableDecl
+    public VariableDecl.VariableDecl(String p0, annotations.ast.Type p1) {
+        setID(p0);
+        setType(p1);
+        setOriginalID(p1);
+    }
+
 }

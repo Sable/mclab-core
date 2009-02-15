@@ -1,0 +1,66 @@
+/*
+ *  Converting to SSA Form 
+ *  1. Renaming
+ */
+import java.util.*;
+
+aspect SSAForm {
+
+	// Renaming functions
+	public void ASTNode.renaming(String orgName, String newName) {	
+		for(int i = 0; i < getNumChild(); i++) {
+			getChild(i).renaming(orgName, newName);
+		}
+	}
+	public void Name.renaming(String orgName, String newName) {	
+		if(orgName.equals(getID())) {
+			setID(newName);
+		}
+	}
+	// Node: ForStmt, If..else.., only means one node
+    public void ForStmt.renaming(String orgName, String newName) {	
+    	getAssignStmt().renaming(orgName, newName);
+    }
+    public void WhileStmt.renaming(String orgName, String newName) {	
+        getExpr().renaming(orgName, newName);
+    }
+    public void IfStmt.renaming(String orgName, String newName) {	
+        // Do nothing, because IfBlock will has a separate code-node
+    }
+    public void IfBlock.renaming(String orgName, String newName) {	
+        // Do nothing, because Condition-Expr will has a separate code-node
+    }
+
+    public void SwitchStmt.renaming(String orgName, String newName) {	
+        getExpr().renaming(orgName, newName);
+    }
+
+	// Avoid replacing the LHS variable name    
+    public void AssignStmt.renaming(String orgName, String newName) {	
+    	ASTNode lhs = getLHS();
+    	if(lhs instanceof ParameterizedExpr) {
+	    	// Allow to rename LHS array variable's arguments 
+    		((ParameterizedExpr) lhs).getArgList().renaming(orgName, newName);
+    	}
+        getRHS().renaming(orgName, newName);
+    }
+
+	//-------------------------------------------------------------------------
+	// getVarName(): return LHS variable name, A(i,j) return A
+	// Only can call on AssignStmt/NameExpr/ParameterizedExpr
+	public String ASTNode.getVarName() {	
+		return "";
+	}
+    public String AssignStmt.getVarName() {	
+    	return getLHS().getVarName();
+    }
+	public String NameExpr.getVarName() {
+		return getName().getVarName();
+	}
+	public String Name.getVarName() {
+		return getID();
+	}
+	public String ParameterizedExpr.getVarName() {
+		return getTarget().getVarName();
+	}
+}
