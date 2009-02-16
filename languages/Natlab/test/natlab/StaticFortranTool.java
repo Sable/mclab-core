@@ -28,16 +28,19 @@ import annotations.ast.Type;
  * 
  *  Extent the tool to support more functionalities
  *  Usage: 
- *  	-m2n : translate .m to .n
- *  	-d   : convert all .n files of a folder to F95
+ *  	-m2n [folder-name | filename]: translate .m to .n
+ *  	filename
+ *  	-d   folder-name: convert all .n files of the folder to F95
+ *  			- pathname starting by '/' will be treated as 
+ *  				absolution pathname, otherwise are seen as relative pathname 
  *  
  *  BTW: .n Errors
  *  1.	[3, 1]  unexpected token HELP_COMMENT
  *  	Cannot recover from the syntax error
- *  Sol: manual remove empty line after the function declaration
+ *  Solution: manual remove empty line after the function declaration
  *  2. Usage Example:
  *  (1) -m2n \languages\Fortran\benchmarks	\
- *  (2) -d \languages\Fortran\benchmarks\adapt\
+ *  (2) -d .\languages\Fortran\benchmarks\adapt\
  */ 
 public class StaticFortranTool {
 	static boolean DEBUG = false; // false;
@@ -48,6 +51,8 @@ public class StaticFortranTool {
 	public final static String TEMP_VAR_PREFIX = "tmpvar_";
 	public static final String PhiFunctionName = "PHISSA";
 
+	public static String PATH_STRING = "/";	// different in DOS and Linux 
+	
 	static PrintStream out = System.out; 
 	
 	// Flag, true: set the first .m function as main function (Program)
@@ -120,7 +125,13 @@ public class StaticFortranTool {
 	// Main function
 	public static void main(String[] args) {
 		if (args.length < 1) {
-			System.err.println("Usage: java natlab.StaticFortranTool {basename}");
+			System.err.println("Usage: ");
+			System.err.println("   java natlab.StaticFortranTool filename.n ");
+			System.err.println("   java natlab.StaticFortranTool -d folder-name ");
+			System.err.println("Note: Converting a specified file or all .n files of the folder to Fortran95.");
+			System.err.println("      The pathname starting by '/' will be treated as absolution pathname,\n"
+			                 + "      otherwise are seen as relative pathname ");
+
 			System.exit(1);
 		}
 		
@@ -169,24 +180,26 @@ public class StaticFortranTool {
         } 
         int startIndex = basename.lastIndexOf("/");
         if(startIndex<=0 || startIndex>=basename.length()) {
-        	startIndex = basename.lastIndexOf("\\");
+        	startIndex = basename.lastIndexOf(PATH_STRING);
         }
         if(startIndex<=0 || startIndex>=basename.length()) {
         	pureName = "";
         } else { 
         	pureName = basename.substring(startIndex+1);
         }
-        
 	    fortranname = basename + ".f95";
 	}
 	public static void convert2Fortran(String filename) {
-		// Solving the filename
-		// filename = getAbslouteName(filename);
+        int startIndex = System.getProperty("user.dir").lastIndexOf("/");
+        if(startIndex<=0) {
+        	PATH_STRING = "\\";
+        } else {
+        	PATH_STRING = "/";
+        }
     	solveFilename(filename);
     	convert2Fortran(filename, fortranname);
 	}
 	public static void convert2Fortran(String filename, String fName) {
-		fortranname = fName;
 		System.out.println("Converting 2 Fortran : "+filename);
 		System.out.println("Fortran file : "+fortranname);
 
@@ -196,7 +209,6 @@ public class StaticFortranTool {
 
 			// Parsing the file
     		ASTNode actual = parseFile(filename, out);
-
 			
     		// Handle each function one by one
 			ASTNode prog = actual;
@@ -1580,25 +1592,32 @@ public class StaticFortranTool {
 	public static void convertFolder(String folderName) {
 		translateFolder(folderName, CONVERTION);
 	}
+	// Absolute pathname starting with X: or / 
 	public static String getAbslouteName(String name) {
 		String absDirName = name;
 		if(!name.subSequence(1, 2).equals(":")) {
-			if(name.subSequence(0, 1).equals("\\")) {
-				absDirName = System.getProperty("user.dir") + name;
+			if(name.subSequence(0, 1).equals(PATH_STRING)) {
+				absDirName = name;
 			} else {
-				absDirName = System.getProperty("user.dir") + name;
+				absDirName = System.getProperty("user.dir")+ PATH_STRING + name;
 			}
-		}
+		} 
 		return absDirName;
 	}
 	// Find the list of .n files to translate. 
 	// Merge them into a whole file, then call converting function.
 	// Can handle one/two level directory 
 	public static void translateFolder(String folderName, String task) {		
+        int startIndex = System.getProperty("user.dir").lastIndexOf("/");
+        if(startIndex<=0) {
+        	PATH_STRING = "\\";
+        } else {
+        	PATH_STRING = "/";
+        }
+
 		// Absolute directory name = Current working folder + ...
-		String absDirName = getAbslouteName(folderName);
+        String absDirName = getAbslouteName(folderName);
 	    File mainFolder = new File(absDirName);
-	    System.out.println("Folder/file name: "+absDirName);
 	    // Check whether it's a file, 
 	    if(!mainFolder.isDirectory()) {
 	    	if(task.equals(TRANSLATION)) {
@@ -1624,7 +1643,8 @@ public class StaticFortranTool {
 	            return file.isDirectory();
 	        }
 	    };
-	    File[] subFolders = mainFolder.listFiles(fileFilter);
+	    // Don't enter sub-folder, because '.svn' bothers the program
+	    File[] subFolders = null;	//  mainFolder.listFiles(fileFilter);
 	    if (subFolders == null || subFolders.length==0) {
 	    	// System.err.println("Either dir does not exist or is not a directory.");
 	    	// There is only one level of directory
@@ -1637,7 +1657,7 @@ public class StaticFortranTool {
 			    String[] children = dir.list(mfileFilter);
 	    		System.out.println("translateFile: "+dir);
 		        for (int i=0; i<children.length; i++) {
-		        	String filename = dir.getAbsolutePath()+"\\"+children[i];
+		        	String filename = dir.getAbsolutePath()+PATH_STRING+children[i];
 		    		System.out.println("translateFile: "+filename);
 		            translateFile(filename);
 		        }
@@ -1651,13 +1671,15 @@ public class StaticFortranTool {
 			    String filename =  "";
 			    if(children.length>0) {
 		    		// create a temporary file name
-			    	String tmpFilename = dir.getAbsolutePath()+"\\"+"_temp_m2f.m";
+			    	String tmpFilename = dir.getAbsolutePath()+PATH_STRING+"_temp_m2f.m";
 			    	String mainFilename;	// first file name
 			    	if(children.length>1) {
 				    	// 1. Read the first file, 
 					    //	(#) if it's a script, and there are more files,
 					    //		then transform it into a function
-					    filename =  mainFilename = dir.getAbsolutePath()+"\\"+children[0];
+					    filename =  mainFilename = dir.getAbsolutePath()+PATH_STRING+children[0];
+						solveFilename(mainFilename);
+
 					    ASTNode astTree = parseFile(filename, System.out);
 					    if(astTree instanceof Script) {
 					    	bScriptFile = true;
@@ -1668,14 +1690,15 @@ public class StaticFortranTool {
 						    // 2. Merge all files into one memory file, 	
 					        for (int i=0; i<children.length; i++) {
 					        	if(children[i].substring(0, 4).equalsIgnoreCase("drv_")) {
-						        	filename = dir.getAbsolutePath()+"\\"+children[i];
+						        	filename = dir.getAbsolutePath()+PATH_STRING+children[i];
+						        	solveFilename(filename);
 						        	appendFile(filename, outTemp, i, bScriptFile);
 						        	break;
 					        	}
 					        }
 					        for (int i=0; i<children.length; i++) {
 					        	if(!(children[i].substring(0, 4).equalsIgnoreCase("drv_"))) {
-						        	filename = dir.getAbsolutePath()+"\\"+children[i];
+						        	filename = dir.getAbsolutePath()+PATH_STRING+children[i];
 						        	appendFile(filename, outTemp, i, bScriptFile);
 					        	}
 					        }
@@ -1686,7 +1709,6 @@ public class StaticFortranTool {
 							System.exit(9);
 						}
 						// 3. Convert the whole file to Fortran
-						solveFilename(mainFilename);
 						String outFilename = fortranname;
 			        	convert2Fortran(tmpFilename, outFilename);
 			    	} else {
@@ -1699,8 +1721,8 @@ public class StaticFortranTool {
     	}
 	}
 	public static void appendFile(String filename, PrintStream outTemp, int i, boolean bScriptFile) throws IOException {
-    	solveFilename(filename);
-    	System.out.println("convert2Fortran-[Merge]: "+filename);
+    	filename = getAbslouteName(filename);
+    	System.out.println("MATLAB2Fortran-[found]: "+filename);
 
 		BufferedReader inFile = new BufferedReader(new FileReader(filename));
 		// Merge file together
