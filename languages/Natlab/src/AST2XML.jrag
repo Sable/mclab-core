@@ -438,8 +438,9 @@ aspect ASTtoXML {
     	long id = nodeCounter();
         setuID(id);
 
-		Element e = doc.createElement("ExprStmt");
-		e.setAttribute("id", Long.toString(id));
+        Element e = doc.createElement("ExprStmt");
+        e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
         
         getExpr().getXML(doc, e);
 
@@ -453,6 +454,7 @@ aspect ASTtoXML {
 
         	Element e = doc.createElement("AssignStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         getLHS().getXML(doc, e);
         getRHS().getXML(doc, e);
@@ -467,6 +469,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("GlobalStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         for(Name name : getNames()) {
             name.getXML(doc, e);
@@ -482,6 +485,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("PersistentStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         for(Name name : getNames()) {
             name.getXML(doc, e);
@@ -498,6 +502,7 @@ aspect ASTtoXML {
 		Element e = doc.createElement("ShellCommandStmt");
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("command", getCommand());
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
         return true;
@@ -509,6 +514,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("BreakStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
         return true;
@@ -520,6 +526,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("ContinueStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
         return true;
@@ -531,6 +538,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("ReturnStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
         return true;
