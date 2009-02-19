@@ -19,4 +19,4 @@ events {: return symbol(EVENTS); :} OPEN_END
 %:
 %:
 <<ANY>> {: error("Illegal character in classdef '" + yytext() + "'"); :}
-<<EOF>> {: error("Unclosed brackets in class"); :}
+<<EOF>> {: error("Unclosed brackets in class"); :} END_BRACKETED

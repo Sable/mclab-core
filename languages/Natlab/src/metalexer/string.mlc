@@ -18,4 +18,4 @@
 %:
 %:
 <<ANY>> {: append(yytext()); :}
-<<EOF>> {: error("Unterminated string literal"); :}
+<<EOF>> {: error("Unterminated string literal"); :} END_STRING

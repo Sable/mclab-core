@@ -17,4 +17,4 @@
 %:
 %:
 <<ANY>> {: append(yytext()); :}
-<<EOF>> {: error("Unterminated bracket comment"); :}
+<<EOF>> {: error("Unterminated bracket comment"); :} END_BRACKET_COMMENT
