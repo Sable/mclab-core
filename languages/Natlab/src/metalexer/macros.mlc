@@ -12,7 +12,10 @@ EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
 Letter = [a-zA-Z]
 Digit = [0-9]
 HexDigit = {Digit} | [a-fA-F]
+
+//Please see jar:file:///packages/matlab_2008a/help/techdoc/help.jar!/learn_matlab/f2-520.html
 Identifier = {Letter}([_] | {Letter} | {Digit})*
+
 SciExp = [Ee][+\-]?{Digit}+
 Imaginary = [iIjJ]
 IntNumber = {Digit}+
