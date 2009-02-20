@@ -1,4 +1,7 @@
 aspect PrettyPrint {
+
+    protected static final String ASTNode.INDENT_TAB = "  ";
+         
     syn String ASTNode.getPrettyPrinted() {
         StringBuffer buf = new StringBuffer();
         for(beaver.Symbol comment : getComments()) {
@@ -479,14 +482,14 @@ aspect PrettyPrint {
     	ASTNode parent = getParent();
     	if ( parent != null ){
         	ASTNode gparent = parent.getParent();
-    	    return (gparent instanceof Program) ? "" : parent.getIndent() + '\t';
+    	    return (gparent instanceof Program) ? "" : parent.getIndent() + ASTNode.INDENT_TAB;
         }
         return "" ;
     }
     eq SwitchCaseBlock.getIndent() {
     	ASTNode parent = getParent();
     	if ( parent != null ){
-        	return parent.getIndent() + '\t';
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
         }
         return "" ;
     } 
@@ -494,7 +497,15 @@ aspect PrettyPrint {
     eq DefaultCaseBlock.getIndent() {
     	ASTNode parent = getParent();
     	if ( parent != null ){
-        	return parent.getIndent() + '\t';
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    eq Function.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+    	     ASTNode gparent = parent.getParent();
+    	     return (gparent instanceof Program) ? "" : parent.getIndent() + ASTNode.INDENT_TAB;
         }
         return "" ;
     }
