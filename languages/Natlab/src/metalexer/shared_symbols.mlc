@@ -106,6 +106,7 @@
 
 //numeric literals
 {IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
+{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
 {FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
 {HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
 {ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
