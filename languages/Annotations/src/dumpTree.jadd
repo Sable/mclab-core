@@ -115,6 +115,13 @@ aspect dumpTree{
 		return ASTNode__Dims;
 	}
 
-
+	// Used to keep the closest variable used to define the dimensions
+	protected java.util.List<String> Size.String_var_Dims;
+	public void Size.setVariableDims(java.util.List<String> value) {
+		String_var_Dims = value;
+	}
+	public java.util.List<String> Size.getVariableDims() {
+		return String_var_Dims;
+	}
 	
 }
