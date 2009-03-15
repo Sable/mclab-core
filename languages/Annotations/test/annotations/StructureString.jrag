@@ -31,16 +31,26 @@ aspect StructureString {
 		return buf.toString();
 	}
 	
-	eq Size.getStructureString() {
+	eq Size.getStructureString() {	// -JL, for supporting dynamic indexes
 		StringBuffer buf = new StringBuffer();
 		buf.append("[");
 		boolean first = true;
-		for(Integer dim: getDims()) {
-			if(!first) {
-				buf.append(", ");
+		if(getDims()!=null) {
+			for (Integer dim : getDims()) {
+				if (!first) {
+					buf.append(", ");
+				}
+				first = false;
+				buf.append(dim);
 			}
-			first = false;
-			buf.append(dim);
+		} else if(getDynamicDims()!=null) {
+			for (String dim : getDynamicDims()) {
+				if (!first) {
+					buf.append(", ");
+				}
+				first = false;
+				buf.append(dim);
+			}
 		}
 		buf.append("]");
 		return buf.toString();
