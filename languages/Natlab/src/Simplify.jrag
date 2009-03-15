@@ -50,7 +50,7 @@ aspect Simplify {
 							setChild(replacementNode,i);
 						}
 					}
-		        }
+				}
 			} else {
 			}
 		}	
@@ -110,6 +110,7 @@ aspect Simplify {
 		}
 	}
 	
+	
 	// stmtList: stmt-list from the top of the subtree, where we can add stmt on it
 	// level : the level, all node deeper than this level need to be simplified.
 	// RETURN : null, if there is no simplify need to do.
@@ -129,20 +130,49 @@ aspect Simplify {
 		else 
 			return this;
 	}
+	// All Transpose expression will be simplified
+	// Only when Transpose expression in RHS and LHS is a variable name 
+	public Expr MTransposeExpr.simplify(List stmtList, int level)  {		
+		Expr op = getOperand().simplify(stmtList, level);
+		if(op!=null) {
+			setOperand(op);
+		}
+		boolean bNeed = true;
+		if(getParent() instanceof AssignStmt) {
+			bNeed = !(((AssignStmt)getParent()).getLHS() instanceof NameExpr);
+		}
+		if(bNeed) {
+			return simplifyTranform(stmtList, level);
+		} else {
+			return null;
+		}
+	}	
+	
 	public Expr ParameterizedExpr.simplify(List stmtList, int level)  {
+		boolean bLinearIndexing = false;
 		inMethodCall++;
 		// 1. Calling to next level 
-	        List<Expr> args = getArgs();	// get the updated tree
+		List<Expr> args = getArgs();	// get the updated tree
 		int i=0;
 		for(Expr arg : args) {
+			// if the case of ":" as an argument
+			if(arg instanceof ColonExpr) {
+				bLinearIndexing = true; 
+			}
 			Expr argExpr = arg.simplify(stmtList, level);
 			if(argExpr != null)
 				setArg(argExpr, i);
 			i++;
 		}
+		// If just one argument is :, then it's normal indexing
+		if(i>1)
+			bLinearIndexing = false;
 		inMethodCall--;
 		// 2. Rewrite this level, split into a single assignment
-		return simplifyTranform(stmtList, level);
+		if(bLinearIndexing) 
+			return null;
+		else
+			return simplifyTranform(stmtList, level);
 	}
 	
 	// (1) Matrix, should be split from the BinaryExpr, ParameterizedExpr
@@ -253,18 +283,20 @@ aspect Simplify {
 			setLower(lowExpr);
 		if(upExpr != null)
 			setUpper(upExpr);
-        if(hasIncr()) {
-        	Expr incrExpr = getIncr().simplify(stmtList, level);
-    		if(incrExpr != null)
-    			setIncr(incrExpr);
-        }
+		if(hasIncr()) {
+			Expr incrExpr = getIncr().simplify(stmtList, level);
+			if(incrExpr != null)
+				setIncr(incrExpr);
+		}
 		
-        inMethodCall = bOld;
-		// 2. Rewrite this level
-		if(inMethodCall>0)
+		inMethodCall = bOld;
+		// If it's part of ParameterizedExpr, mostly are indexing, then skip
+		if(inMethodCall>0) { // (getParent() instanceof natlab.ast.List) {	
+			return null;
+		} else {
+		// 2. Rewrite this level  // 
 			return simplifyTranform(stmtList, level);
-		else 
-			return this;
+		}
 	}
 
 	//-------------------------------------------------------------------------

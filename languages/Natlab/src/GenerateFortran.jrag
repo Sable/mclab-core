@@ -560,14 +560,14 @@ aspect GenerateFortran {
     eq RangeExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
         ASTNode parentAssign = getParent();
-        // Only try less 10 time
-        for(int i = 1; i<10;i++) {
+        // Get the closest assignment statement
+        while(parentAssign!=null) {
         	if(parentAssign instanceof AssignStmt) 
         		break;
         	else
         		parentAssign = parentAssign.getParent();
         }
-        if ((parentAssign instanceof AssignStmt)
+        if (parentAssign!=null && (parentAssign instanceof AssignStmt)
         		&& parentAssign.getParent() instanceof ForStmt) {
         	// i=1:2:5  => i=1,5,2
 	        buf.append(getLower().getFortran());
@@ -577,6 +577,16 @@ aspect GenerateFortran {
 	            buf.append(" , ");
 	            buf.append(getIncr().getFortran());
 	        }
+        } else if(getParent().getParent() instanceof ParameterizedExpr) {
+        	// keep range expression, without parentheses
+        	// In Fortran, the form is low:upper:inc
+            buf.append(getLower().getStructureString());
+            buf.append(" : ");
+            buf.append(getUpper().getStructureString());
+            if(hasIncr()) {
+                buf.append(" : ");
+                buf.append(getIncr().getStructureString());
+            }
         } else {
 	        buf.append("(/(III, III=");
 	        buf.append(getLower().getFortran());
@@ -635,9 +645,11 @@ aspect GenerateFortran {
         boolean bParenthesis = true;
         
         if(fname.equalsIgnoreCase("zeros")) {
-        	buf.append("0; !");
+        	buf.append("0");
+	        return buf.toString();
         } else if(fname.equalsIgnoreCase("ones")) {
-        	buf.append("1; !");
+        	buf.append("1");
+	        return buf.toString();
         } else if(fname.equalsIgnoreCase("fprintf")) {	// TODO: fprintf 
         	buf.append("PRINT ");
 	        boolean first = true;
@@ -710,8 +722,25 @@ aspect GenerateFortran {
 	        return buf.toString();
 	        
         } else if(fname.equalsIgnoreCase("mean")) {
+        	// Here handle two cases
+        	// 1) mean(F(:)) => SUM(F)/(0.0+SIZE(F))
+        	// 2) mean(F)    => SUM(F,1)/(0.0+SIZE(F,1))
 	        buf.append(" SUM(");		
 	        for(Expr arg : args) {
+	        	if(arg instanceof NameExpr) {
+	        		buf.append(arg.getFortran()+",1)/(0.0+SIZE("+arg.getFortran()+",1))");
+	        		return buf.toString(); 
+	        	} else if(arg instanceof ParameterizedExpr) {
+	        		// For arg=F(:) 
+	        		if(((ParameterizedExpr)arg).getNumArg()==1) {
+		        		if(((ParameterizedExpr)arg).getArgs().getChild(0) instanceof ColonExpr) {
+		        			String str = ((ParameterizedExpr)arg).getTarget().getFortran();
+			        		buf.append(str+")/(0.0+SIZE("+str+"))");
+			        		return buf.toString(); 
+		        		}
+	        		}
+	        	}
+	        	// Other cases, treat as mean of whole array
 	            buf.append(arg.getFortran()); // Only take one parameter
 	            break;
 	        }
@@ -720,7 +749,7 @@ aspect GenerateFortran {
 	            buf.append(arg.getFortran()); // Only take one parameter
 	            break;
 	        }
-	        buf.append(")");
+    		buf.append(")");
 	        return buf.toString();
         	 
         } else if(fname.equalsIgnoreCase("nargin")) {
@@ -832,8 +861,12 @@ aspect GenerateFortran {
     	} else if (fname.equalsIgnoreCase("clc")) {
     		buf.append(" ! clc  !! Not support.");
     		
-    	} else if (fname.equalsIgnoreCase("round")) {
+    	} else if (fname.equalsIgnoreCase("round") || fname.equalsIgnoreCase("floor")
+        		|| fname.equalsIgnoreCase("fix")) {
     		buf.append("floor");
+    	} else if (fname.equalsIgnoreCase("ceil")) {
+    		buf.append("CEILING");
+
     	} else if (fname.equalsIgnoreCase("ALLOCATE")
     			|| fname.equalsIgnoreCase("DEALLOCATE")
     			|| fname.equalsIgnoreCase("NULLIFY")
@@ -1108,10 +1141,8 @@ aspect GenerateFortran {
     			return buf.toString();
         	}
         }
-		buf.append(getLHS().getFortran());
-		buf.append(" * ");
-		buf.append(getRHS().getFortran());
-		return buf.toString();
+        // Calling the parent's function. 
+        return getFortranLessComments("*");  
     }
 	
 
@@ -1235,6 +1266,8 @@ aspect GenerateFortran {
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("III")), 
 				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("JJJ")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
 		// temporary variable for output num2str()
 		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
@@ -1258,7 +1291,7 @@ aspect GenerateFortran {
 				declStmtList = getStmtList();
 				declStmtList.addChild(stmtNode);
 			} else {
-				declStmtList.insertChild(stmtNode, lastDeclLocation);
+				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
 			} 
 		}
 	}
@@ -1320,7 +1353,7 @@ aspect GenerateFortran {
 			declStmtList = getStmtList();
 			declStmtList.addChild(argFor);
 		} else {
-			declStmtList.insertChild(argFor, lastDeclLocation);
+			declStmtList.insertChild(argFor, lastDeclLocation+1);
 		} 
 	}
 	//-------------------------------------------------------------------------
@@ -1342,10 +1375,18 @@ aspect GenerateFortran {
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("III")), 
 				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("JJJ")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
 		// temporary variable for output num2str()
 		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
 
+		// for command line arguments
+		stmtList.add(new AssignStmt(new NameExpr(new Name("int_tmpvar")), 
+				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("arg_buffer")), 
+				new StringLiteralExpr("0000000000")));
+		
 		// adding tmpvar(1,1)=0.0
 		//natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
 		//list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
@@ -1359,7 +1400,7 @@ aspect GenerateFortran {
 				declStmtList = getStmtList();
 				declStmtList.addChild(stmtNode);
 			} else {
-				declStmtList.insertChild(stmtNode, lastDeclLocation);
+				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
 			} 
 		}
 	}

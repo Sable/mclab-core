@@ -24,7 +24,7 @@ public class ASTToolBox {
  	}
 
 	// Find the close parent node 
- 	public static ASTNode getParentAssignStmtNode(ASTNode varNode) {
+ 	public static AssignStmt getParentAssignStmtNode(ASTNode varNode) {
 	    ASTNode parentNode = varNode.getParent();
 	    // If the varNode is already the assignment-statement, then don't need 
 	    // to find it's parent
@@ -38,7 +38,7 @@ public class ASTToolBox {
 	    		parentNode = parentNode.getParent(); 	   
 	    	}
 	    }
-	    return parentNode;
+	    return (AssignStmt)parentNode;
  	}
 	// Find the close parent node 
  	public static natlab.ast.List getParentStmtListNode(ASTNode varNode) {
@@ -58,4 +58,21 @@ public class ASTToolBox {
 	    return (natlab.ast.List) parentNode;
  	}
 	
+ 	public static boolean isInsideArray(ASTNode varNode) {
+ 		boolean bResult = false;
+	    ASTNode parentNode = varNode;
+	    do{
+		    if((parentNode instanceof AssignStmt) ) {
+		    	break;
+		    } if((parentNode instanceof ParameterizedExpr) ) {
+		    	bResult = true;
+		    	break;
+		    } else {
+	    		parentNode = parentNode.getParent(); 	   
+		    }
+	    } while((parentNode!=null) && !bResult);
+	    
+	    return bResult;
+ 	}
+
 }

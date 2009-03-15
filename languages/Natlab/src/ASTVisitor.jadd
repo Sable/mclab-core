@@ -134,9 +134,12 @@ aspect ASTVisitor {
 	// Index for all nodes
     private static int ASTNode.internalNodeID = 0;
     private int ASTNode.NodeID = 0;
+    public void ASTNode.initNodeID() { internalNodeID=0;}
     public int ASTNode.nextNodeID() { return ++internalNodeID;}
     public int ASTNode.getNodeID() { return NodeID;}
     public int ASTNode.getLastNodeID() { return internalNodeID;}
+    // counter record how many tmp variable create from it
+    public int ASTNode.VarCnt = 0;	
     // Only NodeID can only be set once.
     public boolean ASTNode.setNodeID() { 
     	if(NodeID==0) {
@@ -242,9 +245,29 @@ aspect ASTVisitor {
     	nestedLevelCounter--;
     }
     public void AssignStmt.generateUseBoxesList() {
-    	nestedLevelCounter++;
-    	super.generateUseBoxesList();
-    	nestedLevelCounter--;
+    	// Simplify RHS when LHS is a array access, 
+    	if(getLHS() instanceof ParameterizedExpr && !(getRHS() instanceof NameExpr)) {
+            nestedLevelCounter++;
+            // Following is a modified version from ASTNode.generateUseBoxesList()
+        	// set the node ID first
+        	setNodeID();
+        	nestedLevel = nestedLevelCounter;	 
+        	// Generate the uses boxes  
+        	generateUseBoxes();
+        	// handle LHS() as normal
+	    	getLHS().generateUseBoxesList();
+	    	// handle RHS(), increase the nested-level-counter
+	    	nestedLevelCounter++;
+	    	getRHS().generateUseBoxesList();
+            // Collecting the uses boxes 
+            collectUseBoxesList();
+            // restore nested-level-counter
+	    	nestedLevelCounter-=2;
+        } else {
+        	nestedLevelCounter++;
+        	super.generateUseBoxesList();
+        	nestedLevelCounter--;
+        }
     }
     
     public void ParameterizedExpr.generateUseBoxesList() {
@@ -253,6 +276,11 @@ aspect ASTVisitor {
     	nestedLevelCounter--;
     }
     public void BinaryExpr.generateUseBoxesList() {
+    	nestedLevelCounter++;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter--;
+    }
+    public void RangeExpr.generateUseBoxesList() {
     	nestedLevelCounter++;
     	super.generateUseBoxesList();
     	nestedLevelCounter--;
@@ -293,7 +321,12 @@ aspect ASTVisitor {
         }
     	nestedLevelCounter--;
     }
-
+    // All Transpose expression will be simplified
+    public void MTransposeExpr.generateUseBoxesList() {
+    	nestedLevelCounter+=2;
+    	super.generateUseBoxesList();
+    	nestedLevelCounter-=2;
+    }
 
 	// Generate function for collecting all its child-nodes' use-boxes
     public void ASTNode.collectUseBoxesListAll() {

@@ -135,114 +135,11 @@ aspect TypeCollection {
 	public annotations.ast.Type MatrixExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
 		// #. Calling type inference engine to get the type
 		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
-/*		
-		annotations.ast.Type elementType=null;
-		annotations.ast.Type tmpType=null;
-		// 1. Calling to next level 
-        List<Row> rows = getRows();
-		int maxColumn=0;
-		int rowElem, totalNum=0;
-        for(Row row : rows) {
-        	// TODO: this one may not check all row, because the 'break' below
-        	rowElem = row.getElements().getNumChild();
-        	if(maxColumn < rowElem)
-        		maxColumn = rowElem;
-        		
-			tmpType = row.collectType(stScope, varNode);
-
-			// Return biggest KNOWN element's type
-			// TODO: currently just support matrix with primary type
-			// 	and maximum type is DOUBLE! (which should be COMPLEX)
-			if(tmpType!=null) {
-				if(elementType == null)	{
-					elementType = tmpType;
-				} 
-				if(elementType.getName().equals("double")) {
-					break;
-				} else if(tmpType.getName().equals("double")) {
-					elementType = tmpType;
-					break;
-				} else if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
-					// Add each row's length 
-					int loc1= tmpType.getName().indexOf("(");
-					int loc2= tmpType.getName().indexOf(")");					
-					totalNum += (new Integer(tmpType.getName().substring(loc1+1,loc2))).intValue();
-				}
-			} else {
-				elementType = null;
-			}
-			// System.err.println("MatrixExpr-Row:[<"+getNodeID()+">] " + elementType.getName()+"("+totalNum);
-        }
-        // The elementType should be a kind of PrimitiveType, here adding the dimensions
-        if(elementType!=null) {
-			java.util.List<Integer> dim = new java.util.ArrayList<Integer>();
-			annotations.ast.Type varType; 
-			
-			// Doing string concatenation ['ab','cd'] ='abcd', generate Primitive-Type
-	        // MATLAB doesn't allow vertical concatenation, ['ab';'cd'] is illegal!
-	        if(natlab.TypeInferenceEngine.isCharacterType(elementType)) {
-				// System.err.println("MatrixExpr collectType:[<"+getNodeID()+">] " + elementType.getName()+"("+totalNum);
-				varType = new annotations.ast.PrimitiveType("character("+(totalNum)+")");
-				// The whole string concatenation is happened in Row.getFortran() 
-			} else {
-				// Normal matrix type
-				for(int i=0; i<rows.getNumChild(); i++) {
-					dim.add(maxColumn);
-				}
-				varType = new annotations.ast.MatrixType(
-						new annotations.ast.PrimitiveType(elementType.getName()));
-				((annotations.ast.MatrixType) varType).setSize(new annotations.ast.Size(dim));
-			}
-			return varType;
-        } else {
-        	return null;
-        }
-*/
 	}
 
 	public annotations.ast.Type Row.collectType(SymbolTableScope stScope, ASTNode varNode)  {
 		// #. Calling type inference engine to get the type
 		return natlab.TypeInferenceEngine.inferType(stScope, this, varNode);
-/*		
-		annotations.ast.Type elementType=null;
-		annotations.ast.Type tmpType=null;
-		int totalNum = 0;
-		// 1. Calling to next level 
-        List<Expr> elements = getElements();
-        for(Expr element : elements) {
-			tmpType = element.collectType(stScope, varNode);
-			// Return biggest KNOWN element's type
-			// TODO: currently just support matrix with primary type
-			// 	and maximum type is DOUBLE! (which should be COMPLEX)
-			if(tmpType!=null) {
-				if(elementType == null)	{
-					elementType = tmpType;
-				} 
-				if(elementType.getName().equals("double")) {
-					break;
-				} else if(tmpType.getName().equals("double")) {
-					elementType = tmpType;
-					break;
-				} else if(natlab.TypeInferenceEngine.isCharacterType(tmpType)){ 
-					// Doing string concatenation ['ab','cdf'] ='abcdf'
-					// And need to know length of each of them
-					int loc1= tmpType.getName().indexOf("(");
-					int loc2= tmpType.getName().indexOf(")");					
-					totalNum += (new Integer(tmpType.getName().substring(loc1+1,loc2))).intValue();
-				}
-			} else {
-				elementType = null;
-			}
-         }
-        if(natlab.TypeInferenceEngine.isCharacterType(tmpType)) {
-			// Doing string concatenation ['ab','cdf'] ='abcdf'
-			// And need to know length of each of them
-			elementType = new annotations.ast.PrimitiveType("character("+(totalNum)+")");
-		}
-        
-		// 2. Don't change the row itself 
-		return elementType;
-*/		
 	}
 	
 	// i.e.  for i=(1:runs) in an integer, handle here.
@@ -287,9 +184,14 @@ aspect UpdateSymbolTableScope {
     public SymbolTableScope Function.updateSymbolTableScope(SymbolTableScope symtbl) {
     	// Finding the VariableDecl node for each entry,	
     	if(!bParamDeclAdded) {
+    		// Adding input/output parameters,  skip dumplicated, 
 	    	List<VariableDecl> pDeclList = getParamDeclList();
+	    	java.util.HashSet<String> varSet = new java.util.HashSet<String>(); 
 	    	for(VariableDecl decl: pDeclList) {
-	    		addDeclStmt(decl);
+	    		if(!varSet.contains(decl.getID())) {
+		    		varSet.add(decl.getID());
+		    		addDeclStmt(decl);
+	    		}
 	    	}
     	}
 

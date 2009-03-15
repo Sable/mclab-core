@@ -20,7 +20,8 @@ public class SymbolTableEntry
     private LiteralExpr value=null;		// max value
     private LiteralExpr valueMin=null;	// min value 
     private String valueStr="";			// min value 
-    private boolean isConstant=false;	 
+    private boolean isConstant=false;
+    public boolean isFirmType=false;		// if it's true, then its dimensions cannot be changed
     // The old way is 'value' just keep the constant value,
     // right now, value can store StringLiteralExpr
     
