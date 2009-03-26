@@ -120,7 +120,7 @@ public class Main
 		    }
 		    if( options.xml() ){
 		    	//System.out.println(cu.ASTtoXML());
-		    	System.out.println(cu.XMLtoString(cu.ASTtoXML()));
+		    	System.out.print(cu.XMLtoString(cu.ASTtoXML()));
 		    }
 		    else if( options.pretty() ){
                         if( !quiet )
