@@ -1,0 +1,151 @@
+
+%goal annotation;
+
+Annotation annotation =
+     stmt.l* {: return new Annotation(nullToEmpty(makeListNode((java.util.List<Stmt>)l))); :}
+  ;
+
+Stmt stmt =
+     stmt_body.s STMT_TERMINATOR
+  ;
+
+Stmt stmt_body =
+     type_stmt_body
+  |  size_stmt_body
+  |  scalar_stmt_body
+  ;
+
+Entity entity =
+     IDENTIFIER.i {: return new Variable(i); :}
+  |  entity.e LCURLY num_list.l RCURLY {: return new Cell(e, (java.util.List<Integer>) l.value); :}
+  |  entity.e DOT IDENTIFIER.i {: return new Field(e, i); :}
+  ;
+
+TypeStmt type_stmt_body =
+     entity.e HAS_TYPE type.t {: return new TypeStmt(e, t); :}
+  ;
+
+Type type =
+     list_type
+  |  arrow_type
+  |  intersection_type
+  ;
+
+IntersectionType intersection_type =
+     intersection_op_type.t1 INTERSECT intersection_op_type.t2 {: return new IntersectionType(new List<Type>().add(t1).add(t2)); :}
+  |  intersection_type.i INTERSECT intersection_op_type.t {: i.getTypes().add(t); return i; :}
+  ;
+
+Type intersection_op_type =
+     list_type_parenthesize_union
+  |  arrow_type
+  ;
+
+ArrowType arrow_type =
+     arg_list_type.a ARROW result_type.t {: return new ArrowType(a, t); :}
+  ;
+
+Type arg_list_type =
+     result_type
+  |  LPAREN list_type_list.l ELEMENT_SEPARATOR vararg_type.t RPAREN {: return new ArgTupleType(l, t); :}
+  ;
+
+Type result_type =
+     list_type_parenthesize_union
+  |  vararg_type
+  |  unit_type
+  ;
+
+VarArgType vararg_type =
+     list_type_parenthesize_union.t VARARG_MODIFIER {: return new VarArgType(t); :}
+  ;
+
+UnitType unit_type =
+     LPAREN RPAREN {: return new UnitType(); :}
+  ;
+
+Type list_type =
+     base_type
+  |  tuple_type
+  |  cell_array_type
+  |  union_type
+  |  matrix_type
+  ;
+
+Type list_type_parenthesize_union =
+     base_type
+  |  tuple_type
+  |  cell_array_type
+  |  LPAREN union_type.t RPAREN
+  |  matrix_type
+  ;
+
+List list_type_list =
+     list_type.t {: return new List<Type>().add(t); :}
+  |  list_type_list.l ELEMENT_SEPARATOR list_type.t {: return l.add(t); :}
+  ;
+
+TupleType tuple_type =
+  |  LPAREN list_type_list.l ELEMENT_SEPARATOR list_type.t RPAREN {: return new TupleType(l.add(t)); :}
+  ;
+
+CellArrayType cell_array_type =
+     LCURLY list_type.t RCURLY {: return new CellArrayType(t); :}
+  ;
+
+UnionType union_type =
+     union_op_type.t1 UNION union_op_type.t2 {: return new UnionType(new List<Type>().add(t1).add(t2)); :}
+  |  union_type.u UNION union_op_type.t {: u.getTypes().add(t); return u; :}
+  ;
+
+Type union_op_type =
+     base_type
+  |  tuple_type
+  |  cell_array_type
+  |  matrix_type
+  |  LPAREN intersection_type.t RPAREN
+  |  LPAREN arrow_type.t RPAREN
+  ;
+
+Type matrix_type =
+     LSQUARE base_type.b RSQUARE {: return new MatrixType(b); :}
+  ;
+
+BaseType base_type =
+     IDENTIFIER.i {: return new PrimitiveType(i); :}
+  |  TYPE_VAR_MODIFIER IDENTIFIER.i {: return new TypeVarType(i); :}
+  |  HANDLE_MODIFIER LPAREN arrow_type.a RPAREN {: return new HandleType(a); :}
+  |  UNKNOWN_TYPE {: return new UnknownType(); :}
+  |  struct_type
+  ;
+
+StructType struct_type =
+     LCURLY field_entry_list.l RCURLY {: return new StructType(l); :}
+  ;
+
+FieldEntry field_entry =
+     IDENTIFIER.i HAS_TYPE type.t {: return new FieldEntry(i, t); :}
+  ;
+
+List field_entry_list =
+     field_entry.e {: return new List<FieldEntry>().add(e); :}
+  |  field_entry_list.l ELEMENT_SEPARATOR field_entry.e {: return l.add(e); :}
+  ;
+
+SizeStmt size_stmt_body =
+     SIZE_OF entity.e EQ size.s {: return new SizeStmt(e, s); :}
+  ;
+
+Size size =
+     LSQUARE num_list.l RSQUARE {: return new Size((java.util.List<Integer>) l.value); :}
+  ;
+
+num_list =
+     NUMBER.n {: java.util.List<Integer> nums = new java.util.ArrayList<Integer>(); nums.add(Integer.getInteger(n)); return new Symbol(nums); :}
+  |  num_list.l ELEMENT_SEPARATOR NUMBER.n {: ((java.util.List<Integer>) l.value).add(Integer.getInteger(n)); return l; :}
+  ;
+
+ScalarStmt scalar_stmt_body =
+     IS_SCALAR entity.e {: return new ScalarStmt(e, true); :}
+  |  IS_NOT_SCALAR entity.e {: return new ScalarStmt(e, false); :}
+  ;

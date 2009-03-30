@@ -5,7 +5,9 @@ Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;
 EmptyProgram : Program;
 
-abstract ClassBody;
+abstract Body;
+abstract ClassBody : Body;
+
 ClassDef : Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents*;
 Attribute ::= <Key:String> Expr;
 SuperClass ::= <Name:String>;
@@ -17,13 +19,16 @@ PropertyAccess ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Na
 ClassEvents:ClassBody ::= Attribute* Event*;
 Event ::= <Name:String>;
 
+Function ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+
+abstract ClassMethod;
+abstract FunctionStmt;
+
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;
 MultiLineHelpComment : HelpComment;
 
 Name ::= <ID : String>;
-
-Function ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
 
 abstract Stmt;
 ExprStmt : Stmt ::= Expr;

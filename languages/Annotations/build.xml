@@ -65,7 +65,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests" />
+	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests" />
 
 	<!-- Overriding to define classpaths (may depend on bin.dir) -->
 	<target name="set.bin.dir" depends="BinDir.set.bin.dir">

@@ -7,6 +7,7 @@
 	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
 	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="jastaddparser.jar.path" path="${lib.dir}/JastAddParser/JastAddParser.jar" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
@@ -66,7 +67,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen, gen.tests, options" />
+	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests, options" />
 
 	<!-- Special target for building MATLAB2Fortran Code-Gen -->
 	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
@@ -78,6 +79,12 @@
 			<arg value="${src.dir}/${lexer.dir}" />
 			<arg value="${gen.dir}/${lexer.dir}" />
 		</java>
+		
+		<java jar="${lib.dir}/${metalexer.jar.path.prop}" failonerror="true" fork="true">
+			<arg value="${aspects.layout.name}" />
+			<arg value="${src.dir}/${lexer.dir}" />
+			<arg value="${gen.dir}/${lexer.dir}" />
+		</java>
 	</target>
 
 	<!-- generates Java files from JFlex scanner spec -->
@@ -85,6 +92,9 @@
 	<target name="jflex" depends="def.jflex.task, metalexer">
 		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.meta.flex" destdir="${gen.dir}" nobak="yes" />
 		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
+		
+		<jflex file="${gen.dir}/${lexer.dir}/${aspects.layout.name}.meta.flex" destdir="${gen.dir}" nobak="yes" />
+		<jflex file="${gen.dir}/${lexer.dir}/${aspects.layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
 	<!--=====================================================================-->
@@ -131,7 +141,7 @@
 		<ant dir="${matlab.dir}" target="clean" inheritall="false" />
 	</target>
 
-	<target name="matlab.eclipse.build" description="call eclipse.build in the Matlab language">
+	<target name="matlab.eclipse.build" depends="set.annotations.bin.dir" description="call eclipse.build in the Matlab language">
 		<ant dir="${matlab.dir}" target="eclipse.build" inheritall="false" />
 	</target>
 	<target name="matlab.eclipse.clean" description="call eclipse.clean in the Matlab language">
@@ -164,6 +174,7 @@
 			<path refid="antlr.jar.path" />
 			<path location="${basedir}/${bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
+			<path location="${basedir}/${annotations.bin.dir}" />
 		</path>
 	</target>
 

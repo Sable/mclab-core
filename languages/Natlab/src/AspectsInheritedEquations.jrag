@@ -1,0 +1,32 @@
+aspect AspectsInheritedEquations {
+
+	//Name Resolution
+
+    eq Aspect.getMethod(int i).isLValue() = false;
+    eq Aspect.getAction(int i).isLValue() = false;
+    eq Aspect.getProperty(int i).isLValue() = false;
+    eq Aspect.getPattern(int i).isLValue() = false;
+
+    eq Aspect.getMethod(int i).getSiblingsInh() = new HashMap<String,Function>();
+
+    eq Aspect.getMethod(int i).getParentFunction() = null;
+
+
+	//TypeInference
+
+    eq Aspect.getMethod(int i).getType( Name n ) = localGetType( n );
+    eq Aspect.getAction(int i).getType( Name n ) = localGetType( n );
+    eq Aspect.getProperty(int i).getType( Name n ) = localGetType( n );
+    eq Aspect.getPattern(int i).getType( Name n ) = localGetType( n );
+
+    eq Aspect.getMethod(int i).getSize( Name n ) = localGetSize( n );
+    eq Aspect.getAction(int i).getSize( Name n ) = localGetSize( n );
+    eq Aspect.getProperty(int i).getSize( Name n ) = localGetSize( n );
+    eq Aspect.getPattern(int i).getSize( Name n ) = localGetSize( n );
+
+
+	//SymbolTable {
+
+	eq Aspect.getAction(int i).getScope() = this;
+
+}

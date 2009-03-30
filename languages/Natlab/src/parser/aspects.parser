@@ -1,0 +1,42 @@
+
+Aspect aspect =
+     ASPECT IDENTIFIER.name stmt_separator_list help_comment.comments* aspect_body.body* END 
+	 	{: return aspect(name, comments, body); :}
+  ;
+  
+Body aspect_body =
+     properties_block.p stmt_separator_opt_list {: return p; :}
+  |  methods_block.m stmt_separator_opt_list {: return m; :}
+  |  patterns_block.p stmt_separator_opt_list {: return p; :}
+  |  actions_block.a stmt_separator_opt_list {: return a; :}
+  ;
+
+Patterns patterns_block =
+	 PATTERNS stmt_separator_list patterns_body.body* END {: return new Patterns(body); :}
+  ;
+
+Pattern patterns_body =
+     IDENTIFIER.name COLON pattern_designators.pd stmt_separator_list {: return new Pattern(name, pd); :}
+  ;
+  
+Expr pattern_designators =
+     pattern_designator.pd {: return pd; :}
+  |  LPAREN pattern_designators.pd RPAREN {: return pd; :}
+  |  pattern_designators.l AND pattern_designator.pd {: return new AndExpr(l, pd); :}
+  |  pattern_designators.l OR pattern_designator.pd {: return new OrExpr(l, pd); :}
+  ;
+     
+Expr pattern_designator =
+     IDENTIFIER.name LPAREN arg_list.l RPAREN {: return new PatternDesignator(name, l); :}
+  ;
+  
+Actions actions_block =
+	 ACTIONS stmt_separator_list actions_body.body* END {: return new Actions(body); :}
+  ;
+  
+AspectAction actions_body =
+     IDENTIFIER.name COLON IDENTIFIER.type IDENTIFIER.pattern COLON input_params.in stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return action(name, type, pattern, in, comments, body); :}
+  |  IDENTIFIER.name COLON IDENTIFIER.type IDENTIFIER.pattern stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return action(name, type, pattern, null, comments, body); :}
+  ;

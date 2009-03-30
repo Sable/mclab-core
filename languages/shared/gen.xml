@@ -14,7 +14,23 @@
 	<target name="beaver" depends="def.beaver.task">
 		<beaver file="${src.dir}/${parser.spec}" destdir="${gen.dir}" terminalNames="yes" compress="no" useSwitch="yes" />
 	</target>
-
+	
+	<target name="parser" depends="def.beaver.task">
+                <mkdir dir="${gen.dir}/parser"/>
+                <!-- generate the parser phase 1, create a full .lalr specification from fragments-->
+                <concat destfile="${gen.dir}/${parser.input}" binary="true" force="false">
+                        <fileset dir="${src.dir}">
+                                <include name="**/*.parser"/>
+                        </fileset>
+                </concat>
+                <!-- generate the parser phase 2, translating .lalr to .beaver -->
+		<java classpath="${lib.dir}/${jastaddparser.jar.path.prop}:${lib.dir}/${beaver.rt.jar.path.prop}" classname="Main" fork="true">
+                        <arg line="${gen.dir}/${parser.input} ${gen.dir}/${parser.grammar}"/>
+                </java>
+                <!-- generate the parser phase 3, translating .beaver to .java -->
+                <beaver file="${gen.dir}/${parser.grammar}" destdir="${gen.dir}/${parser.output}" terminalNames="yes" compress="no" useSwitch="yes"/>
+        </target>
+	
 	<!-- generates Java files from JastAdd specs -->
 	<target name="jastadd" depends="def.jastadd.task">
 		<mkdir dir="${gen.dir}/${ast.pkg}" />
@@ -32,8 +48,12 @@
 		</jastadd>
 	</target>
 
-	<!-- jflex, beaver, jastadd, and options -->
-	<target name="gen" depends="jflex, beaver, jastadd" />
+        <!-- Gen - beaver: jflex, beaver, jastadd, and options -->
+        <target name="gen" depends="jflex, beaver, jastadd" />
+
+	<!-- Gen - parser+beaver: jflex, parser+beaver, jastadd, and options -->
+        <target name="gen-parser" depends="jflex, parser, jastadd" />
+	
 	<!-- remove files created by gen -->
 	<target name="clean.gen">
 		<delete includeemptydirs="true">

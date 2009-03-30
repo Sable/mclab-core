@@ -1,0 +1,8 @@
+%component aspects_start
+%helper
+
+%extern "Symbol symbol(short)"
+
+%%
+
+"aspect" {: :} START_ASPECT
