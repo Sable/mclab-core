@@ -42,10 +42,12 @@ public class Main
                 quiet = options.quiet();  //check if quiet mode is active
 
                 if( options.e() ){
-                    System.err.println("exhaustive list");
+                    if( !quiet )
+                        System.err.println("exhaustive list");
                 }
                 if( options.d() ){
-                    System.err.println("dynamic linking");
+                    if( !quiet )
+                        System.err.println("dynamic linking");
                 }
                 if( options.getFiles().size() == 0 ){
                     System.err.println("No files provided, must have at least one file.");
@@ -106,7 +108,8 @@ public class Main
                             System.err.println("Parsing: " + file);
                         Program prog = parseFile( file,  fileReader, errors );
 
-                        System.err.println( errors.toString() );
+                        if( errors.length() > 0 )
+                            System.err.print( errors.toString() );
                         
                         if( prog == null ){
                             System.err.println("\nSkipping " + file);
