@@ -110,12 +110,11 @@
 
     //helper for constructing an AST Function node
     //separates stmts from nested functions and attaches comments
-    private Function function(List<Name> outParams, String name, List<Name> inParams, List<HelpComment> comments, List body) {
+    private Function function(List<Name> outParams, String name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         if(body != null) {
-            for(Object obj : body) {
-            	Symbol stmtOrFcn = (Symbol)obj;
+            for(Symbol stmtOrFcn : body) {
                 if(stmtOrFcn instanceof Stmt) {
                     stmts.add((Stmt) stmtOrFcn);
                 } else if(stmtOrFcn instanceof Function) {
@@ -168,13 +167,12 @@
     
     //helper for constructing an AST Methods node
     //separates signatures from functions
-    private Methods methods(List<Attribute> attr, List body) {
+    private Methods methods(List<Attribute> attr, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Signature> sign = new List<Signature>();
         List<PropertyAccess> prop = new List<PropertyAccess>();
         List<Function> function = new List<Function>();
         if(body != null) {
-            for(Object obj : body) {
-            	Symbol signOrFcn = (Symbol)obj;
+            for(Symbol signOrFcn : body) {
                 if(signOrFcn instanceof Signature) {
                     sign.add((Signature) signOrFcn);
                 } else if(signOrFcn instanceof PropertyAccess) {
@@ -195,12 +193,11 @@
     
     //helper for constructing an AST PropertAccess node
     //separates stmts from nested functions and attaches comments
-    private PropertyAccess propertyAccess(List<Name> outParams, String access, String name, List<Name> inParams, List<HelpComment> comments, List body) {
+    private PropertyAccess propertyAccess(List<Name> outParams, String access, String name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         if(body != null) {
-            for(Object obj : body) {
-            	Symbol stmtOrFcn = (Symbol)obj;
+            for(Symbol stmtOrFcn : body) {
                 if(stmtOrFcn instanceof Stmt) {
                     stmts.add((Stmt) stmtOrFcn);
                 } else if(stmtOrFcn instanceof Function) {
@@ -257,13 +254,12 @@
     
     //helper for constructing an AST Action node
     //separates stmts from nested functions and attaches comments
-    private AspectAction action(String name, String place, String pattern, List<Name> inParams, List<HelpComment> comments, List body) {
+    private AspectAction action(String name, String place, String pattern, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         
         if(body != null) {
-            for(Object obj : body) {
-            	Symbol stmtOrFcn = (Symbol)obj;
+            for(Symbol stmtOrFcn : body) {
                 if(stmtOrFcn instanceof Stmt) {
                     stmts.add((Stmt) stmtOrFcn);
                 } else if(stmtOrFcn instanceof Function) {

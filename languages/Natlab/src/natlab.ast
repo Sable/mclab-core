@@ -7,6 +7,7 @@ EmptyProgram : Program;
 
 abstract Body;
 abstract ClassBody : Body;
+abstract FunctionOrSignatureOrPropertyAccessOrStmt;
 
 ClassDef : Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents*;
 Attribute ::= <Key:String> Expr;
@@ -14,15 +15,12 @@ SuperClass ::= <Name:String>;
 Properties:ClassBody ::= Attribute* Property*;
 Property ::= <Name:String> Expr;
 Methods:ClassBody ::= Attribute* Signature* PropAcc:PropertyAccess* Function*;
-Signature ::= OutputParam:Name* <Name:String> InputParam:Name*;
-PropertyAccess ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+Signature : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name*;
+PropertyAccess : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
 ClassEvents:ClassBody ::= Attribute* Event*;
 Event ::= <Name:String>;
 
-Function ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
-
-abstract ClassMethod;
-abstract FunctionStmt;
+Function : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;
@@ -30,7 +28,7 @@ MultiLineHelpComment : HelpComment;
 
 Name ::= <ID : String>;
 
-abstract Stmt;
+abstract Stmt : FunctionOrSignatureOrPropertyAccessOrStmt;
 ExprStmt : Stmt ::= Expr;
 AssignStmt : Stmt ::= LHS:Expr RHS:Expr;
 GlobalStmt : Stmt ::= Name*;

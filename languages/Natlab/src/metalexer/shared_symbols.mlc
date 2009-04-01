@@ -104,14 +104,21 @@
     commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
 :}
 
-//numeric literals
-{IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
-{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
-{FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
-{HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
-{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
-{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :} START_TRANSPOSE
-{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :} START_TRANSPOSE
+//numeric literals - TODO: changed to strings because of JastAddParser limitation
+//{IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
+//{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
+//{FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
+//{HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
+//{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :} START_TRANSPOSE
+{IntNumber} {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{FPNumber} {: return symbol(FP_NUMBER, yytext()); :} START_TRANSPOSE
+{HexNumber} {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
 
 //bang (!) syntax
 {ShellCommand} {: return symbol(SHELL_COMMAND, yytext().substring(1)); :}

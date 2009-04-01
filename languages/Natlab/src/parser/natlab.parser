@@ -71,7 +71,7 @@ List param_list =
   ;
 
 //used to mix stmts and nested functions in a containing function
-FunctionStmt stmt_or_function =
+FunctionOrSignatureOrPropertyAccessOrStmt stmt_or_function =
      stmt.s {: return s; :}
      //NB: body since otherwise there is a conflict: function newline could be 
      //  (function, empty stmt) or (function with newline)
@@ -135,10 +135,10 @@ Property properties_body =
   |  IDENTIFIER.name ASSIGN expr.value stmt_separator_list {: return new Property(name, value); :}
   ;
 
-ClassMethod methods_body =
+FunctionOrSignatureOrPropertyAccessOrStmt methods_body =
 	 function.f {: return f; :}
   |  function_signature.s {: return s; :}
-  |  property_access.p stmt_separator_opt_list {: return p; :}
+  |  property_access.p {: return p; :}
   ;
   
 Signature function_signature =
@@ -275,12 +275,12 @@ BooleanFakeSymbol stmt_separator =
   ;
 
 List stmt_separator_opt_list =
-    {: return null; :}
-  | stmt_separator_list.n
+    {: return new List(); :}
+  | stmt_separator_list.n {: return n; :}
   ;
 List stmt_separator_list =
-    stmt_separator.n
-  | stmt_separator_list.l stmt_separator.n
+    stmt_separator.n {: return new List(); :}
+  | stmt_separator_list.l stmt_separator.n {: return l; :}
   ;
 
 //assingment appearing in a for loop (i.e. optionally surrounded by parens)
@@ -405,11 +405,12 @@ Expr cell_access =
 
 LiteralExpr literal =
      INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i)); :}
-  |  IM_INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i)); :}
+  |  IM_INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i, true)); :}
   |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f)); :}
-  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f)); :}
+  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f, true)); :}
   |  STRING.s {: return new StringLiteralExpr(s); :}
   ;
+
 
 MatrixExpr matrix =
      LSQUARE optional_row_list.l RSQUARE {: return new MatrixExpr(l); :}
