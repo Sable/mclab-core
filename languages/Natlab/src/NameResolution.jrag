@@ -340,6 +340,12 @@ aspect NameResolution{
     //eq Program.doRewrite() = canDoRewrites;
     inh boolean ASTNode.doDeclRewrite();
 
+    eq List.getChild(int i).doDeclRewrite(){
+        if( getParent() == null )
+            return false;
+        else
+            return doDeclRewrite();
+    }
     eq Program.getChild(int i).doDeclRewrite() = canDoDeclRewrites;
     syn boolean Program.doDeclRewrite() = canDoDeclRewrites;
         
