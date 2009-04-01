@@ -7,7 +7,7 @@
 	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
 	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
-	<path id="jastaddparser.jar.path" path="${lib.dir}/JastAddParser/JastAddParser.jar" />
+	<path id="jastaddparser.jar.path" path="${lib.dir}/${jastaddparser.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
