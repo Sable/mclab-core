@@ -277,7 +277,7 @@ aspect NameResolution{
     
     private boolean Script.doneDeclRewrite = false;
     rewrite Script{
-        when( doDeclRewrite() && !doneDeclRewrite )
+        when( getParent()!=null && doDeclRewrite() && !doneDeclRewrite )
         to Script{
             Script s = new Script();
             s.setHelpCommentList(getHelpCommentList());
@@ -303,7 +303,7 @@ aspect NameResolution{
     }
 
     rewrite Function{
-        when( doDeclRewrite() && !(this instanceof FunctionDecl) )
+        when( getParent()!=null && doDeclRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
             FunctionDecl f = new FunctionDecl();
             //set f with all the same data as original function
