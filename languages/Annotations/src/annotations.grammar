@@ -85,6 +85,7 @@
 %terminals LPAREN, RPAREN, LCURLY, RCURLY, LSQUARE, RSQUARE;
 %terminals VARARG_MODIFIER, HANDLE_MODIFIER, TYPE_VAR_MODIFIER, UNKNOWN_TYPE, ARROW;
 %terminals UNION, INTERSECT;
+%terminals LOOP_FUSION, LOOP_FISSION, LOOP_INTERCHANGE, LOOP_REVERSAL, LOOP_UNROLLING;
 
 %typeof NUMBER = "Integer";
 %typeof IDENTIFIER = "String";
@@ -115,6 +116,8 @@
 %typeof size_stmt_body = "SizeStmt";
 %typeof size = "Size";
 %typeof scalar_stmt_body = "ScalarStmt";
+%typeof opt_stmt_body = "OptStmt";
+%typeof loop_opt_stmt_body = "LoopOptStmt";
 
 %goal annotation;
 
@@ -130,6 +133,7 @@ stmt_body =
      type_stmt_body
   |  size_stmt_body
   |  scalar_stmt_body
+  |  opt_stmt_body
   ;
 
 entity =
@@ -265,4 +269,16 @@ num_list =
 scalar_stmt_body =
      IS_SCALAR entity.e {: return new ScalarStmt(e, true); :}
   |  IS_NOT_SCALAR entity.e {: return new ScalarStmt(e, false); :}
+  ;
+
+opt_stmt_body =
+     loop_opt_stmt_body
+  ;
+
+loop_opt_stmt_body =
+     LOOP_FUSION {: return new LoopFusionOpt(); :}
+  |  LOOP_FISSION {: return new LoopFissionOpt(); :}
+  |  LOOP_INTERCHANGE {: return new LoopInterchangeOpt(); :}
+  |  LOOP_REVERSAL {: return new LoopReversalOpt(); :}
+  |  LOOP_UNROLLING {: return new LoopUnrollingOpt(); :}
   ;

@@ -107,6 +107,12 @@ Comment = [/][/] .*
 "+" { return symbol(IS_SCALAR); }
 "-" { return symbol(IS_NOT_SCALAR); }
 
+LoopFusion { return symbol(LOOP_FUSION); }
+LoopFission { return symbol(LOOP_FISSION); }
+LoopInterchange { return symbol(LOOP_INTERCHANGE); }
+LoopReversal { return symbol(LOOP_REVERSAL); }
+LoopUnrolling { return symbol(LOOP_UNROLLING); }
+
 {Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
 
 {Identifier} { return symbol(IDENTIFIER, yytext()); }

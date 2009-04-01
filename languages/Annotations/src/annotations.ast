@@ -4,6 +4,14 @@ abstract Stmt;
 SizeStmt : Stmt ::= Entity Size;
 TypeStmt : Stmt ::= Entity Type;
 ScalarStmt : Stmt ::= Entity <Scalar:boolean>;
+abstract OptStmt : Stmt;
+
+abstract LoopOptStmt : OptStmt;
+LoopFusionOpt : LoopOptStmt;
+LoopFissionOpt : LoopOptStmt;
+LoopInterchangeOpt : LoopOptStmt;
+LoopReversalOpt : LoopOptStmt;
+LoopUnrollingOpt : LoopOptStmt;
 
 abstract Entity;
 Variable : Entity ::= <Name>;

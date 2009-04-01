@@ -175,4 +175,10 @@ aspect StructureString {
 		return buf.toString();
 	}
 	eq FieldEntry.getStructureString() = getName() + " : " + getType().getStructureString();
+	
+	eq LoopFusionOpt.getStructureString() = "LoopFusion;\n";
+	eq LoopFissionOpt.getStructureString() = "LoopFission;\n";
+	eq LoopInterchangeOpt.getStructureString() = "LoopInterchange;\n";
+	eq LoopReversalOpt.getStructureString() = "LoopReversal;\n";
+	eq LoopUnrollingOpt.getStructureString() = "LoopUnrolling;\n";
 }

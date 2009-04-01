@@ -349,4 +349,17 @@ aspect ASTtoXML {
 		parent.appendChild(e);
         return true;
 	}
+    
+    eq LoopOptStmt.getXML(Document doc, Element parent) {
+        long id = nodeCounter();
+        setuID(id);
+        
+        String className = getClass().getName();
+        Element e = doc.createElement(className.substring(className.lastIndexOf('.') + 1));
+        e.setAttribute("id", Long.toString(id));
+        e.setAttribute("name", Long.toString(id));
+        
+        parent.appendChild(e);
+        return true;
+    }
 }

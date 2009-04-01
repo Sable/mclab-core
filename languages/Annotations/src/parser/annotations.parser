@@ -13,6 +13,7 @@ Stmt stmt_body =
      type_stmt_body
   |  size_stmt_body
   |  scalar_stmt_body
+  |  opt_stmt_body
   ;
 
 Entity entity =
@@ -148,4 +149,16 @@ num_list =
 ScalarStmt scalar_stmt_body =
      IS_SCALAR entity.e {: return new ScalarStmt(e, true); :}
   |  IS_NOT_SCALAR entity.e {: return new ScalarStmt(e, false); :}
+  ;
+
+OptStmt opt_stmt_body =
+     loop_opt_stmt_body
+  ;
+
+LoopOptStmt loop_opt_stmt_body =
+     LOOP_FUSION {: return new LoopFusionOpt(); :}
+  |  LOOP_FISSION {: return new LoopFissionOpt(); :}
+  |  LOOP_INTERCHANGE {: return new LoopInterchangeOpt(); :}
+  |  LOOP_REVERSAL {: return new LoopReversalOpt(); :}
+  |  LOOP_UNROLLING {: return new LoopUnrollingOpt(); :}
   ;
