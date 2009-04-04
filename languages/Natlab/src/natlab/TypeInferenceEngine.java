@@ -1380,8 +1380,12 @@ public class TypeInferenceEngine {
             } else if(fname.equalsIgnoreCase("char")) {
     			// TODO: char() is quite complicated
     			
-            } else if(fname.equalsIgnoreCase("randn") || fname.equalsIgnoreCase("rand")) { 
-    			varType = createMatrixType(TYPENAME_DOUBLE, expr, true);
+            } else if(fname.equalsIgnoreCase("randn") || fname.equalsIgnoreCase("rand")) {
+            	if(expr.getNumArg()==0) {
+            		varType = new PrimitiveType(TYPENAME_DOUBLE);
+            	} else {
+            		varType = createMatrixType(TYPENAME_DOUBLE, expr, true);
+            	}
             } else if(fname.equalsIgnoreCase("zeros") 
             		|| fname.equalsIgnoreCase("ones")
             		|| fname.equalsIgnoreCase("magic")) {

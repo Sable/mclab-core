@@ -703,21 +703,23 @@ aspect GenerateFortran {
         	int num = getNumArg();
         	buf.append("CALL RANDOM_NUMBER(");
 	        buf.append(varName);
-	        buf.append("(");	// variable brackets
-	        boolean first = true;
-	        for(Expr arg : args) {
-	        	// TODO: Skip the dimension which size is 1
-	        	// column matrix/row matrix, corresponding to solution in  
-	        	// TypeInferenceEngine.createMatrixType(String PrimitiveTypeName, ParameterizedExpr expr)
-	        	// if(! arg.getFortranLessComments().equals("1")) {
-		            if(!first) {
-		                buf.append(", ");
-		            }
-		            buf.append(":");
-		            first = false;
-	        	// }
-	        }
-	        buf.append(")");	// variable brackets
+	        if(getNumArg()>0) {
+		        buf.append("(");	// variable brackets
+		        boolean first = true;
+		        for(Expr arg : args) {
+		        	// TODO: Skip the dimension which size is 1
+		        	// column matrix/row matrix, corresponding to solution in  
+		        	// TypeInferenceEngine.createMatrixType(String PrimitiveTypeName, ParameterizedExpr expr)
+		        	// if(! arg.getFortranLessComments().equals("1")) {
+			            if(!first) {
+			                buf.append(", ");
+			            }
+			            buf.append(":");
+			            first = false;
+		        	// }
+		        }
+		        buf.append(")");	// variable brackets
+		    }
 	        buf.append(")");	// function brackets
 	        return buf.toString();
 	        
