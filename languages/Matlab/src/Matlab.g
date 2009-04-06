@@ -330,6 +330,7 @@ stmt_body :
   |  t_RETURN t_FILLER?
   |  t_WHILE t_FILLER? expr sep_stmt_list t_END t_FILLER?
   |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
+  |  t_ANNOTATION t_FILLER?
   ;
 
 maybe_cmd options { k=1; } : //k = 1 forces reliance on the syntactic predicate
@@ -888,6 +889,8 @@ t_IDENTIFIER : IDENTIFIER { offsetTracker.advanceByTextSize($text); };
 t_NUMBER : NUMBER { offsetTracker.advanceByTextSize($text); };
 t_STRING : STRING { offsetTracker.advanceByTextSize($text); };
 
+t_ANNOTATION : ANNOTATION { offsetTracker.advanceByTextSize($text); };
+
 t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
 t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); } -> 
     template(revised={$text.startsWith("\%\%") ? ("\% " + $text.substring(2)) : $text}) "<revised>";
@@ -980,6 +983,9 @@ ASSIGN : '=' { couldBeFieldName = false; };
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : {!isPreTransposeChar(input.LA(-1))}?=>'\'' STRING_CHAR* ('\'' | (LINE_TERMINATOR)=> { $type = MISC; }) { couldBeFieldName = false; };
+
+fragment ANNOTATION_FILLER : ~'*' | '*' ~')';
+ANNOTATION : '(*' ANNOTATION_FILLER* '*)' { couldBeFieldName = false; };
 
 fragment BRACKET_COMMENT_FILLER : ~'%' | '%' ~('{' | '}');
 BRACKET_COMMENT : '%{' BRACKET_COMMENT_FILLER* (BRACKET_COMMENT BRACKET_COMMENT_FILLER*)* '%}';

@@ -128,3 +128,4 @@ parserpass_class
 parserpass_command
 parserpass_end
 parserpass_powprefix
+annotation_parser
