@@ -23,6 +23,8 @@ public class AllTests {
                 //suite.addTestSuite(LookupLValueSanityTests.class);
                 
                 suite.addTestSuite(ErrorCheckTest.class);
+
+                suite.addTestSuite(XMLCommandPassTests.class);
 		//$JUnit-END$
 		return suite;
 	}

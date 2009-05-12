@@ -62,4 +62,22 @@ No static linking is done.
       <long_desc>All messages will be suppressed, unless an error occurs. </long_desc>
     </boolopt>
   </section>
+  <section>
+    <name>Server options</name>
+    <boolopt>
+      <name>Server mode</name>
+      <alias>server</alias>
+      <short_desc>Run frontend in server mode on a given port, default is 47146</short_desc>
+      <long_desc>Run the frontend as a server. Opens a socket on a
+      given port and waits for XML encoded commands.</long_desc>
+    </boolopt>
+    <stropt>
+      <name>Server port</name>
+      <set_arg_label>port</set_arg_label>
+      <alias>sport</alias>
+      <alias>sp</alias>
+      <short_desc>Set the port the server runs on</short_desc>
+      <long_desc>Set the server to run on a given port. Default is 47146.</long_desc>
+    </stropt>
+  </section>
 </options>

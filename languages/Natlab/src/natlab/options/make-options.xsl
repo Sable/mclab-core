@@ -125,7 +125,8 @@ public class Options extends OptionsBase {
     </xsl:for-each>
             ) {
                 if( !hasMoreOptions() ) {
-                    G.v().out.println( "No value given for option -"+option );
+                    //G.v().out.println( "No value given for option -"+option );
+                    System.out.println( "No value given for option -"+option );
                     return false;
                 }
                 String value = nextOption();
@@ -139,14 +140,16 @@ public class Options extends OptionsBase {
                 ) {
                     if( <xsl:copy-of select="$name"/> != 0
                     &#38;&#38; <xsl:copy-of select="$name"/> != <xsl:copy-of select="$name"/>_<xsl:value-of select="translate(alias[last()],'-. ','___')"/> ) {
-                        G.v().out.println( "Multiple values given for option "+option );
+                        //G.v().out.println( "Multiple values given for option "+option );
+                        System.out.println( "Multiple values given for option "+option );
                         return false;
                     }
                     <xsl:copy-of select="$name"/> = <xsl:copy-of select="$name"/>_<xsl:value-of select="translate(alias[last()],'-. ','___')"/>;
                 }
     </xsl:for-each>
                 else {
-                    G.v().out.println( "Invalid value "+value+" given for option -"+option );
+                    //G.v().out.println( "Invalid value "+value+" given for option -"+option );
+                    System.out.println( "Invalid value "+value+" given for option -"+option );
                     return false;
                 }
            }
@@ -160,7 +163,8 @@ public class Options extends OptionsBase {
     </xsl:for-each>
             ) {
                 if( !hasMoreOptions() ) {
-                    G.v().out.println( "No value given for option -"+option );
+                    //G.v().out.println( "No value given for option -"+option );
+                    System.out.println( "No value given for option -"+option );
                     return false;
                 }
                 String value = nextOption();
@@ -180,12 +184,14 @@ public class Options extends OptionsBase {
     </xsl:for-each>
             ) {
                 if( !hasMoreOptions() ) {
-                    G.v().out.println( "No phase name given for option -"+option );
+                    //G.v().out.println( "No phase name given for option -"+option );
+                    System.out.println( "No phase name given for option -"+option );
                     return false;
                 }
                 String phaseName = nextOption();
                 if( !hasMoreOptions() ) {
-                    G.v().out.println( "No phase option given for option -"+option+" "+phaseName );
+                    //G.v().out.println( "No phase option given for option -"+option+" "+phaseName );
+                    System.out.println( "No phase option given for option -"+option+" "+phaseName );
                     return false;
                 }
                 String phaseOption = nextOption();
@@ -203,7 +209,8 @@ public class Options extends OptionsBase {
     </xsl:for-each>
             ) {
                 if( !hasMoreOptions() ) {
-                    G.v().out.println( "No value given for option -"+option );
+                    //G.v().out.println( "No value given for option -"+option );
+                    System.out.println( "No value given for option -"+option );
                     return false;
                 }
                 String value = nextOption();
@@ -211,7 +218,8 @@ public class Options extends OptionsBase {
                 if( <xsl:copy-of select="$name"/>.length() == 0 )
                     <xsl:copy-of select="$name"/> = value;
                 else {
-                    G.v().out.println( "Duplicate values "+<xsl:copy-of select="$name"/>+" and "+value+" for option -"+option );
+                    //G.v().out.println( "Duplicate values "+<xsl:copy-of select="$name"/>+" and "+value+" for option -"+option );
+                    System.out.println( "Duplicate values "+<xsl:copy-of select="$name"/>+" and "+value+" for option -"+option );
                     return false;
                 }
             }
