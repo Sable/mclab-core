@@ -195,9 +195,12 @@ public class Main
                                 Program prog = parseFile( fileName, source, serverErrors );
                                 if( serverErrors.length() > 0){
                                     //TODO-JD: send errors
+                                    out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
+                                    continue;
                                 }
                                 if( prog == null ){
                                     //TODO-JD: send errors
+                                    out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
                                     continue;
                                 }
                                 CompilationUnits cu = new CompilationUnits();
