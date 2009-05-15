@@ -20,4 +20,4 @@ actions {: return symbol(ACTIONS); :} OPEN_END
 %:
 %:
 <<ANY>> {: error("Illegal character in aspect '" + yytext() + "'"); :}
-<<EOF>> {: return symbol(EOF); :} END //should be: error("Unclosed aspect"); :}
+<<EOF>> {: error("Unterminated aspect"); :}

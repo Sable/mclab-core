@@ -490,7 +490,6 @@ public class StaticFortranTool {
             	System.exit(1);
             }
 			in.close();
-			scanner.stop();
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -2304,7 +2303,6 @@ public class StaticFortranTool {
 					}
 				}		
 			}
-			scanner.stop();
 		} catch(Parser.Exception e) {
 			System.out.println("**ERROR**");
 			System.out.println(e.getMessage());

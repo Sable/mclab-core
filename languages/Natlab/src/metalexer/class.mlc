@@ -19,4 +19,4 @@ events {: return symbol(EVENTS); :} OPEN_END
 %:
 %:
 <<ANY>> {: error("Illegal character in classdef '" + yytext() + "'"); :}
-<<EOF>> {: return symbol(EOF); :} END //should be: error("Unclosed classdef"); :}
+<<EOF>> {: error("Unterminated classdef"); :}

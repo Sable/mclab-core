@@ -46,17 +46,12 @@ public class Interpreter {
 					//System.out.println(original.XMLtoString(original.ASTtoXML()));
 					// System.out.println(original.dumpTree());
 				}
-				scanner.stop();
 			} catch(Parser.Exception e) {
 				System.out.println("**ERROR**");
 				System.out.println(e.getMessage());
 				for(String error : parser.getErrors()) {
 					System.out.println(error);
 				}
-			} finally {
-			    if(scanner != null) {
-			        scanner.stop();
-			    }
 			}
 		}
 		System.out.println("Goodbye!");

@@ -511,11 +511,6 @@ public class Main
 	    if( e.getMessage() != null )
 		errBuf.append( e.getMessage() + "\n");
             return null;
-	}
-        finally{
-            if(scanner != null) {
-                scanner.stop();
-            }
         }
     }
     private static boolean processCmdLine(String[] args)
