@@ -105,8 +105,7 @@ public class Main
                     XMLCommandHandler xmlCH = new XMLCommandHandler();
                     boolean shutdown = false;
                     //loop until told to shutdown
-                    while( !shutdown ){
-                        
+                    while( !shutdown ) {
                         commandBuf = new StringBuffer();
                         try{
                             //loop while reading in from socket
@@ -119,7 +118,7 @@ public class Main
                                 commandBuf.append((char)inCharInt);
                             }                                
                         }catch( IOException e ){}
-                        if( xmlCH.parse( commandBuf.toString() ) ){
+                        if( xmlCH.parse( commandBuf.toString() ) ) {
                             boolean parsing = false;
                             Reader source = new StringReader( "" );
                             String fileName = "";
@@ -137,10 +136,12 @@ public class Main
                                         System.out.println(" translating");
                                     source = translateFile( fileName, serverErrors );
                                 }
-                                try{
-                                    source = new FileReader( fileName );
-                                }catch( FileNotFoundException e){
-                                    //TODO-JD: send filenotfound error to client
+                                else{
+                                    try{
+                                        source = new FileReader( fileName );
+                                    }catch( FileNotFoundException e){
+                                        //TODO-JD: send filenotfound error to client
+                                    }
                                 }
                             }
                             else if( cmd.equalsIgnoreCase( "parsetext" ) ){
@@ -164,7 +165,17 @@ public class Main
                                 if( !quiet ){
                                     System.out.println(" shutdown cmd ");
                                 }
+                                out.print("<shutdown />\0");
+                                out.flush();
                                 shutdown = true;
+                                try{
+                                    clientSocket.close();
+                                    out.close();
+                                    in.close();
+                                    serverSocket.close();
+                                }catch(IOException e){}
+
+                                continue;
                             }
                             else{
                                 if( !quiet ){
@@ -172,7 +183,7 @@ public class Main
                                 }
                             }
 
-                            if( parsing ){
+                            if( parsing ) {
                                 if( options.matlab() ){
                                     /*if( !quiet )
                                         System.err.println(" translating ");
@@ -195,12 +206,16 @@ public class Main
                                 Program prog = parseFile( fileName, source, serverErrors );
                                 if( serverErrors.length() > 0){
                                     //TODO-JD: send errors
+                                    System.err.print("errors\n" +serverErrors );
                                     out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
+                                    out.flush();
                                     continue;
                                 }
                                 if( prog == null ){
                                     //TODO-JD: send errors
+                                    System.err.print("errors\n" +serverErrors );
                                     out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
+                                    out.flush();
                                     continue;
                                 }
                                 CompilationUnits cu = new CompilationUnits();
@@ -215,7 +230,8 @@ public class Main
                             }
                         }
                     }
-                            
+                    if(!quiet)
+                        System.err.println( "server shutdown" );
                 }
                 else if( options.getFiles().size() == 0 ){
                     System.err.println("No files provided, must have at least one file.");
@@ -328,6 +344,8 @@ public class Main
                     }
                 }
             }
+            //TODO-JD: probably shouldn't need to exit?
+            System.exit(0);
         }
     }
 
@@ -382,7 +400,7 @@ public class Main
             in.close();
             
             if(result instanceof NoChangeResult){
-                in = new BufferedReader( new StringReader( fName ) );
+                in = new BufferedReader( new StringReader( source ) );
             }else {
                 in.close();
                 if(result instanceof ProblemResult){
