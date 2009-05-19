@@ -9,8 +9,8 @@
 %%inherit macros
 
 //start multiline help comment
-{OpenBracketHelpComment} {: :} START_BRACKET_HELP_COMMENT
-{OpenBracketComment} {: :} START_BRACKET_COMMENT
+{OpenBracketHelpComment} {: appendToStartDelim(yytext()); :} START_BRACKET_HELP_COMMENT
+{OpenBracketComment} {: appendToStartDelim(yytext()); :} START_BRACKET_COMMENT
 
 %:
 {HelpComment} {: return symbol(HELP_COMMENT, yytext()); :}
