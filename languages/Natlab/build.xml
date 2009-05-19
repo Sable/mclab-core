@@ -75,7 +75,6 @@
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">
 		<java jar="${lib.dir}/${metalexer.jar.path.prop}" failonerror="true" fork="true">
-			<arg value="-t" />
 			<arg value="${layout.name}" />
 			<arg value="${src.dir}/${lexer.dir}" />
 			<arg value="${gen.dir}/${lexer.dir}" />
