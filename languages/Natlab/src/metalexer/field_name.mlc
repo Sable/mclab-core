@@ -9,7 +9,8 @@
 %:
 
 //ignore keywords - we just saw a dot
-{Identifier} {: return symbol(IDENTIFIER, yytext()); :} START_TRANSPOSE //implies END_FIELD_NAME
+{Identifier} / "'" {: return symbol(IDENTIFIER, yytext()); :} END_FIELD_NAME_START_TRANSPOSE
+{Identifier} {: return symbol(IDENTIFIER, yytext()); :} END_FIELD_NAME
 
 %:
 

@@ -44,7 +44,6 @@ import beaver.Scanner;
 %component semicolon_terminator
 %component string
 %component transpose
-%component comment_start
 %component bracket_comment
 %component bracket_help_comment
 
@@ -77,8 +76,9 @@ import beaver.Scanner;
 %host class
 %guest class_bracketed
 %start START_BRACKETED
-%end END_BRACKETED
+%end [END_BRACKETED END_BRACKETED_START_TRANSPOSE]
 %pair START_BRACKETED, END_BRACKETED
+%pair START_BRACKETED, END_BRACKETED_START_TRANSPOSE
 
 //// Field name ////////////////////////////////////////////////////////////////
 
@@ -87,7 +87,7 @@ import beaver.Scanner;
 %host base, class
 %guest field_name
 %start START_FIELD_NAME
-%end END_FIELD_NAME
+%end [END_FIELD_NAME END_FIELD_NAME_START_TRANSPOSE]
 
 //// Transpose /////////////////////////////////////////////////////////////////
 
@@ -95,7 +95,14 @@ import beaver.Scanner;
 %name transpose
 %host base, class
 %guest transpose
-%start [START_TRANSPOSE END_BRACKETED]
+%start [START_TRANSPOSE END_BRACKETED_START_TRANSPOSE]
+%end END_TRANSPOSE
+
+%%embed
+%name field_name_transpose
+%host field_name
+%guest transpose
+%start END_FIELD_NAME_START_TRANSPOSE
 %end END_TRANSPOSE
 
 //// Strings ///////////////////////////////////////////////////////////////////

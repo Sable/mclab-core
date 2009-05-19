@@ -52,11 +52,14 @@
 
 //bracketing
 \( {: return symbol(LPAREN); :} START_BRACKETED
-\) {: return symbol(RPAREN); :} END_BRACKETED //implies START_TRANSPOSE
+\) / "'" {: return symbol(RPAREN); :} END_BRACKETED_START_TRANSPOSE
+\) {: return symbol(RPAREN); :} END_BRACKETED
 \[ {: return symbol(LSQUARE); :} START_BRACKETED
-\] {: return symbol(RSQUARE); :} END_BRACKETED //implies START_TRANSPOSE
+\] / "'" {: return symbol(RSQUARE); :} END_BRACKETED_START_TRANSPOSE
+\] {: return symbol(RSQUARE); :} END_BRACKETED
 \{ {: return symbol(LCURLY); :} START_BRACKETED
-\} {: return symbol(RCURLY); :} END_BRACKETED //implies START_TRANSPOSE
+\} / "'" {: return symbol(RCURLY); :} END_BRACKETED_START_TRANSPOSE
+\} {: return symbol(RCURLY); :} END_BRACKETED
 
 //stmt terminators
 , {: storedLine = yyline; storedCol = yycolumn; :} START_COMMA_TERMINATOR
@@ -105,20 +108,33 @@
 :}
 
 //numeric literals - TODO: changed to strings because of JastAddParser limitation
-//{IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
-//{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
-//{FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
-//{HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
-//{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
-//{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :} START_TRANSPOSE
-//{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :} START_TRANSPOSE
-{IntNumber} {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
-{IntNumber} / \.[*/\\\^'] {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
-{FPNumber} {: return symbol(FP_NUMBER, yytext()); :} START_TRANSPOSE
-{HexNumber} {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
-{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
-{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, yytext()); :} START_TRANSPOSE
-{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+//{IntNumber} / "'" {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
+//{IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :}
+//{IntNumber} "." [*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} //NB: should be possible to accomplish this with lookahead instead of pushback
+//{FPNumber} / "'" {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
+//{FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :}
+//{HexNumber} / "'" {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
+//{HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :}
+//{ImaginaryIntNumber} / "'" {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :}
+//{ImaginaryFPNumber} / "'" {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :}
+//{ImaginaryHexNumber} / "'" {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :}
+
+{IntNumber} / "'" {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{IntNumber} {: return symbol(INT_NUMBER, yytext()); :}
+{IntNumber} "." [*/\\\^'] {: yypushback(2); return symbol(INT_NUMBER, yytext()); :} //NB: should be possible to accomplish this with lookahead instead of pushback
+{FPNumber} / "'" {: return symbol(FP_NUMBER, yytext()); :} START_TRANSPOSE
+{FPNumber} {: return symbol(FP_NUMBER, yytext()); :}
+{HexNumber} / "'" {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{HexNumber} {: return symbol(INT_NUMBER, yytext()); :}
+{ImaginaryIntNumber} / "'" {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, yytext()); :}
+{ImaginaryFPNumber} / "'" {: return symbol(IM_FP_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, yytext()); :}
+{ImaginaryHexNumber} / "'" {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, yytext()); :}
 
 //bang (!) syntax
 {ShellCommand} {: return symbol(SHELL_COMMAND, yytext().substring(1)); :}

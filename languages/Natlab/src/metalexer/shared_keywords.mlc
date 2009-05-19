@@ -33,4 +33,5 @@ return {: return symbol(RETURN); :}
 %:
 
 //NB: lower precedence than keywords
-{Identifier} {: return symbol(IDENTIFIER, yytext()); :} START_TRANSPOSE
+{Identifier} / "'" {: return symbol(IDENTIFIER, yytext()); :} START_TRANSPOSE
+{Identifier} {: return symbol(IDENTIFIER, yytext()); :}
