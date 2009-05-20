@@ -502,7 +502,7 @@ output_params :
   ;
 
 output_param_list :
-     quiet_element_separator_list? name_list quiet_element_separator_list?
+     quiet_element_separator_list? (name_list quiet_element_separator_list?)?
   ;
 
 name_list :
