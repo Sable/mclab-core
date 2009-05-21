@@ -127,13 +127,20 @@ public class Main
                             if( cmd.equalsIgnoreCase( "parsefile" ) ){
                                 fileName = xmlCH.getBody();
                                 if( !quiet ){
-                                    System.out.println(" parsefile cmd ");
-                                    System.out.println("  parse file "+fileName);
+                                    System.err.println(" parsefile cmd ");
+                                    System.err.println("  parse file "+fileName);
+                                }
+                                if( fileName == null ){
+                                    if( !quiet )
+                                        System.err.println("  file name was null");
+                                    out.print("<errorlist><error>parsefile error: filename was null</error></errorlist>\0");
+                                    out.flush();
+                                    continue;
                                 }
                                 parsing = true;
                                 if( options.matlab() ){
                                     if( !quiet )
-                                        System.out.println(" translating");
+                                        System.err.println(" translating");
                                     source = translateFile( fileName, serverErrors );
                                 }
                                 else{
@@ -141,21 +148,32 @@ public class Main
                                         source = new FileReader( fileName );
                                     }catch( FileNotFoundException e){
                                         //TODO-JD: send filenotfound error to client
+                                        if( !quiet )
+                                            System.err.println("file: "+fileName+" not found");
+                                        out.print("<errorlist><error>file: "+fileName+" not found</error></errorlist>\0");
+                                        out.flush();
                                     }
                                 }
                             }
                             else if( cmd.equalsIgnoreCase( "parsetext" ) ){
                                 String programText = xmlCH.getBody();
                                 if( !quiet ){
-                                    System.out.println(" parsetext cmd ");
-                                    System.out.println("  text to parse:");
-                                    System.out.println( programText );
+                                    System.err.println(" parsetext cmd ");
+                                    System.err.println("  text to parse:");
+                                    System.err.println( programText );
+                                }
+                                if( programText == null ){
+                                    if( !quiet )
+                                        System.err.println("  program text was null");
+                                    out.print("<errorlist><error>parsetext error: program text was null</error></errorlist>\0");
+                                    out.flush();
+                                    continue;
                                 }
                                 fileName = "source/text";
                                 parsing = true;
                                 if( options.matlab() ){
                                     if( !quiet )
-                                        System.out.println(" translating");
+                                        System.err.println(" translating");
                                     source = translateFile( fileName, programText, serverErrors );
                                 }
                                 else
@@ -163,7 +181,7 @@ public class Main
                             }
                             else if( cmd.equalsIgnoreCase( "shutdown" ) ){
                                 if( !quiet ){
-                                    System.out.println(" shutdown cmd ");
+                                    System.err.println(" shutdown cmd ");
                                 }
                                 out.print("<shutdown />\0");
                                 out.flush();
@@ -193,11 +211,17 @@ public class Main
                                         //TODO-JD: send errors
                                         if( !quiet )
                                             System.err.println("errors\n" + serverErrors);
+                                        out.print("<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
+                                        out.flush();
+                                        continue;
+
                                     }
                                     if( source == null ){
                                         //TODO-JD: send errors
                                         if( !quiet )
                                             System.err.println("skipping file");
+                                        out.print("<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
+                                        out.flush();
                                         continue;
                                     }
                                 }
@@ -537,7 +561,7 @@ public class Main
             options.parse( args );
 
             if( args.length == 0 ){
-                System.out.println("No options given\n" +
+                System.err.println("No options given\n" +
                                    "Try -help for usage");
                 return false;
             }
