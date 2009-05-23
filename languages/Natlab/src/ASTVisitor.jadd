@@ -138,7 +138,7 @@ aspect ASTVisitor {
     public int ASTNode.nextNodeID() { return ++internalNodeID;}
     public int ASTNode.getNodeID() { return NodeID;}
     public int ASTNode.getLastNodeID() { return internalNodeID;}
-    // counter record how many tmp variable create from it
+    // Counter recording the # of temporary variables created from this node
     public int ASTNode.VarCnt = 0;	
     // Only NodeID can only be set once.
     public boolean ASTNode.setNodeID() { 
@@ -551,4 +551,5 @@ aspect ASTVisitor {
     public void ReturnStmt.apply(natlab.toolkits.analysis.ASTVisitor visitor) {
         visitor.caseBranchingStmt(this);
     }    
+    
 }

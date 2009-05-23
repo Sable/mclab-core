@@ -79,6 +79,7 @@ public class SymbolTableEntry
     public SymbolTableEntry getOrgNodeEntry(){return orgNodeEntry;}
 
     // Save value in the Symbol table, value can be Int/FP/String literal	-JL 12.21
+    static int count = 0;
     public void setValue(LiteralExpr v) {
     	value = v;
     	valueMin = v;

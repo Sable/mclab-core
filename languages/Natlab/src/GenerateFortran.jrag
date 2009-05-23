@@ -101,7 +101,7 @@ aspect GenerateFortran {
 			buf.append('\n');
 		}
 		for (Stmt stmt : getStmts()) {
-			buf.append(stmt.getFortran());
+			buf.append(splitLongLine(stmt.getFortran()));
 			buf.append('\n');
 		}
 		for (Function func : getNestedFunctions()) {
@@ -277,7 +277,7 @@ aspect GenerateFortran {
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getFortran());
+            buf.append(splitLongLine(stmt.getFortran()));
             buf.append('\n');
         }
         for(Function func : getNestedFunctions()) {
@@ -723,6 +723,32 @@ aspect GenerateFortran {
 	        buf.append(")");	// function brackets
 	        return buf.toString();
 	        
+        } else if(fname.equalsIgnoreCase("sum")) {
+        	// Here handle two cases for sum
+        	// 1) sum(F(:)) => SUM(F)
+        	// 2) sum(F)    => SUM(F,1)
+	        buf.append(" (0.0+SUM(");		
+	        for(Expr arg : args) {
+	        	if(arg instanceof NameExpr) {
+	        		buf.append(arg.getFortran()+",1))");
+	        		return buf.toString(); 
+	        	} else if(arg instanceof ParameterizedExpr) {
+	        		// For arg=F(:) 
+	        		if(((ParameterizedExpr)arg).getNumArg()==1) {
+		        		if(((ParameterizedExpr)arg).getArgs().getChild(0) instanceof ColonExpr) {
+		        			String str = ((ParameterizedExpr)arg).getTarget().getFortran();
+			        		buf.append(str+"))");
+			        		return buf.toString(); 
+		        		}
+	        		}
+	        	}
+	        	// Other cases, treat as mean of whole array
+	            buf.append(arg.getFortran()); // Only take one parameter
+	            break;
+	        }
+	        buf.append("))");
+	        return buf.toString();
+        	 
         } else if(fname.equalsIgnoreCase("mean")) {
         	// Here handle two cases
         	// 1) mean(F(:)) => SUM(F)/(0.0+SIZE(F))
@@ -798,7 +824,7 @@ aspect GenerateFortran {
 	        	assignStmt.isCall = true;
 	        	String varName = assignStmt.getLHS().getStructureString();
 	        	// int num = getNumArg();
-	        	// Using temperary variable 'output_real', change it to REAL
+	        	// Using temperary variable 'output_real_tmp', change it to REAL
 	        	buf.append("output_real_tmp = ");
 		        boolean first = true;
 		        for(Expr arg : args) {
@@ -1120,19 +1146,26 @@ aspect GenerateFortran {
     // on BinaryExpr.getFortranLessComments(String op)
     eq PlusExpr.getFortranLessComments() = getFortranLessComments("+");
     eq MinusExpr.getFortranLessComments() = getFortranLessComments("-");
-    
+
+	// 0: scalar * scalar
+	// 1: matrix * scalar
+	// 2: scalar * matrix
+	// 3: matrix * matrix
+	public int MTimesExpr.MatrixOperands = 0;
     eq MTimesExpr.getFortranLessComments() {
         StringBuffer buf = new StringBuffer(); 
         // TODO: currently, skip the case A(1,2)*B(2,3) 
-        
-        boolean bLHSMatrix = !(getLHS() instanceof ParameterizedExpr) &&
+        boolean bLHSMatrix = (MatrixOperands&0x01)>0;
+        	/* !(getLHS() instanceof ParameterizedExpr) &&
         	((getLHS() instanceof RangeExpr) ||
         	 (getLHS().collectType(ASTNode.gstScope, getLHS()) instanceof annotations.ast.MatrixType) );
-
+			*/
         if(bLHSMatrix) {
-            boolean bRHSMatrix = !(getRHS() instanceof ParameterizedExpr) &&
+            boolean bRHSMatrix = (MatrixOperands&0x02)>0;
+            /* !(getRHS() instanceof ParameterizedExpr) &&
         	((getRHS() instanceof RangeExpr) ||
         	 (getRHS().collectType(ASTNode.gstScope, getRHS()) instanceof annotations.ast.MatrixType) );
+        	 */
         	if(bRHSMatrix) {
         		// LHS and RHS are matrix, 
     			buf.append("MATMUL(");
@@ -1198,7 +1231,7 @@ aspect GenerateFortran {
 	         	buf.append(typeName.toUpperCase());
 	        } else { 	// Special case, user defined type, or BASETYPE
 	         	buf.append(typeName.toUpperCase());
-	         	System.err.println("[VariableDecl]:("+getID()+") type = "+typeName.toUpperCase());
+	         	// System.err.println("[VariableDecl]:("+getID()+") type = "+typeName.toUpperCase());
 	        }
 		} else {
 			// by default it's double // using single instead!
@@ -1279,6 +1312,7 @@ aspect GenerateFortran {
 				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("arg_buffer")), 
 				new StringLiteralExpr("0000000000")));
+		stmtList.add(new EmptyStmt());
 		
 		// adding tmpvar(1,1)=0.0
 		//natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
@@ -1288,13 +1322,13 @@ aspect GenerateFortran {
 		//stmtList.add(new AssignStmt(arrayExpr, 
 		//		new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
 
-		for(Stmt stmtNode: stmtList) { 
+		// Don't know why the List is adding from front
+		for(int i=stmtList.size()-1; i>=0; --i) {
+			Stmt stmtNode = stmtList.get(i);
 			if(declStmtList == null) {
 				declStmtList = getStmtList();
-				declStmtList.addChild(stmtNode);
-			} else {
-				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
 			} 
+			declStmtList.insertChild(stmtNode, lastDeclLocation);
 		}
 	}
 	/*  function foo(scale) => adding following 
@@ -1306,7 +1340,7 @@ aspect GenerateFortran {
 		end
 	 
 	 */
-	public void Function.addCommandLineArgs() {	 
+	public void Function.addCommandLineArgs() {
 		ForStmt argFor = new ForStmt();
 		AssignStmt idxAsg = new AssignStmt();
 		idxAsg.setLHS(new NameExpr(new Name("int_tmpvar")));
@@ -1330,7 +1364,7 @@ aspect GenerateFortran {
 
 		forList.add(bufAsg);
 		
-		// The if(...)
+		// Adding the if(...) part
 		int i = 1;
 		for(Name var: getInputParams()) {
 			String varName = var.getID();
@@ -1351,12 +1385,24 @@ aspect GenerateFortran {
 		// form the For statement
 		argFor.setStmtList(forList);
 
+		// Adding it after variable "arg_buffer"
 		if(declStmtList == null) {
 			declStmtList = getStmtList();
-			declStmtList.addChild(argFor);
-		} else {
-			declStmtList.insertChild(argFor, lastDeclLocation+1);
 		} 
+		boolean bAdd = false;	
+		int loc = 0;
+		for(int j=lastDeclLocation+1; j<declStmtList.getNumChild(); ++j) {
+			if(declStmtList.getChild(j) instanceof AssignStmt) {
+				if(((AssignStmt) declStmtList.getChild(j)).getLHS().getVarName().equals("arg_buffer")) {
+					declStmtList.insertChild(argFor, j+1);
+					bAdd = true;
+					break;
+				}
+			} 
+		}
+		if(!bAdd) {
+			declStmtList.insertChild(argFor, lastDeclLocation+1);
+		}
 	}
 	//-------------------------------------------------------------------------
 	// After adding decl-stmt, appends statements for special value 
@@ -1388,6 +1434,7 @@ aspect GenerateFortran {
 				new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("arg_buffer")), 
 				new StringLiteralExpr("0000000000")));
+		stmtList.add(new EmptyStmt());
 		
 		// adding tmpvar(1,1)=0.0
 		//natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
@@ -1397,13 +1444,13 @@ aspect GenerateFortran {
 		//stmtList.add(new AssignStmt(arrayExpr, 
 		//		new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
 
-		for(Stmt stmtNode: stmtList) { 
+		// Don't know why the List is adding from front
+		for(int i=stmtList.size()-1; i>=0; --i) {
+			Stmt stmtNode = stmtList.get(i);
 			if(declStmtList == null) {
 				declStmtList = getStmtList();
-				declStmtList.addChild(stmtNode);
-			} else {
-				declStmtList.insertChild(stmtNode, lastDeclLocation+1);
 			} 
+			declStmtList.insertChild(stmtNode, lastDeclLocation);
 		}
 	}
 
@@ -1422,4 +1469,60 @@ aspect GenerateFortran {
 		return null;
 	}
 
+	// Used to split the long lines into several lines according to FORTRAN standard
+    public String ASTNode.splitLongLine(String str) {
+		StringBuffer buf = new StringBuffer();
+        int lineMax = 90;
+        String leftData = str;
+        String content ;
+        int fromIndex = 0;
+        while(leftData.length()>0) {
+    		int endIndex = str.indexOf('\n', fromIndex);
+        	if(endIndex<0) {
+        		content = str.substring(fromIndex);
+            	leftData = "";
+        	} else {
+        		++endIndex;
+        		content = str.substring(fromIndex, endIndex);
+            	leftData = str.substring(endIndex);
+            	fromIndex = endIndex;
+        	}
+        	
+	        if(content.length()>lineMax+1 && !isComment(content)) {
+	            int start = 0, end=lineMax;
+	            boolean firstLine = true;
+	            while(true) {// 
+	            	String shortStr = content.substring(start, end);
+	            	if(!firstLine) {
+	                	buf.append("&");
+	                	buf.append("\n");
+	                	buf.append("&");
+	            	}
+	            	firstLine = false;
+	            	buf.append(shortStr);
+	            	start = end;
+	            	if(end>=content.length())
+	            			break;
+	            	end += lineMax;
+	            	if(end>content.length())
+	            		end = content.length();
+	            }
+	        } else {
+	        	buf.append(content);
+	        }
+        }
+        return buf.toString();
+    }
+    public boolean ASTNode.isComment(String str) {
+    	for(int i=0; i<str.length(); i++) {
+    		if(str.charAt(i)==' ' || str.charAt(i)=='\t') {
+    			continue;
+    		} else if(str.charAt(i)=='!') {
+    			return true;
+    		} else {
+    			break;
+    		}
+    	}
+    	return false;
+    }
 }

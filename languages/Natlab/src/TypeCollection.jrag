@@ -181,19 +181,81 @@ aspect UpdateSymbolTableScope {
     }
     
     private boolean Function.bParamDeclAdded = false;
+    private boolean Function.bInputParamDeclAdded = false;
+    private boolean Function.bOutputParamDeclAdded = false;
+
+    public void Function.initFlags() {
+    	bParamDeclAdded = false;
+    	bInputParamDeclAdded = false;
+    	bOutputParamDeclAdded = false;
+    }
+
+    public SymbolTableScope Function.addInputParam2SymbolTableScope(SymbolTableScope symtbl) {
+    	if(!bInputParamDeclAdded) {
+	    	java.util.HashSet<String> varSet = new java.util.HashSet<String>(); 
+			for(Name param: getInputParamList()) {
+				VariableDecl decl = new VariableDecl(param.getID(), new annotations.ast.UnknownType() );
+	    		if(!varSet.contains(decl.getID())) {
+		    		addDeclStmt(decl);
+		    		varSet.add(decl.getID());
+	    		}
+			}
+    		bInputParamDeclAdded = true;
+    	}
+		symtbl = updateSymbolTableDeclNode(symtbl);
+    	return symtbl;
+    }
+    public SymbolTableScope Function.addOutputParam2SymbolTableScope(SymbolTableScope symtbl) {
+    	if(!bOutputParamDeclAdded) {
+	    	java.util.HashSet<String> varSet = new java.util.HashSet<String>(); 
+			for(VariableDecl decl: varDeclList) {
+				varSet.add(decl.getID());
+			}
+			for(Name param: getOutputParamList()) {
+				VariableDecl decl = new VariableDecl(param.getID(), new annotations.ast.UnknownType() );
+	    		if(!varSet.contains(decl.getID())) {
+		    		addDeclStmt(decl);
+		    		varSet.add(decl.getID());
+	    		}
+			}
+			bOutputParamDeclAdded = true;
+    	}
+		symtbl = updateSymbolTableDeclNode(symtbl);
+    	return symtbl;
+    }
+    public SymbolTableScope Function.updateSymbolTableDeclNode(SymbolTableScope symtbl) {
+	    // Make sure all decl node has symbol table entry, 
+	    // for those don't, create entry for them. 
+	    // (this is designed for function's parameters )
+		for(VariableDecl decl: varDeclList) {
+    		String name = decl.getID();
+    		SymbolTableEntry stEntry = symtbl.getSymbolById(name);
+    		if(stEntry == null) {
+    			// set current function node as its original node
+    			stEntry = new SymbolTableEntry(name, name, this);
+    			stEntry.setDeclLocation(decl);
+    			symtbl.addSymbol(stEntry);
+    		}
+    	}
+    	return symtbl;
+    }
+
     public SymbolTableScope Function.updateSymbolTableScope(SymbolTableScope symtbl) {
-    	// Finding the VariableDecl node for each entry,	
+    	/* / Finding the VariableDecl node for each entry,	
     	if(!bParamDeclAdded) {
-    		// Adding input/output parameters,  skip dumplicated, 
+    		// Adding input/output parameters,  skip duplicated, 
 	    	List<VariableDecl> pDeclList = getParamDeclList();
 	    	java.util.HashSet<String> varSet = new java.util.HashSet<String>(); 
 	    	for(VariableDecl decl: pDeclList) {
 	    		if(!varSet.contains(decl.getID())) {
-		    		varSet.add(decl.getID());
 		    		addDeclStmt(decl);
+		    		varSet.add(decl.getID());
 	    		}
 	    	}
-    	}
+	    	bParamDeclAdded = true;
+    	} */
+    	symtbl = addInputParam2SymbolTableScope(symtbl);
+    	symtbl = addOutputParam2SymbolTableScope(symtbl);
 
     	// If decl-node not found, create one,
     	boolean found = false;
@@ -215,21 +277,11 @@ aspect UpdateSymbolTableScope {
 		    	}
 	    	}
     	}
-	    // Make sure all decl node has symbol table entry, 
-	    // for those don't, create entry for them. 
-	    // (this is designed for function parameter list)
-    	for(VariableDecl decl: varDeclList) {
-    		String name = decl.getID();
-    		SymbolTableEntry stEntry = symtbl.getSymbolById(name);
-    		if(stEntry == null) {
-    			stEntry = new SymbolTableEntry(name, name, decl);
-    			stEntry.setDeclLocation(decl);
-    			symtbl.addSymbol(stEntry);
-    		}
-    	}
-	    
+		symtbl = updateSymbolTableDeclNode(symtbl);
+
     	return symtbl;
     }
+
     
     public SymbolTableScope Script.updateSymbolTableScope(SymbolTableScope symtbl) {
 
@@ -294,6 +346,7 @@ aspect UpdateSymbolTableScope {
 			declStmtList = getStmtList();
 			lastDeclLocation = 0;
 		} 
+		node.setNodeID();
 		declStmtList.insertChild(node, lastDeclLocation++);
         // Save info of last adding new VariableDecl()     	
     	varDeclList.add((VariableDecl) node);
@@ -309,6 +362,7 @@ aspect UpdateSymbolTableScope {
 			declStmtList = getStmtList();
 			lastDeclLocation = 0;
 		} 
+		node.setNodeID();
 		declStmtList.insertChild(node, lastDeclLocation++);
         // Save info of last adding new VariableDecl()     	
     	varDeclList.add((VariableDecl) node);

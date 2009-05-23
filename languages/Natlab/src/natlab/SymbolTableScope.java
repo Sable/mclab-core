@@ -10,6 +10,10 @@ public class SymbolTableScope implements SymbolTableInterface{
     // This is because each original name can have many symbol names associated
     // with it
     public HashMap<String, HashMap<String, SymbolTableEntry>> onameTable;
+    
+    // The set of variables (in upper case) current in the symbol table,
+    // This is used by McFor for fast checking variable in case insensitive way. 
+    public HashSet<String> varUpperCaseSet = new HashSet<String>();
 
     public SymbolTableScope() {
     //SymbolTableScope() {
@@ -41,6 +45,8 @@ public class SymbolTableScope implements SymbolTableInterface{
             onameTable.put(oname, onameEntries);
         }
         onameEntries.put(symbol, e);
+        
+        varUpperCaseSet.add(symbol.toUpperCase());
         return true;
     }
 
