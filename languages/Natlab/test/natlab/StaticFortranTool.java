@@ -2,10 +2,10 @@ package natlab;
 
 import java.io.*;
 
+import java.util.*;
+
 import natlab.ast.*;
 import natlab.ast.List;
-
-import java.util.*;
 
 import beaver.Parser;
 
@@ -39,18 +39,19 @@ import annotations.ast.Type;
  */ 
 public class StaticFortranTool {
 	static boolean DEBUG = false; 
-	static boolean DEBUG_TreeFinal  =  false && DEBUG; 	// the final tree before code gen 
+	static boolean DEBUG_Renaming = false && DEBUG;	
+	static boolean DEBUG_TreeFinal =  true && DEBUG; 	// the final tree before code gen 
 	static boolean DEBUG_Default = false && DEBUG;
 	static boolean DEBUG_Simplify= false && DEBUG;	
-	static boolean DEBUG_Tree   =  false && DEBUG; 	// for anything about symbol table/entry 
-	static boolean DEBUG_Symbol = false && DEBUG; 	// for anything about symbol table/entry
+	static boolean DEBUG_Tree   =  true && DEBUG; 	// for anything about symbol table/entry 
+	static boolean DEBUG_Symbol = true && DEBUG; 	// for anything about symbol table/entry
 	static boolean DEBUG_Type  = true && DEBUG; 	// for  Symbol Entry TypeInferenceEngine 
-	static boolean DEBUG_SymTbl = (true)&& DEBUG;
+	static boolean DEBUG_SymTbl = true && DEBUG;
 	static boolean DEBUG_Flow  = false && DEBUG; 	// for [varRuleMap]
 	static boolean DEBUG_Const = false && DEBUG;
 	static boolean DEBUG_Func  = false && DEBUG ;
 	static boolean DEBUG_Alloc = false && DEBUG ;
-	static boolean DEBUG_Order = (false || DEBUG_Func) && DEBUG;
+	static boolean DEBUG_Order = (true || DEBUG_Func) && DEBUG;
 	static boolean DEBUG_Eval  = false && DEBUG ;	
 		
 	final static String benchmarkFolderName = "\\languages\\Fortran\\benchmarks";
@@ -58,14 +59,19 @@ public class StaticFortranTool {
 	final static String CONVERTION = "CONVERTION"; 
 	public final static String TEMP_VAR_PREFIX = "tmpvar_";
 	public static final String PhiFunctionName = "PHISSA";
+	public final static String TEMP_M_FILENAME = "_temp_m2f.m";
 
 	public static String PATH_STRING = "/";			// different in DOS and Linux 
+
+	// Collect uses from declaration
+	public static java.util.List<String> gExtraVarList = new ArrayList<String>();
+	static String[] ExtraVarList={"pi", "eps", "timing_tic", "timing_toc","timing_clock",
+			"III", "JJJ", "output_real_tmp", "int_tmpvar", "arg_buffer", };
 
 	static PrintStream out = System.out; 
 	
 	// Flag, true: set the first .m function as main function (Program)
 	//		false: translate the .m function into subroutine
-    static boolean bMainFunc = true;
     static boolean bMultipleFile = false;
     // extra flag used by convertParameterType() to indicate error ocurrance
     static boolean bReturnVariableConversion = true;
@@ -85,10 +91,12 @@ public class StaticFortranTool {
     // The list of the sub trees
     static java.util.List<ASTNode> gTreeList = new ArrayList<ASTNode>();
     
-    // During type-infer in a function, when encounter another user-defined function
-    // it should stop, and go into that function, until get the return value type.
-    // This list keeps that unfinished the tree node.
+    // During doing type-inference on a function, if encounters another user-defined function
+    // then the type-inference should stop, and goes to infer that function, 
+    // until get the return value type.  Current function should be put into a stack,
+    // so we can re-do the type-inference when finishing user-defined function.
     static java.util.Stack<ASTNode> gReInferTreeStack = new Stack<ASTNode>(); 
+    // Keep the list of user-defined functions need to be inferred.
     static java.util.List<String> gNextInferFuncNameList = new ArrayList<String>(); 
     
     // Global variable points to current sub-tree's code node list 
@@ -99,6 +107,8 @@ public class StaticFortranTool {
     		= new HashMap<ASTNode, java.util.List<ASTNode>>();
     
     // Link code node with a list of symbol table entry, keep for whole process
+    // Because one assignment may have more than one return variables 
+    // Also, more than one node can points to same symbol-table-entry
     static HashMap<ASTNode, ArrayList<SymbolTableEntry>> gCodeNodeEntryMap 
     		= new HashMap<ASTNode, ArrayList<SymbolTableEntry>>();
 
@@ -133,19 +143,29 @@ public class StaticFortranTool {
 	
 
 	public static void initialAll() {
-	    gCodeNodeEntryMap.clear();
-	    gCodeNodeList = null;
+	    
+	    gFuncCallVarMap.clear();
 	    gEntryScopeMap.clear();
-	    gFuncCallArgumentMap.clear();
+	    gFuncReturnTypeListMap.clear();
 	    gFuncCallNodeMap.clear();
 	    gFuncCallParameterMap.clear();
-	    gFuncCallVarMap.clear();
-	    gFuncReturnTypeListMap.clear();
-	    gNextInferFuncNameList.clear();
-	    gReInferTreeStack.clear();
-	    gTreeCodeNodeMap.clear();
+	    gFuncCallArgumentMap.clear();
+
 	    gTreeList.clear();
+	    gReInferTreeStack.clear();
+	    gNextInferFuncNameList.clear();
+	    
+	    gCodeNodeList = null;
+	    
+	    gTreeCodeNodeMap.clear();
+	    gCodeNodeEntryMap.clear();
 	    gTreeSymbolTableMap.clear();
+	    
+	    gExtraVarList.clear();
+	    for(int i=0; i<ExtraVarList.length; ++i)
+	    	gExtraVarList.add(ExtraVarList[i] );
+	    
+	    TypeInferenceEngine.initialAll();
 	}
     //-------------------------------------------------------------------------
 	// Main function
@@ -267,8 +287,10 @@ public class StaticFortranTool {
     	for(File dir : subFolders) {
     		if(task.equals(TRANSLATION)) {
 			    String[] children = dir.list(mfileFilter);
-	    		System.out.println("translateFile: "+dir);
+	    		System.out.println("translate dir: "+dir+" ("+children.length+" files)");
 		        for (int i=0; i<children.length; i++) {
+		        	if(children[i].equals(TEMP_M_FILENAME))
+		        		continue;
 		        	String filename = dir.getAbsolutePath()+PATH_STRING+children[i];
 		    		System.out.println("translateFile: "+filename);
 		            translateFile(filename);
@@ -283,7 +305,7 @@ public class StaticFortranTool {
 			    String filename =  "";
 			    if(children.length>0) {
 		    		// create a temporary file name
-			    	String tmpFilename = dir.getAbsolutePath()+PATH_STRING+"_temp_m2f.m";
+			    	String tmpFilename = dir.getAbsolutePath()+PATH_STRING+TEMP_M_FILENAME;
 			    	String mainFilename;	// first file name
 			    	if(children.length>1) {
 				    	// 1. Read the first file, 
@@ -359,11 +381,11 @@ public class StaticFortranTool {
 	}
 	
 	// Calling MATLAB to Natlab translator to translate .m to .n files
-	public static void translateFile(String filename) {
+	public static void translateFile(String filename) {		
         filename = removeExtension(filename, ".m");
 		System.out.println("Translating: "+filename);
-//		String[] files = {filename};
-//		matlab.Translator.main(files);		// TODO: Ant report error, wired! 
+		String[] files = {filename};
+		matlab.Translator.main(files);		// TODO: Ant report error, wired! 
 	}
 	
 	public static String removeExtension(String filename, String ext) {
@@ -404,13 +426,15 @@ public class StaticFortranTool {
 		} 
 		catch(IOException e1) {
             System.err.println(e1.getMessage());
+			e1.printStackTrace();
             return -99;
 		} 
 		catch(InterruptedException e2) {
             System.err.println(e2.getMessage());
+			e2.printStackTrace();
             return -888;
 		} 
-	}
+	} 
 
 	//-------------------------------------------------------------------------
 	// Convert relative pathname to absolute pathname 
@@ -482,6 +506,7 @@ public class StaticFortranTool {
                 }
                 out.println(e.getMessage());
                 System.err.println(e.getMessage());
+    			e.printStackTrace();
     			System.exit(3);
             }
 			
@@ -511,7 +536,11 @@ public class StaticFortranTool {
     	solveFilename(filename);
     	convert2Fortran(filename, fortranname);
 	}
+	//-------------------------------------------------------------------------
+	// This is the main coordinator, 
+	//-------------------------------------------------------------------------
 	public static void convert2Fortran(String filename, String fName) {
+		// Printing the output of the program,  
 		fortranname = fName;
 		System.out.println("Converting 2 Fortran : "+filename);
 		System.out.println("Fortran file : "+fortranname);
@@ -530,11 +559,13 @@ public class StaticFortranTool {
 			// properly while called by other program. 
 	        actual.initNodeID();
 	        // System.err.println("Init Node ID="+actual.getNodeID()+" next="+actual.getN);
+	        boolean bMainFunc = true;
 			FunctionList funcList;
             if(actual instanceof FunctionList) {
         		bMainFunc = true;
             	funcList = (FunctionList) prog;
             	for(Function func : funcList.getFunctionList()) {
+            		// removeDeclNodes(func);  // TODO: not correct!!
             		func.mainFunc = bMainFunc;
             		gTreeList.add(func);
             		// TypeInferV2(func);	// try anothway
@@ -579,7 +610,7 @@ public class StaticFortranTool {
 		            		}
 		            	}
 	            	}
-	            	// Infer re-do tree, it's a stack
+    				// Infer those unfinished functions, 
 	            	if(gReInferTreeStack.size()>0) {
 	            		ASTNode redoTree = gReInferTreeStack.pop();  //redoTreeList.remove(0);
         				SymbolTableScope stScope = gTreeSymbolTableMap.get(redoTree);
@@ -592,22 +623,16 @@ public class StaticFortranTool {
 	            	}
 	            }
             }
-    		// After have all function signature, infer type of variables 
-            // that used return value variables
+    		// After having all function signature, (which means we know all variables
+            // that being assigned function return values), we need go to infer the variables
+            // that use those variables (assigned return values).
             inferFuncCallVariable();
             
-    		// Adding code for the dynamic shaped variables
-            // After get all types by type-inference, and from the function calls
-            addDynamicAllocation();
-
     		// [x] Transformation / Pre-compile phase: 
     		// 	- change the variable name with different case (case sensitive), to in-sensitive Fortran.
     		//	- adding bridge-variable for each parameter variable being changed in side function
     		transformBridgeVariable();
 
-    		// Transformation for each function call to subroutine call of whole file 
-            transformAllFunctionCalls();
-            
             // Add command line arguments in the main-function 
             if(actual instanceof FunctionList) {
 	            for(ASTNode tree: gTreeList) {
@@ -618,16 +643,21 @@ public class StaticFortranTool {
 	            }
             }
                     
+
             // Generate Fortran together, because all symbol tables may have been changed 
             if(actual instanceof FunctionList) {
-            	funcList = (FunctionList) prog;
-            	for(Function func : funcList.getFunctionList()) {
-                	doCodeGen(func);
+            	funcList = (FunctionList) actual;
+        		java.util.List<Function> functionList = new ArrayList<Function>();
+            	for(Function func : ((FunctionList) actual).getFunctionList()) {
+            		functionList.add(func);
+            	}
+            	for(Function func : functionList ) {
+            		doCodeGen(func);
             	}
             } else {
             	doCodeGen(actual);
             }
-            
+
     		out.close();
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -643,6 +673,34 @@ public class StaticFortranTool {
 		}
 		subtree.setSymbolTableScope(stScope);
 		
+		// out.print(subtree.dumpTreeAll(true));
+
+		HashSet<String> gLocalFuncList = new HashSet<String>();
+		for(ArgTupleType func:gFuncCallParameterMap.keySet()) {
+			gLocalFuncList.add(func.getName());
+		}
+		
+		// Alex's Transformations to get clear Fortran code
+		if(!DEBUG)
+		{
+			AlexFortranAnalyses.bSilence = true;
+			AlexFortranAnalyses.gLocalFuncList = gLocalFuncList;
+			AlexFortranAnalyses.Transformation1(subtree, stScope);
+			AlexFortranAnalyses.Transformation4(subtree, stScope, gExtraVarList);
+		}
+		
+
+		// Adding code for the dynamic shaped variables
+        // After get all types by type-inference, and from the function calls
+        addDynamicAllocation(subtree);
+
+        // This is put behind the Transformation4 (eliminate unused definitions) 
+        // is because it can avoid generate code for some temporary variables 
+        // which are dynamically allocated but can be eliminated.
+
+        // Transformation for each function call to subroutine call of whole file 
+        transformAllFunctionCalls(stScope, subtree);
+        
 		out.println();
 		out.print(subtree.getFortran());
 		out.println();
@@ -661,9 +719,10 @@ public class StaticFortranTool {
         // [x] Clear predefined data
         // gCodeNodeEntryMap keeps for whole process 
         gCodeNodeList = null; 
-        
+
         // [x] Add some default statements, defined in Script, Function
-        actual.addDefaultStmt();	// TODO: should open it in relase version!	
+        if(!DEBUG)
+        	actual.addDefaultStmt();	// TODO: should open it in release version!	
 
         actual.clearUseDefBoxes();
 		actual.generateUseBoxesList();
@@ -676,11 +735,21 @@ public class StaticFortranTool {
         // #Abandon  	[2] Covert into SSA form, and create symbol table
 		// # 			// stScope2 = convert2SSA(actual);
 
+        
         // [2] Just create symbol Table, and map between def-node and symbol-entry
 		stScope2 = buildSymbolTable(actual);
 		
+		for(int i=0; stScope2==null && i<50; ++i) {
+			stScope2 = buildSymbolTable(actual);
+		}
+		if(stScope2==null) {
+			System.err.println("Error: cannot create symbol table on the program");
+		}
+
+		
 		// Save the symbol table scope for that sub-tree
 		gTreeSymbolTableMap.put(actual, stScope2);
+
 		actual.setSymbolTableScope(stScope2);
 				
         // [3] Constant Propagation
@@ -695,19 +764,53 @@ public class StaticFortranTool {
         
 		
 
-        // dumpSymbolTable(stScope2, out, actual);
 
+		int entryCountBefore = stScope2.symTable.size();
         // [5] Inferring type for Decl nodes
         checkSymbolTable(stScope2, actual);   
         
-        // [6] Reload the code node, because there are transformations happened 
+		int entryCountAfter = stScope2.symTable.size();
+		
 
-        dumpSymbolTable(stScope2, out, actual);	// Debug purpose
+		// System.out.println("[stScope2] before="+entryCountBefore+" after="+entryCountAfter);
+		if(entryCountAfter>entryCountBefore) {
+	        // [6] Reload the code node, because there are transformations happened 
+	        // May not necessary
+	        actual.clearUseDefBoxes();
+			actual.generateUseBoxesList();
+	        AbstractFlowAnalysis.setDebug(false, (PrintStream) out);
+	        ReachingDefs defsAnalysis = new ReachingDefs(actual);
+	
+	        java.util.List<ASTNode> codeNodeList = defsAnalysis.getNodeList();
+	        
+	        // Save the result for further use (for convenience) 
+	        // gCodeNodeEntryMap DON"T clear it, 
+	        gCodeNodeList = codeNodeList;
+	        gTreeCodeNodeMap.put(actual, codeNodeList);
+
+	        // Re-do type inference again, where most of them are easily skipped
+	        checkSymbolTable(stScope2, actual);   
+		}
+		
+
 
 
 		// [7] Generate Static Fortran 
     	actual.FortranProgramName = pureName;
         
+        //-----------------------------------------------------------------
+/*        //???  Type inference (v2.0 - flow-analysis)
+        try {
+        	//TypeInfer
+        } catch(Exception e) {
+            //for(String error : parser.getErrors()) {
+            //    out.println(error);
+            //}
+            out.println(e.getMessage());
+            System.err.println(e.getMessage());
+			System.exit(4);
+        }
+*/
  		// The flow-analysis results have been already changed during SSA
  		// conversion. 
 		return actual;
@@ -754,14 +857,15 @@ public class StaticFortranTool {
 		}
 	}
 
-	// Transform all function calls in all the function
-	public static void transformAllFunctionCalls() {
+	// Transform all function calls in current sub-function
+	public static void transformAllFunctionCalls(SymbolTableScope stScope, ASTNode subtree) {
 	    for(ASTNode codeNode: gFuncCallNodeMap.keySet()) {
 			// Transform the function calls to subroutine calls, for those user define
 	        // For subroutine, translate into CALL func(p1,p2,...,r1,r2);
 			// This transformation will postponed to just before code-gen, because
 			// it creates new node and cause inconsistent to symbol table entry
-			transformFunc2Subroutine(codeNode);
+	    	if(gFuncCallNodeMap.get(codeNode).equals(subtree))
+	    		transformFunc2Subroutine(stScope, codeNode);
 	    }
 	}
 
@@ -807,7 +911,6 @@ public class StaticFortranTool {
 					    		Type pType = ((VariableDecl)varDeclNode).getType();
 						    	VariableDecl tmpDecl = new VariableDecl(tmpName, pType);
 						    	tmpDecl.setNodeID();
-						    	// System.err.println("[addNew Decl]"+tmpDecl.getStructureString());
 						    	((Function)tree).addDeclStmt(tmpDecl);
 						    	dumpTypeInfo(tmpDecl.getType(), "[BridgeVariable]"+tmpDecl.getFortranLessComments());
 
@@ -878,7 +981,7 @@ public class StaticFortranTool {
 	public static void transform2Complex(SymbolTableScope stScope, Expr expr) {
 		Expr realExpr = null;
 		Expr imgExpr = null;
-		
+
 		// x+i*y
 		if(expr instanceof PlusExpr) {
 			realExpr = ((PlusExpr) expr).getLHS();
@@ -909,10 +1012,10 @@ public class StaticFortranTool {
 	// 2. For subroutine, only handle those variable whose dynamic variable are not from parameter
 	//			which also not parameter variables
 	// 3. For subroutine, those return parameters should not be DEALLOCATE(), 
-	public static void addDynamicAllocation() {
+	public static void addDynamicAllocation(ASTNode tree) {
 		// [#] Check every function's variable (all of them) through symbol table , 
 		// adding dynamic allocation code for dynamic shape variable
-		for(ASTNode tree: gTreeList) {
+		{
 			// Checking whether need to add allocation
 			java.util.List<String> paramList = null;
 			boolean bMainFunc = false;
@@ -933,6 +1036,7 @@ public class StaticFortranTool {
 					}
 				}
 			}
+			
 			// Checking code-node one by one
 			java.util.List<ASTNode> codeNodeList = gTreeCodeNodeMap.get(tree);
 			if(codeNodeList!=null) {
@@ -1007,7 +1111,14 @@ public class StaticFortranTool {
 						    	if(varNode.getParent() instanceof List) {
 						    		List<Stmt> stmtList = (List<Stmt>)varNode.getParent();
 						    		int loc = stmtList.getIndexOfChild(varNode);
-						    		stmtList.insertChild(allocExpr, loc);
+						    		if(!(varNode instanceof AssignStmt))
+						    			System.err.println("[DynamicAlloc]-loc="+loc+" of CALL: "+varNode.getStructureString()+" in "+stmtList.getNodeID());
+						    		if(loc>=0) {
+						    			stmtList.insertChild(allocExpr, loc);
+						    		} else {
+						    			// This may cause by transformation
+						    			System.err.println("[DynamicAlloc]-loc="+loc+" of "+varNode.getStructureString()+" in "+stmtList.getNodeID());
+						    		}
 						    	} else {
 						    		// Find the close List<Stmt> and location, insert into
 						    		ASTNode parent = varNode.getParent(); 
@@ -1032,11 +1143,45 @@ public class StaticFortranTool {
 					    		
 							}
 						}
-			    	}
-		    	} // if(seList != null) 
+			    	}	// for(...)
+
+		    	} // if(stScope != null) 
 			}
 		}			
 	}
+/******	
+	// In a matrix type, some extent of dimension has function (or complex expression ) in it,
+	// need to create temporary variable for them, 
+	// This case obey the Fortran calling conversion!
+	public static void testingVariableDim(MatrixType varType, ASTNode curNode) {
+		boolean bChanged = false;
+     	java.util.List<String> strDim = new ArrayList<String>();
+    	Size varSize = varType.getSize(); 
+		for (String dim : varSize.getDynamicDims()) {
+			// 1. Testing the function by try first '(' location
+			System.err.println("[testingVariableDim]: Var:"+dim+ " "+dim.indexOf("(",1));
+			if(dim.indexOf("(", 1)>1) {
+    			ExprStmt dimStmt = parseString(dim);
+    			if(dimStmt!=null) {
+    				bChanged = true;
+    				// 2. need to create temporary variable for them, 
+    				NameExpr newVar = TypeInferenceEngine.addNewAssignment
+    					(dimStmt.getExpr(), curNode, null, TypeInferenceEngine.gstScope);
+    				strDim.add(newVar.getVarName());
+    				System.err.println("[testingVariableDim]: New Var:"+newVar.getVarName());
+    			} else {
+    				strDim.add(dim);
+    			}
+			} else {
+				strDim.add(dim);
+			}
+		}
+		System.err.println("[testingVariableDim]: Var:"+strDim.toString());
+		// 3. and update the matrix-type
+		if(bChanged) 
+			varSize.setDynamicDims(strDim);
+	}
+****/	
 	
 	// Create allocate() and deallocate() statement for the matrix-type variable
 	public static java.util.List<Stmt> createAllocStmtFromDecl
@@ -1058,11 +1203,12 @@ public class StaticFortranTool {
 			} else if(varSize.getDynamicDims()!=null) {
 				// testingVariableDim(varType, curNode);
 				for (String dim : varSize.getDynamicDims()) {
-					arglist.add(new NameExpr(new Name(dim)));
+					arglist.add(StaticFortranTool.parseString(dim).getExpr());
+					
 				}
 			}
 		} else {
-			arglist.add(new NameExpr(new Name(":")));
+			arglist.add(new NameExpr(new Name(":")));	// new ColonExpr()
 		}
 		// Creating the phi-expression
 		ParameterizedExpr varExpr = new ParameterizedExpr(
@@ -1120,8 +1266,8 @@ public class StaticFortranTool {
 				if(((Function)actual).getName().equalsIgnoreCase(funcSign.getName())) {
 					funcSignature = funcSign;
 
-					// Get the caller's symbol table scope, only the first one 
-	    			ArrayList<SymbolTableEntry> stEntryList = gFuncCallVarMap.get(funcSign);					
+					// Get the caller's symbol table scope, NOT use anymore
+	    			//ArrayList<SymbolTableEntry> stEntryList = gFuncCallVarMap.get(funcSign);					
 	    			// SymbolTableScope callerScope = gEntryScopeMap.get(stEntryList.get(0));
 	    			
 					int i = 0;
@@ -1150,13 +1296,15 @@ public class StaticFortranTool {
 				    		// So set the parameter variable name as its value
 				    		stEntry.setValue(new StringLiteralExpr(varName));
 				    		
-				    		// Current in the sub-function, varName is the parameter
-				    		ParameterList.add(varName);
-				    		ArgumentList.add(funcSignature.getStaticArgName(i));
-				    		
-				    		i++;
-				    		if(i>=maxArg) 	// Another insurance
+				    		if(i>=maxArg) {	// Another insurance
 				    			break;
+				    		} else {
+					    		// Current in the sub-function, varName is the parameter (including return variable)
+					    		ParameterList.add(varName);
+				    			// put the corresponding formal parameter into the map. 
+					    		ArgumentList.add(funcSignature.getStaticArgName(i));				    		
+					    		i++;
+				    		}
 			    		}
 			    	} // for(VariableDecl decl: ...
 		    		gFuncCallParameterMap.put(funcSign, ParameterList);
@@ -1170,23 +1318,24 @@ public class StaticFortranTool {
 			    		if(stEntry==null) { 
 			    			System.err.println("[Error] Variable "+varName+" doesn't have an symbol entry");
 			    		} else {
-			    			
-							// set type to those parameters
-				    		Type varType = funcSignature.getStaticArgType(i);
-				    		if(TypeInferenceEngine.isCharacterType(varType)) {
-				    			varType = new PrimitiveType("character(LEN=*)");
-					    		((VariableDecl) stEntry.getDeclLocation()).setType(varType);
-				    		} else {
-					    		// Convert argument type to rely on parameter variable 
-				    			// i.g. [caller] B1=func(n1,A1),A1(n1) ==> Function B=func(n,A),A(n)
-				    			Type newType = convertParameterType(funcSignature, varType, false);
-				    			varType = newType;
-					    		((VariableDecl) stEntry.getDeclLocation()).setType(varType);
-				    		}
-				    		
-				    		i++;
-				    		if(i>=maxArg) 	// Another insurance
+				    		if(i>=maxArg) {	// Another insurance
 				    			break;
+				    		} else {
+								// set type to those parameters
+					    		Type varType = funcSignature.getStaticArgType(i);
+					    		if(TypeInferenceEngine.isCharacterType(varType)) {
+					    			varType = new PrimitiveType("character(LEN=*)");
+						    		((VariableDecl) stEntry.getDeclLocation()).setType(varType);
+					    		} else {
+						    		// Convert argument type to rely on parameter variable 
+					    			// i.g. [caller] B1=func(n1,A1),A1(n1) ==> Function B=func(n,A),A(n)
+					    			Type newType = convertParameterType(funcSignature, varType, false);
+					    			varType = newType;
+						    		((VariableDecl) stEntry.getDeclLocation()).setType(varType);
+					    		}
+					    		
+					    		i++;
+				    		}
 			    		}
 			    	} // for(VariableDecl decl:
 				}
@@ -1197,8 +1346,9 @@ public class StaticFortranTool {
 		if(gCodeNodeList!=null) {
 			boolean stopInfer = false;
 			for(ASTNode codeNode: gCodeNodeList) {
-		    	// Get the symbol entry from the global variable
+		    	// Get the symbol entry list of this code node 
 				ArrayList<SymbolTableEntry> seList = gCodeNodeEntryMap.get(codeNode);
+
 				if(seList == null) {
 					seList = new ArrayList<SymbolTableEntry>();
 		    		// TODO: there may have more than one variable
@@ -1210,6 +1360,29 @@ public class StaticFortranTool {
 			    			break;
 			    		}
 					}
+					// When this node is not an assignment, but a stand alone statement, 
+					if(seList.isEmpty() && codeNode instanceof ExprStmt) {
+						Expr expr = ((ExprStmt)codeNode).getExpr();
+						if(expr instanceof NameExpr) {
+							// then handle the case of command form function call. i.e. <2.2> tic, foo
+							TypeInferenceEngine.inferType(stScope, (NameExpr)expr, codeNode); 
+						} else if(expr instanceof ParameterizedExpr) {	
+							// This is a function call, without receiving return value
+							TypeInferenceEngine.SpecialTransform((NameExpr)((ParameterizedExpr)expr).getTarget());
+							// TypeInferenceEngine.createFunctionSignature(stScope, expr, varNode);
+							Type varType = TypeInferenceEngine.inferType(stScope, (ParameterizedExpr)expr, codeNode);						
+
+							// If it's a user defined function, then save the caller info.
+							// Since there is no return value, don't need to infer that function immediately. 
+				    		if(varType instanceof ArgTupleType) {
+				    			ArrayList<SymbolTableEntry> stEntryList = new ArrayList<SymbolTableEntry>();
+				    			gFuncCallVarMap.put((ArgTupleType) varType, stEntryList);
+	
+				    			gFuncCallNodeMap.put(codeNode, actual);	//(ArgTupleType) varType
+				    			
+				    		}
+						}
+					}
 				} 
 				for(SymbolTableEntry stEntry: seList) {
 			    	// For those assignment-statements, that's not the primary def-node
@@ -1220,6 +1393,7 @@ public class StaticFortranTool {
 			    		
 			    		if(stEntry.getDeclLocation()==null) {
 				    		System.err.println("Type-inferType failed on "+codeNode.getStructureString());
+				    		dumpSymbolEntry(stEntry, true);  
 				    		continue;
 			    		}
 			    		// For special case
@@ -1605,13 +1779,14 @@ public class StaticFortranTool {
 	}
 	
 	//-------------------------------------------------------------------------
-	// Transform a function call to (like) sub-routine form, 
+	// Transform a function call to a sub-routine form, 
 	// Transformation doesn't change LHS of this node, just add LHS variables 
 	// to RHS function call expression (as arguments of parameterized expression)
 	// This can handle multi-variable on LHS
 	// Using AssignStmt.isCall as flag to indicate
-	//  whether it has been transformed to subroutine or not
-	public static void transformFunc2Subroutine(ASTNode varNode) {		
+	//    whether it has been transformed to subroutine or not
+	
+	public static void transformFunc2Subroutine(SymbolTableScope stScope, ASTNode varNode) {		
 		if(!(varNode instanceof AssignStmt) || ((AssignStmt)varNode).isCall)
 				return; 
 		
@@ -1630,6 +1805,7 @@ public class StaticFortranTool {
 	    	} else {	// For LHS has only one variable, 
 	    		rhs.addArg(lhs);
 	    	}
+	    	((AssignStmt)varNode).isCall = true;
 	    	
 	    	// put the new expression into statement list
 	    	if(parentNode.getParent() instanceof List) {
@@ -1637,8 +1813,34 @@ public class StaticFortranTool {
 	    		int loc = stmtList.getIndexOfChild(parentNode);
 	    		ExprStmt callStmt = new ExprStmt(rhs);
 	    		stmtList.setChild(callStmt, loc);
-	    	}
-	    	((AssignStmt)varNode).isCall = true;
+
+	    	/*	
+	    		// If put this before addDynamicAllocation(), following are necessary!!
+	    		// Update Symbol table entry, so that last
+	    		// addDynamicAllocation() can find the right place to adding code
+		    	HashSet<String> varSet = new HashSet<String>();
+		    	if(lhs instanceof NameExpr) {
+		    		varSet.add(((NameExpr)lhs).getVarName());
+		    	} else if(lhs instanceof MatrixExpr) {
+		            // There should be only one row
+		            for(Row row : ((MatrixExpr)lhs).getRows()) {
+		    	        for(Expr element : row.getElements()) {
+		    	        	if(element instanceof NameExpr) 
+		    	        		varSet.add(((NameExpr)element).getVarName());
+		    	        }
+		            }
+		    	}
+		    	for(String varName : varSet ) {
+		    		SymbolTableEntry ste = stScope.getSymbolById(varName);
+		    		if(ste!=null && ste.getNodeLocation().equals(varNode)) {
+		    			ste.setNodeLocation(callStmt);
+		    		}
+		    		
+		    	}
+		        */
+	    	} 
+	    	
+	    	
 	    }
 	}
 	
@@ -1665,13 +1867,13 @@ public class StaticFortranTool {
     		// [#1] Infer type from RHS expression, 
     	    Type varType = null;  
     		Type orgType = varDecl.getType();
-		    dumpTypeInfo(orgType, "[inferSymbolEntry]<"+varNode.getNodeID()+">["+e.getSymbol()+"] isFirm=["+e.isFirmType+"]Original Type:");
-		    
+		    dumpTypeInfo(orgType, "[inferSymbolEntry]<"+varNode.getNodeID()+">["+e.getSymbol()+"] "+varNode.getStructureString()+" isFirm=["+e.isFirmType+"]Original Type:");
 		    // Find the assignment statement of the variable, 
 		    // varNode should be the LHS of it. 
 		    AssignStmt parentNode = ASTToolBox.getParentAssignStmtNode(varNode);
     		Expr lhs = ((AssignStmt) parentNode).getLHS();
     		Expr rhs = ((AssignStmt) parentNode).getRHS();
+
 		    if(parentNode!=null) {
 		    	// (1) Perform the type inference in the first time when this function is called
 		    	if(bNewInfer) {
@@ -1712,8 +1914,8 @@ public class StaticFortranTool {
 		    		// array-access expression 
 		    		varType = orgType;
 		    	}
-	        	dumpTypeInfo(varType, "[inferType]-["+e.getSymbol()+"]="); dumpSymbolEntry(e);
-	        	
+	        	dumpTypeInfo(varType, "[inferType]-5["+e.getSymbol()+"]="); // dumpSymbolEntry(e);
+
 	        	// (3) Set the type to be firmed/unchangeable
 	        	if((lhs instanceof NameExpr) && varType instanceof MatrixType) {
 	        		if(rhs instanceof ParameterizedExpr) {
@@ -1764,8 +1966,42 @@ public class StaticFortranTool {
 	        		}
 	        	}
 
+	        	// (*1) Handle the use of array variables
+        		if(rhs instanceof ParameterizedExpr) {
+	        		String fname = ((NameExpr)((ParameterizedExpr) rhs).getTarget()).getName().getID();
+	        		if(stScope.getSymbolById(fname)!=null) {
+		            	// If it's an array variable, set its index as integer
+			        	setIndex2Integer(stScope, (ParameterizedExpr) rhs);
+	        		}
+        		} else if((lhs instanceof NameExpr) && (rhs instanceof RangeExpr)) {
+        			// (*3) Handle the case of loop index variable
+        			if(parentNode.getParent() instanceof ForStmt) {
+    					if(TypeInferenceEngine.isIntegerType(rhsType)) {
+	        				e.isFirmType = true;
+				    		if (!TypeInferenceEngine.isIntegerType(varType)) {
+				    			((VariableDecl)e.getDeclLocation()).setType
+				    				(new PrimitiveType(TypeInferenceEngine.TYPENAME_INTEGER));
+				    		}
+				    		// System.err.println("e.isFirmType = true;"+e.getSymbol()+"="+rhs.getStructureString());
+    					}
+        			}
+		        }
+	            if(rhs instanceof RangeExpr) {
+	            	NameExpr varExpr = null;
+	        		if(lhs instanceof NameExpr) {
+	        			varExpr = (NameExpr) lhs;
+	        		} else if(lhs instanceof ParameterizedExpr) {
+	        			varExpr = (NameExpr)((ParameterizedExpr) lhs).getTarget();
+	        		}
+	        		if(varExpr!=null)
+	        			TypeInferenceEngine.SpecialTransform(varExpr, "III"); 
+	            }
+	            
+
+
 	        	// [#2] Get the value of variable, save in symbol table entry	        	
 	        	if(varType instanceof PrimitiveType) {
+
 		        	if(!e.isConstant() || e.getValue() == null) {
 		        		// Set value for primitive type variable
 		        		// Get value from the expression
@@ -1775,6 +2011,7 @@ public class StaticFortranTool {
 		        		//		- an array variable access:
 		        		// (3)
 		        		String strValue=null;
+	        			
 		        		if ((rhs instanceof RangeExpr)) {
 		        			// Need decide which one is the last
 		        			boolean bIncreased = true;
@@ -1797,28 +2034,57 @@ public class StaticFortranTool {
 		        			if(strValue!=null)
 		        				e.setMaxValue(new StringLiteralExpr(strValue));
 		        			if(lowValue!=null)
-		        				e.setMinValue(new StringLiteralExpr(lowValue));		        			
-		        		
+		        				e.setMinValue(new StringLiteralExpr(lowValue));		        	
+		        					        		
 		        		} else {
-		        			strValue = null;
+		        			strValue = null;	boolean bSet = false;
 		        			if(TypeInferenceEngine.isIntegerType(varType) 
 			        			 && (rhs instanceof ParameterizedExpr)) {
 			        			// Don't need to calculate cases:
-			        			// int n=floor(x);
+			        			// i.e.: int n=floor(x);
+		        				// Value-JL
+
 		        			} else {
-		        				// TODO: Using RHS; 
+		        				// TODO: Using RHS;  TypeInferException
 		        				// here is trying to get the string from combining with  
 		        				// the original variables. (retrieving to the first assignment) 
 		        				try {
 		        					strValue = TypeInferenceEngine.getVariableValue(stScope, rhs);
-		        				} catch (TypeInferException tie) {
+		        					
+		        					// Handle the index=index+1 
+		        					if(TypeInferenceEngine.isIntegerType(varType)) {
+		        						bSet = getIndexVariableValue(stScope, e, rhs);
+		        					}
+		        					// public static Type inferSymbolEntry...(SymbolTableScope stScope, SymbolTableEntry e, 
+		        					//		ASTNode varNode, boolean bNewInfer) 
+		        					// {
+		        					
+		        				} catch(TypeInferException tie) {
+		        					// Get the expression node that causes the exception
 		        					String msg = tie.getMessage();
+		        					Expr nodeExpr = rhs;
+		        					if(tie.node!=null) 
+		        						nodeExpr = (Expr) tie.node;
+		        					// There are following cases:
 		        					if(msg.equals("i")) {
-		        						// which means RSH is an image number
-		        						System.err.println("[TypeInferException]"+rhs.getStructureString());
+		        						// (1) which means RSH is an complex number
 		        						transform2Complex(stScope, rhs);
 		        						varType = new PrimitiveType(TypeInferenceEngine.TYPENAME_COMPLEX);
 		        						varDecl.setType(varType);
+		        					} else {
+		        						// (2) This must be a function in a command form
+		        						// 		i.e.: timing = toc + 1, t1=clock, ...		        						
+		        						// Don't need to handle it here, the inferType() handle it!
+		        						if(TypeInferenceEngine.cmdFormFuncList.contains(tie.node)) {
+		        							System.out.println("[TypeInferException] cmd-form function="+msg+" "+tie.node);
+		        						} else {
+			        						// (3) If the program is not syntactically correct,
+			        						// there are un-defined variables
+		        							System.err.println("[TypeInferException] undefined variable:"+msg+" "+tie.node);
+		        						}
+		        						
+		        						// Ignore the value of the function
+		        						strValue = null;
 		        					}
 		        				}
 		        			}
@@ -1827,13 +2093,21 @@ public class StaticFortranTool {
 		        				strValue = ((AssignStmt) parentNode).getLHS().getVarName();
 		        			}
 		        			
-	        				e.setValue(new StringLiteralExpr(strValue));
+	        				if(!bSet)
+	        					e.setValue(new StringLiteralExpr(strValue));
 		        		}
 		        	} else{
-		        	}	        	
-		        	dumpSymbolEntry(e);
+		        	}		        	
         		}
-        		
+	        	
+	        	// JL-
+	        	if(varType instanceof MatrixType && lhs instanceof NameExpr) {
+        			transform2Scalar(stScope, e, (MatrixType) varType, (NameExpr)lhs);
+	        	}
+	        	// The above function may cause tranformation, therefore, 
+	        	// need to reset some variables.  
+	        	lhs = ((AssignStmt) parentNode).getLHS();
+	        	
 				// [#3] LHS Range adjust,  
 	        	// Check LHS, whether it's an array with correct indexing
 		        if (lhs instanceof ParameterizedExpr) {
@@ -1850,13 +2124,18 @@ public class StaticFortranTool {
 			        	// merge current variable type (varType) with the expression's type
 			        	MatrixType resultType = TypeInferenceEngine.adjustMatrixType(varType, expr);
 			        	mType = resultType;
-			        	dumpTypeInfo(resultType, "[infer]-adjustMatrixType["+e.getSymbol()+"]=");
 			        			        	
 			        	if(TypeInferenceEngine.isValidType(mType)) {
 			    		    varDecl.setType(mType);
 			    		    e.setConstant(false);
 			        	}
+			        	
+			        	dumpTypeInfo(resultType, "[infer]-adjustMatrixType["+e.getSymbol()+"]=");
 				    }
+            		// TODO: ... 
+		        	// (*1) The array index variable must be integer type 
+		        	setIndex2Integer(stScope, expr);
+
 		        	// (2) Change LHS, 
 		        	// When using linear indexing, which means index misses some dimensions
 		        	// i.g.  A=Matrix(1*5),   expr:  A(2)=0.0  => A(1,2) 
@@ -1923,7 +2202,32 @@ public class StaticFortranTool {
 			        	// varType != orgType && 
 
 			        	if((varType instanceof MatrixType)) {
-			        		TypeInferenceEngine.adjustArrayIndex((MatrixType)varType, (MatrixType)orgType, (NameExpr)lhs);
+			        		try {
+				        		TypeInferenceEngine.adjustArrayIndex(
+				        				(MatrixType)varType, (MatrixType)orgType, (NameExpr)lhs);
+	        				} catch(TypeInferException tie) {
+	        					// Get the expression node that causes the exception
+	        					// 1. Renaming the variable, and it reaches nodes,
+	        					String orgName = ((NameExpr)lhs).getVarName();
+								String newName = TypeInferenceEngine.getNewVarName(orgName, lhs);
+								RenamingRule newRule = new RenamingRule(orgName, lhs.getParent(), 
+										newName, lhs.getParent());
+								java.util.List<ASTNode> defNodeList = RenamingAllReached(gCodeNodeList, newRule);
+
+								// 2. Create new symbol table entry for it
+								TypeInferenceEngine.addDeclNodeSymTblEntry(newName, varType,
+										lhs.getParent().getParent(), stScope, (Stmt)lhs.getParent());
+								
+								// 3. Modify gCodeNodeEntryMap, remove old relation node-symtbl-entry
+								// 	create new one
+								defNodeList.add(varNode);
+								for(ASTNode def: defNodeList) {
+									gCodeNodeEntryMap.remove(def);
+									ArrayList<SymbolTableEntry> seList = new ArrayList<SymbolTableEntry>();
+									seList.add(stScope.getSymbolById(newName));
+									gCodeNodeEntryMap.put(def, seList);
+								}
+	        				}
 			        	} else {
 			        		// This is the case, A=1, A=Matrix(n,m)
 			        	}
@@ -1939,8 +2243,187 @@ public class StaticFortranTool {
     	return rhsType;
 	}
 	
+	// Transform a 1x1 matrix into a scalar, 
+	// create temporary variable for it, and update its symbol table	
+	public static void transform2Scalar(SymbolTableScope stScope, SymbolTableEntry e, 
+			MatrixType varType, NameExpr varNode) {
+		if(!(varNode.getParent() instanceof AssignStmt))
+			return;
+		if((varNode.getVarName().contains(TEMP_VAR_PREFIX)))	
+			return;
+		
+		// Check to make sure it's 1x1 matrix
+		boolean onebyone = false;
+		Size varSize = varType.getSize();
+    	if(varSize != null) {
+			if(varSize.getDims()!=null) 
+				if(varSize.getDims().size()==2)
+					for(Integer dim: varSize.getDims()) {
+						if(dim!=1) {
+							onebyone = false;
+							break;
+						} else {
+							onebyone = true;
+						}
+					}
+    	}
+		if(!onebyone)
+			return;
+		
+		AssignStmt asg = (AssignStmt)varNode.getParent();
+		ASTNode parent = asg.getParent();
+		int loc = parent.getIndexOfChild(asg);		
+		
+		
+		// addNewAssignment
+		// Create new assignment and add to AST
+		String tmpName = TypeInferenceEngine.getTempVarName(asg);
+		NameExpr lhs = new NameExpr(new Name(tmpName));
+		
+		AssignStmt newAssign = new AssignStmt();
+		natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		ParameterizedExpr arrayExpr = new ParameterizedExpr(new NameExpr(new Name(tmpName)), list);
+
+		
+		// #. because type inference based on the se-list saved in the gCodeNodeEntryMap.get(codeNode)
+		// which is created by buildSymbolTable(): 
+		// So it's important to change the current assignment to new one!!!
+		newAssign.setLHS(lhs);
+		newAssign.setRHS(asg.getRHS());
+		newAssign.generateUseBoxesList();
+		// Add the new assignment to location
+		parent.insertChild(newAssign, loc);
+
+		// update current assignment
+		asg.setLHS((NameExpr)varNode);
+		asg.setRHS(arrayExpr);
+		asg.generateUseBoxesList();
+
+		// Add new declaration node and symbol table entry
+		MatrixType pType = TypeInferenceEngine.createMatrixType(varType);
+		TypeInferenceEngine.addDeclNodeSymTblEntry(tmpName, pType, parent, stScope, asg);
+		
+		// SymbolTableEntry eorg = stScope.getSymbolById(varNode.getVarName());
+		if(e!=null) {
+			((VariableDecl )e.getDeclLocation()).setType(varType.getElementType());
+			e.setNodeLocation(newAssign);
+		}
+	}	
+
+	public static boolean getIndexVariableValue(SymbolTableScope stScope, SymbolTableEntry e,Expr rhs) {
+		// 1. the statement format should be i=i+1
+		AssignStmt asgStmt = (AssignStmt) rhs.getParent();
+		Expr lhs = asgStmt.getLHS() ; 
+		if(!(lhs instanceof NameExpr) || !(rhs instanceof PlusExpr))
+			return false;
+
+		boolean hasIntLiteral = false;
+		int inc = 0;
+		Expr rhsVarExpr = null;
+		// RHS must have one Integer constant operand
+		if( TypeInferenceEngine.isIntLiteral(((PlusExpr)rhs).getLHS()))  {
+			inc = TypeInferenceEngine.getIntLiteralValue(((PlusExpr)rhs).getLHS());
+			hasIntLiteral = true;
+			rhsVarExpr = ((PlusExpr)rhs).getRHS();
+		} else if( TypeInferenceEngine.isIntLiteral(((PlusExpr)rhs).getRHS()))  {
+			hasIntLiteral = true;
+			inc = TypeInferenceEngine.getIntLiteralValue(((PlusExpr)rhs).getRHS());
+			rhsVarExpr = ((PlusExpr)rhs).getLHS();
+		}
+		if(!hasIntLiteral)
+			return false;
+//    	System.err.println("[getIndexVariableValue]"+inc+"["+rhsVarExpr.getStructureString()+"]"+
+//   			TypeInferenceEngine.getLiteralString(e.getValue()));
+		// RHS must have only one variable which equal to the lhs variable
+		if((rhsVarExpr == null) || !(rhsVarExpr instanceof NameExpr) 
+				|| !((NameExpr)rhsVarExpr).getVarName().equals(e.getSymbol()))
+			return false;					
+			
+		// 2. statement inside a loop, (and the loop should have only one of this)
+		if(!(asgStmt.getParent().getParent() instanceof ForStmt))
+			return false;
+
+		ForStmt forStmt = (ForStmt)asgStmt.getParent().getParent();
+		String loopVar = forStmt.getAssignStmt().getLHS().getVarName();
+    	SymbolTableEntry stEntry = stScope.getSymbolById(loopVar);
+    	
+		// 3. the min() and max() are the same, (implies only handle one of this)
+    	if(e.getValue()!=null && !(TypeInferenceEngine.getLiteralString(e.getValue())
+    			.equals(TypeInferenceEngine.getLiteralString(e.getValueMin()))))
+    		return true;
+    	String value = "";
+    	if(e.getValue()==null)
+    		value = "0";
+    	else 
+    		value = TypeInferenceEngine.getLiteralString(e.getValue());
+    	String strMax = "("+TypeInferenceEngine.getLiteralString(stEntry.getValue())
+    				+"-"+TypeInferenceEngine.getLiteralString(stEntry.getValueMin())+"+1)*"+inc+"+"+value+"";
+    	String strMin = value;
+    	
+		e.setMaxValue(new StringLiteralExpr(strMax));
+		e.setMinValue(new StringLiteralExpr(strMin));		        	
+
+
+		return true;
+	}
+	
+	private static void setIndex2Integer(SymbolTableScope stScope, ParameterizedExpr expr) {
+    	// The array index variable must be integer type
+        for(Expr arg : expr.getArgs()) {
+        	NameExpr varExpr = null;  
+        	if(arg instanceof NameExpr) {
+        		varExpr = (NameExpr) arg;
+        	} else if(arg instanceof ParameterizedExpr) {
+        		varExpr = (NameExpr) ((ParameterizedExpr) arg).getTarget();
+        	}
+        	if(varExpr != null) {
+        		String idxVar = ((NameExpr) varExpr).getVarName();
+		    	SymbolTableEntry stEntry = stScope.getSymbolById(idxVar);
+		    	if(stEntry!=null ) { // && !stEntry.isFirmType
+		    		if(stEntry.getDeclLocation()!=null) {
+			    		Type pType = ((VariableDecl)stEntry.getDeclLocation()).getType();
+			        	dumpTypeInfo(pType, "[arry index]-["+idxVar+"]=");
+			    		if (!TypeInferenceEngine.isIntegerType(pType)) {
+			    			if(pType instanceof PrimitiveType) {
+				    			((VariableDecl)stEntry.getDeclLocation()).setType
+				    				(new PrimitiveType(TypeInferenceEngine.TYPENAME_INTEGER));
+			    			} else {
+			    				Type idxType = TypeInferenceEngine.createMatrixType
+			    					(TypeInferenceEngine.TYPENAME_INTEGER, (MatrixType)pType);
+			    				((VariableDecl)stEntry.getDeclLocation()).setType(idxType);
+					        	dumpTypeInfo(idxType, "[arry index]-["+idxVar+"]=");
+			    			}
+			    		}
+		    		}
+		    		stEntry.isFirmType = true;
+		    	}
+        	}
+        }
+	}
+	
+	// Remove those uncessary variable decl nodes
+	public static void removeDeclNodes(ASTNode actual) {
+		int limit = 0;
+		if(actual instanceof FunctionDecl)
+			limit = 3;
+		// Cleanup all previous created decl-nodes
+		for(int i=0; i<actual.getNumChild(); ++i) {
+			if(i>=limit && actual.getChild(i) instanceof natlab.ast.List) {
+				natlab.ast.List<ASTNode> list = (natlab.ast.List) actual.getChild(i);
+				for(int j=list.getNumChild()-1; j>=0; --j) {
+					if(list.getChild(j) instanceof VariableDecl)  {
+						list.removeChild(j);
+					}
+				}
+			}
+		}
+	}
+	
 	//-------------------------------------------------------------------------
 	// TODO: generate symbol table by flow-analysis  
+	// Precondition: there should no Decl-node exist
 	//-------------------------------------------------------------------------
 	public static SymbolTableScope buildSymbolTable(ASTNode actual) 
 	{
@@ -2014,6 +2497,13 @@ public class StaticFortranTool {
 	    // gCodeNodeEntryMap DON"T clear it, 
 	    gCodeNodeList = codeNodeList;
 	    gTreeCodeNodeMap.put(actual, codeNodeList);
+
+		// TODO: [#] Adding the Function's input parameters into symbol table 
+	    if(actual instanceof Function) {
+	    	// ((Function)actual).initFlags();
+		    ((Function)actual).addInputParam2SymbolTableScope(symtbl);
+			dumpSymbolTable(symtbl, out, false);
+	    }
 	    
 	    // [#] Go through the code node list
 	    for(ASTNode codeNode: codeNodeList) {
@@ -2050,13 +2540,13 @@ public class StaticFortranTool {
 			}
 
 		    // <2>, create renaming rules, phi-nodes
-		    FlowSet workFlowSet;
+		    //FlowSet workFlowSet;
 
 		    // Finding new variable definition only need to check the after set
 	    	// using the after set : workFlowSet = afterSet;
 		    // (beforeSet==null) // This is the case for node "While/For/... "
 			if(beforeSet!=null) {
-		    	workFlowSet = afterSet;	
+		    	//workFlowSet = afterSet;	
 		    	// (1) collecting variables definitions (into varDefMap),
 			    //     and finding duplicated def-nodes (into varRuleMap)
 		    	
@@ -2069,12 +2559,12 @@ public class StaticFortranTool {
 		    	{
 		    		ASTNode defNode = codeNode;
 					// For each node, it will define (at least) one variable
-					if(defNode==null || ((ASTNode) defNode).getDefBoxes()==null) {
+					if(defNode==null || defNode.getDefBoxes()==null) {
 						continue;
 					}
 					
 					// Check if there are new variables defined
-					for(Object vb: ((ASTNode) defNode).getDefBoxes()) {
+					for(Object vb: defNode.getDefBoxes()) {
 						boolean isNewVar = true;
 						
 						
@@ -2083,14 +2573,14 @@ public class StaticFortranTool {
 							if (varName.equals(((natlab.toolkits.ValueBox) vb).getValue())) {
 								RenamingRule rule = varRuleMap.get(varName);
 								if(rule!=null) {
-									rule.addDefNode((ASTNode) defNode);
+									rule.addDefNode(defNode);
 								} else {
 									// creating new rule, when 2nd def-node found
 									ASTNode preDefNode = varDefMap.get(varName);
 								 	// Create new phi-rule 
 									RenamingRule newRule = new RenamingRule(varName, preDefNode,
 											TypeInferenceEngine.getNewVarName(varName, codeNode), 
-											preDefNode, (ASTNode)defNode);
+											preDefNode, defNode);
 									varRuleMap.put(varName, newRule);
 									rule = newRule;
 								}
@@ -2104,23 +2594,46 @@ public class StaticFortranTool {
 							String newVarName = ((natlab.toolkits.ValueBox) vb).getValue(); 
 							varSet.add(newVarName);
 							if(null==varDefMap.get(newVarName)) {
-								varDefMap.put(newVarName, (ASTNode)defNode);
+								varDefMap.put(newVarName, defNode);
 							}
 							// Create symbol entry for first time defined variables 
-							// if(!(((ASTNode)defNode).getVarName().isEmpty()) 
-							//		&& symtbl.getSymbolById(((ASTNode)defNode).getVarName())==null)
+							// if(!((defNode).getVarName().isEmpty()) 
+							//		&& symtbl.getSymbolById((defNode).getVarName())==null)
+							
 							if(symtbl.getSymbolById(newVarName)==null)
 							{
+								// Check variables with different case in symbol table
+								boolean bCheckDiffCase = symtbl.varUpperCaseSet.contains(newVarName.toUpperCase());
+								if(bCheckDiffCase) {
+									// TODO: Renaming current variable
+									// Rewrite LHS of the phiStmt to new name 
+									String newName = TypeInferenceEngine.getNewVarName(newVarName, codeNode);
+									RenamingRule newRule = new RenamingRule(newVarName, codeNode, 
+											newName, codeNode);
+									RenamingAll(codeNodeList, newRule);
+									clearCodeNodeEntryMap(codeNodeList);
+									newVarName = newName;
+									
+									// Because there may have many defintion on same variable,
+									// because renaming changes code-nodes,  
+									// their def/use boxes are also changed, but this line of code
+									// is inside the loop of using those def/use boxes.
+									// So we have to force exit this function and redo building symbol table().
+									// If we don't exit this function, then the program will encounter another
+									// definition on the same variable and cause renaming again and lost 
+									// its closest prior defintion.
+									return null;	
+								}
 								// Add variable to symbol table 
-								SymbolTableEntry stEntry = new SymbolTableEntry(newVarName, newVarName, (ASTNode)defNode); 
+								SymbolTableEntry stEntry = new SymbolTableEntry(newVarName, newVarName, defNode); 
 								symtbl.addSymbol(stEntry);
                     			// Save a copy into global variable for further type inference
-								ArrayList<SymbolTableEntry> seList = gCodeNodeEntryMap.get((ASTNode) defNode);
+								ArrayList<SymbolTableEntry> seList = gCodeNodeEntryMap.get(defNode);
 								if(seList == null) {
 									seList = new ArrayList<SymbolTableEntry>();
 								} 
 								seList.add(stEntry);
-								gCodeNodeEntryMap.put((ASTNode) defNode, seList);
+								gCodeNodeEntryMap.put(defNode, seList);
 							}
 						}
 					}
@@ -2213,14 +2726,106 @@ public class StaticFortranTool {
 
 		}
 
-	    dumpSymbolTable(symtbl, out, actual);	// Debug purpose
 
 		
-		// TODO: [#] Adding declaration for the Script, Function
+		// [#] Adding declaration for the Script, Function
 		actual.updateSymbolTableScope(symtbl);		
 		
 		return symtbl;	// (SymbolTableScope) 
 	}
+	
+	// This function works throught all the program 
+	// renames a variable from old-name to new-name, 
+	// regarding about flow-sets.
+	public static void RenamingAll(java.util.List<ASTNode> codeNodeList, RenamingRule rule) 
+	{
+	    // Renaming the def-node 
+	    if (rule.getDefNode() instanceof AssignStmt) {
+	    	((AssignStmt)rule.getDefNode()).getLHS().renaming(rule.orgName, rule.newName);
+	    } else {
+	    	rule.getDefNode().renaming(rule.orgName, rule.newName);
+	    }
+		// Starting from the top, not current node
+		// Because we cannot know how deep (nested loop/if) current node is in.
+	    for(ASTNode node: codeNodeList) {
+			node.renaming(rule.orgName, rule.newName);
+			// Cannot change Use/Def boxes here because the line of code 
+			// calling this function is inside a loop of using those Use/Def boxes. 
+			// The iteration mechanism doesn't allow to do that.
+			//	node.clearUseDefBoxes(); 
+			//	node.generateUseBoxes();
+	    }
+	}
+	// This should base on flow-sets
+	// The goal is to renaming all the variables of same name 
+	// in the rest of program (starting from 'startNode') to a new name.
+	// Special case, please reference [Type Conflict Flow Analysis]	
+	public static java.util.List<ASTNode>  RenamingAllReached(
+			java.util.List<ASTNode> codeNodeList, RenamingRule rule) 
+	{
+	    
+		ASTNode startNode = rule.getDefNode();
+	    java.util.List<ASTNode> defNodeList = new ArrayList<ASTNode> ();
+	    defNodeList.add(startNode);
+	    // Renaming the def-node 
+	    if (rule.getDefNode() instanceof AssignStmt) {
+	    	((AssignStmt)rule.getDefNode()).getLHS().renaming(rule.orgName, rule.newName);
+	    } else {
+	    	rule.getDefNode().renaming(rule.orgName, rule.newName);
+	    }
+	    
+		ReachingDefs defsAnalysis = new ReachingDefs(codeNodeList.get(0));
+
+		// [3] Retrieve the result	
+		// Sample code for outputting the result flow-set (after set)
+	    Map<ASTNode, FlowSet> afterMap = defsAnalysis.getResult();
+	    Map<ASTNode, FlowSet> beforeMap = defsAnalysis.getBeforeFlow();
+	    // java.util.List<ASTNode> codeNodeList = defsAnalysis.getNodeList(); 
+	    
+	    FlowSet newDefSet =  defsAnalysis.getEmptySet();
+	    FlowSet stopDefSet =  defsAnalysis.getEmptySet();
+	    FlowSet preFlowset = null; 
+
+		// Starting from the top, not current node
+		// Because we cannot know how deep (nested loop/if) current node is in.
+	    for(ASTNode node: codeNodeList) {
+			FlowSet afterSet = afterMap.get(node);
+			FlowSet beforeSet = beforeMap.get(node);
+
+			// Get the difference between two flow-sets
+			if(beforeSet!=null)
+				preFlowset = beforeSet;
+			else 
+				preFlowset = defsAnalysis.getEmptySet();
+			// Analyze the before/after flow sets, to decide the renaming rules
+			preFlowset.difference(afterSet, stopDefSet);
+			afterSet.difference(preFlowset, newDefSet);
+
+
+			if(beforeSet!=null && beforeSet.contains(startNode)) {
+				node.renaming(rule.orgName, rule.newName);
+				node.clearUseDefBoxes(); 
+				node.generateUseBoxes();
+			    // Check if there is new defition override the old one
+				if(stopDefSet.contains(startNode)) {
+					if(!newDefSet.isEmpty()) 
+						startNode = (ASTNode)newDefSet.toList().get(0);
+				    defNodeList.add(startNode);
+					
+				}
+			}
+	    }
+	    return defNodeList;
+	}
+	
+	// Just remove all entries of this sub-function from map 
+	public static void clearCodeNodeEntryMap(java.util.List<ASTNode> codeNodeList) {
+	    for(ASTNode node: codeNodeList) {
+	    	gCodeNodeEntryMap.remove(node);
+	    }
+		
+	}
+	
 	
 	//-------------------------------------------------------------------------
 	public static boolean isVariableName(String test) {
@@ -2242,7 +2847,13 @@ public class StaticFortranTool {
 	//	- null: there is parsing error, i.g. it's empty tree, or other error  
 	//  - 
 	public static HashSet<String> getVariableListFromString(String content) {
-		return getVariableListFromString(parseString(content));
+		if(isVariableName(content)) { 
+			HashSet<String> varSet = new HashSet<String>();
+			varSet.add(content);
+			return varSet;
+		} else {
+			return getVariableListFromString(parseString(content));
+		}
 	}
 	public static HashSet<String> getVariableListFromString(ExprStmt expr) {
 		HashSet<String> varSet = new HashSet<String>();
@@ -2312,6 +2923,7 @@ public class StaticFortranTool {
 		} catch (IOException e) {
 			// Auto-generated catch block
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		return null;
 	}
@@ -2326,7 +2938,6 @@ public class StaticFortranTool {
 		{
 		    StringBuffer buf = new StringBuffer();
 		    dumpTypeInfo(varType, str, buf);
-			// out.println(buf.toString());
 		}
 	}	
 	public static void dumpTypeInfo(Type varType, String str, StringBuffer buf) {
@@ -2346,6 +2957,9 @@ public class StaticFortranTool {
 	}
 	// Static method for debug purpose, called from other class
 	public static void dumpSymbolEntry(SymbolTableEntry e) {
+		dumpSymbolEntry(e, false);
+	}
+	public static void dumpSymbolEntry(SymbolTableEntry e, boolean bOutput) {
 	    StringBuffer buf = new StringBuffer();
 	    buf.append("----[dump]");
 	    dumpSymbolEntry(e, buf);
@@ -2372,6 +2986,10 @@ public class StaticFortranTool {
 		}
 	}
 	public static void dumpSymbolTable(SymbolTableScope stScope, PrintStream out, ASTNode actual) 
+	{
+		dumpSymbolTable(stScope, out, false);
+	}
+	public static void dumpSymbolTable(SymbolTableScope stScope, PrintStream out, boolean bOutput) 
 	{
 	    HashMap<String, SymbolTableEntry> table = stScope.symTable;
 	    
