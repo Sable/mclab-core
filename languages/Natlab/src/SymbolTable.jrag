@@ -246,7 +246,7 @@ aspect SymbolTableToXML{
         return true;
     }
     syn boolean Script.getSymbolTableXML(Document doc, Element parent){
-        HashMap<String, SymbolTableEntry> table = symbolTable().symTable;
+        HashMap<String, SymbolTableEntry> table = getSymbolTableScope().symTable;
 
         Element e = doc.createElement("Symboltable");
 
