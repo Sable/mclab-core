@@ -145,3 +145,10 @@ import beaver.Scanner;
 %guest bracket_help_comment
 %start START_BRACKET_HELP_COMMENT
 %end END_BRACKET_COMMENT
+
+%%embed
+%name eof_error
+%host bracket_comment, bracket_help_comment, class_bracketed, class, string
+%guest base
+%start EOF_ERROR
+%end <ANY> //NB: never happens
