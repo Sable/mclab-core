@@ -1806,7 +1806,7 @@ public class TypeInferenceEngine {
 	// Infer type for intrinsic and user-defined functions in command form
 	// TODO: adding their name and return type of
 	// those intrinsic functions that don't have argument,
-	// There is possible to determinate a function doesn’t support in current system, 
+	// There is possible to determinate a function doesn't support in current system, 
 	// based on the list of intrinsic functions and user-defined functions.)	
 	public static Type inferTypeIntrinsicFunction(NameExpr node) {
 		Type varType = null;
