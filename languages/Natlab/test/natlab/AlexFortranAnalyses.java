@@ -137,7 +137,7 @@ public class AlexFortranAnalyses {
 
 
 				// set of condition when we are not interested in collapsing
-				boolean isRange = (e.getClass().getName().equals(natlab.ast.RangeExpr.class.getCanonicalName()));
+				// boolean isRange = (e.getClass().getName().equals(natlab.ast.RangeExpr.class.getCanonicalName()));
 				
 				//if (e.getNumChild() > 0) System.out.println("kk: " + e.getStructureString() + " -- " +  e.getChild(0).getStructureString());				
 				// if(!isRange)
@@ -328,7 +328,7 @@ public class AlexFortranAnalyses {
 				// here we are sure we have a definition				
 				AssignStmt as = (AssignStmt)iter.next();
 				
-	    		boolean isForStmt = (as.getClass().getName().equals(natlab.ast.ForStmt.class.getCanonicalName()));
+	    		// boolean isForStmt = (as.getClass().getName().equals(natlab.ast.ForStmt.class.getCanonicalName()));
 	    		
 				
 				// look into the map if we have a variable with lower ID
