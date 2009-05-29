@@ -189,13 +189,16 @@
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 	<target name="jar" depends="clean, gen, compile" description="creates an executable release jar">
-		<jar destfile="${jarname}">
+		<jar destfile="${entrypoint.jarname}">
 			<manifest>
 				<attribute name="Main-Class" value="${entrypoint.class}" />
 				<attribute name="Class-Path" value="${lib.dir}/${beaver.rt.jar.path.prop} ${annotations.bin.dir}/ ${lib.dir}/${jflex.jar.path.prop} ${lib.dir}/${beaver.jar.path.prop} ${matlab.bin.dir}/ ${lib.dir}/${antlr.task.jar.path.prop} ${lib.dir}/${antlr3.jar.path.prop} ${lib.dir}/${string.template.jar.path.prop} ${lib.dir}/${antlr2.jar.path.prop}" />
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class" />
 		</jar>
+                <echo file="${entrypoint.script.name}">${entrypoint.script.header}
+java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
+                <chmod file="${entrypoint.script.name}" perm="755" />
 	</target>
 
 	<!-- public versions of eclipse.xml targets -->
