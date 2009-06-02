@@ -29,6 +29,8 @@ public class Main
 {
     private static Options options;
     private static final int SERVER_PORT = 47146; //default server port
+    private static final long HEART_RATE = 1000; //in milliseconds
+    private static final long HEART_DELAY = 3000; //delay till first heart beat check is made
     
     public static void main(String[] args)
     {
@@ -104,6 +106,14 @@ public class Main
                     StringBuffer commandBuf;
                     XMLCommandHandler xmlCH = new XMLCommandHandler();
                     boolean shutdown = false;
+                    //create flag object for keeping track of heart beats
+                    HeartBeatFlag hbFlag = new HeartBeatFlag();
+                    //create the timer that checks the heart beat signal
+                    Timer heartBeat = new Timer();
+                    if( !options.noheart() ){
+                        //start the timer with a HeartBeatTask and an initial delay
+                        heartBeat.schedule(new HeartBeatTask(hbFlag, out, quiet) ,HEART_DELAY, HEART_RATE );
+                    }
                     //loop until told to shutdown
                     while( !shutdown ) {
                         commandBuf = new StringBuffer();
@@ -186,6 +196,8 @@ public class Main
                                 out.print("<shutdown />\0");
                                 out.flush();
                                 shutdown = true;
+                                //cancel the heartbeat timer
+                                heartBeat.cancel();
                                 try{
                                     clientSocket.close();
                                     out.close();
@@ -194,6 +206,10 @@ public class Main
                                 }catch(IOException e){}
 
                                 continue;
+                            }
+                            //when you get a heartbeat signal, set the heart beat flag.
+                            else if( cmd.equalsIgnoreCase( "heartbeat" ) ){
+                                hbFlag.set();
                             }
                             else{
                                 if( !quiet ){

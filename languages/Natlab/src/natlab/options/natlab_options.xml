@@ -79,5 +79,13 @@ No static linking is done.
       <short_desc>Set the port the server runs on</short_desc>
       <long_desc>Set the server to run on a given port. Default is 47146.</long_desc>
     </stropt>
+    <boolopt>
+      <name>No heartbeat</name>
+      <alias>nh</alias>
+      <alias>noheart</alias>
+      <short_desc>Turns off the need for a heartbeat signal</short_desc>
+      <long_desc>The server will no longer try to detect broken connections
+using a the heartbeat signal.</long_desc>
+    </boolopt>
   </section>
 </options>
