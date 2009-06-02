@@ -29,8 +29,8 @@ public class Main
 {
     private static Options options;
     private static final int SERVER_PORT = 47146; //default server port
-    private static final long HEART_RATE = 1000; //in milliseconds
-    private static final long HEART_DELAY = 3000; //delay till first heart beat check is made
+    private static final long HEART_RATE = 4000; //in milliseconds
+    private static final long HEART_DELAY = 5000; //delay till first heart beat check is made
     
     public static void main(String[] args)
     {
