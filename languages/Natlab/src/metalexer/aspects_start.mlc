@@ -5,4 +5,4 @@
 
 %%
 
-"aspect" {: :} START_ASPECT
+aspect {: return symbol(ASPECT); :} START_ASPECT

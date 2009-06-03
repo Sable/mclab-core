@@ -25,11 +25,13 @@ aspect WeedingErrors {
     eq Function.getWeedingErrors() {       
         if(getParent().getParent() instanceof Methods) {
         	String name = getName();
-        	ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
-        	
-	  		if(grandParent.getName().compareTo(getName()) == 0) {
-		  		if(getOutputParams().getNumChild() == 0) {
-	               	error(getPosString(), "CLASS constructor must return the object constructed as output");
+        	if(getParent().getParent().getParent().getParent() instanceof ClassDef) {
+	        	ClassDef grandParent = (ClassDef) getParent().getParent().getParent().getParent();
+	        	
+		  		if(grandParent.getName().compareTo(getName()) == 0) {
+			  		if(getOutputParams().getNumChild() == 0) {
+		               	error(getPosString(), "CLASS constructor must return the object constructed as output");
+					}
 				}
 			}
         }
@@ -208,8 +210,19 @@ aspect WeedingErrors {
         
         String name = getName();
         Boolean match = false; 
-        ClassDef grandParent = (ClassDef) parent.getParent().getParent();
-        for(Properties prop : grandParent.getPropertys()) {
+        
+        List<Properties> props = null;
+        
+        if(parent.getParent().getParent() instanceof ClassDef) {
+        	ClassDef grandParent = (ClassDef) parent.getParent().getParent();
+        	props = grandParent.getPropertys();
+        }
+        else if(parent.getParent().getParent() instanceof Aspect) {
+        	Aspect grandParent = (Aspect) parent.getParent().getParent();
+        	props = grandParent.getPropertys();
+        }
+        
+        for(Properties prop : props) {
             for(Property pty : prop.getPropertys()) {
             	if(name.compareTo(pty.getName()) == 0) {
             		match = true;

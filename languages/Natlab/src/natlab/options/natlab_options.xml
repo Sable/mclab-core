@@ -61,6 +61,13 @@ No static linking is done.
       <short_desc>Suppress all information messages</short_desc>
       <long_desc>All messages will be suppressed, unless an error occurs. </long_desc>
     </boolopt>
+    <boolopt>
+      <name>Aspect Mode</name>
+      <alias>a</alias>
+      <alias>aspect</alias>
+      <short_desc>Use Natlab and Aspect files</short_desc>
+      <long_desc>Use Aspect files to weave into Natlab files.</long_desc>
+    </boolopt>
   </section>
   <section>
     <name>Server options</name>

@@ -14,15 +14,16 @@ public class AllTests {
 		suite.addTestSuite(NatlabParserPassTests.class);
 		suite.addTestSuite(NatlabParserFailTests.class);
 
-                suite.addTestSuite(SymbolTablePassTests.class);
-                suite.addTestSuite(SymbolTableFailTests.class);
-                suite.addTestSuite(SymbolTableSanityTests.class);
+		suite.addTestSuite(SymbolTablePassTests.class);
+		suite.addTestSuite(SymbolTableFailTests.class);
+		suite.addTestSuite(SymbolTableSanityTests.class);
 
-                //suite.addTestSuite(LookupLValuePassTests.class);
-                //suite.addTestSuite(LookupLValueFailTests.class);
-                //suite.addTestSuite(LookupLValueSanityTests.class);
-                
-                suite.addTestSuite(ErrorCheckTest.class);
+		//suite.addTestSuite(LookupLValuePassTests.class);
+		//suite.addTestSuite(LookupLValueFailTests.class);
+		//suite.addTestSuite(LookupLValueSanityTests.class);
+
+		suite.addTestSuite(ErrorCheckTest.class);
+		suite.addTestSuite(AspectsTests.class);
 
                 suite.addTestSuite(XMLCommandPassTests.class);
 		//$JUnit-END$

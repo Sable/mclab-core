@@ -18,7 +18,7 @@ Stmt stmt_body =
 
 Entity entity =
      IDENTIFIER.i {: return new Variable(i); :}
-  |  entity.e LCURLY num_list.l RCURLY {: return new Cell(e, (java.util.List<Integer>) l.value); :}
+  |  entity.e LCURLY num_list.l RCURLY {: java.util.List<Integer> lst = new java.util.ArrayList<Integer>(); for(Object obj : l) { Num num = (Num)obj; lst.add(num.getNumber()); } return new Cell(e, lst); :}
   |  entity.e DOT IDENTIFIER.i {: return new Field(e, i); :}
   ;
 
@@ -138,12 +138,12 @@ SizeStmt size_stmt_body =
   ;
 
 Size size =
-     LSQUARE num_list.l RSQUARE {: return new Size((java.util.List<Integer>) l.value); :}
+     LSQUARE num_list.l RSQUARE {: java.util.List<Integer> lst = new java.util.ArrayList<Integer>(); for(Object obj : l) { Num num = (Num)obj; lst.add(num.getNumber()); } return new Size(lst); :}
   ;
 
-num_list =
-     NUMBER.n {: java.util.List<Integer> nums = new java.util.ArrayList<Integer>(); nums.add(Integer.getInteger(n)); return new Symbol(nums); :}
-  |  num_list.l ELEMENT_SEPARATOR NUMBER.n {: ((java.util.List<Integer>) l.value).add(Integer.getInteger(n)); return l; :}
+List num_list =
+     NUMBER.n {: return new List().add(new Num(Integer.getInteger(n))); :}
+  |  num_list.l ELEMENT_SEPARATOR NUMBER.n {: return l.add(new Num(Integer.getInteger(n))); :}
   ;
 
 ScalarStmt scalar_stmt_body =

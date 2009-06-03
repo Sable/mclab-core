@@ -113,7 +113,9 @@ LoopInterchange { return symbol(LOOP_INTERCHANGE); }
 LoopReversal { return symbol(LOOP_REVERSAL); }
 LoopUnrolling { return symbol(LOOP_UNROLLING); }
 
-{Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
+//TODO: JastAddParser's limitation
+//{Number} { return symbol(NUMBER, Integer.parseInt(yytext())); } //NumberFormatException not possible
+{Number} { return symbol(NUMBER, yytext()); }
 
 {Identifier} { return symbol(IDENTIFIER, yytext()); }
 

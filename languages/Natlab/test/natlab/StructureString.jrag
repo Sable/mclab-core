@@ -278,7 +278,7 @@ aspect StructureString {
     
     eq Attribute.getStructureStringLessComments() = getKey() + " = " + getExpr().getStructureString();
     eq SuperClass.getStructureStringLessComments() = getName();
-    eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString();
+    eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString() + ";";
     eq Event.getStructureStringLessComments() = getName();
     
     eq SuperClassMethodExpr.getStructureStringLessComments() {

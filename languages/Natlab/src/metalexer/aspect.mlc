@@ -8,13 +8,13 @@
 %%
 %%inherit shared_symbols
 
-aspect {: return symbol(ASPECT); :} START_ASPECT
+aspect {: return symbol(ASPECT); :} OPEN_END
 end {: return symbol(END); :} END
 
 properties {: return symbol(PROPERTIES); :} OPEN_END
 methods {: return symbol(METHODS); :} OPEN_END
-patterns {: return symbol(PATTERNS); :} OPEN_END
-actions {: return symbol(ACTIONS); :} OPEN_END
+patterns {: return symbol(PATTERNS); :} PATTERNS
+actions {: return symbol(ACTIONS); :} ACTIONS
 
 %%inherit shared_keywords
 %:

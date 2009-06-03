@@ -1,0 +1,14 @@
+%component aspect_action
+
+%%
+
+%%inherit shared_symbols
+
+before {: return symbol(BEFORE); :} OPEN_END
+after {: return symbol(AFTER); :} OPEN_END
+around {: return symbol(AROUND); :} OPEN_END
+
+aspect {: return symbol(ASPECT); :} ASPECT
+end {: return symbol(END); :} END
+
+%%inherit shared_keywords

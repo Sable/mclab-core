@@ -4,7 +4,7 @@ abstract AspectBody : Body;
 Aspect : Program ::= <Name:String> HelpComment* Property:Properties* Method:Methods* Pattern:Patterns* Action:Actions*;
 Patterns : AspectBody ::= Pattern*;
 Pattern ::= <Name:String> PD:Expr;
-PatternDesignator : Expr ::= <Name:String> Arg:Expr*;
+PatternDesignator : Expr ::= <Name:String> Arg:Name*;
 Actions : AspectBody ::= AspectAction*;
-AspectAction ::= <Name:String> <Place:String> <Pattern:String> Selectors:Name* HelpComment* Stmt* NestedFunction:Function*;
+AspectAction ::= <Name:String> <Type:String> <Pattern:String> Selector:Name* HelpComment* Stmt* NestedFunction:Function*;
 

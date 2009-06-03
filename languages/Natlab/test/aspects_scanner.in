@@ -1,0 +1,39 @@
+aspect test
+
+properties
+count = 0;
+end
+
+methods
+function x = getCount()
+x = count;
+end
+end
+
+patterns
+arrayseta : set(*, *.a);
+arraysetb : set(*, *.b);
+arraysetc : set(nn);
+arraysetd : set(*.b);
+arraysete : set(*.a.*.d);
+arraysetf : set(*, b(*,..));
+end
+
+actions
+countseta : before arrayseta : (newVal)
+if newVal > 100
+display('a_exceeds_100');
+end
+end
+
+countsetb : after arraysetb
+count = count + 1;
+end
+
+countsetc : after arraysetc
+display();
+end
+
+end
+
+end

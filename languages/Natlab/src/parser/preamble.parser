@@ -254,7 +254,7 @@
     
     //helper for constructing an AST Action node
     //separates stmts from nested functions and attaches comments
-    private AspectAction action(String name, String place, String pattern, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
+    private AspectAction action(String name, Name place, String pattern, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         
@@ -275,7 +275,7 @@
         }
         return annotateWithComments(new AspectAction(
                 name,
-                place,
+                place.getID(),
                 pattern,
                 nullToEmpty(inParams),
                 nullToEmpty(comments),

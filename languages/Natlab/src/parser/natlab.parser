@@ -147,9 +147,9 @@ Signature function_signature =
   ;
   
 PropertyAccess property_access =
-     FUNCTION output_params.out ASSIGN IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+     FUNCTION output_params.out ASSIGN IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END stmt_separator_list 
          {: return propertyAccess(out, acc, name, in, comments, body); :}
-  |  FUNCTION IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+  |  FUNCTION IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END stmt_separator_list 
          {: return propertyAccess(null, acc, name, in, comments, body); :}
   ;
   

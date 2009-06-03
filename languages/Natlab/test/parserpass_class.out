@@ -2,8 +2,8 @@
 24 3
 classdef (hidden = true) myClass < double & int32
 properties 
-abc = []
-xyz = 10
+abc = [];
+xyz = 10;
 end
 methods (abc = false, xyz = true) 
 [p] = q(s, t)

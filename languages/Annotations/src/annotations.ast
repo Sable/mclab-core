@@ -16,9 +16,10 @@ LoopUnrollingOpt : LoopOptStmt;
 abstract Entity;
 Variable : Entity ::= <Name>;
 Field : Entity ::= Entity <FieldName>;
-Cell : Entity ::= Entity <Indices : java.util.List<Integer>>;
 
+Cell : Entity ::= Entity <Indices : java.util.List<Integer>>;
 Size ::= <Dims : java.util.List<Integer>>;
+Num ::= <Number : Integer>;
 
 //NB: types are more general then they need to be - see grammar for precise structure
 abstract Type;
