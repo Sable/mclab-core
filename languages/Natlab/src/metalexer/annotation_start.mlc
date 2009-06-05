@@ -5,4 +5,4 @@
 
 %%
 
-"(*" {: :} START_ANNOTATION
+"(*" {: appendToStartDelim(""); /*update start pos*/ :} START_ANNOTATION

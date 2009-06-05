@@ -3,9 +3,9 @@
 %extern "Symbol symbol(short, Object, int, int, int, int)"
 %extern "void error(String) throws Scanner.Exception"
 
-%append{ /*(int startLine, int startCol, int endLine, int endCol, String text)*/
-    return symbol(STRING, text, startLine, startCol, endLine, endCol);
-%append}
+%appendWithStartDelim{ /*(int startLine, int startCol, int endLine, int endCol, String text)*/
+    return symbol(STRING, text, startLine + 1, startCol + 1, endLine + 1, endCol + 1);
+%appendWithStartDelim}
 
 %%
 %%inherit macros

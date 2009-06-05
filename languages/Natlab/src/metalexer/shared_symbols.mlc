@@ -48,7 +48,7 @@
 {OtherWhiteSpace} {: :}
 
 //always a string - we'd be in transpose otherwise
-"'" {: :} START_STRING
+"'" {: appendToStartDelim(""); /*update start pos*/ :} START_STRING
 
 //bracketing
 \( {: return symbol(LPAREN); :} START_BRACKETED

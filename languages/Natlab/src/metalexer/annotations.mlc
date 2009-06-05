@@ -1,8 +1,8 @@
 %component annotations
 
-%append{
-    return symbol(ANNOTATION, text, startLine, startCol, endLine, endCol);
-%append}
+%appendWithStartDelim{
+    return symbol(ANNOTATION, text, startLine + 1, startCol + 1, endLine + 1, endCol + 1);
+%appendWithStartDelim}
 
 Whitespace = [ \t\f\r\n]+
 
