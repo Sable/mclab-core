@@ -90,6 +90,7 @@ aspect Simplify {
 			
 			// (3). Create AssignStmt, add to the top Stmt-List, just before current node			
 			AssignStmt newAsgStmt = new AssignStmt(tmpNameExpr, (Expr)curExpr);
+			newAsgStmt.setOutputSuppressed(true);
 			stmtList.insertChild(newAsgStmt, childLocation);
 			childLocation++;
 			int bakLocation = childLocation;
