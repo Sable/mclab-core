@@ -1,0 +1,242 @@
+
+aspect ASTAnalyze
+{
+    public void ASTNode.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor){
+        visitor.caseASTNode(this);
+    }
+    
+    public void Program.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor){
+        visitor.caseProgram(this);
+    }
+    
+    public void Stmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseStmt(this);
+    }
+    public void BreakStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseBreakStmt(this);
+    }
+    public void ContinueStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseContinueStmt(this);
+    }
+    public void ReturnStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseReturnStmt(this);
+    }
+    public void ForStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        Expr loopRange = getAssignStmt().getRHS();
+        
+        if( loopRange instanceof RangeExpr )
+            visitor.caseRangeForStmt(this);
+        else
+            visitor.caseForStmt(this);
+    }
+    public void WhileStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseWhileStmt(this);
+    }
+    public void TryStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseTryStmt(this);
+    }
+    public void SwitchStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseSwitchStmt(this);
+    }
+    public void IfStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseIfStmt(this);
+    }
+
+    public void Script.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseScript(this);
+    }
+    public void FunctionList.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseFunctionList(this);
+    }
+    public void ExprStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseExprStmt(this);
+    }
+    public void AssignStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseAssignStmt(this);
+    }
+    public void GlobalStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseGlobalStmt(this);
+    }
+    public void PersistentStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.casePersistentStmt(this);
+    }
+    public void ShellCommandStmt.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseShellCommandStmt(this);
+    }
+    public void RangeExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseRangeExpr(this);
+    }
+    public void ColonExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseColonExpr(this);
+    }
+    public void EndExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseEndExpr(this);
+    }
+    public void NameExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseNameExpr(this);
+    }
+    public void ParameterizedExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseParameterizedExpr(this);
+    }
+    public void CellIndexExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseCellIndexExpr(this);
+    }
+    public void DotExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseDotExpr(this);
+    }
+    public void MatrixExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMatrixExpr(this);
+    }
+    public void CellArrayExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseCellArrayExpr(this);
+    }
+    public void SuperClassMethodExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseSuperClassMethodExpr(this);
+    }
+    public void IntLiteralExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseIntLiteralExpr(this);
+    }
+    public void FPLiteralExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseFPLiteralExpr(this);
+    }
+    public void StringLiteralExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseStringLiteralExpr(this);
+    }
+    public void UMinusExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseUMinusExpr(this);
+    }
+    public void UPlusExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseUPlusExpr(this);
+    }
+    public void NotExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseNotExpr(this);
+    }
+    public void MTransposeExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMTransposeExpr(this);
+    }
+    public void ArrayTransposeExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseArrayTransposeExpr(this);
+    }
+    public void PlusExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.casePlusExpr(this);
+    }
+    public void MinusExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMinusExpr(this);
+    }
+    public void MTimesExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMTimesExpr(this);
+    }
+    public void MDivExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMDivExpr(this);
+    }
+    public void MLDivExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMLDivExpr(this);
+    }
+    public void MPowExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseMPowExpr(this);
+    }
+    public void ETimesExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseETimesExpr(this);
+    }
+    public void EDivExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseEDivExpr(this);
+    }
+    public void ELDivExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseELDivExpr(this);
+    }
+    public void EPowExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseEPowExpr(this);
+    }
+    public void AndExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseAndExpr(this);
+    }
+    public void OrExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseOrExpr(this);
+    }
+    public void ShortCircuitAndExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseShortCircuitAndExpr(this);
+    }
+    public void ShortCircuitOrExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseShortCircuitOrExpr(this);
+    }
+    public void LTExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseLTExpr(this);
+    }
+    public void GTExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseGTExpr(this);
+    }
+    public void LEExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseLEExpr(this);
+    }
+    public void GEExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseGEExpr(this);
+    }
+    public void EQExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseEQExpr(this);
+    }
+    public void NEExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseNEExpr(this);
+    }
+    public void FunctionHandleExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseFunctionHandleExpr(this);
+    }
+    public void LambdaExpr.analyze(natlab.toolkits.analysis.AnalysisVisitor visitor)
+    {
+        visitor.caseLambdaExpr(this);
+    }
+}
