@@ -28,28 +28,15 @@ public class GcdTest {
 	}
 	private void isTightlyNestedLoop(ForStmt forStmt)
 	{
-		//int nStmts=forStmt.getNumStmt();
-		//System.out.println("no of statements in for loop are " +nStmts);
-		//for(int i=0;i<nStmts;i++)
-	//	{
+		
 		  Stmt stmt=forStmt.getStmt(0);
 		  if(stmt instanceof ForStmt)
 		  {
 			  ForStmt tForStmt=(ForStmt)stmt;
 			  forNode=tForStmt;
-			  //int no=tForStmt.getNumStmt();
-			  //for(int j=0;j<no;j++)
-			 // {
-				  System.out.println("i am in for stmt");
-				  isTightlyNestedLoop(tForStmt);
-				  
-			 // }
-	//		  return true;
+			  isTightlyNestedLoop(tForStmt);				  
 		  }
-		//  else
-			//  return false;
-		//} 
-		//return true;
+		
 	}
 	
 	
@@ -59,7 +46,7 @@ public class GcdTest {
 		isTightlyNestedLoop(forNode);
 				
 		int nStmts=forNode.getNumStmt();
-		System.out.println("I am in Expression Statement");
+		
 		for(int i=0;i<nStmts;i++)
 		{
 		  Stmt stmt=forNode.getStmt(i);		  
@@ -70,7 +57,7 @@ public class GcdTest {
 		  }
 		  else if(stmt instanceof AssignStmt)
 		  {
-			  System.out.println(" i am in Assignment statement");
+			  System.out.println("I am in Assignment statement");
 			  AssignStmt aStmt=(AssignStmt)stmt;  
 			 
 			 
@@ -99,11 +86,11 @@ public class GcdTest {
 		  }
 		  
 		  
-		}//end of for loop
-		
-		
+		}//end of for loop	
 		
 	}//end of function checkSameArrayAccess.
+	
+	
 	
 	//This function makes equations from array subscript expression.
 	private void makeEquationsForSubscriptExprs(AssignStmt aStmt)
@@ -111,15 +98,13 @@ public class GcdTest {
 		ParameterizedExpr paraLHSExpr=(ParameterizedExpr)aStmt.getLHS();
 		ParameterizedExpr paraRHSExpr=(ParameterizedExpr)aStmt.getRHS();
 		
-		//System.out.println("LHS Parameterized Expression" + paraLHSExpr.getArg(0).dumpCodeTree());
-		//System.out.println("RHS Parameterized Expression" + paraRHSExpr.getArg(0).dumpCodeTree());
 		
 		AffineExpression aExpr1=new AffineExpression();
 		AffineExpression aExpr2=new AffineExpression();
 		
 		resultArray=new boolean[paraLHSExpr.getNumArg()]; //instantiate a boolean array based on dimensions of array under dependence testing.
 		
-		for(int i=0;i < paraLHSExpr.getNumArg();i++)
+		for(int i=0;i < paraLHSExpr.getNumArg();i++) // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
 		{	
 		
 			if(paraLHSExpr.getArg(i) instanceof NameExpr && paraRHSExpr.getArg(i) instanceof PlusExpr)
@@ -136,11 +121,28 @@ public class GcdTest {
 					checkDependence(aExpr1,aExpr2,i);
 									
 				}//end of nested if	
+			}//end of main if			
+			else if(paraLHSExpr.getArg(i) instanceof NameExpr && paraRHSExpr.getArg(i) instanceof MinusExpr)
+			{
+				NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
+				aExpr1.setC(0);
+				aExpr1.setVariable(nExpr.getVarName());			
+				MinusExpr mExpr=(MinusExpr)paraRHSExpr.getArg(i);
+				aExpr2.setVariable(mExpr.getLHS().getVarName());			
+				if(mExpr.getRHS() instanceof IntLiteralExpr)			
+				{
+					IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getRHS();				
+					aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);					
+					checkDependence(aExpr1,aExpr2,i);
+									
+				}//end of nested if	
 			}//end of main if
+			
 	}//end of for
 		
-		
 }//end of function makeEquationsForSubscriptExprs
+	
+	
 	
 	
 	/*private void combineEquations(AffineExpression expr1, AffineExpression expr2)
@@ -174,8 +176,8 @@ public class GcdTest {
 	 * If there is no dependence for that equation then sets value true at the location of resultArray.
 	 * Size of resultArray depends on the dimensions of the array under dependence testing.
 	 */
-	private void checkDependence(AffineExpression expr1, AffineExpression expr2,int index)
-	{
+private void checkDependence(AffineExpression expr1, AffineExpression expr2,int index)
+{
 		AssignStmt assStmt= forNode.getAssignStmt();//This gives the assignment statement of the loop
 		
 		if(assStmt.getRHS() instanceof RangeExpr)
@@ -214,10 +216,10 @@ public class GcdTest {
 		
 		
 		
-	}//end of function checkDependence
+}//end of function checkDependence
 	
-	private void reportTestResult(int index)
-	{
+private void reportTestResult(int index)
+{
 		boolean temp=false;
 		for(int i=0;i<index;i++)
 		{
@@ -236,7 +238,7 @@ public class GcdTest {
 		}
 		
 		
-	}//end of function reportTestResult
+}//end of function reportTestResult
 	
 
 }
