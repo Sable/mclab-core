@@ -1,6 +1,7 @@
 package natlab;
 
 import natlab.options.Options;
+import natlab.toolkits.analysis.ForVisitor;
 import natlab.ast.*;
 import natlab.server.*;
 
@@ -22,8 +23,6 @@ import java.net.*;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 public class Main
 {
@@ -54,6 +53,11 @@ public class Main
 					if( !quiet )
 						System.err.println("dynamic linking");
 				}
+				
+				
+				
+				
+				
 				if( options.server() ){
 					//in server mode
 					if( !quiet )
@@ -292,6 +296,34 @@ public class Main
 						//the correct value.
 						String file = (String) o;
 						Reader fileReader = new StringReader("");
+						
+						//checks if dependence analysis flag is set.
+						//If the flag is set then the type of dependence test that needs to be applied.						
+						if(options.danalysis()){		
+							
+							Program prog = null;							
+							if( !quiet )
+								System.err.println("Dependence Tester");
+							
+							if(options.gcd()){
+								if( !quiet )
+									System.err.println("Dependence Analysis with GCD Test");
+								fileReader=translateFile(file,errors);
+								prog = parseFile( file,  fileReader, errors );
+								
+								if(prog!=null)
+								{
+									String testType="gcd";
+									parseProgramNode(prog,testType);
+									//System.out.println("Out of parser for gcd testing");
+								}
+							}
+							
+							if(options.bj()){
+								if( !quiet )
+									System.err.println("Dependence Analysis with Banerjee's Test");
+							}
+						}
 
 						if( options.matlab() ){
 							//translate each file from matlab to natlab
@@ -418,6 +450,15 @@ public class Main
 			//TODO-JD: probably shouldn't need to exit?
 			System.exit(0);
 		}
+	}
+	
+	private static void parseProgramNode(Program prog,String testType)
+	{
+		   ForVisitor forVisitor = new ForVisitor(testType);
+           prog.apply(forVisitor);  
+           
+           
+		
 	}
 
 	private static Reader translateFile(String fName, StringBuffer errBuf)
@@ -577,6 +618,7 @@ public class Main
 			try{
 
 				Program prog = (Program)parser.parse(scanner);
+				
 				if( parser.hasError() ){
 					for( String error : parser.getErrors())
 						errBuf.append(error + "\n");

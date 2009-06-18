@@ -95,4 +95,31 @@ No static linking is done.
 using a the heartbeat signal.</long_desc>
     </boolopt>
   </section>
-</options>
+   <section>
+    <name>DependenceTester Options</name>
+    <boolopt>
+      <name>DependenceAnalysis</name>
+      <alias>danalysis</alias>      
+      <short_desc>Run Dependence Analysis on the input file</short_desc>
+      <long_desc>
+        Run Dependence Analysis on the input file to figure out dependence relations.
+      </long_desc>  
+     </boolopt>  
+    <boolopt>
+      <name>GCD</name>
+      <alias>gcd</alias>      
+      <short_desc>Run Gcd test on the input file</short_desc>
+      <long_desc>
+        Run Gcd Test on the loops in the input file to figure out dependence relations.
+      </long_desc>
+    </boolopt>
+    <boolopt>
+      <name>BanerJee's Test</name>
+      <alias>bj</alias>      
+      <short_desc>Run Banerjee test on the input file</short_desc>
+      <long_desc>
+        Run Banerjee's Test on the loops in the input file to figure out dependence relations.
+      </long_desc>
+    </boolopt>
+  </section>
+ </options>
