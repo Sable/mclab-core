@@ -1,5 +1,6 @@
 package DependenceAnalysis;
 import natlab.ast.ForStmt;
+import natlab.ast.Expr;
 import natlab.ast.Stmt;
 import natlab.ast.ParameterizedExpr;
 import natlab.ast.ExprStmt;
@@ -13,7 +14,11 @@ import natlab.ast.Name;
 import java.math.BigInteger;
 import natlab.ast.RangeExpr;
 import natlab.ast.ColonExpr;
-
+/*
+ * Author:Amina Aslam
+ * Date:15June,2009
+ * Gcd Test class determines whether there is a dependency in system of equations or not.
+ */
 
 public class GcdTest {
 	
@@ -39,7 +44,7 @@ public class GcdTest {
 		
 	}
 	
-	
+//This function checks whether accessed arrays are the same or not.	
 	private void checkSameArrayAccess()
 	{
 		
@@ -50,11 +55,11 @@ public class GcdTest {
 		for(int i=0;i<nStmts;i++)
 		{
 		  Stmt stmt=forNode.getStmt(i);		  
-		  
+		  for(int j=i;j<nStmts;j++)
 		  if(stmt instanceof ExprStmt)
 		  {
 			  System.out.println("I am in Expression Statement");
-		  }
+		  }//end of if
 		  else if(stmt instanceof AssignStmt)
 		  {
 			  System.out.println("I am in Assignment statement");
@@ -62,28 +67,32 @@ public class GcdTest {
 			 
 			 
 			  if(aStmt.getLHS() instanceof ParameterizedExpr)
-			  {
-				  
+			  { 			  
 				  if(aStmt.getRHS() instanceof ParameterizedExpr)
 				  {					  
 					  if(aStmt.getLHS().getVarName().equals(aStmt.getRHS().getVarName()))
 					  {						
-						  makeEquationsForSubscriptExprs(aStmt);
+						  makeEquationsForSubscriptExprs(aStmt,aStmt.getRHS());
+						  reportTestResult(((ParameterizedExpr)aStmt.getLHS()).getNumArg());
 					  }
-				  }
-				  /*for(int j=i+1;j<nStmts;j++)
+			      }				 
+				  else if (aStmt.getRHS() instanceof PlusExpr)
 				  {
-					  if(aStmt.getRHS() instanceof PlusExpr)
-					  {
-						  
-						  System.out.println(aStmt.getRHS().dumpCodeTree());
-					  }
-				  }*/
-				  
-			  }
-			  reportTestResult(((ParameterizedExpr)aStmt.getLHS()).getNumArg());
-			  
-		  }
+					  PlusExpr pExpr=(PlusExpr)aStmt.getRHS();					  
+					    if(aStmt.getLHS().getVarName().equals(pExpr.getLHS().getVarName()))
+					    	{	  makeEquationsForSubscriptExprs(aStmt,pExpr.getLHS());				    		  
+					    		  reportTestResult(((ParameterizedExpr)aStmt.getLHS()).getNumArg());
+					    		  
+					    	}						    
+					    if(aStmt.getLHS().getVarName().equals(pExpr.getRHS().getVarName()))
+					    	{ makeEquationsForSubscriptExprs(aStmt,pExpr.getRHS());
+				    		  reportTestResult(((ParameterizedExpr)aStmt.getLHS()).getNumArg());					    	
+					        }					
+				  }//end of PlusExpr else if
+				    
+			  }//end of ParameterizedExpr if	
+			  			  
+		  }//end of Assign Stmt else if 
 		  
 		  
 		}//end of for loop	
@@ -93,52 +102,53 @@ public class GcdTest {
 	
 	
 	//This function makes equations from array subscript expression.
-	private void makeEquationsForSubscriptExprs(AssignStmt aStmt)
+	private void makeEquationsForSubscriptExprs(AssignStmt aStmt,Expr RHSExpr)
 	{
 		ParameterizedExpr paraLHSExpr=(ParameterizedExpr)aStmt.getLHS();
-		ParameterizedExpr paraRHSExpr=(ParameterizedExpr)aStmt.getRHS();
-		
-		
 		AffineExpression aExpr1=new AffineExpression();
 		AffineExpression aExpr2=new AffineExpression();
 		
-		resultArray=new boolean[paraLHSExpr.getNumArg()]; //instantiate a boolean array based on dimensions of array under dependence testing.
+		resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.
+
 		
-		for(int i=0;i < paraLHSExpr.getNumArg();i++) // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
-		{	
+		if(RHSExpr instanceof ParameterizedExpr)
+		{
+							
+			 for(int i=0;i < paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
+			 {	
 		
-			if(paraLHSExpr.getArg(i) instanceof NameExpr && paraRHSExpr.getArg(i) instanceof PlusExpr)
-			{
-				NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
-				aExpr1.setC(0);
-				aExpr1.setVariable(nExpr.getVarName());			
-				PlusExpr pExpr=(PlusExpr)paraRHSExpr.getArg(i);
-				aExpr2.setVariable(pExpr.getLHS().getVarName());			
-				if(pExpr.getRHS() instanceof IntLiteralExpr)			
-				{
-					IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
-					aExpr2.setC(iExpr.getValue().getValue().intValue());
-					checkDependence(aExpr1,aExpr2,i);
+				 if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
+				 {
+					 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
+					 aExpr1.setC(0);
+					 aExpr1.setVariable(nExpr.getVarName());			
+					 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+					 aExpr2.setVariable(pExpr.getLHS().getVarName());			
+					 if(pExpr.getRHS() instanceof IntLiteralExpr)			
+					 {
+						 IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
+						 aExpr2.setC(iExpr.getValue().getValue().intValue());
+						 checkDependence(aExpr1,aExpr2,i);
 									
-				}//end of nested if	
-			}//end of main if			
-			else if(paraLHSExpr.getArg(i) instanceof NameExpr && paraRHSExpr.getArg(i) instanceof MinusExpr)
-			{
-				NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
-				aExpr1.setC(0);
-				aExpr1.setVariable(nExpr.getVarName());			
-				MinusExpr mExpr=(MinusExpr)paraRHSExpr.getArg(i);
-				aExpr2.setVariable(mExpr.getLHS().getVarName());			
-				if(mExpr.getRHS() instanceof IntLiteralExpr)			
-				{
-					IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getRHS();				
-					aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);					
-					checkDependence(aExpr1,aExpr2,i);
-									
-				}//end of nested if	
-			}//end of main if
+					 }//end of nested if	
+				 }//end of main if			
+				 else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MinusExpr)
+				 {
+					 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
+					 aExpr1.setC(0);
+					 aExpr1.setVariable(nExpr.getVarName());			
+					 MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+					 aExpr2.setVariable(mExpr.getLHS().getVarName());			
+					 if(mExpr.getRHS() instanceof IntLiteralExpr)			
+					 {
+						 IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getRHS();				
+						 aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);					
+						 checkDependence(aExpr1,aExpr2,i);
+					 }//end of nested if	
+			}//end of main else if
 			
-	}//end of for
+		}//end of for
+	}//end of main if
 		
 }//end of function makeEquationsForSubscriptExprs
 	
