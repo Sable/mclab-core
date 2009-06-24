@@ -3,14 +3,14 @@ package natlab.toolkits.analysis;
 import natlab.ast.*;
 import java.util.*;
 
-public abstract class StructuralForwardAnalysis<A> extends AbstractStructuralAnalysis<A>
+public abstract class AbstractStructuralForwardAnalysis<A> extends AbstractStructuralAnalysis<A>
 {
 
     public static boolean DEBUG = true;
 
     protected Stack<LoopFlowsets> loopStack = new Stack<LoopFlowsets>();
 
-    public StructuralForwardAnalysis(ASTNode tree){
+    public AbstractStructuralForwardAnalysis(ASTNode tree){
         super( tree );
     }
 

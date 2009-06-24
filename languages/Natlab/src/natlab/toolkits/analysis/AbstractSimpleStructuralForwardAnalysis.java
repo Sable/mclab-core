@@ -11,10 +11,10 @@ import java.util.*;
  *
  * @see StructuralForwardAnalysis
  */
-public abstract class SimpleStructuralForwardAnalysis<A> extends StructuralForwardAnalysis<A>
+public abstract class AbstractSimpleStructuralForwardAnalysis<A> extends StructuralForwardAnalysis<A>
 {
 
-    public SimpleStructuralForwardAnalysis(ASTNode tree){
+    public AbstractSimpleStructuralForwardAnalysis(ASTNode tree){
         super( tree );
     }
     /**
