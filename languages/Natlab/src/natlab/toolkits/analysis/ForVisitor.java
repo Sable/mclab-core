@@ -1,5 +1,5 @@
 /*.........................
- * Loop Transformations
+ * Loop Transformations And DependenceAnalysis
  * Author:Amina Aslam.
  * Creation Date:Jun12,2009
  * This class implements AST visitor interface and whenever an instance of For loop is
@@ -22,7 +22,7 @@ import natlab.ast.RangeExpr;
 import natlab.ast.Stmt;
 import natlab.ast.SwitchStmt;
 import natlab.ast.UPlusExpr;
-import DependenceAnalysis.GcdTest;
+import natlab.toolkits.DependenceAnalysis.GcdTest;
 
 //import natlab.looptransformations.LoopFusion;
 //import natlab.looptransformations.LoopInterchange;
