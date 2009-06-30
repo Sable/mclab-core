@@ -1,10 +1,14 @@
 package natlab;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.Map;
 
 import natlab.ast.ASTNode;
+import natlab.ast.IfStmt;
 import natlab.ast.Program;
+import natlab.ast.Stmt;
+import natlab.ast.SwitchStmt;
 import beaver.Parser;
 
 import natlab.toolkits.scalar.*;
@@ -88,14 +92,48 @@ public class StructuralFlowAnalysisTool {
 		    Map<ASTNode, FlowSet> defsMap = defsAnalysis.getResult(); 
 			// Retrieve before flow-sets
 		    Map<ASTNode, FlowSet> beforeMap = defsAnalysis.getBeforeFlow();
+		    
+		    FlowSet newDefSet =  defsAnalysis.getEmptySet();
+		    FlowSet stopDefSet =  defsAnalysis.getEmptySet();
+		    FlowSet preFlowset = null; 
+		    
 		    // Go through each code-node, check its before/after flow-sets
 			for(ASTNode node: defsAnalysis.getNodeList()) {
-				FlowSet flowset = defsMap.get(node);
+				FlowSet afterSet = defsMap.get(node);
 				FlowSet beforeSet = beforeMap.get(node);
 				out.println("doAnalysis on: " + node.getNodeID()
 				 		+" ["+ node.getDefBoxes()+"] ["+ node.getUseBoxes());	
 				out.println("\t Before-Flow: " + beforeSet);
-				out.println("\t After-Flow: " + flowset);
+				out.println("\t After-Flow: " + afterSet);
+
+				// Analyze the before/after flow sets, get the difference between them
+				if(beforeSet!=null)
+					preFlowset = beforeSet;
+				else 
+					preFlowset = defsAnalysis.getEmptySet();				
+				// stopDefSet: stopped definitions
+				preFlowset.difference(afterSet, stopDefSet);
+				// newDefSet: new added definitions
+				afterSet.difference(preFlowset, newDefSet);
+				out.println("\t Stop-Defs: " + stopDefSet);
+				out.print("\t New--Defs: " + newDefSet);
+				printVariableNames(newDefSet, out);
+				
+				// Special treatment for IfStmt and SwitchStmt
+				if(node instanceof IfStmt || node instanceof SwitchStmt) {
+					// Using alternative result from Reaching-Def-Analysis
+					// Where only return the flow set of 1st iteration
+				    Map<Stmt, FlowSet> filterBeforeMap = defsAnalysis.getfilterBeforeFlow();
+				    FlowSet fBSet = filterBeforeMap.get((Stmt)node);
+				    Map<ASTNode, FlowSet> filterAfterMap = defsAnalysis.getfilterAfterFlow();
+				    FlowSet fASet = filterAfterMap.get(node);
+				    if(fBSet!=null && fASet!=null) {
+					    FlowSet tmpSet =  defsAnalysis.getEmptySet();
+					    fASet.difference(fBSet, tmpSet);
+						out.print("\t #New#Defs: " + tmpSet);
+						printVariableNames(tmpSet, out);
+				    }
+				}
 			}
 
 			out.close();
@@ -108,6 +146,17 @@ public class StructuralFlowAnalysisTool {
 			e.printStackTrace();
 			System.exit(3);
 		}
+	}
+	private static void printVariableNames(FlowSet newDefSet, PrintStream out) {
+		// Print out names of new defined variables
+		HashSet<String> varSet =  new HashSet<String>();
+		for(Object defObj:newDefSet.toList()) {
+			for(Object vb: ((ASTNode) defObj).getDefBoxes()) {
+				varSet.add(((natlab.toolkits.ValueBox) vb).getValue());
+			}
+		}
+		out.println("\t" + varSet);
+		
 	}
 }
 
