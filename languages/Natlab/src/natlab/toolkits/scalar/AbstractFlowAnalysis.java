@@ -60,6 +60,7 @@ public abstract class AbstractFlowAnalysis<N,A>
     {
     	int size = tree.getLastNodeID();
         unitToBeforeFlow = new HashMap<N,A>(size * 2 + 1, 0.7f);
+        filterUnitToBeforeFlow = new HashMap<Stmt,A>(size * 2 + 1, 0.7f);
         this.tree = tree;
     }
     /* commented by JL

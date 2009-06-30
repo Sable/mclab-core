@@ -55,6 +55,7 @@ public abstract class FlowAnalysis<N,A> extends AbstractFlowAnalysis<N,A> implem
     	super(tree);
     	int size = tree.getLastNodeID(); 
     	unitToAfterFlow = new HashMap<N,A>(size * 2 + 1, 0.7f);
+    	filterUnitToAfterFlow = new HashMap<N,A>(size * 2 + 1, 0.7f);
     }
  
     /** Given the merge of the <code>out</code> sets, compute the <code>in</code> set 

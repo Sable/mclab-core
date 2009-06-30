@@ -226,11 +226,14 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		copy(currentAfterFlow, previousBeforeFlow);
 		unitToBeforeFlow.put((N)node, previousBeforeFlow);
 		
-		// Save the current after flow-set
-		A NodeAfterFlow = newInitialFlow();
-		copy(currentAfterFlow, NodeAfterFlow);
-		unitToAfterFlow.put((N) node, NodeAfterFlow);	
-
+		// Save the before-flow-set of the first iteration, 
+		// used with filterUnitToAfterFlow to determine the definitions happened in this statement
+		if(filterUnitToBeforeFlow.get((Stmt)node)==null) {
+			A filterBeforeFlow = newInitialFlow();
+			copy(currentAfterFlow, filterBeforeFlow);
+			filterUnitToBeforeFlow.put((Stmt)node, filterBeforeFlow);
+		}		
+		
 		// Get after-set from each branch (if, elseif, else)
         for(IfBlock block : node.getIfBlocks()) {
         	// using same before set for each branch
@@ -250,8 +253,12 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 			
 		// Updating the current after flow-set
 		copy(previousAfterFlow, currentAfterFlow);
-		// Don't update the IfStmt with the after-set of END, there is not back edge.
-		// unitToAfterFlow.put((N) node, previousAfterFlow);	
+		unitToAfterFlow.put((N) node, previousAfterFlow);
+		// Save the after-flow-set of the first iteration,  
+		// This is an extra flow-set result, works with filterUnitToBeforeFlow. 
+		if(filterUnitToAfterFlow.get((N) node)==null) {
+			filterUnitToAfterFlow.put((N) node, previousAfterFlow);
+		}
 	}
 	
 	// special cases for Switch statement 
@@ -272,11 +279,14 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 		copy(currentAfterFlow, previousBeforeFlow);
 		unitToBeforeFlow.put((N)node, previousBeforeFlow);
 		
-		// Save the current after flow-set
-		A NodeAfterFlow = newInitialFlow();
-		copy(currentAfterFlow, NodeAfterFlow);
-		unitToAfterFlow.put((N) node, NodeAfterFlow);	
-
+		// Save the before-flow-set of the first iteration, 
+		// used with filterUnitToAfterFlow to determine the definitions happened in this statement
+		if(filterUnitToBeforeFlow.get((Stmt)node)==null) {
+			A filterBeforeFlow = newInitialFlow();
+			copy(currentAfterFlow, filterBeforeFlow);
+			filterUnitToBeforeFlow.put((Stmt)node, filterBeforeFlow);
+		}		
+		
 		// Get after-set from each branch 
         for(SwitchCaseBlock block : node.getSwitchCaseBlocks()) {
         	// using same before set for each branch
@@ -296,8 +306,12 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 			
 		// Updating the current after flow-set
 		copy(previousAfterFlow, currentAfterFlow);
-		// Don't update the node with the after-set of END, there is not back edge.
-		// unitToAfterFlow.put((N) node, previousAfterFlow);	
+		unitToAfterFlow.put((N) node, previousAfterFlow);
+		// Save the after-flow-set of the first iteration,  
+		// This is an extra flow-set result, works with filterUnitToBeforeFlow. 
+		if(filterUnitToAfterFlow.get((N) node)==null) {
+			filterUnitToAfterFlow.put((N) node, previousAfterFlow);
+		}
 	}
 
 	// Overload function, accepts the user-defined analysis class,
@@ -344,6 +358,15 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
     public Map<N, A> getBeforeFlow() {
     	return unitToBeforeFlow; 
     }
+    
+	// Return result of analysis IF/Switch statements
+    public Map<Stmt, A> getfilterBeforeFlow() {
+    	return filterUnitToBeforeFlow; 
+    }
+    public Map<N, A> getfilterAfterFlow() {
+    	return filterUnitToAfterFlow; 
+    }
+    
 }
 
 // Data class includs Break and Continue Flowset List
