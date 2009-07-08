@@ -22,13 +22,19 @@ import natlab.ast.RangeExpr;
 import natlab.ast.Stmt;
 import natlab.ast.SwitchStmt;
 import natlab.ast.UPlusExpr;
-import natlab.toolkits.DependenceAnalysis.GcdTest;
+//import natlab.toolkits.DependenceAnalysis.SVPCTest;
+import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
 
 //import natlab.looptransformations.LoopFusion;
 //import natlab.looptransformations.LoopInterchange;
 //import natlab.looptransformations.LoopReversal;
 //import natlab.looptransformations.LoopFission;
 //import natlab.looptransformations.LoopUnrolling;
+/*
+ * TO DO:In ForVisitor class determine the depth of loop nest and then call the appropriate test.if depth is 2 or less than 2 then call GCD.
+ * else if depth is 3 or greater than 3 call Acyclic test. 
+ * 
+ */
 
 public class ForVisitor implements ASTVisitor {
 
@@ -54,10 +60,11 @@ public class ForVisitor implements ASTVisitor {
 			ForStmt forNode=(ForStmt) node;
 			
 			
-			if(testType.compareTo("gcd")==0)
+			if(testType.compareTo("gcd")==0) //this thing needs to be changed aswell according to interaction diagram.
 			{
 					
-				GcdTest gcd=new GcdTest(forNode);
+				DependenceAnalysisDriver dAnalysisDriver=new DependenceAnalysisDriver(forNode);
+				dAnalysisDriver.createConstraints();
 				
 			}
 			

@@ -1,6 +1,6 @@
 for i = 1:1:10
-	 a(i) = b(i) + c(i);
-	 d(i) = a(i); 
-	 b(i)=d(i)
+   for j=1:1:10
+	 a(i,j)=a(j+10,i+11);
+   end 	
 end
 
