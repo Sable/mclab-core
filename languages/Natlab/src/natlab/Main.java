@@ -306,8 +306,8 @@ public class Main
 								System.err.println("Dependence Tester");
 							
 							if(options.gcd()){
-								if( !quiet )
-									System.err.println("Dependence Analysis with GCD Test");
+								if( !quiet )	
+								System.err.println("Dependence Analysis with GCD Test");
 								fileReader=translateFile(file,errors);
 								prog = parseFile( file,  fileReader, errors );
 								
