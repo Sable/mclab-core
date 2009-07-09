@@ -57,7 +57,7 @@ public class SVPCTest {
 	//private ForStmt forStmtArray[]=new ForStmt[3];
 	//private static int loopIndex=0;
 	
-	public SVPCTest(ForStmt fNode)	
+	public SVPCTest()	
 	{	
 
         try {
@@ -180,23 +180,36 @@ public class SVPCTest {
 	{
 		boolean isApplicable=false;
 		int graphSize=cGraph.getGraphSize();
+		System.out.println("graph size is"+graphSize);
 		Map cMap=cGraph.getGraphData();
 		//Get Map in Set interface to get key and value
 		Set s=cMap.entrySet();
 		
 	      //Move next key and value of Map by iterator
         Iterator it=s.iterator();
-        Map.Entry m =(Map.Entry)it.next();//get the first entry in the Graph
+      // Map.Entry m =(Map.Entry)it.next();//get the first entry in the Graph
      // getKey is used to get key of Map
-        String key1=(String)m.getKey();
-        AffineExpression aExpr1=(AffineExpression)m.getValue();
+    /*   String key=(String)m.getKey();
+        ConstraintsList cList1=(ConstraintsList)m.getValue();        
+        AffineExpression aExpr3=(AffineExpression)cList1.getListData().getData();
+        System.out.println("Affine Data"+aExpr3.getLoopVariable()+aExpr3.getVariable());*/
 
         while(it.hasNext())
         {
             // key=value separator this by Map.Entry to get key and value
-            m =(Map.Entry)it.next();
-            if(((String)m.getKey()).equals(key1))
-            {
+        	Map.Entry m =(Map.Entry)it.next();
+            String key1=(String)m.getKey();
+            System.out.println("value for this key is"+key1);
+            ConstraintsList cList=(ConstraintsList)cMap.get(key1);
+            //ConstraintsList cList=(ConstraintsList)m.getValue();        return firstNode.data;
+           // AffineExpression aExpr1=(AffineExpression)cList.getListData().getData();
+           // System.out.println("Affine Data for expression 1 "+aExpr1.getLoopVariable()+ aExpr1.getVariable()+ aExpr1.getC());
+          //  AffineExpression aExpr2=(AffineExpression)cList.getListData().getNext().getData();
+         //   System.out.println("Affine Data for expression 2 "+ aExpr2.getLoopVariable()+ aExpr2.getVariable()+ aExpr2.getC());
+            //m =(Map.Entry)it.next();
+          //Map.Entry m =(Map.Entry)it.next();
+           /*// if(key2.equals(key1))
+            //{
             	AffineExpression aExpr2=(AffineExpression)m.getValue();
             	if((aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr2.getLowerBound() instanceof IntLiteralExpr) && (aExpr1.getUpperBound() instanceof IntLiteralExpr && aExpr2.getUpperBound() instanceof IntLiteralExpr)) 
             	{
@@ -210,6 +223,10 @@ public class SVPCTest {
             			dependencyFlag="No";
             			System.out.println("There is no dependency for this system of Equations");
             		}//end of 3rd if
+            		else 
+            		{
+            			System.out.println("There is dependency for this system of Equations");
+            		}//end of 3rd else
             		isApplicable=true;
             	}//end of 2nd if
             	else 
@@ -217,7 +234,12 @@ public class SVPCTest {
             		isApplicable=false;
             	}
             }//end of 1st if
-            aExpr1=(AffineExpression)m.getValue();     	
+            key1=(String)m.getKey();
+            System.out.println("key1"+key1);
+            cList=(ConstraintsList)m.getValue();        
+            aExpr1=(AffineExpression)cList.getListData().getData();
+            System.out.println("Affine Data for the next node"+aExpr1.getLoopVariable()+aExpr1.getVariable());*/
+            
           }//end of while
 
 		return true;

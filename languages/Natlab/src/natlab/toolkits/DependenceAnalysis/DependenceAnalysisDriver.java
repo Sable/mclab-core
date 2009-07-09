@@ -33,7 +33,10 @@ public class DependenceAnalysisDriver {
 		boolean isApplicable=false;
 		if(cGraph.getGraphSize()!=0)
 		{
-			 isApplicable= svpcTest.checkDependence(cGraph);
+			svpcTest=new SVPCTest();
+			 //isApplicable= svpcTest.checkDependence(cGraph);
+			//cGraph.temp();
+			 System.out.println("i am in SVPC test");
 		}
 		if (!isApplicable)
 		{

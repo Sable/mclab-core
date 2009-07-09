@@ -252,7 +252,7 @@ public class ConstraintsToolBox {
 			for(int i=0;i<=loopIndex;i++)
 			 {
 				  AssignStmt assStmt= forStmtArray[i].getAssignStmt();					
-			 	  if(assStmt.getVarName().equals(aExpr1.getLoopVariable())) //this is to compare array subscript with loop index.
+			 	  if(assStmt.getVarName().equals(aExpr1.getLoopVariable())) //this is to compare array subscript with loop index variable.
 			 		{
 			 		  if(assStmt.getRHS() instanceof RangeExpr)		 		
 						{
