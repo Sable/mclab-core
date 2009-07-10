@@ -590,7 +590,8 @@ public class Main
 			}
 			else{
 				for(TranslationProblem prob : problems){
-					CompilationProblem Translationcproblem = new CompilationProblem(prob+"\n");
+					CompilationProblem Translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob.getMessage()+"\n");
+					errList.add(Translationcproblem);
 
 				}
 				return null;
