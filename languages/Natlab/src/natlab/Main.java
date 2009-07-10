@@ -1,7 +1,7 @@
 package natlab;
 
 import natlab.options.Options;
-import natlab.toolkits.analysis.ForVisitor;
+//import natlab.toolkits.analysis.ForVisitor;
 import natlab.ast.*;
 import natlab.server.*;
 
@@ -34,7 +34,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		boolean quiet; //controls the suppression of messages
-		StringBuffer errors = new StringBuffer();
+		ArrayList errors = new ArrayList();
 		options = new Options();
 
 		if( processCmdLine( args ) ){
@@ -137,7 +137,7 @@ public class Main
 							Reader source = new StringReader( "" );
 							String fileName = "";
 							String cmd = xmlCH.getCommand();
-							StringBuffer serverErrors = new StringBuffer();
+							ArrayList serverErrors = new ArrayList();
 							if( cmd.equalsIgnoreCase( "parsefile" ) ){
 								fileName = xmlCH.getBody();
 								if( !quiet ){
@@ -145,10 +145,11 @@ public class Main
 									System.err.println("  parse file "+fileName);
 								}
 								if( fileName == null ){
+									String FNstr="";
 									if( !quiet )
-										System.err.println("  file name was null");
-									out.print("<errorlist><error>parsefile error: filename was null</error></errorlist>\0");
-									out.flush();
+										FNstr+="  file name was null"+"/n";
+									CompilationProblem FileNullcerror = new CompilationProblem(FNstr+="<errorlist><error>parsefile error: filename was null</error></errorlist>\0");
+									errors.add(FileNullcerror);
 									continue;
 								}
 								parsing = true;
@@ -161,11 +162,11 @@ public class Main
 									try{
 										source = new FileReader( fileName );
 									}catch( FileNotFoundException e){
-										//TODO-JD: send filenotfound error to client
+										String FNFEstr="";
 										if( !quiet )
-											System.err.println("file: "+fileName+" not found");
-										out.print("<errorlist><error>file: "+fileName+" not found</error></errorlist>\0");
-										out.flush();
+											FNFEstr+="file: "+fileName+" not found"+"/n";
+										CompilationProblem FileNotFoundcerror = new CompilationProblem(FNFEstr+="<errorlist><error>file: "+fileName+" not found</error></errorlist>\0");
+										errors.add(FileNotFoundcerror);
 									}
 								}
 							}
@@ -200,7 +201,7 @@ public class Main
 								out.print("<shutdown />\0");
 								out.flush();
 								shutdown = true;
-								//cancel the heartbeat timer
+								//cancel the heartbeat timer - orly?
 								heartBeat.cancel();
 								try{
 									clientSocket.close();
@@ -227,39 +228,41 @@ public class Main
                                         System.err.println(" translating ");
                                     source = translateFile( fileName, source, serverErrors );
 									 */
-									if( serverErrors.length() > 0 ){
-										//TODO-JD: send errors
+									if( serverErrors.size() > 0 ){
+										String serverEstr="";
 										if( !quiet )
-											System.err.println("errors\n" + serverErrors);
-										out.print("<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
-										out.flush();
+											serverEstr+="errors\n" + serverErrors+"/n";
+										CompilationProblem Servercerror = new CompilationProblem(serverEstr+="<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
+										errors.add(Servercerror);
 										continue;
 
 									}
 									if( source == null ){
-										//TODO-JD: send errors
+										String fooEstr="";
 										if( !quiet )
-											System.err.println("skipping file");
-										out.print("<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
-										out.flush();
+											fooEstr+="skipping file"+"/n";
+										CompilationProblem Foocerror = new CompilationProblem(fooEstr+="<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
+										errors.add(Foocerror);
 										continue;
 									}
 								}
 								if( !quiet )
 									System.err.println(" parsing ");
 								Program prog = parseFile( fileName, source, serverErrors );
-								if( serverErrors.length() > 0){
-									//TODO-JD: send errors
-									System.err.print("errors\n" +serverErrors );
-									out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
-									out.flush();
+								if( serverErrors.size() > 0){
+									String serverEstr="";
+									if( !quiet )
+										serverEstr+="errors\n" + serverErrors+"/n";
+									CompilationProblem Servercerror = new CompilationProblem(serverEstr+="<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
+									errors.add(Servercerror);
 									continue;
 								}
 								if( prog == null ){
-									//TODO-JD: send errors
-									System.err.print("errors\n" +serverErrors );
-									out.print("<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
-									out.flush();
+									String serverEstr="";
+									if( !quiet )
+										serverEstr+="errors\n" + serverErrors+"/n";
+									CompilationProblem Servercerror = new CompilationProblem(serverEstr+="<errorlist><error>Error has occured, more information to come later</error></errorlist>\0");
+									errors.add(Servercerror);
 									continue;
 								}
 								CompilationUnits cu = new CompilationUnits();
@@ -369,7 +372,7 @@ public class Main
                                 System.exit(1);
                             }
 							 */
-							if( errors.length() > 0 )
+							if( errors.size() > 0 )
 								System.err.print( errors.toString() );
 							if( fileReader == null ){
 								System.err.println("\nSkipping " + file);
@@ -396,7 +399,7 @@ public class Main
 							prog = parseFile( file,  fileReader, errors );
 
 						//report errors
-						if( errors.length() > 0 )
+						if( errors.size() > 0 )
 							System.err.print( errors.toString() );
 
 						if( prog == null ){
@@ -454,14 +457,14 @@ public class Main
 	
 	private static void parseProgramNode(Program prog,String testType)
 	{
-		   ForVisitor forVisitor = new ForVisitor(testType);
-           prog.apply(forVisitor);  
+		  // ForVisitor forVisitor = new ForVisitor(testType);
+           //prog.apply(forVisitor);  
            
            
 		
 	}
 
-	private static Reader translateFile(String fName, StringBuffer errBuf)
+	private static Reader translateFile(String fName, ArrayList errList)
 	{
 		BufferedReader in = null;
 		PositionMap prePosMap = null;
@@ -477,7 +480,8 @@ public class Main
 				in.close();
 				if(result instanceof ProblemResult){
 					for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
-						errBuf.append(prob+"\n");
+						CompilationProblem translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob+"\n");
+						errList.add(translationcproblem);
 					}
 					return null; //terminate early since extraction parser can't work without balanced 'end's
 				} else if(result instanceof TranslationResult){
@@ -487,21 +491,21 @@ public class Main
 				}
 			}
 		}catch(FileNotFoundException e){
-			errBuf.append("File "+fName+" not found!\nAborting\n");
+			CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
+			errList.add(FileNotFoundcerror);
 			return null;
 		}
 		catch(IOException e){
-			errBuf.append("Error translating "+fName+"\n");
-			errBuf.append(e.getMessage());
-			errBuf.append("\n\nAborting\n");
+			CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+			errList.add( IOcerror);
 			return null;
 		}
 
-		return finishTranslateFile(fName, in, prePosMap, errBuf);
+		return finishTranslateFile(fName, in, prePosMap, errList);
 
 	}
 
-	private static Reader translateFile(String fName, String source, StringBuffer errBuf)
+	private static Reader translateFile(String fName, String source, ArrayList errList)
 	{
 		BufferedReader in = null;
 		PositionMap prePosMap = null;
@@ -517,7 +521,8 @@ public class Main
 				in.close();
 				if(result instanceof ProblemResult){
 					for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
-						errBuf.append(prob+"\n");
+						CompilationProblem translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob+"\n");
+						errList.add(translationcproblem);
 					}
 					return null; //terminate early since extraction parser can't work without balanced 'end's
 				} else if(result instanceof TranslationResult){
@@ -527,21 +532,21 @@ public class Main
 				}
 			}
 		}catch(FileNotFoundException e){
-			errBuf.append("File "+fName+" not found!\nAborting\n");
+			CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
+			errList.add(FileNotFoundcerror);
 			return null;
 		}
 		catch(IOException e){
-			errBuf.append("Error translating "+fName+"\n");
-			errBuf.append(e.getMessage());
-			errBuf.append("\n\nAborting\n");
+			CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+			errList.add( IOcerror);
 			return null;
 		}
 
-		return finishTranslateFile(fName, in, prePosMap, errBuf);
+		return finishTranslateFile(fName, in, prePosMap, errList);
 	}
-	//Translate a fiven file and return a reader to access the translated version
-	private static Reader finishTranslateFile(String fName, Reader in, 
-			PositionMap prePosMap, StringBuffer errBuf)
+	//Translate a given file and return a reader to access the translated version
+	private static Reader finishTranslateFile(String fName, BufferedReader in, 
+			PositionMap prePosMap, ArrayList errList)
 	{
 		try{
 			/*
@@ -557,9 +562,9 @@ public class Main
                 in = new BufferedReader( file );
             }else {
                 in.close();
-                if(result instanceof ProblemResult){
+                if(result instanceof ProbscplemResult){
                     for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
-                        errBuf.append(prob+"\n");
+                        errList.append(prob+"\n");
                     }
                     return null; //terminate early since extraction parser can't work without balanced 'end's
                 } else if(result instanceof TranslationResult){
@@ -585,18 +590,19 @@ public class Main
 			}
 			else{
 				for(TranslationProblem prob : problems){
-					errBuf.append(prob+"\n");
+					CompilationProblem Translationcproblem = new CompilationProblem(prob+"\n");
+
 				}
 				return null;
 			}
 		}catch(FileNotFoundException e){
-			errBuf.append("File "+fName+" not found!\nAborting\n");
+			CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
+			errList.add(FileNotFoundcerror);
 			return null;
 		}
 		catch(IOException e){
-			errBuf.append("Error translating "+fName+"\n");
-			errBuf.append(e.getMessage());
-			errBuf.append("\n\nAborting\n");
+			CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+			errList.add( IOcerror);
 			return null;
 		}
 
@@ -604,7 +610,7 @@ public class Main
 
 	//Parse a given file and return a Program ast node
 	//if file does not exist or other problems, exit program
-	private static Program parseFile(String fName, Reader file, StringBuffer errBuf )
+	private static Program parseFile(String fName, Reader file, ArrayList errList )
 	{
 		NatlabParser parser = new NatlabParser();
 		NatlabScanner scanner = null;
@@ -620,34 +626,40 @@ public class Main
 				Program prog = (Program)parser.parse(scanner);
 				
 				if( parser.hasError() ){
-					for( String error : parser.getErrors())
-						errBuf.append(error + "\n");
-					prog = null;
+					String delim = "],[";
+					for( String error : parser.getErrors()){
+						//return an array of string with {line, column, msg}
+						String[] message = error.split(delim);
+						CompilationProblem Parsercerror = new CompilationProblem(Integer.valueOf(message[0]).intValue(),Integer.valueOf(message[1]).intValue(),message[3]);
+						errList.add(Parsercerror);}
+						prog = null;
 				}
 				return prog;
 
 			}catch(Parser.Exception e){
-				errBuf.append(e.getMessage());
+				String ErrorString= e.getMessage()+"\n";
 				for(String error : parser.getErrors()) {
-					errBuf.append(error + "\n");
+					ErrorString+= error + "\n";
 				}
+				CompilationProblem Parsercerror = new CompilationProblem(ErrorString);
+				errList.add(Parsercerror);
 				return null;
 			} 
 		}catch(FileNotFoundException e){
-			errBuf.append( "File "+fName+" not found!\n" );
+			CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
+			errList.add(FileNotFoundcerror);
 			return null;
 		}
 		catch(IOException e){
-			errBuf.append( "Problem parsing "+fName + "\n");
-			if( e.getMessage() != null )
-				errBuf.append( e.getMessage() + "\n");
+			CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+			errList.add( IOcerror);
 			return null;
 		}
 	}
 
 //	Parse a given aspect file and return a Program ast node
 //	if file does not exist or other problems, exit program
-	private static Program parseAspectFile(String fName, Reader file, StringBuffer errBuf )
+	private static Program parseAspectFile(String fName, Reader file, ArrayList errList )
 	{
 		NatlabParser parser = new NatlabParser();
 		AspectsScanner scanner = null;
@@ -662,27 +674,30 @@ public class Main
 
 				Program prog = (Program)parser.parse(scanner);
 				if( parser.hasError() ){
-					for( String error : parser.getErrors())
-						errBuf.append(error + "\n");
-					prog = null;
+					for( String error : parser.getErrors()){
+						CompilationProblem Parsercerror = new CompilationProblem(error + "\n");
+						errList.add(Parsercerror);}
+						prog = null;
 				}
 				return prog;
 
 			}catch(Parser.Exception e){
-				errBuf.append(e.getMessage());
+				String ErrorString= e.getMessage()+"\n";
 				for(String error : parser.getErrors()) {
-					errBuf.append(error + "\n");
+					ErrorString+= error + "\n";
 				}
+				CompilationProblem Parsercerror = new CompilationProblem(ErrorString);
+				errList.add(Parsercerror);
 				return null;
 			} 
 		}catch(FileNotFoundException e){
-			errBuf.append( "File "+fName+" not found!\n" );
+			CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
+			errList.add(FileNotFoundcerror);
 			return null;
 		}
 		catch(IOException e){
-			errBuf.append( "Problem parsing "+fName + "\n");
-			if( e.getMessage() != null )
-				errBuf.append( e.getMessage() + "\n");
+			CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+			errList.add( IOcerror);
 			return null;
 		}
 		finally{
