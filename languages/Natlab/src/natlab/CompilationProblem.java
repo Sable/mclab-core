@@ -1,7 +1,9 @@
 package natlab;
 
+import java.util.ArrayList;
+
 /**
- * Describes the positon and nature of a problem encountered while compiling
+ * Describes the position and nature of a problem encountered while compiling
  * source. This can include matlab to natlab translation problems, parsing 
  * problems, and general compilation problems
  */
@@ -55,4 +57,12 @@ public class CompilationProblem
         else
             return msg;
     }
+    static public String toStringAll(ArrayList errors){
+    	String allErrors="";
+    	for(int i=0;i==errors.size();i++){
+    		allErrors += "/n"+errors.get(i).toString()+"/n";
+    	}
+    	return allErrors;
+    }
+    
 }
