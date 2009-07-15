@@ -10,7 +10,7 @@ public class AffineExpression {
 	private int C;
 	private String variable;
 	//private boolean isConstant; //to check if there is a constraint that has more than one variable.
-	private String loopVariable;
+	private String loopVariable; //to check which index variable 
 	private Expr lowerBound;
 	private Expr upperBound;
 	/*private IntLiteralExpr lowerBound;

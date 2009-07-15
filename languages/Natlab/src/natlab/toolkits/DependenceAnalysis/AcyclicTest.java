@@ -320,7 +320,7 @@ public class AcyclicTest {
 	/*
 	 * This function is used to search Constraints Graph to set values of variables.
 	 */
-	private void searchGraph(String LKey,String UKey,Iterator it)
+	private void searchGraph(String LKey,String UKey, Iterator it)
 	{
 
 		while(it.hasNext())
@@ -352,4 +352,4 @@ public class AcyclicTest {
 		
 	}//end of function searchGraph
 
-}
+}//end of class

@@ -177,7 +177,7 @@ public class ConstraintsToolBox {
 			resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.	
 			//if(RHSExpr instanceof ParameterizedExpr)			//{
 								
-				 for(int i=0;i <paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
+				 for(int i=0; i<paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
 				  {		
 					 AffineExpression aExpr1=new AffineExpression();
 					 AffineExpression aExpr2=new AffineExpression();
@@ -188,7 +188,8 @@ public class ConstraintsToolBox {
 						 aExpr1.setLoopVariable(nExpr.getVarName());
 						 aExpr2.setLoopVariable(nExpr.getVarName());
 						 aExpr1.setC(0);
-						 aExpr1.setVariable("t"+i);			
+						 aExpr1.setVariable("t"+i);
+						 System.out.println(aExpr1.getVariable());
 						 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 						 aExpr2.setVariable("t"+i);
 						 setUpperAndLowerBounds(aExpr1,aExpr2);
@@ -229,6 +230,7 @@ public class ConstraintsToolBox {
 						 aExpr2.setLoopVariable(nExpr.getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setVariable("t"+i);
+						 System.out.println(aExpr1.getVariable());
 						 aExpr2.setC(0);
 						 aExpr2.setVariable("t"+i);
 						 setUpperAndLowerBounds(aExpr1, aExpr2);
