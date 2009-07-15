@@ -3,35 +3,51 @@ import natlab.ast.PlusExpr;
 import natlab.ast.MinusExpr;
 import natlab.ast.NameExpr;
 import natlab.ast.IntLiteralExpr;
+import natlab.ast.Expr;
 
 public class AffineExpression {
 	
 	private int C;
 	private String variable;
-	private boolean isConstant; //to check if there is a constraint that has more than one variable.
-	private IntLiteralExpr lowerBound;
+	//private boolean isConstant; //to check if there is a constraint that has more than one variable.
+	private String loopVariable;
+	private Expr lowerBound;
+	private Expr upperBound;
+	/*private IntLiteralExpr lowerBound;
 	private IntLiteralExpr upperBound;
-	private PlusExpr pLBound;
-	private PlusExpr pUBound;
+	private Expr pLBound;
+	private Expr pUBound;
 	private NameExpr nLBound;
 	private NameExpr nUBound;
 	private MinusExpr mLBound;
-	private MinusExpr mUBound;
-	private String loopVariable;
+	private MinusExpr mUBound;*/
+
 	
+	public Expr getLowerBound() {
+		return lowerBound;
+	}
+	public void setLowerBound(Expr lowerBound) {
+		this.lowerBound = lowerBound;
+	}
+	public Expr getUpperBound() {
+		return upperBound;
+	}
+	public void setUpperBound(Expr upperBound) {
+		this.upperBound = upperBound;
+	}
 	public String getLoopVariable() {
 		return loopVariable;
 	}
 	public void setLoopVariable(String loopVariable) {
 		this.loopVariable = loopVariable;
 	}
-	public PlusExpr getPLBound() {
+/*	public Expr getPLBound() {
 		return pLBound;
 	}
 	public void setPLBound(PlusExpr bound) {
 		pLBound = bound;
 	}
-	public PlusExpr getPUBound() {
+	public Expr getPUBound() {
 		return pUBound;
 	}
 	public void setPUBound(PlusExpr bound) {
@@ -80,7 +96,7 @@ public class AffineExpression {
 	}
 	public void setisConstant(boolean isConst) {
 		isConstant = isConst;
-	}
+	}*/
 	
 	public int getC() {
 		return C;
@@ -97,10 +113,6 @@ public class AffineExpression {
 	
 	
 	
-	/*private class Expression{
-		private float C;
-		private String variable;		
-	}*/	
 
 }
 

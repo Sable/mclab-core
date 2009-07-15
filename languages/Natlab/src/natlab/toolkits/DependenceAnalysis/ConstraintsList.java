@@ -3,6 +3,7 @@ package natlab.toolkits.DependenceAnalysis;
 public class ConstraintsList {
 	private ListNode firstNode;
 	private ListNode lastNode;
+	//private AffineExpression data;
 	
 	public ConstraintsList()
 	{
@@ -14,28 +15,47 @@ public class ConstraintsList {
 		//{
 			firstNode=new ListNode(insertItem,null);
 			lastNode=null;
+			//data=insertItem;
 		//}
 		//else //firstNode refers to the new node.
 		//	firstNode=new ListNode(insertItem,firstNode);
 	}
 	public void insertAtFront(AffineExpression insertItem,ConstraintsList subList)
 	{
-		firstNode=new ListNode(insertItem,null);
-		//firstNode=new ListNode(insertItem,new ListNode(subList.getListData().getData(),null));
+		//firstNode=new ListNode(insertItem,null);
+		firstNode=new ListNode(insertItem,new ListNode(subList.getListNode().getData(),null));
 		//firstNode=new ListNode(insertItem,new ListNode(subList.getListData(),null));
 		lastNode=null;
+		//data=insertItem;
 	}
-	public AffineExpression getListData(ConstraintsList cList4)
+	public ListNode getListNode()
 	{
 		
 		if(firstNode.nextNode==null && lastNode==null)
 		{
-			ListNode current=firstNode;
-			System.out.println("first node data" + current.data.getLoopVariable());
 			
+			ListNode currentNode=firstNode;
+			return currentNode;
+			//System.out.println("first node data" + current.data.getLoopVariable() + current.data.getVariable());			
 		}
-		return firstNode.data;
+		else if(firstNode.nextNode!=null && lastNode==null)
+		{
+			return firstNode;
+		}
+		return null;
+	
 	}
+	/*public AffineExpression getInsertItem()
+	{
+		if(data!=null)
+		{
+			System.out.println("i am in insert item" + data.getVariable());
+			return data;
+		}
+		else
+			return null;
+	}*/
+	
 	
 	private boolean isEmpty()
 	{
@@ -46,5 +66,10 @@ public class ConstraintsList {
 		 else 
 			 return false;
 	}
-
+	
+	/*public String toString()
+	{
+		AffineExpression aExpr3=this.getInsertItem();
+	 	return aExpr3.getLoopVariable()+ " "+ aExpr3.getVariable()+ " "+aExpr3.getC();
+	}*/
 }

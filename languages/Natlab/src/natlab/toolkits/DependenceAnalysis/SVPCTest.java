@@ -72,180 +72,66 @@ public class SVPCTest {
         	System.out.println("IOException:");
             e.printStackTrace();
          }
-        //ConstraintsToolBox contraints=new ConstraintsToolBox(fNode);
-        //forStmtArray[loopIndex]=forNode;
-		//checkArrayAccessAcrossStmts();
-		
+       
 	}//end SVPC Test constructor.
-	
 
-	
-	/*
-	 * 
-	 * This function does the following.
-	 * 1.In case of a nested loop compare the array subscript expression with loop index to get the upper and lower range of that loop e.g.
-	 * for int i=1:1:10
-	 *   for int j=1:1:9
-	 *   	a(i,j)=a(j+10,i+9)
-	 *   end
-	 *  end 
-	 * 2.Sets the index of resultArray to false if there is dependence for that particular equation.
-	 * If there is no dependence for that equation then sets value true at the location of resultArray.
-	 * Size of resultArray depends on the dimensions of the array under dependence testing.
-	 */
-	
-	/*private void checkDependence(AffineExpression expr1, AffineExpression expr2,int index)
-	{
-		/*int upperBound=0;
-		int lowerBound=0;
-		
-			for(int i=0;i<=loopIndex;i++)
-			{
-				AssignStmt assStmt= forStmtArray[i].getAssignStmt();  
-				
-				if(assStmt.getVarName().equals(expr1.getVariable())) //this is to compare array subscript with loop index.
-				{
-					if(assStmt.getRHS() instanceof RangeExpr)
-					{
-						RangeExpr rExpr=(RangeExpr) assStmt.getRHS();						
-						if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr)
-						{
-							System.out.println("i am a constraint not bounded on both sides by variables");
-							IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();
-							upperBound=iExprUpper.getValue().getValue().intValue();
-							IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
-							lowerBound=iExprLower.getValue().getValue().intValue();
-							lowerBound=lowerBound-expr2.getC();							
-						}//end of 3rd if
-						else if(rExpr.getUpper() instanceof PlusExpr && (rExpr.getLower() instanceof NameExpr)|| rExpr.getLower() instanceof PlusExpr)
-						{
-							System.out.println("I am a constraint bounded on both sides by variables");														
-						}
-					}//end of 2nd if					
-				}//end of 1st if
-				
-				/*if(assStmt.getVarName().equals(expr2.getVariable()))
-				{
-					if(assStmt.getRHS() instanceof RangeExpr)
-					{
-						RangeExpr rExpr=(RangeExpr) assStmt.getRHS();
-						if(rExpr.getLower() instanceof IntLiteralExpr)
-						{					
-							
-						}//end of 3rd if
-						else if(rExpr.getLower() instanceof PlusExpr)
-						{
-							System.out.println("I am in equation");
-							System.out.println(rExpr.getLower().getStructureString());
-						}
-					}//end of 2nd if					
-				}//end of 1st if*/
-				
-		//	}//end of forLoop
-			
-			//AssignStmt assStmt= forNode.getAssignStmt();//This gives the assignment statement of the loop
-			
-		/*	if(assStmt.getRHS() instanceof RangeExpr)
-			{
-				RangeExpr rExpr=(RangeExpr) assStmt.getRHS();
-				if(rExpr.getUpper() instanceof IntLiteralExpr)
-				{					
-					IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();*/
-		/*int lowerBound=0;
-		lowerBound=expr2.getLowerBound()-expr2.getC();
-				
-					if(lowerBound > expr1.getUpperBound())
-					{				
-						resultArray[index]=false;	
-						dependencyFlag="No";
-					}
-					else
-						{					
-						 resultArray[index]=true;
-						 dependencyFlag="Yes";
-	
-						}					
-				//}				
-				
-			//}			
-			/*else if(assStmt.getRHS() instanceof ColonExpr)
-			{
-				System.out.println("For first loop colon expr");
-				
-			}*/			
-			
-	//}//end of function checkDependence
 	
 	public boolean checkDependence(ConstraintsGraph cGraph)
 	{
-		boolean isApplicable=false;
-		int graphSize=cGraph.getGraphSize();
-		System.out.println("graph size is"+graphSize);
+		boolean isApplicable=false;		
+		AffineExpression aExpr1=null,aExpr2=null;		
 		Map cMap=cGraph.getGraphData();
 		//Get Map in Set interface to get key and value
 		Set s=cMap.entrySet();
 		
 	      //Move next key and value of Map by iterator
-        Iterator it=s.iterator();
-      // Map.Entry m =(Map.Entry)it.next();//get the first entry in the Graph
-     // getKey is used to get key of Map
-    /*   String key=(String)m.getKey();
-        ConstraintsList cList1=(ConstraintsList)m.getValue();        
-        AffineExpression aExpr3=(AffineExpression)cList1.getListData().getData();
-        System.out.println("Affine Data"+aExpr3.getLoopVariable()+aExpr3.getVariable());*/
-
+        Iterator it=s.iterator();      
         while(it.hasNext())
         {
             // key=value separator this by Map.Entry to get key and value
-        	Map.Entry m =(Map.Entry)it.next();
-            String key1=(String)m.getKey();
-            System.out.println("value for this key is"+key1);
-            ConstraintsList cList=(ConstraintsList)cMap.get(key1);
-            //ConstraintsList cList=(ConstraintsList)m.getValue();        return firstNode.data;
-           // AffineExpression aExpr1=(AffineExpression)cList.getListData().getData();
-           // System.out.println("Affine Data for expression 1 "+aExpr1.getLoopVariable()+ aExpr1.getVariable()+ aExpr1.getC());
-          //  AffineExpression aExpr2=(AffineExpression)cList.getListData().getNext().getData();
-         //   System.out.println("Affine Data for expression 2 "+ aExpr2.getLoopVariable()+ aExpr2.getVariable()+ aExpr2.getC());
-            //m =(Map.Entry)it.next();
-          //Map.Entry m =(Map.Entry)it.next();
-           /*// if(key2.equals(key1))
-            //{
-            	AffineExpression aExpr2=(AffineExpression)m.getValue();
-            	if((aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr2.getLowerBound() instanceof IntLiteralExpr) && (aExpr1.getUpperBound() instanceof IntLiteralExpr && aExpr2.getUpperBound() instanceof IntLiteralExpr)) 
-            	{
-            		IntLiteralExpr iExprUpper=aExpr1.getUpperBound();
-					IntLiteralExpr iExprLower=aExpr2.getLowerBound();            		
-            		int lowerBound=0;
-            		lowerBound=iExprLower.getValue().getValue().intValue()-aExpr2.getC();
-            		if(lowerBound > iExprUpper.getValue().getValue().intValue())
-            		 {
-            			//resultArray[index]=false;	
-            			dependencyFlag="No";
-            			System.out.println("There is no dependency for this system of Equations");
-            		}//end of 3rd if
-            		else 
-            		{
-            			System.out.println("There is dependency for this system of Equations");
-            		}//end of 3rd else
-            		isApplicable=true;
-            	}//end of 2nd if
-            	else 
-            	{
-            		isApplicable=false;
-            	}
-            }//end of 1st if
-            key1=(String)m.getKey();
-            System.out.println("key1"+key1);
-            cList=(ConstraintsList)m.getValue();        
-            aExpr1=(AffineExpression)cList.getListData().getData();
-            System.out.println("Affine Data for the next node"+aExpr1.getLoopVariable()+aExpr1.getVariable());*/
+        	Map.Entry m =(Map.Entry)it.next();        	
+        	String key=(String)m.getKey();      
+            ConstraintsList cList1=(ConstraintsList)m.getValue();
+            if(cList1.getListNode()!=null)
+            {
+            	 aExpr1=cList1.getListNode().getData();
+            }
+            if(cList1.getListNode().getNext()!=null)
+            {
+            	 aExpr2=cList1.getListNode().getNext().getData();
+            }          
             
-          }//end of while
+          
+         	if((aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr2.getLowerBound() instanceof IntLiteralExpr) && (aExpr1.getUpperBound() instanceof IntLiteralExpr && aExpr2.getUpperBound() instanceof IntLiteralExpr)) 
+        	{
+        		IntLiteralExpr iExprUpper=(IntLiteralExpr)aExpr1.getUpperBound();
+				IntLiteralExpr iExprLower=(IntLiteralExpr)aExpr2.getLowerBound();            		
+        		int lowerBound=0;
+        		lowerBound=iExprLower.getValue().getValue().intValue()-aExpr2.getC();
+        		
+        		if(lowerBound > iExprUpper.getValue().getValue().intValue())
+        		 {       			
+        			dependencyFlag="No";
+        			System.out.println("There is no dependency for this system of Equations");
+        		}//end of 3rd if
+        		else 
+        		{
+        			System.out.println("There is dependency for this system of Equations");
+        		}//end of 3rd else
+        		isApplicable=true;
+        	}//end of 2nd if
+        	else 
+        	{
+        		isApplicable=false;
+        		return isApplicable;
+        	}//end of else.    
+	
 
-		return true;
+        }//end of while
+       return isApplicable;
 		
 		
-	}
+	}//end of checkDependence function. 
 	
 	private void reportTestResult(int index)
 	{

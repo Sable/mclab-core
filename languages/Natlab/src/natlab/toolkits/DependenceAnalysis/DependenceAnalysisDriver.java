@@ -17,6 +17,7 @@ public class DependenceAnalysisDriver {
 	private ForStmt forNode;
 	private ConstraintsGraph cGraph;
 	private SVPCTest svpcTest;
+	private AcyclicTest acyclicTest;
 	public DependenceAnalysisDriver(ForStmt fNode)	
 	{	
 		forNode=fNode;
@@ -34,14 +35,23 @@ public class DependenceAnalysisDriver {
 		if(cGraph.getGraphSize()!=0)
 		{
 			svpcTest=new SVPCTest();
-			 //isApplicable= svpcTest.checkDependence(cGraph);
+			 
+			isApplicable= svpcTest.checkDependence(cGraph);
 			//cGraph.temp();
 			 System.out.println("i am in SVPC test");
 		}
 		if (!isApplicable)
 		{
 			System.out.println("Apply Acyclic test");
-			//then apply Acyclic test
+			acyclicTest=new AcyclicTest();
+			cGraph=acyclicTest.makeSubstituitionForVariable(cGraph);
+			boolean isAcyclicApplicable=acyclicTest.getisApplicable();
+			if(isAcyclicApplicable)
+			{
+				System.out.println("now apply SVPC Test");
+				isApplicable= svpcTest.checkDependence(cGraph);
+			}
+			
 		}
 	}
 

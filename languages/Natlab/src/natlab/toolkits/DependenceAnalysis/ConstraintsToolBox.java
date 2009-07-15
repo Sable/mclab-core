@@ -172,14 +172,16 @@ public class ConstraintsToolBox {
 		{
 			
 			ParameterizedExpr paraLHSExpr=(ParameterizedExpr)LHSExpr;
-			AffineExpression aExpr1=new AffineExpression();
-			AffineExpression aExpr2=new AffineExpression();		
+			
 			
 			resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.	
 			//if(RHSExpr instanceof ParameterizedExpr)			//{
 								
 				 for(int i=0;i <paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
-				  {				  
+				  {		
+					 AffineExpression aExpr1=new AffineExpression();
+					 AffineExpression aExpr2=new AffineExpression();
+					 
 					 if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
 					 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
@@ -195,7 +197,9 @@ public class ConstraintsToolBox {
 							 IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
 							 aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);
 							 //checkDependence(aExpr1,aExpr2,i);
+							 
 							 cGraph.createGraph(aExpr1,aExpr2);
+							 
 						 }//end of nested if	
 					 }//end of main if			
 					 else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MinusExpr)
@@ -211,7 +215,8 @@ public class ConstraintsToolBox {
 						 if(mExpr.getRHS() instanceof IntLiteralExpr)			
 						 {
 							 IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getRHS();				
-							 aExpr2.setC(iExpr.getValue().getValue().intValue());					
+							 aExpr2.setC(iExpr.getValue().getValue().intValue());
+							 
 							 //checkDependence(aExpr1,aExpr2,i);
 							 cGraph.createGraph(aExpr1,aExpr2);
 						 }//end of nested if	
@@ -259,7 +264,7 @@ public class ConstraintsToolBox {
 			 			  RangeExpr rExpr=(RangeExpr) assStmt.getRHS();						
 						  if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr)
 						   {
-							    System.out.println("I am a constraint not bounded on both sides by variables of IntLiteralExpression");
+							    System.out.println("I am a constraint bounded on both sides by variables of IntLiteralExpression");
 			 				    IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();
 								//upperBound=iExprUpper.getValue().getValue().intValue();
 								IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
@@ -271,15 +276,19 @@ public class ConstraintsToolBox {
 						   }//end of 3rd if
 						  else if(rExpr.getUpper() instanceof PlusExpr)
 							{
-								System.out.println("I am a constraint bounded on both sides by variables by PlusExpr");
+								System.out.println("I am a constraint bounded on both sides by variables of PlusExpr");
 								PlusExpr pExpr=(PlusExpr)rExpr.getUpper();
-								aExpr1.setPUBound(pExpr);
-								aExpr2.setPUBound(pExpr);
+								aExpr1.setUpperBound(pExpr);
+								aExpr2.setUpperBound(pExpr);
+								//aExpr1.setPUBound(pExpr);
+								//aExpr2.setPUBound(pExpr);
 								if(rExpr.getLower() instanceof NameExpr)
 								{
 									NameExpr nExpr=(NameExpr)rExpr.getLower();
-									aExpr1.setNLBound(nExpr);
-									aExpr2.setNLBound(nExpr);
+									//aExpr1.setNLBound(nExpr);
+									//aExpr2.setNLBound(nExpr);
+									aExpr1.setLowerBound(nExpr);
+									aExpr2.setLowerBound(nExpr);
 								}
 								else if(rExpr.getLower() instanceof IntLiteralExpr)
 								{
@@ -291,27 +300,27 @@ public class ConstraintsToolBox {
 								else if(rExpr.getLower() instanceof PlusExpr)
 								{
 									PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
-									aExpr1.setPLBound(pLExpr);
-									aExpr2.setPLBound(pLExpr);									
+									aExpr1.setLowerBound(pLExpr);
+									aExpr2.setLowerBound(pLExpr);									
 								}	
 								else if(rExpr.getLower() instanceof MinusExpr)
 								{
 									MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
-									aExpr1.setMLBound(mLExpr);
-									aExpr2.setMLBound(mLExpr);
+									aExpr1.setLowerBound(mLExpr);
+									aExpr2.setLowerBound(mLExpr);
 								}								
 							}//end of else if
 						  else if(rExpr.getUpper() instanceof MinusExpr)
 							{
 								System.out.println("I am a constraint bounded on both sides by variables");
 								MinusExpr mExpr=(MinusExpr)rExpr.getUpper();
-								aExpr1.setMUBound(mExpr);
-								aExpr2.setMUBound(mExpr);
+								aExpr1.setUpperBound(mExpr);
+								aExpr2.setUpperBound(mExpr);
 								if(rExpr.getLower() instanceof NameExpr)
 								{
 									NameExpr nExpr=(NameExpr)rExpr.getLower();
-									aExpr1.setNLBound(nExpr);
-									aExpr2.setNLBound(nExpr);
+									aExpr1.setLowerBound(nExpr);
+									aExpr2.setLowerBound(nExpr);
 								}
 								else if(rExpr.getLower() instanceof IntLiteralExpr)
 								{
@@ -323,20 +332,20 @@ public class ConstraintsToolBox {
 								else if(rExpr.getLower() instanceof PlusExpr)
 								{
 									PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
-									aExpr1.setPLBound(pLExpr);
-									aExpr2.setPLBound(pLExpr);									
+									aExpr1.setLowerBound(pLExpr);
+									aExpr2.setLowerBound(pLExpr);									
 								}	
 								else if(rExpr.getLower() instanceof MinusExpr)
 								{
 									MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
-									aExpr1.setMLBound(mLExpr);
-									aExpr2.setMLBound(mLExpr);
+									aExpr1.setLowerBound(mLExpr);
+									aExpr2.setLowerBound(mLExpr);
 								}								
 							}//end of else if
 						}//end of 2nd if					
 					}//end of 1st if
 			 }//end of for loop		
-		  }//end of function.
+		  }//end of setUpperAndLowerBounds function.
 
 
 }
