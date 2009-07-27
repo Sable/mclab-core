@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import natlab.ast.MTimesExpr;
 import natlab.ast.ForStmt;
 import natlab.ast.IntLiteralExpr;
 import natlab.ast.NameExpr;
@@ -81,13 +82,458 @@ public class AcyclicTest {
 	            }
 	            else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MinusExpr)
 	            {
-	            	setVariables((NameExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);
-	            	
+	            	setVariables((NameExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
 	            }
+	            else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+	            {
+	            	setVariables((NameExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            } 
+	            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+	            {
+	            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }  
+	            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+	            {
+	            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }
+	            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+	            {
+	            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }
+	            else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+	            {
+	            	setVariables((MinusExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }
+	            else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+	            {
+	            	setVariables((PlusExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }
+	            else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+	            {
+	            	setVariables((PlusExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }
+	            else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+	            {
+	            	setVariables((MinusExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+	            }  
          }//end of 1st if statement
         }//end of while
 		return cGraph;		
   }//end of makeSusbtituitionForVariable function.
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by PlusExpr and UpperEnd by MinusExpr
+	 */	
+	private void setVariables(MinusExpr pExpr1,PlusExpr pExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=pExpr1.getLHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=pExpr2.getLHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+        if(tExpr1!=null && ((MinusExpr)aExpr.getLowerBound()).getRHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+         {      
+	        	int value=((IntLiteralExpr)((MinusExpr)aExpr.getLowerBound()).getRHS()).getValue().getValue().intValue();
+	        	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()-value;                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+         }//end of 1st if
+         if(((PlusExpr)aExpr.getUpperBound()).getRHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((PlusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue() +value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		 int value=((IntLiteralExpr)((PlusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()+value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if           	  	           		            	
+	}//end of function
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by PlusExpr and UpperEnd by MinusExpr
+	 */	
+	private void setVariables(PlusExpr pExpr1,MinusExpr pExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=pExpr1.getLHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=pExpr2.getLHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+        if(tExpr1!=null && ((PlusExpr)aExpr.getLowerBound()).getRHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+         {      
+	        	int value=((IntLiteralExpr)((PlusExpr)aExpr.getLowerBound()).getRHS()).getValue().getValue().intValue();
+	        	value =value + ((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue();                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+         }//end of 1st if
+         if(((MinusExpr)aExpr.getUpperBound()).getRHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MinusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue() - value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		 int value=((IntLiteralExpr)((MinusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()-value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if           	  	           		            	
+	}//end of function
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by PlusExpr and UpperEnd by MTimesExpr
+	 */		
+	private void setVariables(PlusExpr mExpr1,MTimesExpr mExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=mExpr1.getLHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr2.getRHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+     	if(tExpr1!=null && ((PlusExpr)aExpr.getLowerBound()).getRHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+        {      
+	        	int value=((IntLiteralExpr)((PlusExpr)aExpr.getLowerBound()).getRHS()).getValue().getValue().intValue();
+	        	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()+value;                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+        }//end of 1st if
+         if(((MTimesExpr)aExpr.getUpperBound()).getLHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()*value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()*value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by MinusExpr and UpperEnd by MTimesExpr
+	 */		
+	private void setVariables(MinusExpr mExpr1,MTimesExpr mExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=mExpr1.getLHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr2.getRHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+     	if(tExpr1!=null && ((MinusExpr)aExpr.getLowerBound()).getRHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+        {      
+	        	int value=((IntLiteralExpr)((MinusExpr)aExpr.getLowerBound()).getRHS()).getValue().getValue().intValue();
+	        	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()-value;                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+        }//end of 1st if
+         if(((MTimesExpr)aExpr.getUpperBound()).getLHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()*value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()*value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by MTimesExpr and UpperEnd by MinusExpr
+	 */		
+	private void setVariables(MTimesExpr mExpr1,MinusExpr mExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=mExpr1.getRHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr2.getLHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+     	if(tExpr1!=null && ((MTimesExpr)aExpr.getLowerBound()).getLHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+        {      
+	        	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getLowerBound()).getLHS()).getValue().getValue().intValue();
+	        	value =value*((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue();                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+        }//end of 1st if
+         if(((MinusExpr)aExpr.getUpperBound()).getRHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MinusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()-value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((MinusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()-value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
+	
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by MTimesExpr and UpperEnd by PlusExpr
+	 */		
+	private void setVariables(MTimesExpr mExpr1,PlusExpr mExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=mExpr1.getRHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr2.getLHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+     	if(tExpr1!=null && ((MTimesExpr)aExpr.getLowerBound()).getLHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+        {      
+	        	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getLowerBound()).getLHS()).getValue().getValue().intValue();
+	        	value =value*((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue();                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+        }//end of 1st if
+         if(((PlusExpr)aExpr.getUpperBound()).getRHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((PlusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()+value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((PlusExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()+value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
+	
+	
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by MTimesExpr and UpperEnd by MTimesExpr
+	 */		
+	private void setVariables(MTimesExpr mExpr1,MTimesExpr mExpr2,Iterator it,ConstraintsList cList)
+	{
+		String LKey=mExpr1.getRHS().getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr2.getRHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+     	if(tExpr1!=null && ((MTimesExpr)aExpr.getLowerBound()).getLHS() instanceof IntLiteralExpr )//tExpr1.getLowerBound() instanceof IntLiteralExpr)
+        {      
+	        	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getLowerBound()).getLHS()).getValue().getValue().intValue();
+	        	value =value*((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue();                        		
+	        	IntLiteralExpr intExpr=new IntLiteralExpr();
+	        	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+	        	aExpr.setLowerBound(intExpr);
+	        	cList.getListNode().getNext().getData().setLowerBound(intExpr);
+	        	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());	        	
+        }//end of 1st if
+         if(((MTimesExpr)aExpr.getUpperBound()).getLHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()*value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()*value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
+	
+	/*
+	 * This function sets the variables of a constraint bounded on lower end by NameExpr and UpperEnd by MTimesExpr
+	 */		
+	private void setVariables(NameExpr nExpr,MTimesExpr mExpr,Iterator it,ConstraintsList cList)
+	{
+		String LKey=nExpr.getVarName();
+     	System.out.println("Key is "+LKey);
+     	String UKey=mExpr.getRHS().getVarName();
+     	System.out.println("Upperkey is " + UKey);
+     	AffineExpression aExpr=cList.getListNode().getData();
+     	searchGraph(LKey,UKey,it);
+        if(tExpr1!=null && tExpr1.getLowerBound() instanceof IntLiteralExpr)
+         {        	
+          		aExpr.setLowerBound(tExpr1.getLowerBound());//setting the lower bound for first constraint.
+           		cList.getListNode().getNext().getData().setLowerBound(tExpr1.getLowerBound());//setting the lower bound for sub constraint of the first constraint.
+         }//end of 1st if
+         if(((MTimesExpr)aExpr.getUpperBound()).getLHS() instanceof IntLiteralExpr)
+          {
+        	 if(tExpr1!=null && tExpr2==null) //LKey and UKey same.
+        	 {
+            	int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getLHS()).getValue().getValue().intValue();
+            	value =((IntLiteralExpr)tExpr1.getLowerBound()).getValue().getValue().intValue()*value;                        		
+            	IntLiteralExpr intExpr=new IntLiteralExpr();
+            	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+            	aExpr.setUpperBound(intExpr);
+            	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+            	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+            	isApplicable=true;
+        	 }//end of 3rd if                    	 
+        	 else if(tExpr2!=null)	 //LKey and UKey different.                   	  
+              {
+        		int value=((IntLiteralExpr)((MTimesExpr)aExpr.getUpperBound()).getRHS()).getValue().getValue().intValue();
+             	value =((IntLiteralExpr)tExpr2.getLowerBound()).getValue().getValue().intValue()*value;                        		
+             	IntLiteralExpr intExpr=new IntLiteralExpr();
+             	Integer iObj=new Integer(value);        											
+				intExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+             	aExpr.setUpperBound(intExpr);
+             	cList.getListNode().getNext().getData().setUpperBound(intExpr);
+             	System.out.println("New Expression value is " +intExpr.getValue().getValue().intValue());
+             	isApplicable=true;                    		 
+              }//end of else if
+        	}//end of 2nd if          		            	
+	}//end of function
+
 	
 	/*
 	 * This function sets the variables of a constraint bounded on lower end by NameExpr and UpperEnd by PlusExpr
@@ -318,7 +764,9 @@ public class AcyclicTest {
 	
 	
 	/*
-	 * This function is used to search Constraints Graph to set values of variables.
+	 * This function is used to search Constraints Graph to set values of variables.It returns the affine Expression 
+	 * which is bounded by the Keys given as input to this function.
+	 * 
 	 */
 	private void searchGraph(String LKey,String UKey, Iterator it)
 	{

@@ -106,9 +106,10 @@ public class SVPCTest {
         	{
         		IntLiteralExpr iExprUpper=(IntLiteralExpr)aExpr1.getUpperBound();
 				IntLiteralExpr iExprLower=(IntLiteralExpr)aExpr2.getLowerBound();            		
-        		int lowerBound=0;
-        		lowerBound=iExprLower.getValue().getValue().intValue()-aExpr2.getC();
-        		
+        		int lowerBound=0;        		
+        		if(aExpr2.getC()>0)	lowerBound=iExprLower.getValue().getValue().intValue()+aExpr2.getC();     		
+        	    else lowerBound=iExprLower.getValue().getValue().intValue()-aExpr2.getC();        		
+        		System.out.println("lower bound is" + lowerBound+aExpr2.getLoopVariable());
         		if(lowerBound > iExprUpper.getValue().getValue().intValue())
         		 {       			
         			dependencyFlag="No";

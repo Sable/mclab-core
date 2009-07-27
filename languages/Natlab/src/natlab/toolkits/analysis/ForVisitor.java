@@ -64,7 +64,8 @@ public class ForVisitor implements ASTVisitor {
 			{
 					
 				DependenceAnalysisDriver dAnalysisDriver=new DependenceAnalysisDriver(forNode);
-				dAnalysisDriver.createConstraints();
+				dAnalysisDriver.traverseLoopStatements();
+				//dAnalysisDriver.createConstraints();
 				
 			}
 			

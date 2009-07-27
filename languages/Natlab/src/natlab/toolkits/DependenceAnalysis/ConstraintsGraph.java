@@ -1,9 +1,6 @@
 package natlab.toolkits.DependenceAnalysis;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-
 
 public class ConstraintsGraph {
 	private Map<String,ConstraintsList> cMap;
@@ -22,7 +19,7 @@ public class ConstraintsGraph {
 		subList1.insertAtFront(aExpr2);
 		cList1.insertAtFront(aExpr1,subList1);		
 		//cList1.insertAtFront(aExpr1,null);		
-		cMap.put(aExpr1.getVariable(), cList1);
+		cMap.put(aExpr1.getKey(), cList1);
 		
 		//System.out.println("********\n" + cMap + "\n******");
 		
@@ -42,12 +39,12 @@ public class ConstraintsGraph {
 			}
 		}*/
 		
-		//cMap.put(aExpr1.getVariable(), aExpr2.getLoopVariable());
-		//System.out.println("aExpr1 variable is"+cList1.getInsertItem().getLoopVariable() + " "+ aExpr1.getVariable() + " " +aExpr1.getC());
+		//cMap.put(aExpr1.getKey(), aExpr2.getLoopVariable());
+		//System.out.println("aExpr1 variable is"+cList1.getInsertItem().getLoopVariable() + " "+ aExpr1.getKey() + " " +aExpr1.getC());
 		/*ConstraintsList cList2=new ConstraintsList();
 		cList2.insertAtFront(aExpr2);
-		cMap.put(aExpr2.getVariable(), cList2);
-		System.out.println("aExpr2 variable is"+aExpr2.getVariable());*/
+		cMap.put(aExpr2.getKey(), cList2);
+		System.out.println("aExpr2 variable is"+aExpr2.getKey());*/
 		//temp();
 		
 	}
@@ -83,11 +80,11 @@ public class ConstraintsGraph {
             	 	AffineExpression aExpr3=cList4.getInsertItem();
             	 	System.out.println(cList4.toString());
             	 	//aExpr3=(AffineExpression)cList4.getListData(key2);
-            	 	System.out.println("Affine Data for cMap  "+aExpr3.getLoopVariable()+ " "+ aExpr3.getVariable()+ " "+aExpr3.getC());
+            	 	System.out.println("Affine Data for cMap  "+aExpr3.getLoopVariable()+ " "+ aExpr3.getKey()+ " "+aExpr3.getC());
              }
             
             //AffineExpression aExpr4=(AffineExpression)cList1.getListData().getNext().getData();
-            //System.out.println("Affine Data for expression 2 "+ aExpr4.getLoopVariable()+" "+ aExpr4.getVariable()+" "+ aExpr4.getC());           
+            //System.out.println("Affine Data for expression 2 "+ aExpr4.getLoopVariable()+" "+ aExpr4.getKey()+" "+ aExpr4.getC());           
                      
          }//end of while
 
