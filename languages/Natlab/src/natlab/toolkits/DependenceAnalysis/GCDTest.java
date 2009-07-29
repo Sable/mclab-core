@@ -12,7 +12,7 @@ import natlab.ast.IntLiteralExpr;
 /*
  * Author:Amina Aslam
  * Date:24 Jul,2009
- * GCD Test class calculates the GCD of the Constraint Equations.
+ * GCD Test class calculates the GCD of the Constraints' Equations.
  */
 
 public class GCDTest {
@@ -20,6 +20,7 @@ public class GCDTest {
 	private long v;
 	private long gcd;
 	private long c=0;
+	private boolean isSolution;
 	
 	public GCDTest()
 	{
@@ -27,6 +28,7 @@ public class GCDTest {
 		v=0;
 		gcd=0;
 		c=0;
+		isSolution=false;
 	}
 	
 	public void calculateGcd (ConstraintsGraph cGraph) 
@@ -52,13 +54,10 @@ public class GCDTest {
             if(cList1.getListNode().getNext()!=null)
             {
             	 aExpr2=cList1.getListNode().getNext().getData();
-            }          
-        }//end of while   
+            }                     
 		//long gcd = 0;
 	    long r = 0;
 	    assignValues(aExpr1,aExpr2);
-	    
-
 	    while (true) {
 	      if (v == 0) {
 	        gcd = u;
@@ -70,24 +69,34 @@ public class GCDTest {
 	        u = v;
 	        v = r;
 	      }//end of else 
-	    }//end of while 
+	    }//end of 2nd while
+	    isSolution();  
+      }//end of 1st while
 	 
 
-	}//end of calculate GCD function.
+	}//end of calculateGCD function.
 	
 	/*
-	 * This function tells whether there is a solution to the system of equations or not.
+	 * This function calculates whether there is a solution to the system of equations or not.
 	 * If the constant is divided by gcd then there is a solution to the system of equations.
 	 * 
 	 */
-	public boolean isSolution()
+	private void isSolution()
 	{
-		boolean isSolution=false;
 		if(c%gcd==0)
-		{
-			isSolution=true;
-		}		
-		return isSolution;
+		{   isSolution=true;
+			System.out.println("Gcd Result" + c%gcd);
+		}
+		else 
+		{isSolution=false;
+		 System.out.println("Gcd Result" + c%gcd);
+		 System.out.println("There is no integer solution for the system of equations");
+		}
+	}//end of isSolution function
+	
+	public boolean getIsSolution()
+	{
+	    return isSolution;	
 	}
 	
 	
@@ -99,28 +108,58 @@ public class GCDTest {
 	 */
 	private void assignValues(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
-		if(aExpr1.getIndexExpr() instanceof NameExpr)
+		if(aExpr1.getIndexExpr() instanceof NameExpr)//e.g.i=j
 	    {  	u = 1;
-	    	if(aExpr2.getIndexExpr() instanceof NameExpr)v = 1;	    	
+	    	if(aExpr2.getIndexExpr() instanceof NameExpr)
+	    		{ v = 1;
+	    		  if(aExpr1.getC() > 0) c=Math.abs(aExpr2.getC()-aExpr1.getC());
+	    		  else if(aExpr1.getC() < 0) c=Math.abs(aExpr2.getC()+aExpr1.getC());
+	    		  else if(aExpr1.getC()==0) c=Math.abs(aExpr2.getC());
+	    		}	    	
 	    }//end of if
-		else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g. 2i=2j+10
+		else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g. 2i=2j+10  2i=2j-10
 		{
 			MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
 			u=Math.abs(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue());
-			if(aExpr2.getIndexExpr() instanceof PlusExpr)
-			{
-			   if(((PlusExpr)aExpr2.getIndexExpr()).getLHS() instanceof MTimesExpr) //this check is to handle these types of equations 2j+10
-			   {
-				  MTimesExpr mExpr2=(MTimesExpr)((PlusExpr)aExpr2.getIndexExpr()).getLHS();
-				  v=Math.abs(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
-				  c=Math.abs(aExpr2.getC());
-			   }//end of 2nd if
-			   else v=1; c=Math.abs(aExpr2.getC());
-			   
-			}//end of 1st if
-		}//end of else if	
+			
+			   if(aExpr2.getIndexExpr() instanceof MTimesExpr) //this check is to handle these types of equations 2j+10
+			   {		  
+				    MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+				    v=Math.abs(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+	    		    if(aExpr1.getC() > 0) c=Math.abs(aExpr2.getC()-aExpr1.getC());
+	    		    else if(aExpr1.getC() < 0) c=Math.abs(aExpr2.getC()+aExpr1.getC());
+	    		    else if(aExpr1.getC()==0) c=Math.abs(aExpr2.getC());
+	    				    
+	    	   }//end of 1st if			   		
+		}//end of else if
 		
-		else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g.2i=2j
+		else if(aExpr1.getIndexExpr() instanceof NameExpr) //e.g. i=2j+10  i=2j-10
+	    {  	u = 1;
+	    	if(aExpr2.getIndexExpr() instanceof MTimesExpr)//aExpr2.getIndexExpr() returns 2j part of the equation.
+	    		{			  
+	    		    MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+				    v=Math.abs(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+	    		    if(aExpr1.getC() > 0) c=Math.abs(aExpr2.getC()-aExpr1.getC());
+	    		    else if(aExpr1.getC() < 0) c=Math.abs(aExpr2.getC()+aExpr1.getC());
+	    		    else if(aExpr1.getC()==0) c=Math.abs(aExpr2.getC());	    		  
+			   }//end of 2nd if			  	    	
+	    }//end of else if
+		
+		else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g. 2i=j+10 or 2i=j-10
+		{
+			MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
+			u=Math.abs(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue());
+     		if(aExpr2.getIndexExpr() instanceof NameExpr) //this check is to handle these types of equations 2j+10
+			   {    v = 1;
+				    NameExpr mExpr2=(NameExpr)aExpr2.getIndexExpr();				    
+	    		    if(aExpr1.getC() > 0) c=Math.abs(aExpr2.getC()-aExpr1.getC());
+	    		    else if(aExpr1.getC() < 0) c=Math.abs(aExpr2.getC()+aExpr1.getC());
+	    		    else if(aExpr1.getC()==0) c=Math.abs(aExpr2.getC());				  
+	    		}//end of 1st if
+		}//end of else if
+
+		
+		/*else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g.2i=2j
 		{
 			MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
 			u=Math.abs(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue());
@@ -235,7 +274,7 @@ public class GCDTest {
 			   }//end of 2nd if
 			   else v=1;	c=Math.abs(aExpr2.getC()-aExpr1.getC());				
 			}//end of 1st if
-		}//end of else if
+		}//end of else if*/
 
 }//end of assign values function 
 

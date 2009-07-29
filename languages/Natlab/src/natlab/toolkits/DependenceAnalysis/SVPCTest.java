@@ -102,7 +102,7 @@ public class SVPCTest {
             }          
             
           
-         	if((aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr2.getLowerBound() instanceof IntLiteralExpr) && (aExpr1.getUpperBound() instanceof IntLiteralExpr && aExpr2.getUpperBound() instanceof IntLiteralExpr)) 
+         	if(aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr1.getUpperBound() instanceof IntLiteralExpr ) 
         	{
         		IntLiteralExpr iExprUpper=(IntLiteralExpr)aExpr1.getUpperBound();
 				IntLiteralExpr iExprLower=(IntLiteralExpr)aExpr2.getLowerBound();            		
@@ -128,9 +128,8 @@ public class SVPCTest {
         	}//end of else.    
 	
 
-        }//end of while
+        }//end of while        
        return isApplicable;
-		
 		
 	}//end of checkDependence function. 
 	

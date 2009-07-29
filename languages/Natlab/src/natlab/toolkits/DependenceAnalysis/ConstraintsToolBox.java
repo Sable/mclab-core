@@ -80,52 +80,50 @@ public class ConstraintsToolBox {
 	 *  		a(i,j)=a(i+10,j-9)
 	 *  	end
 	 */	
-		public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr)
-		{		 
-			boolean aFlag=false;
-			    	  if(aExpr instanceof ParameterizedExpr)
-						  { 			  
-							  if(bExpr instanceof ParameterizedExpr)
-							  {					  
-								  if(aExpr.getVarName().equals(bExpr.getVarName()))
-								  {
-									  System.out.println("I am in parameterized expression");								  
-									  makeEquationsForSubscriptExprs(aExpr,bExpr);
-									  aFlag=true;
-									  //reportTestResult(((ParameterizedExpr)aExpr).getNumArg());								  
-								  }
-						      }				 
-							  else if (bExpr instanceof PlusExpr)
-							  {
-								  PlusExpr pExpr=(PlusExpr)bExpr;					  
-								    if(aExpr.getVarName().equals(pExpr.getLHS().getVarName()))
-								    	{
-								    		  System.out.println("I am in plus expression for LHS");
-								    	      makeEquationsForSubscriptExprs(aExpr,pExpr.getLHS());
-								    	      aFlag=true;
-								    		  //reportTestResult(((ParameterizedExpr)aExpr).getNumArg());							    		  
-								    	}						    
-								    if(aExpr.getVarName().equals(pExpr.getRHS().getVarName()))
-								    	{
-								    	  System.out.println("I am in plus expression RHS");
-								    	  makeEquationsForSubscriptExprs(aExpr,pExpr.getRHS());
-								    	  aFlag=true;
-							    		  //reportTestResult(((ParameterizedExpr)aExpr).getNumArg());					    	
-								        }					
-							  }//end of PlusExpr else if
-							    
-						  }//end of ParameterizedExpr if
-			    	  return aFlag;
-						
-		}//end of function checkSameArrayAccess.
-		public ConstraintsGraph getGraph()
-		{
-			if(cGraph!=null)
-			{
-				return cGraph;
-			}
-			else return null;
-		}
+public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr)
+ {		 
+	boolean aFlag=false;
+	if(aExpr instanceof ParameterizedExpr)
+	 { 			  
+		  if(bExpr instanceof ParameterizedExpr)
+	    	  {					  
+				  if(aExpr.getVarName().equals(bExpr.getVarName()))
+				  {
+		    		  System.out.println("I am in parameterized expression");								  
+			 		  makeEquationsForSubscriptExprs(aExpr,bExpr);
+					  aFlag=true;
+				  }
+				}				 
+	 else if (bExpr instanceof PlusExpr)
+	  {
+		  PlusExpr pExpr=(PlusExpr)bExpr;					  
+	     if(aExpr.getVarName().equals(pExpr.getLHS().getVarName()))
+	    	{
+	    		  System.out.println("I am in plus expression for LHS");
+	    	      makeEquationsForSubscriptExprs(aExpr,pExpr.getLHS());
+	    	      aFlag=true;							    		  
+			}						    
+	     if(aExpr.getVarName().equals(pExpr.getRHS().getVarName()))
+		  	{
+		     	  System.out.println("I am in plus expression RHS");
+		    	  makeEquationsForSubscriptExprs(aExpr,pExpr.getRHS());
+		    	  aFlag=true;						    	
+			}					
+		}//end of PlusExpr else if
+						    
+    }//end of ParameterizedExpr if
+  	return aFlag;						
+}//end of function checkSameArrayAccess.
+
+
+public ConstraintsGraph getGraph()
+{
+  if(cGraph!=null)
+	{
+	  return cGraph;
+	}
+	else return null;
+}//end of function ConstraintsGraph
 		
 		
 		
@@ -172,8 +170,6 @@ public class ConstraintsToolBox {
 						
 		}//end of function checkArrayAccessAcrossStmts.*/	
 		
-		
-		
 		/*This function does following. 
 		 * 1.Makes equations from array subscript expression.		 * 
 		 * TO DO:Handle cases where LHS is not an instance of NameExpr.		 
@@ -183,18 +179,14 @@ public class ConstraintsToolBox {
 		{
 			
 			ParameterizedExpr paraLHSExpr=(ParameterizedExpr)LHSExpr;
-			
-			
 			resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.	
-			//if(RHSExpr instanceof ParameterizedExpr)			//{
-								
-				 for(int i=0; i<paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
-				  {		
-					 AffineExpression aExpr1=new AffineExpression();
-					 AffineExpression aExpr2=new AffineExpression();
-					 
-					 if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
-					 {
+					
+			for(int i=0; i<paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
+			  {		
+				 AffineExpression aExpr1=new AffineExpression();
+				 AffineExpression aExpr2=new AffineExpression();					 
+				 if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
+				 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
 						 aExpr1.setLoopVariable(nExpr.getVarName());
 						 aExpr2.setLoopVariable(nExpr.getVarName());
@@ -209,9 +201,8 @@ public class ConstraintsToolBox {
 						 {
 							 IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
 							 aExpr2.setC(iExpr.getValue().getValue().intValue());
-							 System.out.println("PlusExpr"+aExpr2.getC());
-							 cGraph.createGraph(aExpr1,aExpr2);
-							 
+							 System.out.println("PlusExpr "+ aExpr2.getC());
+							 cGraph.createGraph(aExpr1,aExpr2);							 
 						 }//end of nested if	
 					 }//end of main if			
 					 else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MinusExpr)
@@ -230,7 +221,7 @@ public class ConstraintsToolBox {
 						 {
 							 IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getRHS();				
 							 aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);
-							 System.out.println("MinusExpr"+aExpr2.getC());
+							 System.out.println("MinusExpr  "+aExpr2.getC());
 							 cGraph.createGraph(aExpr1,aExpr2);
 						 }//end of nested if	
 				     }//end of main else if
@@ -269,6 +260,72 @@ public class ConstraintsToolBox {
 							 cGraph.createGraph(aExpr1,aExpr2);
 						 //}//end of nested if						 
 					 }//end of main else if
+					 
+					 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
+					 {
+						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
+						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr1.setC(0);
+						 aExpr1.setKey("t"+i);			
+						 aExpr1.setIndexExpr(mExpr);
+						 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setKey("t"+i);
+						 aExpr2.setIndexExpr(pExpr.getLHS());
+						 //if(pExpr.getLHS() instanceof MTimesExpr)aExpr2.setIndexExpr((MTimesExpr)pExpr.getLHS());//for these equations 2i=2j+10
+						 //else if(pExpr.getLHS() instanceof NameExpr)aExpr2.setIndexExpr((NameExpr)pExpr.getLHS());//for these equations 2i=j+10
+						 setUpperAndLowerBounds(aExpr1,aExpr2);
+						 if(pExpr.getRHS() instanceof IntLiteralExpr)			
+						 {
+							IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
+							aExpr2.setC(iExpr.getValue().getValue().intValue());							 
+							cGraph.createGraph(aExpr1,aExpr2);
+						 }//end of nested if						 
+					 }//end of main else if
+					 
+					 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MinusExpr)
+					 {
+						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
+						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr1.setC(0);
+						 aExpr1.setKey("t"+i);			
+						 aExpr1.setIndexExpr(mExpr);
+						 MinusExpr miExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setKey("t"+i);
+						 aExpr2.setIndexExpr(miExpr.getLHS());
+						 //if(miExpr.getLHS() instanceof MTimesExpr)aExpr2.setIndexExpr((MTimesExpr)miExpr.getLHS());//for these equations 2i=2j-10
+						 ///else if(miExpr.getLHS() instanceof NameExpr)aExpr2.setIndexExpr((NameExpr)miExpr.getLHS());//for these equations 2i=j-10
+						 setUpperAndLowerBounds(aExpr1,aExpr2);
+						 if(miExpr.getRHS() instanceof IntLiteralExpr)			
+						 {
+							IntLiteralExpr iExpr=(IntLiteralExpr)miExpr.getRHS();				
+							aExpr2.setC((iExpr.getValue().getValue().intValue())*-1);							 
+							cGraph.createGraph(aExpr1,aExpr2);
+						 }//end of nested if						 
+					 }//end of main else if
+					 
+					 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof NameExpr)
+					 {
+						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
+						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr1.setC(0);
+						 aExpr1.setKey("t"+i);			
+						 aExpr1.setIndexExpr(mExpr);
+						 NameExpr nExpr=(NameExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setKey("t"+i);
+						 aExpr2.setIndexExpr(nExpr);
+						 setUpperAndLowerBounds(aExpr1,aExpr2);
+						 //if(miExpr.getRHS() instanceof IntLiteralExpr)			
+						 //{
+							//IntLiteralExpr iExpr=(IntLiteralExpr)miExpr.getRHS();				
+							aExpr2.setC(0);							 
+							cGraph.createGraph(aExpr1,aExpr2);
+						 //}//end of nested if						 
+					 }//end of main else if
+
+
 					 else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr)
 					 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
@@ -300,151 +357,151 @@ public class ConstraintsToolBox {
 		 */							
 		private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression aExpr2)
 		{	
-		    int upperBound=0;
-		    int lowerBound=0;
-		    
+			int upperBound=0;
+			int lowerBound=0;
+
 			for(int i=0;i<loopIndex;i++)
-			 {
-				  AssignStmt assStmt= forStmtArray[i].getAssignStmt();					
-			 	  if(assStmt.getVarName().equals(aExpr1.getLoopVariable())) //this is to compare array subscript with loop index variable.
-			 		{
-			 		  if(assStmt.getRHS() instanceof RangeExpr)		 		
+			{
+				AssignStmt assStmt= forStmtArray[i].getAssignStmt();					
+				if(assStmt.getVarName().equals(aExpr1.getLoopVariable())) //this is to compare array subscript with loop index variable.
+				{
+					if(assStmt.getRHS() instanceof RangeExpr)		 		
+					{
+						RangeExpr rExpr=(RangeExpr) assStmt.getRHS();						
+						if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr)
 						{
-			 			  RangeExpr rExpr=(RangeExpr) assStmt.getRHS();						
-						  if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr)
-						   {
-							    System.out.println("I am a constraint bounded on both sides by variables of IntLiteralExpression");
-			 				    IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();
-								//upperBound=iExprUpper.getValue().getValue().intValue();
+							System.out.println("I am a constraint bounded on both sides by variables of IntLiteralExpression");
+							IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();
+							//upperBound=iExprUpper.getValue().getValue().intValue();
+							IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
+							//lowerBound=iExprLower.getValue().getValue().intValue();
+							aExpr1.setUpperBound(iExprUpper);
+							aExpr1.setLowerBound(iExprLower);
+							aExpr2.setUpperBound(iExprUpper);
+							aExpr2.setLowerBound(iExprLower);
+						}//end of 3rd if
+						else if(rExpr.getUpper() instanceof PlusExpr)
+						{
+							System.out.println("I am a constraint bounded on both sides by variables of PlusExpr");
+							PlusExpr pExpr=(PlusExpr)rExpr.getUpper();
+							aExpr1.setUpperBound(pExpr);
+							aExpr2.setUpperBound(pExpr);
+							//aExpr1.setPUBound(pExpr);
+							//aExpr2.setPUBound(pExpr);
+							if(rExpr.getLower() instanceof NameExpr)
+							{
+								NameExpr nExpr=(NameExpr)rExpr.getLower();
+								//aExpr1.setNLBound(nExpr);
+								//aExpr2.setNLBound(nExpr);
+								aExpr1.setLowerBound(nExpr);
+								aExpr2.setLowerBound(nExpr);
+							}
+							else if(rExpr.getLower() instanceof IntLiteralExpr)
+							{
 								IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
 								//lowerBound=iExprLower.getValue().getValue().intValue();
-								aExpr1.setUpperBound(iExprUpper);
-								aExpr1.setLowerBound(iExprLower);
-								aExpr2.setUpperBound(iExprUpper);
+								aExpr1.setLowerBound(iExprLower);									
 								aExpr2.setLowerBound(iExprLower);
-						   }//end of 3rd if
-						  else if(rExpr.getUpper() instanceof PlusExpr)
+							}
+							else if(rExpr.getLower() instanceof PlusExpr)
 							{
-								System.out.println("I am a constraint bounded on both sides by variables of PlusExpr");
-								PlusExpr pExpr=(PlusExpr)rExpr.getUpper();
-								aExpr1.setUpperBound(pExpr);
-								aExpr2.setUpperBound(pExpr);
-								//aExpr1.setPUBound(pExpr);
-								//aExpr2.setPUBound(pExpr);
-								if(rExpr.getLower() instanceof NameExpr)
-								{
-									NameExpr nExpr=(NameExpr)rExpr.getLower();
-									//aExpr1.setNLBound(nExpr);
-									//aExpr2.setNLBound(nExpr);
-									aExpr1.setLowerBound(nExpr);
-									aExpr2.setLowerBound(nExpr);
-								}
-								else if(rExpr.getLower() instanceof IntLiteralExpr)
-								{
-									IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
-									//lowerBound=iExprLower.getValue().getValue().intValue();
-									aExpr1.setLowerBound(iExprLower);									
-									aExpr2.setLowerBound(iExprLower);
-								}
-								else if(rExpr.getLower() instanceof PlusExpr)
-								{
-									PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(pLExpr);
-									aExpr2.setLowerBound(pLExpr);									
-								}	
-								else if(rExpr.getLower() instanceof MinusExpr)
-								{
-									MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(mLExpr);
-									aExpr2.setLowerBound(mLExpr);
-								}	
-								else if(rExpr.getLower() instanceof MTimesExpr)
-								{
-									MTimesExpr mExpr=(MTimesExpr)rExpr.getLower();
-									aExpr1.setLowerBound(mExpr);
-									aExpr2.setLowerBound(mExpr);
-								}
-							}//end of else if
-						  else if(rExpr.getUpper() instanceof MinusExpr)
+								PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(pLExpr);
+								aExpr2.setLowerBound(pLExpr);									
+							}	
+							else if(rExpr.getLower() instanceof MinusExpr)
 							{
-								System.out.println("I am a constraint bounded on both sides by variables");
-								MinusExpr mExpr=(MinusExpr)rExpr.getUpper();
-								aExpr1.setUpperBound(mExpr);
-								aExpr2.setUpperBound(mExpr);
-								if(rExpr.getLower() instanceof NameExpr)
-								{
-									NameExpr nExpr=(NameExpr)rExpr.getLower();
-									aExpr1.setLowerBound(nExpr);
-									aExpr2.setLowerBound(nExpr);
-								}
-								else if(rExpr.getLower() instanceof IntLiteralExpr)
-								{
-									IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
-									//lowerBound=iExprLower.getValue().getValue().intValue();
-									aExpr1.setLowerBound(iExprLower);									
-									aExpr2.setLowerBound(iExprLower);
-								}
-								else if(rExpr.getLower() instanceof PlusExpr)
-								{
-									PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(pLExpr);
-									aExpr2.setLowerBound(pLExpr);									
-								}	
-								else if(rExpr.getLower() instanceof MinusExpr)
-								{
-									MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(mLExpr);
-									aExpr2.setLowerBound(mLExpr);
-								}
-								else if(rExpr.getLower() instanceof MTimesExpr)
-								{
-									MTimesExpr muExpr=(MTimesExpr)rExpr.getLower();
-									aExpr1.setLowerBound(muExpr);
-									aExpr2.setLowerBound(muExpr);
-								}							
-							}//end of else if
-						  else if(rExpr.getUpper() instanceof MTimesExpr)
+								MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(mLExpr);
+								aExpr2.setLowerBound(mLExpr);
+							}	
+							else if(rExpr.getLower() instanceof MTimesExpr)
 							{
-								System.out.println("I am a constraint bounded on both sides by variables");
-								MTimesExpr muExpr=(MTimesExpr)rExpr.getUpper();
-								aExpr1.setUpperBound(muExpr);
-								aExpr2.setUpperBound(muExpr);
-								if(rExpr.getLower() instanceof NameExpr)
-								{
-									NameExpr nExpr=(NameExpr)rExpr.getLower();
-									aExpr1.setLowerBound(nExpr);
-									aExpr2.setLowerBound(nExpr);
-								}
-								else if(rExpr.getLower() instanceof IntLiteralExpr)
-								{
-									IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
-									//lowerBound=iExprLower.getValue().getValue().intValue();
-									aExpr1.setLowerBound(iExprLower);									
-									aExpr2.setLowerBound(iExprLower);
-								}
-								else if(rExpr.getLower() instanceof PlusExpr)
-								{
-									PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(pLExpr);
-									aExpr2.setLowerBound(pLExpr);									
-								}	
-								else if(rExpr.getLower() instanceof MinusExpr)
-								{
-									MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
-									aExpr1.setLowerBound(mLExpr);
-									aExpr2.setLowerBound(mLExpr);
-								}
-								else if(rExpr.getLower() instanceof MTimesExpr)
-								{
-									MTimesExpr mulExpr=(MTimesExpr)rExpr.getLower();
-									aExpr1.setLowerBound(mulExpr);
-									aExpr2.setLowerBound(mulExpr);
-								}							
-							}//end of else if
-						}//end of 2nd if			 		  
-					}//end of 1st if
-			 }//end of for loop		
-		  }//end of setUpperAndLowerBounds function.
+								MTimesExpr mExpr=(MTimesExpr)rExpr.getLower();
+								aExpr1.setLowerBound(mExpr);
+								aExpr2.setLowerBound(mExpr);
+							}
+						}//end of else if
+						else if(rExpr.getUpper() instanceof MinusExpr)
+						{
+							System.out.println("I am a constraint bounded on both sides by variables");
+							MinusExpr mExpr=(MinusExpr)rExpr.getUpper();
+							aExpr1.setUpperBound(mExpr);
+							aExpr2.setUpperBound(mExpr);
+							if(rExpr.getLower() instanceof NameExpr)
+							{
+								NameExpr nExpr=(NameExpr)rExpr.getLower();
+								aExpr1.setLowerBound(nExpr);
+								aExpr2.setLowerBound(nExpr);
+							}
+							else if(rExpr.getLower() instanceof IntLiteralExpr)
+							{
+								IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
+								//lowerBound=iExprLower.getValue().getValue().intValue();
+								aExpr1.setLowerBound(iExprLower);									
+								aExpr2.setLowerBound(iExprLower);
+							}
+							else if(rExpr.getLower() instanceof PlusExpr)
+							{
+								PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(pLExpr);
+								aExpr2.setLowerBound(pLExpr);									
+							}	
+							else if(rExpr.getLower() instanceof MinusExpr)
+							{
+								MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(mLExpr);
+								aExpr2.setLowerBound(mLExpr);
+							}
+							else if(rExpr.getLower() instanceof MTimesExpr)
+							{
+								MTimesExpr muExpr=(MTimesExpr)rExpr.getLower();
+								aExpr1.setLowerBound(muExpr);
+								aExpr2.setLowerBound(muExpr);
+							}							
+						}//end of else if
+						else if(rExpr.getUpper() instanceof MTimesExpr)
+						{
+							System.out.println("I am a constraint bounded on both sides by variables");
+							MTimesExpr muExpr=(MTimesExpr)rExpr.getUpper();
+							aExpr1.setUpperBound(muExpr);
+							aExpr2.setUpperBound(muExpr);
+							if(rExpr.getLower() instanceof NameExpr)
+							{
+								NameExpr nExpr=(NameExpr)rExpr.getLower();
+								aExpr1.setLowerBound(nExpr);
+								aExpr2.setLowerBound(nExpr);
+							}
+							else if(rExpr.getLower() instanceof IntLiteralExpr)
+							{
+								IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
+								//lowerBound=iExprLower.getValue().getValue().intValue();
+								aExpr1.setLowerBound(iExprLower);									
+								aExpr2.setLowerBound(iExprLower);
+							}
+							else if(rExpr.getLower() instanceof PlusExpr)
+							{
+								PlusExpr pLExpr=(PlusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(pLExpr);
+								aExpr2.setLowerBound(pLExpr);									
+							}	
+							else if(rExpr.getLower() instanceof MinusExpr)
+							{
+								MinusExpr mLExpr=(MinusExpr)rExpr.getLower();
+								aExpr1.setLowerBound(mLExpr);
+								aExpr2.setLowerBound(mLExpr);
+							}
+							else if(rExpr.getLower() instanceof MTimesExpr)
+							{
+								MTimesExpr mulExpr=(MTimesExpr)rExpr.getLower();
+								aExpr1.setLowerBound(mulExpr);
+								aExpr2.setLowerBound(mulExpr);
+							}							
+						}//end of else if
+					}//end of 2nd if			 		  
+				}//end of 1st if
+			}//end of for loop		
+		}//end of setUpperAndLowerBounds function.
 
 
 }

@@ -77,7 +77,7 @@ public class DependenceAnalysisDriver {
 					  if(i==j)
 					  {
 						  System.out.println("i am in same statements block");
-						  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS());//compare LHS(sameStmt) with RHS(sameStmt)
+						  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS());//compare LHS(sameStmt) with RHS(sameStmt)						  
 						  if(aFlag){ApplyTests(cToolBox);}		  
 					   }//end of if
 					  else
@@ -114,13 +114,13 @@ public void ApplyTests(ConstraintsToolBox cToolBox)
 			ConstraintsGraph cGraph=cToolBox.getGraph();
 			gcdTest=new GCDTest();
 			gcdTest.calculateGcd(cGraph);
-			isSvpcApplicable=gcdTest.isSolution();
+			isSvpcApplicable=gcdTest.getIsSolution();
 			if(isSvpcApplicable)
 			{
 			   svpcTest=new SVPCTest();			 
-			   isSvpcApplicable= svpcTest.checkDependence(cGraph);			
+			   isAcyclicApplicable= svpcTest.checkDependence(cGraph);			
 			   System.out.println("i am in SVPC test");			
-			   if (isSvpcApplicable)
+			   if (!isAcyclicApplicable)
 			   {
 				System.out.println("Apply Acyclic test");
 				acyclicTest=new AcyclicTest();
@@ -129,7 +129,7 @@ public void ApplyTests(ConstraintsToolBox cToolBox)
 				if(isAcyclicApplicable)
 				{   System.out.println("now apply SVPC Test");
 					svpcTest.checkDependence(cGraph);
-				}//end of 4th if				
+				}//end of 4th if					
 			}//end of 3rd if
 		  }//end of 2nd if
 	 }//end of if 1st if
