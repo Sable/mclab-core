@@ -13,13 +13,13 @@ import natlab.ast.*;
  * containing node case, e.g. the for node, must deal with setting up
  * the correct currentInSet value.
  */
-public class AnalysisHelperVisitor extends AnalysisVisitor
+public class AnalysisHelper extends AbstractNodeCaseHandler
 {
 
     /** 
      * The analysis being helped
      */
-    private AbstractStructuralAnalysis helpee;
+    private StructuralAnalysis helpee;
 
     /**
      * Class contstructor
@@ -27,7 +27,7 @@ public class AnalysisHelperVisitor extends AnalysisVisitor
      * @param helpee  the analysis being helped
      * @param tree    the root of the tree being analyzed
      */
-    public AnalysisHelperVisitor( AbstractStructuralAnalysis helpee, ASTNode tree )
+    public AnalysisHelper( StructuralAnalysis helpee, ASTNode tree )
     {
         super( tree );
         this.helpee = helpee;

@@ -9,7 +9,7 @@ import java.util.*;
  * implementations of methods such as processBreaks and
  * caseBreakStmt.
  *
- * @see StructuralForwardAnalysis
+ * @see AbstractStructuralForwardAnalysis
  */
 public abstract class AbstractSimpleStructuralForwardAnalysis<A> extends AbstractStructuralForwardAnalysis<A>
 {

@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Abstract implementation of a structural analysis. 
  */
-public abstract class AbstractStructuralAnalysis<A> extends AnalysisVisitor
+public abstract class AbstractStructuralAnalysis<A> extends AbstractNodeCaseHandler implements StructuralAnalysis<A>
 {
 
     protected A currentOutSet;
@@ -26,18 +26,26 @@ public abstract class AbstractStructuralAnalysis<A> extends AnalysisVisitor
 
     }
 
+
+    public void caseRangeForStmt(ForStmt node)
+    {
+        caseForStmt(node);
+    }
+
+
+
     public void analyze()
     {
         //initialize currentOutSet
         currentOutSet = newInitialFlow();
         analyze( tree );
     }
-    public void analyze( ASTNode node )
+    protected void analyze( ASTNode node )
     {
         node.analyze( helper );
     }
-    protected abstract void merge(A in1, A in2, A out);
-    protected abstract void copy(A source, A dest);
+    public abstract void merge(A in1, A in2, A out);
+    public abstract void copy(A source, A dest);
 
     public A getCurrentOutSet()
     {
