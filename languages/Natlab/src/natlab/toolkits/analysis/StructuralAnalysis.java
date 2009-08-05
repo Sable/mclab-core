@@ -8,7 +8,20 @@ import java.util.*;
  */
 public interface StructuralAnalysis<A> extends NodeCaseHandler
 {
-    //public StructuralAnalysis(ASTNode tree);
+
+    /**
+     * Get the map of resulting out flow sets.
+     *
+     * @return Map of out flow sets.
+     */
+    public Map<ASTNode, A> getOutFlowSets();
+
+    /**
+     * Get the map of resulting in flow sets.
+     *
+     * @return Map of in flow sets.
+     */
+    public Map<ASTNode, A> getInFlowSets();
 
 
     /**

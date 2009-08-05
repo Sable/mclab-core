@@ -26,6 +26,13 @@ public abstract class AbstractStructuralAnalysis<A> extends AbstractNodeCaseHand
 
     }
 
+    public Map<ASTNode, A> getOutFlowSets(){
+        return outFlowSets;
+    }
+
+    public Map<ASTNode, A> getInFlowSets(){
+        return inFlowSets;
+    }
 
     public void caseRangeForStmt(ForStmt node)
     {
