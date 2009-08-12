@@ -78,6 +78,8 @@ public class TestClient
             try{Thread.currentThread().sleep(1000);}catch(Exception e){}
 
             
+            System.out.println("waiting for 5 secs");
+            try{Thread.currentThread().sleep(5000);}catch(Exception e){}
 
             System.out.println("sending shutdown");
             out.print(shutdown);
