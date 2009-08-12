@@ -1,0 +1,419 @@
+aspect AnalysisPrettyPrint {
+
+    syn String ASTNode.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    {
+        StringBuffer buf = new StringBuffer();
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(comment.value);
+            buf.append("\n");
+        }
+        buf.append( getAnalysisPrettyPrintedLessComments( analysis ) );
+        return buf.toString();
+    }
+
+    syn String ASTNode.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    {
+        //throw new UnsupportedOperationException( getClass().getName() + ".getAnalysisPrettyPrintedLessComments( analysis )");
+        return getPrettyPrintedLessComments();
+    }
+
+    eq CompilationUnits.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    {
+        StringBuffer buf = new StringBuffer();
+
+        boolean first = true;
+        for( Program p : getPrograms() ){
+            if( first )
+                first = false;
+            else
+                buf.append("\n\n");
+            
+            buf.append( p.getAnalysisPrettyPrinted( analysis ) );
+        }
+        return buf.toString();
+    }
+
+    //program
+    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        return "";
+    }
+      
+    // Variable Declaration
+    eq VariableDecl.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) = "%Declare " + getID();
+    
+    
+    // Script    
+    eq Script.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getAnalysisPrettyPrinted( analysis ));
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionList.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        for(Function func : getFunctions()) {
+            buf.append(func.getAnalysisPrettyPrinted( analysis ));
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionList.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(comment.value);
+            buf.append("\n");
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionDecl.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
+                
+        //collect all comments     
+        StringBuffer cbuf = new StringBuffer();
+         
+        for(beaver.Symbol comment : getComments()) {
+            cbuf.append(comment.value);
+            cbuf.append("\n");
+        }
+        if (cbuf.length() > 0) 
+        {
+          // insert the comments before "end"; length of end = 3
+          buf.insert(buf.length() - getIndent().length() - 3 , cbuf.toString() );
+        }
+        return buf.toString();
+    }
+    
+    eq Function.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "function ");
+        buf.append(" [");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getAnalysisPrettyPrinted( analysis ));
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getAnalysisPrettyPrinted( analysis ));
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getAnalysisPrettyPrinted( analysis ));
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getAnalysisPrettyPrinted( analysis ));
+            buf.append('\n');
+        }
+        buf.append(indent + "end");
+        return buf.toString();
+    }
+       
+    //help comments
+    
+    eq HelpComment.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) = getText();
+
+    //Stmts
+
+    eq Stmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append( getPrettyPrintedLessComments() );
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }
+        return buf.toString();
+    }
+    eq ForStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "for ");
+        String assignStmt = getAssignStmt().getAnalysisPrettyPrinted( analysis );
+        buf.append( assignStmt.trim() );   // remove all initial tabs
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        buf.append(indent + "end");
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }        
+        return buf.toString();
+    }
+
+    eq WhileStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "while ");
+        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        buf.append(indent + "end");
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }
+        return buf.toString();
+    }
+
+    // if-elseif-else
+    eq IfStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        boolean first = true;
+        for(IfBlock block : getIfBlocks()) {
+            if(!first) {
+                buf.append( indent + "else" );
+            }
+            buf.append(block.getAnalysisPrettyPrinted( analysis ));
+            first = false;
+        }
+        if(hasElseBlock()) {
+            buf.append(getElseBlock().getAnalysisPrettyPrinted( analysis ));
+        }
+        buf.append(indent + "end");
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }
+        return buf.toString();
+    }
+
+    eq IfBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "if ");
+        buf.append(getCondition().getAnalysisPrettyPrinted( analysis ));
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        return buf.toString();
+    }
+
+    eq ElseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "else ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        return buf.toString();
+    }
+/////////////////////////////////////////////
+    // switch-case
+    eq SwitchStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "switch ");
+        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append('\n');
+        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
+            buf.append(scase.getAnalysisPrettyPrinted( analysis ));
+        }
+        if(hasDefaultCaseBlock()) {
+            buf.append(getDefaultCaseBlock().getAnalysisPrettyPrinted( analysis ));
+        }
+        buf.append( indent + "end");
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }
+        return buf.toString();
+    }
+    eq SwitchCaseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "case ");
+        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        return buf.toString();
+    }
+    eq DefaultCaseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append(indent + "otherwise ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        return buf.toString();
+    }
+
+    // try-catch
+    eq TryStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+        StringBuffer buf = new StringBuffer();
+        String indent = getIndent();
+        buf.append( indent + "try ");
+        buf.append('\n');
+        for(Stmt stmt : getTryStmts()) {
+            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+        }
+        List<Stmt> catchList = getCatchStmts();
+        if (catchList.getNumChild()>0) {
+            buf.append( indent + "catch ");
+            buf.append('\n');        
+            for(Stmt stmt : catchList) {
+                String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            	buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
+            }
+        }
+        buf.append( indent + "end" );
+        natlab.toolkits.analysis.FlowSet in, out;
+        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
+        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        if( in != null && out != null ){
+            buf.append( indent + "% Data flow\n%\n" );
+            if( in != null ){
+                buf.append( indent + "% In set\n" );
+                Scanner inScanner = new Scanner( in.toString() );
+                while( inScanner.hasNextLine() )
+                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            if( out != null ){
+                buf.append( indent + "% Out set\n" );
+                Scanner outScanner = new Scanner( in.toString() );
+                while( outScanner.hasNextLine() )
+                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                buf.append( indent + "% \n" );
+            }
+            buf.append( indent + "% \n" );
+            buf.append( "\n" );
+        }
+        return buf.toString();
+    }
+}
