@@ -4,10 +4,32 @@ import natlab.ast.*;
 import java.util.*;
 
 /**
- * Interface for structural analysis. 
+ * Interface for structural analysis. Note: implementations should
+ * supply a standard constructor that takes in an ASTNode as argument.
  */
-public interface StructuralAnalysis<A> extends NodeCaseHandler
+public interface StructuralAnalysis<A extends FlowSet> extends NodeCaseHandler
 {
+
+    /**
+     * Executes the analysis.
+     */
+    public void analyze();
+
+    /**
+     * Get the AST on which the analysis is being performed.
+     *
+     * @return ASTNode on which the analysis is performed.
+     */
+    public ASTNode getTree();
+
+    /**
+     * Returns a boolean signifying whether or not the analysis has
+     * been performed on the given AST. This does not necessarily
+     * take into account changes to the AST.
+     *
+     * @return Whether or not the analysis has been performed.
+     */
+    public boolean isAnalyzed();
 
     /**
      * Get the map of resulting out flow sets.
@@ -22,17 +44,6 @@ public interface StructuralAnalysis<A> extends NodeCaseHandler
      * @return Map of in flow sets.
      */
     public Map<ASTNode, A> getInFlowSets();
-
-
-    /**
-     * A case for for loops that are known to loop over simple ranges.
-     */
-    public void caseRangeForStmt(ForStmt node);
-
-    /**
-     * Executes the analysis.
-     */
-    public void analyze();
 
     /**
      * Merge two flowSets into a third one.

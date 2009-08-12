@@ -8,12 +8,6 @@ import natlab.ast.*;
  */
 public abstract class AbstractNodeCaseHandler implements NodeCaseHandler
 {
-
-    protected ASTNode tree;
-    public AbstractNodeCaseHandler(ASTNode tree){
-        this.tree = tree;
-    }
-
     public abstract void caseASTNode(ASTNode node);
 
     public void caseProgram(Program node)
@@ -191,6 +185,10 @@ public abstract class AbstractNodeCaseHandler implements NodeCaseHandler
     public void caseForStmt(ForStmt node)
     {
         caseStmt(node);
+    }
+    public void caseRangeForStmt(ForStmt node)
+    {
+        caseForStmt(node);
     }
     public void caseWhileStmt(WhileStmt node)
     {

@@ -3,7 +3,7 @@ package natlab.toolkits.analysis;
 import natlab.ast.*;
 import java.util.*;
 
-public abstract class AbstractStructuralForwardAnalysis<A> extends AbstractStructuralAnalysis<A>
+public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralAnalysis<A>
 {
 
     public static boolean DEBUG = true;

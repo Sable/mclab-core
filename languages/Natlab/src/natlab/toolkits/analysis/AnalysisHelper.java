@@ -22,14 +22,12 @@ public class AnalysisHelper extends AbstractNodeCaseHandler
     private StructuralAnalysis helpee;
 
     /**
-     * Class contstructor
+     * Class constructor with given helpee.
      *
-     * @param helpee  the analysis being helped
-     * @param tree    the root of the tree being analyzed
+     * @param helpee  the analysis being helped.
      */
-    public AnalysisHelper( StructuralAnalysis helpee, ASTNode tree )
+    public AnalysisHelper( StructuralAnalysis helpee )
     {
-        super( tree );
         this.helpee = helpee;
     }
 

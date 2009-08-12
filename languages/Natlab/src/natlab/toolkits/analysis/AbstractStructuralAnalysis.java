@@ -6,24 +6,31 @@ import java.util.*;
 /**
  * Abstract implementation of a structural analysis. 
  */
-public abstract class AbstractStructuralAnalysis<A> extends AbstractNodeCaseHandler implements StructuralAnalysis<A>
+public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends AbstractNodeCaseHandler implements StructuralAnalysis<A>
 {
 
     protected A currentOutSet;
     protected A currentInSet;
     protected Map<ASTNode,A> outFlowSets, inFlowSets;
-    private AnalysisHelperVisitor helper;
+    protected ASTNode tree;
+    private AnalysisHelper helper;
+
+    protected boolean analyzed = false;
 
     public AbstractStructuralAnalysis(ASTNode tree){
-        super( tree );
+        this.tree = tree;
 
         //setup maps
         outFlowSets = new HashMap<ASTNode, A>();
         inFlowSets = new HashMap<ASTNode, A>();
 
         //setup helper visitor
-        helper = new AnalysisHelperVisitor( this, tree );
+        helper = new AnalysisHelper( this );
+    }
 
+    public ASTNode getTree()
+    {
+        return tree;
     }
 
     public Map<ASTNode, A> getOutFlowSets(){
@@ -34,18 +41,41 @@ public abstract class AbstractStructuralAnalysis<A> extends AbstractNodeCaseHand
         return inFlowSets;
     }
 
-    public void caseRangeForStmt(ForStmt node)
+    /**
+     * Returns a boolean signifying whether or not the analysis has
+     * been performed on a given AST. This does not take into account
+     * changes to the AST.
+     *
+     * @return Whether or not the analysis has been performed.
+     */
+    public boolean isAnalyzed()
     {
-        caseForStmt(node);
+        return analyzed;
     }
 
-
-
+    /**
+     * Perform the analysis on the entire AST. Also has the effect of
+     * setting the is analyzed status to true.
+     *
+     * Note, as of this time the analyzed status has no effect on
+     * whether or not the analysis is performed. This results in the
+     * analysis being able to be run multiple times on the same
+     * AST. This could be desirable if the AST has been modified in
+     * some way. If you wish to prevent the analysis from being
+     * performed you should check the is analyzed status with the
+     * isAnalyzed method. The is analyzed method does not however take
+     * into account any changes made to the AST since the status was
+     * changed. 
+     *
+     * @see isAnalyzed()
+     */
     public void analyze()
     {
         //initialize currentOutSet
         currentOutSet = newInitialFlow();
         analyze( tree );
+
+        analyzed = true;
     }
     protected void analyze( ASTNode node )
     {

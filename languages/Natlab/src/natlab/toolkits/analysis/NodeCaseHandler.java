@@ -53,6 +53,10 @@ public interface NodeCaseHandler
     public void caseReturnStmt(ReturnStmt node);
     public void caseEmptyStmt(EmptyStmt node);
     public void caseForStmt(ForStmt node);
+    /**
+     * A case for for loops that are known to loop over simple ranges.
+     */
+    public void caseRangeForStmt(ForStmt node);
     public void caseWhileStmt(WhileStmt node);
     public void caseTryStmt(TryStmt node);
     public void caseSwitchStmt(SwitchStmt node);

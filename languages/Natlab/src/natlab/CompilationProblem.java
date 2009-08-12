@@ -1,6 +1,6 @@
 package natlab;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Describes the position and nature of a problem encountered while compiling
@@ -57,7 +57,7 @@ public class CompilationProblem
         else
             return msg;
     }
-    static public String toStringAll(ArrayList errors){
+    static public String toStringAll(List errors){
     	String allErrors="";
     	for(int i=0;i==errors.size();i++){
     		allErrors += "/n"+errors.get(i).toString()+"/n";

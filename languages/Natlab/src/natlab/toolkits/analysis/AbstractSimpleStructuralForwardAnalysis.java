@@ -11,7 +11,7 @@ import java.util.*;
  *
  * @see AbstractStructuralForwardAnalysis
  */
-public abstract class AbstractSimpleStructuralForwardAnalysis<A> extends AbstractStructuralForwardAnalysis<A>
+public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralForwardAnalysis<A>
 {
 
     public AbstractSimpleStructuralForwardAnalysis(ASTNode tree){
