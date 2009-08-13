@@ -1,9 +1,8 @@
-for i = 1:1:10
-   for j=i:1:i+4
-     for k=j:1:i+2	
-	 a(i,j,k)=a(j+10,i-11,k);		 
-	 b(i)=b(i);
-     end	
-   end 	
-end
-
+for i = 2:2:10      
+          t = data(j-1);
+          data(j-1) = data(i-1);
+          data(i-1) = t;          
+          t = data(j);
+          data(j) = data(i);
+          data(i) = t;
+ end

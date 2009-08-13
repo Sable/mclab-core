@@ -108,15 +108,17 @@ public class DependenceAnalysisDriver {
 	 */
 public void ApplyTests(ConstraintsToolBox cToolBox)
 {
-		boolean isAcyclicApplicable,isSvpcApplicable=false;		
+		boolean isAcyclicApplicable,isApplicable=false;		
 		if(cToolBox.getGraph()!=null)
 		{
 			ConstraintsGraph cGraph=cToolBox.getGraph();
 			gcdTest=new GCDTest();
 			gcdTest.calculateGcd(cGraph);
-			isSvpcApplicable=gcdTest.getIsSolution();
-			if(isSvpcApplicable)
+			isApplicable=gcdTest.getIsSolution();
+			if(isApplicable)
 			{
+			   BanerjeeTest bTest=new BanerjeeTest(forStmtArray);
+			   bTest.directionVectorHierarchyDriver(cGraph);
 			   svpcTest=new SVPCTest();			 
 			   isAcyclicApplicable= svpcTest.checkDependence(cGraph);			
 			   System.out.println("i am in SVPC test");			

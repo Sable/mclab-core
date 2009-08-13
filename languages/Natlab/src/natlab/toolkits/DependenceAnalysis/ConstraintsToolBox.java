@@ -27,21 +27,17 @@ public class ConstraintsToolBox {
 	//private ForStmt forNode;
 	private Stmt fStmt;
 	private String dependencyFlag="No";
-	private ForStmt forStmtArray[]=new ForStmt[3];
+	private ForStmt forStmtArray[];
 	private static int loopIndex=0;
 	private static boolean resultArray[];
 	private ConstraintsGraph cGraph;
 	
 	public ConstraintsToolBox(int index,ForStmt fStmtArray[])
 	{
-		//fStmt=s;
-		//forStmtArray[loopIndex]=fNode;
 		cGraph=new ConstraintsGraph();
 		loopIndex=index;
-		forStmtArray=fStmtArray;
-		//checkArrayAccessAcrossStmts();
-
-		
+		forStmtArray=new ForStmt[index];
+		forStmtArray=fStmtArray;		
 	}
 	/*
 	 * This function does the following
@@ -188,12 +184,13 @@ public ConstraintsGraph getGraph()
 				 if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
 				 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
+						 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 						 aExpr1.setLoopVariable(nExpr.getVarName());
-						 aExpr2.setLoopVariable(nExpr.getVarName());
+						 aExpr2.setLoopVariable(pExpr.getLHS().getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);
 						 aExpr1.setIndexExpr(nExpr);
-						 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 //PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 						 aExpr2.setIndexExpr(pExpr.getLHS());
 						 aExpr2.setKey("t"+i);
 						 setUpperAndLowerBounds(aExpr1,aExpr2);
@@ -209,11 +206,12 @@ public ConstraintsGraph getGraph()
 					 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
 						 aExpr1.setLoopVariable(nExpr.getVarName());
-						 aExpr2.setLoopVariable(nExpr.getVarName());
+						 MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(mExpr.getLHS().getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(nExpr);
-						 MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 //MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(mExpr.getLHS());
 						 setUpperAndLowerBounds(aExpr1,aExpr2);
@@ -229,7 +227,8 @@ public ConstraintsGraph getGraph()
 					 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);						 
 						 aExpr1.setLoopVariable(nExpr.getVarName());
-						 aExpr2.setLoopVariable(nExpr.getVarName());
+						 NameExpr nExpr1=(NameExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(nExpr1.getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);
 						 aExpr1.setIndexExpr(nExpr);
@@ -243,12 +242,12 @@ public ConstraintsGraph getGraph()
 					 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr)
 					 {
 						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
-						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
-						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());						 
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(mExpr);
 						 MTimesExpr mExpr1=(MTimesExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(mExpr1.getRHS().getVarName());
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(mExpr1);
 						 setUpperAndLowerBounds(aExpr1,aExpr2);
@@ -264,12 +263,12 @@ public ConstraintsGraph getGraph()
 					 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
 					 {
 						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
-						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
-						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());						 
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(mExpr);
 						 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(pExpr.getLHS().getVarName());
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(pExpr.getLHS());
 						 //if(pExpr.getLHS() instanceof MTimesExpr)aExpr2.setIndexExpr((MTimesExpr)pExpr.getLHS());//for these equations 2i=2j+10
@@ -287,11 +286,11 @@ public ConstraintsGraph getGraph()
 					 {
 						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
 						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
-						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(mExpr);
 						 MinusExpr miExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(miExpr.getLHS().getVarName());
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(miExpr.getLHS());
 						 //if(miExpr.getLHS() instanceof MTimesExpr)aExpr2.setIndexExpr((MTimesExpr)miExpr.getLHS());//for these equations 2i=2j-10
@@ -309,11 +308,11 @@ public ConstraintsGraph getGraph()
 					 {
 						 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
 						 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());
-						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(mExpr);
 						 NameExpr nExpr=(NameExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(nExpr.getVarName());
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(nExpr);
 						 setUpperAndLowerBounds(aExpr1,aExpr2);
@@ -330,11 +329,11 @@ public ConstraintsGraph getGraph()
 					 {
 						 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
 						 aExpr1.setLoopVariable(nExpr.getVarName());
-						 aExpr2.setLoopVariable(nExpr.getVarName());
 						 aExpr1.setC(0);
 						 aExpr1.setKey("t"+i);			
 						 aExpr1.setIndexExpr(nExpr);
 						 MTimesExpr mExpr=(MTimesExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+						 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
 						 aExpr2.setKey("t"+i);
 						 aExpr2.setIndexExpr(mExpr);
 						 setUpperAndLowerBounds(aExpr1,aExpr2);						 				
