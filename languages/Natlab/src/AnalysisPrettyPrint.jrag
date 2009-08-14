@@ -161,7 +161,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
@@ -197,7 +197,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
@@ -233,7 +233,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
@@ -274,7 +274,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
@@ -338,7 +338,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
@@ -406,7 +406,7 @@ aspect AnalysisPrettyPrint {
             }
             if( out != null ){
                 buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( in.toString() );
+                Scanner outScanner = new Scanner( out.toString() );
                 while( outScanner.hasNextLine() )
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
