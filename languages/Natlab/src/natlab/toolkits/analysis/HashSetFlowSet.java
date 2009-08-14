@@ -28,7 +28,7 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
     /**
      * Clones the underlying HashSet
      */
-    public FlowSet<D> clone()
+    public HashSetFlowSet<D> clone()
     {
         HashSet<D> cloneSet = (HashSet<D>)set.clone();
         return new HashSetFlowSet( cloneSet );

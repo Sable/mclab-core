@@ -22,13 +22,13 @@ import java.util.*;
  */
 public abstract class AbstractFlowSet<D> implements FlowSet<D>
 {
-    public abstract FlowSet<D> clone();
+    public abstract AbstractFlowSet<D> clone();
     
     /**
      * implemented, but inefficient.
      */
-    public FlowSet<D> emptySet() {
-        FlowSet<D> t = clone();
+    public AbstractFlowSet<D> emptySet() {
+        AbstractFlowSet<D> t = clone();
         t.clear();
         return t;
     }
