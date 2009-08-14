@@ -131,10 +131,6 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         loopStack.pop();
     }
 
-    //shouldn't be here
-    protected abstract void setupBreaks();
-    protected abstract void setupContinues();
-
 
     public void caseWhileStmt(WhileStmt node)
     {
