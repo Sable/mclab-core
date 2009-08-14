@@ -122,4 +122,17 @@ using a the heartbeat signal.</long_desc>
       </long_desc>
     </boolopt>
   </section>
+   <section>
+     <name>Fortran Generator Options</name>
+     <boolopt>
+       <name>Generate Fortran</name>
+       <alias>f</alias>
+       <alias>fortran</alias>
+       <short_desc>Generates fortran code</short_desc>
+       <long_desc>
+         Run the fortran code generator to produce a fortran code
+         representation of the input sounce.
+       </long_desc>
+     </boolopt>
+   </section>
  </options>
