@@ -24,11 +24,14 @@ public class TestAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashSe
     
     @Override
     public void caseAssignStmt(AssignStmt node) {
+    	currentOutSet = new HashSetFlowSet<String>();
 		copy(currentInSet, currentOutSet);
-		for (String s : node.getLValues()){
-			currentOutSet.add(s);
-		}
-    }
+		currentOutSet.add(node.getLHS().getPrettyPrinted());
+		System.out.println(currentInSet);
+		System.out.println(currentOutSet);
+		outFlowSets.put(node, currentOutSet);
+		inFlowSets.put(node, currentInSet);
+    }    
     
     
 	@Override
@@ -53,7 +56,7 @@ public class TestAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashSe
 
 	@Override
 	public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest) {
-		currentInSet.copy(currentOutSet);
+		source.copy(dest);
 	}
 
 	@Override

@@ -34,11 +34,11 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     }
     
     public void copy(FlowSet<? super D> dest) {
-        List<D> elements = toList();
-        Iterator<D> it = elements.iterator();
+    	if (this == dest) return;
         dest.clear();
-        while (it.hasNext())
-            dest.add(it.next());
+        for (D element : toList()){
+        	dest.add(element);
+        }
     }
     
     /**
