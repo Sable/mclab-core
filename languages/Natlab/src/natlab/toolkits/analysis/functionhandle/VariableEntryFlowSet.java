@@ -25,4 +25,13 @@ public class VariableEntryFlowSet extends HashSetFlowSet<VariableEntry> {
 			set.add(obj);			
 		}
 	}
+	
+	/**
+	 * remove existing instance, and add the new object
+	 */
+	public void addNew(VariableEntry obj){
+		set.remove(obj);
+		set.add(obj);		
+	}
+	
 }
