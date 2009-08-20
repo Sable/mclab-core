@@ -10,7 +10,7 @@ import natlab.toolkits.analysis.*;
 public class TestAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> {
 
 	public static void main(String[] args) throws Exception {
-		String source = "/home/2005/adubra/McLab/matlabtests/test.m";
+		String source = "D:/Classes/McLab/matlabfiddle/small/test2.m";
 		FlowAnalysisTestTool tool = new FlowAnalysisTestTool(source,TestAnalysis.class);
 		System.out.println(tool.run());
 	}
