@@ -27,6 +27,16 @@ public class VariableEntry {
 	}
 	
 	/**
+	 * creates a variable which is assinged a reference
+	 */
+	public VariableEntry(String name,FunctionReference ref){
+		this.name = name;
+		references.add(ref);	
+		assignedFunction = true;
+	}
+	
+	
+	/**
 	 * creates a variable that is either a value or unassigned, based on te argument
 	 */
 	public VariableEntry(String name,boolean assignedValue){

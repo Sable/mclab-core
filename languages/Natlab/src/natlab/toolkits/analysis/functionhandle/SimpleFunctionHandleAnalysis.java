@@ -25,13 +25,18 @@ public class SimpleFunctionHandleAnalysis extends
 		copy(currentInSet, currentOutSet);
 		//find the new variable entry
 		String name = node.getLHS().getPrettyPrinted();
-				
-		VariableEntry var = new VariableEntry(name);
-
-		
-		
-		currentOutSet.addNew(var);
-		
+		Expr expr = node.getRHS();
+		VariableEntry var;
+		if (expr instanceof LambdaExpr){
+			System.out.println("found lambda!");
+			var = new VariableEntry(name,new FunctionReference((LambdaExpr)expr));
+			currentOutSet.addNew(var);
+		}
+		if (expr instanceof FunctionHandleExpr){
+			System.out.println("found fhandle!");
+			var = new VariableEntry(name,new FunctionReference((FunctionHandleExpr)expr));
+			currentOutSet.addNew(var);
+		}
 		
 		//end of find new var entry
 		System.out.println(currentInSet);
