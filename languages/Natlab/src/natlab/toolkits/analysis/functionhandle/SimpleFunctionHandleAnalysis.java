@@ -7,9 +7,9 @@ import natlab.toolkits.analysis.*;
 public class SimpleFunctionHandleAnalysis extends
 		AbstractSimpleStructuralForwardAnalysis<VariableEntryFlowSet> {
 	
-	void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 		String source = "D:/Classes/McLab/matlabfiddle/small/test2.m";
-		FlowAnalysisTestTool tool = new FlowAnalysisTestTool(source,TestAnalysis.class);
+		FlowAnalysisTestTool tool = new FlowAnalysisTestTool(source,SimpleFunctionHandleAnalysis.class);
 		System.out.println(tool.run());
 	}
 	
@@ -36,6 +36,7 @@ public class SimpleFunctionHandleAnalysis extends
 		//end of find new var entry
 		System.out.println(currentInSet);
 		System.out.println(currentOutSet);
+		System.out.println("bla");
 		outFlowSets.put(node, currentOutSet);
 		inFlowSets.put(node, currentInSet);
     }    

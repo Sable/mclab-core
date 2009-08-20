@@ -28,6 +28,7 @@ public class TestAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashSe
 		copy(currentInSet, currentOutSet);
 		currentOutSet.add(node.getLHS().getPrettyPrinted());
 		System.out.println(currentInSet);
+		System.out.println("bla 2");
 		System.out.println(currentOutSet);
 		outFlowSets.put(node, currentOutSet);
 		inFlowSets.put(node, currentInSet);
