@@ -14,6 +14,7 @@ import natlab.ast.NameExpr;
  * Date:10 Aug,2009
  * BanerjeeTest class calculates the direction vector for a dependence relation. 
  * TODO:I have to handle case where N<0(loop is decrementing).Currently,assumption is that N>0.
+ * Currently,this test works for array subscript expressions involving two loop variables.
  */
 public class BanerjeeTest {
 	
@@ -43,57 +44,64 @@ public class BanerjeeTest {
 	 */
 	public void directionVectorHierarchyDriver(ConstraintsGraph cGraph)
 	{
-		int gSize=cGraph.getGraphSize();
-		LBArray1=new int[gSize*2];
-		UBArray1=new int[gSize*2];
-		int counter=0;
-		boolean dependenceFlag=false;
-		AffineExpression aExpr1=null,aExpr2=null,tExpr=null;		
-		Map cMap=cGraph.getGraphData();
-		//Get Map in Set interface to get key and value
-		Set s=cMap.entrySet();		
-	    //Move next key and value of Map by iterator
-        Iterator it=s.iterator();      
-        while(it.hasNext())
-        {   // key=value separator this by Map.Entry to get key and value
-        	Map.Entry m =(Map.Entry)it.next();        	
-        	String key=(String)m.getKey();      
-            ConstraintsList cList1=(ConstraintsList)m.getValue();
-            if(cList1.getListNode()!=null)
-            {    aExpr1=cList1.getListNode().getData();    
-            	 tExpr=aExpr1; 	
-                 if(cList1.getListNode().getNext()!=null)
-                 {   aExpr2=cList1.getListNode().getNext().getData();
-                	 dependenceFlag=testDependenceInAllDirections(aExpr1,aExpr2);
-                	 if(dependenceFlag)
-                	 {
-                		 boolean lFlag=testDependenceInLessAndAllDirections(aExpr1,aExpr2);
-                		 if(lFlag)
-                		 {//then expand the hierarchy}
-                			 testDependenceInLessAndLessDirections(aExpr1,aExpr2);
-                			 testDependenceInLessAndEqualDirections(aExpr1,aExpr2);
-                			 testDependenceInLessAndGreaterDirections(aExpr1,aExpr2);
-                		 }
-                		 boolean gFlag=testDependenceInGreaterAndAllDirections(aExpr1,aExpr2);
-                		 if(gFlag)
-                		 {//then expand the hierarchy}
-                			 testDependenceInGreaterAndGreaterDirections(aExpr1,aExpr2);
-                			 testDependenceInGreaterAndLessDirections(aExpr1,aExpr2);
-                			 testDependenceInGreaterAndEqualDirections(aExpr1,aExpr2);
-                		 }                			 
-                		 boolean eFlag=testDependenceInEqualAndAllDirections(aExpr1,aExpr2);
-                		 if(eFlag)
-                		 {//then expand the hierarchy}
-                			 testDependenceInEqualAndEqualDirections(aExpr1,aExpr2);
-                			 testDependenceInEqualAndLessDirections(aExpr1,aExpr2);
-                			 testDependenceInEqualAndGreaterDirections(aExpr1,aExpr2);
-                		 } 		 
-                	 }//end of 3rd if
-                 }//end of 2nd if
-            }//end of 1st if
+	  int gSize=cGraph.getGraphSize();
+	  LBArray1=new int[gSize*2];
+	  UBArray1=new int[gSize*2];
+	  //int counter=0;
+	  boolean dependenceFlag=false;
+	  AffineExpression aExpr1=null,aExpr2=null,tExpr=null;		
+	  Map cMap=cGraph.getGraphData();
+	  //Get Map in Set interface to get key and value
+	  Set s=cMap.entrySet();		
+	  //Move next key and value of Map by iterator
+      Iterator it=s.iterator();      
+      while(it.hasNext())
+       {   // key=value separator this by Map.Entry to get key and value
+          Map.Entry m =(Map.Entry)it.next();        	
+          String key=(String)m.getKey();      
+          ConstraintsList cList1=(ConstraintsList)m.getValue();
+          if(cList1.getListNode()!=null)
+          { 
+        	aExpr1=cList1.getListNode().getData();    
+            tExpr=aExpr1; 	
+            if(cList1.getListNode().getNext()!=null)
+             { 
+            	aExpr2=cList1.getListNode().getNext().getData();
+                dependenceFlag=testDependenceInAllDirections(aExpr1,aExpr2);
+                if(dependenceFlag)
+                 {
+                    boolean lFlag=testDependenceInLessAndAllDirections(aExpr1,aExpr2);
+                	if(lFlag)
+                	{
+                	  testDependenceInLessAndLessDirections(aExpr1,aExpr2);
+                	  testDependenceInLessAndEqualDirections(aExpr1,aExpr2);
+                	  testDependenceInLessAndGreaterDirections(aExpr1,aExpr2);
+                	}//end of if
+                    boolean gFlag=testDependenceInGreaterAndAllDirections(aExpr1,aExpr2);
+                	if(gFlag)
+                	{
+                	   testDependenceInGreaterAndGreaterDirections(aExpr1,aExpr2);
+                	   testDependenceInGreaterAndLessDirections(aExpr1,aExpr2);
+                	   testDependenceInGreaterAndEqualDirections(aExpr1,aExpr2);
+                     }//end of if                 			 
+                     boolean eFlag=testDependenceInEqualAndAllDirections(aExpr1,aExpr2);
+                	 if(eFlag)
+                	 {//then expand the hierarchy}
+                	    testDependenceInEqualAndEqualDirections(aExpr1,aExpr2);
+                		testDependenceInEqualAndLessDirections(aExpr1,aExpr2);
+                		testDependenceInEqualAndGreaterDirections(aExpr1,aExpr2);                		 		 
+                	 }//end of  if
+                 }//end of 3rd if
+            }//end of 2nd if
+          }//end of 1st if
         }//end of while
-	}//end of function directionVectorHierarchyDriver.
+      }//end of function directionVectorHierarchyDriver.
 	
+	/*
+	 * This function calculates the direction vector in (*,*) and uses following equation
+	 *  LB< = (A- - B+)*(U-L)+(A-B)L
+	 *  UB< = (A+ - B-)*(U-L)+(A-B)L
+	 */
 	public boolean testDependenceInAllDirections(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
 		AffineExpression tExpr=aExpr1;
@@ -295,19 +303,34 @@ public class BanerjeeTest {
 	}
 	
 	public boolean testDependenceInLessAndAllDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		
-		return true;
-	}
+	{	
+		calculateDependenceInLessDirection(aExpr1,aExpr2);
+	    int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+	    lSum=LBArray2[0];
+	    uSum=LBArray2[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray1[i];
+	    	uSum+=UBArray1[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}//end of function.
+	
 	/*
 	 * This function calculates dependence in less Direction.It uses following equations for LB and UB.
 	 * LB< = (A- - B)-(U-L-N)+(A-B)L-BN
 	 * UB< = (A+ - B)+(U-L-N)+(A-B)L-BN 
 	 */
-	private boolean calculateDependenceInLessDirection(AffineExpression aExpr1,AffineExpression aExpr2)
+	private void calculateDependenceInLessDirection(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
 		AffineExpression tExpr=aExpr1;
-		boolean dependenceFlag=false;
+		//boolean dependenceFlag=false;
 		determineLoopVariablesInAConstraint(aExpr1,aExpr2);
 	    if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
 	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
@@ -345,9 +368,9 @@ public class BanerjeeTest {
 		                   UBArray1[i]=UBArray1[i]-(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()*N);
 		                   tExpr=aExpr2;
 	                    }//end of for loop
-	                   	dependenceFlag=testDependence(aExpr1,aExpr2);
-	                   	if(dependenceFlag)return true;
-	                   	else return dependenceFlag;
+	                   	//dependenceFlag=testDependence(aExpr1,aExpr2);
+	                   	//if(dependenceFlag)return true;
+	                   	//else return dependenceFlag;
 	                  }//end of 2nd if                 	
 	         }//end of 1st if
 	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
@@ -380,9 +403,9 @@ public class BanerjeeTest {
 		                   UBArray1[i]=UBArray1[i]-(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()*N);
 		                   tExpr=aExpr2;
 	                    }//end of for loop
-	                   	dependenceFlag=testDependence(aExpr1,aExpr2);
-	                   	if(dependenceFlag)return true;
-	                   	else return dependenceFlag;
+	                   	//dependenceFlag=testDependence(aExpr1,aExpr2);
+	                   	//if(dependenceFlag)return true;
+	                   	//else return dependenceFlag;
 	                }//end of 2nd if                 	
 	         }//end of else if                  
 	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
@@ -401,9 +424,9 @@ public class BanerjeeTest {
 		                   UBArray1[i]=UBArray1[i]-(1*N);
 		                   tExpr=aExpr2;
 	               }//end of for loop
-	            dependenceFlag=testDependence(aExpr1,aExpr2);
-	            if(dependenceFlag)return true;
-	            else return dependenceFlag;
+	            //dependenceFlag=testDependence(aExpr1,aExpr2);
+	            //if(dependenceFlag)return true;
+	            //else return dependenceFlag;
 	        }//end of else if
 	    else if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
 	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
@@ -440,13 +463,14 @@ public class BanerjeeTest {
 		                   UBArray1[i]=UBArray1[i]-(1*N);
 		                   tExpr=aExpr2;
 	                    }//end of for loop
-	                   	dependenceFlag=testDependence(aExpr1,aExpr2);
-	                   	if(dependenceFlag)return true;
-	                   	else return dependenceFlag;
+	              //     	dependenceFlag=testDependence(aExpr1,aExpr2);
+	                //   	if(dependenceFlag)return true;
+	                  // 	else return dependenceFlag;
 	               }//end of if                 	
 	         }//end of else if
-	    return false;	
+	//    return false;	
 	}
+	
 	/*
 	 * This function determines the increment in loop and assigns it to variable N.
 	 */
@@ -468,47 +492,487 @@ public class BanerjeeTest {
    }//end of function call.
 	public boolean testDependenceInEqualAndAllDirections(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
-		return true;
-	}
-	public boolean testDependenceInGreaterAndAllDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+		calculateDependenceInEqualDirection(aExpr1,aExpr2);
+	    int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+	    lSum=LBArray3[0];
+	    uSum=LBArray3[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray1[i];
+	    	uSum+=UBArray1[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}//end of function call.
+	
+	/*
+	 * This function calculates dependence in less Direction.It uses following equations for LB and UB.
+	 * LB= = (A- B)-(U-L)+(A-B)L
+	 * UB= = (A- B)+(U-L)+(A-B)L 
+	 */
+	private void calculateDependenceInEqualDirection(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
-		return true;
-	}
+		AffineExpression tExpr=aExpr1;		
+		determineLoopVariablesInAConstraint(aExpr1,aExpr2);
+	    if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
+	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
+	          MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+	          if(mExpr1.getLHS() instanceof IntLiteralExpr && mExpr2.getLHS() instanceof IntLiteralExpr)
+	            {   
+	        	  for(int i=0;i<nLoopVariables;i++)	            
+	               {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                   //determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		               LBArray3[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		               //determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		               LBArray3[i]-=((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue();
+		               if(LBArray3[i] < 0){determineRealNumSign(true,LBArray3[i]);LBArray3[i]=A*-1;}
+	                   else if(LBArray3[i] > 0) {determineRealNumSign(false,LBArray3[i]);LBArray3[i]=A;}
+		               determineLoopBounds(tExpr);
+		               LBArray3[i]=LBArray3[i]*(U-L);
+		               int temp=(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue() - ((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+		               temp=temp*L;
+		               LBArray3[i]=LBArray3[i]+temp;
+		               //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.
+		               UBArray3[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		               //determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		               UBArray3[i]-=((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue();
+		               if(LBArray3[i] < 0){determineRealNumSign(true,LBArray3[i]);LBArray3[i]=A*-1;}
+	                   else if(LBArray3[i] > 0) {determineRealNumSign(false,LBArray3[i]);LBArray3[i]=A;}
+
+		               UBArray3[i]=UBArray3[i]*(U-L);                    	 
+		               UBArray3[i]=UBArray3[i]+temp;
+		               tExpr=aExpr2;
+	                  }//end of for loop
+	                   	//dependenceFlag=testDependence(aExpr1,aExpr2);
+	                   	//if(dependenceFlag)return true;
+	                   	//else return dependenceFlag;
+	               }//end of 2nd if                 	
+	         }//end of 1st if
+	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
+	      {   NameExpr mExpr1=(NameExpr)aExpr1.getIndexExpr();
+	          MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+	          if(mExpr2.getLHS() instanceof IntLiteralExpr)
+	            {   
+	        	  for(int i=0;i<nLoopVariables;i++)	            
+	               {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                    LBArray3[i]=1;
+		                //determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                LBArray3[i]-=((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue();
+		                if(LBArray3[i] < 0){determineRealNumSign(true,LBArray3[i]);LBArray3[i]=A*-1;}
+		                else if(LBArray3[i] > 0) {determineRealNumSign(false,LBArray3[i]);LBArray3[i]=A;}
+
+		                determineLoopBounds(tExpr);
+		                LBArray3[i]=LBArray3[i]*(U-L);
+		                int temp=(1- ((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+		                temp=temp*L;
+		                LBArray3[i]=LBArray3[i]+temp;
+		                   //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.
+		                   //determineRealNumSign(true,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                UBArray3[i]=1;
+		                //determineRealNumSign(false,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                UBArray3[i]-=((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue();
+		                if(UBArray3[i] < 0){determineRealNumSign(true,UBArray3[i]);UBArray3[i]=A*-1;}
+		                else if(UBArray3[i] > 0) {determineRealNumSign(false,UBArray3[i]);UBArray3[i]=A;}
+
+		                UBArray3[i]=UBArray3[i]*(U-L);                    	 
+		                UBArray3[i]=UBArray3[i]+temp;
+		                tExpr=aExpr2;
+	                    }//end of for loop	                   	
+	                }//end of 2nd if                 	
+	         }//end of else if                  
+	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
+	      {   NameExpr mExpr1=(NameExpr)aExpr1.getIndexExpr();
+	          NameExpr mExpr2=(NameExpr)aExpr2.getIndexExpr();	           
+	          for(int i=0;i<nLoopVariables;i++)
+	            {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                //determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+	            	//for NameExpr A=1,since A- > 0  is 0;
+		                LBArray3[i]=0;		                
+		                UBArray3[i]=0;          
+		                tExpr=aExpr2;
+	            }//end of for loop	           
+	        }//end of else if
+	    else if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
+	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
+	          NameExpr mExpr2=(NameExpr)aExpr2.getIndexExpr();
+	          if(mExpr1.getLHS() instanceof IntLiteralExpr)
+	            {   for(int i=0;i<nLoopVariables;i++)
+	                  {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	            		//determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                   LBArray3[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		                   //determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   LBArray3[i]-=1;
+		                   if(LBArray3[i] < 0){determineRealNumSign(true,LBArray3[i]);LBArray3[i]=A*-1;}
+		                   else if(LBArray3[i] > 0) {determineRealNumSign(false,LBArray3[i]);LBArray3[i]=A;}
+		                   determineLoopBounds(tExpr);
+		                   LBArray3[i]=LBArray3[i]*(U-L);
+		                   int temp=(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue() - 1);
+		                   temp=temp*L;
+		                   LBArray3[i]=LBArray3[i]+temp;
+		                   
+		                  //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.		                   
+		                   UBArray3[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		                   //determineRealNumSign(false,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   UBArray3[i]-=1;
+		                   if(UBArray3[i] < 0){determineRealNumSign(true,UBArray3[i]);UBArray3[i]=A*-1;}
+		                   else if(UBArray3[i] > 0) {determineRealNumSign(false,UBArray3[i]);UBArray3[i]=A;}
+		                   UBArray3[i]=UBArray3[i]*(U-L);                    	 
+		                   UBArray3[i]=UBArray3[i]+temp;
+		                   tExpr=aExpr2;
+	                    }//end of for loop
+	            }//end of if                 	
+	       }//end of else if    		
+	}//end of function call.
+
+	public boolean testDependenceInGreaterAndAllDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{		
+		calculateDependenceInGreaterDirection(aExpr1,aExpr2);
+	    int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+	    lSum=LBArray4[0];
+	    uSum=LBArray4[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray1[i];
+	    	uSum+=UBArray1[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}//end of function call.
+	
+	/*
+	 * This function calculates dependence in less Direction.It uses following equations for LB and UB.
+	 * LB< = (A - B+)-(U-L-N)+(A-B)L-AN
+	 * UB< = (A - B-)+(U-L-N)+(A-B)L-AN
+	 *  
+	 */
+	private void calculateDependenceInGreaterDirection(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		AffineExpression tExpr=aExpr1;
+		//boolean dependenceFlag=false;
+		determineLoopVariablesInAConstraint(aExpr1,aExpr2);
+	    if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
+	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
+	          MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+	          if(mExpr1.getLHS() instanceof IntLiteralExpr && mExpr2.getLHS() instanceof IntLiteralExpr)
+	            {   
+	            	 for(int i=0;i<nLoopVariables;i++)
+	                  {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                      //determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                   LBArray4[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		                   determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   LBArray4[i]-=A;
+		                   if(LBArray4[i] < 0){determineRealNumSign(true,LBArray4[i]);LBArray4[i]=A*-1;}
+		                   else if(LBArray4[i] > 0) {determineRealNumSign(false,LBArray4[i]);LBArray4[i]=A;}
+		                   determineLoopBounds(tExpr);
+		                   determineLoopIncrement(tExpr);
+		                   LBArray4[i]=LBArray4[i]*(U-L-N);
+		                   int temp=(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue() - ((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+		                   temp=temp*L;
+		                   LBArray4[i]=LBArray4[i]+temp;
+		                   LBArray4[i]=LBArray4[i]+(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()*N);
+		                   
+		                  //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.
+		                   //determineRealNumSign(true,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                   UBArray4[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		                   determineRealNumSign(false,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   UBArray4[i]-=((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue();
+		                   if(UBArray4[i] < 0){
+		                	   determineRealNumSign(false,UBArray4[i]);
+		                	   UBArray4[i]=A*-1;
+		                   }
+		                   else if(UBArray4[i] > 0){determineRealNumSign(true,UBArray4[i]);UBArray4[i]=A;}
+		                   UBArray4[i]=UBArray4[i]*(U-L-N);                    	 
+		                   UBArray4[i]=UBArray4[i]+temp;
+		                   UBArray4[i]=UBArray4[i]+(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()*N);
+		                   tExpr=aExpr2;
+	                    }//end of for loop
+	                 }//end of 2nd if                 	
+	            }//end of 1st if
+	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof MTimesExpr))
+	      {   NameExpr mExpr1=(NameExpr)aExpr1.getIndexExpr();
+	          MTimesExpr mExpr2=(MTimesExpr)aExpr2.getIndexExpr();
+	          if(mExpr2.getLHS() instanceof IntLiteralExpr)
+	            {   
+	            	 for(int i=0;i<nLoopVariables;i++)
+	                  {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                      //determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+	            		   //for NameExpr A=1,since A- > 0  is 0;
+		                   LBArray4[i]=1;
+		                   determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   LBArray4[i]-=A;		                   
+		                   if(LBArray4[i] < 0){determineRealNumSign(true,LBArray4[i]);LBArray4[i]=A*-1;}
+		                   else if(LBArray4[i] > 0) {determineRealNumSign(false,LBArray4[i]);LBArray4[i]=A;}
+		                   determineLoopBounds(tExpr);
+		                   determineLoopIncrement(tExpr);
+		                   LBArray4[i]=LBArray4[i]*(U-L-N);
+		                   int temp=(1 - ((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+		                   temp=temp*L;
+		                   LBArray4[i]=LBArray4[i]+temp;
+		                   LBArray4[i]=LBArray4[i]+N;
+		                   
+		                   //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.
+		                   UBArray4[i]=1;
+		                   determineRealNumSign(false,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   UBArray4[i]-=A;
+		                   if(UBArray4[i] < 0){determineRealNumSign(true,UBArray4[i]);UBArray4[i]=A*-1;}
+		                   else if(UBArray4[i] > 0) {determineRealNumSign(false,UBArray4[i]);UBArray4[i]=A;}
+		                   UBArray4[i]=UBArray4[i]*(U-L-N);                    	 
+		                   UBArray4[i]=UBArray4[i]+temp;
+		                   UBArray4[i]=UBArray4[i]+N;
+		                   tExpr=aExpr2;
+	                    }//end of for loop	                   	
+	                }//end of 2nd if                 	
+	            }//end of else if                 
+	    else if((aExpr1.getIndexExpr() instanceof NameExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
+	      {   NameExpr mExpr1=(NameExpr)aExpr1.getIndexExpr();
+	          NameExpr mExpr2=(NameExpr)aExpr2.getIndexExpr();	           
+	          for(int i=0;i<nLoopVariables;i++)
+	            {   
+	        	    //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.	                    
+	            	 //for NameExpr A=1,since A- > 0  is 0;
+		             determineLoopIncrement(tExpr);
+		             LBArray4[i]=N;
+		             //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.		                   
+		             UBArray4[i]=N;
+		             tExpr=aExpr2;       	        
+	             }//end of for loop
+	         }//end of else if
+	    else if((aExpr1.getIndexExpr() instanceof MTimesExpr) && (aExpr2.getIndexExpr() instanceof NameExpr))
+	      {   MTimesExpr mExpr1=(MTimesExpr)aExpr1.getIndexExpr();
+	          NameExpr mExpr2=(NameExpr)aExpr2.getIndexExpr();
+	          if(mExpr1.getLHS() instanceof IntLiteralExpr)
+	            {   for(int i=0;i<nLoopVariables;i++)
+	                  {   //This calculates the Lower Bound of direction vector for the no of loop variables involved in a constraint.
+	                      //determineRealNumSign(false,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                   LBArray4[i]=((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue();
+		                   //determineRealNumSign(true,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   LBArray4[i]-=1;
+		                   if(LBArray4[i] < 0){determineRealNumSign(true,LBArray4[i]);LBArray4[i]=A*-1;}
+		                   else if(LBArray4[i] > 0) {determineRealNumSign(false,LBArray4[i]);LBArray4[i]=A;}
+		                   determineLoopBounds(tExpr);
+		                   determineLoopIncrement(tExpr);
+		                   LBArray4[i]=LBArray4[i]*(U-L-N);
+		                   int temp=(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue() - 1);
+		                   temp=temp*L;
+		                   LBArray4[i]=LBArray4[i]+temp;
+		                   LBArray4[i]=LBArray4[i]+(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()*N);
+		                   
+		                  //This calculates the Upper Bound of direction vector for the no of loop variables involved in a constraint.
+		                   determineRealNumSign(true,((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of negative part of real no. A-
+		                   UBArray4[i]=A;
+		                   //determineRealNumSign(false,((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue()); //flag is set to false to determine the value of positive part of real no. B+
+		                   UBArray4[i]-=1;
+		                   if(UBArray4[i] < 0){
+		                	   determineRealNumSign(false,UBArray4[i]);
+		                	   UBArray4[i]=A*-1;
+		                   }
+		                   else if(UBArray4[i] > 0){determineRealNumSign(true,UBArray4[i]);UBArray4[i]=A;}
+		                   UBArray4[i]=UBArray4[i]*(U-L-N);                    	 
+		                   UBArray4[i]=UBArray4[i]+temp;
+		                   UBArray4[i]=UBArray4[i]+(A*N);
+		                   tExpr=aExpr2;
+	                    }//end of for loop	             
+	               }//end of if                 	
+	         }//end of else if
+ }
+	/*
+	 * This function calculates (<,<) direction vector for an array access.
+	 */
 	public boolean testDependenceInLessAndLessDirections(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
-		return true;
-	}
-	public boolean testDependenceInLessAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInLessAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInEqualAndLessDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInEqualAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInEqualAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInGreaterAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInGreaterAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
-	}
-	public boolean testDependenceInGreaterAndLessDirections(AffineExpression aExpr1,AffineExpression aExpr2)
-	{
-		return true;
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;	    
+	    for(int i=0;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray2[i];
+	    	uSum+=UBArray2[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
 	}
 	
-}
+	/*
+	 * This function calculates (<,=) direction vector for an array access.
+	 */
+	public boolean testDependenceInLessAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+		lSum=LBArray2[0];
+		uSum=UBArray2[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray3[i];
+	    	uSum+=UBArray3[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	
+	/*
+	 * This function calculates (<,>) direction vector for an array access.
+	 */
+	public boolean testDependenceInLessAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+		lSum=LBArray2[0];
+		uSum=UBArray2[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray4[i];
+	    	uSum+=UBArray4[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	
+	/*
+	 * This function calculates (=,<) direction vector for an array access.
+	 */
+	public boolean testDependenceInEqualAndLessDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+		lSum=LBArray3[0];
+		uSum=UBArray3[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray2[i];
+	    	uSum+=UBArray2[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	/*
+	 * This function calculates (=,=) direction vector for an array access.
+	 */
+	public boolean testDependenceInEqualAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+		//lSum=LBArray2[0];
+		//uSum=UBArray2[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray3[i];
+	    	uSum+=UBArray3[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	/*
+	 * This function calculates (=,>) direction vector for an array access.
+	 */
+	public boolean testDependenceInEqualAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;
+		lSum=LBArray2[0];
+		uSum=UBArray2[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray4[i];
+	    	uSum+=UBArray4[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	/*
+	 * This function calculates (>,>) direction vector for an array access.
+	 */
+	public boolean testDependenceInGreaterAndGreaterDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;	
+	    for(int i=0;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray4[i];
+	    	uSum+=UBArray4[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;		
+	}
+	/*
+	 * This function calculates (>,=) direction vector for an array access.
+	 */
+	public boolean testDependenceInGreaterAndEqualDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;	
+		lSum=LBArray4[0];
+		uSum=UBArray4[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray3[i];
+	    	uSum+=UBArray3[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	
+	/*
+	 * This function calculates (>,<) direction vector for an array access.
+	 */
+	public boolean testDependenceInGreaterAndLessDirections(AffineExpression aExpr1,AffineExpression aExpr2)
+	{
+		int lSum=0,uSum=0;
+	    int b,a;
+		b=aExpr2.getC();
+		a=aExpr1.getC();
+		int result=b-a;	
+		lSum=LBArray4[0];
+		uSum=UBArray4[0];
+	    for(int i=1;i<nLoopVariables;i++)
+	    {
+	    	lSum+=LBArray2[i];
+	    	uSum+=UBArray2[i];
+	    }
+	    if(lSum > result || result > uSum)return false;
+		else if ((lSum < result) ||(lSum== result)  && (result < uSum) || (result==uSum))return true;
+		return false;
+	}
+	
+}//end of class.
