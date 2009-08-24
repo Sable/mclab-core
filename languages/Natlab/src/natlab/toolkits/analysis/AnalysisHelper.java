@@ -4,7 +4,7 @@ import natlab.ast.*;
 
 /**
  * An analysis helper used to hide some of the details of the
- * analysis.  Specifically it hides the copying of currentOutSet to
+ * analysis.  Specifically it hides the assignment of currentOutSet to
  * currentInSet. This guarantees that when a node is processed it will
  * have the out of the previous node as in. The helpee should still
  * make a copy of the in set. This of course only makes sense for
