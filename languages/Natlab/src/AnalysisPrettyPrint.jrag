@@ -151,7 +151,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -166,8 +166,7 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
-            buf.append( "\n" );
+            //buf.append( indent + "% \n" );
         }
         return buf.toString();
     }
@@ -187,7 +186,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -202,7 +201,6 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
             buf.append( "\n" );
         }        
         return buf.toString();
@@ -223,7 +221,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -238,7 +236,6 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
             buf.append( "\n" );
         }
         return buf.toString();
@@ -264,7 +261,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -279,7 +276,6 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
             buf.append( "\n" );
         }
         return buf.toString();
@@ -328,7 +324,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -343,7 +339,6 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
             buf.append( "\n" );
         }
         return buf.toString();
@@ -396,7 +391,7 @@ aspect AnalysisPrettyPrint {
         in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
         out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
-            buf.append( indent + "% Data flow\n%\n" );
+            buf.append( "\n" + indent + "% Data flow\n" + indent + "%\n" );
             if( in != null ){
                 buf.append( indent + "% In set\n" );
                 Scanner inScanner = new Scanner( in.toString() );
@@ -411,7 +406,6 @@ aspect AnalysisPrettyPrint {
                     buf.append( indent + "% " + outScanner.nextLine() + "\n" );
                 buf.append( indent + "% \n" );
             }
-            buf.append( indent + "% \n" );
             buf.append( "\n" );
         }
         return buf.toString();
