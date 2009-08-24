@@ -6,7 +6,7 @@ import java.util.*;
 public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralAnalysis<A>
 {
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     protected Stack<LoopFlowsets> loopStack = new Stack<LoopFlowsets>();
 
@@ -214,7 +214,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         //copy and save the inset
         A ifInSet = newInitialFlow();
         copy( currentInSet, ifInSet );
-        
+
         inFlowSets.put( node, ifInSet );
 
         //setup mergedOuts to capture the outs of each branch
@@ -226,6 +226,8 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
 
         //process each IfBlock
         for( IfBlock block : node.getIfBlocks() ){
+            if( DEBUG )
+                System.out.println( "if block" );
             condition = block.getCondition();
             body = block.getStmts();
 
@@ -236,19 +238,36 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //store the out of the condition as the in for the next
             //block
             nextIn = currentOutSet;
-            
+
+            currentInSet = nextIn;
+            if( DEBUG )
+                System.out.println( "!"+currentInSet );
             //process body
             analyze( body );
-            
+            if( DEBUG ){
+                System.out.println( "!"+currentInSet );
+                System.out.println( "!"+currentOutSet );
+            }
             //merge out with previous outs
             merge( currentOutSet, mergedOuts, mergedOuts );
         }
         //if an elseBlock exists, process it, otherwise merge the
         //nextIn into the mergedOuts
         if( node.hasElseBlock() ){
+            if( DEBUG )
+                System.out.println( "else block" );
             ElseBlock block = node.getElseBlock();
             body = block.getStmts();
+            //currentOutSet will become the currentInSet for the body,
+            //thanks to the AnalysisHelper
+            currentOutSet = nextIn;
+            if( DEBUG )
+                System.out.println( "!"+currentInSet );
             analyze( body );
+            if( DEBUG ){
+                System.out.println( "!"+currentInSet );
+                System.out.println( "!"+currentOutSet );
+            }
             merge( currentOutSet, mergedOuts, mergedOuts );
         }
         else{
