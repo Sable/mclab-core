@@ -294,7 +294,6 @@ public class Main
 
                     //parse each file and put them in a list of Programs
                     LinkedList<Program> programs = new LinkedList<Program>();
-                    LinkedList<Program> aspects = new LinkedList<Program>();
                     
                     for( Object o : options.getFiles() ){
                         //When processing files there are currently two options.
@@ -365,11 +364,7 @@ public class Main
                         if( !quiet )
                             System.err.println("Parsing: " + file);
                         //parse the file
-                        Program prog = null;
-                        if(options.aspect())
-                            prog = parseAspectFile( file,  fileReader, errors );
-                        else
-                            prog = parseFile( file,  fileReader, errors );
+                        Program prog = parseFile( file,  fileReader, errors );
                         
                         //report errors
                         if( errors.size() > 0 )
@@ -381,35 +376,19 @@ public class Main
                         }
                         
                         //Weeding checks
-                        if(prog.errorCheck()){
-                            System.err.println("\nWeeding Failed, Skipping: " + file);
-                            break;
-                        }
+                        //if(prog.errorCheck()){
+                        //    System.err.println("\nWeeding Failed, Skipping: " + file);
+                        //    break;
+                        //}
                         
-                        if(options.aspect() && prog instanceof Aspect) {
-                            if( !quiet ) {
-                                System.err.println("Fetching Aspect Info: " + file);
-                            }
-                            AspectsEngine.fetchAspectInfo(prog);
-                            aspects.add(AspectsEngine.convertToFunctionList(prog));
-                        } else {
-                            programs.add(prog);
-                        }
+                        programs.add(prog);
                     }
                     
                     //Take all resulting Program nodes and place them in a
                     //CompilationUnits instance
                     CompilationUnits cu = new CompilationUnits();
                     for( Program p : programs ){
-                        if(options.aspect()) {
-                            //AspectsEngine.weaveAspect(p);
-                            p.aspectsCorrespondingFunctions();
-                            p.aspectsWeave();
-                        }
                         cu.addProgram( p );
-                    }
-                    for( Program a : aspects ){
-                        cu.addProgram( a );
                     }
                     
                     if( options.xml() ){
@@ -646,56 +625,6 @@ public class Main
             CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
             errList.add( IOcerror);
             return null;
-        }
-    }
-    
-    //	Parse a given aspect file and return a Program ast node
-    //	if file does not exist or other problems, exit program
-    private static Program parseAspectFile(String fName, Reader file, ArrayList errList )
-    {
-        NatlabParser parser = new NatlabParser();
-        AspectsScanner scanner = null;
-        CommentBuffer cb = new CommentBuffer();
-        
-        parser.setCommentBuffer(cb);
-        
-        try{
-            scanner = new AspectsScanner( file );
-            scanner.setCommentBuffer( cb );
-            try{
-                
-                Program prog = (Program)parser.parse(scanner);
-                if( parser.hasError() ){
-                    for( String error : parser.getErrors()){
-                        CompilationProblem Parsercerror = new CompilationProblem(error + "\n");
-                        errList.add(Parsercerror);}
-                    prog = null;
-                }
-                return prog;
-                
-            }catch(Parser.Exception e){
-                String ErrorString= e.getMessage()+"\n";
-                for(String error : parser.getErrors()) {
-                    ErrorString+= error + "\n";
-                }
-                CompilationProblem Parsercerror = new CompilationProblem(ErrorString);
-                errList.add(Parsercerror);
-                return null;
-            } 
-        }catch(FileNotFoundException e){
-            CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
-            errList.add(FileNotFoundcerror);
-            return null;
-        }
-        catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
-            errList.add( IOcerror);
-            return null;
-        }
-        finally{
-            if(scanner != null) {
-                //scanner.stop();
-            }
         }
     }
     

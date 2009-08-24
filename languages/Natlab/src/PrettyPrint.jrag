@@ -469,7 +469,211 @@ aspect PrettyPrint {
     eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
     eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
     
+    // Class
     
+    eq ClassDef.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("classdef ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getPrettyPrinted());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append(getName());
+        first = true;
+        for(SuperClass sup : getSuperClasss()) {
+            if(first)
+            	buf.append(" < ");
+            else
+                buf.append(" & ");
+            buf.append(sup.getPrettyPrinted());
+            first = false;
+        }
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Properties prop : getPropertys()) {
+            buf.append(prop.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Methods methods : getMethods()) {
+            buf.append(methods.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(ClassEvents events : getClassEvents()) {
+            buf.append(events.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Properties.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getIndent() + "properties ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getPrettyPrinted());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Property prop : getPropertys()) {
+            buf.append(prop.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append(getIndent() + "end");
+        return buf.toString();
+    } 
+    
+    eq Methods.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getIndent() + "methods ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getPrettyPrinted());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Signature sign : getSignatures()) {
+            buf.append(sign.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(PropertyAccess prop : getPropAccs()) {
+            buf.append(prop.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Function func : getFunctions()) {
+            buf.append(func.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append(getIndent() + "end");
+        return buf.toString();
+    }
+    
+    eq Signature.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getIndent() + "[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    eq PropertyAccess.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getIndent() + "function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getAccess());
+        buf.append(".");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getPrettyPrinted());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getPrettyPrinted());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append(getIndent() + "end");
+        return buf.toString();
+    }
+    
+    eq ClassEvents.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getIndent() + "events ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getPrettyPrinted());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Event eve : getEvents()) {
+            buf.append(eve.getPrettyPrinted());
+            buf.append('\n');
+        }
+        buf.append(getIndent() + "end");
+        return buf.toString();
+    }
+    
+    eq Attribute.getPrettyPrintedLessComments() = getKey() + " = " + getExpr().getPrettyPrinted();
+    eq SuperClass.getPrettyPrintedLessComments() = getName();
+    eq Property.getPrettyPrintedLessComments() = getIndent() + getName() + " = " + getExpr().getPrettyPrinted() + ";";
+    eq Event.getPrettyPrintedLessComments() = getIndent() + getName();
+    
+    eq SuperClassMethodExpr.getPrettyPrintedLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getFuncName().getPrettyPrinted());
+        buf.append("@");
+        buf.append(getClassName().getPrettyPrinted());
+		return buf.toString();
+    }
     
     //// ANNOTATION EXTENSION - START //////////////////////////////////////////
 
@@ -506,6 +710,62 @@ aspect PrettyPrint {
     	if ( parent != null ){
     	     ASTNode gparent = parent.getParent();
     	     return (gparent instanceof Program) ? "" : parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq Properties.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq Methods.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq ClassEvents.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq PropertyAccess.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq Property.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+    	    return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq Signature.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
+        }
+        return "" ;
+    }
+    
+    eq Event.getIndent() {
+    	ASTNode parent = getParent();
+    	if ( parent != null ){
+        	return parent.getIndent() + ASTNode.INDENT_TAB;
         }
         return "" ;
     }

@@ -12,7 +12,6 @@ Program program_before_comments =
      script.s {: return s; :}
   |  function_seq.f {: return f; :}
   |  class_def.c {: return c; :}
-  |  aspect.a {: return a; :}
   |  {: return new EmptyProgram(); :}
   |  otherTerminal {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
   ;

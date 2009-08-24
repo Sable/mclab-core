@@ -1,4 +1,5 @@
 package natlab;
+import static natlab.NatlabParser.Terminals.*;
 %%
 %%
 %layout annotated_natlab

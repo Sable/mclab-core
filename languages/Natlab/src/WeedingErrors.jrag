@@ -217,10 +217,11 @@ aspect WeedingErrors {
         	ClassDef grandParent = (ClassDef) parent.getParent().getParent();
         	props = grandParent.getPropertys();
         }
-        else if(parent.getParent().getParent() instanceof Aspect) {
-        	Aspect grandParent = (Aspect) parent.getParent().getParent();
-        	props = grandParent.getPropertys();
-        }
+        //TODO: Toheed - Uncomment
+        //else if(parent.getParent().getParent() instanceof Aspect) {
+        //	Aspect grandParent = (Aspect) parent.getParent().getParent();
+        //	props = grandParent.getPropertys();
+        //}
         
         for(Properties prop : props) {
             for(Property pty : prop.getPropertys()) {
