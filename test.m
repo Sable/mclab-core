@@ -1,8 +1,5 @@
-for i = 2:2:10      
-          t = data(j-1);
-          data(j-1) = data(i-1);
-          data(i-1) = t;          
-          t = data(j);
-          data(j) = data(i);
-          data(i) = t;
- end
+for ii = 2:n,
+    for jj = 2:m,
+ 	f(ii, jj) = f(ii, jj)+mask(ii, jj)*(0.25*(f(ii-1, jj)+f(ii+1, jj)+f(ii, jj-1)+f(ii, jj+1))-f(ii, jj));
+    end;
+end;

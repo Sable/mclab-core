@@ -59,63 +59,59 @@ public class AcyclicTest {
         	String key=(String)m.getKey();      
             ConstraintsList cList1=(ConstraintsList)m.getValue();
             if(cList1.getListNode()!=null)
-            {   aExpr1=cList1.getListNode().getData();
-                //if(!(aExpr1.getLowerBound().getClass().getName().equals("natlab.ast.IntLiteralExpr")) && !(aExpr1.getUpperBound().getClass().getName().equals("natlab.ast.IntLiteralExpr")))
-            	//{System.out.println("AcyclicTest is not applicable:This constraint is bounded on both sides by variable");	break;}//end of if     	 	                  
-                // else
-                // {              	             	
-	            	 if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof PlusExpr)
-	            	 {            		 
-	            		 setVariables((NameExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);
-	            	 }            		                            
-		            else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof NameExpr)
-		            {
-		            	setVariables((NameExpr)aExpr1.getLowerBound(),(NameExpr)aExpr1.getUpperBound(),it,cList1);
-	      		    }//end of else if
-		            else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof PlusExpr)
-		            {
-		            	setVariables((PlusExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);
-		            }
-		            else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof MinusExpr)
-		            {
-		            	setVariables((MinusExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);
-		            }
-		            else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MinusExpr)
-		            {
-		            	setVariables((NameExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
-		            {
-		            	setVariables((NameExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            } 
-		            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
-		            {
-		            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }  
-		            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof PlusExpr)
-		            {
-		            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MinusExpr)
-		            {
+            {   aExpr1=cList1.getListNode().getData();                           	             	
+	           	if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+	           	 {            		 
+	           		 setVariables((NameExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);
+	           	 }//end of if            		                            
+		         else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof NameExpr)
+		          {
+		           	setVariables((NameExpr)aExpr1.getLowerBound(),(NameExpr)aExpr1.getUpperBound(),it,cList1);
+	      		  }//end of else if
+		         else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+		          {
+		           	setVariables((PlusExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);
+		          }
+		          else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+		          {
+		           	setVariables((MinusExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);
+		          }
+		          else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+		          {
+		           	setVariables((NameExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+		          }
+		          else if(aExpr1.getLowerBound() instanceof NameExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+		          {
+		           	setVariables((NameExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+		          } 
+		          else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+		          {
+		           	setVariables((MTimesExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
+		          }  
+		         else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+		          {
+		           	setVariables((MTimesExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+		          }
+		         else if(aExpr1.getLowerBound() instanceof MTimesExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+		          {
 		            	setVariables((MTimesExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
-		            {
+		          }
+		         else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+		         {
 		            	setVariables((MinusExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
-		            {
+		         }
+		         else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MTimesExpr)
+		         {
 		            	setVariables((PlusExpr)aExpr1.getLowerBound(),(MTimesExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MinusExpr)
-		            {
+		         }
+		         else if(aExpr1.getLowerBound() instanceof PlusExpr && aExpr1.getUpperBound() instanceof MinusExpr)
+		         {
 		            	setVariables((PlusExpr)aExpr1.getLowerBound(),(MinusExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            }
-		            else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof PlusExpr)
-		            {
-		            	setVariables((MinusExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
-		            } 
+		         }
+		         else if(aExpr1.getLowerBound() instanceof MinusExpr && aExpr1.getUpperBound() instanceof PlusExpr)
+		         {
+		           	setVariables((MinusExpr)aExpr1.getLowerBound(),(PlusExpr)aExpr1.getUpperBound(),it, cList1);	            	
+		         } 
            //  }//end of else
          }//end of 1st if statement
         }//end of while

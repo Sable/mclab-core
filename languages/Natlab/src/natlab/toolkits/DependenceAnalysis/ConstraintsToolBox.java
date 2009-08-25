@@ -167,7 +167,7 @@ public ConstraintsGraph getGraph()
 		}//end of function checkArrayAccessAcrossStmts.*/	
 		
 		/*This function does following. 
-		 * 1.Makes equations from array subscript expression.		 * 
+		 * 1.Makes equations from array subscript expression.		  
 		 * TO DO:Handle cases where LHS is not an instance of NameExpr.		 
 		 * 
 		 */
@@ -177,7 +177,7 @@ public ConstraintsGraph getGraph()
 			ParameterizedExpr paraLHSExpr=(ParameterizedExpr)LHSExpr;
 			resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.	
 					
-			for(int i=0; i<paraLHSExpr.getNumArg();i++)   // To handle multi dimensional arrays. e.g.a(i,j)=a(j-11,i+10)
+			for(int i=0; i<paraLHSExpr.getNumArg();i++)   // To handle multidimensional arrays. e.g.a(i,j)=a(j-11,i+10)
 			  {		
 				 AffineExpression aExpr1=new AffineExpression();
 				 AffineExpression aExpr2=new AffineExpression();					 

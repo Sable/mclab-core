@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import natlab.ast.Stmt;
 import natlab.ast.ForStmt;
 import natlab.ast.AssignStmt;
+
 /*
  * Author:Amina Aslam
  * Date:07 Jul,2009
@@ -13,8 +14,8 @@ import natlab.ast.AssignStmt;
  * need to be performed on for loop statements. 
  */
 
-public class DependenceAnalysisDriver {
-	
+public class DependenceAnalysisDriver
+{
 	private ForStmt forNode;
 	//private ConstraintsGraph cGraph;
 	private ForStmt forStmtArray[];
@@ -22,31 +23,32 @@ public class DependenceAnalysisDriver {
 	private AcyclicTest acyclicTest;
 	private GCDTest gcdTest;
 	private int loopIndex;
-	public DependenceAnalysisDriver(ForStmt fNode)	
-	{	
-		forNode=fNode;
-		forStmtArray=new ForStmt[forNode.getNumChild()+1];
-		loopIndex=0;
-		forStmtArray[loopIndex]=forNode;
-		System.out.println(forNode.getNumChild());
-	}
+	
+public DependenceAnalysisDriver(ForStmt fNode)	
+{	
+	forNode=fNode;
+	forStmtArray=new ForStmt[forNode.getNumChild()+1];
+	loopIndex=0;
+	forStmtArray[loopIndex]=forNode;
+	System.out.println(forNode.getNumChild());
+}
 	/*
 	 * This function does the following 
 	 * 1.Checks for tightly nested loops.
 	 */	
-    private void isTightlyNestedLoop(ForStmt forStmt)
-	 {
+private void isTightlyNestedLoop(ForStmt forStmt)
+{
 			 
-		  Stmt stmt=forStmt.getStmt(0);
-		  if(stmt instanceof ForStmt)
-		  {		  loopIndex++;			  
-				  ForStmt tForStmt=(ForStmt)stmt;
-				  forStmtArray[loopIndex]=tForStmt;
-				  forNode=tForStmt;				  
-				  isTightlyNestedLoop(tForStmt);				  
-		  }//end of if
+  Stmt stmt=forStmt.getStmt(0);
+  if(stmt instanceof ForStmt)
+  {		  loopIndex++;			  
+		  ForStmt tForStmt=(ForStmt)stmt;
+		  forStmtArray[loopIndex]=tForStmt;
+		  forNode=tForStmt;				  
+		  isTightlyNestedLoop(tForStmt);				  
+  }//end of if
 			
-	}//end of function
+}//end of function
     
 
 	/*
@@ -59,83 +61,86 @@ public class DependenceAnalysisDriver {
 	 * e.g. 1:a(i)=a(i)+c(i)
 	 * 		2:d(i)=a(i)
 	 */
-	public void traverseLoopStatements()
+public void traverseLoopStatements()
+{
+	isTightlyNestedLoop(forNode);
+	int nStmts=forNode.getNumStmt();
+	System.out.println("No of Statements"+nStmts);
+	boolean aFlag=false;
+	for(int i=0;i<nStmts;i++)
 	{
-		isTightlyNestedLoop(forNode);
-		int nStmts=forNode.getNumStmt();
-		
-		System.out.println("No of Statements"+nStmts);
-		boolean aFlag=false;
-		for(int i=0;i<nStmts;i++)
-		{
-			Stmt s=forNode.getStmt(i);
-			if(s instanceof AssignStmt)
-			{
-				AssignStmt aStmt1=(AssignStmt)s;
-				for(int j=i;j<nStmts;j++)
-				  {	ConstraintsToolBox cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);		  
-					  if(i==j)
-					  {
-						  System.out.println("i am in same statements block");
-						  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS());//compare LHS(sameStmt) with RHS(sameStmt)						  
-						  if(aFlag){ApplyTests(cToolBox);}		  
-					   }//end of if
-					  else
-					  {
-						  Stmt bStmt=forNode.getStmt(j);
-						  if(bStmt instanceof AssignStmt)
-						  {
-							  System.out.println("i am in different statements block");
-							  AssignStmt aStmt2=(AssignStmt)bStmt;
-							  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getRHS()); //compare LHS(previousStmt) with RHS(nextStmt)
-							  if(aFlag){ApplyTests(cToolBox);}
-							  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getLHS());//compare LHS(previousStmt) with LHS(nextStmt)
-							  if(aFlag){ApplyTests(cToolBox);}
-							  aFlag=cToolBox.checkSameArrayAccess(aStmt1.getRHS(),aStmt2.getLHS());//compare RHS(previousStmt) with LHS(nextStmt)
-							  if(aFlag){ApplyTests(cToolBox);}							  
-						  }//end of if
-					  }//end of else
-				  }//end of inner for loop				
-			}//end of if
-		}//end of for 
-	}//end of traverseLoopStatements function
-	
-	
-	
+	  Stmt s=forNode.getStmt(i);
+	  if(s instanceof AssignStmt)
+	  {
+		AssignStmt aStmt1=(AssignStmt)s;
+		for(int j=i;j<nStmts;j++)
+		{ConstraintsToolBox cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);		  
+	  	 if(i==j)
+		 { System.out.println("i am in same statements block");
+			aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS());//compare LHS(sameStmt) with RHS(sameStmt)						  
+			if(aFlag){ApplyTests(cToolBox);}		  
+		  }//end of if
+		else
+		 {Stmt bStmt=forNode.getStmt(j);
+		  if(bStmt instanceof AssignStmt)
+		   {  System.out.println("i am in different statements block");
+			   AssignStmt aStmt2=(AssignStmt)bStmt;
+			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getRHS()); //compare LHS(previousStmt) with RHS(nextStmt)
+			   if(aFlag){ApplyTests(cToolBox);}
+			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getLHS());//compare LHS(previousStmt) with LHS(nextStmt)
+			   if(aFlag){ApplyTests(cToolBox);}
+			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getRHS(),aStmt2.getLHS());//compare RHS(previousStmt) with LHS(nextStmt)
+			   if(aFlag){ApplyTests(cToolBox);}							  
+			 }//end of if
+			}//end of else
+		}//end of inner for loop				
+	}//end of if
+  }//end of for 
+}//end of traverseLoopStatements function	
 	
 	/*
 	 * ApplyTests function applies appropriate test on the graph for a statement and then prints the results.
 	 */
 public void ApplyTests(ConstraintsToolBox cToolBox)
 {
-		boolean isAcyclicApplicable,isApplicable=false;		
-		if(cToolBox.getGraph()!=null)
+	boolean issvpcApplicable,isApplicable,isAcyclicApplicable=false;		
+	if(cToolBox.getGraph()!=null)
+	{
+		ConstraintsGraph cGraph=cToolBox.getGraph();
+		gcdTest=new GCDTest();
+		gcdTest.calculateGcd(cGraph);
+		isApplicable=gcdTest.getIsSolution();
+		if(isApplicable)
 		{
-			ConstraintsGraph cGraph=cToolBox.getGraph();
-			gcdTest=new GCDTest();
-			gcdTest.calculateGcd(cGraph);
-			isApplicable=gcdTest.getIsSolution();
-			if(isApplicable)
-			{
-			   BanerjeeTest bTest=new BanerjeeTest(forStmtArray);
-			   bTest.directionVectorHierarchyDriver(cGraph);
-			   svpcTest=new SVPCTest();			 
-			   isAcyclicApplicable= svpcTest.checkDependence(cGraph);			
-			   System.out.println("i am in SVPC test");			
-			   if (!isAcyclicApplicable)
-			   {
-				System.out.println("Apply Acyclic test");
+		   //BanerjeeTest bTest=new BanerjeeTest(forStmtArray); //this should not be called here.Need to change its location. 
+		   // bTest.directionVectorHierarchyDriver(cGraph); // same for this,need to change it.
+			svpcTest=new SVPCTest();			 
+			issvpcApplicable= svpcTest.checkDependence(cGraph);			
+			System.out.println("i am in SVPC test");			
+			if (!issvpcApplicable)
+			 {
+			    System.out.println("Apply Acyclic test");
 				acyclicTest=new AcyclicTest();
 				cGraph=acyclicTest.makeSubstituitionForVariable(cGraph);
 			    isAcyclicApplicable=acyclicTest.getisApplicable();
 				if(isAcyclicApplicable)
 				{   System.out.println("now apply SVPC Test");
 					svpcTest.checkDependence(cGraph);
-				}//end of 4th if					
+				}//end of 4th if				
+				else{approximateRanges(cGraph);}
 			}//end of 3rd if
 		  }//end of 2nd if
 	 }//end of if 1st if
  }//end of ApplyTests function
 
+
+/*
+ * This function calculates the results for different ranges of variables involved in loop bounds.
+ */
+public void approximateRanges(ConstraintsGraph cGraph)
+{
+	RangeApproximation rApprox=new RangeApproximation();
+	rApprox.substituteVariablesWithConstantValues(cGraph);
+}
 
 }
