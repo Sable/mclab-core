@@ -4,6 +4,7 @@ import natlab.options.Options;
 //import natlab.toolkits.analysis.ForVisitor;
 import natlab.ast.*;
 import natlab.server.*;
+import natlab.toolkits.analysis.ForVisitor;
 
 /*import matlab.MatlabParser;
 import matlab.TranslationProblem;
@@ -309,8 +310,7 @@ public class Main
 			
                         //checks if dependence analysis flag is set.
                         //If the flag is set then the type of dependence test that needs to be applied.						
-                        if(options.danalysis()){		
-                            
+                        if(options.danalysis()){                            
                             Program prog = null;							
                             if( !quiet )
                                 System.err.println("Dependence Tester");
@@ -409,11 +409,8 @@ public class Main
     
     private static void parseProgramNode(Program prog,String testType)
     {
-        // ForVisitor forVisitor = new ForVisitor(testType);
-        //prog.apply(forVisitor);  
-        
-        
-	
+        ForVisitor forVisitor = new ForVisitor(testType);
+        prog.apply(forVisitor);   
     }
     
     /**
