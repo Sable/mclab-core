@@ -8,6 +8,7 @@ import natlab.ast.MTimesExpr;
 import natlab.ast.PlusExpr;
 import natlab.ast.MinusExpr;
 import natlab.ast.IntLiteralExpr;
+import java.io.*;
 
 /*
  * Author:Amina Aslam
@@ -21,14 +22,16 @@ public class GCDTest {
 	private long gcd;
 	private long c=0;
 	private boolean isSolution;
+	private RandomAccessFile raf;
 	
-	public GCDTest()
-	{
-		u=0;
+	public GCDTest(RandomAccessFile rf)
+	{   u=0;
 		v=0;
 		gcd=0;
 		c=0;
 		isSolution=false;
+		raf=rf;
+		try{raf.writeBytes("Start of GCD Test" + '\n');}catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
 	}
 	
 	public void calculateGcd (ConstraintsGraph cGraph) 
@@ -86,11 +89,16 @@ public class GCDTest {
 		if(c%gcd==0)
 		{   isSolution=true;
 			System.out.println("Gcd Result" + c%gcd);
+			try{raf.writeBytes("GCD result for the system of equations is:" + c%gcd +'\n');
+			}catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
 		}
 		else 
 		{isSolution=false;
 		 System.out.println("Gcd Result" + c%gcd);
 		 System.out.println("There is no integer solution for the system of equations");
+		 try{raf.writeBytes("GCD result for the system of equations is:" + c%gcd +'\n');
+		     raf.writeBytes("There is no integer solution for the system of equations." +'\n');
+		   }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
 		}
 	}//end of isSolution function
 	

@@ -23,6 +23,7 @@ public class DependenceAnalysisDriver
 	private AcyclicTest acyclicTest;
 	private GCDTest gcdTest;
 	private int loopIndex;
+	private ConstraintsToolBox cToolBox;
 	
 public DependenceAnalysisDriver(ForStmt fNode)	
 {	
@@ -63,8 +64,18 @@ private void isTightlyNestedLoop(ForStmt forStmt)
 	 */
 public void traverseLoopStatements()
 {
+	File file;
+	RandomAccessFile raf=null;
+	try {file = new File("Rsults.txt");
+        raf = new RandomAccessFile(file, "rw");     
+    }catch (IOException e) 
+    {  System.out.println("IOException:Couldnot open the new file");
+        e.printStackTrace();
+     }//end of catch
+    
 	isTightlyNestedLoop(forNode);
 	int nStmts=forNode.getNumStmt();
+	cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);
 	System.out.println("No of Statements"+nStmts);
 	boolean aFlag=false;
 	for(int i=0;i<nStmts;i++)
@@ -72,13 +83,16 @@ public void traverseLoopStatements()
 	  Stmt s=forNode.getStmt(i);
 	  if(s instanceof AssignStmt)
 	  {
-		AssignStmt aStmt1=(AssignStmt)s;
+		AssignStmt aStmt1=(AssignStmt)s;		
 		for(int j=i;j<nStmts;j++)
-		{ConstraintsToolBox cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);		  
+		{//ConstraintsToolBox cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);		  
 	  	 if(i==j)
-		 { System.out.println("i am in same statements block");
+		 {  System.out.println("i am in same statements block");
+    		try{raf.writeBytes("Dependency result for the statement(s): " + aStmt1.getPrettyPrinted() +'\n');	     
+	 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
+	 	    
 			aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS());//compare LHS(sameStmt) with RHS(sameStmt)						  
-			if(aFlag){ApplyTests(cToolBox);}		  
+			if(aFlag){ApplyTests(cToolBox,raf);}		  
 		  }//end of if
 		else
 		 {Stmt bStmt=forNode.getStmt(j);
@@ -86,48 +100,56 @@ public void traverseLoopStatements()
 		   {  System.out.println("i am in different statements block");
 			   AssignStmt aStmt2=(AssignStmt)bStmt;
 			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getRHS()); //compare LHS(previousStmt) with RHS(nextStmt)
-			   if(aFlag){ApplyTests(cToolBox);}
+			   try{raf.writeBytes("Dependency result for the statement(s): " + aStmt1.getLHS().getPrettyPrinted()+ "  " + aStmt2.getRHS().getPrettyPrinted() +'\n');	     
+		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch		 	    
+			   if(aFlag){ApplyTests(cToolBox,raf);}
+			   
 			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getLHS());//compare LHS(previousStmt) with LHS(nextStmt)
-			   if(aFlag){ApplyTests(cToolBox);}
+			   try{raf.writeBytes("Dependency result for the statement(s): " + aStmt1.getLHS().getPrettyPrinted()+ "  " + aStmt2.getLHS().getPrettyPrinted() +'\n');	     
+		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
+			   if(aFlag){ApplyTests(cToolBox,raf);}
+			   
 			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getRHS(),aStmt2.getLHS());//compare RHS(previousStmt) with LHS(nextStmt)
-			   if(aFlag){ApplyTests(cToolBox);}							  
+			   try{raf.writeBytes("Dependency result for the statement(s): " + aStmt1.getRHS().getPrettyPrinted()+ "  " + aStmt2.getRHS().getPrettyPrinted() +'\n');	     
+		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
+		 	   if(aFlag){ApplyTests(cToolBox,raf);}							  
 			 }//end of if
 			}//end of else
 		}//end of inner for loop				
 	}//end of if
   }//end of for 
+  try{raf.close();}catch(IOException e){System.out.println("IOException:Couldnot close the file");}	
 }//end of traverseLoopStatements function	
 	
 	/*
 	 * ApplyTests function applies appropriate test on the graph for a statement and then prints the results.
 	 */
-public void ApplyTests(ConstraintsToolBox cToolBox)
-{
-	boolean issvpcApplicable,isApplicable,isAcyclicApplicable=false;		
+public void ApplyTests(ConstraintsToolBox cToolBox,RandomAccessFile raf)
+{	boolean issvpcApplicable,isApplicable,isAcyclicApplicable=false;		
 	if(cToolBox.getGraph()!=null)
 	{
 		ConstraintsGraph cGraph=cToolBox.getGraph();
-		gcdTest=new GCDTest();
+		gcdTest=new GCDTest(raf);
 		gcdTest.calculateGcd(cGraph);
 		isApplicable=gcdTest.getIsSolution();
 		if(isApplicable)
 		{
 		   //BanerjeeTest bTest=new BanerjeeTest(forStmtArray); //this should not be called here.Need to change its location. 
 		   // bTest.directionVectorHierarchyDriver(cGraph); // same for this,need to change it.
-			svpcTest=new SVPCTest();			 
+			svpcTest=new SVPCTest(raf);			 
 			issvpcApplicable= svpcTest.checkDependence(cGraph);			
 			System.out.println("i am in SVPC test");			
 			if (!issvpcApplicable)
 			 {
 			    System.out.println("Apply Acyclic test");
-				acyclicTest=new AcyclicTest();
+				acyclicTest=new AcyclicTest(raf);
 				cGraph=acyclicTest.makeSubstituitionForVariable(cGraph);
 			    isAcyclicApplicable=acyclicTest.getisApplicable();
 				if(isAcyclicApplicable)
 				{   System.out.println("now apply SVPC Test");
 					svpcTest.checkDependence(cGraph);
 				}//end of 4th if				
-				else{approximateRanges(cGraph);}
+				//else{approximateRanges(cGraph);}
 			}//end of 3rd if
 		  }//end of 2nd if
 	 }//end of if 1st if
@@ -135,12 +157,40 @@ public void ApplyTests(ConstraintsToolBox cToolBox)
 
 
 /*
- * This function calculates the results for different ranges of variables involved in loop bounds.
+ * This function does the following
+ * 1.This function calculates the results for different ranges of variables involved in loop bounds.
+ * 2.Creates mapping for the loopRanges and Result's file.
+ * 3.Then applies the tests on the new Ranges. 
  */
 public void approximateRanges(ConstraintsGraph cGraph)
-{
+ {
 	RangeApproximation rApprox=new RangeApproximation();
-	rApprox.substituteVariablesWithConstantValues(cGraph);
-}
+	int lRange=0,uRange=0;
+	File file;
+	RandomAccessFile raf=null;
+	for(int i=0;i<260;i+=10)
+	{ lRange=i+1;
+	  uRange=i+10;
+	  rApprox.substituteVariablesWithConstantValues(cGraph,lRange,uRange);
+	  try {
+	       file = new File("Range"+lRange+"-"+uRange+".txt");
+           raf = new RandomAccessFile(file, "rw");
+           raf.writeBytes("Applying Tests for the following range"+ lRange + "-" + uRange +'\n');
+      }catch (IOException e) 
+      {
+      	System.out.println("IOException:Couldnot open the new file");
+          e.printStackTrace();
+       }//end of catch
+      LoopBounds lBounds=new LoopBounds();
+      lBounds.setLowerBound(lRange);
+      lBounds.setUpperBound(uRange);
+      RangeMap rMap=new RangeMap();
+      rMap.createMapping(lBounds, "Range"+lRange+"-"+uRange+".txt");
+	  ApplyTests(cToolBox,raf);
+	  try{
+		  raf.close();
+	  }catch(IOException e){System.out.println("IOException:Couldnot close the file");}
+   }//end of for
+ }//end of function call.
 
 }

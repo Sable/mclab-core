@@ -51,28 +51,15 @@ public class SVPCTest {
 	
 	//private ForStmt forNode;
 	private static boolean resultArray[];
-	private File file;
+	//private File file;
 	private RandomAccessFile raf;	
 	private String dependencyFlag="No";
 	//private ForStmt forStmtArray[]=new ForStmt[3];
 	//private static int loopIndex=0;
 	
-	public SVPCTest()	
+	public SVPCTest(RandomAccessFile rf)	
 	{	
-
-        try {
-       
-            file = new File("GcdTest.txt");
-            raf = new RandomAccessFile(file, "rw");
-            raf.writeBytes("Dependency B/w Stmt(i) And Stmt(j):"+'\t' + '\t'+"Dependency Result:"+'\n');
-            //raf.writeBytes(""+ '\n');            
-           // raf.close();
-        }catch (IOException e) 
-        {
-        	System.out.println("IOException:");
-            e.printStackTrace();
-         }
-       
+		raf=rf;        
 	}//end SVPC Test constructor.
 
 	
@@ -93,15 +80,10 @@ public class SVPCTest {
         	String key=(String)m.getKey();      
             ConstraintsList cList1=(ConstraintsList)m.getValue();
             if(cList1.getListNode()!=null)
-            {
-            	 aExpr1=cList1.getListNode().getData();
-            }
+            {aExpr1=cList1.getListNode().getData();
+            //}
             if(cList1.getListNode().getNext()!=null)
-            {
-            	 aExpr2=cList1.getListNode().getNext().getData();
-            }          
-            
-          
+            {aExpr2=cList1.getListNode().getNext().getData();//}          
          	if(aExpr1.getLowerBound() instanceof IntLiteralExpr && aExpr1.getUpperBound() instanceof IntLiteralExpr ) 
         	{
         		IntLiteralExpr iExprUpper=(IntLiteralExpr)aExpr1.getUpperBound();
@@ -111,41 +93,40 @@ public class SVPCTest {
         	    else lowerBound=iExprLower.getValue().getValue().intValue()-aExpr2.getC();        		
         		System.out.println("lower bound is" + lowerBound+aExpr2.getLoopVariable());
         		if(lowerBound > iExprUpper.getValue().getValue().intValue())
-        		 {       			
-        			dependencyFlag="No";
-        			System.out.println("There is no dependency for this system of Equations");
-        		}//end of 3rd if
+        		 { dependencyFlag="No";
+                   System.out.println("There is no dependency for this system of Equations");
+                   try{raf.writeBytes("Applying SVPC Test:"+'\n');	     
+                       raf.writeBytes("There is no dependency for this system of equations:"+'\n');
+     		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
+                 }//end of 4th if
         		else 
-        		{
-        			System.out.println("There is dependency for this system of Equations");
-        		}//end of 3rd else
+        		{System.out.println("There is dependency for this system of Equations");
+        		try{raf.writeBytes("There is no dependency for this system of equations:"+'\n');
+		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch 
+        	   }//end of 4th else
         		isApplicable=true;
-        	}//end of 2nd if
-        	else 
+        	}//end of 3rd if
+         	else 
         	{
         		isApplicable=false;
         		return isApplicable;
         	}//end of else.    
-	
-
+           }//end of 2nd if
+          }//end of 1st if
         }//end of while        
-       return isApplicable;
-		
+       return isApplicable;		
 	}//end of checkDependence function. 
 	
 	private void reportTestResult(int index)
 	{
 			boolean temp=false;
 			for(int i=0;i<index;i++)
-			{
-				if(resultArray[i]==false)
-				{
-					System.out.println("There is no dependence for this system of equations");
-					temp=true;
-					return;
+			{  if(resultArray[i]==false)
+				{System.out.println("There is no dependence for this system of equations");
+				 temp=true;
+				 return;
 				}
-			}
-			
+			}			
 			if(!temp)
 			{
 				System.out.println("There is dependence for this system of equations");
