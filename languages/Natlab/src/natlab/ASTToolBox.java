@@ -75,4 +75,69 @@ public class ASTToolBox {
 	    return bResult;
  	}
 
+ 	public static boolean isInsideLoop(ASTNode varNode) {
+ 		boolean bResult = false;
+	    ASTNode parentNode = varNode;
+	    do{
+		    if((parentNode instanceof WhileStmt) 
+		    		|| (parentNode instanceof ForStmt)) {
+		    	bResult = true;
+		    	break;
+		    } else {
+	    		parentNode = parentNode.getParent(); 	   
+		    }
+	    } while((parentNode!=null) && !(parentNode instanceof Program) && !bResult);
+	    
+	    return bResult;
+ 	}
+ 	public static ForStmt getParentForStmtNode(ASTNode varNode) {
+	    ASTNode parentNode = varNode.getParent();
+	    // If the varNode is already the assignment-statement, then don't need 
+	    // to find it's parent
+	    if((varNode instanceof ForStmt)) {
+	    	parentNode = varNode;
+	    } else {
+		    // varNode/e.getNodeLocation() is NameExpr, it may directly belongs to
+	    	// AssignStmt, or ParameterizedExpr.
+	    	while ((parentNode!=null) && !(parentNode instanceof ForStmt)) {
+	    		varNode = parentNode;
+	    		parentNode = parentNode.getParent(); 	   
+	    	}
+	    }
+	    return (ForStmt)parentNode;
+ 	}
+
+ 	public static IfStmt getParentIfStmtNode(ASTNode varNode) {
+	    ASTNode parentNode = varNode.getParent();
+	    // If the varNode is already the assignment-statement, then don't need 
+	    // to find it's parent
+	    if((varNode instanceof IfStmt)) {
+	    	parentNode = varNode;
+	    } else {
+		    // varNode/e.getNodeLocation() is NameExpr, it may directly belongs to
+	    	// AssignStmt, or ParameterizedExpr.
+	    	while ((parentNode!=null) && !(parentNode instanceof IfStmt)) {
+	    		varNode = parentNode;
+	    		parentNode = parentNode.getParent(); 	   
+	    	}
+	    }
+	    return (IfStmt)parentNode;
+ 	}
+ 	public static ASTNode getSubtreeRoot(ASTNode varNode) {
+	    ASTNode parentNode = varNode.getParent();
+	    // If the varNode is already the assignment-statement, then don't need 
+	    // to find it's parent
+	    if((varNode instanceof Script)|| (varNode instanceof Function)) {
+	    	parentNode = varNode;
+	    } else {
+		    // varNode/e.getNodeLocation() is NameExpr, it may directly belongs to
+	    	// AssignStmt, or ParameterizedExpr.
+	    	while ((parentNode!=null) && 
+	    			!((parentNode instanceof Script)||(parentNode instanceof Function))) {
+	    		varNode = parentNode;
+	    		parentNode = parentNode.getParent(); 	   
+	    	}
+	    }
+	    return parentNode;
+ 	}
 }

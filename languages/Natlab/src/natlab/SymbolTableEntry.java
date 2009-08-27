@@ -21,6 +21,7 @@ public class SymbolTableEntry
     private LiteralExpr valueMin=null;	// min value 
     private String valueStr="";			// min value 
     private boolean isConstant=false;
+    private boolean isConstantSize=false;
     public boolean isFirmType=false;		// if it's true, then its dimensions cannot be changed
     // The old way is 'value' just keep the constant value,
     // right now, value can store StringLiteralExpr
@@ -107,6 +108,12 @@ public class SymbolTableEntry
     }
     public void setConstant(boolean flag) {
     	isConstant = flag;
+    }
+    public boolean isConstantSize() {
+    	return isConstantSize;
+    }
+    public void setConstantSize(boolean flag) {
+    	isConstantSize = flag;
     }
    
    

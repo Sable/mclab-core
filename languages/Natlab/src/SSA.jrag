@@ -25,12 +25,6 @@ aspect SSAForm {
     public void WhileStmt.renaming(String orgName, String newName) {	
         getExpr().renaming(orgName, newName);
     }
-    public void IfStmt.renaming(String orgName, String newName) {	
-        // Do nothing, because IfBlock will has a separate code-node
-    }
-    public void IfBlock.renaming(String orgName, String newName) {	
-        // Do nothing, because Condition-Expr will has a separate code-node
-    }
 
     public void SwitchStmt.renaming(String orgName, String newName) {	
         getExpr().renaming(orgName, newName);
@@ -73,13 +67,7 @@ aspect SSAForm {
 	public void WhileStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
 		getExpr().renaming(orgName, newExpr);
 	}
-	public void IfStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
-		// Do nothing, because IfBlock will has a separate code-node
-	}
-	public void IfBlock.renaming(String orgName, natlab.ast.Expr newExpr) {	
-		// Do nothing, because Condition-Expr will has a separate code-node
-	}
-	
+
 	public void SwitchStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
 		getExpr().renaming(orgName, newExpr);
 	}

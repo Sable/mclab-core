@@ -83,7 +83,7 @@ aspect Simplify {
 		if(nestedLevel>level) {
 			// (1). Create new temporary variable, by Symbol-Table interface
 			// VariableDeclaration varDecl = createTempVar(type());
-			String tmpName = "tmpvar_" + curExpr.getNodeID();
+			String tmpName = "tmpvar" + (++VarCnt); // curExpr.getNodeID();
 			
 			// (2). Create NameExpr node
 			NameExpr tmpNameExpr = new NameExpr(new Name(tmpName));
@@ -299,6 +299,15 @@ aspect Simplify {
 			return simplifyTranform(stmtList, level);
 		}
 	}
+
+	public Expr NameExpr.simplify(List stmtList, int level)  {
+		if(getVarName().equals("rand") || getVarName().equals("randn")) {
+			return simplifyTranform(stmtList, 1);
+		} else {
+			return null;
+		}
+	}
+	
 
 	//-------------------------------------------------------------------------
 	// Get constant R-Value, LiteralExpr: FPLiteralExpr, IntLiteralExpr, StringLiteralExpr

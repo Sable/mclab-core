@@ -25,6 +25,8 @@ aspect GenerateFortran {
 
     // Program name
     static public String ASTNode.FortranProgramName= "matlab_2_fortran";
+    static public boolean ASTNode.FLAG_BLAS = false;
+    static public boolean ASTNode.FLAG_BOUNDS_CHECK = false;
     
     public boolean Function.mainFunc= false;
 
@@ -71,6 +73,7 @@ aspect GenerateFortran {
 		    buf.append("PROGRAM ");
 		    buf.append(getName());
 		    buf.append('\n');
+			buf.append("USE Mod_"+getName()+"\n");			
 			buf.append("IMPLICIT NONE\n");			
 		} else {
 			buf.append("SUBROUTINE ");
@@ -332,8 +335,13 @@ aspect GenerateFortran {
     eq EmptyStmt.getFortranLessComments() = "";
     eq ExprStmt.getFortranLessComments() {
     	String str = getExpr().getFortran() + (isOutputSuppressed() ? ";" : "");
-    	if(getExpr() instanceof LiteralExpr)	// StringLiteralExpr
-    		str = "WRITE (*,*) " + str;
+    	if(getExpr() instanceof LiteralExpr) {	// StringLiteralExpr
+    		// str = "WRITE (*,*) " + str;
+    		str = "! " + str;		// Ignore then
+    	}
+    	if(getExpr() instanceof NameExpr) {
+    		str = "! " + str;		// Ignore then
+    	}
         return str;
     }
     
@@ -359,8 +367,10 @@ aspect GenerateFortran {
                 // Using default variable"  timing_clock; 
         		buf.append("CALL CPU_TIME(timing_clock); ");
         		buf.append(lhs);
-        		// buf.append("(1,6) = timing_clock;");
-        		buf.append("(1,:) = [0.0,0.0,0.0,0.0,0.0,timing_clock];");
+        		buf.append(" = 0.0;");
+        		buf.append(lhs);
+        		buf.append("(1,6) = timing_clock;");
+        		// buf.append("(1,:) = [0.0,0.0,0.0,0.0,0.0,timing_clock];");
 
     	} else if(isCall) {	
 	    	// This is CallExprStmt type
@@ -751,19 +761,19 @@ aspect GenerateFortran {
         	 
         } else if(fname.equalsIgnoreCase("mean")) {
         	// Here handle two cases
-        	// 1) mean(F(:)) => SUM(F)/(0.0+SIZE(F))
-        	// 2) mean(F)    => SUM(F,1)/(0.0+SIZE(F,1))
-	        buf.append(" SUM(");		
+        	// 1) mean(F(:)) => (SUM(F)/(0.0+SIZE(F)))
+        	// 2) mean(F)    => (SUM(F,1)/(0.0+SIZE(F,1)))
+	        buf.append(" (SUM(");		
 	        for(Expr arg : args) {
 	        	if(arg instanceof NameExpr) {
-	        		buf.append(arg.getFortran()+",1)/(0.0+SIZE("+arg.getFortran()+",1))");
+	        		buf.append(arg.getFortran()+",1)/(0.0+SIZE("+arg.getFortran()+",1)))");
 	        		return buf.toString(); 
 	        	} else if(arg instanceof ParameterizedExpr) {
 	        		// For arg=F(:) 
 	        		if(((ParameterizedExpr)arg).getNumArg()==1) {
 		        		if(((ParameterizedExpr)arg).getArgs().getChild(0) instanceof ColonExpr) {
 		        			String str = ((ParameterizedExpr)arg).getTarget().getFortran();
-			        		buf.append(str+")/(0.0+SIZE("+str+"))");
+			        		buf.append(str+")/(0.0+SIZE("+str+")))");
 			        		return buf.toString(); 
 		        		}
 	        		}
@@ -777,7 +787,7 @@ aspect GenerateFortran {
 	            buf.append(arg.getFortran()); // Only take one parameter
 	            break;
 	        }
-    		buf.append(")");
+    		buf.append("))");
 	        return buf.toString();
         	 
         } else if(fname.equalsIgnoreCase("nargin")) {
@@ -789,7 +799,7 @@ aspect GenerateFortran {
 	            buf.append(arg.getFortran());
 	            break;
 	        }
-	        buf.append(")/LOG(2.0)");
+	        buf.append("+0.0)/LOG(2.0)");
 	        return buf.toString();
         
         } else if(fname.equalsIgnoreCase("str2num")) {
@@ -889,12 +899,38 @@ aspect GenerateFortran {
     	} else if (fname.equalsIgnoreCase("clc")) {
     		buf.append(" ! clc  !! Not support.");
     		
-    	} else if (fname.equalsIgnoreCase("round") || fname.equalsIgnoreCase("floor")
+    	} else if (fname.equalsIgnoreCase("floor")
         		|| fname.equalsIgnoreCase("fix")) {
     		buf.append("floor");
+    	} else if (fname.equalsIgnoreCase("round")) {
+    		buf.append("floor(0.5+");
+	        boolean first = true;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(arg.getFortran());
+	            first = false;
+	        }
+	        buf.append(") ");
+	        return buf.toString();
+    		
     	} else if (fname.equalsIgnoreCase("ceil")) {
     		buf.append("CEILING");
 
+    	} else if (fname.equalsIgnoreCase("dgemm")) {
+        	buf.append("CALL " + fname +"(");
+	        boolean first = true;
+	        for(Expr arg : args) {
+	            if(!first) {
+	                buf.append(", ");
+	            }
+	            buf.append(arg.getFortran());
+	            first = false;
+	        }
+	        buf.append(") ");
+	        return buf.toString();        	
+    		
     	} else if (fname.equalsIgnoreCase("ALLOCATE")
     			|| fname.equalsIgnoreCase("DEALLOCATE")
     			|| fname.equalsIgnoreCase("NULLIFY")
@@ -1222,8 +1258,8 @@ aspect GenerateFortran {
 			typeName= getType().getName();
 			if(typeName.equalsIgnoreCase("int")) {
 	         	buf.append("INTEGER");
-	   		} else if(typeName.equalsIgnoreCase("double")) {	// using single instead!
-	         	buf.append("REAL");	
+	   		} else if(typeName.equalsIgnoreCase("double")) {	
+	         	buf.append("DOUBLE PRECISION");				// single -> REAL
 	   		} else if(typeName.equalsIgnoreCase("logical")) {
 				buf.append("LOGICAL");
 	   		} else if(typeName.length()>=9 &&
@@ -1290,7 +1326,7 @@ aspect GenerateFortran {
 		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
 		stmtList.add(new EmptyStmt());
 		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.14159265359"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
@@ -1306,6 +1342,12 @@ aspect GenerateFortran {
 		// temporary variable for output num2str()
 		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		// temporary variable for using BLAS 
+		stmtList.add(new AssignStmt(new NameExpr(new Name("ZERO")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("ONE")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("1.0"))));
 
 		// for command line arguments
 		stmtList.add(new AssignStmt(new NameExpr(new Name("int_tmpvar")), 
@@ -1401,7 +1443,7 @@ aspect GenerateFortran {
 			} 
 		}
 		if(!bAdd) {
-			declStmtList.insertChild(argFor, lastDeclLocation+1);
+			declStmtList.insertChild(argFor, lastDeclLocation);
 		}
 	}
 	//-------------------------------------------------------------------------
@@ -1412,7 +1454,7 @@ aspect GenerateFortran {
 		java.util.List<Stmt> stmtList = new java.util.ArrayList<Stmt>();
 		stmtList.add(new EmptyStmt());
 		stmtList.add(new AssignStmt(new NameExpr(new Name("pi")), 
-				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.1416"))));
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("3.14159265359"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("eps")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("2.2204e-16"))));
 		stmtList.add(new AssignStmt(new NameExpr(new Name("timing_tic")), 
@@ -1428,6 +1470,12 @@ aspect GenerateFortran {
 		// temporary variable for output num2str()
 		stmtList.add(new AssignStmt(new NameExpr(new Name("output_real_tmp")), 
 				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+
+		// temporary variable for using BLAS 
+		stmtList.add(new AssignStmt(new NameExpr(new Name("ZERO")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0"))));
+		stmtList.add(new AssignStmt(new NameExpr(new Name("ONE")), 
+				new FPLiteralExpr(new natlab.FPNumericLiteralValue("1.0"))));
 
 		// for command line arguments
 		stmtList.add(new AssignStmt(new NameExpr(new Name("int_tmpvar")), 

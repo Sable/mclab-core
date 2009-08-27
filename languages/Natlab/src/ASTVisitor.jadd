@@ -138,8 +138,8 @@ aspect ASTVisitor {
     public int ASTNode.nextNodeID() { return ++internalNodeID;}
     public int ASTNode.getNodeID() { return NodeID;}
     public int ASTNode.getLastNodeID() { return internalNodeID;}
-    // Counter recording the # of temporary variables created from this node
-    public int ASTNode.VarCnt = 0;	
+    // Counter recording the # of temporary variables created from this program
+    public static int ASTNode.VarCnt = 0;	
     // Only NodeID can only be set once.
     public boolean ASTNode.setNodeID() { 
     	if(NodeID==0) {

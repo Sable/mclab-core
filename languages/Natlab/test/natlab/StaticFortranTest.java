@@ -13,23 +13,32 @@ public class StaticFortranTest extends TestCase
 	private static final String basePath = "../Benchmarks/matlabBenchmarks/";
 		// "./languages/Fortran/benchmarks/"; 
     private static final String diffFileName = "diff.log";
-    private static final String checkExtention = ".ok";
-    private static final String inFileName[] = { 
-    	"test/FuncArg1.m", "test/FuncArg2.m", "test/FuncArg3.m",
+    private static final String checkExtention = ".R3";//".ok2";
+    private static final String inFileName[] = {
+    	
+    	"test/FuncArg1.m", "test/FuncArg2.m", "test/FuncArg3.m" , "test/FuncArg4.m",    	
     	"test/FuncForm.m", 
     	"test/RangeExpr.m", "test/MatrixConstruction.m",
     	"test/ParamExpr1.m","test/ParamExpr2.m", "test/ParamExpr3.m","test/ParamExpr4.m",    	
     	"test/Transform1.m", "test/Transform2.m", "test/Transform3.m",
-    	"test/TransformFunc.m",
-    	
-    	"test/TypeConflict.m", "test/benchmark2_2.m",     
-    	};
+    	/*
+    	"test/TransformFunc.m",    	
+    	"test/TypeConflict.m",     	
+    	"test/benchmark2_2.m",     
+    	*/
+    };
 
     private static final String inFolderName[] = {
-    	"capr","clos", "crni",
-    	"diff","dich","edit",
-    	"fiff","fft", "fdtd",
+    	
+    	"capr",
+        "clos",
+    	"diff","dich",
+    	"edit",	 
+    	"fiff", "fft", 
+    	"fdtd",
     	"mbrt","nb1d", "nb3d",
+    	
+    	/*  "adpt", "crni",*/
    	};
     	// 
 
@@ -44,7 +53,7 @@ public class StaticFortranTest extends TestCase
     	for(int i=0; i<inFileName.length; i++) {
 	    	argList[0] = basePath + inFileName[i];
 	    	StaticFortranTool.DEBUG = false;
-	        String filenameTag = StaticFortranTool.M2F(argList);
+	        String filenameTag = McFor.M2F(argList);
 	        bIdentical = gatherDiff(filenameTag, filenameTag+checkExtention);
 	    	if(!bIdentical)	System.err.println("[Error] in "+filenameTag);
 	    	bIdenticalAll = bIdenticalAll && bIdentical;
@@ -52,7 +61,7 @@ public class StaticFortranTest extends TestCase
     	for(int i=0; i<inFolderName.length; i++) {
 	    	argList[0] = "-d";
 	    	argList[1] = basePath + inFolderName[i];
-	        String filenameTag = StaticFortranTool.M2F(argList);
+	        String filenameTag = McFor.M2F(argList);
 	        bIdentical = gatherDiff(filenameTag, filenameTag+checkExtention);
 	    	if(!bIdentical)	System.err.println("[Error] in "+filenameTag);
 	    	bIdenticalAll = bIdenticalAll && bIdentical;

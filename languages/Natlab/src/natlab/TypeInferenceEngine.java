@@ -8,6 +8,7 @@ import natlab.ast.*;
 import natlab.SymbolTableScope;
 import natlab.SymbolTableEntry;
 
+// import JFlex.Out;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.Type;
@@ -27,6 +28,7 @@ import annotations.ast.UnknownType;
 public class TypeInferenceEngine {
 
 	static public boolean DEBUG = false;
+	static public boolean DEBUG2 = false;
 	static public int loopCounter = 1;
 
     // set inside the transposeType(), to indicate that the new inferred type 
@@ -43,8 +45,11 @@ public class TypeInferenceEngine {
 	
 	static final public String TYPENAME_CHARACTER = "character";
 
-	public static final String TEMP_VAR_PREFIX = "tmpvar_";	
+	public static final String TEMP_VAR_PREFIX = "tmpvar";	
 	static final public String PHI_FUNC_NAME = "PHISSA";
+	public static final String ALPHA_FUNC_NAME = "_Alpha_";
+	public static final String BETA_FUNC_NAME = "_Beta_";
+	public static final String LAMBDA_FUNC_NAME = "_Lambda_";
 
 	// Constant for index
 	static final int ERROR_EXTENT = -9999;
@@ -52,8 +57,18 @@ public class TypeInferenceEngine {
 
 	// A set of intrinsic function node, which is in command form
 	static HashSet<NameExpr> cmdFormFuncList = new HashSet<NameExpr>();
+	static HashSet<String> userFuncList = new HashSet<String>();
 	// Used to remember a list of function performed special transformations  
 	static HashSet<String> specialFuncList = new HashSet<String>();
+	static HashSet<String> intrinsicFuncList = new HashSet<String>();
+	
+	// Following are MATLAB intrinsic functions that supported in this compiler 
+	// They could be overload by user-defined function, 
+	static String[] intrinsicFuncArray = {"toc","tic","clock","rand","randn","zeros","ones",
+			"magic", "reshape", "transpose", 
+			"int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", 
+			"str2num", "sin", "cos", "log", "log2", "log10", "abs", "min", "sqrt", 
+			"floor", "fix", "round", "ceil", "sum", "mean", "exp", "numel", "size", };
 	
 	static SymbolTableScope gstScope;
 
@@ -73,15 +88,69 @@ public class TypeInferenceEngine {
 	
 	public static void initialAll() {
 		cmdFormFuncList.clear();
-	    specialFuncList.clear();		
+	    specialFuncList.clear();
+	    userFuncList.clear();
+	    
+	    intrinsicFuncList.clear();
+	    for(int i=0; i<intrinsicFuncArray.length; ++i) {
+	    	intrinsicFuncList.add(intrinsicFuncArray[i]);	    	
+	    }
+	}
+	public static boolean isIntrinsicFunction(String name) {
+		return intrinsicFuncList.contains(name);
 	}
 	
 	// Purpose: create new name for renaming
-	public static String getNewVarName(String orgName, ASTNode node) {
+	// @deprecated 
+	public static String getNewVarName(String orgName, ASTNode node) { // This is deprecated.
 		return orgName+"_"+node.getNodeID()+(++node.VarCnt);
 	}
+	// Generate new name that is not a intrinsic function name
+	public static String getNewFuncName(String orgName) {
+		int start = 1;
+		String basename = orgName; 
+		char last = orgName.charAt(orgName.length()-1);
+		if(last>='0' && last<='9') {
+			start = last-'0';
+			basename = orgName.substring(0, orgName.length()-1);
+		}
+		String newName = basename+""+start;
+		for(int i=start; ; ++i) {
+			newName = basename+""+i;
+			// Make sure the new name hasn't been appeared in the function 
+			if(!TypeInferenceEngine.isIntrinsicFunction(newName)) {
+				return newName;	        	
+	        }
+		}
+	}
+	public static String getNewVarName(String orgName, SymbolTableScope stScope) {
+		int start = 1;
+		String basename = orgName; 
+		char last = orgName.charAt(orgName.length()-1);
+		if(last>='0' && last<='9') {
+			start = last-'0';
+			basename = orgName.substring(0, orgName.length()-1);
+		}
+		String newName = basename+""+start;
+		if(stScope!=null) {
+			for(int i=start; ; ++i) {
+				newName = basename+""+i;
+				// Make sure the new name hasn't been appeared in the function 
+				boolean bCheckDiffCase = stScope.varUpperCaseSet.contains(newName.toUpperCase());
+				SymbolTableEntry stEntry = stScope.getSymbolById(newName);
+		        if(!bCheckDiffCase && stEntry==null && !stScope.nameSet.contains(newName)) {
+					return newName;	        	
+		        }
+			}
+		}
+		return  newName;
+	}
 	public static String getTempVarName(ASTNode node) {
-		return TEMP_VAR_PREFIX+node.getNodeID()+(++node.VarCnt);
+		// return TEMP_VAR_PREFIX+node.getNodeID()+(++node.VarCnt);
+		//if(node.VarCnt==1)
+		// 		throw new RuntimeException("	tmpvar_ = "+node.VarCnt);
+		//else
+		return TEMP_VAR_PREFIX+(++node.VarCnt);
 	}
 
 	public static Type inferType(SymbolTableScope stScope, NameExpr node, ASTNode varNode) 
@@ -96,19 +165,27 @@ public class TypeInferenceEngine {
 			// Handle variables
 	        SymbolTableEntry stEntry = stScope.getSymbolById(node.getName().getID());
 	        if(stEntry==null) {
-	        	// This is a function in command form, either built-in or user-defined.
-	        	return inferTypeIntrinsicFunction(node);
-	        }
-	        if(stEntry.getDeclLocation()!=null) {
-	        	VariableDecl varDecl = (VariableDecl) stEntry.getDeclLocation();
-	        	varType = varDecl.getType();
+	    		// (1) undefined variable: including 'i','j'; return null;
+	    		// (2) function call in command form:built-in / user defined; return some type;  
+	        	varType = inferTypeIntrinsicFunction(node);
 	        } else {
-	    		// assert(varDecl.getType()!=null) 
-	    		// This case, the Variable doesn't initialize, therefore 
-	    		// the parser should report error
-	        	System.err.println("[inferType]-NameExpr: Null varDecl "+node.getStructureStringLessComments());
-	        	return null;
+		        if(stEntry.getDeclLocation()!=null) {
+		        	VariableDecl varDecl = (VariableDecl) stEntry.getDeclLocation();
+		        	varType = varDecl.getType();
+		        }
 	        }
+    		// This case, the Variable doesn't defined nor initialized
+        	if(!isValidType(varType)) {
+	        	if((varName.equals("i") || varName.equals("j"))) {
+	        		varType = new PrimitiveType(TYPENAME_COMPLEX);
+	        	} else {
+	        		if(stEntry==null) 
+		        		System.err.println("[Error] undefined variable: "+varName);
+	        		else
+	        			System.err.println("[Error] uninitialized variable: "+varName);
+		        	return null;
+	        	}
+        	}
 		}
 		// LHS Range adjustment will not happen here,  
         if (varNode instanceof ParameterizedExpr && 
@@ -140,7 +217,7 @@ public class TypeInferenceEngine {
 				if(size.getDims().size()==1) {
 					// Update the argument's type, and the expression will be adjusted
 					// during 2nd time adjustment pass.
-					// i.g.: tmp1=[1,2], tmp2=TRANSPOSE(tmp1); => tmp1={1,2}
+					// e.g., tmp1=[1,2], tmp2=TRANSPOSE(tmp1); => tmp1={1,2}
 					//		=> tmp1(1,:)=[1,2]
 					// result type
 					dim.add(size.getDims().get(0));
@@ -212,15 +289,6 @@ public class TypeInferenceEngine {
 	}
 	private static void transform2ParameterizedExpr(NameExpr node) {
 		transform2ParameterizedExpr(node, node,new Expr[0]);
-		/*
-		// if(!(node instanceof ParameterizedExpr) && (node instanceof NameExpr))
-    	ASTNode parent = node.getParent();
-    	int loc = parent.getIndexOfChild(node);
-				+" parent=["+parent.getNodeID()+"] "+parent );
-    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
-    	ParameterizedExpr funcExpr = new ParameterizedExpr(node, list);
-    	parent.setChild(funcExpr, loc);
-    	*/
 	}
 	// Transform a expression into logical expression, and update the AST
 	public static Expr transform2LogicalOnly(Expr oprandExpr, Type typeExpr) {
@@ -291,7 +359,7 @@ public class TypeInferenceEngine {
 	}
 	
 	// Only transform the expression, don't modify the variable's type
-	// Because some variable should keep integer, i.g. loop-index variables
+	// Because some variable should keep integer, e.g., loop-index variables
 	private static void transformInteger2Double(Expr expr) {
 		ASTNode parent = expr.getParent();
     	int loc = parent.getIndexOfChild(expr);
@@ -301,7 +369,7 @@ public class TypeInferenceEngine {
 	}
 	
 	public static int getDimensionNumber(MatrixType mType) {
-		int num = 0;
+		int num = -1;
     	if(mType.getSize().getDims()!=null) {
     		num = mType.getSize().getDims().size();
     	} else if(mType.getSize().getDynamicDims()!=null) {
@@ -310,20 +378,66 @@ public class TypeInferenceEngine {
 		return num;
 	}
 	
+	public static boolean isEqualSize(Size size1, Size size2) {
+		boolean bEqual = false;
+		// Compare integer dimensions
+		if(size1.getDims()!=null && size2.getDims()!=null) {
+			java.util.List<Integer> intDim1 = size1.getDims();
+			java.util.List<Integer> intDim2 = size2.getDims();
+			if(intDim1.size()==intDim2.size()) {
+				bEqual = true;
+				for(int i=0; i<intDim1.size(); ++i) {
+					if(intDim1.get(i)!=intDim2.get(i)) {
+						bEqual = false;
+						break;
+					}
+				}
+			}
+		} else if(size1.getDims()==null && size2.getDims()==null) {
+			// When they don't have the integer dimension
+			if(size1.getDynamicDims()!=null && size2.getDynamicDims()!=null) {
+				java.util.List<String> strDim1 = size1.getDynamicDims();
+				java.util.List<String> strDim2 = size2.getDynamicDims();
+				if(strDim1.size()==strDim2.size()) {
+					bEqual = true;
+					for(int i=0; i<strDim1.size(); ++i) {
+						// Here we check both the two expressions and the values of them,
+						if(!strDim1.get(i).equals(strDim2.get(i))) {
+							if(McFor.compareExpressions(strDim1.get(i), strDim2.get(i))
+									!=McFor.COMPARE_EQUAL) {
+								bEqual = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		return bEqual;
+	}
+	
 	public static boolean isEqualType(Type type1, Type type2 ) {
 		boolean bResult = false;
 		if(type1!=null && type2!=null) {
 			if(type1 instanceof PrimitiveType && type2 instanceof PrimitiveType) {
 				bResult =(type1.getName().equals(type2.getName()));
 			} else if ((type1 instanceof MatrixType) && (type2 instanceof MatrixType)) {
-				// Otherwise, there are both MatrixType, check number of dimensions
-				int dimNum1= getDimensionNumber((MatrixType) type1);
-				int dimNum2= getDimensionNumber((MatrixType) type2);
-				bResult = dimNum1==dimNum2;
+				if(((MatrixType)type1).getElementType().getName()
+						.equals(((MatrixType)type2).getElementType().getName())) {
+					// Otherwise, there are both MatrixType, check number of dimensions
+					int dimNum1 = getDimensionNumber((MatrixType) type1);
+					int dimNum2 = getDimensionNumber((MatrixType) type2);
+					bResult = (dimNum1==dimNum2);
+	
+					if(bResult) {
+						bResult = isEqualSize(((MatrixType) type1).getSize(), ((MatrixType) type2).getSize());
+					}
+				}
 			}
 		}
 		return bResult;
 	}
+	
 	public static Type inferType(SymbolTableScope stScope, 
 			BinaryExpr expr, Type lhsType, Type rhsType, ASTNode varNode)
 	{
@@ -356,34 +470,36 @@ public class TypeInferenceEngine {
 				PrimitiveType pType = new PrimitiveType(TYPENAME_LOGICAL);
 				if(lhsType instanceof MatrixType) {
 					varType = createMatrixType(TYPENAME_LOGICAL, (MatrixType)lhsType);
-					pType = (PrimitiveType)((MatrixType)lhsType).getElementType();
+					// pType = (PrimitiveType)((MatrixType)lhsType).getElementType();
 				} else if(rhsType instanceof MatrixType) {
 					varType = createMatrixType(TYPENAME_LOGICAL, (MatrixType)rhsType);
-					pType = (PrimitiveType)((MatrixType)rhsType).getElementType();
+					// pType = (PrimitiveType)((MatrixType)rhsType).getElementType();
 				}
-				
+			/**	
+				//TODO: Transformation for B=B>0
 				if(varType instanceof MatrixType) {
 	            	// (1). remember current location
 					ASTNode parent = expr.getParent();
 	            	int loc = parent.getIndexOfChild(expr);
 
 	            	// (2) Create new variable = this new parameterized-expression            	
-	            	NameExpr newVar = addNewAssignment(expr, expr, null, stScope, varType);
+	            	// NameExpr newVar = addNewAssignment(expr, expr, null, stScope, varType);
 	            	
 	            	// (3) Add more assignment when necessary
 	            	//		Using parent, because the expr is lost, becomes part of new assignment
 	            	if(isDoubleType(pType)) {
 	            		MatrixType imType = createMatrixType(TYPENAME_INTEGER, (MatrixType)varType);
-	            		NameExpr newVar2 = addNewAssignment(newVar, parent, null, stScope, imType);
-	            		newVar = newVar2;
-	            	}
+	            		NameExpr newVar = addNewAssignment(expr, expr, null, stScope, imType);
+	            		//NameExpr newVar2 = addNewAssignment(newVar, parent, null, stScope, imType);
+	            		//newVar = newVar2;
 	            	
-	            	
-	            	// (3) replace by temporary assignment 
-	            	parent.setChild(newVar, loc);
-	            	// strExtent = newVar.getName().getID();
+		            	// (3) replace by temporary assignment 
+		            	parent.setChild(newVar, loc);
+		            	// strExtent = newVar.getName().getID();
+	            	}	            	
             	
 				}
+			**/
 			}
 			
 		} else {
@@ -406,8 +522,10 @@ public class TypeInferenceEngine {
 				if((lhsType instanceof MatrixType) && (rhsType instanceof MatrixType)) {
 					PrimitiveType pType = mergePrimitiveType((PrimitiveType)((MatrixType)lhsType).getElementType(),
 							(PrimitiveType)((MatrixType)rhsType).getElementType());
-					// For matrix - matrix operation, result's type is at lease double 
-					pType = mergePrimitiveType(pType, new PrimitiveType(TYPENAME_DOUBLE));
+					// if(expr instanceof MTimesExpr) {
+					// For matrix * matrix operation, result's type may should be double, benchmark:'clos'  
+					//	pType = mergePrimitiveType(pType, new PrimitiveType(TYPENAME_DOUBLE));
+					//}
 					// Check the conform-able when either one is a matrix!					
 					java.util.List<Integer> dim = new ArrayList<Integer>();
 					java.util.List<Integer> lDims = ((MatrixType) lhsType).getSize().getDims();
@@ -427,7 +545,6 @@ public class TypeInferenceEngine {
 									MatrixType mType = new MatrixType(pType);
 									mType.setSize(new Size(dim));
 									return mType;
-	
 								}
 							}
 						} else {
@@ -447,22 +564,45 @@ public class TypeInferenceEngine {
 							
 							if(lstrDims.size()==2 && rstrDims.size()==2) {
 								java.util.List<String> strDims = new ArrayList<String>();
+								if(expr.getLHS().getVarName().equals(expr.getRHS().getVarName())) {
+									// Transform B=B*B, to B1=B; B=B1*B1; 
+									pType = mergePrimitiveType(pType, new PrimitiveType(TYPENAME_DOUBLE));
+									if(expr.getParent() instanceof AssignStmt) {
+										Expr asgLHS = ((AssignStmt) expr.getParent()).getLHS();
+										if((asgLHS instanceof NameExpr) 
+												&& ((NameExpr) asgLHS).getVarName().equals(expr.getLHS().getVarName())) {
+											String tmpName = getNewVarName(expr.getLHS().getVarName(), stScope);
+											NameExpr lhs = new NameExpr(new Name(tmpName));
+											// Add a new assignment B1=B; before it. 
+											NameExpr newVarExpr = addNewAssignment(lhs, asgLHS, expr.getLHS(), 
+													null, stScope,  true); 
+											// change B=B*B  => B=B1*B1;
+											NameExpr lhs2 = new NameExpr(new Name(tmpName));
+											expr.setLHS(lhs2);
+											NameExpr rhs2 = new NameExpr(new Name(tmpName));
+											expr.setRHS(lhs2);
+										}
+									}
+								}
 								if(lstrDims.get(1)!=rstrDims.get(0)) {
 									if(expr.getLHS().getVarName().equals(expr.getRHS().getVarName())) {
 										// Extent to the larger one
 										// This is an special solution for benchmark 'clos'
-										// B*B, B{N,N+N}
+										//  B*B, B{N,N+N}
 										String str0 = lstrDims.get(0);
 										String str1 = lstrDims.get(1);
-										str0 = StaticFortranTool.selectLargerExpressions(str0, str1);
+										str0 = McFor.selectLargerExpressions(str0, str1);
 										lstrDims.set(0, str0);	lstrDims.set(1, str0);
 										rstrDims.set(0, str0);	rstrDims.set(1, str0);
-										System.err.println("[inferType-BinaryExpr]"+" special case!");
+										System.err.println("[inferType-BinaryExpr]  special case!"+expr.getStructureString());
+										// For matrix * matrix operation, result's type may should be double, benchmark:'clos'  
+										pType = mergePrimitiveType(pType, new PrimitiveType(TYPENAME_DOUBLE));
+										
 									}
 									
 								}
 								if(lstrDims.get(1).equals(rstrDims.get(0))
-										|| StaticFortranTool.COMPARE_EQUAL==StaticFortranTool.compareExpressions(lstrDims.get(1), rstrDims.get(0))) {
+										|| McFor.COMPARE_EQUAL==McFor.compareExpressions(lstrDims.get(1), rstrDims.get(0))) {
 									strDims.add(lstrDims.get(0));
 									strDims.add(rstrDims.get(1));
 									//Even if(dim.get(0)==1  && dim.get(1)==1), it's a 1x1, NOT a scalar 
@@ -527,7 +667,7 @@ public class TypeInferenceEngine {
 							}
 							
 							for(int i=0; i<lstrDims.size() && i<rstrDims.size(); i++) {
-								String str = StaticFortranTool.selectLargerExpressions(lstrDims.get(i), rstrDims.get(i));
+								String str = McFor.selectLargerExpressions(lstrDims.get(i), rstrDims.get(i));
 								strDims.add(str);
 							}
 							MatrixType mType = new MatrixType(pType);
@@ -873,60 +1013,15 @@ public class TypeInferenceEngine {
             	if(loc<0)
             		return;
             	
-            	// Handle column concatenation case: mag = [mag; newdata];
-            	// into mag(index, :) = newdata;
+            	// Handle column concatenation case:
+            	//    mag = [mag; newdata];
+            	// to mag(index, :) = newdata;
 				Row row0 = expr.getRows().getChild(0);
 				String varName = varExpr.getVarName();
 				if(row0.getNumElement()==1 && row0.getElement(0) instanceof NameExpr
 						&& ((NameExpr)row0.getElement(0)).getVarName().equals(varName)) 
 				{
-					
-					SymbolTableEntry stEntry = stScope.getSymbolById(varName);
-					if(stEntry!=null) {
-						// (1) get variable initial statement, and 1st-dimension
-						ASTNode initNode = stEntry.getNodeLocation();
-						int firstDim = 0;
-			    		Type varType = ((VariableDecl) stEntry.getDeclLocation()).getType();		    		
-						if (varType instanceof MatrixType) {
-							java.util.List<Integer> lDims = ((MatrixType)varType).getSize().getDims();
-							if(lDims!=null) {
-								firstDim = lDims.get(0);
-							} else {
-								System.err.println("Error: Matrix concatenation, variable has dynamic dimensions!");
-							}
-							// (2) create temporary index assignment
-							NameExpr indexExpr = addNewAssignment(
-									new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+firstDim)),
-									initNode,  null, stScope); 
-							// (3) create temporary index increasing assignment
-							PlusExpr indexPlus = new PlusExpr(indexExpr,
-									new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+1)));
-							addNewAssignment(indexExpr, indexPlus, parentAsg,  null, stScope);
-							
-							// (4) Transform Matrix concatenation into index increasing form
-			            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
-			            	list.add(indexExpr);
-			            	list.add(new ColonExpr());
-							
-			            	ParameterizedExpr exprParam = new ParameterizedExpr(varExpr, list);			    		
-			            	parentAsg.setLHS(exprParam);
-
-							Row row1 = expr.getRows().getChild(1);
-							// Assume (row1.getNumElement()==1 
-			            	parentAsg.setRHS(row1.getElement(0));
-
-			            	// JL-DEBUG
-							
-							
-						} else {
-							System.err.println("Error: Matrix concatenation, variable is not matrix type!");
-						}
-					}
-
-					// public static void transformConcatenation2Index(SymbolTableScope stScope, 
-					//		MatrixExpr expr, MatrixType mType, Type[] rowTypes) {
-					// transformConcatenation2Index(stScope, expr,)
-
+					transformConcatenation2Index(stScope, expr);
 					
 				} else {
 		    		// m12=[r1,r2] ==> m12(1, :) = r1; m12(2, :) = r2;
@@ -984,6 +1079,74 @@ public class TypeInferenceEngine {
 		}
 	}
 
+	
+	// Handle column concatenation case:
+	//    mag = [mag; newdata];
+	// to mag(index, :) = newdata;
+	public static boolean transformConcatenation2Index(SymbolTableScope stScope, MatrixExpr expr) {
+		// This is the basic structure of the matrix assignment
+		if( expr.getParent() instanceof AssignStmt 
+				&& ((AssignStmt) expr.getParent()).getLHS() instanceof NameExpr
+				&& ((AssignStmt) expr.getParent()).getRHS()==expr) {
+			// (1). remember current location
+			AssignStmt parentAsg = (AssignStmt) expr.getParent();
+			NameExpr varExpr = (NameExpr)parentAsg.getLHS(); 
+	    	// Handle column concatenation case:
+	    	//    mag = [mag; newdata];
+	    	// to mag(index, :) = newdata;
+			Row row0 = expr.getRows().getChild(0);
+			String varName = varExpr.getVarName();
+			if(row0.getNumElement()==1 && row0.getElement(0) instanceof NameExpr
+					&& ((NameExpr)row0.getElement(0)).getVarName().equals(varName)) 
+			{
+				
+				SymbolTableEntry stEntry = stScope.getSymbolById(varName);
+				if(stEntry==null) {
+					return false;
+				}
+				// (1) get variable initial statement, and 1st-dimension
+				ASTNode initNode = stEntry.getNodeLocation();
+				int firstDim = 0;
+				if(stEntry.getDeclLocation()!=null) {
+		    		Type varType = ((VariableDecl) stEntry.getDeclLocation()).getType();
+		    		if (varType instanceof MatrixType) {
+						java.util.List<Integer> lDims = ((MatrixType)varType).getSize().getDims();
+						if(lDims!=null) {
+							firstDim = lDims.get(0);
+						} else {
+							System.err.println("Error: Matrix concatenation, variable has dynamic dimensions!");
+						}
+		    		}
+				}
+				// (2) create temporary index assignment
+				NameExpr indexExpr = addNewAssignment(
+						new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+firstDim)),
+						initNode,  null, stScope, false); 
+				// (3) create temporary index increasing assignment
+				PlusExpr indexPlus = new PlusExpr(indexExpr,
+						new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+1)));
+				addNewAssignment(indexExpr, indexPlus, parentAsg,  null, stScope, false);
+				
+				// (4) Transform Matrix concatenation into index increasing form
+            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+            	list.add(indexExpr);
+            	list.add(new ColonExpr());
+				
+            	ParameterizedExpr exprParam = new ParameterizedExpr(varExpr, list);			    		
+            	parentAsg.setLHS(exprParam);
+
+				Row row1 = expr.getRows().getChild(1);
+				// Assume (row1.getNumElement()==1 
+            	parentAsg.setRHS(row1.getElement(0));
+            	return true;
+
+			}
+			
+		} 
+    	return false;
+		
+	}
+
 	// Utility Functions for range expression
 	// # 2nd time calling RangeExpr.inferType() should not trigger following transformation
 	// Because the transformation will 
@@ -993,12 +1156,13 @@ public class TypeInferenceEngine {
 	// 	- it relies on the constant propagation to convert variable range into constant range
 	// For variable range:
 	//	- it relies on the transformation to create new variable for extent
+	// e.g., For A(1:n,1), getStringExtent calculates the extent of "1:n" 
 	public static String getStringExtent(SymbolTableScope stScope, String exprStr, boolean isInteger) {
 		// This is a temporary solution!
 		// This can be handled by saving the range expression in the Symbol Table,
 		// at the time when calculating the value and saving it to the Symbol Table Entry.
 		String strExtent = null;
-		ExprStmt exprStmt =  StaticFortranTool.parseString(exprStr);
+		ExprStmt exprStmt =  McFor.parseString(exprStr);
 		Expr expr = exprStmt.getExpr();
 		if(expr instanceof RangeExpr) {
 			return getStringExtent(stScope, (RangeExpr)expr, isInteger);
@@ -1008,9 +1172,6 @@ public class TypeInferenceEngine {
 	
 	public static String getStringExtent(SymbolTableScope stScope, RangeExpr expr, boolean isInteger) {
 		String strExtent = null;
-		// This is handled by inferSymbolEntry(), because it needs 2 values
-		// following is dummy code
-		// TODO: Need to calculate the value of Range Expr!
 		String strLow = getVariableValue(stScope, ((RangeExpr)expr).getLower());
 		String strUpp = getVariableValue(stScope, ((RangeExpr)expr).getUpper());
 		if(((RangeExpr)expr).hasIncr()) {
@@ -1018,8 +1179,19 @@ public class TypeInferenceEngine {
 			strExtent = "("+strExtent+")/"+getVariableValue(stScope, ((RangeExpr)expr).getUpper());
 			strExtent = strExtent + "+1" ;
 		} else {
-			strExtent = strUpp + "-" + strLow;
-			strExtent = strExtent + "+1" ;
+			if(isIntLiteral(expr.getLower())) {
+				int sum = 1-getIntLiteralValue(expr.getLower());
+				if(sum!=0)
+					if(sum>0)
+						strExtent = strUpp+"+"+sum;
+					else
+						strExtent = strUpp+"-"+Math.abs(sum);
+				else
+					strExtent = strUpp;
+			} else {
+				strExtent = strUpp + "-" + strLow;
+				strExtent = strExtent + "+1" ;
+			}
 		}
 		return strExtent;
 	}
@@ -1102,7 +1274,6 @@ public class TypeInferenceEngine {
 				isInteger = false;
 				mType = new MatrixType(new PrimitiveType(TYPENAME_INTEGER));
 			}
-			// TODO: This case is quite series, need list all cases...
 		}
 
 		// [1] Literal:  IntLiteralExpr and FPLiteralExpr, NEVER consider StringLiteralExpr
@@ -1152,7 +1323,7 @@ public class TypeInferenceEngine {
 				parent.setChild(newPlus, loc);
 			}
 		} else {
-			// [2] extent are variables
+			// [2] extent has variable(s)
 			// get value for each one
 			SymbolTableEntry varEntry = stScope.getSymbolById(varNode.getVarName());
 			int first, last;
@@ -1168,7 +1339,20 @@ public class TypeInferenceEngine {
 					// Using integer division, so don't need floor()
 					strExtent = "("+lastStr+"-"+firstStr+")/"+incStr+"+1";
 				} else if(firstStr!=null && lastStr!=null) {
-					strExtent = lastStr+"+1"+"-"+firstStr;
+					// Here try to avoid result becomes "n-1+1",   
+					if(isIntLiteral(expr.getLower())) {
+						int sum = 1-getIntLiteralValue(expr.getLower());
+						if(sum!=0)
+							if(sum>0)
+								strExtent = lastStr+"+"+sum;
+							else
+								strExtent = lastStr+"-"+Math.abs(sum);
+						else
+							strExtent = lastStr;
+							
+					} else {
+						strExtent = lastStr+"+1"+"-"+firstStr;
+					}
 				}
 			} else {
 				if(expr.hasIncr()) {
@@ -1229,35 +1413,50 @@ public class TypeInferenceEngine {
             	
             	// (1) Create new variable = this new parameterized-expression            	
             	NameExpr newVar = addNewAssignment(newPlus, expr, null, stScope);
+            	SymbolTableEntry ste1 = stScope.getSymbolById(newVar.getVarName());
+            	ste1.setValue(new StringLiteralExpr(getVariableValue(stScope, newPlus)));
 
             	// using that temporary assignment 
             	strExtent = newVar.getName().getID();
             	
             	// Re-build this range expression
 				RangeExpr newRange = new RangeExpr();
+
+				newRange.setLower(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")));
 				
+				MinusExpr lowMinus = new MinusExpr();
+				lowMinus.setLHS(newVar);
+				lowMinus.setRHS(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));				
+            	newRange.setUpper(lowMinus);
+
+            	PlusExpr lowerPlus = new PlusExpr();
+				lowerPlus.setRHS(expr.getLower());				
+				
+				ASTNode parent = expr.getParent();
+				int loc = parent.getIndexOfChild(expr);
+
 				if(isInteger) {
-					// A3 = 1:6.3	==> A3 = 1:floor(6.3)
-					// already did above.
+					if(expr.hasIncr()) {
+						// A3 = 1:inc:6.3	
+						MTimesExpr newMTime = new MTimesExpr();
+						newMTime.setLHS(expr.getIncr());	// put scalar on LHS makes MTimesExpr infer faster
+						newMTime.setRHS(newRange);
+						lowerPlus.setLHS(newMTime);
+
+						parent.setChild(lowerPlus, loc);	            		
+					} else {
+						// A3 = 1:6.3	==> A3 = 1:floor(6.3)
+						// already did above.
+					}
+
 				} else {
 					// A2 = -2.5:2.5			==> A2 = (0:(6-1))+(-2.5)
 					// A4 = 10:2.5:15			==> A4 = (0:(3-1))*(2.5)+10
-					newRange.setLower(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")));
-			
-					MinusExpr lowMinus = new MinusExpr();
-					lowMinus.setLHS(newVar);
-					lowMinus.setRHS(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));				
-	            	newRange.setUpper(lowMinus);
-	
-	            	PlusExpr lowerPlus = new PlusExpr();
-					lowerPlus.setRHS(expr.getLower());				
 					
-					ASTNode parent = expr.getParent();
-					int loc = parent.getIndexOfChild(expr);
-					
-					// ForStmt's index variable
-	            	Stmt stmtNode = ASTToolBox.getParentStmtNode(expr);
-	            	if(stmtNode.getParent() instanceof ForStmt) {
+					if(bForStmtIndex) {
+						// ForStmt's index variable
+						Stmt stmtNode = ASTToolBox.getParentStmtNode(expr);
+						// if(stmtNode.getParent() instanceof ForStmt) 
 	            		List<Stmt> stmtList = ((ForStmt) stmtNode.getParent()).getStmtList();
 	        			// (2) Replace by another temporary variable
 	        			// Create new assignment and replace only one
@@ -1268,7 +1467,12 @@ public class TypeInferenceEngine {
 	        				dupRange.setIncr(newRange.getIncr());
 	        			}	        			
 	        			
+	        			// create new for index variable and set its values
 	                	NameExpr newVar2 = addNewAssignment(dupRange, stmtNode, stmtNode.getParent(), stScope);
+	                	SymbolTableEntry ste = stScope.getSymbolById(newVar2.getVarName());
+	                	ste.setMinValue(new StringLiteralExpr(dupRange.getLower().getStructureString()));
+	                	ste.setMaxValue(new StringLiteralExpr(dupRange.getUpper().getStructureString()));
+	                	
 	                	// set flag: this range-expr is not used by ForStmt
 
 						// Using new variable to create new assignment
@@ -1288,10 +1492,9 @@ public class TypeInferenceEngine {
 	        			loc = stmtNode.getIndexOfChild(expr);
 						stmtNode.setChild(lowerPlus, loc);
 						stmtList.generateUseBoxesList();
-
+					
 			    		return new PrimitiveType(TYPENAME_DOUBLE);
-						
-						
+												
 	            	} else {
 						if(expr.hasIncr()) {
 							MTimesExpr newMTime = new MTimesExpr();
@@ -1317,6 +1520,22 @@ public class TypeInferenceEngine {
     	if(bForStmtIndex) {
     		return new PrimitiveType(TYPENAME_INTEGER);
     	} else { 
+    		/**		// TODO: JL-09.06
+    		// Change it to two dimensional: 
+    		// This isn't right, because A=1:n, B(:, 1)=1:n, both legal in MATLAB
+    		Size size = mType.getSize();
+    		java.util.List<String> strDim = size.getDynamicDims();
+    		java.util.List<Integer> intDim = size.getDims();
+        	if(strDim!=null) {
+        		strDim.add(0, "1");
+    			size.setDynamicDims(strDim);
+        	} 
+        	if(intDim!=null) {
+        		intDim.add(0, 1);
+        		size.setDims(intDim);
+        	}
+        	mType.setSize(size);
+        	**/
     		return mType;
     	}
 	}
@@ -1330,21 +1549,35 @@ public class TypeInferenceEngine {
 			ASTNode parentNode, SymbolTableScope stScope) {
 		return addNewAssignment(RHS, curStmt, parentNode, stScope, new PrimitiveType(TYPENAME_INTEGER), lhs, false);
 	}
+	public static NameExpr addNewAssignment(NameExpr lhs, Expr RHS, ASTNode curStmt, 
+			ASTNode parentNode, SymbolTableScope stScope, boolean bAddDecl) {
+		return addNewAssignment(RHS, curStmt, parentNode, stScope, new PrimitiveType(TYPENAME_INTEGER), lhs, bAddDecl);
+	}
+	// This may cause error, because its default bAddDecl=true
 	public static NameExpr addNewAssignment(Expr RHS, ASTNode curStmt, 
 			ASTNode parentNode, SymbolTableScope stScope) {
-		return addNewAssignment(RHS, curStmt, parentNode, stScope, new PrimitiveType(TYPENAME_INTEGER));
+		return addNewAssignment(RHS, curStmt, parentNode, stScope, true);
+	}
+	public static NameExpr addNewAssignment(Expr RHS, ASTNode curStmt, 
+			ASTNode parentNode, SymbolTableScope stScope, boolean bAddDecl) {
+		return addNewAssignment(RHS, curStmt, parentNode, stScope, new PrimitiveType(TYPENAME_INTEGER), bAddDecl);
 	}
 	public static NameExpr addNewAssignment(Expr RHS, ASTNode curStmt, 
 			ASTNode parentNode, SymbolTableScope stScope, Type pType) 
 	{
-		
+		return addNewAssignment(RHS, curStmt, parentNode, stScope, pType, true);		
+	}
+	public static NameExpr addNewAssignment(Expr RHS, ASTNode curStmt, 
+			ASTNode parentNode, SymbolTableScope stScope, Type pType, boolean bAddDecl) 
+	{		
 		if(RHS==null || curStmt==null)
 			return null;
 		String tmpName = getTempVarName(curStmt);
 		NameExpr lhs = new NameExpr(new Name(tmpName));
-		return addNewAssignment(RHS, curStmt, parentNode, stScope, pType, lhs, true);
+		return addNewAssignment(RHS, curStmt, parentNode, stScope, pType, lhs, bAddDecl);
 		
 	}
+	// If parentNode==null, add to this location
 	public static NameExpr addNewAssignment(Expr RHS, ASTNode curStmt, 
 			ASTNode parentNode, SymbolTableScope stScope, Type pType, NameExpr lhs, boolean bAddDecl) 
 	{
@@ -1353,7 +1586,7 @@ public class TypeInferenceEngine {
 		// Find the parent statement list node, and directly child node
 		// It must be done first, because the new assignment may break
 		// the original parent/child relation, 
-		// i.g. curStmt becomes child of new assignment
+		// e.g., curStmt becomes child of new assignment
 		ASTNode parent = curStmt.getParent(); 
 		ASTNode child = curStmt;
 		int loc = 0;
@@ -1400,6 +1633,7 @@ public class TypeInferenceEngine {
 		// Add new declaration node
     	VariableDecl tmpDecl = new VariableDecl(tmpName, pType, tmpName);
     	tmpDecl.setNodeID();
+
     	// adding them into tree;
     	while(!(parent.getChild(0) instanceof VariableDecl)) {
     		do {
@@ -1420,7 +1654,6 @@ public class TypeInferenceEngine {
     		if(root instanceof Function) 
     			((Function) root).addDeclStmt(tmpDecl);
     	} else if(parent!=null && (parent.getChild(0) instanceof VariableDecl)) {
-	    	// System.out.println("[addNewAssignment]"+tmpDecl.getStructureString());
 			parent.insertChild(tmpDecl, 0);
 			((VariableDecl)parent.getChild(0)).setType(pType);
 		} else {
@@ -1465,10 +1698,10 @@ public class TypeInferenceEngine {
 	    	if(varType instanceof MatrixType) {
 		    	// (1) adjust RHS in case of: 
 	        	// When using linear indexing, which means index misses some dimension
-	        	// i.g.  A=Matrix(1*5),   expr:  A(2)  => A(1,2) 
-	        	// i.g.  B=Matrix(5*1),   expr:  B(3)  => B(3,1)
-	        	// i.g.  C=Matrix(2*10),  expr:  C(4)  => B(1,4)	// row major ??
-	        	// 							expr:  C(15)  => B(2,5)	// row major
+	        	// e.g., A=Matrix(1*5),   expr:  A(2)  => A(1,2) 
+	        	// e.g., B=Matrix(5*1),   expr:  B(3)  => B(3,1)
+	        	// e.g., C=Matrix(2*10),  expr:  C(4)  => C(2,2); C(5)  => C(1,3)	// row major 
+
 	    		MatrixType mType = createMatrixType((MatrixType)varType);
 	    		boolean bSuccess = adjustParameterizedExpr((MatrixType) mType, expr);
 	    		// False means from expr cannot get a proper type! 
@@ -1516,7 +1749,7 @@ public class TypeInferenceEngine {
             		|| fname.equalsIgnoreCase(TYPENAME_LOGICAL)
             		|| fname.equalsIgnoreCase(TYPENAME_COMPLEX)
             		) { 
-    			varType =  new PrimitiveType(fname);
+    			varType =  new PrimitiveType(fname.toLowerCase());
     			
             } else if(fname.equalsIgnoreCase("toc")) {
     			varType = new PrimitiveType(TYPENAME_DOUBLE);
@@ -1577,7 +1810,11 @@ public class TypeInferenceEngine {
     				varType =  new PrimitiveType(TYPENAME_DOUBLE);	
     			}
 
-            } else if(fname.equalsIgnoreCase(PHI_FUNC_NAME)) {	
+            } else if(fname.equalsIgnoreCase(PHI_FUNC_NAME)
+            		|| fname.equalsIgnoreCase(ALPHA_FUNC_NAME)
+            		|| fname.equalsIgnoreCase(BETA_FUNC_NAME)
+            		|| fname.equalsIgnoreCase(LAMBDA_FUNC_NAME)) {	
+            	
     			// TODO: create union type for PHI function, abandoned now!
             	for(int i=0; i<expr.getNumArg(); i++) {
 	    			Type argType = expr.getArg(i).collectType(stScope, varNode);
@@ -1664,11 +1901,13 @@ public class TypeInferenceEngine {
             		varType = new PrimitiveType(TYPENAME_INTEGER);
             	}
 
-            } else if(fname.equalsIgnoreCase("round") || fname.equalsIgnoreCase("floor")
+            } else if(fname.equalsIgnoreCase("floor")
             		|| fname.equalsIgnoreCase("fix")) {
             	expr.setTarget(new NameExpr(new Name("floor")));
     			varType = new PrimitiveType(TYPENAME_INTEGER);
     			transformIntegerArg2Double(stScope, expr, 1);
+            } else if(fname.equalsIgnoreCase("round")) {
+    			varType = new PrimitiveType(TYPENAME_INTEGER);
     			
             } else if(fname.equalsIgnoreCase("ceil")) {
     			varType = new PrimitiveType(TYPENAME_INTEGER);
@@ -1713,9 +1952,15 @@ public class TypeInferenceEngine {
     	        }
             } else if(fname.equalsIgnoreCase("exp")) {
     			varType = new PrimitiveType(TYPENAME_DOUBLE);
+    			varType = expr.getArg(0).collectType(stScope, varNode);
+    			if(!isComplexType(varType)) {
+    				varType =  new PrimitiveType(TYPENAME_DOUBLE);	
+    			}
     				
             } else if(fname.equalsIgnoreCase("ALLOCATED")) {
     			varType = new PrimitiveType(TYPENAME_LOGICAL);
+            } else if(fname.equalsIgnoreCase("LEN")) {
+    			varType = new PrimitiveType(TYPENAME_INTEGER);
     			
             } else if(fname.equalsIgnoreCase("numel")
             		|| (fname.equalsIgnoreCase("size"))) {
@@ -1805,27 +2050,30 @@ public class TypeInferenceEngine {
 	//-------------------------------------------------------------------------
 	// Infer type for intrinsic and user-defined functions in command form
 	// TODO: adding their name and return type of
-	// those intrinsic functions that don't have argument,
-	// There is possible to determinate a function doesn't support in current system, 
+	// 		those intrinsic functions that don't have argument,
+	// There is possible to determinate a function doesn�t support in current system, 
 	// based on the list of intrinsic functions and user-defined functions.)	
 	public static Type inferTypeIntrinsicFunction(NameExpr node) {
 		Type varType = null;
 		String varName = node.getName().getID();
 		// 1. Intrinsic functions
-		if(varName.equalsIgnoreCase("toc")) {
+		if(varName.equalsIgnoreCase("toc") || varName.equalsIgnoreCase("tic")) {
 			varType = new PrimitiveType(TYPENAME_DOUBLE);
 		} else if(varName.equalsIgnoreCase("clock")) {
 			varType = createMatrixType(TYPENAME_DOUBLE, 1,6);
-		} else {
+		} else if(varName.equalsIgnoreCase("rand") || varName.equalsIgnoreCase("randn")) {
+			varType = new PrimitiveType(TYPENAME_DOUBLE);
+		} else if(userFuncList.contains(varName)){
         	// 2. User-defined functions
         	varType = createFunctionSignature(node);
+		} else {
+			// Undefined variable
+			varType = null;
 		}
-		// Save those node, and convert to normal form later. 
+		// Save those nodes and convert to normal form later. 
 		// Don't convert those function into normal form now, 
 		// because it will not affect current type-infer()
-		if(varName.equals("i") || varName.equals("j") ) {
-			// complex number
-		} else {
+		if(isValidType(varType)){
 			// Special code for adding extra statement corresponding to code-gen
 			SpecialTransform(node);
 			cmdFormFuncList.add(node);
@@ -1833,7 +2081,9 @@ public class TypeInferenceEngine {
 
 		return varType;
 	}
-	// Special code for adding extra statement corresponding to code-gen
+	
+	// Special function - for Aggregation Transformation
+	// By adding extra statement corresponding to code-gen
 	// like III=III
 	public static void SpecialTransform(NameExpr node, String varName) {
 		if(specialFuncList.contains(varName))
@@ -1860,6 +2110,7 @@ public class TypeInferenceEngine {
 			specialFuncList.add(varName);
 		}
 	}
+	// Handles the command form function calls
 	public static void SpecialTransform(NameExpr node) {
 		String varName = node.getName().getID();
 		if(varName.equalsIgnoreCase("toc") && ( !cmdFormFuncList.contains(node) 
@@ -1876,21 +2127,9 @@ public class TypeInferenceEngine {
 			SpecialTransform(node, "output_real_tmp");
 		}
 	}
-	//-------------------------------------------------------------------------
+
 	
-	public static boolean isValidType(Type varType)
-	{
-		return (varType!=null && !(varType instanceof UnknownType));
-	}
-	public static boolean isIntegerType(Type varType) {
-        if(varType!=null && varType instanceof PrimitiveType
-        		&& varType.getName().equalsIgnoreCase(TYPENAME_INTEGER)) {
-        	return true;
-        } else {
-        	return false;
-        }
-	}
-	 
+	//-------------------------------------------------------------------------
 	public static String getLiteralString(LiteralExpr expr) {
 		if(expr==null) {
 			return null;
@@ -1956,43 +2195,61 @@ public class TypeInferenceEngine {
         	return false;
         }
 	}
+	public static boolean isNumricLiteral(Expr expr) {
+		return (isIntLiteral(expr) || isFPLiteral(expr));
+	}
 	public static boolean isStringLiteral(Expr expr) {
 		return (expr instanceof StringLiteralExpr);
 	}
 
+	//---------------------------------------------------------------
+	public static boolean isValidType(Type varType)	{
+		return (varType!=null && !(varType instanceof UnknownType));
+	}
+	public static boolean isPrimitiveType(Type varType) {
+		return (varType!=null && (varType instanceof PrimitiveType));
+	}
+	public static boolean isMatrixType(Type varType) {
+		return (varType!=null &&(varType instanceof MatrixType));
+	}
+	public static boolean isIntegerType(Type varType) {
+        return (varType!=null && varType instanceof PrimitiveType
+        		&& varType.getName().equalsIgnoreCase(TYPENAME_INTEGER));
+	}
+	public static boolean isIntegerMatrixType(Type varType) {
+        return (isMatrixType(varType)) 
+			&& isIntegerType(((MatrixType)varType).getElementType());
+	}	 
 	public static boolean isComplexType(Type varType) {
-        if(varType!=null && varType instanceof PrimitiveType
-        		&& varType.getName().equalsIgnoreCase(TYPENAME_COMPLEX)) {
-        	return true;
-        } else {
-        	return false;
-        }
+        return (varType!=null && varType instanceof PrimitiveType
+        		&& varType.getName().equalsIgnoreCase(TYPENAME_COMPLEX)) ;
+	}
+	public static boolean isComplexMatrixType(Type varType) {
+        return (isMatrixType(varType)) 
+			&& isComplexType(((MatrixType)varType).getElementType());
 	}
 	public static boolean isDoubleType(Type varType) {
-        if(varType!=null && varType instanceof PrimitiveType
-        		&& varType.getName().equalsIgnoreCase(TYPENAME_DOUBLE)) {
-        	return true;
-        } else {
-        	return false;
-        }
+        return (varType!=null && varType instanceof PrimitiveType
+        		&& varType.getName().equalsIgnoreCase(TYPENAME_DOUBLE));
+	}
+	public static boolean isDoubleMatrixType(Type varType) {
+        return (isMatrixType(varType)) 
+        		&& isDoubleType(((MatrixType)varType).getElementType());
 	}
 	
 	public static boolean isCharacterType(Type varType) {
-        if(varType!=null && varType.getName().length()>=TYPENAME_CHARACTER.length()
-				&& varType.getName().substring(0, TYPENAME_CHARACTER.length()).equalsIgnoreCase(TYPENAME_CHARACTER)) {
-        	return true;
-        } else {
-        	return false;
-        }
+        return (varType!=null && varType.getName().length()>=TYPENAME_CHARACTER.length()
+				&& varType.getName().substring(0, TYPENAME_CHARACTER.length())
+				.equalsIgnoreCase(TYPENAME_CHARACTER)) ;
 	}
 	public static boolean isLogicalType(Type varType) {
-		if(varType!=null 
+		return (varType!=null 
 				&& varType instanceof PrimitiveType 
-				&& varType.getName().equalsIgnoreCase(TYPENAME_LOGICAL)) {
-			return true;
-		} else {
-			return false;
-		}
+				&& varType.getName().equalsIgnoreCase(TYPENAME_LOGICAL));
+	}
+	public static boolean isLogicalMatrixType(Type varType) {
+        return (isMatrixType(varType)) 
+        	&& isLogicalType(((MatrixType)varType).getElementType());
 	}
 
 	private static Integer maxInteger(Integer i1, Integer i2) {
@@ -2053,13 +2310,13 @@ TODO: rhsType ==> [n-1+1]
 	}
 	// 
 	// Get the type of the parameterized-expression represents.
-	// i.g. U={int}{n,m},  U(1,2)=U(1,j)=U(i,2)={int}; 
+	// e.g., U={int}{n,m},  U(1,2)=U(1,j)=U(i,2)={int}; 
 	//		U(:,2)=U(:,j)={n};   U(i,:)=U(1,:)={m};
 	// Parameters:
-	//	- varType: the type of the variable, i.g. U={int}{n,m}
+	//	- varType: the type of the variable, e.g., U={int}{n,m}
 	//	- expr  : the ParameterizedExpr expression
 	//	- lType : the expression's maximum possible type according to its format,
-	//			: their dimensions, i.g. U(i,:)={i,:}
+	//			: their dimensions, e.g., U(i,:)={i,:}
 	
 	public static Type getParameterizedExprType(SymbolTableScope stScope, MatrixType varType, ParameterizedExpr expr) {
 		PrimitiveType pType = (PrimitiveType) varType.getElementType();
@@ -2114,7 +2371,7 @@ TODO: rhsType ==> [n-1+1]
 	//----------------------------------------------------------------------------------
     // Check and decide the final matrix type for variable like: X(10) = ..., X(1,1)=..
 	// varType: the inferred type of the expression, based on RHS
-	// expr : the LHS expression, which may indicate a use of the variable, 
+	// expr : the LHS expression, which may expand the size of the variable, 
 	// There are many cases:
 	//	- varType = PrimaryType			expr = x(1,2)		: enlarge
 	//	- Matrix(2,3)					expr = x(4,5)		: enlarge
@@ -2122,9 +2379,11 @@ TODO: rhsType ==> [n-1+1]
 	//  - Matrix(1,3)					expr = x(2)			: change expr=x(1,2)
 	// ... ...
 	// ... ...	
-	// Adjust the inferred type (varType) with the matrix-access expression (expr)
+	// Adjust the inferred type (varType) with the indexed-access expression (expr)
 	// Get the correct data type that based on those two.
-	// Because they may different, i.g. A(1,2)=0.0
+	// Because they may different, e.g., A(1,2)=0.0
+	
+	// Return null, when the two sizes are not comparable, 
 	public static MatrixType adjustMatrixType(Type varType, ParameterizedExpr expr) {
 		String typeName =  TYPENAME_DOUBLE;
     	if(varType!=null) {
@@ -2132,6 +2391,7 @@ TODO: rhsType ==> [n-1+1]
     	}
     	MatrixType lType = createMatrixType(typeName, (ParameterizedExpr) expr);
     	MatrixType mType = mergeMatrixType(varType, lType);
+    	
     	
     	return mType;
 	}
@@ -2172,10 +2432,13 @@ TODO: rhsType ==> [n-1+1]
 	}
 
 	// The result type will be a matrix type with largest dimension of those two types
-	// And the primary type will be the smallest compatible type of those two.
+	// And the primary type will be the larger type of those two.
 	// Case 1: Primitive-Type, Matrix-Type
-	//			- merge primitive type, use the Size of Matrix-Type
-	// Case 2: 
+	//		- merge primitive type, use the Size of Matrix-Type
+	// Case 2:  Matrix-Type, Matrix-Type
+	//		- Primitive type : merge
+	//		- Size comparable, then use larger one, 
+	// 		- Size not-comparable, Return larger one.		
 	public static MatrixType mergeMatrixType(Type varType, MatrixType lType) {
 		String typeName = TYPENAME_DOUBLE;
     	if(varType==null) {
@@ -2199,6 +2462,11 @@ TODO: rhsType ==> [n-1+1]
     	java.util.List<Integer> lDims = lType.getSize().getDims();
     	java.util.List<Integer> mDims = new ArrayList<Integer>();
 		if(lDims==null || vDims==null) {
+			// Case 2: One of the size contains integer, another contains variable
+			//		They are not comparable.
+			// Case 3: Two sizes contains variables
+			//		Comparable: when they only have the same variables
+			
 			// Dynamic indexes
 			// Convert static dimension to string, so that they can compare each other
 			fillStringDimensions(lType, (MatrixType)varType);
@@ -2222,7 +2490,20 @@ TODO: rhsType ==> [n-1+1]
 			java.util.List<String> lstrDims = lType.getSize().getDynamicDims();
 			java.util.List<String> mstrDims = new ArrayList<String>();
 			java.util.List<String> tmpDims = new ArrayList<String>();
-			// Align the dimensions
+			
+			// Check for illegal type
+			for(int i=0;i<vstrDims.size();++i) {
+				if(vstrDims.get(i).isEmpty()) {
+					return lType;
+				}
+			}
+			for(int i=0;i<lstrDims.size();++i) {
+				if(lstrDims.get(i).isEmpty()) {
+					return (MatrixType)varType;
+				}
+			}
+			
+			// Align the dimensions of the two size,
 			if(vstrDims.size()>lstrDims.size() && lstrDims.size()>0) {
 				for(int i=0;i<vstrDims.size();++i) {
 					String strv = vstrDims.get(i); 
@@ -2234,18 +2515,35 @@ TODO: rhsType ==> [n-1+1]
 				}
 				lstrDims = tmpDims;
 			} else if(vstrDims.size()<lstrDims.size() && vstrDims.size()>0) { 
+				boolean b1 = false;
 				for(int i=0;i<lstrDims.size();++i) {
 					String strl = lstrDims.get(i); 
 					if(strl.equals("1")) {
 						tmpDims.add(strl);
+						b1 = true;
 					}
 					if(i<vstrDims.size())
 						tmpDims.add(vstrDims.get(i));
 				}
-				vstrDims = tmpDims;
+				if(b1) {
+					vstrDims = tmpDims;
+				} else {
+					tmpDims.clear();
+					// For the case: A(1,:)=[1,2,3]
+					for(int i=0, j=0;i<lstrDims.size();++i) {
+						String strl = lstrDims.get(i); 
+						if(strl.equals(":")) {
+							tmpDims.add(vstrDims.get(j++));
+						} else {
+							tmpDims.add(strl);
+						}
+					}
+					vstrDims = tmpDims;
+				}
 			}
-			
+
 			// If their dimensions still cannot match, then choose larger one. 
+			// Case: A(1,:)=[1,2,3]; LHS=A[2,3], RHS=[3]
 			if(vstrDims.size()>lstrDims.size()) {
 				Size strSize = new Size();
 				strSize.setDynamicDims(vstrDims);
@@ -2256,31 +2554,46 @@ TODO: rhsType ==> [n-1+1]
 				strSize.setDynamicDims(lstrDims);
 				mType.setSize(strSize);
 				return mType;
+
 			} else {
-				// (vstrDims.size()==lstrDims.size()) 
 				// compare each dimension's string, choose bigger one
 				for(int i=0;i<vstrDims.size();++i) {
 					String str = vstrDims.get(i); 
 					String strl = lstrDims.get(i); 
 					
+					// If there is an error, then cannot merge 
+					if(str==null || strl==null) {
+			/*
 					if(str==null && strl==null) {
 						str = "1";
 					} else if(str==null) {
 						str = strl;
 					} else if(strl==null) {
 						// lType is a unsolved dimension variable,  which has null
-						// i.g. D(1,null), then ignore this type, 
-						return (MatrixType)varType;			
+						// e.g., D(1,null), then ignore this type, 
+						// return (MatrixType)varType;
+						 
+			 */
+						System.err.println("[mergeMatrixType] Size has null value ["+str+"]["+strl+"]");
+						return null;
 					} else if (!(str.equals(strl))) {
 						// First, skip those uncertain value from temporary variables
+						/*
+						// Must comparable, I don't know what is the cases of TEMP_VAR_PREFIX
 						if(str.contains(TEMP_VAR_PREFIX)) {
 							str = strl;
 						} else if(strl.contains(TEMP_VAR_PREFIX)) {
 							// using str;
 						} else {
+						*/
 							// Compare (i+1,i), (i-1,i), (i+1-1)
-							str = StaticFortranTool.selectLargerExpressions(str, strl);
-						}
+							String str0 = str;
+							str = McFor.selectLargerExpressions(str, strl);
+							if(str==null) {
+								// System.err.println("[mergeMatrixType] Size has are not comparable ["+str0+"]["+strl+"]");
+								return null;
+							}
+						// }
 					}
 					mstrDims.add(str);
 				}
@@ -2290,6 +2603,7 @@ TODO: rhsType ==> [n-1+1]
 				return mType;
 			}
 		} else {
+			// Case 1: Two sizes contains all integers
 			int vsize = vDims.size();
 			int lsize = lDims.size();
 	    	
@@ -2412,7 +2726,7 @@ TODO: rhsType ==> [n-1+1]
 		return createMatrixType(PrimitiveTypeName, expr, bMxM, true);
 	}
 	// Parameters:
-	// 	- bMxM : flag for special case: i.g. randn(m) => m-by-m matrix
+	// 	- bMxM : flag for special case: e.g., randn(m) => m-by-m matrix
 	//	- bGetValue: true: get value of the index variable/expression as result
 	//				false: just use the index-variable as result
 	public static MatrixType createMatrixType(String PrimitiveTypeName, 
@@ -2431,7 +2745,7 @@ TODO: rhsType ==> [n-1+1]
         		// if(((IntLiteralExpr) arg).getValue().getValue().intValue()==1) 
         			// column matrix/row matrix,
         			// currently treat as two dimension array
-        			// i.g.: A=1:10, B=rand(1,10); C=rand(10,1)
+        			// e.g., A=1:10, B=rand(1,10); C=rand(10,1)
         		// 
         		int extent = getIntLiteralValue(arg); 
 	        	Dims.add(extent);
@@ -2471,12 +2785,10 @@ TODO: rhsType ==> [n-1+1]
         		}
         	} else {
 	        	// Using variable in the extent of each dimension
-        		// TODO: Different type of Node are handled by getVariableValue()
+        		// Different type of Node are handled by getVariableValue()
         		String strValue = null;
     			if(bGetValue) {
         			strValue = getVariableValue(gstScope, arg);
-    			} else { 
-    				strValue = arg.getStructureString();
     			}
         		if(strValue == null) {
         			strValue = arg.getStructureString();
@@ -2732,7 +3044,7 @@ TODO: rhsType ==> [n-1+1]
 				AssignStmt idxAsg = new AssignStmt();
 				idxAsg.setLHS(new NameExpr(new Name("int_tmpvar")));
 				idxAsg.setRHS(new RangeExpr(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")), 
-						new Opt<Expr>(), StaticFortranTool.parseString(rstrDims.get(0)).getExpr())); 
+						new Opt<Expr>(), McFor.parseString(rstrDims.get(0)).getExpr())); 
 						// new NameExpr(new Name(rstrDims.get(0)))));
 				argFor.setAssignStmt(idxAsg);
 				// Statement list of ForStmt
@@ -2750,9 +3062,13 @@ TODO: rhsType ==> [n-1+1]
 		            	ParameterizedExpr kkParam1 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist1);
 		            	MinusExpr minus1 = new MinusExpr(kkParam1, 
 		            			new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
-	    				MDivExpr div1 = new MDivExpr(minus1, StaticFortranTool.parseString(lstrDims.get(1)).getExpr()); 
-	    						// new NameExpr(new Name(lstrDims.get(1))));
-	    				PlusExpr plus1 = new PlusExpr(div1, 
+	    				MDivExpr div1 = new MDivExpr(minus1, McFor.parseString(lstrDims.get(1)).getExpr()); 
+	    				PlusExpr newPlus1 = new PlusExpr(div1, 
+	    						new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0")));
+		            	natlab.ast.List<Expr> divlist1 = new natlab.ast.List<Expr>();
+		            	divlist1.add(newPlus1);
+	    				ParameterizedExpr divFloor = new ParameterizedExpr(new NameExpr(new Name("floor")), divlist1);	    						// new NameExpr(new Name(lstrDims.get(1))));
+	    				PlusExpr plus1 = new PlusExpr(divFloor, 
 	    						new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 						AssignStmt bufAsg1 = new AssignStmt();
 						bufAsg1.setLHS(new NameExpr(new Name("III")));
@@ -2767,7 +3083,7 @@ TODO: rhsType ==> [n-1+1]
 	    				
 		            	natlab.ast.List<Expr> plist2 = new natlab.ast.List<Expr>();
 	    				plist2.add(minus2);
-	    				plist2.add( StaticFortranTool.parseString(lstrDims.get(1)).getExpr());
+	    				plist2.add( McFor.parseString(lstrDims.get(1)).getExpr());
 	    				// plist2.add(new NameExpr(new Name(lstrDims.get(1))));
 		            	ParameterizedExpr expr2 = new ParameterizedExpr(new NameExpr(new Name("mod")), plist2);
 
@@ -2882,7 +3198,7 @@ TODO: rhsType ==> [n-1+1]
 					AssignStmt idxAsg = new AssignStmt();
 					idxAsg.setLHS(new NameExpr(new Name("III")));
 					idxAsg.setRHS(new RangeExpr(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")), 
-							new Opt<Expr>(), StaticFortranTool.parseString(rstrDims.get(0)).getExpr())); 
+							new Opt<Expr>(), McFor.parseString(rstrDims.get(0)).getExpr())); 
 							// new NameExpr(new Name(rstrDims.get(0)))));
 					argFor.setAssignStmt(idxAsg);
 					
@@ -2890,7 +3206,7 @@ TODO: rhsType ==> [n-1+1]
 					AssignStmt idxAsg2 = new AssignStmt();
 					idxAsg2.setLHS(new NameExpr(new Name("JJJ")));
 					idxAsg2.setRHS(new RangeExpr(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")), 
-							new Opt<Expr>(), StaticFortranTool.parseString(rstrDims.get(1)).getExpr())); 
+							new Opt<Expr>(), McFor.parseString(rstrDims.get(1)).getExpr())); 
 							// new NameExpr(new Name(rstrDims.get(1)))));
 					argFor2.setAssignStmt(idxAsg2);
 
@@ -2946,12 +3262,12 @@ TODO: rhsType ==> [n-1+1]
 	}
 	
 	// When using linear indexing, which means index misses some dimension
-	// i.g.  A=Matrix(1*5),   expr:  A(2)=0.0  => A(1,2) 
-	// i.g.  B=Matrix(5*1),   expr:  B(3)=0.0  => B(3,1)
-	// i.g.  C=Matrix(2*10),  expr:  C(4)=0.0  => C(1,4)	// row major ??
+	// e.g., A=Matrix(1*5),   expr:  A(2)=0.0  => A(1,2) 
+	// e.g., B=Matrix(5*1),   expr:  B(3)=0.0  => B(3,1)
+	// e.g., C=Matrix(2*10),  expr:  C(4)=0.0  => C(1,4)	// row major ??
 	// 						  expr:  C(15)=0.0 => C(2,5)	// row major
 	// Handle : expression:
-	// i.g. A=U(:), A=U(:,:)  ==> A=U
+	// e.g., A=U(:), A=U(:,:)  ==> A=U
 	// Linear indexing A(i, j), A(k)=A((k-1)/j+1,(k-1)%j+1)
 	// 	dd=zeros(n,1); dd(k)=5,	=>dd(k,1)=5   
 	//	ff=zeros(1,n); ff(k)=5, =>ff(1,k)=5
@@ -2981,8 +3297,8 @@ TODO: rhsType ==> [n-1+1]
     	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
 
     	// [1] Hand : expression:
-    	// 	i.g. A=U(:), A=U(:,:)  ==> A=U
-    	// 	i.g. A(:)=U, A(:,:)=U  ==> A=U, 
+    	// 	e.g., A=U(:), A=U(:,:)  ==> A=U
+    	// 	e.g., A(:)=U, A(:,:)=U  ==> A=U, 
     	// actually it equals to A(:)=U(:), if both has one-dimension
 		// The case mean(r(:)), will not be simplified, so will not fail into current function
     	if(lDims==null) {
@@ -3003,7 +3319,8 @@ TODO: rhsType ==> [n-1+1]
 	    			int loc = parent.getIndexOfChild(expr);
 	    	    	parent.setChild(expr.getTarget(), loc);
 	    	    	return false;
-        		} else if(bContainColon) {
+        		} else {
+        			// if(bContainColon) 
         			// The extern is an range expression
         			// if it's linear indexing, then need transform it into an For-loop
         			int mDimNum = 0;
@@ -3012,6 +3329,7 @@ TODO: rhsType ==> [n-1+1]
         			} else {
         				mDimNum = mstrDims.size();
         			}
+        			// Current expr has less subscripts than its matrix type.
         			if(lstrDims.size()<mDimNum) {
         				// Transform into an For-loop
         				expr = transfromRangeIndex2Forloop(expr);
@@ -3122,7 +3440,7 @@ TODO: rhsType ==> [n-1+1]
     				} else {
     		        	// Linear indexing A(i, j), A(k)=A((k-1)/j+1,(k-1)%j+1)
     					MinusExpr rowMinus = new MinusExpr(
-    							StaticFortranTool.parseString(lstrDims.get(0)).getExpr(), 
+    							McFor.parseString(lstrDims.get(0)).getExpr(), 
     							// new NameExpr(new Name(lstrDims.get(0))), 
     							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     					MDivExpr rowDiv = new MDivExpr(rowMinus,  
@@ -3130,7 +3448,7 @@ TODO: rhsType ==> [n-1+1]
     					PlusExpr rowIndex = new PlusExpr(rowDiv, 
     							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 
-    					MinusExpr colMinus = new MinusExpr(StaticFortranTool.parseString(lstrDims.get(0)).getExpr(),
+    					MinusExpr colMinus = new MinusExpr(McFor.parseString(lstrDims.get(0)).getExpr(),
     							// new NameExpr(new Name(lstrDims.get(0))), 
     							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     			    	natlab.ast.List<Expr> colList = new natlab.ast.List<Expr>();
@@ -3210,8 +3528,8 @@ TODO: rhsType ==> [n-1+1]
 	// Adjust a LHS array, represented as a name-expression,  
 	// When LHS's dimension doesn't match the RHS's, needs adjust the LHS's indexing 
 	// It's usually the row/column vector case. 
-	// 	i.g. A=Matrix(1*5), then A=1:5  should be A(1,:)=1:5
-	// 	i.g. A=Matrix(1,n), then A=1:5  should be A(1,:)=1:5
+	// 	e.g., A=Matrix(1*5), then A=1:5  should be A(1,:)=1:5
+	// 	e.g., A=Matrix(1,n), then A=1:5  should be A(1,:)=1:5
 	// Parameters: 
 	// 		rType: inferred type for RHS, type that want to adjust to 
 	// 		lType: LHS variable type, same as it in symbol table
@@ -3287,7 +3605,7 @@ TODO: rhsType ==> [n-1+1]
 	        		}
         		} else {
             		// Cannot handle >1 dimension difference between them  
-        			System.err.println("[adjustArrayIndex]: cannot handle difference between ["+expr.getNodeID()+"]"+mstrDims.size()+"[]"+lstrDims.size());
+        			System.err.println("[adjustArrayIndex]: cannot handle difference between ["+expr.getNodeID()+"]"+mstrDims.size()+"<>"+lstrDims.size());
         		}
         	}
         	
@@ -3301,7 +3619,7 @@ TODO: rhsType ==> [n-1+1]
     		return;
     	
     	if(lDims.size()>rDims.size()) {
-    		// Major cases are 2-dimension, i.g. A=1:5; A=[1,2,3,4,5]
+    		// Major cases are 2-dimension, e.g., A=1:5; A=[1,2,3,4,5]
     		// Since LHS is just a NameExpr, not a parameterized-expression, 
     		// If LHS/RHS dimension difference is 1, then add ':' colon-expression to LHS
     		if(lDims.size()==2 && rDims.size()==1) { 
@@ -3370,7 +3688,7 @@ TODO: rhsType ==> [n-1+1]
 	// TODO: Testing createFunctionSignature()
 	public static Type createFunctionSignature(SymbolTableScope stScope, 
 			ParameterizedExpr expr, ASTNode varNode)
-	{	
+	{			
 		ArgTupleType funcSignature = new ArgTupleType(); 
 		funcSignature.setName(expr.getVarName());
         List<Expr> args = expr.getArgs();
@@ -3392,8 +3710,24 @@ TODO: rhsType ==> [n-1+1]
             	argName = arg.getVarName();
         	}
         	funcSignature.addStaticArgType(argType, argName);
+        	
         }
 		return funcSignature;
+	}
+	public static boolean isEqualFuncSignature(ArgTupleType func1, ArgTupleType func2) {
+		boolean bEqual = false;
+		int i=0; 
+		if(func1.getNumStaticArgType()==func2.getNumStaticArgType()) {
+			bEqual = true;
+			for(Type type1: func1.getStaticArgTypes()) {
+				if(!isEqualType(type1, func2.getStaticArgTypes().getChild(i))) {
+					bEqual = false;
+					break;
+				}
+				i++;
+			}
+		}
+		return bEqual;
 	}
 	// This is used for a Command Form function call
 	public static Type createFunctionSignature(NameExpr expr)
@@ -3422,37 +3756,66 @@ TODO: rhsType ==> [n-1+1]
 		
 		return varType;
 	}
-	// 
+	
+	// Following constants are used to indicate the value range of the variable
+	// stored in the symbol table 
+	public final static int VALUE_NEGATIVE = -2;
+	public final static int VALUE_NON_POSITIVE = -1;
+	public final static int VALUE_ZERO = 0;
+	public final static int VALUE_NON_NEGATIVE = 1;
+	public final static int VALUE_POSITIVE = 2;
+	public final static int VALUE_FULL_RANGE = 3;	// -infinite ~ + infinite
+	
+	// TODO: getVariableValue
 	// Get the string combining with values of each element node in the expression sub-tree	
-	// BTW, the stScope may not necessary
-	// 
+	// Don't care about constant or not, just calculate
+	// 		when involving, then cannot calculate, 
+	// - buit-in function calls
+	// - matrix access
+	// - matrix, 
 	public static String getVariableValue(SymbolTableScope stScope, Expr expr) {
 		String strValue=null;
 		String varName = expr.getVarName();
-		
-		// Special case: III,JJJ, int_tmpvar used for array indexing transformation 
+
+		// Special case: III,JJJ, int_tmpvar used for array indexing transformation --[???]
 		// which should not affect the acutal index range, so skip them
 		if(varName.equals("III") || varName.equals("JJJ") )
 			return "0";
 				
-		// If it an variable  
+		// Get the value, and store in 'strValue'
+		// 1. It's a constant
 		if((expr instanceof LiteralExpr)) {
 			strValue = getLiteralString((LiteralExpr)expr);
+			
 		} else if((expr instanceof NameExpr)) {
+			
+			// 2. It is a variable, then check the variable is defined or not
+			// A defined variable: should have symbol table entry and type.  
 			varName = ((NameExpr) expr).getName().getID();
 			SymbolTableEntry rhsEntry = stScope.getSymbolById(varName);
-			if(rhsEntry!=null) {
-				strValue = getLiteralString(rhsEntry.getValue());
+			if(rhsEntry!=null && isValidType(((VariableDecl) rhsEntry.getDeclLocation()).getType())) 
+			{
+				Type varType = ((VariableDecl) rhsEntry.getDeclLocation()).getType();
+				// Don't use the value of matrix variables
+				if(isPrimitiveType(varType))
+					strValue = getLiteralString(rhsEntry.getValue());
+				
 			} else { 
-    			// Handle the un-initialized variable, such as 'i' the imagine sign
-				strValue = ((NameExpr) expr).getName().getID();
+    			// Handle the un-initialized variable, such as the imaginary unit 'i'/'j'
+				// The proper messages should be displayed by McFor
 				throw new TypeInferException(varName, expr);
 			}
+			
 		} else if ((expr instanceof ParameterizedExpr)) {
+			// 3. Array access or Function call
 			// Array variable access can be checked by 			        			
 			// 		SymbolTableEntry rhsEntry = stScope.getSymbolById(rhsName);
 			// Otherwise it's a function call
 			// But since here don't support array variable, so treat them same
+			// For simplicity, this case we return null.
+			strValue = null;
+
+			/*
 			// return the string.
 	        StringBuffer buf = new StringBuffer();
 	        List<Expr> args = ((ParameterizedExpr) expr).getArgs();
@@ -3470,10 +3833,12 @@ TODO: rhsType ==> [n-1+1]
                 first = false;
             }
             buf.append(")");
-			strValue = buf.toString();
+			strValue = buf.toString();	*/
 			
 		} else if (expr instanceof BinaryExpr){
+			// 4. Other expressions, recursively get the value
 			String opStr = null;
+			// Only support following operation
 			if(expr instanceof PlusExpr) {
 				opStr = "+";
 			} else if(expr instanceof MinusExpr) {
@@ -3500,19 +3865,48 @@ TODO: rhsType ==> [n-1+1]
 			} else if(expr instanceof UMinusExpr) {
 				opStr = "-";
 			}
-			strValue = "("+opStr+getVariableValue(stScope, ((UnaryExpr) expr).getOperand())+")";
+			String opValue = opStr+getVariableValue(stScope, ((UnaryExpr) expr).getOperand());
+			if(opValue!=null)
+				strValue = "("+opValue+")";
 			
-// TODO
 		} else if ((expr instanceof RangeExpr)) {
-			// Need to calculate the value of Range Expr!
-			// Detailed ones is in inferSymbolEntry(), because it needs 2 values
-			String strLow = getVariableValue(stScope, ((RangeExpr)expr).getLower());
-			String strUpp = getVariableValue(stScope, ((RangeExpr)expr).getUpper());
-			strValue = strLow + ":" + strUpp;
+			// 5. Range Expression, for simplicity, only take maxinum value
+			// If want to get 2 values, can handle it inferSymbolEntry().
+			strValue = null;
+			boolean bIncreased = true;
+			boolean bUnknown = false;
+			// If the range-expr has incr-expr, then it must be a con 
+			if(((RangeExpr)expr).hasIncr()) {
+				Expr incExpr = ((RangeExpr)expr).getIncr();
+				if(isNumricLiteral(incExpr)) {
+					if(isIntLiteral(incExpr)) {
+						bIncreased = (getIntLiteralValue(incExpr)>0);
+					} else if(isFPLiteral(incExpr)) {
+						bIncreased = (getFPLiteralValue(incExpr)>0);
+					} 
+				} else {
+					// Currently, assume it's increased
+					
+					// otherwise, get the value range from the variable
+					//if(incExpr instanceof NameExpr) {
+					//	String inc = getVariableValue(stScope, incExpr);
+					//} else {
+					//	// it's unpredictable
+					//	bUnknown = true;
+					//}
+				}
+			} 			
+			if(!bUnknown) {
+				if(bIncreased)
+					strValue = getVariableValue(stScope, ((RangeExpr)expr).getUpper());
+				else
+					strValue = getVariableValue(stScope, ((RangeExpr)expr).getLower());
+			}
 		} else {	
-			// unsure situation
-			strValue = null;	// expr.getFortran();
+			// Unsure support cases 
+			strValue = null;	
 		}
+		
 		return strValue;
 	}
 	

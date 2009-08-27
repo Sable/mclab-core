@@ -120,10 +120,22 @@ aspect TypeCollection {
 	}
 	
 	public annotations.ast.Type IntLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
-		return new annotations.ast.PrimitiveType("int");
+		String str = this.getStructureString();
+		char tail = str.charAt(str.length()-1);
+		if(tail=='i' || tail=='j') {
+			return new annotations.ast.PrimitiveType("complex");
+		} else {
+			return new annotations.ast.PrimitiveType("int");
+		}
 	}
 	public annotations.ast.Type FPLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
-		return new annotations.ast.PrimitiveType("double");
+		String str = this.getStructureString();
+		char tail = str.charAt(str.length()-1);
+		if(tail=='i' || tail=='j') {
+			return new annotations.ast.PrimitiveType("complex");
+		} else {
+			return new annotations.ast.PrimitiveType("double");
+		}
 	}
 	public annotations.ast.Type StringLiteralExpr.collectType(SymbolTableScope stScope, ASTNode varNode)  {
 		return new annotations.ast.PrimitiveType("character("+(getValue().length())+")");
