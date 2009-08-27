@@ -2493,12 +2493,12 @@ TODO: rhsType ==> [n-1+1]
 			
 			// Check for illegal type
 			for(int i=0;i<vstrDims.size();++i) {
-				if(vstrDims.get(i).isEmpty()) {
+				if(vstrDims.get(i)==null || vstrDims.get(i).length()==0) {
 					return lType;
 				}
 			}
 			for(int i=0;i<lstrDims.size();++i) {
-				if(lstrDims.get(i).isEmpty()) {
+				if(lstrDims.get(i)==null || lstrDims.get(i).length()==0) {
 					return (MatrixType)varType;
 				}
 			}

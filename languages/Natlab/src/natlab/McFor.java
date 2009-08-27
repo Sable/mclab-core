@@ -583,7 +583,7 @@ public class McFor {
             	System.exit(1);
             }
 			in.close();
-			scanner.stop();
+			// scanner.stop();
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -4434,15 +4434,15 @@ public class McFor {
 					// When parsing an expression, will get a Script  
 					ASTNode exprStmt = ((Script) original).getStmtList().getChild(0);
 					if(!(exprStmt instanceof ExprStmt)) {
-						scanner.stop();
+						// scanner.stop();
 						return null;
 					} else {
-						scanner.stop();
+						// scanner.stop();
 						return (ExprStmt) exprStmt;
 					}
 				}		
 			}
-			scanner.stop();
+			//  scanner.stop();
 		} catch(Parser.Exception e) {
 			System.out.println("**ERROR**");
 			System.out.println(e.getMessage());

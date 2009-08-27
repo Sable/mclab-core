@@ -520,7 +520,7 @@ public class StaticFortranTool {
             	System.exit(1);
             }
 			in.close();
-			scanner.stop();
+			// scanner.stop();
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -3116,7 +3116,7 @@ if(DEBUG_isFirmType) {
 					}
 				}		
 			}
-			scanner.stop();
+			// scanner.stop();
 		} catch(Parser.Exception e) {
 			System.out.println("**ERROR**");
 			System.out.println(e.getMessage());
