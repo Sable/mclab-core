@@ -16,6 +16,7 @@ import natlab.ast.Expr;
 import natlab.ast.ForStmt;
 import natlab.ast.Function;
 import natlab.ast.LiteralExpr;
+import natlab.ast.MatrixExpr;
 import natlab.ast.Name;
 import natlab.ast.NameExpr;
 import natlab.ast.ParameterizedExpr;
@@ -27,11 +28,14 @@ import natlab.toolkits.scalar.ReachingDefs;
 public class AlexFortranAnalyses {
 	public static boolean bSilence = false;
 	public static HashSet<String> gLocalFuncList;
+	public static final String TEMP_VAR_PREFIX = TypeInferenceEngine.TEMP_VAR_PREFIX;
 	
 	public static ASTNode Transformation1(ASTNode subtree, SymbolTableScope scope) {
 		if(!bSilence) System.out.println(" --- START alex transformation 1");
 		if(!bSilence) System.out.println(" --- GOAL: collapse subexpressions");		
 
+		// System.out.println(subtree.dumpTreeAll(true));
+		
 		// reaching definitions analysis
 		subtree.clearUseDefBoxes();
 		subtree.generateUseBoxesList();	
@@ -84,11 +88,11 @@ public class AlexFortranAnalyses {
 					Type varType = ((VariableDecl)varDeclNode).getType();
 					if(varType instanceof MatrixType) {
 						if (as.getRHS() instanceof LiteralExpr) { 
-							// tmpvar_364 = 1
+							// tmpvar1 = 1
 							bSpecial = true;
 						} else if (as.getRHS() instanceof ParameterizedExpr) {
 							String fname = ((NameExpr)((ParameterizedExpr)as.getRHS()).getTarget()).getName().getID();
-							// tmpvar_364 = ones(n, 1)
+							// tmpvar2 = ones(n, 1)
 							if(fname.equalsIgnoreCase("ones") 
 									|| fname.equalsIgnoreCase("zeros")									
 									|| fname.equalsIgnoreCase("randn")
@@ -100,7 +104,7 @@ public class AlexFortranAnalyses {
 					if(!bSpecial) {
 						if (as.getRHS() instanceof ParameterizedExpr) {
 							String fname = ((NameExpr)((ParameterizedExpr)as.getRHS()).getTarget()).getName().getID();
-							// tmpvar_364 = ones(n, 1)
+							// tmpvar1 = ones(n, 1)
 							if(fname.equalsIgnoreCase("ones") 
 									|| fname.equalsIgnoreCase("zeros")									
 									|| fname.equalsIgnoreCase("num2str")
@@ -108,17 +112,12 @@ public class AlexFortranAnalyses {
 									|| fname.equalsIgnoreCase("rand")) {
 								 bSpecial = true;
 							} else {						
-								// Special rule: i.e.: tmpvar_1=user-function(a,b)  
+								// Special rule: i.e.: tmpvar1=user-function(a,b)  
 								// because user defined function need to be transform into subroutine call, so
 								bSpecial = gLocalFuncList.contains(fname);
 							}
 						}
 					}
-				}
-				// Special rule, tmpvar_1=tmpvar_2, this assignment contains 
-				// implicit conversion between two type of data
-				if(as.getRHS() instanceof NameExpr && as.leftBox.getValue().contains("tmpvar_")) {
-					bSpecial = true;
 				}
 
 				// RHS must not contain the same variable, i.e. index=index+1
@@ -131,13 +130,12 @@ public class AlexFortranAnalyses {
 						// System.err.println("RHS has same variable: " + as.getStructureString());
 						bSpecial = true;
 						break;
-			    	}
-			    	
+			    	}			    	
 			    }
 
 
 				// set of condition when we are not interested in collapsing
-				// boolean isRange = (e.getClass().getName().equals(natlab.ast.RangeExpr.class.getCanonicalName()));
+				boolean isRange = (e.getClass().getName().equals(natlab.ast.RangeExpr.class.getCanonicalName()));
 				
 				//if (e.getNumChild() > 0) System.out.println("kk: " + e.getStructureString() + " -- " +  e.getChild(0).getStructureString());				
 				// if(!isRange)
@@ -146,9 +144,9 @@ public class AlexFortranAnalyses {
 				// Currently only to collapse temporary variables...
 				if (as.getLHS() instanceof NameExpr 
 						&& !(as.getParent() instanceof ForStmt)		// not in the loop index variable
-						&& as.leftBox.getValue().contains("tmpvar_")
+						&& as.leftBox.getValue().startsWith(TEMP_VAR_PREFIX)
 						&& !bSpecial	// avoid special
-						) 
+					) 
 				{
 					// If there are two assignment, then we don't know which one should be used
 					// so skip it
@@ -209,9 +207,31 @@ public class AlexFortranAnalyses {
 	    			 
 		    	*/
 	    			{		    			
-		    			//System.out.println(" replace> " +  vboxVal + " with " + e.getPrettyPrinted() 
+	    				// Don't replace the variable in assignments that contain 
+	    				// implicit conversion between two type of data
+	    				boolean bReplace = true;
+	    				if((codeNode instanceof AssignStmt)) {
+	    					Expr lhs = ((AssignStmt)codeNode).getLHS();
+	    					Expr rhs = ((AssignStmt)codeNode).getRHS();
+	    					if((lhs instanceof NameExpr) &&
+	    							(rhs instanceof NameExpr) && ((NameExpr)rhs).getVarName().equals(vboxVal)) {
+	    						Type lhsType = TypeInferenceEngine.getVariableType(scope, lhs);
+	    						Type rhsType = TypeInferenceEngine.getVariableType(scope, rhs);
+	    						
+	    						bReplace = TypeInferenceEngine.isEqualType(lhsType, rhsType);
+	    					}	    					
+		    				// Don't replace the variable in a matrix construction expression, e.g., A=[B,C];
+		    				// This is the bug of gfortran, it doesn't support complex expression in matrix construction.
+	    					// Benchmark 'capr'
+		    				if(rhs instanceof MatrixExpr) {
+		    					bReplace = false;
+		    				}
+	    				}
+		    			//System.out.println("[Alex] replace> ["+bReplace+"] "+vboxVal + " with " + e.getPrettyPrinted() 
 		    			//		+ " (" + e.getClass().getName()+") on ["+codeNode.getNodeID()+"] "+codeNode);
-		    			codeNode.renaming(vboxVal, e);		    	
+
+	    				if(bReplace) 
+	    					codeNode.renaming(vboxVal, e);		    	
 		    		}
 		    				    	
 		    	}
@@ -229,8 +249,8 @@ public class AlexFortranAnalyses {
 	}
 
 	public static ASTNode Transformation2(ASTNode subtree, SymbolTableScope scope) {
-		System.out.println(" --- START alex transformation 2");
-		System.out.println(" --- GOAL: reuse variables when possible");		
+		if(!bSilence) System.out.println(" --- START alex transformation 2");
+		if(!bSilence) System.out.println(" --- GOAL: reuse variables when possible");		
 
 		// 1. store ID of note of last use for each var (using a map)
 		// 2. use the map at any point to see if current node ID < ID of used var,
@@ -328,7 +348,7 @@ public class AlexFortranAnalyses {
 				// here we are sure we have a definition				
 				AssignStmt as = (AssignStmt)iter.next();
 				
-	    		// boolean isForStmt = (as.getClass().getName().equals(natlab.ast.ForStmt.class.getCanonicalName()));
+	    		boolean isForStmt = (as.getClass().getName().equals(natlab.ast.ForStmt.class.getCanonicalName()));
 	    		
 				
 				// look into the map if we have a variable with lower ID
@@ -390,14 +410,8 @@ public class AlexFortranAnalyses {
 				
 				//System.out.println(" after> " +  codeNode.getStructureString() );
 				//System.out.println(" after> " +  gExpMap.get("d").getStructureString() );
-				
 				//System.out.println();
-				
-				
-				
 			}
-			
-			
 			
 			//
 			// replace all further use boxes
@@ -424,11 +438,6 @@ public class AlexFortranAnalyses {
 			
 	    	
 	    }		
-		
-		
-		
-		
-				
 		
 		System.out.println(" --- END alex transformation 2");
 		
@@ -465,6 +474,7 @@ public class AlexFortranAnalyses {
 
 		// Collect uses from declaration
 		java.util.List<String> usedVarList = collectUseFromDeclaration(subtree, scope);
+		if(!bSilence)  System.out.println(" --- usedVarList="+usedVarList);
 
 		// reaching definitions analysis
 		subtree.clearUseDefBoxes();
@@ -500,6 +510,13 @@ public class AlexFortranAnalyses {
 			Iterator<AssignStmt> iter = defSet.iterator();
 			while (iter.hasNext()) {
 				AssignStmt as = iter.next();
+				if(as.leftBox.getValue().startsWith(TEMP_VAR_PREFIX)) {
+					if(!bSilence) System.out.println("   [" + as.leftBox.getValue() +"]<"
+							+gParamList.contains(as.leftBox.getValue())+"><"
+							+usedVarList.contains(as.leftBox.getValue())+"><"
+							+(as.getParent() instanceof ForStmt)+"><"
+							);
+				}
 
 				// Don't remove assignments on parameters
 				if(! gParamList.contains(as.leftBox.getValue())
@@ -508,14 +525,15 @@ public class AlexFortranAnalyses {
 						) 
 				{
 					// TODO: only remove candidate variables and temporary variables
-					if(as.leftBox.getValue().contains("tmpvar_")
+					if(as.leftBox.getValue().startsWith(TEMP_VAR_PREFIX)
 							|| (candidateList.size()==0)
 							|| (candidateList.size()!=0 && candidateList.contains(as.leftBox.getValue())) )
 					{
 						gDefMap.put(as.leftBox.getValue(), new Integer(as.getNodeID()));
 					}
 					
-					// System.out.println("   ---" + as.leftBox.getValue() +"   ---" + as.getNodeID() );
+					if(as.leftBox.getValue().startsWith(TEMP_VAR_PREFIX))
+						if(!bSilence) System.out.println("   ---" + as.leftBox.getValue() +"   ---" + as.getNodeID() );
 				}
 			}
 			
@@ -651,6 +669,8 @@ public class AlexFortranAnalyses {
 		ArrayList<String> usedVarList = new ArrayList<String>();
 		HashSet<String> dimStringSet = new HashSet<String>();
 		
+		// McFor.dumpSymbolTable(stScope, System.out, true);
+		
 		for(SymbolTableEntry stEntry: stScope.symTable.values()) {
 	    	if(stEntry==null) { 
 	    		continue;
@@ -665,24 +685,46 @@ public class AlexFortranAnalyses {
     		// For those dynamic shape type
 			if((varType instanceof MatrixType) 
 					&& (((MatrixType) varType).getSize().getDims()==null)) {
-		    	Size varSize = ((MatrixType)varType).getSize(); 
-				if(varSize.getVariableDims()!=null) {
+		    	Size varSize = ((MatrixType)varType).getSize();
+		    	// Old version
+		    	if(varSize.getVariableDims()!=null) {
 					// using variable for dynamic allocation
 					for (String dim : varSize.getVariableDims()) {
 						dimStringSet.add(dim);
+						if(!bSilence)  System.out.println(" --"+stEntry.getSymbol()+"- getVariableDims()="+dim);
 					}
-				} else if(varSize.getDynamicDims()!=null) {
+		    	} else if(varSize.getDynamicDims()!=null) {
 					// testingVariableDim(varType, curNode);
 					for (String dim : varSize.getDynamicDims()) {
 						dimStringSet.add(dim);
+						if(!bSilence)  System.out.println(" --"+stEntry.getSymbol()+"- getDynamicDims()="+dim);
+					}
+				
+				}
+				/*		// New version	    	
+				if(varSize.getDynamicDims()!=null) {
+					// testingVariableDim(varType, curNode);
+					for (String dim : varSize.getDynamicDims()) {
+						dimStringSet.add(dim);
+						if(!bSilence)  System.out.println(" --"+stEntry.getSymbol()+"- getDynamicDims()="+dim);
+					}
+				} else if(varSize.getVariableDims()!=null) {
+					// using variable for dynamic allocation
+					for (String dim : varSize.getVariableDims()) {
+						dimStringSet.add(dim);
+						if(!bSilence)  System.out.println(" --"+stEntry.getSymbol()+"- getVariableDims()="+dim);
 					}
 				}
+				*/
 			}
 		}
 
 		HashSet<String> usedVarSet = new HashSet<String>();
 		for(String str : dimStringSet) {
-			HashSet<String> varSet = StaticFortranTool.getVariableListFromString(str); 
+			HashSet<String> varSet = McFor.getVariableListFromString(str); 
+			if(str.contains(":")) {
+				System.err.println("[getVariableListFromString]["+str+"]"+varSet);
+			}
 			usedVarSet.addAll(varSet);
 		}
 		usedVarList.addAll(usedVarSet);
