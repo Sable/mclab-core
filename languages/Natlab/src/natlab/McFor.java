@@ -4,6 +4,15 @@ import java.io.*;
 
 import java.util.*;
 
+import org.antlr.runtime.ANTLRReaderStream;
+
+import matlab.CompositePositionMap;
+import matlab.FunctionEndScanner;
+import matlab.MatlabParser;
+import matlab.OffsetTracker;
+import matlab.PositionMap;
+import matlab.TextPosition;
+import matlab.TranslationProblem;
 import natlab.ast.*;
 import natlab.ast.List;
 
@@ -19,7 +28,13 @@ import annotations.ast.PrimitiveType;
 import annotations.ast.Size;
 import annotations.ast.Type;
 import annotations.ast.UnknownType;
-// import ast.AST.Node;
+
+import matlab.*;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
+
+import org.antlr.runtime.ANTLRReaderStream;
 
 /**
  * A  for translate MATLAB program to Fortran code
@@ -412,10 +427,54 @@ public class McFor {
 		System.out.println("Translating: "+filename);
         filename = removeExtension(filename, ".m");
 		String[] files = {filename};
-		matlab.Translator.main(files);		
+		// matlab.Translator.main(files);
+		MATLAB2Natlab(filename);
 		return filename +".n"; 
 	}
+	// This is taken from main() of matlab.Translator
+	public static void MATLAB2Natlab(String filename) {
+        String basename = filename;
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(basename + ".m"));
 
+            FunctionEndScanner prescanner = new FunctionEndScanner(in);
+            FunctionEndScanner.Result result = prescanner.translate();
+            in.close();
+
+            if(result instanceof NoChangeResult) {
+                in = new BufferedReader(new FileReader(basename + ".m")); //just re-open original file
+            } else if(result instanceof ProblemResult) {
+                for(TranslationProblem prob : ((ProblemResult) result).getProblems()) {
+                    System.err.println(prob);
+                }
+                System.exit(0); //terminate early since extraction parser can't work without balanced 'end's
+            } else if(result instanceof TranslationResult) {
+                TranslationResult transResult = (TranslationResult) result;
+                in = new BufferedReader(new StringReader(transResult.getText()));
+            }
+
+            OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+            ArrayList<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+            String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
+            
+            PrintWriter out = new PrintWriter(new FileWriter(basename + ".n"));
+            if(problems.isEmpty()) {
+                out.print(destText);
+            } else {
+                for(TranslationProblem prob : problems) {
+                    System.err.println("~" + prob);
+                }
+            }
+            out.close();
+            in.close();
+            // System.exit(0);
+        } catch(IOException e) {
+            e.printStackTrace();
+            // System.exit(2);
+        }
+	}
+
+	
 	/**
 	 * Executes system command in Linux, print out the outputs
 	 * @param cmd
@@ -828,7 +887,7 @@ public class McFor {
 
 		try {
 			out = new PrintStream(fortranname);	
-			outSymTbl = new PrintStream(fortranname+".sym");	// DEBUG
+			// outSymTbl = new PrintStream(fortranname+".sym");	// DEBUG
 
 			// Parsing the file
     		ASTNode actual = parseFile(filename, out);
@@ -1007,7 +1066,7 @@ public class McFor {
             }
 
     		out.close();
-    		outSymTbl.close();
+    		// outSymTbl.close();
             
 		} catch(IOException e) {
 			e.printStackTrace();
