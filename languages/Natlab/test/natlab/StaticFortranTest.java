@@ -12,7 +12,7 @@ public class StaticFortranTest extends TestCase
     private static final String diffFileName = "diff.log";
     private static final String checkExtention = ".R3";//".ok";
     private static final String inFileName[] = {
-    	
+    	"test/ComplexNum.m", "test/CellArray.m",  "test/ExprStmt.m",  
     	"test/FuncForm.m", 
     	"test/FuncArg1.m", "test/FuncArg2.m", "test/FuncArg3.m" , "test/FuncArg4.m",    	
     	"test/RangeExpr.m", "test/MatrixConstruction.m",
@@ -25,7 +25,6 @@ public class StaticFortranTest extends TestCase
     };
 
     private static final String inFolderName[] = {
-    	
     	"capr",
         "clos",
     	"diff","dich",
