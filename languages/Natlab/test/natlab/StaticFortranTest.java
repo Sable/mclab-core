@@ -8,24 +8,20 @@ import natlab.ast.*;
 
 public class StaticFortranTest extends TestCase
 {
-	// ".\languages\Fortran\benchmarks\adapt\
-	// "./languages/natlab/test/";
-	private static final String basePath = "../Benchmarks/matlabBenchmarks/";
-		// "./languages/Fortran/benchmarks/"; 
+	private static final String basePath = "../Benchmarks/matlabBenchmarks/McFor/mcfor_test/";
     private static final String diffFileName = "diff.log";
-    private static final String checkExtention = ".R3";//".ok2";
+    private static final String checkExtention = ".R3";//".ok";
     private static final String inFileName[] = {
     	
-    	"test/FuncArg1.m", "test/FuncArg2.m", "test/FuncArg3.m" , "test/FuncArg4.m",    	
     	"test/FuncForm.m", 
+    	"test/FuncArg1.m", "test/FuncArg2.m", "test/FuncArg3.m" , "test/FuncArg4.m",    	
     	"test/RangeExpr.m", "test/MatrixConstruction.m",
     	"test/ParamExpr1.m","test/ParamExpr2.m", "test/ParamExpr3.m","test/ParamExpr4.m",    	
-    	"test/Transform1.m", "test/Transform2.m", "test/Transform3.m",
-    	/*
+    	"test/Transform1.m", "test/Transform2.m", "test/Transform3.m",    	
     	"test/TransformFunc.m",    	
-    	"test/TypeConflict.m",     	
+    	"test/TypeConflict.m",  "test/TypeConflictFunc.m",
+    	"test/TypeInferrenceProcess.m",
     	"test/benchmark2_2.m",     
-    	*/
     };
 
     private static final String inFolderName[] = {
@@ -38,9 +34,11 @@ public class StaticFortranTest extends TestCase
     	"fdtd",
     	"mbrt","nb1d", "nb3d",
     	
-    	/*  "adpt", "crni",*/
+    	/*  
+		"adpt", // need option -fbounds-check
+		"crni",
+    	 */
    	};
-    	// 
 
     public void test_ErrorCheckTest_function() throws Exception
     {
