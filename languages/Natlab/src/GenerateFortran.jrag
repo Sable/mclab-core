@@ -531,7 +531,7 @@ aspect GenerateFortran {
     }
     eq DefaultCaseBlock.getFortranLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("otherwise ");
+        buf.append("CASE DEFAULT ");
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
             buf.append('\t');
