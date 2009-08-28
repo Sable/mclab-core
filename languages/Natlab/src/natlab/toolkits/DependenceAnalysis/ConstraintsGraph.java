@@ -11,7 +11,7 @@ public class ConstraintsGraph {
 	}
 	
 	//To DO:handle case with constraint bounded on both sides by variables.
-	public void createGraph(AffineExpression aExpr1,AffineExpression aExpr2)
+	public void addToGraph(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
 		
 		ConstraintsList cList1=new ConstraintsList();
