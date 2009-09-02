@@ -1663,7 +1663,17 @@ public class McFor {
 			    							}
 				    					}
 				    				} else {
-				    					break;
+				    					// Those definition may inside the for, while, if, switch,...
+				    					// But this is not an accurate solution. 
+				    					if((parent.getChild(j) instanceof ForStmt) 
+					    					|| (parent.getChild(j) instanceof WhileStmt)
+				    						|| (parent.getChild(j) instanceof IfStmt)
+				    						|| (parent.getChild(j) instanceof SwitchStmt)
+				    						) {
+				    						break;
+				    					} else {
+				    						continue;
+				    					}
 				    				}
 				    				if(bFound) {
 				    					break;
