@@ -412,7 +412,9 @@ aspect PrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionHandleExpr.getPrettyPrintedLessComments() = getIndent() + "@" + getName().getStructureString();
+    //eq FunctionHandleExpr.getPrettyPrintedLessComments() = getIndent() + "@" + getName().getStructureString();
+    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getStructureString();
+    
     eq LambdaExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         String indent =  getIndent();
