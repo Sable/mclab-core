@@ -1,7 +1,7 @@
 package natlab;
 
 import java.util.*;
-import natlab.ast.*;
+import ast.*;
 
 public interface LocalFunctionLookupInterface
 {

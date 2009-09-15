@@ -6,7 +6,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 
-import natlab.ast.*;
+import ast.*;
 //import java.io.StringBuffer;
 
 public class SymbolTableEntry

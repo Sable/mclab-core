@@ -11,7 +11,7 @@ package natlab.toolkits.scalar;
  *  - 2008.07 by Jun Li
  *		- Adding data class LoopFlowsetList<A>, caseSwitchStmt()
  */
-import natlab.ast.*;
+import ast.*;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public abstract class StructuralForwardFlowAnalysis<N, A> extends FlowAnalysis<N
 	public void caseASTNode(ASTNode node) 
 	{
 		// Skip unnecessary nodes
-		if(node instanceof natlab.ast.List || node instanceof natlab.ast.Opt ) {
+		if(node instanceof ast.List || node instanceof ast.Opt ) {
 			return;
 		}
 		// Add current node in visited node list  

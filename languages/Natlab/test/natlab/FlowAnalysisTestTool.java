@@ -3,7 +3,7 @@ package natlab;
 import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
-import natlab.ast.*;
+import ast.*;
 import natlab.toolkits.analysis.*;
 import natlab.Main;
 import natlab.CompilationProblem;

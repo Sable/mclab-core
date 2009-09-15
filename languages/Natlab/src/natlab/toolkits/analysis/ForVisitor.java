@@ -8,20 +8,20 @@
  */
 package natlab.toolkits.analysis;
 
-import natlab.ast.Opt;
+import ast.Opt;
 import natlab.IntNumericLiteralValue;
-import natlab.ast.ASTNode;
-import natlab.ast.AssignStmt;
-import natlab.ast.ColonExpr;
-import natlab.ast.Expr;
-import natlab.ast.FPLiteralExpr;
-import natlab.ast.ForStmt;
-import natlab.ast.IfStmt;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.RangeExpr;
-import natlab.ast.Stmt;
-import natlab.ast.SwitchStmt;
-import natlab.ast.UPlusExpr;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ColonExpr;
+import ast.Expr;
+import ast.FPLiteralExpr;
+import ast.ForStmt;
+import ast.IfStmt;
+import ast.IntLiteralExpr;
+import ast.RangeExpr;
+import ast.Stmt;
+import ast.SwitchStmt;
+import ast.UPlusExpr;
 //import natlab.toolkits.DependenceAnalysis.SVPCTest;
 import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
 

@@ -43,15 +43,15 @@ aspect SSAForm {
     }
 	// ------------------------------------------------------------------------
 	// Renaming functions
-	public void ASTNode.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void ASTNode.renaming(String orgName, ast.Expr newExpr) {	
 		for(int i = 0; i < getNumChild(); i++) {
 			getChild(i).renaming(orgName, newExpr);
 		}
 	}
-	public void NameExpr.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void NameExpr.renaming(String orgName, ast.Expr newExpr) {	
 		if(orgName.equals(getName().getID())) {
 			// replace by newExpr;
-			natlab.ast.ASTNode parent = this.getParent();
+			ast.ASTNode parent = this.getParent();
 			int loc = parent.getIndexOfChild(this);
 			if(loc>=0)	
 				parent.setChild(newExpr, loc);
@@ -60,20 +60,20 @@ aspect SSAForm {
 		}
 	}
 	// Node: ForStmt, If..else.., only means one node
-	public void ForStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void ForStmt.renaming(String orgName, ast.Expr newExpr) {	
 		getAssignStmt().renaming(orgName, newExpr);
 		getStmtList().renaming(orgName, newExpr);
 	}
-	public void WhileStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void WhileStmt.renaming(String orgName, ast.Expr newExpr) {	
 		getExpr().renaming(orgName, newExpr);
 	}
 
-	public void SwitchStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void SwitchStmt.renaming(String orgName, ast.Expr newExpr) {	
 		getExpr().renaming(orgName, newExpr);
 	}
 	
 	// Avoid replacing the LHS variable name	
-	public void AssignStmt.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void AssignStmt.renaming(String orgName, ast.Expr newExpr) {	
 		ASTNode lhs = getLHS();
 		if(lhs instanceof ParameterizedExpr) {
 			// Allow to rename LHS array variable's arguments 
@@ -83,7 +83,7 @@ aspect SSAForm {
 	}
 	
 	// Avoid replacing the Array variable name, just renaming arguments
-	public void ParameterizedExpr.renaming(String orgName, natlab.ast.Expr newExpr) {	
+	public void ParameterizedExpr.renaming(String orgName, ast.Expr newExpr) {	
 		getArgList().renaming(orgName, newExpr);
 	}
 	

@@ -1,9 +1,9 @@
 package natlab;
 
 import java.util.*;
-import natlab.ast.Program;
-import natlab.ast.Script;
-import natlab.ast.FunctionList;
+import ast.Program;
+import ast.Script;
+import ast.FunctionList;
 import beaver.Parser;
 
 /**

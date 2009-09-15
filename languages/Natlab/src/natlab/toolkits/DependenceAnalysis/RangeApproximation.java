@@ -3,12 +3,12 @@ package natlab.toolkits.DependenceAnalysis;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import natlab.ast.Expr;
-import natlab.ast.MTimesExpr;
-import natlab.ast.MinusExpr;
-import natlab.ast.NameExpr;
-import natlab.ast.PlusExpr;
-import natlab.ast.IntLiteralExpr;
+import ast.Expr;
+import ast.MTimesExpr;
+import ast.MinusExpr;
+import ast.NameExpr;
+import ast.PlusExpr;
+import ast.IntLiteralExpr;
 
 /*
  * Author:Amina Aslam

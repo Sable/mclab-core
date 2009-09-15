@@ -3,7 +3,7 @@ package natlab;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import natlab.ast.*;
+import ast.*;
 
 import natlab.SymbolTableScope;
 import natlab.SymbolTableEntry;
@@ -279,7 +279,7 @@ public class TypeInferenceEngine {
 	public static void transform2ParameterizedExpr(Expr node, NameExpr newNode, Expr...exprs) {
     	ASTNode parent = node.getParent();
     	int loc = parent.getIndexOfChild(node);
-    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+    	ast.List<Expr> list = new ast.List<Expr>();
 		for(Expr expr: exprs) {
 			list.add(expr);
 		}
@@ -313,7 +313,7 @@ public class TypeInferenceEngine {
 						|| typeExpr.getName().equalsIgnoreCase(TYPENAME_DOUBLE)) {
 				NEExpr newExpr=new NEExpr();  
 				if(typeExpr.getName().equalsIgnoreCase(TYPENAME_INTEGER)) {
-					newExpr = new NEExpr(oprandExpr, new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")));
+					newExpr = new NEExpr(oprandExpr, new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")));
 				} else {
 					newExpr = new NEExpr(oprandExpr, new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0")));
 				}
@@ -908,7 +908,7 @@ public class TypeInferenceEngine {
 				    		AssignStmt rowAsg = new AssignStmt();
 				    		// Split the row
 							// 	m3=[9,8,7;6,5,4;11,12,13;15,16,17]; => m3(1,:)=[9,8,7], ...
-			            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+			            	ast.List<Expr> list = new ast.List<Expr>();
 		    				list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+index)));	                				
 				    		list.add(new ColonExpr());
 			            	ParameterizedExpr exprParam = new ParameterizedExpr(varExpr, list);			    		
@@ -971,18 +971,18 @@ public class TypeInferenceEngine {
 						for(int i=0; i<mDims.get(0); i++) {
 				    		rowStart++;
 				    		AssignStmt rowAsg = new AssignStmt();
-			            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+			            	ast.List<Expr> list = new ast.List<Expr>();
 		    				list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+rowStart)));
 				    		list.add(new ColonExpr());
 			            	ParameterizedExpr exprParam = new ParameterizedExpr(varExpr, list);			    		
 				    		rowAsg.setLHS(exprParam);
 				    		
 			            	// Adjusted row matrix is RHS
-			            	natlab.ast.List<Expr> rlist = new natlab.ast.List<Expr>();
+			            	ast.List<Expr> rlist = new ast.List<Expr>();
 			            	// there is only one row!
 				    		Row row = expr.getRows().getChild(0);
 				    		for(Expr element: row.getElements()) {
-				            	natlab.ast.List<Expr> elist = new natlab.ast.List<Expr>();
+				            	ast.List<Expr> elist = new ast.List<Expr>();
 			    				elist.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+rowStart)));
 					    		elist.add(new ColonExpr());
 				            	ParameterizedExpr elemParam = new ParameterizedExpr(element, elist);
@@ -1034,7 +1034,7 @@ public class TypeInferenceEngine {
 						// create new assign, with new LHS,RHS
 	            		Row row = expr.getRows().getChild(index-1);
 			    		AssignStmt rowAsg = new AssignStmt();
-		            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> list = new ast.List<Expr>();
 			    		// Split the row
 						// 	C=[A;B];  => C(1,:)=A; C(2,:)=B  
 	            		Type rowType = rowTypes[index-1];
@@ -1128,7 +1128,7 @@ public class TypeInferenceEngine {
 				addNewAssignment(indexExpr, indexPlus, parentAsg,  null, stScope, false);
 				
 				// (4) Transform Matrix concatenation into index increasing form
-            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+            	ast.List<Expr> list = new ast.List<Expr>();
             	list.add(indexExpr);
             	list.add(new ColonExpr());
 				
@@ -1296,7 +1296,7 @@ public class TypeInferenceEngine {
 					// All of three are integer, OK, no need to transform
 				} else {
 					// A3 = 1:6.3	==> A3 = 1:floor(6.3)
-	            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+	            	ast.List<Expr> list = new ast.List<Expr>();
     				list.add(expr.getUpper());	                				
 	            	ParameterizedExpr exprParam = new ParameterizedExpr(new NameExpr(new Name("floor")), list);
 	            	expr.setUpper(exprParam);
@@ -1371,7 +1371,7 @@ public class TypeInferenceEngine {
 			
 			// For integer, only adjust range.upper() when it is not integer expression, 
 			if(isInteger && !(isIntegerType(expr.getUpper().collectType(stScope, expr.getUpper()))))  {
-				natlab.ast.List<Expr> upperlist = new natlab.ast.List<Expr>();
+				ast.List<Expr> upperlist = new ast.List<Expr>();
 				upperlist.add(expr.getUpper());	
             	ParameterizedExpr upperParam = new ParameterizedExpr(new NameExpr(new Name("floor")), upperlist);
 				expr.setUpper(upperParam);
@@ -1385,7 +1385,7 @@ public class TypeInferenceEngine {
 				newMinus.setLHS(expr.getUpper());
 				newMinus.setRHS(expr.getLower());
 				
-				natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+				ast.List<Expr> list = new ast.List<Expr>();
 				if(expr.hasIncr()) {
 					MDivExpr newDiv = new MDivExpr();
 					newDiv.setLHS(newMinus);
@@ -1593,7 +1593,7 @@ public class TypeInferenceEngine {
 		if(parentNode!=null) {
 			loc = parentNode.getIndexOfChild(child);
 		} else {
-			while ((parent!=null) && !(parent instanceof natlab.ast.List)) {
+			while ((parent!=null) && !(parent instanceof ast.List)) {
 	    		child  = parent;
 	    		parent = child.getParent(); 	   
 	    	}
@@ -1772,7 +1772,7 @@ public class TypeInferenceEngine {
     			
             } else if(fname.equalsIgnoreCase("reshape")) {
             	// type could be int/double, union?
-            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+            	ast.List<Expr> list = new ast.List<Expr>();
             	list.add(expr.getArg(1));	list.add(expr.getArg(2));
             	// It should be a matrix type ...
             	String baseTypeName = TYPENAME_DOUBLE; 
@@ -1845,14 +1845,14 @@ public class TypeInferenceEngine {
 			    		
         	    		// When only one vector argument, then flat vector
 			    		if(argType instanceof MatrixType && expr.getNumArg()==1) {
-	    	            	natlab.ast.List<Expr> listMin = new natlab.ast.List<Expr>();
+	    	            	ast.List<Expr> listMin = new ast.List<Expr>();
 	            	    	java.util.List<Integer> argDims = ((MatrixType) argType).getSize().getDims();
 	            	    	if(argDims.size()!=1) {
 	        	            	System.err.println("[inferType]MIN(A)["+expr.getStructureString()+"] is not a vector!");
 	            	    	} else {
 	            	    		for(int i=0; i<argDims.get(0); ++i) {
-	            	            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
-	                				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+(i+1))));	                				
+	            	            	ast.List<Expr> list = new ast.List<Expr>();
+	                				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+(i+1))));	                				
 	            	            	ParameterizedExpr exprSizeFunc = new ParameterizedExpr(argExpr , list);
 	            	            	listMin.add(exprSizeFunc);
 	            	    		}
@@ -1991,9 +1991,9 @@ public class TypeInferenceEngine {
         	    			int loc = parent.getIndexOfChild(expr);
         	    			if(argDims!=null) {
 	            	    		for(int i=0; i<argDims.size(); ++i) {
-	            	            	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+	            	            	ast.List<Expr> list = new ast.List<Expr>();
 	            	            	list.add(expr.getArg(0));
-	                				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+(i+1))));                				
+	                				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+(i+1))));                				
 	            	            	ParameterizedExpr exprSizeFunc = new ParameterizedExpr(funcNameExpr , list);
 	            	    			if(i==0) {
 	            	    				mainExpr = new MTimesExpr();
@@ -2091,10 +2091,10 @@ public class TypeInferenceEngine {
 		Stmt stmt = ASTToolBox.getParentStmtNode(node);
 		// The 'stmt' maybe an assignment statement in ForStmt, 
 		// which will be returned by following if(..)
-		if(!(stmt.getParent() instanceof natlab.ast.List)) {
+		if(!(stmt.getParent() instanceof ast.List)) {
 			return ;
 		} 
-		natlab.ast.List list = (natlab.ast.List)stmt.getParent();
+		ast.List list = (ast.List)stmt.getParent();
 
 		NameExpr lhs = new NameExpr(new Name(varName));
 		NameExpr rhs = new NameExpr(new Name(varName));
@@ -3048,7 +3048,7 @@ TODO: rhsType ==> [n-1+1]
 						// new NameExpr(new Name(rstrDims.get(0)))));
 				argFor.setAssignStmt(idxAsg);
 				// Statement list of ForStmt
-				natlab.ast.List<Stmt> forList = new natlab.ast.List<Stmt>();
+				ast.List<Stmt> forList = new ast.List<Stmt>();
 
 				// Case 1: rr(kk) has one argument, and in LHS of assignment statement
 				// Index array kk() contains integer, and are all legal index for rr() 
@@ -3057,7 +3057,7 @@ TODO: rhsType ==> [n-1+1]
 	    			// If there is linear indexing, 
 	    			if(lstrDims.size()==2 && rstrDims.size()==1) {		    			
 						// First assignment 
-		            	natlab.ast.List<Expr> kklist1 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> kklist1 = new ast.List<Expr>();
 		            	kklist1.add(new NameExpr(new Name("int_tmpvar")));
 		            	ParameterizedExpr kkParam1 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist1);
 		            	MinusExpr minus1 = new MinusExpr(kkParam1, 
@@ -3065,7 +3065,7 @@ TODO: rhsType ==> [n-1+1]
 	    				MDivExpr div1 = new MDivExpr(minus1, McFor.parseString(lstrDims.get(1)).getExpr()); 
 	    				PlusExpr newPlus1 = new PlusExpr(div1, 
 	    						new FPLiteralExpr(new natlab.FPNumericLiteralValue("0.0")));
-		            	natlab.ast.List<Expr> divlist1 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> divlist1 = new ast.List<Expr>();
 		            	divlist1.add(newPlus1);
 	    				ParameterizedExpr divFloor = new ParameterizedExpr(new NameExpr(new Name("floor")), divlist1);	    						// new NameExpr(new Name(lstrDims.get(1))));
 	    				PlusExpr plus1 = new PlusExpr(divFloor, 
@@ -3075,13 +3075,13 @@ TODO: rhsType ==> [n-1+1]
 						bufAsg1.setRHS(plus1);
 
 						// Second assignment 
-		            	natlab.ast.List<Expr> kklist2 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> kklist2 = new ast.List<Expr>();
 		            	kklist2.add(new NameExpr(new Name("int_tmpvar")));
 		            	ParameterizedExpr kkParam2 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist2);
 		            	MinusExpr minus2 = new MinusExpr(kkParam2, 
 		            			new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 	    				
-		            	natlab.ast.List<Expr> plist2 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> plist2 = new ast.List<Expr>();
 	    				plist2.add(minus2);
 	    				plist2.add( McFor.parseString(lstrDims.get(1)).getExpr());
 	    				// plist2.add(new NameExpr(new Name(lstrDims.get(1))));
@@ -3097,7 +3097,7 @@ TODO: rhsType ==> [n-1+1]
 						forList.add(bufAsg2);
 						
 						// Modify current assignment
-		            	natlab.ast.List<Expr> plist3 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> plist3 = new ast.List<Expr>();
 	    				plist3.add(new NameExpr(new Name("III")));
 	    				plist3.add(new NameExpr(new Name("JJJ")));
 		            	expr.setArgList(plist3);	
@@ -3115,7 +3115,7 @@ TODO: rhsType ==> [n-1+1]
 					} else if(lstrDims.size()==1 && rstrDims.size()==1) {
 						// Case 1-2:	kk = (1:n); rr = zeros(n); rr(kk)=1.0;
 						// Change the original assignment 
-		            	natlab.ast.List<Expr> kklist2 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> kklist2 = new ast.List<Expr>();
 		            	kklist2.add(new NameExpr(new Name("int_tmpvar")));
 		            	ParameterizedExpr kkParam2 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist2);
 	    				expr.setArg(kkParam2, 0);
@@ -3135,12 +3135,12 @@ TODO: rhsType ==> [n-1+1]
 					if(lstrDims.size()==1 && rstrDims.size()==1) {
 						// Case 1-2:	kk = (1:n); rr = zeros(n); rr(kk)=1.0;
 						// Change the original assignment 
-		            	natlab.ast.List<Expr> kklist2 = new natlab.ast.List<Expr>();
+		            	ast.List<Expr> kklist2 = new ast.List<Expr>();
 		            	kklist2.add(new NameExpr(new Name("int_tmpvar")));
 		            	ParameterizedExpr kkParam2 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist2);
 	    				expr.setArg(kkParam2, 0);
 
-	    				natlab.ast.List<Expr> plist2 = new natlab.ast.List<Expr>();
+	    				ast.List<Expr> plist2 = new ast.List<Expr>();
 	    				plist2.add(new NameExpr(new Name("int_tmpvar")));
 		            	ParameterizedExpr exprLHS = new ParameterizedExpr((NameExpr)asgStmt.getLHS(), plist2);
 		            	asgStmt.setLHS(exprLHS);
@@ -3211,10 +3211,10 @@ TODO: rhsType ==> [n-1+1]
 					argFor2.setAssignStmt(idxAsg2);
 
 					// Statement list of ForStmt
-					natlab.ast.List<Stmt> forList = new natlab.ast.List<Stmt>();
-					natlab.ast.List<Stmt> forList2 = new natlab.ast.List<Stmt>();
+					ast.List<Stmt> forList = new ast.List<Stmt>();
+					ast.List<Stmt> forList2 = new ast.List<Stmt>();
 					// First assignment 
-	            	natlab.ast.List<Expr> kklist1 = new natlab.ast.List<Expr>();
+	            	ast.List<Expr> kklist1 = new ast.List<Expr>();
 	            	// for(String dim: cstrDims) 
 	            	kklist1.add(new NameExpr(new Name("III")));
 	            	kklist1.add(new NameExpr(new Name("JJJ")));
@@ -3222,12 +3222,12 @@ TODO: rhsType ==> [n-1+1]
 	            	ParameterizedExpr kkParam1 = new ParameterizedExpr(lhs, kklist1);
 	            	
 	            	// assume rstrDims.size()==2 
-	            	natlab.ast.List<Expr> kklist2 = new natlab.ast.List<Expr>();
+	            	ast.List<Expr> kklist2 = new ast.List<Expr>();
 	            	kklist2.add(new NameExpr(new Name("III")));
 	            	kklist2.add(new NameExpr(new Name("JJJ")));
 	            	ParameterizedExpr kkParam2 = new ParameterizedExpr(((NameExpr)expr.getArg(0)), kklist2);
 	            	
-	            	natlab.ast.List<Expr> kklist3 = new natlab.ast.List<Expr>();
+	            	ast.List<Expr> kklist3 = new ast.List<Expr>();
 	            	kklist3.add(kkParam2);
 	            	int i=0;
 	            	for(String dim: lstrDims) {
@@ -3294,7 +3294,7 @@ TODO: rhsType ==> [n-1+1]
     	java.util.List<String> lstrDims = lType.getSize().getDynamicDims();
     	java.util.List<String> mstrDims = mType.getSize().getDynamicDims();
 
-    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+    	ast.List<Expr> list = new ast.List<Expr>();
 
     	// [1] Hand : expression:
     	// 	e.g., A=U(:), A=U(:,:)  ==> A=U
@@ -3388,14 +3388,14 @@ TODO: rhsType ==> [n-1+1]
 	        			int i=0;
 	        			for(Expr arg: expr.getArgList()) {
 		        			if(index == i) {
-		        				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		        				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		        			}
 	        				list.add(arg);
 	        				// list.add(new NameExpr(new Name(lstrDims.get(i)))); // this is the value
 	        				++i;
 	        			}
 	        			if(index == i) {
-	        				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+	        				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 	        			}
 	        		} else {
 	            		// Cannot find dimension=1, then add ":" to it
@@ -3423,40 +3423,40 @@ TODO: rhsType ==> [n-1+1]
     		// Major cases are 2-dimension
     		if(mDims.size()==2) { 	// implies lDims.size()==1
     			if(mDims.get(0)==1) {
-    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     				list.add(expr.getArg(0));
     			} else if(mDims.get(1)==1) {
     				list.add(expr.getArg(0));
-    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     			} else {
     				// Linear indexing: C=Matrix(2*10), expr:  C(4)=0.0  => C(1,4) 
     				// 				  					expr:  C(15)=0.0 => C(2,5)	// row major
     				if(!bExprIsDynamic) {
 	    				int row = (lDims.get(0)-1)/mDims.get(1)+1;
 	    				int col = ((lDims.get(0)-1)%mDims.get(1))+1;
-	    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+row)));
-	    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+col)));
+	    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+row)));
+	    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+col)));
 
     				} else {
     		        	// Linear indexing A(i, j), A(k)=A((k-1)/j+1,(k-1)%j+1)
     					MinusExpr rowMinus = new MinusExpr(
     							McFor.parseString(lstrDims.get(0)).getExpr(), 
     							// new NameExpr(new Name(lstrDims.get(0))), 
-    							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    							new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     					MDivExpr rowDiv = new MDivExpr(rowMinus,  
-    							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+mDims.get(1))));
+    							new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+mDims.get(1))));
     					PlusExpr rowIndex = new PlusExpr(rowDiv, 
-    							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    							new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 
     					MinusExpr colMinus = new MinusExpr(McFor.parseString(lstrDims.get(0)).getExpr(),
     							// new NameExpr(new Name(lstrDims.get(0))), 
-    							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
-    			    	natlab.ast.List<Expr> colList = new natlab.ast.List<Expr>();
+    							new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    			    	ast.List<Expr> colList = new ast.List<Expr>();
 						colList.add(colMinus);
-						colList.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+mDims.get(1))));
+						colList.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+mDims.get(1))));
     			    	ParameterizedExpr colParam = new ParameterizedExpr(new NameExpr(new Name("mod")), colList);
     					PlusExpr colIndex = new PlusExpr(colParam, 
-    							new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    							new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     					list.add(rowIndex);
     					list.add(colIndex);
     				}
@@ -3512,7 +3512,7 @@ TODO: rhsType ==> [n-1+1]
 			argFor.setAssignStmt(idxAsg);
 	
 			// Statement list of ForStmt
-			natlab.ast.List<Stmt> forList = new natlab.ast.List<Stmt>();
+			ast.List<Stmt> forList = new ast.List<Stmt>();
 			// First assignment
 			expr.setArg(new NameExpr(new Name("int_tmpvar")), index);
 			forList.add((AssignStmt)expr.getParent());
@@ -3544,7 +3544,7 @@ TODO: rhsType ==> [n-1+1]
 		// LSH expression type 
     	java.util.List<Integer> lDims = lType.getSize().getDims();
     	java.util.List<Integer> rDims = rType.getSize().getDims();	
-    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+    	ast.List<Expr> list = new ast.List<Expr>();
 
     	MatrixType mType = rType;
     	java.util.List<String> lstrDims = lType.getSize().getDynamicDims();
@@ -3586,7 +3586,7 @@ TODO: rhsType ==> [n-1+1]
 	        			int i=0;
 	        			for(String extent: lstrDims) {
 		        			if(index == i) {
-		        				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+		        				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		        			} else {
 		        				list.add(new ColonExpr());
 		        			}
@@ -3624,11 +3624,11 @@ TODO: rhsType ==> [n-1+1]
     		// If LHS/RHS dimension difference is 1, then add ':' colon-expression to LHS
     		if(lDims.size()==2 && rDims.size()==1) { 
     			if(lDims.get(0)==1) {
-    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     				list.add(new ColonExpr());
     			} else if(lDims.get(1)==1) {
     				list.add(new ColonExpr());
-    				list.add(new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
+    				list.add(new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
     			} else {
     				// In case: C=Matrix(2*10),  expr:  C=[1,2] ??? Grammar Error
     	    		System.err.println("[Error]adjustArrayIndex: lhs=["+lDims.get(0)+","+lDims.get(1)+"]");
@@ -3663,7 +3663,7 @@ TODO: rhsType ==> [n-1+1]
 	}
 	// Change array to A(1,1)
 	public static void adjustArrayIndex(PrimitiveType rType, MatrixType lType, NameExpr expr) {
-    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+    	ast.List<Expr> list = new ast.List<Expr>();
     	java.util.List<Integer> lDims = lType.getSize().getDims();
     	java.util.List<String> lstrDims = lType.getSize().getDynamicDims();
     	if(lDims!=null) {

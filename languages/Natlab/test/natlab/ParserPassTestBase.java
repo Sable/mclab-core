@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
-import natlab.ast.Program;
+import ast.Program;
 import beaver.Symbol;
 
 /** 

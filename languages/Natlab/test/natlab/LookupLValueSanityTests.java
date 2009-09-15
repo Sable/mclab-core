@@ -2,7 +2,7 @@ package natlab;
 
 import java.io.*;
 import junit.framework.TestCase;
-import natlab.ast.*;
+import ast.*;
 import natlab.SymbolTableEntry;
 
 public class LookupLValueSanityTests extends TestCase

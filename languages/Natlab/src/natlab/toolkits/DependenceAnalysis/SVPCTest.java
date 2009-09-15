@@ -1,31 +1,31 @@
 package natlab.toolkits.DependenceAnalysis;
-import natlab.ast.ForStmt;
+import ast.ForStmt;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
-import natlab.ast.Expr;
-import natlab.ast.Stmt;
-import natlab.ast.ParameterizedExpr;
-import natlab.ast.ExprStmt;
-import natlab.ast.AssignStmt;
-import natlab.ast.PlusExpr;
-import natlab.ast.NameExpr;
+import ast.Expr;
+import ast.Stmt;
+import ast.ParameterizedExpr;
+import ast.ExprStmt;
+import ast.AssignStmt;
+import ast.PlusExpr;
+import ast.NameExpr;
 import natlab.DecIntNumericLiteralValue;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.MinusExpr;
-import natlab.ast.Name;
+import ast.IntLiteralExpr;
+import ast.MinusExpr;
+import ast.Name;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.ast.RangeExpr;
-import natlab.ast.ColonExpr;
+import ast.RangeExpr;
+import ast.ColonExpr;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.io.IOException;
-import natlab.ast.EQExpr;
+import ast.EQExpr;
 /*
  * Author:Amina Aslam
  * Date:15 June,2009

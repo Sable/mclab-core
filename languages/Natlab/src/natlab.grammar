@@ -1,4 +1,4 @@
-%import "natlab.ast.*";
+%import "ast.*";
 
 %package "natlab";
 
@@ -56,7 +56,7 @@
     //// AST helpers ///////////////////////////////////////////////////////////
 
     //add all elements of a util list to an ast list
-    private static <T extends ASTNode<?>> natlab.ast.List<T> addAll(natlab.ast.List<T> node, java.util.List<T> children) {
+    private static <T extends ASTNode<?>> ast.List<T> addAll(ast.List<T> node, java.util.List<T> children) {
         for(T child : children) {
             node.add(child);
         }
@@ -64,11 +64,11 @@
     }
 
     //make a new ast list for a given util list
-    private static <T extends ASTNode<?>> natlab.ast.List<T> makeListNode(java.util.List<T> children) {
+    private static <T extends ASTNode<?>> ast.List<T> makeListNode(java.util.List<T> children) {
         if(children == null) {
             return null;
         }
-        return addAll(new natlab.ast.List<T>(), children);
+        return addAll(new ast.List<T>(), children);
     }
 
     //// Stmt terminators //////////////////////////////////////////////////////

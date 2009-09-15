@@ -1,7 +1,7 @@
 
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 
 public abstract class AnalysisVisitor
 {

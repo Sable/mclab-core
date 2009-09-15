@@ -1,6 +1,6 @@
 package natlab;
 
-import natlab.ast.*;
+import ast.*;
 
 public class ASTToolBox {
 
@@ -41,21 +41,21 @@ public class ASTToolBox {
 	    return (AssignStmt)parentNode;
  	}
 	// Find the close parent node 
- 	public static natlab.ast.List getParentStmtListNode(ASTNode varNode) {
+ 	public static ast.List getParentStmtListNode(ASTNode varNode) {
 	    ASTNode parentNode = varNode.getParent();
 	    // If the varNode is already the assignment-statement, then don't need 
 	    // to find it's parent
-	    if((varNode instanceof natlab.ast.List)) {
+	    if((varNode instanceof ast.List)) {
 	    	parentNode = varNode;
 	    } else {
 		    // varNode/e.getNodeLocation() is NameExpr, it may directly belongs to
 	    	// AssignStmt, or ParameterizedExpr.
-	    	while ((parentNode!=null) && !(parentNode instanceof natlab.ast.List)) {
+	    	while ((parentNode!=null) && !(parentNode instanceof ast.List)) {
 	    		varNode = parentNode;
 	    		parentNode = parentNode.getParent(); 	   
 	    	}
 	    }
-	    return (natlab.ast.List) parentNode;
+	    return (ast.List) parentNode;
  	}
 	
  	public static boolean isInsideArray(ASTNode varNode) {

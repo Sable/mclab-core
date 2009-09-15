@@ -2,7 +2,7 @@ package natlab;
 
 import java.io.*;
 
-import natlab.ast.Program;
+import ast.Program;
 import beaver.Parser;
 
 /**

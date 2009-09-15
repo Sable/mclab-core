@@ -13,8 +13,8 @@ import matlab.OffsetTracker;
 import matlab.PositionMap;
 import matlab.TextPosition;
 import matlab.TranslationProblem;
-import natlab.ast.*;
-import natlab.ast.List;
+import ast.*;
+import ast.List;
 
 import beaver.Parser;
 
@@ -839,7 +839,7 @@ public class McFor {
 				if(bMainFunc && ((Function) func).getOutputParamList().getNumChild()>0) {
 					List<Stmt> stmtlist = ((Function) func).getStmtList();	            	
 		    		for(Name outparam :((Function) func).getOutputParamList()) {
-		    	    	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		    	    	ast.List<Expr> list = new ast.List<Expr>();
 		    			list.add(new NameExpr(outparam));
 		    	    	ParameterizedExpr dispExpr = new ParameterizedExpr(new NameExpr(new Name("disp")), list);
 		    	    	ExprStmt dispStmt = new ExprStmt(dispExpr);
@@ -862,7 +862,7 @@ public class McFor {
 	    }
 		return actual;
 	}
-	public static void changeCell2Matrix( natlab.ast.List<Stmt> stmtList) {
+	public static void changeCell2Matrix( ast.List<Stmt> stmtList) {
 		for(Stmt stmt : stmtList) {
 			if(stmt instanceof AssignStmt) {
 				Expr rhs = ((AssignStmt) stmt).getRHS();
@@ -1126,15 +1126,15 @@ public class McFor {
 			//END IF
 			// Creating the expression
 			// If Statement list ...
-			natlab.ast.List<Stmt> stmtlist= new natlab.ast.List<Stmt>();
+			ast.List<Stmt> stmtlist= new ast.List<Stmt>();
 			// If condition
-	     	natlab.ast.List<Expr> list0 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list0 = new ast.List<Expr>();
 	     	list0.add(new NameExpr(new Name(varName)));
 			ParameterizedExpr checkExpr = new ParameterizedExpr(
 					new NameExpr(new Name("ALLOCATED")), list0);
 			
 			// assignments 
-	     	natlab.ast.List<Expr> list1 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list1 = new ast.List<Expr>();
 	     	list1.add(new NameExpr(new Name(varName)));
 	     	list1.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 			ParameterizedExpr sizeExpr1 = new ParameterizedExpr(
@@ -1145,7 +1145,7 @@ public class McFor {
 
 			AssignStmt asg2 = null;
 			if(strDims.size()==2) {
-		     	natlab.ast.List<Expr> list2 = new natlab.ast.List<Expr>();
+		     	ast.List<Expr> list2 = new ast.List<Expr>();
 		     	list2.add(new NameExpr(new Name(varName)));
 		     	list2.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("2")));
 				ParameterizedExpr sizeExpr2 = new ParameterizedExpr(
@@ -1238,18 +1238,18 @@ public class McFor {
 			
 			// Creating the expression
 			// If Statement list ...
-			natlab.ast.List<Stmt> stmtlist= new natlab.ast.List<Stmt>();
+			ast.List<Stmt> stmtlist= new ast.List<Stmt>();
 			// 1.	        DEALLOCATE(SRmat_tmp)
 			Stmt deallocTemp = createDeallocateStmt(varName+"_tmp");
 			stmtlist.add(deallocTemp);
 
 		    // 2. ALLOCATE(SRmat_tmp(SRmat_d1, SRmat_d2))
-	     	natlab.ast.List<Expr> list1 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list1 = new ast.List<Expr>();
 	     	list1.add(new NameExpr(new Name(varName+"_d1")));
 	     	list1.add(new NameExpr(new Name(varName+"_d2")));
 			ParameterizedExpr tempArray = new ParameterizedExpr(
 					new NameExpr(new Name(varName+"_tmp")), list1);		
-	     	natlab.ast.List<Expr> list2 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list2 = new ast.List<Expr>();
 	     	list2.add(tempArray);
 			ParameterizedExpr allocTemp = new ParameterizedExpr(
 					new NameExpr(new Name("ALLOCATE")), list2);		
@@ -1264,7 +1264,7 @@ public class McFor {
 			stmtlist.add(deallocStmt);
 			
 			// 5. SRmat_d1max=MAX(SRmat_d1, p); SRmat_d2max=MAX(SRmat_d2, 5);
-	     	natlab.ast.List<Expr> listD1 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> listD1 = new ast.List<Expr>();
 	     	listD1.add(new NameExpr(new Name(varName+"_d1")));
 	     	listD1.add(new NameExpr(new Name(lhsArg0)));
 			ParameterizedExpr maxD1 = new ParameterizedExpr(
@@ -1273,7 +1273,7 @@ public class McFor {
 					new NameExpr(new Name(varName+"_d1max")),maxD1);
 			stmtlist.add(maxD1Stmt);
 				
-	     	natlab.ast.List<Expr> listD2 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> listD2 = new ast.List<Expr>();
 	     	listD2.add(new NameExpr(new Name(varName+"_d2")));
 	     	listD2.add(new NameExpr(new Name(lhsArg1)));
 			ParameterizedExpr maxD2 = new ParameterizedExpr(
@@ -1283,19 +1283,19 @@ public class McFor {
 			stmtlist.add(maxD2Stmt);
 			
 			// 6. 	      ALLOCATE(SRmat(SRmat_d1max, SRmat_d2max))
-	     	natlab.ast.List<Expr> list5 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list5 = new ast.List<Expr>();
 	     	list5.add(new NameExpr(new Name(varName+"_d1max")));
 	     	list5.add(new NameExpr(new Name(varName+"_d2max")));
 			ParameterizedExpr array2 = new ParameterizedExpr(
 					new NameExpr(new Name(varName)), list5);		
-	     	natlab.ast.List<Expr> list6 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> list6 = new ast.List<Expr>();
 	     	list6.add(array2);
 			ParameterizedExpr reallocExpr = new ParameterizedExpr(
 					new NameExpr(new Name("ALLOCATE")), list6);		
 			stmtlist.add(new ExprStmt(reallocExpr));
 				     	
 			// 7. SRmat(1:SRmat_d1,1:SRmat_d2) = SRmat_tmp(1:SRmat_d1,1:SRmat_d2)
-	     	natlab.ast.List<Expr> listC1 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> listC1 = new ast.List<Expr>();
 	     	listC1.add(new RangeExpr(
 	     			new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")),
 	     			new Opt<Expr>(),
@@ -1307,7 +1307,7 @@ public class McFor {
 			ParameterizedExpr lhsC1 = new ParameterizedExpr(
 					new NameExpr(new Name(varName)), listC1);		
 			
-	     	natlab.ast.List<Expr> listC2 = new natlab.ast.List<Expr>();
+	     	ast.List<Expr> listC2 = new ast.List<Expr>();
 	     	listC2.add(new RangeExpr(
 	     			new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")),
 	     			new Opt<Expr>(),
@@ -1641,7 +1641,7 @@ public class McFor {
 
 					    	// adding them into tree;
 					    	ASTNode parent = varDeclNode.getParent();
-				    		if(parent instanceof natlab.ast.List) {
+				    		if(parent instanceof ast.List) {
 				    			int i=0, j=0;
 				    			for(; i < parent.getNumChild(); i++) {
 				    				if(!(parent.getChild(i) instanceof VariableDecl)) {
@@ -1793,7 +1793,7 @@ public class McFor {
 		}
 	}
 	private static Expr createComplexExpr(Expr realExpr, Expr imgExpr) {
-		natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		ast.List<Expr> list = new ast.List<Expr>();
 		if(realExpr!=null) {
 			list.add(realExpr);
 		} else {
@@ -2009,7 +2009,7 @@ public class McFor {
 							    		// Find the close List<Stmt> and location, insert into
 							    		ASTNode parent = varNode.getParent(); 
 							    		ASTNode child = varNode;
-						    			while ((parent!=null) && !(parent instanceof natlab.ast.List)) {
+						    			while ((parent!=null) && !(parent instanceof ast.List)) {
 						    	    		child  = parent;
 						    	    		parent = child.getParent(); 	   
 						    	    	}
@@ -2075,7 +2075,7 @@ public class McFor {
 					
 					// SymbolTableEntry stLHS = stScope.getSymbolById(((NameExpr)lhs).getVarName());
 					
-					natlab.ast.List<Expr> arglist = new natlab.ast.List<Expr>();	
+					ast.List<Expr> arglist = new ast.List<Expr>();	
 					arglist.add(new StringLiteralExpr("N"));
 					arglist.add(new StringLiteralExpr("N"));
 					arglist.add(new NameExpr(new Name(strDims1.get(0))));
@@ -2124,7 +2124,7 @@ public class McFor {
 			(VariableDecl declNode, MatrixType varType, ASTNode curNode) {
 
 		java.util.List<Stmt> exprStmtList = new ArrayList<Stmt>();
-     	natlab.ast.List<Expr> arglist = new natlab.ast.List<Expr>();
+     	ast.List<Expr> arglist = new ast.List<Expr>();
     	Size varSize = varType.getSize(); 
     	if(varSize != null) {
 			if(varSize.getDims()!=null) {
@@ -2149,21 +2149,21 @@ public class McFor {
 		ParameterizedExpr varExpr = new ParameterizedExpr(
 				new NameExpr(new Name(declNode.getID())), arglist);
 		
-		natlab.ast.List<Expr> listName = new natlab.ast.List<Expr>();
+		ast.List<Expr> listName = new ast.List<Expr>();
 		listName.add(new NameExpr(new Name(declNode.getID())));
 		//ParameterizedExpr deallocExpr = new ParameterizedExpr(
 		//		new NameExpr(new Name("DEALLOCATE")), listName);
 		//Stmt deallocStmt = new ExprStmt(deallocExpr);
 		Stmt deallocStmt = createDeallocateStmt(declNode.getID());
 		
-     	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+     	ast.List<Expr> list = new ast.List<Expr>();
      	list.add(varExpr);
 		ParameterizedExpr allocExpr = new ParameterizedExpr(
 				new NameExpr(new Name("ALLOCATE")), list);		
 		ParameterizedExpr checkExpr = new ParameterizedExpr(
 				new NameExpr(new Name("ALLOCATED")), listName);
 		
-		natlab.ast.List<Stmt> stmtlist= new natlab.ast.List<Stmt>();
+		ast.List<Stmt> stmtlist= new ast.List<Stmt>();
 		stmtlist.add(new ExprStmt(allocExpr));
 
 		IfStmt tmpIfStmt  = new IfStmt();
@@ -2178,7 +2178,7 @@ public class McFor {
 	}
 	private static Stmt createDeallocateStmt(String varName) {
 		// Deallocate statement
-		natlab.ast.List<Expr> listName = new natlab.ast.List<Expr>();
+		ast.List<Expr> listName = new ast.List<Expr>();
 		listName.add(new NameExpr(new Name(varName)));
 		ParameterizedExpr deallocExpr = new ParameterizedExpr(
 				new NameExpr(new Name("DEALLOCATE")), listName);
@@ -2187,7 +2187,7 @@ public class McFor {
 		ParameterizedExpr checkExpr = new ParameterizedExpr(
 				new NameExpr(new Name("ALLOCATED")), listName);
 		
-		natlab.ast.List<Stmt> stmtlist= new natlab.ast.List<Stmt>();
+		ast.List<Stmt> stmtlist= new ast.List<Stmt>();
 		stmtlist.add(new ExprStmt(deallocExpr));
 
 		// If Statement
@@ -3539,7 +3539,7 @@ public class McFor {
 		NameExpr lhs = new NameExpr(new Name(tmpName));
 		
 		AssignStmt newAssign = new AssignStmt();
-		natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		ast.List<Expr> list = new ast.List<Expr>();
 		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		ParameterizedExpr arrayExpr = new ParameterizedExpr(new NameExpr(new Name(tmpName)), list);
@@ -3677,8 +3677,8 @@ public class McFor {
 			limit = 3;
 		// Cleanup all previous created decl-nodes
 		for(int i=0; i<actual.getNumChild(); ++i) {
-			if(i>=limit && actual.getChild(i) instanceof natlab.ast.List) {
-				natlab.ast.List<ASTNode> list = (natlab.ast.List) actual.getChild(i);
+			if(i>=limit && actual.getChild(i) instanceof ast.List) {
+				ast.List<ASTNode> list = (ast.List) actual.getChild(i);
 				for(int j=list.getNumChild()-1; j>=0; --j) {
 					if(list.getChild(j) instanceof VariableDecl)  {
 						list.removeChild(j);
@@ -4184,7 +4184,7 @@ public class McFor {
 	private static AssignStmt createPhiFunction(String name, ArrayList<ASTNode> varDefList, String funcName) {
 		if(varDefList!=null && varDefList.size()>1) {
 			// Gather all arguments of this phi-node, (currently, using the node-id instead)
-			natlab.ast.List<Expr> arglist = new natlab.ast.List<Expr>();
+			ast.List<Expr> arglist = new ast.List<Expr>();
 			for(ASTNode node: varDefList) {
 				arglist.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+node.getNodeID())));
 			}

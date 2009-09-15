@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 
 /**
  * An analysis helper used to hide some of the details of the

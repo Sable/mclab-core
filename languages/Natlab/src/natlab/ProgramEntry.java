@@ -1,6 +1,6 @@
 package natlab;
 
-import natlab.ast.Program;
+import ast.Program;
 
 /**
  * A entry for a Program used in the Resolver's and loaders lists

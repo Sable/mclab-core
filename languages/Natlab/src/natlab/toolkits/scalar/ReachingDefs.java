@@ -10,7 +10,7 @@ package natlab.toolkits.scalar;
  *  - 2008.06 created by Jun Li
  *  	- Specify the <N,A> to <ASTNode, ArraySparseSet> 
  */
-import natlab.ast.*;
+import ast.*;
 import natlab.toolkits.*;
 
 import java.util.HashMap;

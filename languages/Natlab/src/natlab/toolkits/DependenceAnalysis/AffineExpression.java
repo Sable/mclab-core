@@ -1,9 +1,9 @@
 package natlab.toolkits.DependenceAnalysis;
-import natlab.ast.PlusExpr;
-import natlab.ast.MinusExpr;
-import natlab.ast.NameExpr;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.Expr;
+import ast.PlusExpr;
+import ast.MinusExpr;
+import ast.NameExpr;
+import ast.IntLiteralExpr;
+import ast.Expr;
 
 public class AffineExpression {
 	

@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 import java.util.*;
 
 /**

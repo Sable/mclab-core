@@ -35,7 +35,7 @@ package natlab.toolkits.scalar;
 
 import java.util.*;
 
-import natlab.ast.ASTNode;
+import ast.ASTNode;
 import natlab.toolkits.ValueBox;
 
 /**
@@ -243,9 +243,9 @@ public class ArraySparseSet extends AbstractFlowSet
 		boolean preDefined = false;
     	for(int i=0; i<other.numElements; i++) {
     		preDefined = false;
-    		for(ValueBox vb : (java.util.List<ValueBox>) ((natlab.ast.ASTNode) other.elements[i]).getDefBoxes()) {
+    		for(ValueBox vb : (java.util.List<ValueBox>) ((ast.ASTNode) other.elements[i]).getDefBoxes()) {
 	        	for(int j=0; j<gen.numElements; j++) {
-	        		for(ValueBox vbDest : (java.util.List<ValueBox>) ((natlab.ast.ASTNode) gen.elements[j]).getDefBoxes()) {
+	        		for(ValueBox vbDest : (java.util.List<ValueBox>) ((ast.ASTNode) gen.elements[j]).getDefBoxes()) {
 	        			if(vb.getValue().equals(vbDest.getValue())) {
 	        				preDefined = true;
 	        				break;
@@ -339,9 +339,9 @@ public class ArraySparseSet extends AbstractFlowSet
 		StringBuffer buffer = new StringBuffer("{");
 		// buffer.append("["+ numElements+"]");
 		if(!isEmpty()) {
-			if(elements[0] instanceof natlab.ast.ASTNode) {
+			if(elements[0] instanceof ast.ASTNode) {
 		        for(int i = 0; i < numElements; i++) {
-					buffer.append(((natlab.ast.ASTNode)elements[i]).getNodeID()+", ");
+					buffer.append(((ast.ASTNode)elements[i]).getNodeID()+", ");
 				}
 			}
 		}

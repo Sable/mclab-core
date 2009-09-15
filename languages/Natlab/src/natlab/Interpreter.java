@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import natlab.ast.ASTNode;
-import natlab.ast.Program;
+import ast.ASTNode;
+import ast.Program;
 import beaver.Parser;
 
 public class Interpreter {

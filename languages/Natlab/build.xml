@@ -181,6 +181,7 @@
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 	<target name="jar" depends="clean, gen, compile" description="creates an executable release jar">
+          <echo>"${lib.dir}/${beaver.rt.jar.path.prop} ${annotations.bin.dir}/ ${lib.dir}/${jflex.jar.path.prop} ${lib.dir}/${beaver.jar.path.prop} ${matlab.bin.dir}/ ${lib.dir}/${antlr.task.jar.path.prop} ${lib.dir}/${antlr3.jar.path.prop} ${lib.dir}/${string.template.jar.path.prop} ${lib.dir}/${antlr2.jar.path.prop}"</echo>
 		<jar destfile="${entrypoint.jarname}">
 			<manifest>
 				<attribute name="Main-Class" value="${entrypoint.class}" />

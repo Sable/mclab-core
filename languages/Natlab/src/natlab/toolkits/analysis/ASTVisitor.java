@@ -12,7 +12,7 @@ package natlab.toolkits.analysis;
 import java.util.*;
 import java.util.List;
 
-import natlab.ast.*;
+import ast.*;
 import natlab.toolkits.scalar.*;
 
 

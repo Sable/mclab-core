@@ -4,8 +4,8 @@ import java.io.*;
 
 import java.util.*;
 
-import natlab.ast.*;
-import natlab.ast.List;
+import ast.*;
+import ast.List;
 
 import beaver.Parser;
 
@@ -978,7 +978,7 @@ public class StaticFortranTool {
 
 						    	// adding them into tree;
 						    	ASTNode parent = varDeclNode.getParent();
-					    		if(parent instanceof natlab.ast.List) {
+					    		if(parent instanceof ast.List) {
 					    			int i=0;
 					    			for(; i < parent.getNumChild(); i++) {
 					    				if(!(parent.getChild(i) instanceof VariableDecl)) {
@@ -1065,7 +1065,7 @@ public class StaticFortranTool {
 			ASTNode parent = expr.getParent();
 			int loc = parent.getIndexOfChild(expr);
 			
-			natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+			ast.List<Expr> list = new ast.List<Expr>();
 			if(realExpr!=null) {
 				list.add(realExpr);
 			} else {
@@ -1200,7 +1200,7 @@ public class StaticFortranTool {
 						    		// Find the close List<Stmt> and location, insert into
 						    		ASTNode parent = varNode.getParent(); 
 						    		ASTNode child = varNode;
-					    			while ((parent!=null) && !(parent instanceof natlab.ast.List)) {
+					    			while ((parent!=null) && !(parent instanceof ast.List)) {
 					    	    		child  = parent;
 					    	    		parent = child.getParent(); 	   
 					    	    	}
@@ -1265,7 +1265,7 @@ public class StaticFortranTool {
 			(VariableDecl declNode, MatrixType varType, ASTNode curNode) {
 
 		java.util.List<Stmt> exprStmtList = new ArrayList<Stmt>();
-     	natlab.ast.List<Expr> arglist = new natlab.ast.List<Expr>();
+     	ast.List<Expr> arglist = new ast.List<Expr>();
     	Size varSize = varType.getSize(); 
     	if(varSize != null) {
 			if(varSize.getDims()!=null) {
@@ -1292,20 +1292,20 @@ public class StaticFortranTool {
 		ParameterizedExpr varExpr = new ParameterizedExpr(
 				new NameExpr(new Name(declNode.getID())), arglist);
 				
-		natlab.ast.List<Expr> listName = new natlab.ast.List<Expr>();
+		ast.List<Expr> listName = new ast.List<Expr>();
 		listName.add(new NameExpr(new Name(declNode.getID())));
 		ParameterizedExpr deallocExpr = new ParameterizedExpr(
 				new NameExpr(new Name("DEALLOCATE")), listName);
 		Stmt deallocStmt = new ExprStmt(deallocExpr);
 		
-     	natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+     	ast.List<Expr> list = new ast.List<Expr>();
      	list.add(varExpr);
 		ParameterizedExpr allocExpr = new ParameterizedExpr(
 				new NameExpr(new Name("ALLOCATE")), list);		
 		ParameterizedExpr checkExpr = new ParameterizedExpr(
 				new NameExpr(new Name("ALLOCATED")), listName);
 		
-		natlab.ast.List<Stmt> stmtlist= new natlab.ast.List<Stmt>();
+		ast.List<Stmt> stmtlist= new ast.List<Stmt>();
 		stmtlist.add(new ExprStmt(allocExpr));
 
 		IfStmt tmpIfStmt  = new IfStmt();
@@ -2423,7 +2423,7 @@ if(DEBUG_isFirmType) {
 		NameExpr lhs = new NameExpr(new Name(tmpName));
 		
 		AssignStmt newAssign = new AssignStmt();
-		natlab.ast.List<Expr> list = new natlab.ast.List<Expr>();
+		ast.List<Expr> list = new ast.List<Expr>();
 		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		list.add(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")));
 		ParameterizedExpr arrayExpr = new ParameterizedExpr(new NameExpr(new Name(tmpName)), list);
@@ -2557,8 +2557,8 @@ if(DEBUG_isFirmType) {
 			limit = 3;
 		// Cleanup all previous created decl-nodes
 		for(int i=0; i<actual.getNumChild(); ++i) {
-			if(i>=limit && actual.getChild(i) instanceof natlab.ast.List) {
-				natlab.ast.List<ASTNode> list = (natlab.ast.List) actual.getChild(i);
+			if(i>=limit && actual.getChild(i) instanceof ast.List) {
+				ast.List<ASTNode> list = (ast.List) actual.getChild(i);
 				for(int j=list.getNumChild()-1; j>=0; --j) {
 					if(list.getChild(j) instanceof VariableDecl)  {
 						list.removeChild(j);
@@ -2807,7 +2807,7 @@ if(DEBUG_isFirmType) {
 				for(RenamingRule rule: varRuleMap.values()) {
 					if(DEBUG_Flow) out.println("[varRuleMap]"+rule);
 					// Gather all arguments of this phi-node
-					natlab.ast.List<Expr> arglist = new natlab.ast.List<Expr>();
+					ast.List<Expr> arglist = new ast.List<Expr>();
 					for(ASTNode node: rule.nodeList) {
 						// 1. AssignStmt/ParamExpr/NameExpr/ has getVarName()
 						// 2. Node.getVarName() is updated name -- for renaming...

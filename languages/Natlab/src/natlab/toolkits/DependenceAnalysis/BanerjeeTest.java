@@ -3,12 +3,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.ast.ForStmt;
-import natlab.ast.MTimesExpr;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.Expr;
-import natlab.ast.RangeExpr;
-import natlab.ast.NameExpr;
+import ast.ForStmt;
+import ast.MTimesExpr;
+import ast.IntLiteralExpr;
+import ast.Expr;
+import ast.RangeExpr;
+import ast.NameExpr;
 /*
  * Author:Amina Aslam
  * Date:10 Aug,2009

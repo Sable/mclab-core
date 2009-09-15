@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 import java.util.*;
 
 public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralAnalysis<A>

@@ -3,17 +3,17 @@ package natlab.toolkits.DependenceAnalysis;
 import java.io.File;
 import java.io.RandomAccessFile;
 
-import natlab.ast.AssignStmt;
-import natlab.ast.Expr;
-import natlab.ast.ForStmt;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.MinusExpr;
-import natlab.ast.NameExpr;
-import natlab.ast.ParameterizedExpr;
-import natlab.ast.PlusExpr;
-import natlab.ast.RangeExpr;
-import natlab.ast.Stmt;
-import natlab.ast.MTimesExpr;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.ForStmt;
+import ast.IntLiteralExpr;
+import ast.MinusExpr;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.PlusExpr;
+import ast.RangeExpr;
+import ast.Stmt;
+import ast.MTimesExpr;
 import java.util.Iterator;
 /*
  * Author:Amina Aslam
@@ -121,7 +121,7 @@ private Expr tokenizeExpression(Expr expr)
 	 System.out.println(pExpr.getRHS().getClass().toString());	 
 	 if(pExpr.getLHS() instanceof ParameterizedExpr){ newExpr=pExpr.getRHS();return pExpr.getLHS();}
 	 else
-	 { if(!(pExpr.getLHS().getClass().toString().equals("class natlab.ast.IntLiteralExpr")) || !(pExpr.getLHS().getClass().toString().equals("class natlab.ast.FPLiteralExpr")))
+	 { if(!(pExpr.getLHS().getClass().toString().equals("class ast.IntLiteralExpr")) || !(pExpr.getLHS().getClass().toString().equals("class ast.FPLiteralExpr")))
 	   { newExpr=pExpr.getLHS();
 	     if(pExpr.getRHS() instanceof ParameterizedExpr)
 	     { teExpr=pExpr.getRHS();
@@ -131,7 +131,7 @@ private Expr tokenizeExpression(Expr expr)
      }//end of else
 	 if(pExpr.getRHS() instanceof ParameterizedExpr) return pExpr.getRHS();
 	 else 
-	 { if(!(pExpr.getLHS().getClass().equals("class natlab.ast.IntLiteralExpr")) || !(pExpr.getLHS().getClass().equals("class natlab.ast.FPLiteralExpr")))
+	 { if(!(pExpr.getLHS().getClass().equals("class ast.IntLiteralExpr")) || !(pExpr.getLHS().getClass().equals("class ast.FPLiteralExpr")))
 		{tokenizeExpression(pExpr.getRHS());}		 
 	 }
    }//end of else if 
@@ -140,7 +140,7 @@ private Expr tokenizeExpression(Expr expr)
 	 MTimesExpr mExpr=(MTimesExpr)expr;
  	 if(mExpr.getLHS() instanceof ParameterizedExpr){newExpr=mExpr.getRHS(); return mExpr.getLHS();}
 	 else
-	  {if(!(mExpr.getLHS().getClass().toString().equals("class natlab.ast.IntLiteralExpr")) && !(mExpr.getLHS().getClass().toString().equals("class natlab.ast.FPLiteralExpr")))
+	  {if(!(mExpr.getLHS().getClass().toString().equals("class ast.IntLiteralExpr")) && !(mExpr.getLHS().getClass().toString().equals("class ast.FPLiteralExpr")))
 		 {newExpr=mExpr.getLHS();
 	     if(mExpr.getRHS() instanceof ParameterizedExpr)
 	     { teExpr=mExpr.getRHS();
@@ -150,7 +150,7 @@ private Expr tokenizeExpression(Expr expr)
        }//end of else  	 
 	 if(mExpr.getRHS() instanceof ParameterizedExpr) return mExpr.getRHS();
 	 else 
-	  {if(!(mExpr.getRHS().getClass().toString().equals("class natlab.ast.IntLiteralExpr")) && !(mExpr.getRHS().getClass().toString().equals("class natlab.ast.FPLiteralExpr")))
+	  {if(!(mExpr.getRHS().getClass().toString().equals("class ast.IntLiteralExpr")) && !(mExpr.getRHS().getClass().toString().equals("class ast.FPLiteralExpr")))
 		 {tokenizeExpression(mExpr.getRHS());return teExpr;}		 
 	  }
   }//end of else if 
@@ -159,7 +159,7 @@ private Expr tokenizeExpression(Expr expr)
 	 MinusExpr miExpr=(MinusExpr)expr;
  	 if(miExpr.getLHS() instanceof ParameterizedExpr){newExpr=miExpr.getRHS(); return miExpr.getLHS();}
 	 else
-	  {if(!(miExpr.getLHS().getClass().toString().equals("class natlab.ast.IntLiteralExpr")) && !(miExpr.getLHS().getClass().toString().equals("class natlab.ast.FPLiteralExpr")))
+	  {if(!(miExpr.getLHS().getClass().toString().equals("class ast.IntLiteralExpr")) && !(miExpr.getLHS().getClass().toString().equals("class ast.FPLiteralExpr")))
 		{newExpr=miExpr.getLHS();
 	     if(miExpr.getRHS() instanceof ParameterizedExpr)
 	     { teExpr=miExpr.getRHS();
@@ -169,7 +169,7 @@ private Expr tokenizeExpression(Expr expr)
 	  }
 	 if(miExpr.getRHS() instanceof ParameterizedExpr) return miExpr.getRHS();
 	 else
-	  {if(!(miExpr.getRHS().getClass().toString().equals("class natlab.ast.IntLiteralExpr")) && !(miExpr.getRHS().getClass().toString().equals("class natlab.ast.FPLiteralExpr")))
+	  {if(!(miExpr.getRHS().getClass().toString().equals("class ast.IntLiteralExpr")) && !(miExpr.getRHS().getClass().toString().equals("class ast.FPLiteralExpr")))
 		 {tokenizeExpression(miExpr.getRHS());}
 	 }
   }//end of else if

@@ -4,11 +4,11 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
 
-import natlab.ast.ASTNode;
-import natlab.ast.IfStmt;
-import natlab.ast.Program;
-import natlab.ast.Stmt;
-import natlab.ast.SwitchStmt;
+import ast.ASTNode;
+import ast.IfStmt;
+import ast.Program;
+import ast.Stmt;
+import ast.SwitchStmt;
 import beaver.Parser;
 
 import natlab.toolkits.scalar.*;

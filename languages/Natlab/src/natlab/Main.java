@@ -2,7 +2,7 @@ package natlab;
 
 import natlab.options.Options;
 //import natlab.toolkits.analysis.ForVisitor;
-import natlab.ast.*;
+import ast.*;
 import natlab.server.*;
 import natlab.toolkits.analysis.ForVisitor;
 
@@ -42,8 +42,11 @@ public class Main
      * Main method deals with command line options and execution of
      * desired functions.
      */
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
+
+        natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
+        System.exit(0);
         boolean quiet; //controls the suppression of messages
         ArrayList errors = new ArrayList();
         options = new Options();

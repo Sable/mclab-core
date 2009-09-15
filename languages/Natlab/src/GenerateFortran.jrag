@@ -1389,19 +1389,19 @@ aspect GenerateFortran {
 		idxAsg.setRHS(new RangeExpr(new IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")), 
 				new Opt<Expr>(), 
 				new ParameterizedExpr(new NameExpr(new Name("nargin")),
-						new natlab.ast.List<Expr>()) ));
+						new ast.List<Expr>()) ));
 		argFor.setAssignStmt(idxAsg);
 
 		// Statement list of For
-		natlab.ast.List<Stmt> forList = new natlab.ast.List<Stmt>();
+		ast.List<Stmt> forList = new ast.List<Stmt>();
 		
 		AssignStmt bufAsg = new AssignStmt();
 		bufAsg.setLHS(new NameExpr(new Name("arg_buffer")));
-		natlab.ast.List<Expr> clist = new natlab.ast.List<Expr>();
+		ast.List<Expr> clist = new ast.List<Expr>();
 		clist.add(new NameExpr(new Name("int_tmpvar")));
 		bufAsg.setRHS(new CellIndexExpr(new NameExpr(new Name("varargin")), clist) );
 		
-		natlab.ast.List<Expr> str2numList = new natlab.ast.List<Expr>();
+		ast.List<Expr> str2numList = new ast.List<Expr>();
 		str2numList.add(new NameExpr(new Name("arg_buffer")));
 
 		forList.add(bufAsg);
@@ -1410,7 +1410,7 @@ aspect GenerateFortran {
 		int i = 1;
 		for(Name var: getInputParams()) {
 			String varName = var.getID();
-			natlab.ast.List<Stmt> listIf1 = new natlab.ast.List<Stmt>();
+			ast.List<Stmt> listIf1 = new ast.List<Stmt>();
 			listIf1.add(new AssignStmt((new NameExpr(new Name(varName))),
 					new ParameterizedExpr(new NameExpr(new Name("str2num")),
 							str2numList) ) );
@@ -1419,7 +1419,7 @@ aspect GenerateFortran {
 					new EQExpr(new NameExpr(new Name("int_tmpvar")), 
 							new IntLiteralExpr(new natlab.DecIntNumericLiteralValue(""+i))),
 					listIf1);
-			natlab.ast.List<IfBlock> ifBlockList = new natlab.ast.List<IfBlock>();
+			ast.List<IfBlock> ifBlockList = new ast.List<IfBlock>();
 			ifBlockList.add(asgIf1);
 			forList.add(new IfStmt(ifBlockList, new Opt<ElseBlock>()));
 			++i;

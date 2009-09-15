@@ -252,8 +252,8 @@ aspect Simplify {
  			// While (cond) ==> DO ; if(cond) ...
  			// (1>0)
  			setExpr(new GTExpr(
- 					new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")),
- 					new natlab.ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")))
+ 					new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("1")),
+ 					new ast.IntLiteralExpr(new natlab.DecIntNumericLiteralValue("0")))
  			);
 
  			// Create new if statement to handle the condition

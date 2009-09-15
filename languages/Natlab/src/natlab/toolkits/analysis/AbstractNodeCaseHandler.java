@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 
 /** 
  * An abstract implementation of the NodeCaseHandler, which simply

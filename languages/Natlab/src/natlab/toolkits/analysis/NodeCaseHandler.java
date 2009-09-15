@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis;
 
-import natlab.ast.*;
+import ast.*;
 
 /**
  * A collection of cases to match each node type in the AST. This can

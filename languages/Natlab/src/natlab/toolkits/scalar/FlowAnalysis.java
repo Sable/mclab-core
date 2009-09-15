@@ -31,7 +31,7 @@ package natlab.toolkits.scalar;
  *  - 2008.06 by Jun Li
  *  	- changed to handle AST-tree instead of UnitGraph
  */
-import natlab.ast.*;
+import ast.*;
 import natlab.toolkits.analysis.ASTVisitor;
 
 import java.util.HashMap;

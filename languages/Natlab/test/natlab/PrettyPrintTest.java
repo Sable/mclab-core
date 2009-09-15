@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import natlab.ast.Program;
+import ast.Program;
 import beaver.Parser;
 
 public class PrettyPrintTest extends TestCase {

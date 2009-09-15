@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis.functionhandle;
 
-import natlab.ast.*;
+import ast.*;
 
 /**
  * a reference to a function

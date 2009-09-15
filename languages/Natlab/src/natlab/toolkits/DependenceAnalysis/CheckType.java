@@ -1,6 +1,6 @@
 package natlab.toolkits.DependenceAnalysis;
 
-import natlab.ast.Stmt;
+import ast.Stmt;
 
 public class CheckType {
 	Stmt stmt;

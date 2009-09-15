@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
-import natlab.ast.*;
+import ast.*;
 
 public class StaticFortranTest extends TestCase
 {

@@ -4,13 +4,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.ast.MTimesExpr;
-import natlab.ast.ForStmt;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.NameExpr;
-import natlab.ast.PlusExpr;
-import natlab.ast.MinusExpr;
-import natlab.ast.Expr;
+import ast.MTimesExpr;
+import ast.ForStmt;
+import ast.IntLiteralExpr;
+import ast.NameExpr;
+import ast.PlusExpr;
+import ast.MinusExpr;
+import ast.Expr;
 import java.io.*;
 
 /*

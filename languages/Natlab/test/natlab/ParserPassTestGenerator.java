@@ -16,7 +16,7 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 	protected void printHeader(PrintWriter testFileWriter) {
 		testFileWriter.println("package natlab;");
 		testFileWriter.println();
-		testFileWriter.println("import natlab.ast.Program;");
+		testFileWriter.println("import ast.Program;");
 		testFileWriter.println();
 		testFileWriter.println("public class NatlabParserPassTests extends ParserPassTestBase {");
 	}

@@ -3,9 +3,9 @@ package natlab.toolkits.DependenceAnalysis;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import natlab.ast.Stmt;
-import natlab.ast.ForStmt;
-import natlab.ast.AssignStmt;
+import ast.Stmt;
+import ast.ForStmt;
+import ast.AssignStmt;
 
 /*
  * Author:Amina Aslam

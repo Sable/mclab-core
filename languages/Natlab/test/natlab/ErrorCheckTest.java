@@ -2,7 +2,7 @@ package natlab;
 
 import java.io.*;
 import junit.framework.TestCase;
-import natlab.ast.*;
+import ast.*;
 
 public class ErrorCheckTest extends TestCase
 {

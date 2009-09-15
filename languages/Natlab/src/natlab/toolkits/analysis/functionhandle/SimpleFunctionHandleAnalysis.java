@@ -1,7 +1,7 @@
 package natlab.toolkits.analysis.functionhandle;
 
 import natlab.FlowAnalysisTestTool;
-import natlab.ast.*;
+import ast.*;
 import natlab.toolkits.analysis.*;
 
 public class SimpleFunctionHandleAnalysis extends
