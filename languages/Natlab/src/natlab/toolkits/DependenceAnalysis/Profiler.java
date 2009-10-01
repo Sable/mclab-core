@@ -1,9 +1,9 @@
 package natlab.toolkits.DependenceAnalysis;
-import natlab.ast.ForStmt;
-import natlab.ast.Program;
-import natlab.ast.AssignStmt;
-import natlab.ast.*;
-import natlab.ast.ASTNode;
+import ast.ForStmt;
+import ast.Program;
+import ast.AssignStmt;
+import ast.*;
+import ast.ASTNode;
 import natlab.toolkits.analysis.ForVisitor;
 import natlab.IntNumericLiteralValue;
 import java.math.*;

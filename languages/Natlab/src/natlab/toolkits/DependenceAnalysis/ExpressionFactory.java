@@ -1,10 +1,10 @@
 package natlab.toolkits.DependenceAnalysis;
 
-import natlab.ast.List;
-import natlab.ast.Name;
-import natlab.ast.NameExpr;
-import natlab.ast.ParameterizedExpr;
-import natlab.ast.Expr;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Expr;
 
 public class ExpressionFactory {
 	/*
