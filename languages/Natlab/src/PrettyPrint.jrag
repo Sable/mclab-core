@@ -334,6 +334,8 @@ aspect PrettyPrint {
         return buf.toString();
     }
     eq ColonExpr.getPrettyPrintedLessComments() = ":";
+
+    eq EndExpr.getPrettyPrintedLessComments() = "end";
     
     eq Name.getPrettyPrintedLessComments() = getID();
 
