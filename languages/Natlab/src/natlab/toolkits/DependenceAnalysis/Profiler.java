@@ -5,6 +5,9 @@ import natlab.ast.AssignStmt;
 import natlab.ast.*;
 import natlab.ast.ASTNode;
 import natlab.toolkits.analysis.ForVisitor;
+import natlab.IntNumericLiteralValue;
+import java.math.*;
+import natlab.NumericLiteralValue;
 
 /*
  * Author:Amina Aslam
@@ -19,10 +22,27 @@ import natlab.toolkits.analysis.ForVisitor;
 public class Profiler {
 	private Program prog;
 	private ForStmt forNode;
-	private NameExpr fidNameExpr;
+	private NameExpr fileNameExpr;
+	private String fileName;
+	private ExpressionFactory eFactory;
+	
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fName) {
+		this.fileName ="";		
+		for(int i=0;i<fName.length();i++)
+		{
+		  char ch=fName.charAt(i);	
+		  if(ch=='.') break;
+		  else fileName+=ch;		  
+		}
+		fileName.trim();		
+	}
 	public Profiler()
-	{ 
-		fidNameExpr=new NameExpr();
+	{     
+	    eFactory=new ExpressionFactory();
+	    fileNameExpr=eFactory.createNameExpr("xmlFileName");
 	}	
 	public Program getProg() {
 		return prog;
@@ -38,7 +58,13 @@ public class Profiler {
 	}
 	public void changeAST()
 	{
-		System.out.println(prog.dumpTreeAll());
+		//System.out.println(prog.dumpTreeAll());
+		insertDateTimeNode();
+		insertFileNameVariableNode();
+		traverseProgramNode(); 
+		//insertCheckFileExistNode();//needs to call insertFieOpenNode if file doesnot exist.
+		System.out.println(prog.getPrettyPrinted());
+		//insertFileOpenNode();
 		/*AssignStmt fOpenAStmt=new AssignStmt(); //this is for opening up a file. fid=fopen('test.txt', 'a+');
 		
 		Name fidName=new Name();
@@ -84,30 +110,278 @@ public class Profiler {
 	}
 	
 	/*
+	 * This function inserts file following code into the ast
+	 * 1.xmlFileName=fileName
+	 */
+	private void insertFileNameVariableNode()
+	{
+		  //For inserting this variable xmlFileName=fileName		   
+		  AssignStmt aStmt=new AssignStmt();		  		  
+		  StringLiteralExpr sExpr=new StringLiteralExpr();
+		  sExpr.setValue(fileName+".xml");	  
+		  aStmt.setLHS(fileNameExpr);
+		  aStmt.setRHS(sExpr);
+		  aStmt.setOutputSuppressed(true);
+		  aStmt.setParent(prog.getChild(1));		  
+		  prog.getChild(1).insertChild(aStmt, 2);
+	}
+	
+	
+	/*
+	 * This function inserts file following code into the ast	 * 
+	 * 1.xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');
+	 */
+	private void insertFileOpenNode(int nodeNumber)
+	{
+	  	  
+	  //For inserting this code to MatLabfile xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');	  	
+	  AssignStmt fOAStmt=new AssignStmt();	  
+	  fOAStmt.setLHS(fileNameExpr);
+	  
+	  //ParameterizedExpr fOParaExpr=new ParameterizedExpr();
+	  NameExpr fONExpr2=eFactory.createNameExpr("fullfile");	  
+	  //fOParaExpr.setTarget(fONExpr2);	 
+	  List fOList=new List();
+	  StringLiteralExpr fOSE1=new StringLiteralExpr();
+	  fOSE1.setValue(" ");
+	  StringLiteralExpr fOSE2=new StringLiteralExpr();
+	  fOSE2.setValue(fileName+".xml");
+	  fOList.insertChild(fOSE1,0);
+	  fOList.insertChild(fOSE2,1);
+	  //fOParaExpr.setArgList(fOList);
+	  fOAStmt.setRHS(eFactory.createParaExpr(fONExpr2, fOList));	
+	  fOAStmt.setOutputSuppressed(true);
+	  fOAStmt.setParent(prog.getChild(1).getChild(nodeNumber));				
+	  prog.getChild(1).insertChild(fOAStmt, nodeNumber+1);	  
+	  System.out.println(fOAStmt.dumpTreeAll());
+	 }
+	
+	
+	/*
+	 * This function insert the following code into the ast
+	 * 1.[pathstr, name, ext, versn] = fileparts(xmlFileName);
+	 * 2.A = exist([pathstr name '.xml'],'file');
+	 * 	   
+	 */
+	private void insertCheckFileExistNode(int nodeNumber)
+	{
+		AssignStmt fEAStmt1=new AssignStmt();
+		MatrixExpr fEMExpr1=new MatrixExpr();
+		
+		Row fERow=new Row();		
+		NameExpr pathStrExpr=eFactory.createNameExpr("pathstr");		
+		NameExpr nameExpr=eFactory.createNameExpr("name");				
+		NameExpr extExpr=eFactory.createNameExpr("ext");	
+		
+		fERow.addElement(pathStrExpr);
+		fERow.addElement(nameExpr);
+		fERow.addElement(extExpr);
+		
+		fEMExpr1.setRow(fERow, 0);
+		fEAStmt1.setLHS(fEMExpr1);
+		
+		//ParameterizedExpr filePartsParaExpr=new ParameterizedExpr();
+		NameExpr filePartsNameExpr=eFactory.createNameExpr("fileparts");		
+		//filePartsParaExpr.setTarget(filePartsNameExpr);	
+
+		//filePartsParaExpr.setArg(fileNameExpr, 0);
+		fEAStmt1.setRHS(eFactory.createParaExpr(filePartsNameExpr, fileNameExpr, 0));
+		fEAStmt1.setOutputSuppressed(true);
+		
+		AssignStmt fEAStmt2=new AssignStmt();
+		NameExpr aNameExpr=eFactory.createNameExpr("A");		
+		fEAStmt2.setLHS(aNameExpr);
+		
+		//ParameterizedExpr existParaExpr=new ParameterizedExpr();
+		NameExpr existNameExpr=eFactory.createNameExpr("exist");		
+		MatrixExpr existMExpr=new MatrixExpr();
+		StringLiteralExpr xmlString=new StringLiteralExpr();
+		xmlString.setValue(".xml");
+		Row fERow1=new Row();
+		fERow1.addElement(pathStrExpr);
+		fERow1.addElement(nameExpr);
+		fERow1.addElement(xmlString);		
+		existMExpr.setRow(fERow1, 0);
+		StringLiteralExpr fileString=new StringLiteralExpr();
+		fileString.setValue("file");
+		List existList=new List();
+		existList.insertChild(existMExpr, 0);
+		existList.insertChild(fileString, 1);
+		//existParaExpr.setTarget(existNameExpr);
+		//existParaExpr.setArgList(existList);
+		fEAStmt2.setRHS(eFactory.createParaExpr(existNameExpr, existList));
+		fEAStmt2.setOutputSuppressed(true);
+		fEAStmt1.setParent(prog.getChild(1).getChild(nodeNumber));				
+		prog.getChild(1).insertChild(fEAStmt1, nodeNumber+1);
+		fEAStmt2.setParent(prog.getChild(1).getChild(nodeNumber));				
+		prog.getChild(1).insertChild(fEAStmt2, nodeNumber+2);
+		System.out.println(fEAStmt1.dumpTreeAll());
+		System.out.println(fEAStmt2.dumpTreeAll());
+		insertIfNode(nodeNumber+3);
+		
+		
+	}
+	
+	
+	
+	/*
+	 *This function inserts date time writing code to the program  
+	 *1.t=now
+	 *2.S = datestr(t);
+	 */
+	private void insertDateTimeNode()
+	{
+		AssignStmt dTAStmt1=new AssignStmt();
+		NameExpr dTNExpr1=eFactory.createNameExpr("t");		
+		dTAStmt1.setLHS(dTNExpr1);
+		
+		NameExpr dTNExpr2=eFactory.createNameExpr("now");
+		dTAStmt1.setRHS(dTNExpr2);
+		dTAStmt1.setOutputSuppressed(true);
+		
+		//This code is inserted into the AST S = datestr(t);
+		AssignStmt dTAStmt2=new AssignStmt();
+		NameExpr dTNExpr3=eFactory.createNameExpr("S");		
+		dTAStmt2.setLHS(dTNExpr3);
+		
+		//ParameterizedExpr dTParaExpr=new ParameterizedExpr();
+		NameExpr dTNExpr4=eFactory.createNameExpr("datestr");				
+		//dTParaExpr.setTarget(dTNExpr4);
+		//List dTList=new List();
+		//dTList.insertChild(dTNExpr1,0);	
+		//dTParaExpr.setArgList(dTList);
+		dTAStmt2.setRHS(eFactory.createParaExpr(dTNExpr4, dTNExpr1, 0));
+		dTAStmt2.setOutputSuppressed(true);
+		//insert the siblings to the AST
+		dTAStmt1.setParent(prog.getChild(1));				
+		prog.getChild(1).insertChild(dTAStmt1, 0);
+		dTAStmt2.setParent(prog.getChild(1));				
+		prog.getChild(1).insertChild(dTAStmt2, 1);
+		
+		System.out.println(dTAStmt1.dumpTreeAll());
+		System.out.println(dTAStmt2.dumpTreeAll());
+		//System.out.println(prog.getPrettyPrinted());
+		
+		
+	}
+	/*
+	 * This method inserts the following code into the AST.
+	 * if(A==2)  
+          xDoc=xmlread([xmlFileName '.xml']);       
+          xRoot=xDoc.getDocumentElement;
+       else   
+       end
+	 */
+	private void insertIfNode(int index)
+	{
+		
+		//For inserting this code to ast if(A==2)
+	    IfStmt ifStmt=new IfStmt();
+	    IfBlock ifBlock=new IfBlock();
+	    EQExpr eqExpr=new EQExpr();
+	    NameExpr aNameExpr= eFactory.createNameExpr("A");	    
+	    IntLiteralExpr incExpr=new IntLiteralExpr();					
+		BigInteger incValue=new BigInteger(new Integer(2).toString());						
+		incExpr.setValue(new natlab.DecIntNumericLiteralValue(incValue.toString()));
+		eqExpr.setLHS(aNameExpr);
+		eqExpr.setRHS(incExpr);		
+		
+		//For inserting this code into the AST xDoc=xmlread([xmlFileName '.xml']);
+		AssignStmt xDocAStmt=new AssignStmt();
+		NameExpr xDocNExpr=eFactory.createNameExpr("xDoc");
+		xDocAStmt.setLHS(xDocNExpr);
+		
+		//ParameterizedExpr xmlReadPExpr=new ParameterizedExpr();
+		NameExpr xmlReadNExpr=eFactory.createNameExpr("xmlRead");		
+		//xmlReadPExpr.setTarget(xmlReadNExpr);
+		
+		//MatrixExpr xmlReadMExpr=new MatrixExpr();
+		//Row xmlReadRow=new Row();
+		//NameExpr xmlFileNameExpr=eFactory.createNameExpr("xmlFileName");
+		//StringLiteralExpr xmlString=new StringLiteralExpr();
+		//xmlString.setValue(".xml");		
+		//xmlReadRow.addElement(xmlFileNameExpr);
+		//xmlReadRow.addElement(xmlString);				
+		//xmlReadMExpr.setRow(xmlReadRow, 0);
+		xDocAStmt.setRHS(eFactory.createParaExpr(xmlReadNExpr, fileNameExpr, 0));
+		xDocAStmt.setOutputSuppressed(true);
+		
+		//For inserting this code into the AST xRoot=xDoc.getDocumentElement;
+		AssignStmt xRootAStmt=new AssignStmt();
+		NameExpr xRootNExpr=eFactory.createNameExpr("xRoot");
+		xRootAStmt.setLHS(xRootNExpr);
+		DotExpr xDocDExpr=new DotExpr();
+		Name n=new Name();
+		n.setID("getDocumentElement");
+		xDocDExpr.setTarget(xDocNExpr);
+		xDocDExpr.setField(n);
+		xRootAStmt.setRHS(xDocDExpr);
+		xRootAStmt.setOutputSuppressed(true);
+		//Adding statements to if block.
+		List ifList=new List();
+		ifList.insertChild(xDocAStmt, 0); //needs to change this to handle more statements.
+		ifList.insertChild(xRootAStmt, 1);
+		ifBlock.setCondition(eqExpr);
+		ifBlock.setStmtList(ifList);
+		ifStmt.setIfBlock(ifBlock, 0);
+		
+		prog.getChild(1).insertChild(ifStmt, index);
+		ifStmt.setParent(prog.getChild(1));
+		System.out.println(ifStmt.dumpTreeAll()); 
+	 }
+	
+	/*
+	 * This node inserts following code into the AST
+	 * 1.Would create an element in the docNode
+	 * e.g.elRunNo = docNode.createElement('RunNo'); 
+	 */
+	private void insertCreateElementNode(String nodeName)
+	{
+	   AssignStmt aStmt=new AssignStmt();
+	   NameExpr nExpr1=eFactory.createNameExpr(nodeName);
+	   aStmt.setLHS(nExpr1);
+	   
+	   DotExpr dExpr=new DotExpr();
+	   NameExpr nExpr2=eFactory.createNameExpr("docNode"); //needs to look at it.
+	   Name createElement=new Name();
+	   createElement.setID("createElement");
+	   StringLiteralExpr sExpr=new StringLiteralExpr();
+	   sExpr.setValue(nodeName);
+	   dExpr.setTarget(nExpr2);
+	   dExpr.setField(createElement);
+	   ParameterizedExpr pExpr=eFactory.createParaExpr(dExpr, sExpr, 0);
+	   aStmt.setRHS(pExpr);
+	   aStmt.setOutputSuppressed(true);
+	   System.out.println(aStmt.dumpTreeAll());   
+	   
+	}
+	
+	
+	/*
 	 * This function traverses the program node and looks for ForLoop.
 	 */
 	private void traverseProgramNode()
 	{
 		int nNode=prog.getChild(1).getNumChild();
-		System.out.println(nNode);
-		System.out.println(prog.dumpTreeAll());
+		//System.out.println(nNode);
+		//System.out.println(prog.dumpTreeAll());
 		for(int i=0;i<nNode;i++)
 		{	
 			ASTNode node=prog.getChild(1).getChild(i);
 			if(node instanceof ForStmt)
 			{
 				forNode=(ForStmt)node;
-				insertFileWriteNode(i);				
+				insertCheckFileExistNode(i);				
 			}//end of if
 		}//end of for
-		System.out.println(prog.getPrettyPrinted());
+		//System.out.println(prog.getPrettyPrinted());
 	}//end of function
 	
 	
 	/*
 	 * This function insert a node which adds write to file functionality to MATLAB progam.
 	 */
-	private void insertFileWriteNode(int nodeNumber)
+/*	private void insertFileWriteNode(int nodeNumber)
 	{
 		//ForVisitor forVisitor = new ForVisitor();
         //prog.apply(forVisitor);
@@ -152,7 +426,7 @@ public class Profiler {
 		//uBoundName.setID("n");
 		nECount++;
 		
-		fPrintfList.insertChild(fidNameExpr, 0);
+		//fPrintfList.insertChild(fidNameExpr, 0);
 		for(int i=0;i<sECount;i++)
 		{
 	    	fPrintfList.insertChild(sE1, i);
@@ -170,6 +444,6 @@ public class Profiler {
 		System.out.println(fPrintfAStmt.dumpTreeAll());
 
 		
-	}
+	}*/
 	
 }
