@@ -218,7 +218,9 @@ aspect PrettyPrint {
         boolean first = true;
         for(IfBlock block : getIfBlocks()) {
             if(!first) {
-                buf.append( indent + "else" );
+                buf.append( indent + "elseif " );
+            }else {
+            	buf.append( indent + "if " );
             }
             buf.append(block.getPrettyPrinted());
             first = false;
@@ -233,7 +235,7 @@ aspect PrettyPrint {
     eq IfBlock.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
-        buf.append(indent + "if ");
+        //buf.append(indent + "if ");
         buf.append(getCondition().getPrettyPrinted());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
