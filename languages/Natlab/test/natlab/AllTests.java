@@ -24,6 +24,8 @@ public class AllTests {
 
 		suite.addTestSuite(ErrorCheckTest.class);
 		suite.addTestSuite(XMLCommandPassTests.class);
+
+                suite.addTestSuite(FunctionVFDatumTest.class);
 		//$JUnit-END$
 		return suite;
 	}

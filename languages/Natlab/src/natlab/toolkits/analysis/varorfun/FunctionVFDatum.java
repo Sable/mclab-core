@@ -10,6 +10,10 @@ package natlab.toolkits.analysis.varorfun;
 public class FunctionVFDatum extends AbstractVFDatum
 {
 
+    public FunctionVFDatum( )
+    {
+        super();
+    }
     protected FunctionVFDatum( Value v){
         super(v);
     }
