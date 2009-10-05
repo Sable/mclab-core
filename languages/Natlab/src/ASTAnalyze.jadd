@@ -239,4 +239,13 @@ aspect ASTAnalyze
     {
         visitor.caseLambdaExpr(this);
     }
+
+    public void Function.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFunction(this);
+    }
+    public void FunctionDecl.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFunctionDecl(this);
+    }
 }

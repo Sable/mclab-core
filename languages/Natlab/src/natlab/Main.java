@@ -6,6 +6,8 @@ import ast.*;
 import natlab.server.*;
 import natlab.toolkits.analysis.ForVisitor;
 
+import natlab.toolkits.analysis.varorfun.*;
+
 /*import matlab.MatlabParser;
 import matlab.TranslationProblem;
 import matlab.OffsetTracker;
@@ -45,8 +47,8 @@ public class Main
     public static void main(String[] args) throws Exception
     {
 
-        natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
-        System.exit(0);
+        //natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
+        //System.exit(0);
         boolean quiet; //controls the suppression of messages
         ArrayList errors = new ArrayList();
         options = new Options();
@@ -312,7 +314,7 @@ public class Main
                         Reader fileReader = new StringReader("");
 			
                         //checks if dependence analysis flag is set.
-                        //If the flag is set then the type of dependence test that needs to be applied.						
+                        //If the flag is set then the type of dependence test that needs to be applied.
                         if(options.danalysis()){                            
                             Program prog = null;							
                             if( !quiet )
@@ -402,6 +404,15 @@ public class Main
                         if( !quiet )
                             System.err.println("Pretty Printing");
                         System.out.println(cu.getPrettyPrinted());
+                    }
+                    else if( options.vfpreorder() ){
+                        VFPreorderAnalysis a = new VFPreorderAnalysis( cu );
+                        a.analyze();
+                        System.out.println(cu.getPrettyPrinted());
+                        System.out.println( a.getCurrentSet().toString() );
+
+                        FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, VFStructuralForwardAnalysis.class );
+                        System.out.println( testTool.run() );
                     }
                 }
             }

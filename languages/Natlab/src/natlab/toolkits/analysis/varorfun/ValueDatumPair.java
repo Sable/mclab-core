@@ -41,4 +41,21 @@ public class ValueDatumPair< V, D extends VFDatum>
     {
         return datum = d;
     }
+    /**
+     * Clones the Pair, but only does a deep clone of the datum, not
+     * the value.
+     */
+    public ValueDatumPair<V, D> clone()
+    {
+        return new ValueDatumPair( value, datum.clone() );
+    }
+
+    public static <A extends VFDatum> String toString(Object v, A d){
+        return "< " + v.toString() + ", " + d.toString() + " >";
+    }
+    public String toString()
+    {
+        return toString( value, datum );
+    }
+        
 }

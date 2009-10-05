@@ -7,15 +7,34 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
     extends AbstractNodeCaseHandler 
     implements Analysis<A>
 {
+    protected final boolean DEBUG=false;
 
+    protected Map<ASTNode, A> flowSets;
     protected A currentSet;
     protected ASTNode tree;
     protected boolean analyzed = false;
 
+    public A getCurrentSet()
+    {
+        return currentSet;
+    }
+    public AbstractPreorderAnalysis(){
+        super();
+    }
     public AbstractPreorderAnalysis(ASTNode tree){
         this.tree = tree;
+        flowSets = new HashMap<ASTNode, A>();
     }
 
+    public Map<ASTNode, A> getFlowSets()
+    {
+        return flowSets;
+    }
+
+    public void setTree( ASTNode t )
+    {
+        tree = t;
+    }
     public ASTNode getTree()
     {
         return tree;
@@ -48,7 +67,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
      *
      * @see isAnalyzed()
      */
-    public void analyzed()
+    public void analyze()
     {
         //initialize set
         currentSet = newInitialFlow();
@@ -61,4 +80,15 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
 
     public abstract void caseCondition( Expr condExpr );
 
+    public void caseASTNode(ASTNode node)
+    {
+        if(DEBUG)
+            System.err.println("in caseASTNode for node type " + node.getClass().getCanonicalName() );
+        //visit each child node in forward order
+        for( int i = 0; i<node.getNumChild(); i++ ){
+            if( node.getChild(i) != null )
+                node.getChild(i).analyze( this );
+        }
+    }
+    
 }

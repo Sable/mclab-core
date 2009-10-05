@@ -7,7 +7,6 @@ package natlab.toolkits.analysis.varorfun;
 
 public abstract class AbstractVFDatum implements VFDatum
 {
-
     protected Value value = Value.BOT;
 
     /**
@@ -19,6 +18,7 @@ public abstract class AbstractVFDatum implements VFDatum
     protected AbstractVFDatum( Value v ){
         value = v;
     }
+
     
     public abstract void makeVariable();
     public abstract void makeAssignedVariable();
@@ -84,4 +84,12 @@ public abstract class AbstractVFDatum implements VFDatum
 
         return in2.merge( in1 );
     }
+
+    public abstract VFDatum clone();
+    
+    public String toString()
+    {
+        return value.toString();
+    }
+
 }

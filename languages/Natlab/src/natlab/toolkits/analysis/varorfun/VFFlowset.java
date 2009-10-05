@@ -17,9 +17,17 @@ import natlab.toolkits.analysis.*;
  * @see VFDatum
  */
 
+//TODO-JD make some operations unsupported 
 public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumPair<V,D>>
 {
 
+    public void copy(VFFlowset<V, D> dest) {
+    	if (this == dest) return;
+        dest.clear();
+        for (ValueDatumPair<V,D> element : toList()){
+        	dest.add(element);
+        }
+    }
     protected HashMap<V, D> set;
     
     public VFFlowset()
@@ -63,11 +71,15 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     }
     public void add(ValueDatumPair<V,D> pair)
     {
-        VFDatum d = set.get( pair.getValue() );
-        if( d != null )
-            d.merge( pair.getDatum() );
-        else
+        D d = set.get( pair.getValue() );
+        if( d != null ){
+            //TODO-JD Is this safe?
+            d = (D)(d.merge( pair.getDatum() ));
+            set.put( pair.getValue(), d );
+        }
+        else{
             set.put( pair.getValue(), pair.getDatum() );
+        }
     }
 
     public boolean remove( ValueDatumPair<V,D> pair )
@@ -85,6 +97,58 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
             list.add( new ValueDatumPair( entry.getKey(), entry.getValue() ) );
         }
         return list;
+    }
+
+    public void union(VFFlowset<V,D> other, 
+                      VFFlowset<V,D> dest)
+    {
+        if( dest == this && dest == other )
+            return;
+        if( this == other )
+            copy(dest);
+
+        VFFlowset<V,D> tmpDest = new VFFlowset();
+
+        for( ValueDatumPair<V,D> pair : this.toList() ){
+            if( !other.contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
+                D newDatum = (D)(pair.getDatum().clone());
+                newDatum.makeVariable();
+                tmpDest.add( new ValueDatumPair( pair.getValue(), newDatum ) );
+            }
+            else
+                tmpDest.add( pair );
+        }
+        for( ValueDatumPair<V,D> pair : other.toList() ){
+            if( !contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
+                D newDatum = (D)(pair.getDatum().clone());
+                newDatum.makeVariable();
+                tmpDest.add( new ValueDatumPair( pair.getValue(), newDatum ) );
+            }
+            else
+                tmpDest.add( pair );
+        }
+    }
+    public String toString()
+    {
+        StringBuffer s = new StringBuffer();
+        s.append("{");
+        boolean first = true;
+        for( Map.Entry<V,D> entry : set.entrySet() ){
+            if( first ){
+                s.append("\n");
+                first = false;
+            }
+            else
+                s.append(", \n");
+            
+            s.append( ValueDatumPair.toString(entry.getKey(), entry.getValue() ) );
+            //"< " + entry.getKey().toString() + ", " entry.getValue().toString() + " >");
+        }
+        if( !first )
+            s.append("\n");
+        s.append("}");
+
+        return s.toString();
     }
 
 }

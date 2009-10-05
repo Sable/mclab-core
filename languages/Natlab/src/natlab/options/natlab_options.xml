@@ -13,7 +13,7 @@
       <short_desc>Display help and exit</short_desc>
       <long_desc>
         Display the textual help message and exit immediately without
-furthur processing.
+        furthur processing.
       </long_desc>
     </boolopt>
     <boolopt>
@@ -21,7 +21,7 @@ furthur processing.
       <alias>e</alias>
       <short_desc>file list is exhaustive</short_desc>
       <long_desc>
-The Provided list of files represents all files that will be in the execution 
+        The Provided list of files represents all files that will be in the execution 
 environment.
       </long_desc>
     </boolopt>
@@ -76,7 +76,7 @@ No static linking is done.
       <alias>server</alias>
       <short_desc>Run frontend in server mode on a given port, default is 47146</short_desc>
       <long_desc>Run the frontend as a server. Opens a socket on a
-      given port and waits for XML encoded commands.</long_desc>
+        given port and waits for XML encoded commands.</long_desc>
     </boolopt>
     <stropt>
       <name>Server port</name>
@@ -92,10 +92,10 @@ No static linking is done.
       <alias>noheart</alias>
       <short_desc>Turns off the need for a heartbeat signal</short_desc>
       <long_desc>The server will no longer try to detect broken connections
-using a the heartbeat signal.</long_desc>
+        using a the heartbeat signal.</long_desc>
     </boolopt>
   </section>
-   <section>
+  <section>
     <name>DependenceTester Options</name>
     <boolopt>
       <name>DependenceAnalysis</name>
@@ -104,7 +104,7 @@ using a the heartbeat signal.</long_desc>
       <long_desc>
         Run Dependence Analysis on the input file to figure out dependence relations.
       </long_desc>  
-     </boolopt>  
+    </boolopt>  
     <boolopt>
       <name>GCD</name>
       <alias>gcd</alias>      
@@ -122,17 +122,24 @@ using a the heartbeat signal.</long_desc>
       </long_desc>
     </boolopt>
   </section>
-   <section>
-     <name>Fortran Generator Options</name>
-     <boolopt>
-       <name>Generate Fortran</name>
-       <alias>f</alias>
-       <alias>fortran</alias>
-       <short_desc>Generates fortran code</short_desc>
-       <long_desc>
-         Run the fortran code generator to produce a fortran code
-         representation of the input sounce.
-       </long_desc>
-     </boolopt>
-   </section>
- </options>
+  <section>
+    <name>Fortran Generator Options</name>
+    <boolopt>
+      <name>Generate Fortran</name>
+      <alias>f</alias>
+      <alias>fortran</alias>
+      <short_desc>Generates fortran code</short_desc>
+      <long_desc>
+        Run the fortran code generator to produce a fortran code
+        representation of the input sounce.
+      </long_desc>
+    </boolopt>
+  </section>
+  <section>
+    <name>Testing</name>
+    <boolopt>
+      <name>Var or function preorder test</name>
+      <alias>vfpreorder</alias>
+    </boolopt>
+  </section>
+</options>
