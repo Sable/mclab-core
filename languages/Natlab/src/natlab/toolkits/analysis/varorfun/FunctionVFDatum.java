@@ -18,6 +18,10 @@ public class FunctionVFDatum extends AbstractVFDatum
         super(v);
     }
 
+    public FunctionVFDatum clone()
+    {
+        return new FunctionVFDatum( value );
+    }
     /**
      * Make value a variable. If value is BOT or AVAR then change to
      * VAR. If the value is FUN then change to TOP. Otherwise do

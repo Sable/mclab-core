@@ -18,6 +18,11 @@ public class ScriptVFDatum extends AbstractVFDatum
         super(v);
     }
 
+    public ScriptVFDatum clone()
+    {
+        return new ScriptVFDatum( value );
+    }
+
     /**
      * Make value a variable. If value is either BOT, AVAR or FUN then
      * change the value to VAR, otherwise do nothing.
