@@ -108,4 +108,9 @@ public interface VFDatum
      * @return The resulting merged datum
      */
     public VFDatum merge(VFDatum that);
+
+    /**
+     * Clone the datum.
+     */
+    public VFDatum clone();
 }
