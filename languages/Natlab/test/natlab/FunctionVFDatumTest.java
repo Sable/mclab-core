@@ -35,23 +35,23 @@ public class FunctionVFDatumTest extends TestCase
     {
         FunctionVFDatum d = new FunctionVFDatum();
         d.makeAssignedVariable();
-        assertTrue(FunctionVFDatum.Value.AVAR.equals( d.getValue() ));
+        assertTrue("from BOT", FunctionVFDatum.Value.AVAR.equals( d.getValue() ));
 
         d = new FunctionVFDatum();
         d.makeFunction();
         d.makeAssignedVariable();
-        assertTrue(FunctionVFDatum.Value.TOP.equals( d.getValue() ));
+        assertTrue("from FUN", FunctionVFDatum.Value.TOP.equals( d.getValue() ));
 
         d = new FunctionVFDatum();
         d.makeVariable();
         d.makeAssignedVariable();
-        assertTrue(FunctionVFDatum.Value.VAR.equals( d.getValue() ));
+        assertTrue("from VAR", FunctionVFDatum.Value.AVAR.equals( d.getValue() ));
 
         d = new FunctionVFDatum();
         d.makeVariable();
         d.makeFunction();
         d.makeAssignedVariable();
-        assertTrue(FunctionVFDatum.Value.TOP.equals( d.getValue() ));
+        assertTrue("from TOP", FunctionVFDatum.Value.TOP.equals( d.getValue() ));
     }
 
     public void test_functionvfdatum_makefun() throws Exception
