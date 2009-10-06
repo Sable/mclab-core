@@ -83,7 +83,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
     public void caseASTNode(ASTNode node)
     {
         if(DEBUG)
-            System.err.println("in caseASTNode for node type " + node.getClass().getCanonicalName() );
+            System.err.println("in caseASTNode for node type " + node.getClass() );
         //visit each child node in forward order
         for( int i = 0; i<node.getNumChild(); i++ ){
             if( node.getChild(i) != null )
