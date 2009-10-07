@@ -25,7 +25,7 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     	if (this == dest) return;
         dest.clear();
         for (ValueDatumPair<V,D> element : toList()){
-        	dest.add(element);
+            dest.add(element.clone());
         }
     }
     protected HashMap<V, D> set;

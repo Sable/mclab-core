@@ -6,7 +6,7 @@ import natlab.toolkits.analysis.*;
 //note, must be applied on a tree containing a function or script node 
 public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForwardAnalysis< VFFlowset<String, VFDatum> >
 {
-
+    //public static boolean DEBUG = true;
     protected boolean isScript = true;
     protected VFPreorderAnalysis functionAnalysis = null;
 
@@ -16,6 +16,8 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
     {
         return (VFFlowset<String, VFDatum>)initialFlow.clone();
     }
+
+    //Helper methods to create new datums
     public VFDatum newVariableDatum()
     {
         if( isScript ){
@@ -56,26 +58,35 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
         }
     }
 
+    //constructor
     public VFStructuralForwardAnalysis( ASTNode tree ){
         super( tree );
         initialFlow = new VFFlowset<String, VFDatum>();
+        currentOutSet = newInitialFlow();
     }
 
+    //Begin cases
     public void caseScript( Script node )
     {
         isScript = true;
         initialFlow = new VFFlowset();
+        currentOutSet = newInitialFlow();
     }
 
     public void caseFunction( Function node )
     {
         isScript = false;
         if( functionAnalysis == null || functionAnalysis.getFlowSets().get(node) == null){
-            functionAnalysis = new VFPreorderAnalysis();
+            functionAnalysis = new VFPreorderAnalysis( node );
             functionAnalysis.analyze();
         }
         initialFlow = functionAnalysis.getFlowSets().get(node);
+        currentInSet = newInitialFlow();
+        currentOutSet = newInitialFlow();
+        caseASTNode( node );
     }
+
+
 
     public void caseCondition( Expr node ){
         caseExpr( node );
@@ -104,7 +115,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
         in1.union( in2, out );
     }
     
-    public void caseAssignStmt(AssignStmt node){
+    /*    public void caseAssignStmt(AssignStmt node){
         System.err.println("hey in assign stmt");
         inFlowSets.put(node, currentInSet.clone() );
         copy(currentInSet, currentOutSet);
@@ -113,6 +124,13 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
             currentOutSet.remove( new ValueDatumPair(s, newVariableDatum() ));
             currentOutSet.add(new ValueDatumPair(s, newAssignedVariableDatum()) );
         }
+        outFlowSets.put(node, currentOutSet.clone() );
+        }*/
+    public void caseStmt( Stmt node )
+    {
+        inFlowSets.put(node, currentInSet.clone() );
+        currentOutSet = newInitialFlow();
+        copy( currentInSet, currentOutSet );
         outFlowSets.put(node, currentOutSet.clone() );
     }
 }
