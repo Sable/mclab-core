@@ -89,6 +89,10 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
 
 
     public void caseCondition( Expr node ){
+        inFlowSets.put(node, currentInSet.clone() );
+        currentOutSet = newInitialFlow();
+        copy( currentInSet, currentOutSet );
+        outFlowSets.put(node, currentOutSet.clone() );
         caseExpr( node );
     }
 
