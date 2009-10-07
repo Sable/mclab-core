@@ -32,7 +32,7 @@ aspect PrettyPrint {
             if( first )
                 first = false;
             else
-                buf.append("\n\n");
+                buf.append("\n==========================\n\n");
             
             buf.append( p.getPrettyPrinted() );
         }
