@@ -43,5 +43,11 @@ public class ExpressionFactory {
   	  paraExpr.setArg(argExpr, index);
   	  return paraExpr;
     }
+    public Name createName(String Name)
+    {
+    	Name n=new Name();
+    	n.setID(Name);
+    	return n;
+    }
 
 }

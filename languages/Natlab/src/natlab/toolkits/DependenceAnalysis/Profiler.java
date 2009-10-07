@@ -9,6 +9,7 @@ import natlab.IntNumericLiteralValue;
 import java.math.*;
 import natlab.NumericLiteralValue;
 
+//TODO:Write all the code and then start inserting into the location.
 /*
  * Author:Amina Aslam
  * Date:11 Sep,2009
@@ -25,6 +26,8 @@ public class Profiler {
 	private NameExpr fileNameExpr;
 	private String fileName;
 	private ExpressionFactory eFactory;
+	private NameExpr docNode;
+	private NameExpr timeStamp;
 	
 	public String getFileName() {
 		return fileName;
@@ -43,6 +46,7 @@ public class Profiler {
 	{     
 	    eFactory=new ExpressionFactory();
 	    fileNameExpr=eFactory.createNameExpr("xmlFileName");
+	    timeStamp=eFactory.createNameExpr("S");	
 	}	
 	public Program getProg() {
 		return prog;
@@ -59,11 +63,20 @@ public class Profiler {
 	public void changeAST()
 	{
 		//System.out.println(prog.dumpTreeAll());
-		insertDateTimeNode();
-		insertFileNameVariableNode();
-		traverseProgramNode(); 
+		//insertDateTimeNode();
+		//insertFileNameVariableNode();
+		//traverseProgramNode(); 
 		//insertCheckFileExistNode();//needs to call insertFieOpenNode if file doesnot exist.
-		System.out.println(prog.getPrettyPrinted());
+		//System.out.println(prog.getPrettyPrinted());
+		//insertRootNode();
+		// insertElseBlock();
+		insertCreateElementNode("RunNo");
+	
+		
+		
+		
+		
+		
 		//insertFileOpenNode();
 		/*AssignStmt fOpenAStmt=new AssignStmt(); //this is for opening up a file. fid=fopen('test.txt', 'a+');
 		
@@ -131,7 +144,7 @@ public class Profiler {
 	 * This function inserts file following code into the ast	 * 
 	 * 1.xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');
 	 */
-	private void insertFileOpenNode(int nodeNumber)
+	private AssignStmt insertFileOpenNode()
 	{
 	  	  
 	  //For inserting this code to MatLabfile xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');	  	
@@ -151,9 +164,10 @@ public class Profiler {
 	  //fOParaExpr.setArgList(fOList);
 	  fOAStmt.setRHS(eFactory.createParaExpr(fONExpr2, fOList));	
 	  fOAStmt.setOutputSuppressed(true);
-	  fOAStmt.setParent(prog.getChild(1).getChild(nodeNumber));				
-	  prog.getChild(1).insertChild(fOAStmt, nodeNumber+1);	  
+	  //fOAStmt.setParent(prog.getChild(1).getChild(nodeNumber));				
+	 // prog.getChild(1).insertChild(fOAStmt, nodeNumber+1);
 	  System.out.println(fOAStmt.dumpTreeAll());
+	  return fOAStmt;
 	 }
 	
 	
@@ -217,11 +231,52 @@ public class Profiler {
 		prog.getChild(1).insertChild(fEAStmt2, nodeNumber+2);
 		System.out.println(fEAStmt1.dumpTreeAll());
 		System.out.println(fEAStmt2.dumpTreeAll());
-		insertIfNode(nodeNumber+3);
-		
-		
+		insertIfNode(nodeNumber+3);		
 	}
 	
+	/*
+	 *This function inserts following node into the AST
+	 *
+	 *docNode = com.mathworks.xml.XMLUtils.createDocument('AD');
+	 *
+	 */
+	private AssignStmt insertRootNode()
+	{
+		AssignStmt aStmt=new AssignStmt();
+		docNode=eFactory.createNameExpr("docNode");
+		aStmt.setLHS(docNode);
+		StringLiteralExpr sExpr=new StringLiteralExpr();
+		sExpr.setValue("AD");
+		Name createDocument=eFactory.createName("createDocument");
+		Name XMLUtils=eFactory.createName("XMLUtils");
+		Name xml=eFactory.createName("xml");
+		Name mathworks=eFactory.createName("mathworks");
+		
+		DotExpr dExpr1=new DotExpr();
+		DotExpr dExpr2=new DotExpr();
+		dExpr2.setField(createDocument);		
+		
+		DotExpr dExpr3=new DotExpr();
+		dExpr3.setField(XMLUtils);
+		
+		DotExpr dExpr4=new DotExpr();
+		dExpr4.setField(xml);
+		
+		DotExpr dExpr5=new DotExpr();
+		dExpr5.setField(mathworks);
+		
+		//DotExpr dExpr6=new DotExpr();
+		dExpr5.setTarget(eFactory.createNameExpr("com"));
+		dExpr4.setTarget(dExpr5);
+		dExpr3.setTarget(dExpr4);
+		dExpr2.setTarget(dExpr3);		
+		ParameterizedExpr pExpr=eFactory.createParaExpr(dExpr2,sExpr , 0);		
+		aStmt.setRHS(pExpr);
+		aStmt.setOutputSuppressed(true);
+		return aStmt;
+		//System.out.println(aStmt.dumpTreeAll());
+		//System.out.println(aStmt.getPrettyPrinted());
+	}
 	
 	
 	/*
@@ -240,9 +295,12 @@ public class Profiler {
 		dTAStmt1.setOutputSuppressed(true);
 		
 		//This code is inserted into the AST S = datestr(t);
-		AssignStmt dTAStmt2=new AssignStmt();
-		NameExpr dTNExpr3=eFactory.createNameExpr("S");		
-		dTAStmt2.setLHS(dTNExpr3);
+		//AssignStmt dTAStmt2=new AssignStmt();
+		//NameExpr dTNExpr3=eFactory.createNameExpr("S");		
+		//dTAStmt2.setLHS(dTNExpr3);
+		AssignStmt dTAStmt2 =new AssignStmt();				
+		dTAStmt2.setLHS(timeStamp);
+		
 		
 		//ParameterizedExpr dTParaExpr=new ParameterizedExpr();
 		NameExpr dTNExpr4=eFactory.createNameExpr("datestr");				
@@ -321,6 +379,10 @@ public class Profiler {
 		List ifList=new List();
 		ifList.insertChild(xDocAStmt, 0); //needs to change this to handle more statements.
 		ifList.insertChild(xRootAStmt, 1);
+		//TODO: insert Statements here for children.. Look into this 
+		insertCreateElementNode("RunNo"); 
+		insertCreateElementNode("LoopNo");
+		insertCreateElementNode("LowerBound");
 		ifBlock.setCondition(eqExpr);
 		ifBlock.setStmtList(ifList);
 		ifStmt.setIfBlock(ifBlock, 0);
@@ -329,11 +391,27 @@ public class Profiler {
 		ifStmt.setParent(prog.getChild(1));
 		System.out.println(ifStmt.dumpTreeAll()); 
 	 }
+	/*
+	 * This function inserts the following node into the ast
+	 * else
+	 *   statements
+	 *   e.g.docNode = com.mathworks.xml.XMLUtils.createDocument('AD');
+	 *   
+	 */
+	private void insertElseBlock()
+	{
+		ElseBlock elseBlock=new ElseBlock();
+		elseBlock.addStmt(insertFileOpenNode());
+		elseBlock.addStmt(insertRootNode());
+		System.out.println(elseBlock.dumpTreeAll());
+		System.out.println(elseBlock.getPrettyPrinted());
+	}
 	
 	/*
 	 * This node inserts following code into the AST
 	 * 1.Would create an element in the docNode
-	 * e.g.elRunNo = docNode.createElement('RunNo'); 
+	 * e.g.elRunNo = docNode.createElement('RunNo');
+	 * TODO:pass the attribute Name also if needs to set it.overload this method 
 	 */
 	private void insertCreateElementNode(String nodeName)
 	{
@@ -352,8 +430,69 @@ public class Profiler {
 	   ParameterizedExpr pExpr=eFactory.createParaExpr(dExpr, sExpr, 0);
 	   aStmt.setRHS(pExpr);
 	   aStmt.setOutputSuppressed(true);
-	   System.out.println(aStmt.dumpTreeAll());   
+	   insertAppendChildNode(nExpr1,"VariableName");
+	   insertAppendChildNode(nExpr1,"Range");
 	   
+	   StringLiteralExpr s=new StringLiteralExpr(); // these three lines are temporary code
+	   s.setValue("TimeStamp");
+	   insertSetAttributeNode(nExpr1,s,timeStamp);
+	   
+	   System.out.println(aStmt.dumpTreeAll());   	   
+	}
+	
+	/*
+	 * This function inserts the following code into the AST
+	 * 1.Would append children to existing nodes.
+	 * e.g. elLBVariableName=elLowerBound.appendChild(docNode.createElement('VariableName')); 
+	 */
+	private void insertAppendChildNode(NameExpr parentName,String Name)
+	{
+		AssignStmt aStmt=new AssignStmt();
+		NameExpr nExpr=eFactory.createNameExpr(parentName.getName().getVarName()+"child");
+		aStmt.setLHS(nExpr);
+		
+		DotExpr dExpr1=new DotExpr();
+		dExpr1.setTarget(parentName);
+		Name appendChild=new Name("appendChild");
+		dExpr1.setField(appendChild);
+		
+		DotExpr dExpr2=new DotExpr();
+		NameExpr nExpr2=eFactory.createNameExpr("docNode"); //needs to look at it.
+		Name createElement=new Name();
+		createElement.setID("createElement");
+		StringLiteralExpr sExpr=new StringLiteralExpr();
+		sExpr.setValue(Name);
+		dExpr2.setTarget(nExpr2);
+		dExpr2.setField(createElement);
+		ParameterizedExpr pExpr1=eFactory.createParaExpr(dExpr2, sExpr, 0);
+		ParameterizedExpr pExpr2=eFactory.createParaExpr(dExpr1,pExpr1,0);
+		aStmt.setRHS(pExpr2);
+		aStmt.setOutputSuppressed(true);
+		System.out.println(aStmt.dumpTreeAll());
+		
+	}
+	/*
+	 * This function inserts setAttribute field of an element.
+	 * e.g.elRunNo.setAttribute('TimeStamp',S);
+	 */
+	private void insertSetAttributeNode(NameExpr callerExpr,StringLiteralExpr attributeName,NameExpr attributeValue)
+	{
+		
+		ExprStmt attributeStmt= new ExprStmt();
+		//ParameterizedExpr attributeParaExpr=
+		Name setAttribute=eFactory.createName("setAttribute");
+	    DotExpr attributeDotExpr=new DotExpr();	
+	    attributeDotExpr.setTarget(callerExpr);
+	    attributeDotExpr.setField(setAttribute);
+	    List attributeList=new List();
+	    attributeList.insertChild(attributeName, 0);
+	    attributeList.insertChild(attributeValue, 1);
+	    ParameterizedExpr attributeParaExpr=eFactory.createParaExpr(attributeDotExpr,attributeList);
+	    attributeStmt.setExpr(attributeParaExpr);
+	    attributeStmt.setOutputSuppressed(true);
+	    System.out.println(attributeStmt.dumpTreeAll());
+	    System.out.println(attributeStmt.getPrettyPrinted());
+	    		
 	}
 	
 	
