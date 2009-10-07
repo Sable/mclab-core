@@ -90,6 +90,10 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     {
         return set.containsKey( pair.getValue() );
     }
+    public D contains( V value )
+    {
+        return set.get(value);
+    }
     public List< ValueDatumPair<V,D> > toList()
     {
         List< ValueDatumPair<V,D> > list = new ArrayList( set.size() );
