@@ -45,10 +45,14 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
      */
     public A processBreaks()
     {
-        A mergedSets = newInitialFlow();
+        A mergedSets = null;
 
-        for( A set : loopStack.peek().getBreakOutSets() )
-            merge( set, mergedSets, mergedSets );
+        for( A set : loopStack.peek().getBreakOutSets() ){
+            if( mergedSets == null )
+                copy(set, mergedSets);
+            else
+                merge( set, mergedSets, mergedSets );
+        }
 
         return mergedSets;
     }
@@ -59,11 +63,14 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
      */
     public A processContinues()
     {
-        A mergedSets = newInitialFlow();
+        A mergedSets = null;
 
-        for( A set : loopStack.peek().getContinueOutSets() )
-            merge( set, mergedSets, mergedSets );
-
+        for( A set : loopStack.peek().getContinueOutSets() ){
+            if( mergedSets == null )
+                copy(set, mergedSets);
+            else
+                merge( set, mergedSets, mergedSets );
+        }
         return mergedSets;
     }
 }

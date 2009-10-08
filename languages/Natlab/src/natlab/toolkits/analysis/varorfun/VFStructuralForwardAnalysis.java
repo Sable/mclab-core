@@ -117,25 +117,38 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
     public void merge( VFFlowset<String, VFDatum> in1, VFFlowset<String,  VFDatum> in2, VFFlowset<String,  VFDatum> out )
     {
         in1.union( in2, out );
+        if(DEBUG)
+            System.out.println("done merging " + out);
     }
     
-    /*    public void caseAssignStmt(AssignStmt node){
-        System.err.println("hey in assign stmt");
+    public void caseAssignStmt(AssignStmt node){
+        if(DEBUG)
+            System.err.println("hey in assign stmt");
         inFlowSets.put(node, currentInSet.clone() );
         copy(currentInSet, currentOutSet);
         for(String s : node.getLValues()){
-            System.err.println("makeing " + s + " an AVAR");
-            currentOutSet.remove( new ValueDatumPair(s, newVariableDatum() ));
-            currentOutSet.add(new ValueDatumPair(s, newAssignedVariableDatum()) );
+            if(DEBUG)
+                System.err.println("makeing " + s + " an AVAR if we can");
+            VFDatum d = currentOutSet.contains( s );
+            if( d == null )
+                currentOutSet.add(new ValueDatumPair(s, newAssignedVariableDatum()) );
+            else
+                d.makeAssignedVariable();
         }
         outFlowSets.put(node, currentOutSet.clone() );
-        }*/
+    }
     public void caseStmt( Stmt node )
     {
         inFlowSets.put(node, currentInSet.clone() );
         currentOutSet = newInitialFlow();
         copy( currentInSet, currentOutSet );
         outFlowSets.put(node, currentOutSet.clone() );
+    }
+    public void caseEmptyStmt( EmptyStmt node )
+    {
+        //currentOutSet = newInitialFlow();
+        //copy( currentInSet, currentOutSet );
+        return;
     }
 }
         

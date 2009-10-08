@@ -12,6 +12,11 @@ import natlab.toolkits.analysis.*;
 public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<String, FunctionVFDatum> >
 {
 
+    //TODO-JD add case for handling new RHS names that aren't involved
+    //in an @ expression and correspond to a visible function. Visible
+    //functions will have to be estimated of course. This is only for
+    //the function context, not scripts.
+
     public VFPreorderAnalysis( ASTNode tree )
     {
         super( tree );
@@ -51,6 +56,15 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     {
         caseASTNode( condExpr );
     }
+
+    public void caseFunctionList( FunctionList node )
+    {
+        for( Function f : node.getFunctions() ){
+            currentSet = newInitialFlow();
+            f.analyze(this);
+        }
+    }
+
 
     public void caseFunction( Function node )
     {
@@ -123,3 +137,4 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         currentSet.add( new ValueDatumPair( node.getName().getID(), newFunctionDatum() ) );
     }
 }
+

@@ -95,7 +95,10 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             analyze( body );
             continueSet = processContinues();
             mergedOut = newInitialFlow();
-            merge(currentOutSet, continueSet, mergedOut);
+            if( continueSet == null )
+                copy(currentOutSet, mergedOut);
+            else
+                merge(currentOutSet, continueSet, mergedOut);
 
             //setup the current out as the merged out
             //this is the current out before processing the update
@@ -107,6 +110,11 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             caseLoopVarAsUpdate( loopVar );
 
             //setup in for loop var as condition, in = out of update
+            // merged with loop in
+            //TODO-JD: Does this even make sense? The three cases
+            // should have split in and out sets somehow, ah well, not
+            // really possible for matlab semantics is it?
+            merge( loopInSet, currentOutSet, currentOutSet );
             currentInSet = currentOutSet;
             
             caseLoopVarAsCondition( loopVar );
@@ -115,7 +123,10 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //use for new out
             breakSet = processBreaks();
             mergedOut = newInitialFlow();
-            merge( currentOutSet, breakSet, mergedOut );
+            if( breakSet == null )
+                copy( currentOutSet, mergedOut );
+            else
+                merge( currentOutSet, breakSet, mergedOut );
             newOut = mergedOut;
             //newOut is the new out of the entire loop
 
@@ -176,15 +187,20 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             analyze( body );
             continueSet = processContinues();
             mergedOut = newInitialFlow();
-            merge( currentOutSet, continueSet, mergedOut );
+            if( continueSet == null )
+                copy( currentOutSet, mergedOut );
+            else
+                merge( currentOutSet, continueSet, mergedOut );
 
             //setup the current out as the merged out
             //this is the current out before processing the loop
             //condition
-            currentOutSet = mergedOut;
+            currentOutSet = (A)(mergedOut.clone());
 
             //setup in for loop condition case
-            currentInSet = mergedOut;
+            //first merge the mergedout with the loop in
+            merge( loopInSet, mergedOut, mergedOut );
+            currentInSet = (A)(mergedOut.clone());
 
             caseCondition( loopCond );
             
@@ -192,7 +208,10 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //use for new out
             breakSet = processBreaks();
             mergedOut = newInitialFlow();
-            merge( currentOutSet, breakSet, mergedOut );
+            if( breakSet == null )
+                copy( currentOutSet, mergedOut );
+            else
+                merge( currentOutSet, breakSet, mergedOut );
             newOut = mergedOut;
             //newOut is the new out of the entire loop
 
@@ -218,38 +237,49 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         inFlowSets.put( node, ifInSet );
 
         //setup mergedOuts to capture the outs of each branch
-        A mergedOuts = newInitialFlow();
+        A mergedOuts = null;
 
         //setup nextIn to be the in for the next block
         //initialize with the ifInSet
-        A nextIn = ifInSet;
+        A nextIn = (A)(ifInSet.clone());
 
         //process each IfBlock
-        for( IfBlock block : node.getIfBlocks() ){
+        for( IfBlock block : node.getIfBlocks() ) {
             if( DEBUG )
                 System.out.println( "if block" );
             condition = block.getCondition();
             body = block.getStmts();
 
             //process condition
-            currentInSet = nextIn;
+            currentInSet = (A)(nextIn.clone());
             caseCondition( condition );
             
             //store the out of the condition as the in for the next
             //block
-            nextIn = currentOutSet;
+            nextIn = (A)(currentOutSet.clone());
 
             currentInSet = nextIn;
             if( DEBUG )
-                System.out.println( "!"+currentInSet );
+                System.out.println( "!in before body"+currentInSet );
             //process body
             analyze( body );
             if( DEBUG ){
-                System.out.println( "!"+currentInSet );
-                System.out.println( "!"+currentOutSet );
+                System.out.println( "!in after body"+currentInSet );
+                System.out.println( "!out after body"+currentOutSet );
             }
             //merge out with previous outs
-            merge( currentOutSet, mergedOuts, mergedOuts );
+            if( mergedOuts == null ){
+                mergedOuts = (A)(currentOutSet.clone());
+                if(DEBUG)
+                    System.out.println( "first mergedOuts is " + mergedOuts.toString() );
+            }
+            else{
+                if(DEBUG)
+                    System.out.println("merging " + currentOutSet.toString() );
+                merge( currentOutSet, mergedOuts, mergedOuts );
+                if(DEBUG)
+                    System.out.println("result " + mergedOuts.toString());
+            }
         }
         //if an elseBlock exists, process it, otherwise merge the
         //nextIn into the mergedOuts
@@ -260,15 +290,20 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             body = block.getStmts();
             //currentOutSet will become the currentInSet for the body,
             //thanks to the AnalysisHelper
-            currentOutSet = nextIn;
+            currentInSet = (A)(nextIn.clone());
+            currentOutSet = (A)(nextIn.clone());
             if( DEBUG )
-                System.out.println( "!"+currentInSet );
+                System.out.println( "!in before body "+currentInSet );
             analyze( body );
             if( DEBUG ){
-                System.out.println( "!"+currentInSet );
-                System.out.println( "!"+currentOutSet );
+                System.out.println( "!in after body "+currentInSet );
+                System.out.println( "!out after body "+currentOutSet );
             }
+            if(DEBUG)
+                System.out.println("merging " + currentOutSet.toString() );
             merge( currentOutSet, mergedOuts, mergedOuts );
+            if(DEBUG)
+                System.out.println("result " + mergedOuts.toString());
         }
         else{
             merge( nextIn, mergedOuts, mergedOuts );
@@ -276,6 +311,8 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
 
         //set and store the outset
         currentOutSet = mergedOuts;
+        if(DEBUG)
+            System.out.println("outset is " + currentOutSet.toString());
         outFlowSets.put( node, currentOutSet );
     }
     /**

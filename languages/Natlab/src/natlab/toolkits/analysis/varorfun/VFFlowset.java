@@ -21,6 +21,7 @@ import natlab.toolkits.analysis.*;
 public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumPair<V,D>>
 {
 
+    public static boolean DEBUG = false;
     public void copy(VFFlowset<V, D> dest) {
     	if (this == dest) return;
         dest.clear();
@@ -71,10 +72,14 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     }
     public void add(ValueDatumPair<V,D> pair)
     {
+        if( DEBUG )
+            System.out.println("adding " + pair);
         D d = set.get( pair.getValue() );
         if( d != null ){
             //TODO-JD Is this safe?
             d = (D)(d.merge( pair.getDatum() ));
+            if( DEBUG )
+                System.out.println("merged datum is " + d);
             set.put( pair.getValue(), d );
         }
         else{
@@ -113,6 +118,7 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
 
         VFFlowset<V,D> tmpDest = new VFFlowset();
 
+        //add all the elements in this to the tmpDest
         for( ValueDatumPair<V,D> pair : this.toList() ){
             if( !other.contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
                 D newDatum = (D)(pair.getDatum().clone());
@@ -122,6 +128,7 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
             else
                 tmpDest.add( pair );
         }
+        //add all elements in other to tmpDest
         for( ValueDatumPair<V,D> pair : other.toList() ){
             if( !contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
                 D newDatum = (D)(pair.getDatum().clone());
@@ -131,6 +138,8 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
             else
                 tmpDest.add( pair );
         }
+        //copy tmpDest to dest
+        tmpDest.copy(dest);
     }
     public String toString()
     {
