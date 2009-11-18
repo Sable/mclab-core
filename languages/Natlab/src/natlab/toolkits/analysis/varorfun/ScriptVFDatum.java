@@ -29,9 +29,13 @@ public class ScriptVFDatum extends AbstractVFDatum
      */
     public void makeVariable()
     {
-        if( Value.FUN.equals( value ) 
+        /*if( Value.FUN.equals( value ) 
             || Value.BOT.equals( value ) 
             || Value.AVAR.equals( value ) )
+            value = Value.VAR;*/
+        if( Value.FUN.equals( value ) )
+            value = Value.TOP;
+        else if( Value.BOT.equals( value ) || Value.AVAR.equals( value ))
             value = Value.VAR;
     }
 
@@ -41,8 +45,12 @@ public class ScriptVFDatum extends AbstractVFDatum
      */
     public void makeAssignedVariable()
     {
-        if( !( Value.TOP.equals( value ) || Value.AVAR.equals( value ) ) )
+        /*if( !( Value.TOP.equals( value ) || Value.AVAR.equals( value ) ) )
+          value = Value.AVAR;*/
+        if( Value.BOT.equals( value ) || Value.VAR.equals( value ) )
             value = Value.AVAR;
+        else if( Value.FUN.equals( value ) )
+            value = Value.TOP;
     }
 
     /**
@@ -103,7 +111,7 @@ public class ScriptVFDatum extends AbstractVFDatum
         if( !( that instanceof ScriptVFDatum) )
             throw new UnsupportedOperationException( "Trying to merge a ScriptVFDatum with a non ScriptVFDatum" );
 
-        Value ov = that.getValue();
+        /*Value ov = that.getValue();
         if( Value.TOP.equals( value ) || Value.TOP.equals( ov ) )
             return new ScriptVFDatum( Value.TOP );
         else if( Value.VAR.equals( value ) || Value.VAR.equals( ov ) )
@@ -113,7 +121,25 @@ public class ScriptVFDatum extends AbstractVFDatum
         else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
             return new ScriptVFDatum( Value.FUN );
         else
-            return new ScriptVFDatum( Value.BOT );
+        return new ScriptVFDatum( Value.BOT );*/
+
+        Value ov = that.getValue();
+        if( value.equals( ov ) )
+            return new ScriptVFDatum( value );
+        //not equal at this point
+        else if( Value.TOP.equals( value ) || Value.TOP.equals( ov ) )
+            return new ScriptVFDatum( Value.TOP );
+        //not equal and neither are TOP
+        else if( Value.BOT.equals( value ) )
+            return new ScriptVFDatum( ov );
+        else if( Value.BOT.equals( ov ) )
+            return new ScriptVFDatum( value );
+        //not equal, neither are TOP or BOT
+        else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
+            return new ScriptVFDatum( Value.TOP );
+        //not equal and each is either AVAR or VAR, so one must be VAR
+        else
+            return new ScriptVFDatum( Value.VAR );
     }
 
     public static ScriptVFDatum merge(ScriptVFDatum in1, ScriptVFDatum in2)

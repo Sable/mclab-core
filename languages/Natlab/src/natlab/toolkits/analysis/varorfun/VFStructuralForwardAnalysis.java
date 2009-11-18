@@ -35,7 +35,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
     {
         if( isScript ){
             ScriptVFDatum d = new ScriptVFDatum();
-            d.makeVariable();
+            d.makeAssignedVariable();
             return d;
         }
         else{
@@ -71,6 +71,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
         isScript = true;
         initialFlow = new VFFlowset();
         currentOutSet = newInitialFlow();
+        caseASTNode( node );
     }
 
     public void caseFunction( Function node )
