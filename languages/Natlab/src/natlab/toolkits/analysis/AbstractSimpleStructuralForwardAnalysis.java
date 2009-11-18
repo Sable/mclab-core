@@ -5,9 +5,8 @@ import java.util.*;
 
 /**
  * A simple abstract implementation of a
- * StructuralForwardAnalysis. This class provides some simple
- * implementations of methods such as processBreaks and
- * caseBreakStmt.
+ * AbstractStructuralForwardAnalysis. This class provides some simple
+ * implementations of methods such as processBreaks and caseBreakStmt.
  *
  * @see AbstractStructuralForwardAnalysis
  */
@@ -48,8 +47,10 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         A mergedSets = null;
 
         for( A set : loopStack.peek().getBreakOutSets() ){
-            if( mergedSets == null )
+            if( mergedSets == null ){
+                mergedSets = newInitialFlow();
                 copy(set, mergedSets);
+            }
             else
                 merge( set, mergedSets, mergedSets );
         }
@@ -66,8 +67,10 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         A mergedSets = null;
 
         for( A set : loopStack.peek().getContinueOutSets() ){
-            if( mergedSets == null )
+            if( mergedSets == null ){
+                mergedSets = newInitialFlow();
                 copy(set, mergedSets);
+            }
             else
                 merge( set, mergedSets, mergedSets );
         }

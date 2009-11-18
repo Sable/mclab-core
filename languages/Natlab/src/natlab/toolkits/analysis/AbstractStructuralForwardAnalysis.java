@@ -323,7 +323,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
        For forward analysis this contains list of all the break and
        continue out sets, the loop in set and the actual loop node.
 
-       @see StructuralBackwardAnalysis.LoopFlowsets
+       @see AbstractStructuralBackwardAnalysis.LoopFlowsets
     **/
     protected class LoopFlowsets
     {

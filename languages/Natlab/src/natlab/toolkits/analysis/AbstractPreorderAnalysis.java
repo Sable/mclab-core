@@ -7,7 +7,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
     extends AbstractNodeCaseHandler 
     implements Analysis<A>
 {
-    protected final boolean DEBUG=false;
+    public static boolean DEBUG=false;
 
     protected Map<ASTNode, A> flowSets;
     protected A currentSet;
