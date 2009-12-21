@@ -1,9 +1,5 @@
 package natlab.toolkits.DependenceAnalysis;
-import ast.ForStmt;
-import ast.Program;
-import ast.AssignStmt;
 import ast.*;
-import ast.ASTNode;
 import natlab.toolkits.analysis.ForVisitor;
 import natlab.IntNumericLiteralValue;
 import java.math.*;
@@ -20,14 +16,12 @@ import natlab.NumericLiteralValue;
  * 	   1.3.Closes the file.  	 
  */
 
-public class Profiler {
-	private Program prog;
-	private ForStmt forNode;
-	private NameExpr fileNameExpr;
+public class Profiler {	
+	private ForStmt forNode;	
 	private String fileName;
-	private ExpressionFactory eFactory;
-	private NameExpr docNode;
-	private NameExpr timeStamp;
+	private ExpressionFactory eFactory;	
+	private ForStmt[] forStmtArray;
+	private static int loopNo=0;
 	
 	public String getFileName() {
 		return fileName;
@@ -44,89 +38,315 @@ public class Profiler {
 	}
 	public Profiler()
 	{     
-	    eFactory=new ExpressionFactory();
-	    fileNameExpr=eFactory.createNameExpr("xmlFileName");
-	    timeStamp=eFactory.createNameExpr("S");	
-	}	
-	public Program getProg() {
-		return prog;
-	}
-	public void setProg(Program prog) {
-		this.prog = prog;
-	}
-	public ForStmt getForNode() {
-		return forNode;
-	}
-	public void setForNode(ForStmt forNode) {
-		this.forNode = forNode;
-	}
-	public void changeAST()
-	{
-		//System.out.println(prog.dumpTreeAll());
-		//insertDateTimeNode();
-		//insertFileNameVariableNode();
-		//traverseProgramNode(); 
-		//insertCheckFileExistNode();//needs to call insertFieOpenNode if file doesnot exist.
-		//System.out.println(prog.getPrettyPrinted());
-		//insertRootNode();
-		// insertElseBlock();
-		insertCreateElementNode("RunNo");
+	    eFactory=new ExpressionFactory();    
+	    
+	}		
+
 	
+	/*
+	 * This function annotates the loop with loop no
+	 */
+   public void insertLoopNo(ForStmt[] fStmtArray)
+   {	forStmtArray=fStmtArray;
+		Stmt stmt=forStmtArray[0].getStmt(0);
+		if(stmt instanceof AssignStmt)
+		{   
+			AssignStmt aStmt=(AssignStmt)stmt;
+			if(aStmt.getLHS() instanceof NameExpr)
+			{   NameExpr nExpr=(NameExpr)aStmt.getLHS();
+				if(!(nExpr.getName().getVarName().equals("lNum")))
+				{   insertStmt();					
+				}//end of 3rd if				
+			}//end of 2nd if
+			else insertStmt();
+		}//end of 1st if
+		else insertStmt();				
+	}
+   /*
+    * This function inserts the loop no variable into the loop body.
+    */
+   private void insertStmt()
+   {
+	    AssignStmt lNAStmt=new AssignStmt();
+		NameExpr lNExpr=eFactory.createNameExpr("lNum");
+		IntLiteralExpr lNoExpr=new IntLiteralExpr();
+		loopNo++;
+		Integer iObj=new Integer(loopNo);    		        											
+		lNoExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+		lNAStmt.setLHS(lNExpr);
+		lNAStmt.setRHS(lNoExpr);
+		lNAStmt.setOutputSuppressed(true);
+		lNAStmt.setParent(forStmtArray[0]);			
+		List tList=new List();
+		tList.insertChild(lNAStmt, 0);		
+		for(int i=0;i<forStmtArray[0].getNumStmt();i++)
+		{
+			tList.insertChild(forStmtArray[0].getStmt(i), i+1);				
+		}
+		forStmtArray[0].setStmtList(tList);
+   }
+	
+	
+	/*
+	 * This function inserts the following code into the ast
+	 * xmlCodeGenerator('test',1,lVariableName,lowerBound,loopIncFactor,upperBound,nestingLevel);
+	 */
+	public void insertFunctionCall(int nestingLevel,ForStmt[] fStmtArray)
+	{
+		int insertLevel=0;
+		ExprStmt fCExprStmt=new ExprStmt();
+		NameExpr fCNExpr=eFactory.createNameExpr("xmlDataGenerator");
+		List fCList=new List();
+		forStmtArray=fStmtArray;
+		
+		StringLiteralExpr fileNameExpr=new StringLiteralExpr();
+		fileNameExpr.setValue(fileName);//create an expression for fileName
+		
+		IntLiteralExpr nLevelExpr=new IntLiteralExpr();
+		Integer iObj;
+		//iObj=new Integer(nestingLevel+1);		    		        											
+		iObj=new Integer(nestingLevel);
+		nLevelExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));//creates an expression for nestingLevel.
+		
+		IntLiteralExpr lNoExpr=new IntLiteralExpr();
+		Integer lNoObj;
+		lNoObj=new Integer(loopNo);		    		        											
+		lNoExpr.setValue(new natlab.DecIntNumericLiteralValue(lNoObj.toString()));//creates an expression for loopNo.
 		
 		
+		fCList.insertChild(fileNameExpr, 0);
+		fCList.insertChild(createLoopVariableNameExpr(nestingLevel), 1);
+		fCList.insertChild(createLowerBoundExpr(nestingLevel), 2);
+		fCList.insertChild(createUpperBoundExpr(nestingLevel), 3);
+		fCList.insertChild(createLoopIncExpr(nestingLevel), 4);
+		fCList.insertChild(nLevelExpr, 5);
+		fCList.insertChild(lNoExpr, 6);
 		
+		insertLevel=forStmtArray[0].getParent().getIndexOfChild(forStmtArray[0])+1;
+		ParameterizedExpr pExpr=eFactory.createParaExpr(fCNExpr, fCList);
 		
-		
-		//insertFileOpenNode();
-		/*AssignStmt fOpenAStmt=new AssignStmt(); //this is for opening up a file. fid=fopen('test.txt', 'a+');
-		
-		Name fidName=new Name();
-		fidName.setID("fid");
-		fidNameExpr.setName(fidName);
-		fOpenAStmt.setLHS(fidNameExpr);//this set the LHS of AssignStmt.
-		ParameterizedExpr fOpenParaExpr=new ParameterizedExpr();
-		NameExpr fOpenNameExpr=new NameExpr();
-		Name fOpenName=new Name();
-		fOpenName.setID("fopen");
-		fOpenNameExpr.setName(fOpenName);
-		fOpenParaExpr.setTarget(fOpenNameExpr);
-		List fOpenList=new List();
-		StringLiteralExpr sExpr1=new StringLiteralExpr();		
-		sExpr1.setValue("test.txt");
-		StringLiteralExpr sExpr2=new StringLiteralExpr();
-		sExpr2.setValue("a+");		
-		fOpenList.insertChild(sExpr1, 0);
-		fOpenList.insertChild(sExpr2, 1);		
-		fOpenParaExpr.setArgList(fOpenList);
-		fOpenAStmt.setRHS(fOpenParaExpr);
-		
-		fOpenAStmt.setParent(prog.getChild(1));
-		//System.out.println(prog.getChild(1).getChild(0));		
-		prog.getChild(1).insertChild(fOpenAStmt, 0);			
-		//System.out.println(prog.dumpTreeAll());
-		//System.out.println(prog.getPrettyPrinted());
-		
-		traverseProgramNode();		
-		//insert file closing node.This should be the last node in the program.. //fclose(fid)
-		ExprStmt fCloseEStmt= new ExprStmt();
-		ParameterizedExpr fCloseParaExpr=new ParameterizedExpr();
-		NameExpr fCloseNameExpr=new NameExpr();
-		Name fCloseName=new Name();
-		fCloseName.setID("fclose");
-		fCloseNameExpr.setName(fCloseName);
-		fCloseParaExpr.setTarget(fCloseNameExpr);
-		List fCloseList=new List();
-		fCloseList.insertChild(fidNameExpr, 0);
-		fCloseParaExpr.setArgList(fCloseList);
-		fCloseEStmt.setExpr(fCloseParaExpr);
-		//System.out.println(fCloseEStmt.dumpTreeAll());*/		
+		fCExprStmt.setExpr(pExpr);
+		fCExprStmt.setOutputSuppressed(true);	
+		fCExprStmt.setParent(forStmtArray[0].getParent());				
+		//System.out.println("Node Id is"+(forStmtArray[0].getParent().getIndexOfChild(forStmtArray[0])));
+		forStmtArray[0].getParent().insertChild(fCExprStmt, insertLevel);
+		//forStmtArray[0].getParent().insertChild(fCExprStmt, 4);
+		//prog.getChild(1).insertChild(dTAStmt1, 0);		
+	}
+	
+	
+	/*
+	 * This function inserts following code into the program.
+	 * 1.lVariableName=['i','j','k']';
+	 */
+	private Expr createLoopVariableNameExpr(int nestingLevel)
+	{
+		if(nestingLevel >=1)
+		{		  	
+			
+		  Row lVariableNamesRow=new Row();
+		  //for(int i=0;i<forStmtArray.length;i++)
+		  for(int i=0;i<nestingLevel+1;i++)
+		  {			  
+			 AssignStmt aStmt=new AssignStmt();
+			 aStmt=forStmtArray[i].getAssignStmt();			  
+			 if(aStmt.getLHS() instanceof NameExpr)
+			 {
+			   StringLiteralExpr sExpr=new StringLiteralExpr();
+			   sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
+			   lVariableNamesRow.addElement(sExpr);
+			 }
+			 
+		  }
+		  MatrixExpr lVariableNamesMExpr=new MatrixExpr();
+		  lVariableNamesMExpr.addRow(lVariableNamesRow);
+		  MTransposeExpr lVariableNamesMTExpr=new MTransposeExpr();
+		  lVariableNamesMTExpr.setOperand(lVariableNamesMExpr);
+		  return lVariableNamesMTExpr;
+		  
+		}
+		else //(nestingLevel==0)
+		{
+			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
+			  if(aStmt.getLHS() instanceof NameExpr)
+			   {
+				   StringLiteralExpr sExpr=new StringLiteralExpr();
+				    sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
+				   return sExpr;
+			   }
+			  return aStmt.getLHS();//TODO:needs to fix this 
+		}
 	}
 	
 	/*
+	 * This function inserts following code into the program.
+	 * 1.loopIncFactor =[1 2 3]'; %this is a loopInc factor column vector which has following values(1,2,3) depending on nesting levels.
+	 * TODO:1.need to handle all the expression types
+	 *       
+	 */
+	private Expr createLoopIncExpr(int nestingLevel)
+	{
+		
+		if(nestingLevel >=1)
+		{
+		  Row lIncRow=new Row();
+		  //for(int i=0;i<forStmtArray.length;i++)
+		  for(int i=0;i<nestingLevel+1;i++)
+		  {
+			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
+			 if(aStmt.getRHS() instanceof RangeExpr)
+			 {
+			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();
+			   if(rExpr.hasIncr())lIncRow.addElement(rExpr.getIncr());
+			   else
+			   {      IntLiteralExpr incExpr=new IntLiteralExpr();
+					  Integer iObj=new Integer(1);        											
+					  incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+					  lIncRow.addElement(incExpr);	   
+				    
+			   }
+			 }
+		  }
+		  MatrixExpr lIncMExpr=new MatrixExpr();
+		  lIncMExpr.addRow(lIncRow);
+		  MTransposeExpr lIncMTExpr=new MTransposeExpr();
+		  lIncMTExpr.setOperand(lIncMExpr);		  
+		  return lIncMTExpr;
+		  
+		}
+		else 
+		{
+			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
+			  if(aStmt.getRHS() instanceof RangeExpr)
+			   {
+				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 				   
+				   if(rExpr.hasIncr())return rExpr.getIncr();
+				   else
+				   {      IntLiteralExpr incExpr=new IntLiteralExpr();
+						  Integer iObj=new Integer(1);        											
+						  incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+						  return incExpr;	   
+					    
+				   }
+			   }
+			  return aStmt.getRHS();//TODO:needs to fix this	  
+		
+		}	
+		
+	}
+	
+	/*
+	 * This function inserts following code into the program.
+	 * 1.lowerBound =[1 2 3]'; %this is a lowerBound column vector which has following values(1,2,3) depending on nesting levels.
+	 *TODO:1.need to handle all the expression types 
+	 */
+	private Expr createLowerBoundExpr(int nestingLevel)
+	{
+		//AssignStmt lBoundAStmt =new AssignStmt();
+		//lBoundNExpr=eFactory.createNameExpr("lowerBound");
+		//lBoundAStmt.setLHS(lBoundNExpr);
+		if(nestingLevel >=1)
+		{
+			Row lBoundRow=new Row();
+		  //for(int i=0;i<forStmtArray.length;i++)
+		  for(int i=0;i<nestingLevel+1;i++)	
+		  {
+			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
+			 if(aStmt.getRHS() instanceof RangeExpr)
+			 {
+			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
+			   lBoundRow.addElement(rExpr.getLower());
+			 }
+		  }
+		  MatrixExpr lBoundMExpr=new MatrixExpr();
+		  lBoundMExpr.addRow(lBoundRow);
+		  MTransposeExpr lBoundMTExpr=new MTransposeExpr();
+		  lBoundMTExpr.setOperand(lBoundMExpr);
+		  //lBoundAStmt.setRHS(lBoundMTExpr);
+		  //lBoundAStmt.setOutputSuppressed(true);
+		  return lBoundMTExpr;
+		  
+		}
+		else //if(nestingLevel==0)
+		{
+			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
+			  if(aStmt.getRHS() instanceof RangeExpr)
+			   {
+				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
+				   //lBoundAStmt.setRHS(rExpr.getLower());
+				   return rExpr.getLower();
+			   }
+			  return aStmt.getRHS();//TODO:needs to fix this 
+			  
+			  //lBoundAStmt.setOutputSuppressed(true);
+		}
+		//lBoundAStmt.setParent(forStmtArray[0].getParent());				
+		//System.out.println(fCExprStmt.getPrettyPrinted());
+		//forStmtArray[0].getParent().insertChild(lBoundAStmt, ((forStmtArray[0].nestedLevel)+insertLevel));
+		//forStmtArray[0].getParent().insertChild(lBoundAStmt, 3);	
+		
+	}
+	/*
+	 * This function prepares the upperBound parameter of the function call.
+	 */
+	private Expr createUpperBoundExpr(int nestingLevel)
+	{
+		
+		if(nestingLevel >=1)
+		{
+			Row uBoundRow=new Row();
+		  //for(int i=0;i<forStmtArray.length;i++)
+		  for(int i=0;i<nestingLevel+1;i++)
+		  {
+			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
+			 if(aStmt.getRHS() instanceof RangeExpr)
+			 {
+			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
+			   uBoundRow.addElement(rExpr.getUpper());
+			 }
+		  }
+		  MatrixExpr uBoundMExpr=new MatrixExpr();
+		  uBoundMExpr.addRow(uBoundRow);
+		  MTransposeExpr uBoundMTExpr=new MTransposeExpr();
+		  uBoundMTExpr.setOperand(uBoundMExpr);
+		  return uBoundMTExpr;	 
+		  
+		}
+		else //if(nestingLevel==0)
+		{
+			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
+			  if(aStmt.getRHS() instanceof RangeExpr)
+			   {
+				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
+				  
+				   return rExpr.getUpper();
+			   }
+			  
+			 
+			  return aStmt.getRHS();
+		}
+		
+	}
+}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+	/*
 	 * This function inserts file following code into the ast
 	 * 1.xmlFileName=fileName
+	 * 2.It attaches .xml extension to the file name
 	 */
-	private void insertFileNameVariableNode()
+	/*private void insertFileNameVariableNode()
 	{
 		  //For inserting this variable xmlFileName=fileName		   
 		  AssignStmt aStmt=new AssignStmt();		  		  
@@ -137,19 +357,19 @@ public class Profiler {
 		  aStmt.setOutputSuppressed(true);
 		  aStmt.setParent(prog.getChild(1));		  
 		  prog.getChild(1).insertChild(aStmt, 2);
-	}
+	}*/
 	
 	
 	/*
 	 * This function inserts file following code into the ast	 * 
 	 * 1.xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');
 	 */
-	private AssignStmt insertFileOpenNode()
+/*	private AssignStmt insertFileOpenNode()
 	{
 	  	  
 	  //For inserting this code to MatLabfile xmlFileName = fullfile('/home/2008/aaslam1', 'dataOutFile.xml');	  	
 	  AssignStmt fOAStmt=new AssignStmt();	  
-	  fOAStmt.setLHS(fileNameExpr);
+	  //fOAStmt.setLHS(fileNameExpr);
 	  
 	  //ParameterizedExpr fOParaExpr=new ParameterizedExpr();
 	  NameExpr fONExpr2=eFactory.createNameExpr("fullfile");	  
@@ -170,6 +390,35 @@ public class Profiler {
 	  return fOAStmt;
 	 }
 	
+	/*
+	 * This function inserts code for this statement into the AST.
+	 * xmlwrite(xmlFileName, docNode); 
+	 */
+/*	private void insertFileWriteNode()
+	{
+		NameExpr xmlWriteNExpr=eFactory.createNameExpr("xmlwrite");
+		List xmlWriteList=new List();
+		//xmlWriteList.add(fileNameExpr);
+		xmlWriteList.add(docNode);
+		ParameterizedExpr xmlParaExpr=eFactory.createParaExpr(xmlWriteNExpr, xmlWriteList);		
+		System.out.println(xmlParaExpr.dumpTreeAll());
+		
+	}*/
+	
+	/*
+	 * This function adds following code into the AST.
+	 * xDoc = xmlread([xmlFileName, '.xml']);
+	 */
+/*	private void insertReadFileNode()
+	{
+	   AssignStmt docAStmt=new AssignStmt();
+	   docAStmt.setLHS(docNode);
+	   NameExpr xmlReadNExpr=eFactory.createNameExpr("xmlread");
+	   //ParameterizedExpr readFilePExpr=eFactory.createParaExpr(xmlReadNExpr, fileNameExpr, 0);
+	   //docAStmt.setRHS(readFilePExpr);
+	   //docAStmt.setOutputSuppressed(true);
+	}*/
+	
 	
 	/*
 	 * This function insert the following code into the ast
@@ -177,7 +426,7 @@ public class Profiler {
 	 * 2.A = exist([pathstr name '.xml'],'file');
 	 * 	   
 	 */
-	private void insertCheckFileExistNode(int nodeNumber)
+/*	private void insertCheckFileExistNode(int nodeNumber)
 	{
 		AssignStmt fEAStmt1=new AssignStmt();
 		MatrixExpr fEMExpr1=new MatrixExpr();
@@ -199,8 +448,8 @@ public class Profiler {
 		//filePartsParaExpr.setTarget(filePartsNameExpr);	
 
 		//filePartsParaExpr.setArg(fileNameExpr, 0);
-		fEAStmt1.setRHS(eFactory.createParaExpr(filePartsNameExpr, fileNameExpr, 0));
-		fEAStmt1.setOutputSuppressed(true);
+		//fEAStmt1.setRHS(eFactory.createParaExpr(filePartsNameExpr, fileNameExpr, 0));
+		//fEAStmt1.setOutputSuppressed(true);
 		
 		AssignStmt fEAStmt2=new AssignStmt();
 		NameExpr aNameExpr=eFactory.createNameExpr("A");		
@@ -240,7 +489,7 @@ public class Profiler {
 	 *docNode = com.mathworks.xml.XMLUtils.createDocument('AD');
 	 *
 	 */
-	private AssignStmt insertRootNode()
+/*	private AssignStmt insertDocNode()
 	{
 		AssignStmt aStmt=new AssignStmt();
 		docNode=eFactory.createNameExpr("docNode");
@@ -284,7 +533,7 @@ public class Profiler {
 	 *1.t=now
 	 *2.S = datestr(t);
 	 */
-	private void insertDateTimeNode()
+	/*private void insertDateTimeNode()
 	{
 		AssignStmt dTAStmt1=new AssignStmt();
 		NameExpr dTNExpr1=eFactory.createNameExpr("t");		
@@ -330,7 +579,7 @@ public class Profiler {
        else   
        end
 	 */
-	private void insertIfNode(int index)
+/*	private void insertIfNode(int index)
 	{
 		
 		//For inserting this code to ast if(A==2)
@@ -361,8 +610,8 @@ public class Profiler {
 		//xmlReadRow.addElement(xmlFileNameExpr);
 		//xmlReadRow.addElement(xmlString);				
 		//xmlReadMExpr.setRow(xmlReadRow, 0);
-		xDocAStmt.setRHS(eFactory.createParaExpr(xmlReadNExpr, fileNameExpr, 0));
-		xDocAStmt.setOutputSuppressed(true);
+		//xDocAStmt.setRHS(eFactory.createParaExpr(xmlReadNExpr, fileNameExpr, 0));
+		//xDocAStmt.setOutputSuppressed(true);
 		
 		//For inserting this code into the AST xRoot=xDoc.getDocumentElement;
 		AssignStmt xRootAStmt=new AssignStmt();
@@ -398,11 +647,11 @@ public class Profiler {
 	 *   e.g.docNode = com.mathworks.xml.XMLUtils.createDocument('AD');
 	 *   
 	 */
-	private void insertElseBlock()
+	/*private void insertElseBlock()
 	{
 		ElseBlock elseBlock=new ElseBlock();
 		elseBlock.addStmt(insertFileOpenNode());
-		elseBlock.addStmt(insertRootNode());
+		elseBlock.addStmt(insertDocNode());
 		System.out.println(elseBlock.dumpTreeAll());
 		System.out.println(elseBlock.getPrettyPrinted());
 	}
@@ -413,7 +662,7 @@ public class Profiler {
 	 * e.g.elRunNo = docNode.createElement('RunNo');
 	 * TODO:pass the attribute Name also if needs to set it.overload this method 
 	 */
-	private void insertCreateElementNode(String nodeName)
+/*	private void insertCreateElementNode(String nodeName)
 	{
 	   AssignStmt aStmt=new AssignStmt();
 	   NameExpr nExpr1=eFactory.createNameExpr(nodeName);
@@ -445,7 +694,7 @@ public class Profiler {
 	 * 1.Would append children to existing nodes.
 	 * e.g. elLBVariableName=elLowerBound.appendChild(docNode.createElement('VariableName')); 
 	 */
-	private void insertAppendChildNode(NameExpr parentName,String Name)
+/*	private void insertAppendChildNode(NameExpr parentName,String Name)
 	{
 		AssignStmt aStmt=new AssignStmt();
 		NameExpr nExpr=eFactory.createNameExpr(parentName.getName().getVarName()+"child");
@@ -475,7 +724,7 @@ public class Profiler {
 	 * This function inserts setAttribute field of an element.
 	 * e.g.elRunNo.setAttribute('TimeStamp',S);
 	 */
-	private void insertSetAttributeNode(NameExpr callerExpr,StringLiteralExpr attributeName,NameExpr attributeValue)
+/*	private void insertSetAttributeNode(NameExpr callerExpr,StringLiteralExpr attributeName,NameExpr attributeValue)
 	{
 		
 		ExprStmt attributeStmt= new ExprStmt();
@@ -495,11 +744,26 @@ public class Profiler {
 	    		
 	}
 	
+	/*
+	 * This function inserts following node into the AST.It takes as input the data type of variable that needs to be printed.
+	 * docNode.createTextNode(sprintf('%s', 'ii'))
+	 * TODO:Needs to handle expr argument.Add arguments to textNodeList
+	 */
+/*	private ParameterizedExpr insertTextNode(Expr expr)
+	{
+		DotExpr textNodeDExpr=new DotExpr();
+		Name createTextNode=eFactory.createName("createTextNode");
+		ParameterizedExpr textNodePExpr;		
+		NameExpr sprintfNExpr=eFactory.createNameExpr("sprintf");
+		List textNodeList=new List();
+			
+		
+	}
 	
 	/*
 	 * This function traverses the program node and looks for ForLoop.
 	 */
-	private void traverseProgramNode()
+/*	private void traverseProgramNode()
 	{
 		int nNode=prog.getChild(1).getNumChild();
 		//System.out.println(nNode);
@@ -585,4 +849,4 @@ public class Profiler {
 		
 	}*/
 	
-}
+

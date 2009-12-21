@@ -66,7 +66,7 @@ public void traverseLoopStatements()
 {
 	File file;
 	RandomAccessFile raf=null;
-	try {file = new File("Rsults.txt");
+	try {file = new File("Results.txt");
         raf = new RandomAccessFile(file, "rw");     
     }catch (IOException e) 
     {  System.out.println("IOException:Couldnot open the new file");
