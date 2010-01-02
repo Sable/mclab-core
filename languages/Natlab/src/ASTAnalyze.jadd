@@ -95,6 +95,10 @@ aspect ASTAnalyze
     {
         visitor.caseNameExpr(this);
     }
+    public void Name.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseName(this);
+    }
     public void ParameterizedExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
     {
         visitor.caseParameterizedExpr(this);
