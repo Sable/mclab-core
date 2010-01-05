@@ -361,4 +361,9 @@ public class AnalysisHelper extends AbstractNodeCaseHandler
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         helpee.caseFunctionDecl( node );
     }
+    public void caseFunction(Function node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFunction( node );
+    }
 }

@@ -21,7 +21,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
     public void caseASTNode(ASTNode node)
     {
         if( DEBUG ){
-            System.out.println( "caseASTNode");
+            System.out.println( "caseASTNode for node type " + node.getClass());
         }
         //visit each child node in forward order
         for( int i = 0; i<node.getNumChild(); i++ ){

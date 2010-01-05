@@ -6,7 +6,7 @@ import natlab.toolkits.analysis.*;
 //note, must be applied on a tree containing a function or script node 
 public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForwardAnalysis< VFFlowset<String, VFDatum> >
 {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
     protected boolean isScript = true;
     protected VFPreorderAnalysis functionAnalysis = null;
 
@@ -133,17 +133,17 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
     {
         in1.union( in2, out );
         if(DEBUG)
-            System.out.println("done merging " + out);
+            System.out.println("done merging --struct analysis" + out);
     }
     
     public void caseAssignStmt(AssignStmt node){
         if(DEBUG)
-            System.err.println("hey in assign stmt");
+            System.err.println("hey in assign stmt  --struct analysis");
         inFlowSets.put(node, currentInSet.clone() );
         copy(currentInSet, currentOutSet);
         for(String s : node.getLValues()){
             if(DEBUG)
-                System.err.println("makeing " + s + " an AVAR if we can");
+                System.err.println("makeing " + s + " an AVAR if we can  --struct analysis");
             VFDatum d = currentOutSet.contains( s );
             if( d == null )
                 currentOutSet.add(new ValueDatumPair(s, newAssignedVariableDatum()) );
