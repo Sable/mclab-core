@@ -6,7 +6,7 @@ import natlab.toolkits.analysis.*;
 //note, must be applied on a tree containing a function or script node 
 public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForwardAnalysis< VFFlowset<String, VFDatum> >
 {
-    //public static boolean DEBUG = true;
+    public static boolean DEBUG = true;
     protected boolean isScript = true;
     protected VFPreorderAnalysis functionAnalysis = null;
 
@@ -68,6 +68,8 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
     //Begin cases
     public void caseScript( Script node )
     {
+        if(DEBUG)
+            System.out.println("in script case --struct analysis");
         isScript = true;
         initialFlow = new VFFlowset();
         currentOutSet = newInitialFlow();
@@ -76,12 +78,24 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
 
     public void caseFunction( Function node )
     {
+        if(DEBUG)
+            System.out.println("in function case --struct analysis");
         isScript = false;
         if( functionAnalysis == null || functionAnalysis.getFlowSets().get(node) == null){
+            if(DEBUG){
+                VFPreorderAnalysis.DEBUG = true;
+                System.out.println("starting preorder analysis  --struct analysis\n*******************");
+            }
             functionAnalysis = new VFPreorderAnalysis( node );
             functionAnalysis.analyze();
+            if(DEBUG)
+                System.out.println("*******************\ndone preorder analysis  --struct analysis");
         }
         initialFlow = functionAnalysis.getFlowSets().get(node);
+        if(DEBUG){
+            System.out.println("!!!!printing initial flow  --struct analysis");
+            System.out.println( initialFlow );
+        }
         currentInSet = newInitialFlow();
         currentOutSet = newInitialFlow();
         caseASTNode( node );
