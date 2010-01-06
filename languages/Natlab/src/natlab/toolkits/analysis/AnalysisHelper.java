@@ -13,7 +13,7 @@ import ast.*;
  * containing node case, e.g. the for node, must deal with setting up
  * the correct currentInSet value.
  */
-public class AnalysisHelper extends AbstractNodeCaseHandler
+public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCaseHandler
 {
 
     /** 
@@ -365,5 +365,305 @@ public class AnalysisHelper extends AbstractNodeCaseHandler
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         helpee.caseFunction( node );
+    }
+    public void caseType(Type node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseType( node );
+    }
+    public void caseUnionType(UnionType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseUnionType( node );
+    }
+    public void caseIntersectionType(IntersectionType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseIntersectionType( node );
+    }
+    public void caseArrowType(ArrowType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseArrowType( node );
+    }
+    public void caseArgTupleType(ArgTupleType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseArgTupleType( node );
+    }
+    public void caseUnitType(UnitType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseUnitType( node );
+    }
+    public void caseVarArgType(VarArgType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseVarArgType( node );
+    }
+    public void caseTupleType(TupleType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseTupleType( node );
+    }
+    public void caseCellArrayType(CellArrayType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseCellArrayType( node );
+    }
+    public void caseMatrixType(MatrixType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseMatrixType( node );
+    }
+    public void caseBaseType(BaseType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseBaseType( node );
+    }
+    public void casePrimitiveType(PrimitiveType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.casePrimitiveType( node );
+    }
+    public void caseTypeVarType(TypeVarType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseTypeVarType( node );
+    }
+    public void caseHandleType(HandleType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseHandleType( node );
+    }
+    public void caseUnknownType(UnknownType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseUnknownType( node );
+    }
+    public void caseStructType(StructType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseStructType( node );
+    }
+    public void caseIntType(IntType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseIntType( node );
+    }
+    public void caseInt8(Int8 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseInt8( node );
+    }
+    public void caseInt16(Int16 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseInt16( node );
+    }
+    public void caseInt32(Int32 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseInt32( node );
+    }
+    public void caseInt64(Int64 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseInt64( node );
+    }
+    public void caseFloatType(FloatType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFloatType( node );
+    }
+    public void caseFloat32(Float32 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFloat32( node );
+    }
+    public void caseFloat64(Float64 node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFloat64( node );
+    }
+    public void caseCharType(CharType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseCharType( node );
+    }
+    public void caseBoolType(BoolType node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseBoolType( node );
+    }
+    public void caseFieldEntry(FieldEntry node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFieldEntry( node );
+    }
+    public void caseShape(Shape node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseShape( node );
+    }
+    public void caseKnownExtentsShape(KnownExtentsShape node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseKnownExtentsShape( node );
+    }
+    public void caseRank(Rank node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseRank( node );
+    }
+    public void caseKnownRank(KnownRank node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseKnownRank( node );
+    }
+    public void caseExtents(Extents node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseExtents( node );
+    }
+    public void caseKnownExtents(KnownExtents node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseKnownExtents( node );
+    }
+    public void caseExpandedAnnotation(ExpandedAnnotation node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseExpandedAnnotation( node );
+    }
+    public void caseAnnotation(Annotation node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseAnnotation( node );
+    }
+    public void caseEmptyStmt(EmptyStmt node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseEmptyStmt( node );
+    }
+    public void caseMultiLineHelpComment(MultiLineHelpComment node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseMultiLineHelpComment( node );
+    }
+    public void caseOneLineHelpComment(OneLineHelpComment node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseOneLineHelpComment( node );
+    }
+    public void caseClassEvents(ClassEvents node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseClassEvents( node );
+    }
+    public void casePropertyAccess(PropertyAccess node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.casePropertyAccess( node );
+    }
+    public void caseSignature(Signature node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseSignature( node );
+    }
+    public void caseMethods(Methods node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseMethods( node );
+    }
+    public void caseProperties(Properties node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseProperties( node );
+    }
+    public void caseClassDef(ClassDef node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseClassDef( node );
+    }
+    public void caseEmptyProgram(EmptyProgram node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseEmptyProgram( node );
+    }
+    public void caseClassBody(ClassBody node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseClassBody( node );
+    }
+    public void caseRow(Row node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseRow( node );
+    }
+    public void caseElseBlock(ElseBlock node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseElseBlock( node );
+    }
+    public void caseIfBlock(IfBlock node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseIfBlock( node );
+    }
+    public void caseDefaultCaseBlock(DefaultCaseBlock node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseDefaultCaseBlock( node );
+    }
+    public void caseSwitchCaseBlock(SwitchCaseBlock node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseSwitchCaseBlock( node );
+    }
+    public void caseName(Name node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseName( node );
+    }
+    public void caseEvent(Event node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseEvent( node );
+    }
+    public void caseProperty(Property node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseProperty( node );
+    }
+    public void caseSuperClass(SuperClass node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseSuperClass( node );
+    }
+    public void caseAttribute(Attribute node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseAttribute( node );
+    }
+    public void caseCompilationUnits(CompilationUnits node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseCompilationUnits( node );
+    }
+    public void caseHelpComment(HelpComment node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseHelpComment( node );
+    }
+    public void caseFunctionOrSignatureOrPropertyAccessOrStmt(FunctionOrSignatureOrPropertyAccessOrStmt node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseFunctionOrSignatureOrPropertyAccessOrStmt( node );
+    }
+    public void caseBody(Body node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseBody( node );
     }
 }
