@@ -135,7 +135,7 @@ public class AlexFortranAnalyses {
 
 
 				// set of condition when we are not interested in collapsing
-				boolean isRange = (e.getClass().getName().equals(ast.RangeExpr.class.getCanonicalName()));
+                                boolean isRange = e instanceof ast.RangeExpr;
 				
 				//if (e.getNumChild() > 0) System.out.println("kk: " + e.getStructureString() + " -- " +  e.getChild(0).getStructureString());				
 				// if(!isRange)
@@ -348,7 +348,17 @@ public class AlexFortranAnalyses {
 				// here we are sure we have a definition				
 				AssignStmt as = (AssignStmt)iter.next();
 				
-	    		boolean isForStmt = (as.getClass().getName().equals(ast.ForStmt.class.getCanonicalName()));
+                                /*I don't know why the commented
+                                  statement was here but I replaced it
+                                  with the instanceof check. I know
+                                  this is probably ugly but I will
+                                  leave it to anton or someone else to
+                                  fix. 
+                                  - Jesse Doherty 2010-01-05
+                                */
+                                //TODO Fix this!!?!
+                                //boolean isForStmt = (as.getClass().getName().equals(ast.ForStmt.class.getCanonicalName()));
+                                boolean isForStmt = (Object)as instanceof ast.ForStmt;
 	    		
 				
 				// look into the map if we have a variable with lower ID
