@@ -43,6 +43,20 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
     public abstract A processBreaks();
     public abstract A processContinues();
 
+    protected A saveLoopInSet( ForStmt node )
+    {
+        A inSet = newInitialFlow();
+        copy( currentInSet, inSet );
+        inFlowSets.put( node, inSet );
+        return inSet;
+    }
+    protected LoopFlowsets setupLoopStack( A loopIn, ForStmt node )
+    {
+        LoopFlowsets loopFlowsets = new LoopFlowsets( node );
+        loopFlowsets.setLoopInSet( loopIn );
+        loopStack.push( loopFlowsets );
+        return loopFlowsets;
+    }
     public void caseForStmt( ForStmt node)
     {
         if(DEBUG)
@@ -53,26 +67,15 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         AssignStmt loopVar = node.getAssignStmt();
         ASTNode body = node.getStmts();
 
-        //saving the in set of the loop
-        A loopInSet = newInitialFlow();
-        copy( currentInSet, loopInSet );
-        inFlowSets.put( node, loopInSet );
+        A loopInSet = saveLoopInSet( node );
 
-        //process loop variable and store result
-
-        //treat as init
-        //note In for loop var as init will bee loopInSet
+        //note In for loopVar as init will be loopInSet
         caseLoopVarAsInit( loopVar );
         
-        //treat as condition
-        //note In will be out of loop var as init
         currentInSet = currentOutSet;
         caseLoopVarAsCondition( loopVar );
 
-        //setup loop sets for loopstack 
-        LoopFlowsets loopFlowsets = new LoopFlowsets( node );
-        loopFlowsets.setLoopInSet( loopInSet );
-        loopStack.push( loopFlowsets );
+        LoopFlowsets loopFlowsets = setupLoopStack( loopInSet, node );
         
         A continueSet;
         A breakSet;
