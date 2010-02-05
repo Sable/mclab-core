@@ -11,14 +11,33 @@ aspect PrettyPrint {
         buf.append(getPrettyPrintedLessComments());
         return buf.toString();
     } 
+
+    //Special case to deal with comments at the end of functions
+    syn String Function.getPrettyPrinted() {
+        StringBuffer buf = new StringBuffer();
+        buf.append( getPrettyPrintedLessComments() );
+
+        StringBuffer cbuf = new StringBuffer();
+        for( beaver.Symbol comment : getComments() ){
+            cbuf.append(comment.value);
+            cbuf.append("\n");
+        }
+        if( cbuf.length() > 0 ){
+            buf.insert( buf.length() - getIndent().length() - 3, cbuf.toString() );
+        }
+        return buf.toString();
+    }
+
+
     
     syn String ASTNode.getIndent(){
-       ASTNode parent = getParent();
+        ASTNode parent = getParent();
     	if ( parent != null ){
         	return parent.getIndent();
         }
         return "";
     } 
+
 
     //default - exception
     syn String ASTNode.getPrettyPrintedLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()"); }
