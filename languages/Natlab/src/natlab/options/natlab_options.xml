@@ -61,13 +61,22 @@ No static linking is done.
       <short_desc>Suppress all information messages</short_desc>
       <long_desc>All messages will be suppressed, unless an error occurs. </long_desc>
     </boolopt>
-    <boolopt>
+    <!--boolopt>
       <name>Aspect Mode</name>
       <alias>a</alias>
       <alias>aspect</alias>
       <short_desc>Use Natlab and Aspect files</short_desc>
       <long_desc>Use Aspect files to weave into Natlab files.</long_desc>
-    </boolopt>
+    </boolopt-->
+    <stropt>
+      <name>Output Directory</name>
+      <set_arg_label>dir</set_arg_label>
+      <alias>outdir</alias>
+      <alias>od</alias>
+      <short_desc>Output everything to this dir rather than stdout</short_desc>
+      <long_desc>Each file is outputted to a file of the same name in
+      the given directory. The path of the input file is ignored when outputting.</long_desc>
+    </stropt>
   </section>
   <section>
     <name>Server options</name>
@@ -140,6 +149,14 @@ No static linking is done.
     <boolopt>
       <name>Var or function preorder test</name>
       <alias>vfpreorder</alias>
+    </boolopt>
+  </section>
+
+  <section>
+    <name>621 options</name>
+    <boolopt>
+      <name>run analysis</name>
+      <alias>run</alias>
     </boolopt>
   </section>
 </options>
