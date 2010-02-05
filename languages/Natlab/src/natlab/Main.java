@@ -472,6 +472,7 @@ public class Main
                         System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
                     }
                     else if( options.run() ){
+                        //This is for 621 example
                         FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, DefiniteAssignment.class );
                         System.out.println( testTool.run());
                     }
