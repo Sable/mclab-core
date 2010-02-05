@@ -7,6 +7,7 @@ import natlab.server.*;
 import natlab.toolkits.analysis.ForVisitor;
 
 import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.example.*;
 
 /*import matlab.MatlabParser;
 import matlab.TranslationProblem;
@@ -26,6 +27,7 @@ import java.net.*;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -299,7 +301,8 @@ public class Main
                     //Plain cmd line mode
 
                     //parse each file and put them in a list of Programs
-                    LinkedList<Program> programs = new LinkedList<Program>();
+                    ArrayList<Program> programs = new ArrayList<Program>( options.getFiles().size() );
+                    ArrayList<String> fileNames = new ArrayList<String>( options.getFiles().size() );
                     
                     for( Object o : options.getFiles() ){
                         //When processing files there are currently two options.
@@ -312,6 +315,8 @@ public class Main
                         //the correct value.
                         String file = (String) o;
                         Reader fileReader = new StringReader("");
+
+                        fileNames.add( file );
 			
                         //checks if dependence analysis flag is set.
                         //If the flag is set then the type of dependence test that needs to be applied.
@@ -403,7 +408,38 @@ public class Main
                     else if( options.pretty() ){
                         if( !quiet )
                             System.err.println("Pretty Printing");
-                        System.out.println(cu.getPrettyPrinted());
+
+                        //NOTE: This might be fragile, what if Program nodes are removed?
+                        if( options.od().length() > 0 ){
+                            File outputDir = new File( options.od() );
+                            try{
+                                if( !outputDir.exists() && !outputDir.mkdirs() ){
+                                    System.err.println( "Could not create output directory." );
+                                    System.err.println( "Some directories may have been created though." );
+                                    System.exit(1);
+                                }
+                            }catch( SecurityException e ){
+                                System.err.println( "Security error, is there a security manager active?" );
+                                System.err.println( e );
+                                System.exit(1);
+                            }
+                            FileWriter outFile;
+                            String fileName;
+                            for( int i = 0; i<fileNames.size(); i++ ){
+                                    fileName = (new File(fileNames.get(i)) ).getName();
+                                try{
+                                    outFile = new FileWriter( new File( outputDir, fileName ) );
+                                    outFile.write( cu.getProgram(i).getPrettyPrinted() );
+                                    outFile.close();
+                                }catch( IOException e ){
+                                    System.err.println( "Problem writing to file "+new File( outputDir, fileName ) );
+                                    System.err.println( e );
+                                    System.exit(1);
+                                }
+                            }
+                        }
+                        else
+                            System.out.println(cu.getPrettyPrinted());
                     }
                     else if( options.vfpreorder() ){
                         VFPreorderAnalysis a = new VFPreorderAnalysis( cu );
@@ -413,6 +449,31 @@ public class Main
 
                         FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, VFStructuralForwardAnalysis.class );
                         System.out.println( testTool.run() );
+
+                        System.out.println( "********\ndoing vf data collection");
+                        VFDataCollector vfdata = new VFDataCollector( cu );
+                        vfdata.analyze();
+
+                        System.out.println( "********\ndoing use data collection");
+                        UseDataCollector udata = new UseDataCollector( cu );
+                        udata.analyze();
+
+                        System.out.println( "********\ndoing assigned data collection");
+                        AssignedDataCollector adata = new AssignedDataCollector( cu );
+                        adata.analyze();
+
+                        System.out.println( "use "+udata.getCurrentSet().toString() );
+                        System.out.println( "v or f"+vfdata.getCurrentSet().toString() );
+
+                        int[] counts = vfdata.countData("USE");
+                        System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
+                        System.out.println( "assigned "+adata.getCurrentSet().toString() );
+                        counts = adata.countData("USE");
+                        System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
+                    }
+                    else if( options.run() ){
+                        FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, DefiniteAssignment.class );
+                        System.out.println( testTool.run());
                     }
                 }
             }
@@ -611,9 +672,17 @@ public class Main
                     String delim = "],[";
                     for( String error : parser.getErrors()){
                         //return an array of string with {line, column, msg}
-                        String[] message = error.split(delim);
-                        CompilationProblem Parsercerror = new CompilationProblem(Integer.valueOf(message[0]).intValue(),Integer.valueOf(message[1]).intValue(),message[3]);
-                        errList.add(Parsercerror);}
+                        CompilationProblem parserError;
+                        try{
+                            String[] message = error.split(delim);
+                            parserError = new CompilationProblem( Integer.valueOf(message[0]).intValue(),
+                                                                  Integer.valueOf(message[1]).intValue(),
+                                                                  message[3]);
+                        }
+                        catch( PatternSyntaxException e ){
+                            parserError = new CompilationProblem( error );
+                        }
+                        errList.add(parserError);}
                     prog = null;
                 }
                 return prog;
