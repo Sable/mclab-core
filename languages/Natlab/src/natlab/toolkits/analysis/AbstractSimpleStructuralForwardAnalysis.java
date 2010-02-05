@@ -39,6 +39,28 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
     }
 
     /**
+     * A simple implementation of caseCondition. It simply treats it
+     * as an expression.
+     */
+    public void caseCondition( Expr condExpr )
+    {
+        caseExpr( condExpr );
+    }
+    public void caseLoopVarAsCondition( AssignStmt node )
+    {
+        caseAssignStmt( node );
+    }
+    public void caseLoopVarAsInit( AssignStmt node )
+    {
+        caseAssignStmt( node );
+    }
+    public void caseLoopVarAsUpdate( AssignStmt node )
+    {
+        caseAssignStmt( node );
+    }
+
+
+    /**
      * A simple implementation of processBreaks. It merges all break
      * sets into a single set and returns it.
      */
@@ -76,4 +98,5 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         }
         return mergedSets;
     }
+
 }
