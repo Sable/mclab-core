@@ -115,4 +115,9 @@ public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends Abst
 
     public abstract void caseCondition( Expr condExpr );
     public abstract A newInitialFlow();
+
+    public void caseSwitchExpr( Expr switchExpr )
+    {
+        caseExpr( switchExpr );
+    }
 }

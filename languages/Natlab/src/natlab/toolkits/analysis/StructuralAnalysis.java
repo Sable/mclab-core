@@ -115,5 +115,27 @@ public interface StructuralAnalysis<A extends FlowSet> extends Analysis<A>
      */
     public void caseLoopVarAsCondition( AssignStmt loopVar );
 
+    /**
+     * Process the condition expression of a loop or an if. 
+     *
+     * @param condExpr  The condition expression.
+     */
+    public void caseCondition( Expr condExpr );
+
+    /**
+     * Process the main expression of a case statement. This is the
+     * expression that you get as part of the switch header e.g.
+     *<pre>
+     * switch switchExpr
+     *   case caseExpr
+     *     ....
+     * end
+     *</pre>
+     * 
+     *
+     * @param switchExpr  The switch expression to process.
+     */
+    public void caseSwitchExpr( Expr switchExpr );
+
 }
 

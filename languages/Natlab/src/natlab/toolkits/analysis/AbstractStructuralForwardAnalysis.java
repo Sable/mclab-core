@@ -57,6 +57,23 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         loopStack.push( loopFlowsets );
         return loopFlowsets;
     }
+
+    protected A backupOutSet(A outSet)
+    {
+        A backup = newInitialFlow();
+        copy( outSet, backup );
+        return backup;
+    }
+    protected A mergeOuts( A outSet, A newSet )
+    {
+        A merged = newInitialFlow();
+        if( newSet == null )
+            copy( outSet, merged );
+        else
+            merge( outSet, newSet, outSet );
+        return outSet;
+    }
+
     public void caseForStmt( ForStmt node)
     {
         if(DEBUG)
@@ -71,7 +88,8 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
 
         //note In for loopVar as init will be loopInSet
         caseLoopVarAsInit( loopVar );
-        
+        loopInSet = currentOutSet; //the in for the rest of the loop will be the out of init
+
         currentInSet = currentOutSet;
         caseLoopVarAsCondition( loopVar );
 
@@ -82,28 +100,18 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         A mergedOut;
         A newOut;
         
+
+        newOut = currentOutSet;
         if(DEBUG)
             System.out.println( "  forstmt: starting fixed point");
         do{
-            //Store the current out in previousOut for later
-            //comparison
-            previousOut = newInitialFlow();
-            copy( currentOutSet, previousOut );
-
-            //initialize the continue and break lists
+            previousOut = backupOutSet( newOut );
             loopFlowsets.initLists();
             
-            //analyze the body and collect the continue sets, merge
-            //them into one out
             analyze( body );
             continueSet = processContinues();
-            mergedOut = newInitialFlow();
-            if( continueSet == null )
-                copy(currentOutSet, mergedOut);
-            else
-                merge(currentOutSet, continueSet, mergedOut);
+            mergedOut = mergeOuts( currentOutSet, continueSet );
 
-            //setup the current out as the merged out
             //this is the current out before processing the update
             currentOutSet = mergedOut;
 
@@ -112,26 +120,17 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             
             caseLoopVarAsUpdate( loopVar );
 
-            //setup in for loop var as condition, in = out of update
-            // merged with loop in
-            //TODO-JD: Does this even make sense? The three cases
-            // should have split in and out sets somehow, ah well, not
-            // really possible for matlab semantics is it?
             merge( loopInSet, currentOutSet, currentOutSet );
             currentInSet = currentOutSet;
             
             caseLoopVarAsCondition( loopVar );
 
-            //merge the loop var as condition out and break sets
-            //use for new out
             breakSet = processBreaks();
             mergedOut = newInitialFlow();
-            if( breakSet == null )
-                copy( currentOutSet, mergedOut );
-            else
-                merge( currentOutSet, breakSet, mergedOut );
-            newOut = mergedOut;
-            //newOut is the new out of the entire loop
+            mergedOut = mergeOuts( currentOutSet, breakSet );
+            newOut = mergedOut;  //newOut is the new out of the entire loop
+
+            currentOutSet = newOut;
 
             //loop until there is no change
         }while( !previousOut.equals( newOut ) );
