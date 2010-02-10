@@ -7,13 +7,15 @@
 <project name="CodeGen">
 
 	<!-- generates Java files from JastAdd specs -->
-	<target name="jastadd2" depends="def.jastadd.task">
+<!-- THE SAME AS TARGET jastadd IN GEN.XML EXCEPT DIF -->
+        <target name="jastadd2" depends="def.jastadd.task">
 		<mkdir dir="${gen.dir}/${ast.pkg}" />
 		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
 			<fileset dir="${src.dir}">
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
+				<!-- DIFF: these excludes don't exist on jastadd -->
 				<exclude name="**/Annotations.jrag" />
 				<exclude name="**/NameResolution.jrag" />
 				<exclude name="**/NameResolution.jadd" />
@@ -31,6 +33,9 @@
 		</jastadd>
 	</target>
 	
+
+
+<!-- THIS SHOULD BE THE SAME AS THE parser TARGET IN GEN.XML -->        
 	<target name="parser" depends="def.beaver.task">
                 <mkdir dir="${gen.dir}/parser"/>
                 <!-- generate the parser phase 1, create a full .lalr specification from fragments-->
@@ -49,13 +54,15 @@
 	
 	
 
+
+
 	<!-- jflex, beaver, jastadd, and options 
-	<target name="gen2" depends="jflex, beaver, jastadd2" />
--->
+	<target name="gen2" depends="jflex, beaver, jastadd2" />-->
 	<!-- Gen - parser+beaver: jflex, parser+beaver, jastadd, and options -->
+<!-- SAME AS gen IN gen.xml -->
         <target name="gen2" depends="jflex, parser, jastadd2" />
 	
-	
+<!-- SAME AS compile IN compile.xml EXCEPT DIFF-->
 	<target name="compile2" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${basedir}/${ant.bin.dir}">
@@ -64,6 +71,7 @@
 			<src path="${gen.dir}" />
 			<src path="${test.dir}" />
 			<include name="**/*.java" />
+<!-- THIS FILE WAS EXCLUDED -->
 			<exclude name="**/LookupLValue*.java" />
 		</javac>
 	</target>
