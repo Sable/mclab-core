@@ -19,14 +19,6 @@ aspect LValue
     }
 
     syn lazy Set<String> Stmt.getLValues() = new LinkedHashSet<String>();
-    syn Set<String> Expr.getSymbols() = new LinkedHashSet<String>();
-
-    syn Set<String> Name.getSymbols()
-    {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
-        names.add( getID() );
-        return names;
-    }
 
 
     //getLValues equations for Statements
@@ -100,6 +92,27 @@ aspect LValue
         return names;
     }
    
+    syn Set<String> ASTNode.getSymbols()
+    {
+        Set<String> symbols = new LinkedHashSet<String>();
+        for( int i = 0; i<getNumChild(); i++ )
+            symbols.addAll( getChild(i).getSymbols() );
+        return symbols;
+    }
+    syn Set<String> Expr.getSymbols()
+    {
+        Set<String> symbols = new LinkedHashSet<String>();
+        for( int i = 0; i<getNumChild(); i++ )
+            symbols.addAll( getChild(i).getSymbols() );
+        return symbols;
+    }
+
+    syn Set<String> Name.getSymbols()
+    {
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.add( getID() );
+        return names;
+    }
 
     //getSymbols equations for Expressions
     eq NameExpr.getSymbols() = getName().getSymbols();
