@@ -22,7 +22,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         //visit each child node in backwards order
         for( int i = node.getNumChild()-1; i>=0; i-- ){
             if( node.getChild(i) != null )
-                node.getChild(i).analyze( this );
+                analyze( node.getChild(i) );
         }
     }
 
@@ -50,14 +50,14 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         loop.setContinueInFlow( currentOutSet );
     }
 
-    protected A saveLoopInSet( ASTNode node )
+    protected A saveInSet( ASTNode node )
     {
         A inSet = newInitialFlow();
         copy( currentInSet, inSet );
         inFlowSets.put( node, inSet );
         return inSet;
     }
-    protected A backupOutSet(A outSet)
+    protected A backupSet(A outSet)
     {
         A backup = newInitialFlow();
         copy( outSet, backup );
@@ -74,7 +74,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
         loopStack.push(new LoopFlowsets(node));
 
-        A loopInSet = saveLoopInSet( node );
+        A loopInSet = saveInSet( node );
 
 
         A previousOutSet = newInitialFlow();
@@ -83,7 +83,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         caseLoopVarAsCondition(loopVar);
 
         do {
-            previousOutSet = backupOutSet( currentOutSet );
+            previousOutSet = backupSet( currentOutSet );
             currentInSet = currentOutSet;
             caseLoopVarAsUpdate( loopVar );
             setupContinues();
@@ -98,7 +98,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         currentInSet = currentOutSet;
         caseLoopVarAsInit(loopVar);
 
-        outFlowSets.put(node, currentOutSet);
+        outFlowSets.put(node, backupSet( currentOutSet ) );
 
         loopStack.pop();
     }
@@ -111,7 +111,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
         loopStack.push(new LoopFlowsets(node));
 
-        A loopInSet = saveLoopInSet( node );
+        A loopInSet = saveInSet( node );
 
         A previousOutSet = newInitialFlow();
 
@@ -120,7 +120,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
         do {
 
-            previousOutSet = backupOutSet( currentOutSet );
+            previousOutSet = backupSet( currentOutSet );
             currentInSet = currentOutSet;
             setupContinues();
             
@@ -134,10 +134,47 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
         }while(!previousOutSet.equals(currentOutSet));
 
-        outFlowSets.put(node, currentOutSet);
+        outFlowSets.put(node, backupSet( currentOutSet ) );
 
         loopStack.pop();
     }
+
+    public void caseIfStmt( IfStmt node )
+    {
+
+        Expr condition;
+        ASTNode body;
+        
+
+        A ifInSet = saveInSet( node );
+
+        //ifInSet = backupSet( ifInSet );
+
+        A mergedOuts = null;
+
+        A previousOut = backupSet( ifInSet );
+
+        if( node.hasElseBlock() ){
+            ElseBlock block = node.getElseBlock();
+            body = block.getStmts();
+            currentOutSet = backupSet( ifInSet );
+            analyze( body );
+            previousOut = currentOutSet;
+        }
+        for( int i = node.getNumIfBlock()-1; i>=0; i-- ){
+            currentOutSet = backupSet( ifInSet );
+            body = node.getIfBlock(i).getStmts();
+            analyze( body );
+            currentInSet = newInitialFlow();
+            merge( previousOut, currentOutSet, currentInSet );
+            condition = node.getIfBlock(i).getCondition();
+            caseCondition( condition );
+            previousOut = currentOutSet;
+        }
+
+        outFlowSets.put( node, backupSet( currentOutSet ) );
+    }
+
 
     /**
        Represents the information associated with the containing loops
