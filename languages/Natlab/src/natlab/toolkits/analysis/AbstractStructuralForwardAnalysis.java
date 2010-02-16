@@ -23,6 +23,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         if( DEBUG ){
             System.out.println( "caseASTNode for node type " + node.getClass());
         }
+        currentOutSet = currentInSet;
         //visit each child node in forward order
         for( int i = 0; i<node.getNumChild(); i++ ){
             if( node.getChild(i) != null )
@@ -43,7 +44,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
     public abstract A processBreaks();
     public abstract A processContinues();
 
-    protected A saveLoopInSet( ForStmt node )
+    protected A saveInSet( ASTNode node )
     {
         A inSet = newInitialFlow();
         copy( currentInSet, inSet );
@@ -58,7 +59,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         return loopFlowsets;
     }
 
-    protected A backupOutSet(A outSet)
+    protected A backupSet(A outSet)
     {
         A backup = newInitialFlow();
         copy( outSet, backup );
@@ -84,7 +85,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         AssignStmt loopVar = node.getAssignStmt();
         ASTNode body = node.getStmts();
 
-        A loopInSet = saveLoopInSet( node );
+        A loopInSet = saveInSet( node );
 
         //note In for loopVar as init will be loopInSet
         caseLoopVarAsInit( loopVar );
@@ -105,7 +106,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         if(DEBUG)
             System.out.println( "  forstmt: starting fixed point");
         do{
-            previousOut = backupOutSet( newOut );
+            previousOut = backupSet( newOut );
             loopFlowsets.initLists();
             
             analyze( body );
@@ -232,18 +233,14 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         Expr condition;
         ASTNode body;
 
-        //copy and save the inset
-        A ifInSet = newInitialFlow();
-        copy( currentInSet, ifInSet );
-
-        inFlowSets.put( node, ifInSet );
+        A ifInSet = saveInSet( node );
 
         //setup mergedOuts to capture the outs of each branch
         A mergedOuts = null;
 
         //setup nextIn to be the in for the next block
         //initialize with the ifInSet
-        A nextIn = (A)(ifInSet.clone());
+        A nextIn = backupSet( ifInSet );
 
         //process each IfBlock
         for( IfBlock block : node.getIfBlocks() ) {
@@ -251,36 +248,16 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
                 System.out.println( "if block" );
             condition = block.getCondition();
             body = block.getStmts();
-
-            //process condition
-            currentInSet = (A)(nextIn.clone());
+            currentInSet = backupSet( nextIn );
             caseCondition( condition );
-            
-            //store the out of the condition as the in for the next
-            //block
-            nextIn = (A)(currentOutSet.clone());
-
-            currentInSet = nextIn;
-            if( DEBUG )
-                System.out.println( "!in before body"+currentInSet );
-            //process body
+            nextIn = backupSet( currentOutSet );
+            currentOutSet = backupSet( nextIn );
             analyze( body );
-            if( DEBUG ){
-                System.out.println( "!in after body"+currentInSet );
-                System.out.println( "!out after body"+currentOutSet );
-            }
-            //merge out with previous outs
             if( mergedOuts == null ){
-                mergedOuts = (A)(currentOutSet.clone());
-                if(DEBUG)
-                    System.out.println( "first mergedOuts is " + mergedOuts.toString() );
+                mergedOuts = backupSet( currentOutSet );
             }
             else{
-                if(DEBUG)
-                    System.out.println("merging " + currentOutSet.toString() );
                 merge( currentOutSet, mergedOuts, mergedOuts );
-                if(DEBUG)
-                    System.out.println("result " + mergedOuts.toString());
             }
         }
         //if an elseBlock exists, process it, otherwise merge the

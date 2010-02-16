@@ -19,6 +19,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         if( DEBUG ){
             System.out.println( "caseASTNode" );
         }
+        currentOutSet = currentInSet;
         //visit each child node in backwards order
         for( int i = node.getNumChild()-1; i>=0; i-- ){
             if( node.getChild(i) != null )
@@ -147,8 +148,6 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
         
 
         A ifInSet = saveInSet( node );
-
-        //ifInSet = backupSet( ifInSet );
 
         A mergedOuts = null;
 
