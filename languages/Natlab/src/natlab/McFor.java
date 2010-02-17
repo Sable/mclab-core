@@ -375,6 +375,12 @@ public class McFor {
                 return name.startsWith(".m", name.length()-2);
             }
         };
+		FilenameFilter nfileFilter = new FilenameFilter() {
+		    public boolean accept(File file, String name) {
+		        return name.startsWith(".n", name.length()-2);
+		    }
+		};
+	    // Don't enter sub-folder, because '.svn' bothers the program
 
 	    // Don't enter sub-folder, because '.svn' bothers the program
 	    File[] subFolders = null;	//  mainFolder.listFiles(fileFilter);
@@ -386,7 +392,6 @@ public class McFor {
     	// Traverse all sub-folders
     	for(File dir : subFolders) {
 		    String[] children = dir.list(mfileFilter);
-    		System.out.println("translate dir: "+dir+" ("+children.length+" files)");
 	        for (int i=0; i<children.length; i++) {
 	        	if(children[i].equals(TEMP_M_FILENAME))
 	        		continue;
@@ -394,6 +399,20 @@ public class McFor {
 	            String nfilename = translateFile(filename);
 	            filelist.add(nfilename);
 	        }
+
+	        // If there is no .m file, checking .n files
+	        if(children.length==0 || filelist.size()==0) {
+	        	children = dir.list(nfileFilter);
+		        for (int i=0; i<children.length; i++) {
+		        	if(children[i].equals(TEMP_M_FILENAME))
+		        		continue;
+		        	String filename = dir.getAbsolutePath()+PATH_STRING+children[i];
+		            String nfilename = translateFile(filename);
+		            filelist.add(nfilename);
+		        }
+    		}
+
+    		System.out.println("translate dir: "+dir+" ("+filelist.size()+" files)");
 	        
 	        // Because for files in a folder, we assume 'drv_' is the main program, thus,
 	        // we rearrange the order of the files, make the first one to be the main program
