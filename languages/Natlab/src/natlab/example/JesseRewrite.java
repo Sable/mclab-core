@@ -46,7 +46,7 @@ public class JesseRewrite
 
         return ifstmt;
     }
-    public static Stmt genIncrement(int inc)
+    public static Stmt genIncrement()
     {
         Name jessecount1 = new Name("JESSECOUNT");
         Name jessecount2 = new Name("JESSECOUNT");
@@ -92,6 +92,8 @@ public class JesseRewrite
                     node.insertChild( newChild.getChild( j ), i );
                     i++;
                 }
+                if( newChild.getNumChild() > 0 )
+                  i--;
             }
             else
                 node.setChild( newChild, i );
@@ -101,7 +103,7 @@ public class JesseRewrite
 
     public static ASTNode instrumentAssignStmt( AssignStmt node )
     {
-        boolean hasJesse = false
+        boolean hasJesse = false;
         for( String s: node.getLValues() ){
             if( s.equals("jesse") ){
                 hasJesse = true;
