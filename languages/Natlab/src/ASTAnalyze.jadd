@@ -252,4 +252,9 @@ aspect ASTAnalyze
     {
         visitor.caseFunctionDecl(this);
     }
+    public void Row.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseRow(this);
+    }
+
 }
