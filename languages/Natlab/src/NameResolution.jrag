@@ -161,6 +161,7 @@ aspect NameResolution{
     // Adding Declaration nodes
     
     private boolean Script.doneDeclRewrite = false;
+    /* adding these nodes breaks McFor
     rewrite Script{
         when( getParent()!=null && doDeclRewrite() && !doneDeclRewrite )
         to Script{
@@ -177,7 +178,7 @@ aspect NameResolution{
                     System.out.println(symbol + "'s type is null after instanciation");
                 else
                     System.out.println(symbol + "'s type is not null after instanciation");
-                */
+                // * /
             }
             for( int i=0; i<getNumStmt(); i++ ){
                 s.addStmt( getStmt(i) );
@@ -186,7 +187,9 @@ aspect NameResolution{
             return s;
         }
     }
+    */
 
+    /*
     rewrite Function{
         when( getParent()!=null && doDeclRewrite() && !(this instanceof FunctionDecl) )
         to FunctionDecl{
@@ -221,6 +224,9 @@ aspect NameResolution{
             return f;
         }
     }
+    */
+
+
     //syn boolean ASTNode.doRewrite() = getParent().doRewrite();
     //eq Program.doRewrite() = canDoRewrites;
     inh boolean ASTNode.doDeclRewrite();
