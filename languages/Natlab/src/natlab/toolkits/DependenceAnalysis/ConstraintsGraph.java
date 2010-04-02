@@ -1,52 +1,32 @@
 package natlab.toolkits.DependenceAnalysis;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 
 public class ConstraintsGraph {
-	private Map<String,ConstraintsList> cMap;
+	private Map<String,LinkedList> cMap;
 	
 	public ConstraintsGraph()
 	{
-		cMap=new HashMap<String,ConstraintsList>(); //create a new hash map;		
+		//cMap=new HashMap<String,ConstraintsList>(); //create a new hash map;		
+		cMap=new HashMap<String,LinkedList>(); //create a new hash map;
 	}
 	
 	//To DO:handle case with constraint bounded on both sides by variables.
 	public void addToGraph(AffineExpression aExpr1,AffineExpression aExpr2)
 	{
 		
-		ConstraintsList cList1=new ConstraintsList();
-		ConstraintsList subList1=new ConstraintsList();
-		subList1.insertAtFront(aExpr2);
-		cList1.insertAtFront(aExpr1,subList1);		
-		//cList1.insertAtFront(aExpr1,null);		
-		cMap.put(aExpr1.getKey(), cList1);
+		////ConstraintsList cList1=new ConstraintsList();
+		//ConstraintsList subList1=new ConstraintsList();
+		//subList1.insertAtFront(aExpr2);
+		//cList1.insertAtFront(aExpr1,subList1);		
+		//cList1.insertAtFront(aExpr1,null);	
+		LinkedList<AffineExpression> cList=new LinkedList<AffineExpression>();
+		cList.add(aExpr1);
+		cList.add(aExpr2);
+		cMap.put(aExpr1.getKey(), cList);
 		
-		//System.out.println("********\n" + cMap + "\n******");
-		
-		
-		/*if (cMap.size() > 1)
-		{
-			ConstraintsList l = cMap.get(new String("t0"));
-			if ( l != null )
-			{
-				System.out.println("%%%%%\n" + l + "\n%%%%%");
-			}
-			
-			 l = cMap.get(new String("t1"));
-			if ( l != null )
-			{
-				System.out.println("%%%%%\n" + l + "\n%%%%%");
-			}
-		}*/
-		
-		//cMap.put(aExpr1.getKey(), aExpr2.getLoopVariable());
-		//System.out.println("aExpr1 variable is"+cList1.getInsertItem().getLoopVariable() + " "+ aExpr1.getKey() + " " +aExpr1.getC());
-		/*ConstraintsList cList2=new ConstraintsList();
-		cList2.insertAtFront(aExpr2);
-		cMap.put(aExpr2.getKey(), cList2);
-		System.out.println("aExpr2 variable is"+aExpr2.getKey());*/
-		//temp();
-		
+				
 	}
 	/*public void temp()
 	{

@@ -25,13 +25,13 @@ public class AcyclicTest {
 	private boolean isApplicable;
 	private AffineExpression tExpr1;
 	private AffineExpression tExpr2;
-	private RandomAccessFile raf;	
-	public AcyclicTest(RandomAccessFile rf)
+	private File file;	
+	public AcyclicTest()
 	{
 		isApplicable=false;
 		tExpr1=null;
 		tExpr2=null;
-		raf=rf;
+		//file=f;
 	
 	}
 	public boolean getisApplicable()
@@ -42,10 +42,10 @@ public class AcyclicTest {
 	/*
 	 * This function writes to file the results of Acylic test.
 	 */
-	private void writeToFile()
+	/*private void writeToFile()
 	{
 		if(isApplicable){
-			  try{raf.writeBytes("Applying Acylic Test:" +'\n');
+			  /*try{raf.writeBytes("Applying Acylic Test:" +'\n');
 			      raf.writeBytes("Acylic Test is valid for the set of constraints" +'\n');
 	 	      }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
 	 	    }//end of if  
@@ -54,7 +54,7 @@ public class AcyclicTest {
 		      raf.writeBytes("Acylic Test is not valid for the set of constraints" +'\n');
 		      }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch	    	
 		    }
-	}
+	}*/
 	
 	/* 
 	 *  This function does the following
@@ -133,7 +133,7 @@ public class AcyclicTest {
            //  }//end of else
          }//end of 1st if statement
         }//end of while
-        writeToFile();
+        //writeToFile();
 		return cGraph;		
   }//end of makeSusbtituitionForVariable function.
 	
