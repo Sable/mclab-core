@@ -9,6 +9,7 @@ import ast.*;
 public interface NodeCaseHandler
 {
     public void caseASTNode(ASTNode node);
+    public void caseList(List node);
     public void caseProgram(Program node);
     public void caseBody(Body node);
     public void caseFunctionOrSignatureOrPropertyAccessOrStmt(FunctionOrSignatureOrPropertyAccessOrStmt node);

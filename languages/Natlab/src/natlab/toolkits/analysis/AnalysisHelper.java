@@ -36,6 +36,11 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         helpee.caseASTNode( node );
     }
+    public void caseList( List node )
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseList( node );
+    }
     public void caseProgram(Program node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );

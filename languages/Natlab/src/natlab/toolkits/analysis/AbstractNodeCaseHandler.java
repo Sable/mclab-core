@@ -10,6 +10,10 @@ public abstract class AbstractNodeCaseHandler implements NodeCaseHandler
 {
     public abstract void caseASTNode(ASTNode node);
 
+    public void caseList(List node)
+    {
+        caseASTNode(node);
+    }
     public void caseProgram(Program node)
     {
         caseASTNode(node);
