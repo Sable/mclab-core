@@ -125,6 +125,7 @@ private boolean isRangeInfo() {
 public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector){	
 	
 	boolean aFlag=false;
+	LinkedList aList[]=new LinkedList[dData.getNestingLevel()];
 	if(!pTable.isEmpty()){
 		if(pTable.containsKey(Float.toString(dData.getLoopNo()))) setRangeInfo(true);	
     } 
@@ -139,9 +140,14 @@ public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,V
    	    	if(aExpr.getVarName().equals(tExpr.getVarName())){      	    		   
     		   //System.out.println("I am in parameterized expression");
 		       //System.out.println(((ParameterizedExpr)tExpr).getPrettyPrinted());
-   	    	   if(isRangeInfo()){
-   	    		  
+   	    		
+   	    	   if(isRangeInfo()){ //TODO:Need to take this out of this function,doesnot need to it for each access in a statement   	    		  
+   	    		  for(int i=0;i<dData.getNestingLevel();i++){
+   	    			  String key=Float.toString(dData.getLoopNo())+Integer.toString(i);
+   	    		 	  aList[i]=pTable.get(key);
+   	    		 }
    	    	   }
+   	    	  
     		   DependenceData tdData=new DependenceData();
 		 	   tdData.setLoopNo(dData.getLoopNo());
 		 	   tdData.setNestingLevel(dData.getNestingLevel());
@@ -393,9 +399,7 @@ private void tokenizeExpression(Expr expr, Vector<ParameterizedExpr> result)
 		
 		
 private void setBounds(AffineExpression aExpr,AffineExpression bExpression,DependenceData dData){
-	for(int i=0;i<pTable.size();i++){
-		
-	}
+	//LinkedList tList
 }
 		
 
