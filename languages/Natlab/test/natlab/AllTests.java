@@ -26,6 +26,10 @@ public class AllTests {
 		suite.addTestSuite(XMLCommandPassTests.class);
 
                 suite.addTestSuite(FunctionVFDatumTest.class);
+
+                //rewrite tests
+                suite.addTestSuite(RewriteTests.class);
+
 		//$JUnit-END$
 		return suite;
 	}
