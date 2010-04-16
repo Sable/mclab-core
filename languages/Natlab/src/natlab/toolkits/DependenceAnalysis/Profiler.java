@@ -3,6 +3,8 @@ import ast.*;
 import natlab.toolkits.analysis.ForVisitor;
 import natlab.IntNumericLiteralValue;
 import java.math.*;
+import java.util.StringTokenizer;
+
 import natlab.NumericLiteralValue;
 
 //TODO:Write all the code and then start inserting into the location.
@@ -27,14 +29,17 @@ public class Profiler {
 		return fileName;
 	}
 	public void setFileName(String fName) {
-		this.fileName ="";		
+		StringTokenizer st = new StringTokenizer(fName,".");		
+		fileName=st.nextToken();
+		System.out.println(fileName);
+		/*this.fileName ="";		
 		for(int i=0;i<fName.length();i++)
 		{
 		  char ch=fName.charAt(i);	
 		  if(ch=='.') break;
 		  else fileName+=ch;		  
 		}
-		fileName.trim();		
+		fileName.trim();*/		
 	}
 	public Profiler()
 	{     

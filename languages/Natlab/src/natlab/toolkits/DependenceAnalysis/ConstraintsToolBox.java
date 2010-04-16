@@ -14,7 +14,10 @@ import ast.PlusExpr;
 import ast.RangeExpr;
 import ast.Stmt;
 import ast.MTimesExpr;
+
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,6 +32,7 @@ import org.w3c.dom.NodeList;
 
 import ast.MDivExpr;
 import ast.BinaryExpr;
+import ast.Function;
 
 /*
  * Author:Amina Aslam
@@ -44,64 +48,86 @@ public class ConstraintsToolBox {
 	//private String dependencyFlag="No";
 	private ForStmt forStmtArray[];
 	private static int loopIndex=0;
-	private static boolean resultArray[];
+	//private static boolean resultArray[];
 	private ConstraintsGraph cGraph;
+	private Hashtable<String,LinkedList<PredictedData>> pTable;
+	private boolean rangeInfo=false;
+	//private float loopNo;
+	//private Vector<DependenceData> dataVector;
 	
 	//private Expr newExpr;
 	//private Expr teExpr;
+
+/*public float getLoopNo() {
+	return loopNo;
+}
+
+public void setLoopNo(float loopNo) {
+	this.loopNo = loopNo;
+}*/
+
+public ConstraintsToolBox(){
+	cGraph=new ConstraintsGraph();
+}
+
 	
-	
-public ConstraintsToolBox(int index,ForStmt fStmtArray[])
+/*public Hashtable<String, LinkedList<PredictedData>> getPTable() {
+		return pTable;
+}*/
+
+
+public void setPTable(Hashtable<String, LinkedList<PredictedData>> table){
+		pTable = table;
+		
+}
+public ForStmt[] getForStmtArray() {
+	return forStmtArray;
+}
+
+
+public void setForStmtArray(ForStmt[] forStmtArray) {
+	this.forStmtArray = forStmtArray;
+}
+
+
+public static int getLoopIndex() {
+	return loopIndex;
+}
+
+
+public static void setLoopIndex(int loopIndex) {
+	ConstraintsToolBox.loopIndex = loopIndex;
+}
+private void setRangeInfo(boolean rangeInfo) {
+	this.rangeInfo = rangeInfo;
+}
+private boolean isRangeInfo() {
+	return rangeInfo;
+}
+
+
+/*public ConstraintsToolBox(int index,ForStmt fStmtArray[])
 {
 		cGraph=new ConstraintsGraph();
 		loopIndex=index;
 		forStmtArray=new ForStmt[index];
 		forStmtArray=fStmtArray;
+		//dataVector=new Vector<DependenceData>();
 		
-}
-private void writeToXMLFile(Expr aExpr,Expr bExpr,File file,int loopNumber){
-	
-	DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder documentBuilder;
-    Document document;
-	try {
-		documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		document = documentBuilder.parse(file);
-	
-	
-    Node rootNode = document.getDocumentElement();
-    NodeList nList=rootNode.getChildNodes();
-    for(int i=0;i<nList.getLength();i++){
-    	Node tNode=(Node)nList.item(i);
-    	NamedNodeMap nMap=tNode.getAttributes();
-    	Node node=(Node)nMap.getNamedItem("Number");
-    	if(node.getNodeValue().equals(Integer.toString(loopNumber))){           	             
-            Element newNode = document.createElement("ArrayAccess");
-            newNode.setAttribute(new String("access"),aExpr.getPrettyPrinted()+"	"+bExpr.getPrettyPrinted());
-            newNode.setAttribute(new String("DistanceValue"),aExpr.getPrettyPrinted()+"	"+bExpr.getPrettyPrinted());
-            tNode.appendChild(newNode);
-            document.appendChild(rootNode); // add the rootElement to the document
-    	}//end of if
-     }//end of for  
-	}catch (Exception e) {		
-		e.printStackTrace();
-	}
-    
-	
-}
-	
-		
+}*/
+
 	/*
 	 * This function checks whether accessed arrays are the same or not.
 	 * e.g. for int i=1:1:10
 	 *  		a(i,j)=a(i+10,j-9)
 	 *  	end
 	 */	
-public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData)
- {		 
+public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector){	
 	
-	//System.out.println(params.toString()+ " size:: "+params.size());
-	boolean aFlag=false;	
+	boolean aFlag=false;
+	if(!pTable.isEmpty()){
+		if(pTable.containsKey(Float.toString(dData.getLoopNo()))) setRangeInfo(true);	
+    } 
 	if(aExpr instanceof ParameterizedExpr)
 	 { 	
 		Vector<ParameterizedExpr> params=new Vector<ParameterizedExpr>();
@@ -110,18 +136,26 @@ public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData)
    	    while(it.hasNext())	    		 
    	    {   
    	    	Expr tExpr=(Expr)it.next();   	    				
-   	    	if(aExpr.getVarName().equals(tExpr.getVarName()))
-			   {      	    		   
-   	    		   System.out.println("I am in parameterized expression");
-			       System.out.println(((ParameterizedExpr)tExpr).getPrettyPrinted());
-			 	   makeEquationsForSubscriptExprs(aExpr,tExpr,dData);
-			 	   dData.setArrayAccess(aExpr.getPrettyPrinted()+"	"+tExpr.getPrettyPrinted());
-			 	   //writeToXMLFile(aExpr,bExpr,f,loopNumber);
-			 	   if(ApplyTests()){
-			 		 dData.setDependence('y'); 
-				     aFlag=true;
-			 	   }
-			 	   else dData.setDependence('n');
+   	    	if(aExpr.getVarName().equals(tExpr.getVarName())){      	    		   
+    		   //System.out.println("I am in parameterized expression");
+		       //System.out.println(((ParameterizedExpr)tExpr).getPrettyPrinted());
+   	    	   if(isRangeInfo()){
+   	    		  
+   	    	   }
+    		   DependenceData tdData=new DependenceData();
+		 	   tdData.setLoopNo(dData.getLoopNo());
+		 	   tdData.setNestingLevel(dData.getNestingLevel());
+		 	   tdData.setStatementAccessed(dData.getStatementAccessed());
+		 	   makeEquationsForSubscriptExprs(aExpr,tExpr,tdData);
+		 	   tdData.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+tExpr.getPrettyPrinted());			 	  			 	   
+		 	   //System.out.println("I am tdData::::"+tdData.getArrayAccess());
+		 	   if(ApplyTests()){
+		 		 tdData.setDependence('y'); 
+			     aFlag=true;
+			     dataVector.add(tdData);
+			     //System.out.println("no of tdData"+tdData.toString());
+		 	   }
+		 	   else tdData.setDependence('n');
 			   }//end of if
    	    }//end of while
 	 }//end of if
@@ -327,7 +361,7 @@ return dFlag;
  */
 private void tokenizeExpression(Expr expr, Vector<ParameterizedExpr> result)
 {	
- 
+ System.out.println("I am same statement"+expr.getPrettyPrinted());
  if(expr instanceof NameExpr)
  {
 	 return;
@@ -343,6 +377,7 @@ private void tokenizeExpression(Expr expr, Vector<ParameterizedExpr> result)
 	 tokenizeExpression(mExpr.getLHS(), result);
 	 tokenizeExpression(mExpr.getRHS(), result);
   }//end of else if 
+  //else if(expr instanceof )
 }//end of function
 
 
@@ -354,10 +389,14 @@ private void tokenizeExpression(Expr expr, Vector<ParameterizedExpr> result)
 	  return cGraph;
 	}
 	else return null;
-}//end of function ConstraintsGraph
+}//end of function ConstraintsGraph*/
 		
 		
+private void setBounds(AffineExpression aExpr,AffineExpression bExpression,DependenceData dData){
+	for(int i=0;i<pTable.size();i++){
 		
+	}
+}
 		
 
 		
@@ -371,7 +410,7 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 {
 			
   ParameterizedExpr paraLHSExpr=(ParameterizedExpr)LHSExpr;
-  resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.
+  //resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.
   int size=paraLHSExpr.getNumArg();
   int[] array=new int[size];
   int count=0;
@@ -380,8 +419,7 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 		AffineExpression aExpr1=new AffineExpression();
 		AffineExpression aExpr2=new AffineExpression();					 
 		if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof PlusExpr)
-		 {
-			 
+		 {		 
 			 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
 			 PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 			 aExpr1.setLoopVariable(nExpr.getVarName());
@@ -392,14 +430,18 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 			 //PlusExpr pExpr=(PlusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
 			 aExpr2.setIndexExpr(pExpr.getLHS());
 			 aExpr2.setKey("t"+i);
-			 setUpperAndLowerBounds(aExpr1,aExpr2);
+			 if(isRangeInfo()){
+				 setBounds(aExpr1,aExpr2,dData);
+			 }
+			 else setUpperAndLowerBounds(aExpr1,aExpr2);//TODO:If range data is missing then call this function of upper and lower bounds,in the case where range data is present 
+			 //TODO:set the upper and lower bound with it.
 			 if(pExpr.getRHS() instanceof IntLiteralExpr)			
 			 {
 		    	 IntLiteralExpr iExpr=(IntLiteralExpr)pExpr.getRHS();				
-				 aExpr2.setC(iExpr.getValue().getValue().intValue()*-1);
+				 aExpr2.setC(iExpr.getValue().getValue().intValue());
 				 array[count]=aExpr1.getC()-aExpr2.getC();
 				 count++;
-				 System.out.println("PlusExpr "+ aExpr2.getC());
+				 //System.out.println("PlusExpr "+ aExpr2.getC());
 				 cGraph.addToGraph(aExpr1,aExpr2);							 
 			 }//end of nested if	
 		 }//end of main if			
@@ -422,7 +464,7 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 				 aExpr2.setC((iExpr.getValue().getValue().intValue()));
 				 array[count]=aExpr1.getC()+aExpr2.getC();
 				 count++;
-				 System.out.println("MinusExpr  "+aExpr2.getC());
+				 //System.out.println("MinusExpr  "+aExpr2.getC());
 				 cGraph.addToGraph(aExpr1,aExpr2);
 			 }//end of nested if	
 		   }//end of main else if
@@ -754,4 +796,11 @@ private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression a
 	}//end of 1st if
   }//end of for loop		
 }//end of setUpperAndLowerBounds function.
+
+
+
+
+
+
+
 }//end of class

@@ -9,12 +9,12 @@ import java.util.Map;
  */
 
 public class RangeMap {
-	private Map<LoopBounds,String> rMap;
+	private Map<ProfiledLoopBounds,String> rMap;
 	public RangeMap()
 	{
-		rMap=new HashMap<LoopBounds,String>(); //create a new hash map;		
+		rMap=new HashMap<ProfiledLoopBounds,String>(); //create a new hash map;		
 	}
-	public void createMapping(LoopBounds lBounds,String fileName)
+	public void createMapping(ProfiledLoopBounds lBounds,String fileName)
 	{		
 		rMap.put(lBounds, fileName);
 	}

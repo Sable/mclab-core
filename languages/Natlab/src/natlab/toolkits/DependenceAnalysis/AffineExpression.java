@@ -14,7 +14,21 @@ public class AffineExpression {
 	private Expr lowerBound;
 	private Expr upperBound;
 	private Expr indexExpr; //this is to handle variables in Affine Expression e.g. 2i+10.this variable would store 2i.
+	private int uBound;
+	private int lBound;
 	
+	public int getUBound() {
+		return uBound;
+	}
+	public int getLBound() {
+		return lBound;
+	}
+	public void setUBound(int bound) {
+		uBound = bound;
+	}
+	public void setLBound(int bound) {
+		lBound = bound;
+	}
 	public Expr getIndexExpr() {
 		return indexExpr;
 	}

@@ -5,7 +5,7 @@ package natlab.toolkits.DependenceAnalysis;
  * Author:Amina Aslam 
  */
 
-public class NestedLoop {
+public class ProfiledNestedLoop {
 	float loopNo;
 	int startRange;
 	int endRange;

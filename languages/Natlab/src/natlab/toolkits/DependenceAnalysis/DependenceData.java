@@ -9,16 +9,23 @@ import java.util.StringTokenizer;
  */
 
 public class DependenceData {
-	int loopNo;
+	float loopNo;
 	char dependence;
 	int startRange;
 	int endRange;
 	int nestingLevel;
-	LinkedList distanceVectors;
-	NestedLoop nestedLoop;
+	//LinkedList distanceVectors;
+	ProfiledNestedLoop nestedLoop;
 	String arrayAccess;
 	int distanceArray[];
+	String statementAccessed;
 	
+	public String getStatementAccessed() {
+		return statementAccessed;
+	}
+	public void setStatementAccessed(String statementAccessed) {
+		this.statementAccessed = statementAccessed;
+	}
 	public String getArrayAccess() {
 		return arrayAccess;
 	}
@@ -26,13 +33,13 @@ public class DependenceData {
 		this.arrayAccess = arrayAccess;
 	}
 	public DependenceData(){
-		distanceVectors=new LinkedList();		
+		//distanceVectors=new LinkedList();		
 	}	
-	public NestedLoop getNestedLoop() {
+	public ProfiledNestedLoop getNestedLoop() {
 		return nestedLoop;		
 	}
 
-	public void setNestedLoop(NestedLoop nestedLoop) {
+	public void setNestedLoop(ProfiledNestedLoop nestedLoop) {
 		this.nestedLoop = nestedLoop;
 	}	
 	public int getNestingLevel() {
@@ -41,13 +48,13 @@ public class DependenceData {
 	public void setNestingLevel(int nestingLevel) {
 		this.nestingLevel = nestingLevel;
 		if(nestingLevel>0){
-		  nestedLoop=new NestedLoop();	
+		  nestedLoop=new ProfiledNestedLoop();	
 		}
 	}
-	public int getLoopNo() {
+	public float getLoopNo() {
 		return loopNo;
 	}
-	public void setLoopNo(int loopNo) {
+	public void setLoopNo(float loopNo) {
 		this.loopNo = loopNo;
 	}
 	public char getDependence() {
@@ -68,9 +75,9 @@ public class DependenceData {
 	public void setEndRange(int endRange) {
 		this.endRange = endRange;
 	}
-	public LinkedList getDistanceVectors() {
-		return distanceVectors;
-	}
+	//public LinkedList getDistanceVectors() {
+	//	return distanceVectors;
+	//}
 	/*public void setDistanceVectors(int[] array) {
 		/*StringTokenizer st = new StringTokenizer(value,",");
 		int tempArray[]=new int[st.countTokens()];

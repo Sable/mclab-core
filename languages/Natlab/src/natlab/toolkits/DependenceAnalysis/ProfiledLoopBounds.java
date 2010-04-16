@@ -6,7 +6,7 @@ package natlab.toolkits.DependenceAnalysis;
  * 
  */
 
-public class LoopBounds {
+public class ProfiledLoopBounds {
 	private int lowerBound;
 	private int upperBound;
 	public int getLowerBound() {
