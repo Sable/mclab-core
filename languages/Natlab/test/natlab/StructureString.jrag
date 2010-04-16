@@ -19,7 +19,14 @@ aspect StructureString {
     eq EmptyProgram.getStructureStringLessComments() {
         return "";
     }
-    
+    eq CompilationUnits.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Program prog : getPrograms()){
+            buf.append(prog.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
     eq Script.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
