@@ -14,7 +14,16 @@ public class RewriteTests extends TestCase
                 new ast.Name("jun")};
         return names;
     }
-
+    public void testMultipleEquality( TransformedNode<ast.ASTNode> trans, ast.ASTNode[] nodes )
+    {
+        List<ast.ASTNode> newNodes = trans.getMultipleNodes();
+        int i = 0;
+        for( ast.ASTNode n : newNodes ){
+            assertEquals( nodes[i], n );
+            i++;
+        }
+    }
+    //Pass tests
     /** 
      * Tests that a transformed node object created with a single
      * node is a single node and not a multiple node
@@ -76,11 +85,75 @@ public class RewriteTests extends TestCase
     {
         ast.Name[] names = genNameArray();
         TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
-        List<ast.ASTNode> newNames = trans.getMultipleNodes();
-        int i = 0;
-        for( ast.ASTNode n : newNames ){
-            assertEquals( names[i], n );
-            i++;
+
+        testMultipleEquality(trans, names);
+    }
+
+    /**
+     * Tests the ability to grow from a single to multiple.
+     */
+    public void test_transformednodepass_grow1()
+    {
+        ast.Name[] names = genNameArray();
+        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names[0] );
+        for( int i=1; i<names.length; i++ )
+            trans.add( names[i] );
+
+        assertTrue( "TransformedNode was still not multiple",
+                    trans.isMultipleNodes() );
+        assertFalse( " TransformedNode was still single :'(",
+                     trans.isSingleNode() );
+
+        testMultipleEquality(trans, names);
+    }
+
+    /**
+     * Tests the ability to grow a multiple.
+     */
+    public void test_transformednodepass_grow2()
+    {
+        ast.Name[] names = genNameArray();
+        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
+
+        ast.Name newName = new ast.Name( "maxime" );
+        trans.add( newName );
+        ast.Name[] allNames = Arrays.copyOf( names, names.length+1 );
+        allNames[names.length] = newName;
+
+        testMultipleEquality(trans, allNames);
+    }
+
+    //Fail tests
+    /**
+     * Tests the node constructor and getMultipleNodes method for
+     * failure.
+     */
+    public void test_transformednodefail_access1()
+    {
+        ast.Name name = new ast.Name("jesse");
+        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( name );
+
+        try{
+            trans.getMultipleNodes();
+        }catch(UnsupportedOperationException e){
+            return;
         }
+        fail("No exception when trying to access a single node as multiple nodes");
+    }
+    /**
+     * Tests the node constructor and getSingleNode method for
+     * failure.
+     */
+    public void test_transformednodefail_access2()
+    {
+        ast.Name[] names = genNameArray();
+        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>(names);
+
+        try{
+            trans.getSingleNode();
+        }catch(UnsupportedOperationException e){
+            return;
+        }
+        fail("No exception when trying to access a multiple nodes as a single node");
     }
 }
