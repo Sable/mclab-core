@@ -4,7 +4,9 @@ aspect ASTAnalyze
     public void ASTNode.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
         visitor.caseASTNode(this);
     }
-    
+    public void List.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+        visitor.caseList(this);
+    }
     public void Program.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
         visitor.caseProgram(this);
     }
