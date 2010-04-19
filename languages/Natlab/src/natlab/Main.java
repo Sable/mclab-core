@@ -4,6 +4,9 @@ import natlab.options.Options;
 //import natlab.toolkits.analysis.ForVisitor;
 import ast.*;
 import natlab.server.*;
+import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
+import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
+import natlab.toolkits.DependenceAnalysis.Profiler;
 import natlab.toolkits.analysis.ForVisitor;
 
 import natlab.toolkits.analysis.varorfun.*;
@@ -25,9 +28,12 @@ import beaver.Parser;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.ArrayList;
 import java.util.List;
+
+import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
+ 
 import java.util.regex.PatternSyntaxException;
+
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -47,10 +53,14 @@ public class Main
      * desired functions.
      */
     public static void main(String[] args) throws Exception
-    {
+    {	
+
+     // natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
+       // System.exit(0);
 
         //natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
         //System.exit(0);
+
         boolean quiet; //controls the suppression of messages
         ArrayList errors = new ArrayList();
         options = new Options();
@@ -326,6 +336,12 @@ public class Main
                                 System.err.println("Dependence Tester");
                             
                             if(options.gcd()){
+                            	String tString="";
+                            	for(int i=0;i<args.length;i++)
+                            	{
+                            		tString=args[i];
+                            		if(tString.matches("[a-z].m")) break;
+                            	}
                                 if( !quiet )	
                                     System.err.println("Dependence Analysis with GCD Test");
                                 fileReader=translateFile(file,errors);
@@ -334,7 +350,7 @@ public class Main
                                 if(prog!=null)
                                     {
                                         String testType="gcd";
-                                        parseProgramNode(prog,testType);
+                                        parseProgramNode(prog,testType,tString);
                                         //System.out.println("Out of parser for gcd testing");
                                     }
                             }
@@ -342,7 +358,7 @@ public class Main
                             if(options.bj()){
                                 if( !quiet )
                                     System.err.println("Dependence Analysis with Banerjee's Test");
-                            }
+                            } 
                         }
                         
                         if( options.matlab() ){
@@ -483,10 +499,48 @@ public class Main
         }
     }
     
-    private static void parseProgramNode(Program prog,String testType)
+    /*
+     * This program serves as a driver program for LoopAnalysis and Transformation framework.
+     * 1.It instruments the input .m File.
+     * 2.Then invokes the heuristicEngine to determine appropriate range values.
+     * 
+     */
+    private static void parseProgramNode(Program prog,String testType,String fileName)
     {
-        ForVisitor forVisitor = new ForVisitor(testType);
-        prog.apply(forVisitor);   
+    	ProfilerDriver pDriver=new ProfilerDriver();
+    	pDriver.setFileName(fileName);
+    	pDriver.traverseFile(prog);
+        //ForVisitor forVisitor = new ForVisitor();
+        //forVisitor.setProfDriver(pDriver);
+        //prog.apply(forVisitor);
+        pDriver.generateInstrumentedFile(prog);
+        
+    	HeuristicEngineDriver hDriver=new HeuristicEngineDriver(fileName);
+		hDriver.parseXmlFile();		
+        
+		
+		
+		DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
+		dDriver.setFileName(fileName);
+		String fName=dDriver.getFileName();
+	    Reader fileReader = new StringReader("");
+	    ArrayList errors = new ArrayList();
+		fileReader=translateFile(fName,errors);
+	    Program program = parseFile( fName,  fileReader, errors );
+		dDriver.traverseFile(program);	
+        
+        //pDriver.traverseProgram(fileName);
+        //System.out.println(prog.getPrettyPrinted());
+    	
+    	
+    	
+    	//Profiler prof =new Profiler();
+    	//prof.setProg(prog);
+    	//prof.setFileName(fileName);
+    	//System.out.println(prog.dumpTreeAll());
+    	//prof.changeAST();
+    	//ProfilerDriver profDriver =new ProfilerDriver(prog);
+    	//profDriver.traverseProgram();
     }
     
     /**
