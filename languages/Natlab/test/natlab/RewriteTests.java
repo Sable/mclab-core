@@ -23,37 +23,62 @@ public class RewriteTests extends TestCase
             i++;
         }
     }
+    public void assertEmpty( TransformedNode trans )
+    {
+        assertTrue( trans.isEmptyNode() );
+        assertFalse( trans.isSingleNode() );
+        assertFalse( trans.isMultipleNodes() );
+    }
+    public void assertSingle( TransformedNode trans )
+    {
+        assertFalse( trans.isEmptyNode() );
+        assertTrue( trans.isSingleNode() );
+        assertFalse( trans.isMultipleNodes() );
+    }
+    public void assertMultiple( TransformedNode trans )
+    {
+        assertFalse( trans.isEmptyNode() );
+        assertFalse( trans.isSingleNode() );
+        assertTrue( trans.isMultipleNodes() );
+    }
+
     //Pass tests
+
+    /**
+     * Tests the empty constructor.
+     */
+    public void test_transformednodepass_create1()
+    {
+        TransformedNode trans = new TransformedNode();
+        assertEmpty( trans );
+    }
     /** 
      * Tests that a transformed node object created with a single
      * node is a single node and not a multiple node
      */
-    public void test_transformednodepass_create1()
+    public void test_transformednodepass_create2()
     {
         ast.Name name = new ast.Name("jesse");
         TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( name );
-        assertTrue( trans.isSingleNode() );
-        assertFalse( trans.isMultipleNodes() );
+        assertSingle( trans );
     }
     /**
      * Tests the array constructor 
      */
-    public void test_transformednodepass_create2()
+    public void test_transformednodepass_create3()
     {
         ast.Name[] names = genNameArray();
         TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
-        assertTrue( trans.isMultipleNodes() );
-        assertFalse( trans.isSingleNode() );
+        assertMultiple( trans );
     }
     /**
      * Tests the collection constructor with a list.
      */
-    public void test_transformednodepass_create3()
+    public void test_transformednodepass_create4()
     {
         ast.Name[] names = genNameArray();
         TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( Arrays.asList(names) );
-        assertTrue( trans.isMultipleNodes() );
-        assertFalse( trans.isSingleNode() );
+        assertMultiple( trans );
     }
     /**
      * Tests the node constructor and getSingleNode method for sanity
@@ -123,7 +148,21 @@ public class RewriteTests extends TestCase
         testMultipleEquality(trans, allNames);
     }
 
+    /**
+     * Test the ability to grow from an empty.
+     */
+    public void test_transformednodepass_grow3()
+    {
+        ast.Name name = new ast.Name("jesse");
+        TransformedNode trans = new TransformedNode();
+        trans.add( name );
+        assertSingle( trans );
+
+        assertEquals( name, trans.getSingleNode() );
+    }
+
     //Fail tests
+
     /**
      * Tests the node constructor and getMultipleNodes method for
      * failure.
@@ -155,5 +194,23 @@ public class RewriteTests extends TestCase
             return;
         }
         fail("No exception when trying to access a multiple nodes as a single node");
+    }
+    /**
+     * Tests the node constructor and get methods for failure when empty.
+     */
+    public void test_transformednodefail_access3()
+    {
+        TransformedNode trans = new TransformedNode();
+        try{
+            trans.getSingleNode();
+        }catch(UnsupportedOperationException e1){
+            try{
+                trans.getMultipleNodes();
+            }catch(UnsupportedOperationException e2){
+                return;
+            }
+            fail("No exception when trying to access an empty node as multiple nodes");
+        }
+        fail("No exception when trying to access an empty node as a single node");
     }
 }
