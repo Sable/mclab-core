@@ -124,7 +124,7 @@ public class SVPCTest {
        return isApplicable;		
 	}//end of checkDependence function. 
 	
-	private void reportTestResult(int index)
+	/*private void reportTestResult(int index)
 	{
 			boolean temp=false;
 			for(int i=0;i<index;i++)
@@ -164,6 +164,22 @@ public class SVPCTest {
 
 	
 	}*/
+	
+public boolean checkDependence(AffineExpression aExpr,AffineExpression bExpr){
+		boolean isApplicable=false;		
+				int lowerBound=0;        		
+		if(bExpr.getC()>0)	lowerBound=bExpr.getLBound()+bExpr.getC();     		
+	    else lowerBound=lowerBound=bExpr.getLBound()-bExpr.getC();		
+		if(lowerBound >aExpr.getUBound()){ 
+		   dependencyFlag="No";
+		   isApplicable=false;
+           System.out.println("There is no dependency for this system of Equations");
+         }//end of 4th if
+		else System.out.println("There is dependency for this system of Equations");
+       isApplicable=true;        	         	   
+       return isApplicable;		
+ }//end of checkDependence function. 
+
 	
 
 }

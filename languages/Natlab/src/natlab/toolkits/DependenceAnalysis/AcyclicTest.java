@@ -14,7 +14,7 @@ import ast.Expr;
 import java.io.*;
 
 /*
- * Author:Amina Aslam test file 
+ * Author:Amina Aslam 1
  * Date:2 Jul,2009
  * When there is a constraint that is bound on both sides by a variable then Acyclic Test used to eliminate that constraint and transform 
  * it in a form on which SVPC Test can be applied.

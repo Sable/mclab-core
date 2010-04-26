@@ -30,6 +30,7 @@ public class HeuristicEngineDriver {
 	private Hashtable<String,LinkedList> loopTable=new Hashtable<String,LinkedList>();
 	private String fileName;
 	private String dirName;
+	private Hashtable<String,LinkedList<PredictedData>> table;
 	//private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
 	public HeuristicEngineDriver(String fName){
@@ -195,20 +196,13 @@ public class HeuristicEngineDriver {
 	                	LinkedList list=new LinkedList();
 	                	list.add(inData);
 	                	loopTable.put(nestedElement.getAttribute("Number"),list);                	
-	                }                      
-
-	            }//end of if clause
+	                }
+	             }//end of if clause
 	        }//end of for loop with s var
-	        
-	        /*for(int i=0;i<loopTable.size();i++){
-	        	LinkedList tList=(LinkedList)loopTable.get("1.2");
-	        	System.out.println("List size is "+tList.size());
-	        }
-	        System.out.println("Table size is"+loopTable.size());*/
 	        callIntroSort();
 	        HeuristicEngine hEngine=new HeuristicEngine(loopTable);
 	  		//Vector<PredictedData> predictedValues=hEngine.computeRegionDivisors();
-	        Hashtable<String,LinkedList<PredictedData>> table=hEngine.computeRegionDivisors();
+	        table=hEngine.computeRegionDivisors();
 	  		//writeToXMLFile(predictedValues);
 	        writeToXMLFile(table);
 	    }catch (SAXParseException err) {
@@ -226,6 +220,9 @@ public class HeuristicEngineDriver {
 
 	}
 	
+	public Hashtable<String, LinkedList<PredictedData>> getTable() {
+		return table;
+	}
 	/*
 	 * TODO:Needs to fix this currently just IntroSort is not fully implemented 
 	 */

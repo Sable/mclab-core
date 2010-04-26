@@ -168,6 +168,112 @@ public class GCDTest {
 	    		    else if(aExprArray[0].getC()==0) c=Math.abs(aExprArray[1].getC());				  
 	    		}//end of 1st if
 		}//end of else if
+}//end of assign values function 
+
+	
+	public void calculateGcd (AffineExpression aExpr,AffineExpression bExpr) 
+	{
+		
+		//AffineExpression aExpr1,aExpr2;		
+		//Map cMap=cGraph.getGraphData();
+		//Get Map in Set interface to get key and value
+		//Set s=cMap.entrySet();
+		
+	      //Move next key and value of Map by iterator
+        //Iterator it=s.iterator();      
+        //while(it.hasNext())
+        //{
+            // key=value separator this by Map.Entry to get key and value
+        	//Map.Entry m =(Map.Entry)it.next();        	
+        	//String key=(String)m.getKey();      
+            //LinkedList<AffineExpression> cList=(LinkedList<AffineExpression>)m.getValue();
+            /*if(cList1.getListNode()!=null)
+            {
+            	 aExpr1=cList1.getListNode().getData();
+            }
+            if(cList1.getListNode().getNext()!=null)
+            {
+            	 aExpr2=cList1.getListNode().getNext().getData();
+            }*/
+            
+		//long gcd = 0;
+	    long r = 0;
+	    //System.out.println("Size of the Array:::::"+cList.size());
+	    //AffineExpression aExpression[]=new AffineExpression[cList.size()];//(AffineExpression)cList.get(0);
+	    //cList.toArray(aExpression);
+	    
+	    assignValues(aExpr,bExpr);
+	    while (true) {
+	      if (v == 0) {
+	        gcd = u;
+	        break;
+	      }//end of if 
+	      else {
+	        r = u % v;
+	        System.out.println ("u " + u + ", v " + v + ", u % v " + r);
+	        u = v;
+	        v = r;
+	      }//end of else 
+	    }//end of 2nd while
+	    isSolution();  
+     
+	 
+}//end of calculateGCD function.
+	
+	/*
+	 * Assign values to u and v.
+	 */
+	private void assignValues(AffineExpression aExpr,AffineExpression bExpr)
+	{    
+		if(aExpr.getIndexExpr() instanceof NameExpr)//e.g.i=j
+	    {  	u = 1;
+	    	if(bExpr.getIndexExpr() instanceof NameExpr)
+	    		{ v = 1;
+	    		  if(aExpr.getC() > 0) c=Math.abs(bExpr.getC()-aExpr.getC());
+	    		  else if(aExpr.getC() < 0) c=Math.abs(bExpr.getC()+aExpr.getC());
+	    		  else if(aExpr.getC()==0) c=Math.abs(bExpr.getC());
+	    		}	    	
+	    }//end of if
+		else if(aExpr.getIndexExpr() instanceof MTimesExpr) //e.g. 2i=2j+10  2i=2j-10
+		{
+			MTimesExpr mExpr1=(MTimesExpr)aExpr.getIndexExpr();
+			u=Math.abs(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue());
+			
+			   if(bExpr.getIndexExpr() instanceof MTimesExpr) //this check is to handle these types of equations 2j+10
+			   {		  
+				    MTimesExpr mExpr2=(MTimesExpr)bExpr.getIndexExpr();
+				    v=Math.abs(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+	    		    if(aExpr.getC() > 0) c=Math.abs(bExpr.getC()-aExpr.getC());
+	    		    else if(aExpr.getC() < 0) c=Math.abs(bExpr.getC()+aExpr.getC());
+	    		    else if(aExpr.getC()==0) c=Math.abs(bExpr.getC());
+	    				    
+	    	   }//end of 1st if			   		
+		}//end of else if
+		
+		else if(aExpr.getIndexExpr() instanceof NameExpr) //e.g. i=2j+10  i=2j-10
+	    {  	u = 1;
+	    	if(bExpr.getIndexExpr() instanceof MTimesExpr)//bExpr.getIndexExpr() returns 2j part of the equation.
+	    		{			  
+	    		    MTimesExpr mExpr2=(MTimesExpr)bExpr.getIndexExpr();
+				    v=Math.abs(((IntLiteralExpr)mExpr2.getLHS()).getValue().getValue().intValue());
+	    		    if(aExpr.getC() > 0) c=Math.abs(bExpr.getC()-aExpr.getC());
+	    		    else if(aExpr.getC() < 0) c=Math.abs(bExpr.getC()+aExpr.getC());
+	    		    else if(aExpr.getC()==0) c=Math.abs(bExpr.getC());	    		  
+			   }//end of 2nd if			  	    	
+	    }//end of else if
+		
+		else if(aExpr.getIndexExpr() instanceof MTimesExpr) //e.g. 2i=j+10 or 2i=j-10
+		{
+			MTimesExpr mExpr1=(MTimesExpr)aExpr.getIndexExpr();
+			u=Math.abs(((IntLiteralExpr)mExpr1.getLHS()).getValue().getValue().intValue());
+     		if(bExpr.getIndexExpr() instanceof NameExpr) //this check is to handle these types of equations 2j+10
+			   {    v = 1;
+				    NameExpr mExpr2=(NameExpr)bExpr.getIndexExpr();				    
+	    		    if(aExpr.getC() > 0) c=Math.abs(bExpr.getC()-aExpr.getC());
+	    		    else if(aExpr.getC() < 0) c=Math.abs(bExpr.getC()+aExpr.getC());
+	    		    else if(aExpr.getC()==0) c=Math.abs(bExpr.getC());				  
+	    		}//end of 1st if
+		}//end of else if
 
 		
 		/*else if(aExpr1.getIndexExpr() instanceof MTimesExpr) //e.g.2i=2j

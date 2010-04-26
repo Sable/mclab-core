@@ -1,25 +1,38 @@
 package natlab.toolkits.DependenceAnalysis;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
 
 /*
  * This class contains loop Data which is then written to dependenceFile.xml
  * DateCreated:Mar31,2010
  * Author:Amina Aslam 
+ * 
  */
-
-public class DependenceData {
-	float loopNo;
-	char dependence;
-	int startRange;
-	int endRange;
-	int nestingLevel;
+public class DependenceData extends Data {
+	private float loopNo;
+	private String dependence;
+	private int startRange;
+	private int endRange;
+	private int nestingLevel;
+	private String lVarName;
 	//LinkedList distanceVectors;
-	ProfiledNestedLoop nestedLoop;
-	String arrayAccess;
-	int distanceArray[];
-	String statementAccessed;
+	private NestedLoop nestedLoop;
+	private String arrayAccess;
+	private int distanceArray[];
+	private String statementAccessed;
+	private NestedLoop nLoopArray[];
+	private static int count=0;
 	
+	public NestedLoop[] getNLoopArray()  {
+		return nLoopArray;
+	}
+	private void setNLoopArray(int nLevel) {
+		nLoopArray = new NestedLoop[nLevel];
+	}
+	public String getLVarName() {
+		return lVarName;
+	}
+	public void setLVarName(String varName) {
+		lVarName = varName;
+	}
 	public String getStatementAccessed() {
 		return statementAccessed;
 	}
@@ -35,11 +48,14 @@ public class DependenceData {
 	public DependenceData(){
 		//distanceVectors=new LinkedList();		
 	}	
-	public ProfiledNestedLoop getNestedLoop() {
-		return nestedLoop;		
+	public NestedLoop getNestedLoop() {
+	    nestedLoop=new NestedLoop();
+	    nLoopArray[count]=nestedLoop;
+	    count++;
+	    return nestedLoop;
 	}
 
-	public void setNestedLoop(ProfiledNestedLoop nestedLoop) {
+	public void setNestedLoop(NestedLoop nestedLoop) {
 		this.nestedLoop = nestedLoop;
 	}	
 	public int getNestingLevel() {
@@ -47,9 +63,10 @@ public class DependenceData {
 	}
 	public void setNestingLevel(int nestingLevel) {
 		this.nestingLevel = nestingLevel;
-		if(nestingLevel>0){
-		  nestedLoop=new ProfiledNestedLoop();	
-		}
+		this.setNLoopArray(nestingLevel);
+		//if(nestingLevel>0){
+		  //nestedLoop=new NestedLoop();	
+		//}
 	}
 	public float getLoopNo() {
 		return loopNo;
@@ -57,10 +74,10 @@ public class DependenceData {
 	public void setLoopNo(float loopNo) {
 		this.loopNo = loopNo;
 	}
-	public char getDependence() {
+	public String getDependence() {
 		return dependence;
 	}
-	public void setDependence(char dependence) {
+	public void setDependence(String dependence) {
 		this.dependence = dependence;
 	}
 	public int getStartRange() {
@@ -101,6 +118,11 @@ public class DependenceData {
 	}
 	public void setDistanceArray(int[] distanceArray) {
 		this.distanceArray = distanceArray;
+	}
+	public DependenceData clone(){
+		DependenceData dData=new DependenceData();
+		dData=this;
+		return dData;
 	}
 
 
