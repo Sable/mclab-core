@@ -63,7 +63,15 @@
 		</java>
 	</target>
 
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests" />
+        <target name="gen.multireturn.pass.tests" depends="set.bin.dir">
+          <echo message="Generating multireturn pass tests" />
+          <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
+            <arg value="${multireturn.pass.test.list.file}" />
+            <arg value="${gen.dir}" />
+          </java>
+        </target>
+
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.multireturn.pass.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
@@ -185,16 +193,6 @@
 		<jar destfile="${entrypoint.jarname}">
 			<manifest>
 				<attribute name="Main-Class" value="${entrypoint.class}" />
-				<!--attribute name="Class-Path" value="
-                                                                    ${lib.dir}/${beaver.jar.path.prop} 
-
-                                                                    ${lib.dir}/${beaver.rt.jar.path.prop} 
-                                                                    ${lib.dir}/${antlr.task.jar.path.prop} 
-                                                                    ${lib.dir}/${antlr3.jar.path.prop} 
-                                                                    ${lib.dir}/${string.template.jar.path.prop} 
-                                                                    ${lib.dir}/${antlr2.jar.path.prop}
-                                                                    ${annotations.bin.dir}/ 
-                                                                    ${matlab.bin.dir}/ "/-->
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class" />
                         <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
