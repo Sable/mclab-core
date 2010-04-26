@@ -28,7 +28,9 @@ public class AllTests {
                 suite.addTestSuite(FunctionVFDatumTest.class);
 
                 //rewrite tests
-                suite.addTestSuite(RewriteTests.class);
+                suite.addTestSuite(TransformedNodeTests.class);
+
+                suite.addTestSuite(MultireturnSimplifyPassTests.class);
 
 		//$JUnit-END$
 		return suite;
