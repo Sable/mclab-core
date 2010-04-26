@@ -24,25 +24,28 @@ import ast.SwitchStmt;
 import ast.UPlusExpr;
 //import natlab.toolkits.DependenceAnalysis.SVPCTest;
 import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
+import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
+import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
+import ast.WhileStmt;
 
 //import natlab.looptransformations.LoopFusion;
 //import natlab.looptransformations.LoopInterchange;
 //import natlab.looptransformations.LoopReversal;
 //import natlab.looptransformations.LoopFission;
 //import natlab.looptransformations.LoopUnrolling;
-/*
- * TO DO:In ForVisitor class determine the depth of loop nest and then call the appropriate test.if depth is 2 or less than 2 then call GCD.
- * else if depth is 3 or greater than 3 call Acyclic test. 
- * 
- */
 
-public class ForVisitor implements ASTVisitor {
 
+//public class ForVisitor implements ASTVisitor {
+public abstract class ForVisitor implements ASTVisitor {
+	
+      
   	 //private static int loopNo;
-	 //private static ForStmt fStmt1;
+	 //private static ForStmt forNode;
+	 //private String fileName;
+	 //private static ProfilerDriver profDriver;
 	 //private static ForStmt fStmt2;
-	  private String testType;
-	public ForVisitor(String tType)
+	  //private String testType;
+	/*public ForVisitor(String tType)
 	{
 	
 		testType=tType;
@@ -53,21 +56,83 @@ public class ForVisitor implements ASTVisitor {
 		int id=fStmt2.getNodeID();
 		return id;
 	}*/
-	public void caseLoopStmt(ASTNode node){
+	//public ForVisitor()	
+	//{		
 		
-		if (node instanceof ForStmt) {
+	//}
+	/*public ForVisitor()	
+	{
+		profDriver =new ProfilerDriver("amna");
+	}
+	/*public void getForStmt(ForStmt fStmt)
+	{
+		fStmt=forNode;
+	}*/
+	//public ProfilerDriver getProfDriver() {
+		//return profDriver;
+	//}
+	//public void setProfDriver(ProfilerDriver profDriver) {
+	//	this.profDriver = profDriver;
+	//}
+	//public ForStmt return 
+	
+	/*
+	 *  This function does the following. 
+	 *  1.Profiles the input program.
+	 *  
+	 * TODO:Need to fix the flow of the program.What is done is temporary.
+	 */
+	//public void caseLoopStmt(ASTNode node){
+		
+	/*	if (node instanceof ForStmt) {
+			System.out.println("profiler + ++caseLoopStmt is called by "+ node.getClass().getName());			
+			ForStmt forNode=(ForStmt) node;			
+			profDriver.traverseForNode(forNode); 
+			
+			
+			
+			//HeuristicEngineDriver hDriver=new HeuristicEngineDriver(profDriver.getFileName());
+			//hDriver.parseXmlFile();			
+			//DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver(forNode);
+			//dDriver.traverseLoopStatements();			
+		}
+		else
+		{
+			ForVisitor fVisitor=new ForVisitor(); 
+			node.applyAllChild(fVisitor);
+		}
+		/*else if(node instanceof WhileStmt) {
+			System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+			WhileStmt whileNode=(WhileStmt) node;
+			//for(int i=0;i<whileNode.getNumStmt();i++) //to look for "For Loops" inside while loop.
+			//{
+				//whileNode.
+			//}
+			//System.out.println("No of children"+whileNode.getNumChild());
+			ForVisitor fVisitor=new ForVisitor(); 
+			whileNode.applyAllChild(fVisitor);
+			
+		}
 
-			ForStmt forNode=(ForStmt) node;
+			//forNode=(ForStmt) node;
+			//ProfilerDriver profDriver =new ProfilerDriver(forNode);
+			//System.out.println("Number of children are in For Visitor:"+forNode.getNumChild());
+	    	//profDriver.traverseProgram(fileName);
+	    
 			
+			//TODO:Change this option also(for the test names).And give appropriate option names.//this thing needs to be changed as well according to interaction diagram.
 			
-			if(testType.compareTo("gcd")==0) //this thing needs to be changed aswell according to interaction diagram.
-			{
-					
-				DependenceAnalysisDriver dAnalysisDriver=new DependenceAnalysisDriver(forNode);
-				dAnalysisDriver.traverseLoopStatements();
-				//dAnalysisDriver.createConstraints();
+		//	if(testType.compareTo("gcd")==0) 
+		//	{
+				//Profiler prof =new Profiler(forNode);
+				//prof.changeAST();
 				
-			}
+				//TODO:Give user this provision to directly call the dependence analyzer.	
+				//DependenceAnalysisDriver dAnalysisDriver=new DependenceAnalysisDriver(forNode);				
+				//dAnalysisDriver.traverseLoopStatements();
+				
+				
+		//	}
 			
 			/*if(forNode.isEligibleForLoopReversal())
 	         { 
@@ -117,17 +182,29 @@ public class ForVisitor implements ASTVisitor {
 
 			
 
-		} 
-		else {
-			System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
-		}
+		//} 
 		
-	}
+		
+	//}
 	
-	public void caseIfStmt(IfStmt node){}
-	public void caseSwitchStmt(SwitchStmt node){}
-	public void caseBranchingStmt(ASTNode node){}
-	public void caseASTNode(ASTNode node) {}
+	//public void caseIfStmt(IfStmt node){
+	/*	System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+		IfStmt ifNode=(IfStmt) node;
+		ForVisitor fVisitor=new ForVisitor(); 
+		ifNode.applyAllChild(fVisitor);*/
+	//}
+	//public void caseSwitchStmt(SwitchStmt node){
+	/*	System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+		SwitchStmt sNode=(SwitchStmt)node;
+		ForVisitor fVisitor=new ForVisitor(); 
+		sNode.applyAllChild(fVisitor);*/
+	//}
+	//public void caseBranchingStmt(ASTNode node){}
+//	public void caseASTNode(ASTNode node) {	
+		
+		
+	//}
+	
 
 
 }
