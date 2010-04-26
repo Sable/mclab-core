@@ -139,7 +139,6 @@ public class RewritePassTestBase extends TestCase {
             if( !fail ){
                 String name1 = node.getID();
                 String name2 = ((Name)tree2Current).getID();
-                System.err.println( "names " + name1 + " " + name2 );
                 if( nameEquivalence.containsKey( name1 ) ){
                     if( ! nameEquivalence.get( name1 ).equals( name2 ) ){
                         reason = "Names don't match for actual subtree: \n\n"+
