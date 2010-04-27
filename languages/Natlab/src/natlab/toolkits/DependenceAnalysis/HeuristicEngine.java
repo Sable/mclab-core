@@ -72,7 +72,7 @@ public class HeuristicEngine {
 	 */
 	private void valuePlacement(LinkedList l){
 		int maxValue,regionRange=0;
-		LinkedList tList=null;		
+		//LinkedList tList;		
 		maxValue=((UpperBound)((ProfiledData)l.getLast()).getUBound()).getEnd();
     	regionRange=regionRange(maxValue);
     	  int value;
@@ -80,14 +80,15 @@ public class HeuristicEngine {
 		  boolean createList=false;
 		  for(int i=0;i<l.size();i++){
 			 ProfiledData inData=(ProfiledData)l.get(i);
-			 value=((UpperBound)inData.getUBound()).getEnd();
+			 value=((UpperBound)inData.getUBound()).getEnd();			 
 			 if(value < regionRange){			 	
-			 	if(regionValues.containsKey(0) && tList!=null){			    	
+			 	if(regionValues.containsKey(0)){//&& tList!=null){
+			 		LinkedList tList=(LinkedList)regionValues.get(0);
 				    tList.add(inData);
 				    regionValues.put(0, tList);		
 				}
 				else{
-					tList=new LinkedList();
+					LinkedList tList=new LinkedList();
 					tList.add(inData);					
 				    regionValues.put(0, tList);
 				}
@@ -95,12 +96,13 @@ public class HeuristicEngine {
 			}//end of if
 			else{
 				//LinkedList tList=null;
-				if(regionValues.containsKey(value/regionRange) && tList!=null){			    	
+				if(regionValues.containsKey(value/regionRange)){// && tList!=null){
+					LinkedList tList=(LinkedList)regionValues.get(value/regionRange);
 				    tList.add(inData);
 				    regionValues.put(value/regionRange, tList);		
 				}
 				else{
-					tList=new LinkedList();
+					LinkedList tList=new LinkedList();
 					tList.add(inData);					
 				    regionValues.put(value/regionRange, tList);
 				}				
@@ -112,7 +114,7 @@ public class HeuristicEngine {
    private void valuePlacement(LinkedList l,int regionRange){
 			//int regionRange=100;
 			int value;
-			LinkedList tList=null;
+			//LinkedList tList=null;
 			  Hashtable regionValues=new Hashtable();
 			  boolean createList=false;
 			  for(int i=0;i<l.size();i++){
@@ -120,12 +122,13 @@ public class HeuristicEngine {
 				 value=((UpperBound)inData.getUBound()).getEnd();
 				 if(value < regionRange){
 				 	//LinkedList tList=null;
-				 	if(regionValues.containsKey(0) && tList!=null){			    	
+				 	if(regionValues.containsKey(0)){ //&& tList!=null){
+				 		LinkedList tList=(LinkedList)regionValues.get(0);
 					    tList.add(inData);
 					    regionValues.put(0, tList);		
 					}
 					else{
-						tList=new LinkedList();
+						LinkedList tList=new LinkedList();
 						tList.add(inData);					
 					    regionValues.put(0, tList);
 					}
@@ -135,12 +138,13 @@ public class HeuristicEngine {
 					//LinkedList tList=null;					
 					int digitMod = (int)Math.pow (100, 1);
 				    int digit = (value / digitMod) % 10;
-					if(regionValues.containsKey(digit) && tList!=null){			    	
+					if(regionValues.containsKey(digit)){ //&& tList!=null){
+					   LinkedList tList=(LinkedList)regionValues.get(digit);	
 					   tList.add(inData);
 					   regionValues.put(digit, tList);		
 					}
 					else{
-						tList=new LinkedList();
+						LinkedList tList=new LinkedList();
 						tList.add(inData);					
 					    regionValues.put(digit, tList);
 					}				

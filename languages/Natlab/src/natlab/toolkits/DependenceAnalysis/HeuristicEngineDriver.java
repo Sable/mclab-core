@@ -356,11 +356,7 @@ public class HeuristicEngineDriver {
 		       tsElement.setAttribute(new String("TimeStamp"), ts.toString()); 
 		
 		       while(it.hasNext()){
-		    	   //System.out.println("i am in xmlwrite");
-		    	    //PredictedData pData=(PredictedData)it.next();
-		    	   LinkedList<PredictedData> tList=(LinkedList<PredictedData>)it.next();
-		            //System.out.println("i am in xmlwrite"+pData.getLoopNo()+" "+pData.getLowerBound());
-		            //System.out.println("i am in xmlwrite");	                	            	
+		    	   LinkedList<PredictedData> tList=(LinkedList<PredictedData>)it.next();                	            	
 		           for(int i=0;i<tList.size();i++){ 
 		        	   PredictedData pData=(PredictedData)tList.get(i);
 			            Element loopElement = document.createElement("LoopNo"); //create another element
@@ -397,11 +393,8 @@ public class HeuristicEngineDriver {
 		     Timestamp ts=new Timestamp(d.getTime());
 		     tsElement.setAttribute(new String("TimeStamp"), ts.toString());
 		     
-		     while(it.hasNext()){
-		    	   //System.out.println("i am in xmlwrite");
-		    	    //PredictedData pData=(PredictedData)it.next();	        	    
-		            //System.out.println("i am in xmlwrite"+pData.getLoopNo()+" "+pData.getLowerBound());
-		            //System.out.println("i am in xmlwrite");	                	            	
+		     while(it.hasNext()){ 
+		    	 System.out.println(pTable.size());
 		    	    LinkedList<PredictedData> tList=(LinkedList<PredictedData>)it.next();
 		    	    for(int i=0;i<tList.size();i++){ 
 			        	PredictedData pData=(PredictedData)tList.get(i);
@@ -429,7 +422,7 @@ public class HeuristicEngineDriver {
 		    StreamResult result = new StreamResult(file);
 		    transformer.transform(source, result);	     
 		}//end of try
-		catch (Exception e) {System.out.println(e.getMessage());}//end of for
+		catch (Exception e) {System.out.println(e.getCause());}//end of for
  }//end of function call
 		
 		

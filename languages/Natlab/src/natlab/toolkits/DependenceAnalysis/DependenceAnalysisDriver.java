@@ -205,13 +205,17 @@ public void traverseLoopStatements()
 	}//end of if	
   }//end of for 
  	
- //if(dataVector.size()!=0){
-	 writeToXMLFile(dataVector);//}
+ if(dataVector.size()!=0){
+	 LegalityTest lTest=new LegalityTest();
+	 lTest.setDataVector(dataVector);
+	 lTest.testLegality();
+	 writeToXMLFile(dataVector);}
 }//end of traverseLoopStatements function
 
 
+
 /*
- * 
+ *This function writes the dependence information to a file. 
  */
 
 private void writeToXMLFile(Vector<DependenceData> dataVector){

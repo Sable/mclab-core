@@ -21,7 +21,7 @@ public class DependenceData extends Data {
 	private NestedLoop nLoopArray[];
 	private static int count=0;
 	
-	public NestedLoop[] getNLoopArray()  {
+	public NestedLoop[] getNLoopArray() {
 		return nLoopArray;
 	}
 	private void setNLoopArray(int nLevel) {
