@@ -15,63 +15,76 @@ public class MultiReturnRewrite extends AbstractLocalRewrite
         super( tree );
     }
 
-
-
     public void caseAssignStmt( AssignStmt node )
     {
         rewriteChildren( node );
-        
-        
-        // Stmt[] stmts = new Stmt[2];
-        // Expr lhs = node.getLHS();
-        // Expr rhs = node.getRHS();
-
-        // System.out.println( lhs.getClass() );
-        
-        // Name[] tmps = TempFactory.genFreshTempName(2);
-            
-        // stmts[0] = new AssignStmt( new NameExpr( tmps[0] ), rhs );
-        // stmts[1] = new AssignStmt( lhs, new NameExpr( tmps[1] ) );
-
-        // stmts[0].setOutputSuppressed( true );
-        // stmts[1].setOutputSuppressed( node.isOutputSuppressed() );
-        // newNode = new TransformedNode( stmts );
-        
 
         if( node.getLHS() instanceof MatrixExpr ){
             //NOTE: assume lhs is a matrix expr with exactly 1 row
             Row lhs = ((MatrixExpr)node.getLHS()).getRow(0);
             Expr rhs = node.getRHS();
 
-            HashSet<String> names = new HashSet<String>(lhs.getNumElement());
             LinkedList<AssignStmt> newStmts = new LinkedList<AssignStmt>();
             ArrayList<Expr> lvalues = new ArrayList<Expr>( lhs.getNumElement() );
 
-            for( Expr e : lhs.getElements() ){
-                if( e instanceof NameExpr ){
-                    String name = ((NameExpr)e).getName().getID();
-                    if( !names.contains( name ) ){
-                        names.add(name);
-                        lvalues.add( e );
-                        continue;
-                    }
-                }
-                TempFactory tmp = TempFactory.genFreshTempFactory();
-                lvalues.add( tmp.genNameExpr() );
-                AssignStmt newAssign = new AssignStmt( e, tmp.genNameExpr() );
-                newAssign.setOutputSuppressed( true );
-                newStmts.add( newAssign );
-            }
+            buildTempStatements( newStmts, lvalues, lhs.getElements() );
             if( newStmts.size() > 0 ){
-                Row newLHS = new Row( new List() );
-                for( Expr e : lvalues )
-                    newLHS.getElements().add( e );
-                AssignStmt newAssign = new AssignStmt( new MatrixExpr( (new List()).add(newLHS) ),
-                                                       rhs );
-                newAssign.setOutputSuppressed( node.isOutputSuppressed() );
+                AssignStmt newAssign = buildNewAssignment( lvalues, rhs, node.isOutputSuppressed() );
                 newStmts.add( 0, newAssign );
                 newNode = new TransformedNode( newStmts );
             }
         }
+    }
+
+    /**
+     * Builds up the lists of new assignment statemens and a list of
+     * variable names to use in multi return assignment. 
+     *
+     * @param outNewStmts   the list to filled with new assignment
+     *                      statements
+     * @param outLValues    the list to be filled with variable names
+     * @param elements      AST List expressions from the lhs
+     */
+    private void buildTempStatements( LinkedList<AssignStmt> outNewStmts, 
+                                      ArrayList<Expr> outLValues, 
+                                      List<Expr> elements )
+    {
+        HashSet<String> names = new HashSet<String>(elements.getNumChild());
+
+        for( Expr e : elements ){
+            if( e instanceof NameExpr ){
+                String name = ((NameExpr)e).getName().getID();
+                if( !names.contains( name ) ){
+                    names.add(name);
+                    outLValues.add( e );
+                    continue;
+                }
+            }
+            TempFactory tmp = TempFactory.genFreshTempFactory();
+            outLValues.add( tmp.genNameExpr() );
+            AssignStmt newAssign = new AssignStmt( e, tmp.genNameExpr() );
+            newAssign.setOutputSuppressed( true );
+            outNewStmts.add( newAssign );
+        }
+    }
+    
+    /**
+     * Builds the new assignment statement to replace the original
+     * multi return assignment.
+     *
+     * @param lvalues          list of lvalues for new assignment lhs
+     * @param rhs              the rhs expression of original assignment
+     * @param outputSuppressed boolean used to suppress output of new
+     *                         assignment 
+     */
+    private AssignStmt buildNewAssignment( ArrayList<Expr> lvalues, Expr rhs, boolean outputSuppressed )
+    {
+        Row newLHS = new Row( new List() );
+        for( Expr e : lvalues )
+            newLHS.getElements().add( e );
+        AssignStmt newAssign = new AssignStmt( new MatrixExpr( (new List()).add(newLHS) ),
+                                               rhs );
+        newAssign.setOutputSuppressed( outputSuppressed );
+        return newAssign;
     }
 }
