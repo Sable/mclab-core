@@ -78,6 +78,7 @@
 	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests, options" />
 
 	<!-- Special target for building MATLAB2Fortran Code-Gen -->
+        <!-- SAME AS gen EXCEPT FOR USING CodeGen.gen2-->
 	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
 
 	<!-- jflex from metalexer spec -->

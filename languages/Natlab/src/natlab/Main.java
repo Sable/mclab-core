@@ -82,6 +82,19 @@ public class Main
                         System.err.println("dynamic linking");
                 }
 		
+                //fortran neither uses the below parser, nor is a server
+                if( options.fortran() ){ //begin fortran
+                    if( options.getFiles().size() == 0 ){
+                        System.err.println("No files provided, must have at least one file.");
+                        System.exit(1);
+                    }
+                    System.out.println("compiling to fortran "+options.getFiles());
+                    String[] fargs = {"-d",(String)options.getFiles().get(0)};
+                    System.out.println("calling McFor with "+fargs);
+                    McFor.main(fargs);
+                    return;
+                } //end fortran
+                
                 if( options.server() ){
                     //in server mode
                     if( !quiet )

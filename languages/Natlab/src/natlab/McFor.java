@@ -224,11 +224,9 @@ public class McFor {
         System.err.println("Note: Converting a list of specified files to Fortran-95.");
         System.err.println("      The first file in the list should be the main program.");
         System.err.println();
-        System.err.println("   java natlab.McFor -d folder-name ");
-        System.err.println("Note: Converting all .m files of the folder to Fortran-95.");
-        System.err.println("      The file whose name is starting with 'drv_' should be the main program.");
-        System.err.println("      The pathname starting by '/' will be treated as a absolution pathname,\n"
-                           + "      otherwise it is a relative pathname ");
+        System.err.println("   java natlab.McFor -d file-name ");
+        System.err.println("Converts all .m and .n files in the same folder is 'file-name' to Fortran-95.");
+        System.err.println("      the given file-name is the the main program.");
         System.err.println("Support options: -fblas -fbounds-check");
     }
 	
@@ -343,14 +341,24 @@ public class McFor {
     }
 	
     /**
-     * Translate all .m files inside the folder into .n files.  
-     * @param folderName : same arguments from command line
-     * @return : the list of the translated .n filenames 
+     * Translate all .m files inside the folder of the given file into .n files. 
+     * The given file stays in front
+     * @param filename - the main filename, whose folder will be translated
+     * @return : the list of the translated .n filenames and given .n files
      */
-    public static ArrayList<String> translateFolder(String folderName) {
+    public static ArrayList<String> translateFolder(String filename) {
         ArrayList<String> filelist = new ArrayList<String>();
-        if(folderName==null)
+        if(filename==null)
             return filelist;		
+
+        //getting pathname
+        File file = new File(filename);
+        if(!file.exists()) {
+            System.err.println("Error: file name doesn't exist! ("+filename+")");
+            System.exit(2);
+        }
+        String folderName = file.getParent();
+        System.out.println("using folder "+folderName);
 
         // Working on absolute pathname 
         String absDirName = getAbsoluteName(folderName);
@@ -361,8 +369,9 @@ public class McFor {
             System.exit(2);
         }
         System.out.println("Folder/file name: "+absDirName);
-        // Check whether it's a file, 
+        // Check whether it's a file - TODO obsolete
         if(!mainFolder.isDirectory()) {
+            System.err.println("something wrong - this is not a folder: "+mainFolder);
             String nfilename = translateFile(absDirName);
     	    filelist.add(nfilename);
             return filelist;
@@ -395,8 +404,8 @@ public class McFor {
             for (int i=0; i<children.length; i++) {
                 if(children[i].equals(TEMP_M_FILENAME))
                     continue;
-                String filename = dir.getAbsolutePath()+PATH_STRING+children[i];
-                String nfilename = translateFile(filename);
+                String afilename = dir.getAbsolutePath()+PATH_STRING+children[i];
+                String nfilename = translateFile(afilename);
                 filelist.add(nfilename);
             }
 
@@ -406,8 +415,8 @@ public class McFor {
                 for (int i=0; i<children.length; i++) {
                     if(children[i].equals(TEMP_M_FILENAME))
                         continue;
-                    String filename = dir.getAbsolutePath()+PATH_STRING+children[i];
-                    String nfilename = translateFile(filename);
+                    String afilename = dir.getAbsolutePath()+PATH_STRING+children[i];
+                    String nfilename = translateFile(afilename);
                     filelist.add(nfilename);
                 }
             }
@@ -419,9 +428,16 @@ public class McFor {
             ArrayList<String> list = new ArrayList<String>();
             list.addAll(filelist);
             filelist.clear();
+            filename = getAbsoluteName(filename);
+            filename = filename.substring(0,filename.length()-2);
+            System.out.println("this is the main:"+(filename));
+
             for (int i=0; i<list.size(); i++) {
-                String filename = getPureFilename(list.get(i));
-                if(filename.substring(0, 4).equalsIgnoreCase("drv_")) {
+                System.out.println(list.get(i));
+                String afilename = getAbsoluteName(list.get(i));
+                afilename = afilename.substring(0,afilename.length()-2);
+                if(afilename.equalsIgnoreCase(filename)) {
+                    System.out.println("found main: "+afilename);
                     solveFilename(list.get(i));
                     filelist.add(list.get(i)); 
                     list.remove(i);
@@ -440,12 +456,24 @@ public class McFor {
      * @return the translated .n filename
      */
     public static String translateFile(String filename) {
+        //from translateFolder:
+        // Working on absolute pathname 
+        String absName = getAbsoluteName(filename);
+        File main = new File(absName);
+        // Check existence of the folder/file 
+        if(!main.exists()) {
+            System.err.println("Error: Folder/file name doesn't exist! ("+absName +")");
+            System.exit(2);
+        }
+        System.out.println("Folder/file name: "+absName);
+        //end from translateFolder
+
         // Don't translate .n file
-        if(hasExtension(filename, ".n"))
-            return filename;
-        System.out.println("Translating: "+filename);
-        filename = removeExtension(filename, ".m");
-        String[] files = {filename};
+        if(hasExtension(absName, ".n"))
+            return absName;
+        System.out.println("Translating: "+absName);
+        filename = removeExtension(absName, ".m");
+        //String[] files = {filename};
         // matlab.Translator.main(files);
         MATLAB2Natlab(filename);
         return filename +".n"; 
