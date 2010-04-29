@@ -2,8 +2,7 @@ package natlab;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import natlab.Main;
-import natlab.CompilationProblem;
+
 
 public class AbstractRewritePassTestGenerator extends AbstractTestGenerator
 {
