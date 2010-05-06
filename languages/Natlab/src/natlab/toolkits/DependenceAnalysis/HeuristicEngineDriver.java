@@ -200,11 +200,9 @@ public class HeuristicEngineDriver {
 	             }//end of if clause
 	        }//end of for loop with s var
 	        callIntroSort();
-	        HeuristicEngine hEngine=new HeuristicEngine(loopTable);
-	  		//Vector<PredictedData> predictedValues=hEngine.computeRegionDivisors();
-	        table=hEngine.computeRegionDivisors();
+	        
 	  		//writeToXMLFile(predictedValues);
-	        writeToXMLFile(table);
+	        //writeToXMLFile(table);	        
 	    }catch (SAXParseException err) {
 	    System.out.println ("** Parsing error" + ", line " 
 	         + err.getLineNumber () + ", uri " + err.getSystemId ());
@@ -216,7 +214,12 @@ public class HeuristicEngineDriver {
 
 	    }catch (Throwable t) {
 	    t.printStackTrace ();
-	    } 
+	   } 
+	    
+	    HeuristicEngine hEngine=new HeuristicEngine(loopTable);
+        table=hEngine.computeRegionDivisors();
+	    writeToXMLFile(table);
+	    
 
 	}
 	
@@ -235,10 +238,10 @@ public class HeuristicEngineDriver {
 	    	try{
 	  	     b.IntroSort(0, l.size());
 	  		}catch(Exception e){}	
-	  		for(int i=0;i<l.size();i++){		  			
-	  			System.out.print(((UpperBound)((ProfiledData)l.get(i)).getUBound()).getEnd()+" ");
-	  		}
-	  		System.out.println("  ");
+	  		//for(int i=0;i<l.size();i++){		  			
+	  			//System.out.print(((UpperBound)((ProfiledData)l.get(i)).getUBound()).getEnd()+" ");
+	  		//}
+	  		//System.out.println("  ");
 	    }  		
   }
 	
@@ -335,20 +338,29 @@ public class HeuristicEngineDriver {
 	
 	
   public void writeToXMLFile(Hashtable pTable){
-		File file = new File(dirName+"/"+"RangeData"+fileName);		
+		File file = new File(dirName+"/"+"RangeData"+fileName);	
+		System.out.println("I am gerwnejrwejrwerjkkjidsjfdfds");
 		try 
 		{   boolean exists = file.exists();	    
 		    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		    Document document;
-		    Set s=pTable.entrySet();        
-		    Iterator it=s.iterator();
+		    //Element rootElement=null;
+		    //Node rElement=null;
+		    Collection c=pTable.values();
+    	    Iterator it=c.iterator();
 		    
 		    if(!exists) //if file doesnot exist.
 		    {      	
 		     //  System.out.println("i am in xmlwrite"+htable.size()); 
 		       document = documentBuilder.newDocument();
-		       Element rootElement = document.createElement("HD"); // creates a element
+		       
+		    }
+		    else{//if file exist		   		    		
+		   	  document = documentBuilder.parse(file);	       	 
+		   	  document.normalizeDocument();
+		   	  
+		    }
 		       
 		       Element tsElement = document.createElement("RunNo"); // creates a element
 		       Date d=new Date();
@@ -374,28 +386,32 @@ public class HeuristicEngineDriver {
 			            tsElement.appendChild(loopElement); // add element1 under rootElement
 		           }//end of for
 		        }//end of while
-		       rootElement.appendChild(tsElement);
-		       document.appendChild(rootElement); // add the rootElement to the document
+		       
+		       if(!exists){
+		    	   Element rootElement = document.createElement("HD"); // creates a element
+		    	   rootElement.appendChild(tsElement);
+		    	   document.appendChild(rootElement); // add the rootElement to the document
+		       }
+		       
+		       else{
+		    	   Node rElement = document.getDocumentElement();
+		    	   rElement.appendChild(tsElement);
+		       }
 		        /*TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		        Transformer transformer = transformerFactory.newTransformer();
 		        DOMSource source = new DOMSource(document);
 		        StreamResult result = new StreamResult(file);
 		        transformer.transform(source, result);*/
-		    }//end of if
-		    else//if file exist
-		    {    
-		    		
-		   	 document = documentBuilder.parse(file);	       	 
-		   	 document.normalizeDocument();
-		     Node rootElement = document.getDocumentElement();  
-		     Element tsElement = document.createElement("RunNo"); // creates a element
-		     Date d=new Date();
-		     Timestamp ts=new Timestamp(d.getTime());
-		     tsElement.setAttribute(new String("TimeStamp"), ts.toString());
+		    //}//end of if
+		    
+		     //Node rootElement = document.getDocumentElement();  
+		     //Element tsElement = document.createElement("RunNo"); // creates a element
+		     //Date d=new Date();
+		     //Timestamp ts=new Timestamp(d.getTime());
+		     //tsElement.setAttribute(new String("TimeStamp"), ts.toString());
 		     
-		     while(it.hasNext()){ 
-		    	 System.out.println(pTable.size());
-		    	    LinkedList<PredictedData> tList=(LinkedList<PredictedData>)it.next();
+		     /*while(it.hasNext()){		         
+                    LinkedList<PredictedData> tList=(LinkedList<PredictedData>)it.next();	
 		    	    for(int i=0;i<tList.size();i++){ 
 			        	PredictedData pData=(PredictedData)tList.get(i);
 			            Element loopElement = document.createElement("LoopNo"); //create another element
@@ -411,11 +427,13 @@ public class HeuristicEngineDriver {
 			            predictedUBElement.setAttribute(new String("Value"), Integer.toString(pData.getUpperBound()));
 			            loopElement.appendChild(predictedUBElement);
 			            tsElement.appendChild(loopElement); // add element1 under rootElement
-		    	  }//end of for
+		    	  }//end of for               
 		        }//end of while
 		     rootElement.appendChild(tsElement);
 		     //rootElement.appendChild(tsElement); // add element1 under rootElement         
-		   }//end of else      
+		   //}//end of else*/ 
+		       
+		       
 		    TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		    Transformer transformer = transformerFactory.newTransformer();
 		    DOMSource source = new DOMSource(document);

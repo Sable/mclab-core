@@ -349,12 +349,12 @@ public class Main
                                 System.err.println("Dependence Tester");
                             
                             if(options.gcd()){
-                            	String tString="";
-                            	for(int i=0;i<args.length;i++)
-                            	{
-                            		tString=args[i];
-                            		if(tString.matches("[a-z].m")) break;
-                            	}
+                            	//String tString="";
+                            	//for(int i=0;i<args.length;i++)
+                            	//{
+                            	//	tString=args[i];
+                            	//	if(tString.matches("[a-z].m")) break;
+                            	//}
                                 if( !quiet )	
                                     System.err.println("Dependence Analysis with GCD Test");
                                 fileReader=translateFile(file,errors);
@@ -362,8 +362,10 @@ public class Main
 				
                                 if(prog!=null)
                                     {
+                                		//System.out.println(file);
+                                		//System.out.println(tString);
                                         String testType="gcd";
-                                        parseProgramNode(prog,testType,tString);
+                                        parseProgramNode(prog,testType,file);
                                         //System.out.println("Out of parser for gcd testing");
                                     }
                             }
@@ -512,14 +514,17 @@ public class Main
         }
     }
     
+    
     /*
      * This program serves as a driver program for LoopAnalysis and Transformation framework.
      * 1.It instruments the input .m File.
      * 2.Then invokes the heuristicEngine to determine appropriate range values.
+     * 3.Invokes dependence Analysis Driver and applies transformations on the loops if applicable.
+     * 4.Then writes the transformed code to a new file.
      * 
      */
-    private static void parseProgramNode(Program prog,String testType,String fileName)
-    {
+private static void parseProgramNode(Program prog,String testType,String fileName){
+	
     	ProfilerDriver pDriver=new ProfilerDriver();
     	pDriver.setFileName(fileName);
     	pDriver.traverseFile(prog);
@@ -532,15 +537,40 @@ public class Main
 		hDriver.parseXmlFile();		
         
 		
-		
 		DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
 		dDriver.setFileName(fileName);
 		String fName=dDriver.getFileName();
-	    Reader fileReader = new StringReader("");
-	    ArrayList errors = new ArrayList();
-		fileReader=translateFile(fName,errors);
-	    Program program = parseFile( fName,  fileReader, errors );
-		dDriver.traverseFile(program);	
+		dDriver.setPredictedLoopValues(hDriver.getTable());		
+		ArrayList errors = new ArrayList();
+		  try{
+              Reader fileReader = new FileReader( fName);
+              Program program = parseFile( fName,  fileReader, errors );             
+      		  dDriver.traverseFile(program);	
+          }catch(FileNotFoundException e){
+              System.err.println("File "+fName+" not found!\nAborting");
+              System.exit(1);
+          }
+          
+          //TODO:Put a check that if there is no change prog node then dont write to the file
+         /* Writer output; 
+          StringTokenizer st = new StringTokenizer(fName,".");
+      	  String fiName=st.nextToken();
+          File file = new File(fiName+"/"+"transformed"+ fiName + ".m");
+          try {
+			  output = new BufferedWriter(new FileWriter(file));
+			  output.write(prog.getPrettyPrinted());
+	          output.close();
+		   } catch (IOException e) {			  
+			  e.printStackTrace();
+		 } */  	
+		   
+	    //Reader fileReader = new StringReader(fName);
+	    //ArrayList errors = new ArrayList();
+	    //System.out.println( fName );
+	    //fileReader=translateFile(fName,errors);
+		//Program program = parseFile( fName,  fileReader, errors );
+		//System.out.println(program.dumpTreeAll());
+		//dDriver.traverseFile(program);	
         
         //pDriver.traverseProgram(fileName);
         //System.out.println(prog.getPrettyPrinted());

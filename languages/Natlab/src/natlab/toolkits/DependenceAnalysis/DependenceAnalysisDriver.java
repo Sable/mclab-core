@@ -1,6 +1,9 @@
 package natlab.toolkits.DependenceAnalysis;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -48,6 +51,8 @@ public class DependenceAnalysisDriver extends ForVisitor
 	private int loopNumber;
 	private String fileName;
 	private String dirName;
+	private boolean isNested=false;
+	
 	
 /*public DependenceAnalysisDriver(ForStmt fNode)	
 {	
@@ -86,7 +91,8 @@ public void traverseFile(Program prog){
 public void caseLoopStmt(ASTNode node){
 	
 	if (node instanceof ForStmt){
-		System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());			
+		//System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());
+		isNested=false;
 		ForStmt fNode=(ForStmt) node;
 		forNode=fNode;
 		traverseLoopStatements();
@@ -99,14 +105,14 @@ public void caseLoopStmt(ASTNode node){
 }
 
 public void caseIfStmt(IfStmt node){
-	System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+	//System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
 	IfStmt ifNode=(IfStmt) node;
 	//ForVisitor fVisitor=new ForVisitor(); 
 	//ifNode.applyAllChild(fVisitor);
 }
 
 public void caseSwitchStmt(SwitchStmt node){
-	System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+	//System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
 	SwitchStmt sNode=(SwitchStmt)node;
 	//ForVisitor fVisitor=new ForVisitor(); 
 	//sNode.applyAllChild(fVisitor);
@@ -125,13 +131,23 @@ public void setPredictedLoopValues(Hashtable<String,LinkedList<PredictedData>> t
 * 1.Checks for tightly nested loops.
 */	
 private void isTightlyNestedLoop(ForStmt forStmt){
-			 
+  if(!isNested){	
+	//Stmt s=forNode.getStmt(0);
+	Stmt s=forStmt.getStmt(0);
+	forStmtArray.add(forStmt);
+    if(s instanceof AssignStmt){AssignStmt aStmt=(AssignStmt)s;
+        isNested=true; 
+    	if((aStmt.getRHS()) instanceof IntLiteralExpr){
+    		loopNumber=((IntLiteralExpr)aStmt.getRHS()).getValue().getValue().intValue();
+        }//end of 3rd if    	
+     }//end of 2nd if
+  }//end of ist if
   Stmt stmt=forStmt.getStmt(1);
   if(stmt instanceof ForStmt){      			  
 	  ForStmt tForStmt=(ForStmt)stmt;
 	  //forStmtArray[loopIndex]=tForStmt;
 	  forStmtArray.add(tForStmt);
-	  forNode=tForStmt;				  
+	  forNode=tForStmt;	  
 	  loopIndex++;
 	  isTightlyNestedLoop(tForStmt);				  
   }//end of if
@@ -161,11 +177,12 @@ public void traverseLoopStatements()
 	isTightlyNestedLoop(forNode);
 	Vector<DependenceData> dataVector=new Vector<DependenceData>();
 	//DependenceData dData=null;
-	Stmt s=forNode.getStmt(0);
-    if(s instanceof AssignStmt){AssignStmt aStmt=(AssignStmt)s;        
-    	if((aStmt.getRHS()) instanceof IntLiteralExpr){
-    		loopNumber=((IntLiteralExpr)aStmt.getRHS()).getValue().getValue().intValue();}
-    }//end of if
+	//Stmt s=forNode.getStmt(0);
+    //if(s instanceof AssignStmt){AssignStmt aStmt=(AssignStmt)s;        
+    //	if((aStmt.getRHS()) instanceof IntLiteralExpr){
+    	//	loopNumber=((IntLiteralExpr)aStmt.getRHS()).getValue().getValue().intValue();}
+   // 	//System.out.println("Loop Number "+loopNumber);
+   // }//end of if
 	int nStmts=forNode.getNumStmt();
 	//cToolBox=new ConstraintsToolBox(loopIndex+1,forStmtArray);
 	
@@ -173,17 +190,17 @@ public void traverseLoopStatements()
 	cToolBox.setForStmtArray(forStmtArray);
 	//cToolBox.setLoopNo(loopNumber);
 	
-	System.out.println("No of Statements"+nStmts);
+	//System.out.println("No of Statements"+nStmts);
 	boolean aFlag=false;
 	for(int i=1;i<nStmts;i++) //not to include first statement of the loop which is lNum.
 	{
-	  s=forNode.getStmt(i);
+	  Stmt s=forNode.getStmt(i);
 	  if(s instanceof AssignStmt)
 	  {
 		AssignStmt aStmt1=(AssignStmt)s;		
 		for(int j=i;j<nStmts;j++){  
 		   DependenceData dData=prepareDependenceData();
-		   System.out.println("loop Index"+loopIndex);		   
+		   //System.out.println("loop Index"+loopIndex);		   
 		   dData.setStatementAccessed("S"+i+":"+"S"+j);
 	       if(i==j){ 
 	    	   System.out.println("i am in same statements block"); 	    
@@ -208,9 +225,28 @@ public void traverseLoopStatements()
  if(dataVector.size()!=0){
 	 LegalityTest lTest=new LegalityTest();
 	 lTest.setDataVector(dataVector);
+	 lTest.setDirName(dirName);
+	 lTest.setForStmt(forStmtArray);
+	 //System.out.println("Data Vector Sizegjdfgdfhgdfjghd"+dataVector.size());
 	 lTest.testLegality();
-	 writeToXMLFile(dataVector);}
+	 writeToXMLFile(dataVector);
+  }//end of if
+  //writeTransformedCode();
 }//end of traverseLoopStatements function
+
+/*private void writeTransformedCode(){
+	
+	File file = new File(dirName+"/"+"transformed"+dirName+".m");
+	Writer output;
+	try{  
+		boolean exists = file.exists();	
+		if(!exists){
+			output = new BufferedWriter(new FileWriter(file));
+			output.write(node.getPrettyPrinted());
+	        output.close();			
+		}
+	} catch (Exception e) {System.out.println(e.getMessage());}
+}*/
 
 
 
@@ -221,7 +257,7 @@ public void traverseLoopStatements()
 private void writeToXMLFile(Vector<DependenceData> dataVector){
 	
 	File file = new File(dirName+"/"+"dependence"+dirName+".xml");	
-	System.out.println("i am in xmlwrite"+file.getName());
+	
 	String value="";
 	try{  
 		boolean exists = file.exists();	    
@@ -239,7 +275,7 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
         }   	
             
 	    Element loopElement = document.createElement("LoopNo"); //create another element
-	    loopElement.setAttribute(new String("LoopNumber"), Integer.toString(loopNumber));            
+	    loopElement.setAttribute(new String("LoopNumber"), Float.toString(loopNumber));            
 	    loopElement.setAttribute(new String("NestingLevel"), Integer.toString(loopIndex));
 	    Iterator<DependenceData> it=dataVector.iterator();            
 	    while(it.hasNext()){
@@ -248,19 +284,40 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	    	Element rangeElement = document.createElement("Range"); //create another element
 	        rangeElement.setAttribute(new String("Start"), Integer.toString(data.getStartRange()));            
 	        rangeElement.setAttribute(new String("End"), Integer.toString(data.getEndRange()));
-	        rangeElement.setAttribute(new String("Dependence"),data.getDependence());
-	        for(int i=0;i<data.getNLoopArray().length;i++){
-	        	NestedLoop[] nLoop=data.getNLoopArray();
-	        	
-	        	Element nestedLoopElement = document.createElement("NestedLoop"); //create another element
-	            nestedLoopElement.setAttribute(new String("Number"), Float.toString(nLoop[i].getLoopNo()));
-	            
-	            Element nLRangeElement = document.createElement("Range"); //create another element
-	            nLRangeElement.setAttribute(new String("Start"), Float.toString(nLoop[i].getStartRange()));
-	            nLRangeElement.setAttribute(new String("End"), Float.toString(nLoop[i].getEndRange()));
-	            nLRangeElement.setAttribute(new String("Dependence"),data.getDependence());
-	            
-	            Element arrayAccessElement = document.createElement("LoopStmts");            	
+	        rangeElement.setAttribute(new String("Dependence"),data.getDependence());	        
+	        
+	        //System.out.println("i am in xmlwrite"+file.getName());
+	        if(data.getNestingLevel()>0){
+		        for(int i=0;i<data.getNLoopArray().length;i++){
+		        	NestedLoop[] nLoop=data.getNLoopArray();
+		        	
+		        	Element nestedLoopElement = document.createElement("NestedLoop"); //create another element
+		            nestedLoopElement.setAttribute(new String("Number"), Float.toString(nLoop[i].getLoopNo()));
+		            
+		            Element nLRangeElement = document.createElement("Range"); //create another element
+		            nLRangeElement.setAttribute(new String("Start"), Float.toString(nLoop[i].getStartRange()));
+		            nLRangeElement.setAttribute(new String("End"), Float.toString(nLoop[i].getEndRange()));
+		            nLRangeElement.setAttribute(new String("Dependence"),data.getDependence());
+		            
+		            Element arrayAccessElement = document.createElement("LoopStmts");            	
+		        	arrayAccessElement.setAttribute(new String("StmtNumbers"),data.getStatementAccessed() );
+		        	arrayAccessElement.setAttribute(new String("Access"),data.getArrayAccess() );
+		        	int[] array=data.getDistanceArray();
+		        	value="";
+		        	for(int j=0;j<array.length;j++){
+		        		if(j<array.length-1) value+=array[j]+",";
+		        		else value+=array[j];
+		        		//System.out.println("Value"+value+array.length);
+		        	}
+		        	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
+		 
+		            nLRangeElement.appendChild(arrayAccessElement);
+		            nestedLoopElement.appendChild(nLRangeElement);
+		            rangeElement.appendChild(nestedLoopElement); // add element1 under loopElement
+		        } 
+		      }//end of if
+	        else if(data.getNestingLevel()==0){
+	        	Element arrayAccessElement = document.createElement("LoopStmts");            	
 	        	arrayAccessElement.setAttribute(new String("StmtNumbers"),data.getStatementAccessed() );
 	        	arrayAccessElement.setAttribute(new String("Access"),data.getArrayAccess() );
 	        	int[] array=data.getDistanceArray();
@@ -271,14 +328,11 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	        		//System.out.println("Value"+value+array.length);
 	        	}
 	        	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
-	 
-	            nLRangeElement.appendChild(arrayAccessElement);
-	            nestedLoopElement.appendChild(nLRangeElement);
-	            rangeElement.appendChild(nestedLoopElement); // add element1 under loopElement
-	        }    	
+	        	rangeElement.appendChild(arrayAccessElement); // add element1 under loopElement
+	        }//end of else if
 	    	
 	    	loopElement.appendChild(rangeElement); // add element1 under loopElement
-	    }
+	  }
 	    
 	    if(!exists){
 	    	rootElement = document.createElement("AD"); // creates a element
@@ -297,47 +351,7 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	    transformer.transform(source, result);
 	 } catch (Exception e) {System.out.println(e.getMessage());}   
 
-}//end of function writeToXMLFile 
-
-
-     /*   else//if file exist
-        {          
-       	 document = documentBuilder.parse(file);
-       	 
-       	 document.normalizeDocument();
-         Node rootElement = document.getDocumentElement();         
-         Element loopElement = document.createElement("LoopNo"); //create another element         
-         loopElement.setAttribute(new String("LoopNumber"), Integer.toString(loopNumber));            
-         loopElement.setAttribute(new String("NestingLevel"), Integer.toString(loopIndex+1));
-         Iterator it=dataVector.iterator();            
-         while(it.hasNext()){
-         	DependenceData data=(DependenceData)it.next();
-         	Element arrayAccessElement = document.createElement("LoopStmts");
-         	arrayAccessElement.setAttribute(new String("StmtNumbers"),data.getStatementAccessed() );
-         	arrayAccessElement.setAttribute(new String("access"),data.getArrayAccess() );
-         	int[] array=data.getDistanceArray();
-         	value="";
-         	for(int j=0;j<array.length;j++){
-         		if(j<array.length-1) value+=array[j]+",";
-        		else value+=array[j];
-         	}
-         	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
-         	loopElement.appendChild(arrayAccessElement); // add element1 under loopElement
-         }                        
-         rootElement.appendChild(loopElement); // add element1 under rootElement            
-	     //document.appendChild(rootElement); // add the rootElement to the document
-         
-       }//end of else      
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(file);
-        transformer.transform(source, result);
-     } catch (Exception e) {System.out.println(e.getMessage());}   
-	
-}
-
-
+}//end of function writeToXMLFile
 	
 	/*
 	 * ApplyTests function applies appropriate test on the graph for a statement and then prints the results.

@@ -19,16 +19,16 @@ public class Reversal {
 		else {rMatrix[i][j]=0;}
 	  }//end of 2nd for
 	}//end of 1st for
-	 for(int i=0;i<2;i++){
-     	  for(int j=0;j<2;j++){
-     		  System.out.print(rMatrix[i][j]+"  ");
-     	  }
-     }
+	 //for(int i=0;i<Rows;i++){
+     	//  for(int j=0;j<Cols;j++){
+     	//	  System.out.print(rMatrix[i][j]+"  ");
+     	//  }
+     //}
   }//end of function
  public int[][] getMatrix(){
 	 return rMatrix;
  }
- public boolean applyReversal(DependenceData lData){
+ public boolean applyReversal(int[] array){
 	 //LinkedList l=(LinkedList)lData.getDistanceVectors();
 	 /*LinkedList l=(LinkedList)lData.get
 	 for(int i=0;i<l.size();i++){
@@ -37,7 +37,7 @@ public class Reversal {
 		 
 	 }*/
 	 
-	 int[] array=lData.getDistanceArray();	
+	 //int[] array=lData.getDistanceArray();	
 	 if(!multiply(array))return false;	 
 	 return true;
 	 

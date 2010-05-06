@@ -31,7 +31,7 @@ public class ProfilerDriver extends ForVisitor{
 	public void caseLoopStmt(ASTNode node){
 		
 		if (node instanceof ForStmt){
-			System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());			
+			//System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());			
 			ForStmt fNode=(ForStmt) node;
 			forStmt=fNode;
 			traverseForNode();
@@ -42,14 +42,14 @@ public class ProfilerDriver extends ForVisitor{
 	}
 
 	public void caseIfStmt(IfStmt node){
-		System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+		//System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
 		IfStmt ifNode=(IfStmt) node;
 		//ForVisitor fVisitor=new ForVisitor(); 
 		//ifNode.applyAllChild(fVisitor);
 	}
 
 	public void caseSwitchStmt(SwitchStmt node){
-		System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
+		//System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
 		SwitchStmt sNode=(SwitchStmt)node;
 		//ForVisitor fVisitor=new ForVisitor(); 
 		//sNode.applyAllChild(fVisitor);

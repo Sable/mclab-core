@@ -82,18 +82,29 @@
 	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
 
 	<!-- jflex from metalexer spec -->
-	<target name="metalexer">
+	<target name="metalexer">		
 		<java jar="${lib.dir}/${metalexer.jar.path.prop}" failonerror="true" fork="true">
 			<arg value="${layout.name}" />
 			<arg value="${src.dir}/${lexer.dir}" />
-			<arg value="${gen.dir}/${lexer.dir}" />
+			<arg value="${gen.dir}/${lexer.dir}" />		
 		</java>
-	</target>
+		
+		<java jar="${lib.dir}/${metalexer.jar.path.prop}" failonerror="true" fork="true">
+					<arg value="${aspects.layout.name}" />
+					<arg value="${src.dir}/${lexer.dir}" />
+					<arg value="${gen.dir}/${lexer.dir}" />
+		</java>		
+		
+		
+  </target>
 
 	<!-- generates Java files from JFlex scanner spec -->
 	<!-- NB: overrides target from gen.xml -->
 	<target name="jflex" depends="def.jflex.task, metalexer">
+		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.meta.flex" destdir="${gen.dir}" nobak="yes" />
 		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
+		<jflex file="${gen.dir}/${lexer.dir}/${aspects.layout.name}.meta.flex" destdir="${gen.dir}" nobak="yes" />
+		<jflex file="${gen.dir}/${lexer.dir}/${aspects.layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
 	<!--=====================================================================-->

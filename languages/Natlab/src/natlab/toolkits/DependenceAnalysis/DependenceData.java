@@ -6,26 +6,36 @@ package natlab.toolkits.DependenceAnalysis;
  * Author:Amina Aslam 
  * 
  */
-public class DependenceData extends Data {
+public class DependenceData implements Cloneable {
 	private float loopNo;
 	private String dependence;
 	private int startRange;
 	private int endRange;
 	private int nestingLevel;
 	private String lVarName;
+	private String transformation;
 	//LinkedList distanceVectors;
 	private NestedLoop nestedLoop;
 	private String arrayAccess;
 	private int distanceArray[];
 	private String statementAccessed;
 	private NestedLoop nLoopArray[];
-	private static int count=0;
+	private int count=0;
+	private int nestedLRanges;
 	
+	public int getNestedLRanges() {
+		return nestedLRanges;
+	}
+	public void setNestedLRanges(int nestedLRanges) {
+		this.nestedLRanges = nestedLRanges;
+		nLoopArray=new NestedLoop[nestedLRanges];
+	}
 	public NestedLoop[] getNLoopArray() {
 		return nLoopArray;
 	}
-	private void setNLoopArray(int nLevel) {
-		nLoopArray = new NestedLoop[nLevel];
+	public void setNLoopArray(NestedLoop[] array) {
+		//nLoopArray = new NestedLoop[nLevel];
+		nLoopArray=array;
 	}
 	public String getLVarName() {
 		return lVarName;
@@ -51,6 +61,7 @@ public class DependenceData extends Data {
 	public NestedLoop getNestedLoop() {
 	    nestedLoop=new NestedLoop();
 	    nLoopArray[count]=nestedLoop;
+	    System.out.println("Count size"+count);
 	    count++;
 	    return nestedLoop;
 	}
@@ -63,7 +74,7 @@ public class DependenceData extends Data {
 	}
 	public void setNestingLevel(int nestingLevel) {
 		this.nestingLevel = nestingLevel;
-		this.setNLoopArray(nestingLevel);
+		//this.setNLoopArray(nestingLevel);
 		//if(nestingLevel>0){
 		  //nestedLoop=new NestedLoop();	
 		//}
@@ -119,10 +130,18 @@ public class DependenceData extends Data {
 	public void setDistanceArray(int[] distanceArray) {
 		this.distanceArray = distanceArray;
 	}
-	public DependenceData clone(){
-		DependenceData dData=new DependenceData();
-		dData=this;
+	public Object clone(){
+		DependenceData dData=new DependenceData();		
+		dData.setLoopNo(this.getLoopNo());
+		dData.setNestingLevel(this.getNestingLevel());
+		dData.setStatementAccessed(this.getStatementAccessed());		
 		return dData;
+	}
+	public String getTransformation() {
+		return transformation;
+	}
+	public void setTransformation(String transformation) {
+		this.transformation = transformation;
 	}
 
 

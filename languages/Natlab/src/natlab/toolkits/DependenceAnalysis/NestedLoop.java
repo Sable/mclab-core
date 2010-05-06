@@ -11,7 +11,14 @@ public class NestedLoop extends Data{
 	private int endRange;
 	private String lVarName;
 	private char dependence;
+	private String transformation;
 	
+	public String getTransformation() {
+		return transformation;
+	}
+	public void setTransformation(String transformation) {
+		this.transformation = transformation;
+	}
 	public char getDependence() {
 		return dependence;
 	}

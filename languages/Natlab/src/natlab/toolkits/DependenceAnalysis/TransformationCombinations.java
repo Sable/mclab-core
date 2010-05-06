@@ -14,30 +14,49 @@ public class TransformationCombinations {
 	private int cMatrix[][];
 	private int Level;
 	public void createInterchangeReversalMatrix(int rLevel,int nLevel){
-		  Level=nLevel;
-		  cMatrix=new int[nLevel][nLevel];
+		  Level=nLevel+1;
+		  cMatrix=new int[Level][Level];
 		  int sum=0;
-	      Reversal reversal=new Reversal(nLevel,nLevel);
-	      Interchange interchange=new Interchange(nLevel,nLevel);
+	      Reversal reversal=new Reversal(Level,Level);
+	      Interchange interchange=new Interchange(Level,Level);
 	      reversal.setMatrix(rLevel);
-	      interchange.setMatrix(nLevel);
+	      interchange.setMatrix(Level);
 	      int tIMatrix[][]=interchange.getMatrix();
 	      int tRMatrix[][]=reversal.getMatrix();
-	      for(int i=0; i<nLevel; i++){
-	        for(int j=0; j<nLevel; j++){
-	          for(int k=0; k<nLevel; k++){
+	      for(int i=0; i<Level; i++){
+	        for(int j=0; j<Level; j++){
+	          for(int k=0; k<Level; k++){
 	             cMatrix[i][j] += tIMatrix[k][j]*tRMatrix[i][k];	             
 	           }	          
 	         }	        
-	      }
-	      for(int i=0;i<2;i++){
-	      	  for(int j=0;j<2;j++){
-	      		  System.out.print(cMatrix[i][j]+"  ");
-	      	  }
-	      }
+	    }	
 	}
-	public boolean applyCombination(DependenceData lData){
-		int[] array=lData.getDistanceArray();		 
+	
+	public void createReversalInterchangeMatrix(int rLevel,int nLevel){
+		  Level=nLevel+1;
+		  cMatrix=new int[Level][Level];
+		  int sum=0;
+	      Reversal reversal=new Reversal(Level,Level);
+	      Interchange interchange=new Interchange(Level,Level);
+	      reversal.setMatrix(rLevel);
+	      interchange.setMatrix(Level);
+	      int tIMatrix[][]=interchange.getMatrix();
+	      int tRMatrix[][]=reversal.getMatrix();
+	      for(int i=0; i<Level; i++){
+	        for(int j=0; j<Level; j++){
+	          for(int k=0; k<Level; k++){
+	             cMatrix[i][j] += tRMatrix[i][k]*tIMatrix[k][j];	             
+	           }	          
+	         }	        
+	      }
+	      //for(int i=0;i<Level;i++){
+	      	  //for(int j=0;j<Level;j++){
+	      		///  System.out.print(cMatrix[i][j]+"  ");
+	      	  //}
+	      //}
+	}
+	public boolean applyCombination(int[] array){
+		//int[] array=lData.getDistanceArray();		 
 	    if(!multiply(array))return false;
 		return true;
 
