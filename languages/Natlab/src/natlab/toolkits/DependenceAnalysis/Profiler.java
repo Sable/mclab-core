@@ -96,7 +96,7 @@ public class Profiler {
 	 * This function inserts the following code into the ast
 	 * xmlCodeGenerator('test',1,lVariableName,lowerBound,loopIncFactor,upperBound,nestingLevel);
 	 */
-	public void insertFunctionCall(int nestingLevel,ForStmt[] fStmtArray)
+	public void insertFunctionCall(int nestingLevel,ForStmt[] fStmtArray,int maxLoopNo)
 	{
 		int insertLevel=0;
 		ExprStmt fCExprStmt=new ExprStmt();
@@ -118,6 +118,12 @@ public class Profiler {
 		lNoObj=new Integer(loopNo);		    		        											
 		lNoExpr.setValue(new natlab.DecIntNumericLiteralValue(lNoObj.toString()));//creates an expression for loopNo.
 		
+		IntLiteralExpr mLExpr=new IntLiteralExpr();
+		Integer mLObj;
+		mLObj=new Integer(maxLoopNo);		    		        											
+		mLExpr.setValue(new natlab.DecIntNumericLiteralValue(mLObj.toString()));//creates an expression for maxLoopNo.
+		
+		
 		
 		fCList.insertChild(fileNameExpr, 0);
 		fCList.insertChild(createLoopVariableNameExpr(nestingLevel), 1);
@@ -126,6 +132,7 @@ public class Profiler {
 		fCList.insertChild(createLoopIncExpr(nestingLevel), 4);
 		fCList.insertChild(nLevelExpr, 5);
 		fCList.insertChild(lNoExpr, 6);
+		fCList.insertChild(mLExpr, 7);
 		
 		insertLevel=forStmtArray[0].getParent().getIndexOfChild(forStmtArray[0])+1;
 		ParameterizedExpr pExpr=eFactory.createParaExpr(fCNExpr, fCList);
@@ -146,28 +153,30 @@ public class Profiler {
 	 */
 	private Expr createLoopVariableNameExpr(int nestingLevel)
 	{
-		if(nestingLevel >=1)
-		{		  	
+		if(nestingLevel >=1){		  	
 			
 		  Row lVariableNamesRow=new Row();
 		  //for(int i=0;i<forStmtArray.length;i++)
-		  for(int i=0;i<nestingLevel+1;i++)
+		  int level=nestingLevel+1;
+		  for(int i=0;i<level;i++)
 		  {			  
 			 AssignStmt aStmt=new AssignStmt();
 			 aStmt=forStmtArray[i].getAssignStmt();			  
-			 if(aStmt.getLHS() instanceof NameExpr)
-			 {
+			 if(aStmt.getLHS() instanceof NameExpr){
 			   StringLiteralExpr sExpr=new StringLiteralExpr();
 			   sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
 			   lVariableNamesRow.addElement(sExpr);
 			 }
 			 
+			 if(i<(nestingLevel)){lVariableNamesRow.addElement(new StringLiteralExpr(":"));}
+			 
 		  }
 		  MatrixExpr lVariableNamesMExpr=new MatrixExpr();
 		  lVariableNamesMExpr.addRow(lVariableNamesRow);
-		  MTransposeExpr lVariableNamesMTExpr=new MTransposeExpr();
-		  lVariableNamesMTExpr.setOperand(lVariableNamesMExpr);
-		  return lVariableNamesMTExpr;
+		  //MTransposeExpr lVariableNamesMTExpr=new MTransposeExpr();
+		  //lVariableNamesMTExpr.setOperand(lVariableNamesMExpr);
+		  //return lVariableNamesMTExpr;
+		  return lVariableNamesMExpr;
 		  
 		}
 		else //(nestingLevel==0)
@@ -260,8 +269,9 @@ public class Profiler {
 			 if(aStmt.getRHS() instanceof RangeExpr)
 			 {
 			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
-			   lBoundRow.addElement(rExpr.getLower());
+			   lBoundRow.addElement(rExpr.getLower());			   
 			 }
+			 
 		  }
 		  MatrixExpr lBoundMExpr=new MatrixExpr();
 		  lBoundMExpr.addRow(lBoundRow);
@@ -270,6 +280,7 @@ public class Profiler {
 		  //lBoundAStmt.setRHS(lBoundMTExpr);
 		  //lBoundAStmt.setOutputSuppressed(true);
 		  return lBoundMTExpr;
+		  //return lBoundMExpr;
 		  
 		}
 		else //if(nestingLevel==0)
