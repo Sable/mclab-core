@@ -16,6 +16,7 @@ public class ProfilerDriver extends ForVisitor{
 	private int loopIndex=0;
 	private static Profiler prof=new Profiler();
 	private String fileName;	
+	private int maxLoopNo=0;
 	//public ProfilerDriver(ForStmt fStmt)
 	
 	public ProfilerDriver(){	
@@ -34,6 +35,7 @@ public class ProfilerDriver extends ForVisitor{
 			//System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());			
 			ForStmt fNode=(ForStmt) node;
 			forStmt=fNode;
+			maxLoopNo++;
 			traverseForNode();
 		}
 		else{
@@ -62,11 +64,10 @@ public class ProfilerDriver extends ForVisitor{
 	 * This function does the following 
 	 * 1.Checks for tightly nested loops.
 	 */	
-    private void isTightlyNestedLoop(ForStmt fStmt)
-    {
-			 
-       Stmt stmt=fStmt.getStmt(0);
-       if(stmt instanceof ForStmt && stmt!=null)
+ private void isTightlyNestedLoop(ForStmt fStmt){
+      Stmt stmt=fStmt.getStmt(0);
+      //System.out.println(stmt.toString());
+      if(stmt instanceof ForStmt && stmt!=null)
         { loopIndex++;			  
 		  ForStmt tForStmt=(ForStmt)stmt;
 		  forStmtArray[loopIndex]=tForStmt;
@@ -86,7 +87,7 @@ public class ProfilerDriver extends ForVisitor{
 		 isTightlyNestedLoop(forStmt);		 
 		 //prof.setFileName(fileName);//This is already done in Main.java		 
 		 prof.insertLoopNo(forStmtArray);
-		 prof.insertFunctionCall(loopIndex,forStmtArray);         
+		 prof.insertFunctionCall(loopIndex,forStmtArray,maxLoopNo);         
 	    //call a function in profiler with nesting level added to it
 	    //nesting level would be forStmtArray.size;		
 	}
@@ -96,6 +97,9 @@ public class ProfilerDriver extends ForVisitor{
 	}
 	public String getFileName() {
 		return fileName;
+	}
+	public void insertMaxLoopNo(){
+		
 	}
 	
 	/*
