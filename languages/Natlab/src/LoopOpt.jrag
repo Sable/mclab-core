@@ -1,0 +1,36 @@
+aspect LoopOpt {
+    
+    private annotations.ast.LoopOptStmt ForStmt.getFirstLoopOptAnnotation() {
+        if(getNumStmt() == 0) {
+            return null;
+        }
+        Stmt firstStmt = getStmt(0);
+        if(firstStmt instanceof ExpandedAnnotation) {
+            for(annotations.ast.Stmt stmt : ((ExpandedAnnotation) firstStmt).getanno().getStmts()) {
+                if(stmt instanceof annotations.ast.LoopOptStmt) {
+                    return (annotations.ast.LoopOptStmt) stmt;
+                }
+            }
+        }
+        return null;
+    }
+    
+    syn boolean ForStmt.isEligibleForLoopFusion() = getFirstLoopOptAnnotation() instanceof annotations.ast.LoopFusionOpt;
+    syn boolean ForStmt.isEligibleForLoopFission() = getFirstLoopOptAnnotation() instanceof annotations.ast.LoopFissionOpt;
+    syn boolean ForStmt.isEligibleForLoopInterchange() = getFirstLoopOptAnnotation() instanceof annotations.ast.LoopInterchangeOpt;
+    syn boolean ForStmt.isEligibleForLoopReversal() = getFirstLoopOptAnnotation() instanceof annotations.ast.LoopReversalOpt;
+    syn boolean ForStmt.isEligibleForLoopUnrolling() = getFirstLoopOptAnnotation() instanceof annotations.ast.LoopUnrollingOpt;
+    
+     float ForStmt.Fl1;
+     float ForStmt.Fl2;     
+     
+     public float ForStmt.getFl1() {
+        return Fl1;   	
+    }
+    
+    public float ForStmt.getFl2() {
+        return Fl2;   	
+    }
+    
+    
+}
