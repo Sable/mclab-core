@@ -113,7 +113,7 @@ private void setRangeInfo(boolean rangeInfo) {
 private boolean isRangeInfo(){
 	return rangeInfo;
 }
-private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vector<DependenceData> dataVector){
+private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vector<DependenceData> dataVector,boolean flag){
    //int counter=0;	
    boolean isNested=false; 
    if(!pTable.isEmpty()){
@@ -161,17 +161,21 @@ private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vec
 		    	//dData.setNLoopArray(Data.getNLoopArray());
 		    //}
 	        lNo=Data.getLoopNo();
-			makeEquationsForSubscriptExprs(aExpr,bExpr,dData);
-			int[] array=dData.getDistanceArray();
-			for(int k=0;k<dData.getDistanceArray().length;k++){
-				System.out.println("array value"+array[k]);
-			}
+	        if(flag){makeEquationsForSubscriptExprs(aExpr,bExpr,dData);}
+	        else{
+	        	dData.setDependence("n");
+	        }
+			//int[] array=dData.getDistanceArray();
+			//for(int k=0;k<dData.getDistanceArray().length;k++){
+				//System.out.println("array value"+array[k]);
+			//}
 			dataVector.add(dData);
 		}//end of for
 	 }//end of 2nd if
    } //end of 1st if
 
 }
+
 
 /*
 	 * This function checks whether accessed arrays are the same or not.
@@ -181,35 +185,28 @@ private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vec
 */	
 public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector){	
  boolean aFlag=false; //TODO:Needs to fix
+ 
  //LinkedList aList[]=new LinkedList[dData.getNestingLevel()];
  if(aExpr instanceof ParameterizedExpr){ 	
 	Vector<ParameterizedExpr> params=new Vector<ParameterizedExpr>();
 	tokenizeExpression(bExpr,params);
 	Iterator it =params.iterator();
+	if(!it.hasNext()){
+	   	 prepareDependenceData(aExpr,bExpr,dData,dataVector,false);
+	 }
     while(it.hasNext()){   
     	Expr tExpr=(Expr)it.next();   	    				
-    	if(aExpr.getVarName().equals(tExpr.getVarName())){		     	    	  
-		   //DependenceData tdData=new DependenceData(); //This might be un-necessary,can use the incoming dData.
-	 	   //tdData.setLoopNo(dData.getLoopNo());//Can use the same dData.
-	 	   //tdData.setNestingLevel(dData.getNestingLevel());
-	 	   //tdData.setStatementAccessed(dData.getStatementAccessed());
-	 	   //makeEquationsForSubscriptExprs(aExpr,tExpr,tdData);
-    	   //tdData.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+tExpr.getPrettyPrinted());
-    		prepareDependenceData(aExpr,tExpr,dData,dataVector);
-    		//makeEquationsForSubscriptExprs(aExpr,tExpr,dData);	 	    	   
-	 	   //if(ApplyTests()){
-	 		 //tdData.setDependence('y'); 
-	 		 // dData.setDependence('y');
-		      //aFlag=true;
-		     //dataVector.add(tdData);
-		     //dataVector.add(dData);
-		     //System.out.println("no of tdData"+tdData.toString());
-		  //}
-	      //else //tdData.setDependence('n');
-	    	//  dData.setDependence('n');
+    	if(aExpr.getVarName().equals(tExpr.getVarName())){   	  
+		   prepareDependenceData(aExpr,tExpr,dData,dataVector,true);    		
 	  }//end of if
+    	else{   		   	  
+    	   prepareDependenceData(aExpr,tExpr,dData,dataVector,false);	 
+    	}
     }//end of while
- }//end of if
+    
+  }//end of if
+ 
+	 
  return aFlag;						
 }//end of function checkSameArrayAccess.
 
