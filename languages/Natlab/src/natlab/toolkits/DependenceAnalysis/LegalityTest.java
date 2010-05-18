@@ -8,18 +8,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
-
 import ast.ForStmt;
 
 
@@ -29,24 +20,89 @@ public class LegalityTest {
   
   private Vector<DependenceData> dataVector;	
   private Vector<int[]> distanceVector=new Vector<int[]>();
-  private LinkedList<ForStmt> forStmt; 
+  private LinkedList<ForStmt> forStmtList; 
+  private static LinkedList<ForStmt> fusionList=new LinkedList<ForStmt>();
+  
  
 
 public LinkedList<ForStmt> getForStmt() {
-	return forStmt;
+	return forStmtList;
 }
 
 public void setForStmt(LinkedList<ForStmt> forStmt) {
-	this.forStmt = forStmt;
+	this.forStmtList = forStmt;
 }
+ 
+
+/*
+ * This function is called for every "for loop" whether there is dependence or not.It checks for the presence of Loop 
+ * transformation annotations.If annotations are present the calls the respective transformation.
+ * 
+ */
+public void checkForLoopAnnotations(){
+	
+   for(int i=0;i<forStmtList.size();i++){
+	ForStmt forStmt=forStmtList.get(i);
+	
+	if(forStmt.isEligibleForLoopReversal()){
+		for(int k=0;k<dataVector.size();k++){
+			DependenceData data=(DependenceData)dataVector.get(i);
+			if(data.getDependence().equals("n")){
+	     	  LoopReversal lreversal=new LoopReversal(forStmt);
+	     	  data.setTransformation("LoopReversal");
+	     	  lreversal.ApplyLoopReversal();
+		   }//end of if
+		}//end of for
+     }//end of LoopReversal.
+	
+	else if(forStmt.isEligibleForLoopInterchange()){
+		for(int k=0;k<dataVector.size();k++){
+			DependenceData data=(DependenceData)dataVector.get(i);
+			if(data.getDependence().equals("n")){
+			for(int j=i;j<forStmtList.size();j++){
+			  ForStmt fStmt=forStmtList.get(j);	
+			  if(fStmt.isEligibleForLoopInterchange()){	
+	     	    LoopInterchange linterchange=new LoopInterchange();
+	     	    data.setTransformation("LoopInterchange");
+	     	    linterchange.ApplyLoopInterchange(forStmt,fStmt);
+			  }//end of if
+			}//end of for loop
+		  }//end of if
+		}//end of for
+     }//end of LoopInterchange.
+	
+    else if(forStmt.isEligibleForLoopFission()){    	
+    	for(int k=0;k<dataVector.size();k++){
+			DependenceData data=(DependenceData)dataVector.get(i);
+			if(data.getDependence().equals("n")){
+     	      LoopFission lfission=new LoopFission(forStmt,i);//i indicates the loop that needs to be divided into two.
+     	     data.setTransformation("LoopFission");
+     	      lfission.ApplyLoopFission();
+		   }//end of if
+    	}//end of for
+     }//end of LoopFission	
+   }//end of for
+   checkForLoopFusion(forStmtList.get(0));
+    
+}
+private void checkForLoopFusion(ForStmt fStmt){
+	
+	if(fStmt.isEligibleForLoopFusion()){
+	   fusionList.add(fStmt);
+	} 
+    	
+}
+	
 
 
-//this function tests legality of a transformation and then passes it to the transformer.
+
+
+
   /*
-   * TODO:Check whether user has provided some annotations for the type of transformation that needs to be applied.
-   * TODO:If user has not provided any information about the type of transformation that needs to be applied then apply these uniModular transformations.
+   * This function does the following.
+   * 1.This function tests legality of a transformation.If transformation is legal it then passes it to the transformer.
    */
-  public void testLegality(){
+public void testLegality(){
 	  
     DependenceData dData=(DependenceData)dataVector.get(0);
     int nLevel=dData.getNestingLevel();
@@ -107,11 +163,11 @@ public void setForStmt(LinkedList<ForStmt> forStmt) {
 				  }//end of if   
 			   }//end of for
 			  if(count==dataVector.size()){ 
-				  ForStmt fStmt=forStmt.get(i);
+				  ForStmt fStmt=forStmtList.get(i);
 				  LoopReversal reversal=new LoopReversal(fStmt);
 				  reversal.ApplyLoopReversal();
 				  
-				  ForStmt fStmt2=forStmt.get(j);
+				  ForStmt fStmt2=forStmtList.get(j);
 				  LoopInterchange interchange=new LoopInterchange();
 				  interchange.ApplyLoopInterchange(fStmt, fStmt2);
 				  
@@ -169,8 +225,8 @@ public void setForStmt(LinkedList<ForStmt> forStmt) {
 				}//end of if   
 			  }//end of for
 			 if(count==dataVector.size()){ 
-				 ForStmt fStmt2=forStmt.get(j);
-				 ForStmt fStmt=forStmt.get(i);
+				 ForStmt fStmt2=forStmtList.get(j);
+				 ForStmt fStmt=forStmtList.get(i);
 				 LoopInterchange interchange=new LoopInterchange();
 				 interchange.ApplyLoopInterchange(fStmt, fStmt2);					 
 				 
@@ -208,7 +264,7 @@ public void setForStmt(LinkedList<ForStmt> forStmt) {
 		  }//end of for
 		  if(count==dataVector.size()){ 
 			  
-			  ForStmt fStmt=forStmt.get(i);
+			  ForStmt fStmt=forStmtList.get(i);
 			  LoopReversal rev=new LoopReversal(fStmt);
 		      rev.ApplyLoopReversal();			  
 			  writeToXMLFile(lData,"Reversal");	  
@@ -301,5 +357,13 @@ public String getDirName() {
 
 public void setDirName(String dirName) {
 	this.dirName = dirName;
+}
+
+public static LinkedList<ForStmt> getFusionList() {
+	return fusionList;
+}
+
+public static void setFusionList(LinkedList<ForStmt> fusionList) {
+	LegalityTest.fusionList = fusionList;
 }
 }
