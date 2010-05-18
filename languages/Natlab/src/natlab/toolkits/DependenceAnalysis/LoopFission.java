@@ -5,11 +5,11 @@
  * Whenever a For node with "LoopFission" transformation annotated is encountered or visited
  * an object of this class is instantiated.
  */
-//package natlab.looptransformations;
+package natlab.toolkits.DependenceAnalysis;
 
-/*import natlab.ast.ASTNode;
-import natlab.ast.ForStmt;
-import natlab.ast.Stmt;
+import ast.ASTNode;
+import ast.ForStmt;
+import ast.Stmt;
 
 public class LoopFission {
 	
@@ -17,117 +17,89 @@ public class LoopFission {
 	private int fissionPoint;
 	private boolean nestedStatus;
 	private int nestedLevel;
-	public LoopFission(ForStmt fStmt,int fPoint)
-	{	
+	public LoopFission(ForStmt fStmt,int fPoint){	
 				forStmt=fStmt;			
 				fissionPoint=fPoint;
-				nestedStatus=false;
-				nestedLevel=0;
-				checkForNestedLoops();
-				
-			
+				//nestedStatus=false;
+				//nestedLevel=0;
+				//checkForNestedLoops();		
 	}
 	/*
 	 * This method checks the nesting level of the loop and applies loop fission
 	 * at the nested loop if it is annotated with "LoopFission".
 	 */
-	/*private void checkForNestedLoops()
-	{
-		natlab.ast.List<Stmt> fList=forStmt.getStmts();
-		for(int k=0;k<fList.getNumChild();k++)
-		{
+/*	private void checkForNestedLoops(){
+		ast.List<Stmt> fList=forStmt.getStmts();
+		for(int k=0;k<fList.getNumChild();k++){
 			
-			if(fList.getChild(k) instanceof ForStmt)
-			{
+			if(fList.getChild(k) instanceof ForStmt){
 				ForStmt tforStmt=(ForStmt)fList.getChild(k);
-				if(tforStmt.isEligibleForLoopFission())
-				{
+				if(tforStmt.isEligibleForLoopFission()){
 					nestedLevel++;
-					natlab.ast.List<Stmt> forList=tforStmt.getStmtList();
+					ast.List<Stmt> forList=tforStmt.getStmtList();
 					forList.removeChild(0);
 					nestedStatus=true;
 					ApplyLoopFission(fissionPoint,tforStmt);
 				}
 			}
 		}
-		if(!nestedStatus)
-		{
+		if(!nestedStatus){
 			//natlab.ast.List<Stmt> forList=forStmt.getStmtList();
 			//forList.removeChild(0);
 			ApplyLoopFission(fissionPoint,forStmt);
 			
-		}
+		}*/
 	
 		
-	}
+	//}
 	/*
 	 * This method does the following.
 	 * 1.Break the loop at the fission point.
 	 * 2.Add the new loop to AST.
 	 * 3.Send the transformed AST to pretty printer for generating new MATLAB code from the transformed AST.
 	 */
-	/*public void ApplyLoopFission(int fissionPoint,ForStmt tforStmt)	
-	{
-		 
+   public void ApplyLoopFission(){		 
 		
-		int no=forStmt.getNumStmt();
-		
-	
-			
-		
-	
-		
+		int no=forStmt.getNumStmt();		
 		ForStmt forStmt2=new ForStmt();
 		ForStmt forStmt1=new ForStmt();
 		
-		forStmt1.setAssignStmt(tforStmt.getAssignStmt()); //for setting the range expression
-		forStmt2.setAssignStmt(tforStmt.getAssignStmt()); //for setting the range expression
+		forStmt1.setAssignStmt(forStmt.getAssignStmt()); //for setting the range expression
+		forStmt2.setAssignStmt(forStmt.getAssignStmt()); //for setting the range expression
 		
 	
 		
-		natlab.ast.List<Stmt> forList1 = new natlab.ast.List<Stmt>();
-		natlab.ast.List<Stmt> forList2 = new natlab.ast.List<Stmt>();		
+		ast.List<Stmt> forList1 = new ast.List<Stmt>();
+		ast.List<Stmt> forList2 = new ast.List<Stmt>();		
 		
-		for(int i=0;i<fissionPoint;i++)
-		{
-			
+		for(int i=0;i<fissionPoint;i++){			
 			//forStmt1.addStmt(forStmt.getStmt(i));
-			forList1.add(tforStmt.getStmt(i));
+			forList1.add(forStmt.getStmt(i));
 		}
 		
-	    for(int j=fissionPoint;j<no;j++)
-		{
+	    for(int j=fissionPoint;j<no;j++){
 			//forStmt2.addStmt(forStmt.getStmt(j));
-			forList2.add(tforStmt.getStmt(j));				
+			forList2.add(forStmt.getStmt(j));				
 		}
 			
 	    forStmt1.setStmtList(forList1);  //add the loop statements to For node
-	    forStmt2.setStmtList(forList2);  //add the loop statements to For node
-		
-		
+	    forStmt2.setStmtList(forList2);  //add the loop statements to For node		
 		
 		ASTNode parent = forStmt.getParent();
 		int loc = parent.getIndexOfChild(forStmt);
-		if(nestedStatus)
-		{
-			//natlab.ast.List<Stmt> forList=forStmt.getStmtList();
-			//forList.removeChild(1);
-			
-			for(int i=0;i<nestedLevel;i++)
-			{
-				forStmt.setStmt(forStmt1, 1);
-				forStmt.setStmt(forStmt2, 2);
-			}
-			
-		}
-		else
-		{
+		//if(nestedStatus){			
+			///for(int i=0;i<nestedLevel;i++){
+				//forStmt.setStmt(forStmt1, 1);
+				//forStmt.setStmt(forStmt2, 2);
+			//}		
+		//}
+		//else{
 			parent.setChild(forStmt1, loc);		
 			parent.insertChild(forStmt2, loc+1);
 			
-		}
+		//}
 	
 				
 	}
 
-}*/
+}
