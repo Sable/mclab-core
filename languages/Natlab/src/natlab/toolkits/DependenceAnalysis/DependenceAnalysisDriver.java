@@ -23,12 +23,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import ast.ASTNode;
+import ast.FPLiteralExpr;
 import ast.IfStmt;
+import ast.NameExpr;
 import ast.Program;
 import ast.Stmt;
 import ast.ForStmt;
 import ast.AssignStmt;
 import ast.IntLiteralExpr;
+import ast.StringLiteralExpr;
 import ast.SwitchStmt;
 
 
@@ -40,11 +43,9 @@ import ast.SwitchStmt;
  * 
  */
 
-public class DependenceAnalysisDriver extends ForVisitor
-{
-	private ForStmt forNode;
+public class DependenceAnalysisDriver extends ForVisitor{
 	
-	//private ForStmt forStmtArray[];
+	private ForStmt forNode;	
 	private LinkedList<ForStmt> forStmtArray=new LinkedList<ForStmt>();
 	private int loopIndex;
 	private ConstraintsToolBox cToolBox;
@@ -126,31 +127,58 @@ public void setPredictedLoopValues(Hashtable<String,LinkedList<PredictedData>> t
 }
 
 
+
 /*
 * This function does the following 
 * 1.Checks for tightly nested loops.
 */	
 private void isTightlyNestedLoop(ForStmt forStmt){
-  if(!isNested){	
-	//Stmt s=forNode.getStmt(0);
-	Stmt s=forStmt.getStmt(0);
-	forStmtArray.add(forStmt);
-    if(s instanceof AssignStmt){AssignStmt aStmt=(AssignStmt)s;
-        isNested=true; 
-    	if((aStmt.getRHS()) instanceof IntLiteralExpr){
-    		loopNumber=((IntLiteralExpr)aStmt.getRHS()).getValue().getValue().intValue();
-        }//end of 3rd if    	
-     }//end of 2nd if
-  }//end of ist if
-  Stmt stmt=forStmt.getStmt(1);
-  if(stmt instanceof ForStmt){      			  
-	  ForStmt tForStmt=(ForStmt)stmt;
-	  //forStmtArray[loopIndex]=tForStmt;
-	  forStmtArray.add(tForStmt);
-	  forNode=tForStmt;	  
-	  loopIndex++;
-	  isTightlyNestedLoop(tForStmt);				  
-  }//end of if
+ if(forStmt!=null){	
+   //if(!isNested){	
+		//Stmt s=forNode.getStmt(0);	   
+	 for(int j=0;j<forStmt.getNumStmt();j++){  
+		Stmt s=forStmt.getStmt(j);
+		//System.out.println(s.toString());
+	    if(s instanceof AssignStmt){
+	    	AssignStmt aStmt=(AssignStmt)s;
+	    	//System.out.println(aStmt.getLHS().toString());
+	        isNested=true; 
+	    	if((aStmt.getRHS()) instanceof IntLiteralExpr && (aStmt.getLHS()) instanceof NameExpr){
+	    		NameExpr str=(NameExpr)aStmt.getLHS();
+	    		if(str.getVarName().equals("lNum")){
+	    		  loopNumber=((IntLiteralExpr)aStmt.getRHS()).getValue().getValue().intValue();
+	    		  forStmtArray.add(forStmt);
+	    		}
+	        }//end of 3rd if    	
+	     }//end of 2nd if
+	    else if(s instanceof ForStmt){
+	      forStmt=(ForStmt)s;			   
+	      forStmtArray.add(forStmt);
+	      forNode=forStmt;	  
+		  loopIndex++;
+		  isTightlyNestedLoop(forStmt);
+		  break;
+	    }//end of else if
+	    		  
+	 }//end of for
+	 
+	// }//end of ist if  
+	 /* else if(isNested){
+	   ForStmt tForStmt=null;	  
+	   for(int j=0;j<forStmt.getNumStmt();j++){	  
+	     Stmt stmt=forStmt.getStmt(j);
+	     if(stmt instanceof ForStmt){      			  
+		   tForStmt=(ForStmt)stmt;
+		   //forStmtArray[loopIndex]=tForStmt;
+		   forStmtArray.add(tForStmt);
+		   forNode=tForStmt;	  
+		   loopIndex++;
+		   break;
+	    }//end of if
+	  }//end of for
+	   isTightlyNestedLoop(tForStmt);
+	 }//end of else if*/
+}//end of if
 			
 }//end of function
 
@@ -203,13 +231,13 @@ public void traverseLoopStatements()
 		   //System.out.println("loop Index"+loopIndex);		   
 		   dData.setStatementAccessed("S"+i+":"+"S"+j);
 	       if(i==j){ 
-	    	   System.out.println("i am in same statements block"); 	    
+	    	   //System.out.println("i am in same statements block"); 	    
 			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt1.getRHS(),dData,dataVector);//compare LHS(sameStmt) with RHS(sameStmt)
 			 }//end of if
-		  else
-		   {Stmt bStmt=forNode.getStmt(j);
-		    if(bStmt instanceof AssignStmt)  //TODO:Needs to handle when there is an if statement in the loop.
-		    {  System.out.println("i am in different statements block");
+		  else{
+			Stmt bStmt=forNode.getStmt(j);
+		    if(bStmt instanceof AssignStmt){  //TODO:Needs to handle when there is an if statement in the loop.
+		       //System.out.println("i am in different statements block");
 			   AssignStmt aStmt2=(AssignStmt)bStmt;
 			   //System.out.println(aStmt1.getPrettyPrinted());
 			   aFlag=cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getRHS(),dData,dataVector); //compare LHS(previousStmt) with RHS(nextStmt)			   
@@ -220,19 +248,53 @@ public void traverseLoopStatements()
 	       //if(aFlag){dataVector.add(dData);}
 		}//end of inner for loop		
 	}//end of if	
-  }//end of for 
- 	
+  }//end of for
+ 
  if(dataVector.size()!=0){
 	 LegalityTest lTest=new LegalityTest();
-	 lTest.setDataVector(dataVector);
+	 lTest.setDataVector(dataVector);	 	
 	 lTest.setDirName(dirName);
 	 lTest.setForStmt(forStmtArray);
-	 //System.out.println("Data Vector Sizegjdfgdfhgdfjghd"+dataVector.size());
-	 lTest.testLegality();
+	 lTest.checkForLoopAnnotations();
+	 //lTest.testLegality();
 	 writeToXMLFile(dataVector);
   }//end of if
   //writeTransformedCode();
+ 
 }//end of traverseLoopStatements function
+
+public static void checkForLoopFusion(){
+	
+	LinkedList<ForStmt> fList=LegalityTest.getFusionList();
+	float lNo;
+	float l1=0,l2=0;
+	if(fList.size()>0){
+		for(int i=0;i<fList.size();i++){
+			ForStmt fStmt=fList.get(i);
+			
+			//l1=fStmt.getFL1();//TODO:add this to ForStmt 
+			//l2=fStmt.getFL2();//TODO:add this to ForStmt
+			if((int)l1==(int)l2){ //This means fuse the two nested loops which i am not sure will take place or not
+				
+			}
+			else{
+				for(int j=i;j<fList.size();j++){
+					ForStmt fStmt2=fList.get(j);
+					if(fStmt2.getStmt(0) instanceof AssignStmt){
+					  AssignStmt aStmt=(AssignStmt)fStmt.getStmt(0);
+					  lNo=((FPLiteralExpr)aStmt.getRHS()).getValue().getValue().floatValue();
+					  if(l2==lNo){//apply loop fusion on these two loops.
+						LoopFusion lfusion=new LoopFusion(fStmt,fStmt2);
+				     	lfusion.ApplyLoopFusion();    		
+					   }//end of if
+					 }//end of for					
+				  }//end of 2nd for
+			 }//end of else		
+		}//end of 1st for
+	}
+	
+	
+}
 
 /*private void writeTransformedCode(){
 	
@@ -257,7 +319,7 @@ public void traverseLoopStatements()
 private void writeToXMLFile(Vector<DependenceData> dataVector){
 	
 	File file = new File(dirName+"/"+"dependence"+dirName+".xml");	
-	
+	//System.out.println("djndjkwjr");
 	String value="";
 	try{  
 		boolean exists = file.exists();	    
@@ -285,6 +347,7 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	        rangeElement.setAttribute(new String("Start"), Integer.toString(data.getStartRange()));            
 	        rangeElement.setAttribute(new String("End"), Integer.toString(data.getEndRange()));
 	        rangeElement.setAttribute(new String("Dependence"),data.getDependence());	        
+	        rangeElement.setAttribute(new String("ValidTransformation"),data.getTransformation());
 	        
 	        //System.out.println("i am in xmlwrite"+file.getName());
 	        if(data.getNestingLevel()>0){
@@ -304,12 +367,14 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 		        	arrayAccessElement.setAttribute(new String("Access"),data.getArrayAccess() );
 		        	int[] array=data.getDistanceArray();
 		        	value="";
-		        	for(int j=0;j<array.length;j++){
-		        		if(j<array.length-1) value+=array[j]+",";
-		        		else value+=array[j];
-		        		//System.out.println("Value"+value+array.length);
+		        	if(array!=null){
+			        	for(int j=0;j<array.length;j++){
+			        		if(j<array.length-1) value+=array[j]+",";
+			        		else value+=array[j];
+			        		//System.out.println("Value"+value+array.length);
+			        	}
+			        	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
 		        	}
-		        	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
 		 
 		            nLRangeElement.appendChild(arrayAccessElement);
 		            nestedLoopElement.appendChild(nLRangeElement);
@@ -322,18 +387,18 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	        	arrayAccessElement.setAttribute(new String("Access"),data.getArrayAccess() );
 	        	int[] array=data.getDistanceArray();
 	        	value="";
-	        	for(int j=0;j<array.length;j++){
-	        		if(j<array.length-1) value+=array[j]+",";
-	        		else value+=array[j];
-	        		//System.out.println("Value"+value+array.length);
-	        	}
-	        	arrayAccessElement.setAttribute(new String("DistanceVector"),value);
+	        	if(array!=null){
+		        	for(int j=0;j<array.length;j++){
+		        		if(j<array.length-1) value+=array[j]+",";
+		        		else value+=array[j];
+		        		arrayAccessElement.setAttribute(new String("DistanceVector"),value);
+		        		//System.out.println("Value"+value+array.length);
+		        	}
+	        	}	        	
 	        	rangeElement.appendChild(arrayAccessElement); // add element1 under loopElement
-	        }//end of else if
-	    	
+	        }//end of else if	    	
 	    	loopElement.appendChild(rangeElement); // add element1 under loopElement
-	  }
-	    
+	      }	    
 	    if(!exists){
 	    	rootElement = document.createElement("AD"); // creates a element
 	    	rootElement.appendChild(loopElement); // add element1 under rootElement            
