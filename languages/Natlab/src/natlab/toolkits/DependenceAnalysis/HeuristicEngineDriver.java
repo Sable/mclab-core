@@ -38,172 +38,174 @@ public class HeuristicEngineDriver {
 		fileName=st.nextToken();	  	
 	  	fileName=fileName+".xml";
 	  	//System.out.println(fileName);
-	}	
+	}
+	
+	private void populateProfiledData(Element nestedElement){		
+		float lNo=Float.parseFloat(nestedElement.getAttribute("LoopNumber"));
+        ProfiledData inData=new ProfiledData();
+        inData.setLoopNo(lNo); //setting loopNo in inData.
+        
+        
+        //-------setting the lower Bound--------------//
+        NodeList lowerBoundList = nestedElement.getElementsByTagName("LowerBound");               
+        Element lowerBoundElement = (Element)lowerBoundList.item(0);
+       // System.out.println("IIdsf"+lowerBoundElement.getNodeName());
+        
+        
+        NodeList variableNameList = lowerBoundElement.getElementsByTagName("VariableName");
+        Element variableNameElement = (Element)variableNameList.item(0);
+
+        NodeList textFNList = variableNameElement.getChildNodes(); //Setting the loopVariableName
+        String lVName=((Node)textFNList.item(0)).getNodeValue().trim();
+        
+        //System.out.println("Variable Name : " +lVName); 
+               //((Node)textFNList.item(0)).getNodeValue().trim());
+        inData.setLVName(lVName);
+
+        //-------
+        NodeList rangeList = lowerBoundElement.getElementsByTagName("Range");
+        Element rangeElement = (Element)rangeList.item(0);
+        //System.out.println("Range is:::"+rangeElement.getNodeName());
+        
+        NodeList startList = rangeElement.getElementsByTagName("start");
+        Element startElement = (Element)startList.item(0);          
+
+        NodeList textLNList = startElement.getChildNodes();
+        //System.out.println("start : " + 
+            //   ((Node)textLNList.item(0)).getNodeValue().trim());
+        int lbStart=Integer.parseInt(((Node)textLNList.item(0)).getNodeValue()); //setting start of lowerBound.
+        ProfiledLowerBound lBound=inData.getNewLBound();
+        lBound.setStart(lbStart);
+
+        
+        NodeList endList = rangeElement.getElementsByTagName("end");
+        Element endElement = (Element)endList.item(0);               
+
+        NodeList textLNList1 = endElement.getChildNodes();
+        //System.out.println("end : " + 
+            //   ((Node)textLNList1.item(0)).getNodeValue().trim());
+        int lbEnd=Integer.parseInt(((Node)textLNList1.item(0)).getNodeValue()); //setting end of lowerBound.               
+        lBound.setEnd(lbEnd);
+        inData.setLBound(lBound);
+        
+      
+        //............For Upper Bound................//
+       
+        NodeList upperBoundList = nestedElement.getElementsByTagName("UpperBound");               
+        Element upperBoundElement = (Element)upperBoundList.item(0);
+        //System.out.println("IIdsfuuuuuuu"+upperBoundElement.getNodeName());
+        //-------
+        NodeList uvariableNameList = upperBoundElement.getElementsByTagName("VariableName");
+        Element uvariableNameElement = (Element)uvariableNameList.item(0);
+
+        NodeList utextFNList = uvariableNameElement.getChildNodes();
+       // System.out.println("Variable Name : " + 
+           //    ((Node)utextFNList.item(0)).getNodeValue().trim());
+
+        //-------
+        NodeList urangeList = upperBoundElement.getElementsByTagName("Range");
+        Element urangeElement = (Element)urangeList.item(0);
+       // System.out.println("Range is:::"+urangeElement.getNodeName());
+        
+        NodeList ustartList = urangeElement.getElementsByTagName("start");
+        Element ustartElement = (Element)ustartList.item(0);
+        
+
+        NodeList utextLNList = ustartElement.getChildNodes();
+       // System.out.println("start : " + 
+            //   ((Node)utextLNList.item(0)).getNodeValue().trim());
+        
+        int ubStart=Integer.parseInt(((Node)utextLNList.item(0)).getNodeValue());                
+        UpperBound uBound=inData.getNewUBound();
+        uBound.setStart(ubStart); //setting the upper bound..
+        
+
+        
+        NodeList uendList = urangeElement.getElementsByTagName("end");
+        Element uendElement = (Element)uendList.item(0);
+        
+
+        NodeList utextLNList1 = uendElement.getChildNodes();
+        //System.out.println("end : " + 
+            //   ((Node)utextLNList1.item(0)).getNodeValue().trim());
+        int ubEnd=Integer.parseInt(((Node)utextLNList1.item(0)).getNodeValue());        
+        uBound.setEnd(ubEnd); //setting the upper bound..
+        inData.setUBound(uBound);
+        
+        
+        //.......For LoopIncrement Factor...........//                
+        NodeList lifList = nestedElement.getElementsByTagName("LoopIncrementFactor");               
+        Element lifElement = (Element)lifList.item(0);
+        //System.out.println("IIdsfuuuuuuulif"+lifElement.getNodeName());
+        
+        //-------
+        NodeList lifrangeList = lifElement.getElementsByTagName("Range");
+        Element lifrangeElement = (Element)lifrangeList.item(0);
+      //  System.out.println("Range is:::"+lifrangeElement.getNodeName());
+        
+        NodeList lifstartList = lifrangeElement.getElementsByTagName("start");
+        Element lifstartElement = (Element)lifstartList.item(0);
+                     
+
+        NodeList liftextLNList = lifstartElement.getChildNodes();
+        //System.out.println("start : " + 
+           //    ((Node)liftextLNList.item(0)).getNodeValue().trim());
+        int lifStart=Integer.parseInt(((Node)liftextLNList.item(0)).getNodeValue());                                                
+        ProfiledLIF lif=inData.getNewLoopIncFac();
+        lif.setStart(lifStart);
+        
+        NodeList lifendList = lifrangeElement.getElementsByTagName("end");
+        Element lifendElement = (Element)lifendList.item(0);
+        
+
+        NodeList liftextLNList1 = lifendElement.getChildNodes();
+        //System.out.println("end : " + 
+            //   ((Node)liftextLNList1.item(0)).getNodeValue().trim());
+        int lifEnd=Integer.parseInt(((Node)liftextLNList1.item(0)).getNodeValue());                              
+        lif.setEnd(lifEnd);
+        inData.setLoopIncFac(lif);
+        if(loopTable.containsKey(nestedElement.getAttribute("LoopNumber"))){ //get the already existing linked list for the key and add the value to it
+        	//this is to insert data from the different runs of the same loop into the same list.
+        	LinkedList<ProfiledData> tList=(LinkedList<ProfiledData>)loopTable.get(nestedElement.getAttribute("LoopNumber"));
+        	tList.add(inData);           	
+        }
+        else{// create a new linked list for this key and insert it in the hashtable.
+        	LinkedList<ProfiledData> list=new LinkedList<ProfiledData>();
+        	list.add(inData);
+        	loopTable.put(nestedElement.getAttribute("LoopNumber"),list);            	
+        }       
+        
+ }//end of populateProfiledData function.
+	
 	public void parseXmlFile(){
 		StringTokenizer st = new StringTokenizer(fileName,".");		
 		dirName=st.nextToken();	  
-		 try 
-		  {
+		
+		try{
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 	        Document doc = docBuilder.parse (new File(dirName+"/"+fileName));
 	        ProfiledData inData;//=null;
+	        Element lElement;
 	        
 	        // normalize text representation
-	        doc.getDocumentElement ().normalize ();
-	        //System.out.println ("Root element of the doc is " + 
-	         //    doc.getDocumentElement().getNodeName());
-	        
-
-	        NodeList nestedNodeList = doc.getElementsByTagName("NestedLoop");
-	        int totalPersons = nestedNodeList.getLength();
-	       // System.out.println("Total no of Loops : " + totalPersons);
-
-	        for(int s=0; s<nestedNodeList.getLength() ; s++){	                        
-	            Element nestedElement = (Element)nestedNodeList.item(s);
-	            //System.out.println(firstPersonNode.getNodeName());
-	            if(nestedElement.getNodeType() == Node.ELEMENT_NODE){
-	                                
-	                float lNo=Float.parseFloat(nestedElement.getAttribute("Number"));
-	                inData=new ProfiledData();
-	                inData.setLoopNo(lNo); //setting loopNo in inData.
-	                //System.out.println("LoopNo::::"+lNo);
-	                
-	              //-------setting the lower Bound--------------//
-	                NodeList lowerBoundList = nestedElement.getElementsByTagName("LowerBound");               
-	                Element lowerBoundElement = (Element)lowerBoundList.item(0);
-	               // System.out.println("IIdsf"+lowerBoundElement.getNodeName());
-	                
-	                
-	                NodeList variableNameList = lowerBoundElement.getElementsByTagName("VariableName");
-	                Element variableNameElement = (Element)variableNameList.item(0);
-
-	                NodeList textFNList = variableNameElement.getChildNodes(); //Setting the loopVariableName
-	                String lVName=((Node)textFNList.item(0)).getNodeValue().trim();
-	                
-	                //System.out.println("Variable Name : " +lVName); 
-	                       //((Node)textFNList.item(0)).getNodeValue().trim());
-	                inData.setLVName(lVName);
-
-	                //-------
-	                NodeList rangeList = lowerBoundElement.getElementsByTagName("Range");
-	                Element rangeElement = (Element)rangeList.item(0);
-	                //System.out.println("Range is:::"+rangeElement.getNodeName());
-	                
-	                NodeList startList = rangeElement.getElementsByTagName("start");
-	                Element startElement = (Element)startList.item(0);          
-
-	                NodeList textLNList = startElement.getChildNodes();
-	                //System.out.println("start : " + 
-	                    //   ((Node)textLNList.item(0)).getNodeValue().trim());
-	                int lbStart=Integer.parseInt(((Node)textLNList.item(0)).getNodeValue()); //setting start of lowerBound.
-	                ProfiledLowerBound lBound=inData.getNewLBound();
-	                lBound.setStart(lbStart);
-
-	                
-	                NodeList endList = rangeElement.getElementsByTagName("end");
-	                Element endElement = (Element)endList.item(0);               
-
-	                NodeList textLNList1 = endElement.getChildNodes();
-	                //System.out.println("end : " + 
-	                    //   ((Node)textLNList1.item(0)).getNodeValue().trim());
-	                int lbEnd=Integer.parseInt(((Node)textLNList1.item(0)).getNodeValue()); //setting end of lowerBound.               
-	                lBound.setEnd(lbEnd);
-	                inData.setLBound(lBound);
-	                
-	              
-	                //............For Upper Bound................//
-	               
-	                NodeList upperBoundList = nestedElement.getElementsByTagName("UpperBound");               
-	                Element upperBoundElement = (Element)upperBoundList.item(0);
-	                //System.out.println("IIdsfuuuuuuu"+upperBoundElement.getNodeName());
-	                //-------
-	                NodeList uvariableNameList = upperBoundElement.getElementsByTagName("VariableName");
-	                Element uvariableNameElement = (Element)uvariableNameList.item(0);
-
-	                NodeList utextFNList = uvariableNameElement.getChildNodes();
-	               // System.out.println("Variable Name : " + 
-	                   //    ((Node)utextFNList.item(0)).getNodeValue().trim());
-
-	                //-------
-	                NodeList urangeList = upperBoundElement.getElementsByTagName("Range");
-	                Element urangeElement = (Element)urangeList.item(0);
-	               // System.out.println("Range is:::"+urangeElement.getNodeName());
-	                
-	                NodeList ustartList = urangeElement.getElementsByTagName("start");
-	                Element ustartElement = (Element)ustartList.item(0);
-	                
-
-	                NodeList utextLNList = ustartElement.getChildNodes();
-	               // System.out.println("start : " + 
-	                    //   ((Node)utextLNList.item(0)).getNodeValue().trim());
-	                
-	                int ubStart=Integer.parseInt(((Node)utextLNList.item(0)).getNodeValue());                
-	                UpperBound uBound=inData.getNewUBound();
-	                uBound.setStart(ubStart); //setting the upper bound..
-	                
-
-	                
-	                NodeList uendList = urangeElement.getElementsByTagName("end");
-	                Element uendElement = (Element)uendList.item(0);
-	                
-
-	                NodeList utextLNList1 = uendElement.getChildNodes();
-	                //System.out.println("end : " + 
-	                    //   ((Node)utextLNList1.item(0)).getNodeValue().trim());
-	                int ubEnd=Integer.parseInt(((Node)utextLNList1.item(0)).getNodeValue());        
-	                uBound.setEnd(ubEnd); //setting the upper bound..
-	                inData.setUBound(uBound);
-	                
-	                
-	                //.......For LoopIncrement Factor...........//                
-	                NodeList lifList = nestedElement.getElementsByTagName("LoopIncrementFactor");               
-	                Element lifElement = (Element)lifList.item(0);
-	                //System.out.println("IIdsfuuuuuuulif"+lifElement.getNodeName());
-	                
-	                //-------
-	                NodeList lifrangeList = lifElement.getElementsByTagName("Range");
-	                Element lifrangeElement = (Element)lifrangeList.item(0);
-	              //  System.out.println("Range is:::"+lifrangeElement.getNodeName());
-	                
-	                NodeList lifstartList = lifrangeElement.getElementsByTagName("start");
-	                Element lifstartElement = (Element)lifstartList.item(0);
-	                             
-
-	                NodeList liftextLNList = lifstartElement.getChildNodes();
-	                //System.out.println("start : " + 
-	                   //    ((Node)liftextLNList.item(0)).getNodeValue().trim());
-	                int lifStart=Integer.parseInt(((Node)liftextLNList.item(0)).getNodeValue());                                                
-	                ProfiledLIF lif=inData.getNewLoopIncFac();
-	                lif.setStart(lifStart);
-	                
-	                NodeList lifendList = lifrangeElement.getElementsByTagName("end");
-	                Element lifendElement = (Element)lifendList.item(0);
-	                
-
-	                NodeList liftextLNList1 = lifendElement.getChildNodes();
-	                //System.out.println("end : " + 
-	                    //   ((Node)liftextLNList1.item(0)).getNodeValue().trim());
-	                int lifEnd=Integer.parseInt(((Node)liftextLNList1.item(0)).getNodeValue());                              
-	                lif.setEnd(lifEnd);
-	                inData.setLoopIncFac(lif);
-	                if(loopTable.containsKey(nestedElement.getAttribute("Number"))){ //get the already existing linked list for the key and add the value to it
-	                	//this is to insert data from the different runs of the same loop into the same list.
-	                	LinkedList tList=(LinkedList)loopTable.get(nestedElement.getAttribute("Number"));
-	                	tList.add(inData);           	
-	                }
-	                else{// create a new linked list for this key and insert it in the hashtable.
-	                	LinkedList list=new LinkedList();
-	                	list.add(inData);
-	                	loopTable.put(nestedElement.getAttribute("Number"),list);                	
-	                }
-	             }//end of if clause
-	        }//end of for loop with s var
-	        callIntroSort();
-	        
-	  		//writeToXMLFile(predictedValues);
-	        //writeToXMLFile(table);	        
-	    }catch (SAXParseException err) {
+	        doc.getDocumentElement ().normalize ();        
+	        NodeList loopList = doc.getElementsByTagName("LoopNo");
+	        for(int s=0; s<loopList.getLength() ; s++){	                        
+	           Element nestedElement = (Element)loopList.item(s);
+	           NodeList nodeList=nestedElement.getElementsByTagName("NestedLoop");
+	        	if(nodeList.getLength()==0){
+	        		lElement=nestedElement;
+	        		populateProfiledData(lElement);        			    	        
+	    	    }
+	        	else{	        		
+	        		for(int j=0;j<nodeList.getLength();j++){
+	            	    lElement=(Element)nodeList.item(j);	            	    
+	            	    populateProfiledData(lElement);	            	    
+	        		}//end of for    
+	        	 }//end of else
+	         }//end of for
+	     }catch (SAXParseException err) {
 	    System.out.println ("** Parsing error" + ", line " 
 	         + err.getLineNumber () + ", uri " + err.getSystemId ());
 	    System.out.println(" " + err.getMessage ());
@@ -216,12 +218,14 @@ public class HeuristicEngineDriver {
 	    t.printStackTrace ();
 	   } 
 	    
+	    callIntroSort();
 	    HeuristicEngine hEngine=new HeuristicEngine(loopTable);
         table=hEngine.computeRegionDivisors();
 	    writeToXMLFile(table);
 	    
 
 	}
+	
 	
 	public Hashtable<String, LinkedList<PredictedData>> getTable() {
 		return table;
@@ -338,8 +342,8 @@ public class HeuristicEngineDriver {
 	
 	
   public void writeToXMLFile(Hashtable pTable){
-		File file = new File(dirName+"/"+"RangeData"+fileName);	
-		System.out.println("I am gerwnejrwejrwerjkkjidsjfdfds");
+	  
+		File file = new File(dirName+"/"+"RangeData"+fileName);		
 		try 
 		{   boolean exists = file.exists();	    
 		    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
