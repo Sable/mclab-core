@@ -5,28 +5,27 @@
  * Whenever a For node with "LoopFusion" transformation annotated is encountered or visited
  * an object of this class is instantiated.
  */
-//package natlab.looptransformations;
+package natlab.toolkits.DependenceAnalysis;
 
-/*import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import ast.ASTNode;
-import natlab.ast.AssignStmt;
-import natlab.ast.FPLiteralExpr;
-import natlab.ast.NameExpr;
-import natlab.ast.Opt;
-import natlab.ast.ForStmt;
-import natlab.ast.IntLiteralExpr;
-import natlab.ast.RangeExpr;
-import natlab.ast.Stmt;
+import ast.AssignStmt;
+import ast.FPLiteralExpr;
+import ast.NameExpr;
+import ast.Opt;
+import ast.ForStmt;
+import ast.IntLiteralExpr;
+import ast.RangeExpr;
+import ast.Stmt;
 
 public class LoopFusion {
 	
 private ForStmt forStmt1;
 private ForStmt forStmt2;
 	
-public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
-{	
+public LoopFusion(ForStmt fStmt1,ForStmt fStmt2){	
 			forStmt1=fStmt1;		
 			forStmt2=fStmt2;		
 		
@@ -38,37 +37,30 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
 		2.Else return an error �Two loops cannot be fused�.
 	2.Once two loops are combined into one loop,remove the second loop from the AST and send the transformed AST to pretty printer for generating new MATLAB code from the transformed AST.
  */
-/*	public void ApplyLoopFusion()
-	{
+public void ApplyLoopFusion(){
 		
-		if(TestLoopLimits())
-		{
-			natlab.ast.List<Stmt> forList1=forStmt1.getStmtList();
+		if(TestLoopLimits()){
+			ast.List<Stmt> forList1=forStmt1.getStmtList();
 			forList1.removeChild(0);
-			natlab.ast.List<Stmt> forList2=forStmt2.getStmtList();
+			ast.List<Stmt> forList2=forStmt2.getStmtList();
 			forList2.removeChild(0);
 			
 			AssignStmt assStmt1= forStmt1.getAssignStmt();//This gives the assignment statement of the loop
-			AssignStmt assStmt2= forStmt2.getAssignStmt();//This gives the assignment statement of the loop
-			
-			
+			AssignStmt assStmt2= forStmt2.getAssignStmt();//This gives the assignment statement of the loop			
 			
 			//int no= assStmt2.getNumChild();
 			int no=forStmt2.getNumStmt();
 			//System.out.println("No of statements in loop2 " + no);
-			for(int i=0;i<no;i++)
-			{
+			for(int i=0;i<no;i++){
 			    forStmt1.addStmt(forStmt2.getStmt(i));
-			}
-			
+			}	
 				
 			ASTNode parent = forStmt2.getParent(); //get the parent of the second loop 
 			int loc = parent.getIndexOfChild(forStmt2);
 				
 			if (loc>=0) parent.removeChild(loc); //remove the second loop from the AST
 		}
-		else
-		{
+		else{
 			System.out.println("Two loops cannot be fused because their loop limits are different");
 		}
 		
@@ -78,13 +70,11 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
 	 * This method does the following.
 	 * 1.Check the loop bounds of the two loops that need to be fused.
 	 */	
-	/*private boolean TestLoopLimits()
-	{
+  private boolean TestLoopLimits(){
 		
 		AssignStmt assStmt1= forStmt1.getAssignStmt();//This gives the assignment statement of the loop
 		AssignStmt assStmt2= forStmt2.getAssignStmt();//This gives the assignment statement of the loop
-	    if(assStmt1.getRHS() instanceof RangeExpr && assStmt2.getRHS() instanceof RangeExpr)
-	    {	
+	    if(assStmt1.getRHS() instanceof RangeExpr && assStmt2.getRHS() instanceof RangeExpr){	
 	    	
 	    	RangeExpr expr1=(RangeExpr) assStmt1.getRHS();
 	    	RangeExpr expr2=(RangeExpr) assStmt2.getRHS();
@@ -98,8 +88,7 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
     		float fUIndex1;
     		float fUIndex2;
     		boolean exprOptFlag=false;
-	    	if(expr1.getLower() instanceof IntLiteralExpr && expr2.getLower() instanceof IntLiteralExpr)
-			{
+	    	if(expr1.getLower() instanceof IntLiteralExpr && expr2.getLower() instanceof IntLiteralExpr){
 	    		
 				
 				IntLiteralExpr fExprLower1=(IntLiteralExpr) expr1.getLower();				
@@ -121,8 +110,7 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
 			//	System.out.println("Upper Index of loop2  " + UIndex2);
 				
 				exprOptFlag=checkExprOpt(expr1,expr2);
-				if((LIndex1==LIndex2 && UIndex1==UIndex2)&& exprOptFlag)
-			    {
+				if((LIndex1==LIndex2 && UIndex1==UIndex2)&& exprOptFlag){
 			    	return true;
 			    }
 
@@ -164,8 +152,7 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
 		
 	}
 	
-	private boolean checkExprOpt(RangeExpr expr1,RangeExpr expr2)
-	{
+	private boolean checkExprOpt(RangeExpr expr1,RangeExpr expr2){
 		boolean flag=false;
 		if(expr1.hasIncr() && expr2.hasIncr())
 		{						
@@ -209,4 +196,4 @@ public LoopFusion(ForStmt fStmt1,ForStmt fStmt2)
 		
 	}
 
-}*/
+}
