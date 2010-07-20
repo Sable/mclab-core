@@ -31,6 +31,7 @@ public class AllTests {
                 suite.addTestSuite(TransformedNodeTests.class);
 
                 suite.addTestSuite(MultireturnSimplifyPassTests.class);
+                suite.addTestSuite(LeftThreeAddressSimplifyPassTests.class);
 
 		//$JUnit-END$
 		return suite;

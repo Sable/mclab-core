@@ -9,9 +9,10 @@ public class MultireturnSimplifyPassTestGenerator extends AbstractRewritePassTes
         super("/natlab/MultireturnSimplifyPassTests.java");
         className = "MultireturnSimplifyPassTests";
         transformationName = "MultiReturnRewrite";
+        rewritePkg = "multireturn";
     }
 
-    public static void main(String[] args) throws IOException 
+    public static void main(String[] args) throws IOException
     {
         new MultireturnSimplifyPassTestGenerator().generate(args);
     }

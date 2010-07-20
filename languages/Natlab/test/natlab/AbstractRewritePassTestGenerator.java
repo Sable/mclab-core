@@ -13,13 +13,14 @@ public class AbstractRewritePassTestGenerator extends AbstractTestGenerator
     }
     protected String className;
     protected String transformationName;
+    protected String rewritePkg;
 
     protected void printHeader( PrintWriter testFileWriter )
     {
         testFileWriter.println("package natlab;");
         testFileWriter.println("");
         testFileWriter.println("import ast.*;");
-        testFileWriter.println("import natlab.toolkits.rewrite.multireturn.*;");
+        testFileWriter.println("import natlab.toolkits.rewrite."+rewritePkg+".*;");
         testFileWriter.println("import natlab.Main;");
         testFileWriter.println("");
         testFileWriter.println("public class " + className + " extends RewritePassTestBase");

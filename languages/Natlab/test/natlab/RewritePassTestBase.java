@@ -28,11 +28,11 @@ public class RewritePassTestBase extends TestCase {
         TreeAplhaEquivTester tester = new TreeAplhaEquivTester( actual, expected );
         Boolean test = tester.testEquiv();
         String msg = tester.getReason();
-        assertTrue( msg+ "\n\n" +
+        assertTrue( msg+ "\n" +
                     "ACTUAL: \n\n"+
-                    actual.getPrettyPrinted() + "\n\n\n"+
+                    actual.getPrettyPrinted() + "\n\n"+
                     "EXPECTED: \n\n"+
-                    expected.getPrettyPrinted() + "\n\n",
+                    expected.getPrettyPrinted() + "\n",
                     test );
     }
 
@@ -87,17 +87,14 @@ public class RewritePassTestBase extends TestCase {
                 }
                 else{
                     if( current instanceof List ){
-                        reason = "Number of children don't match for actual node: \n\n"+
-                            node + "\n\n"+
-                            "and expected node: \n\n" +
-                            current + "\n";
+                        reason = "Number of elements don't match for actual and expected lists\n";
                     }
                     else
                         reason = "Number of children don't match for actual subtree: \n\n"+
                             node.getPrettyPrinted() + "\n\n"+
                             "and expected subtree: \n\n" +
                             current.getPrettyPrinted() + "\n";
-                    reason += "\nNumbers are "+ numChild + " and "+current.getNumChild()+" respectively\n";
+                    reason += "\nNumbers of children are "+ numChild + " and "+current.getNumChild()+" respectively\n";
                     fail = true;
                 }
             }
