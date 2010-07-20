@@ -70,8 +70,15 @@
             <arg value="${gen.dir}" />
           </java>
         </target>
+        <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
+          <echo message="Generating left three address pass tests" />
+          <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
+            <arg value="${leftthreeaddress.pass.test.list.file}" />
+            <arg value="${gen.dir}" />
+          </java>
+        </target>
 
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.multireturn.pass.tests" />
+	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.multireturn.pass.tests, gen.leftthreeaddress.pass.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
