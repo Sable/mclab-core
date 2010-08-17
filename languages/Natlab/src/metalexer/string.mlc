@@ -13,7 +13,6 @@
 "''" {: append(yytext()); :}
 "'" {: /*just end string - %append will handle token*/ :} END_STRING
 {ValidEscape} {: append(yytext()); :}
-\\ {: error("Invalid escape sequence"); :}
 {LineTerminator} {: error("Unterminated string literal"); :}
 %:
 %:

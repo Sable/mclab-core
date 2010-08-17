@@ -317,6 +317,7 @@ ShellCommand=[!].*
 
 StmtTerminator = [\r\n,;]
 Filler = [\t\f ] | {EscapedLineTerminator}
+
 KeywordPrefix= {StmtTerminator} {Filler}*
 
 //parsing the bit after a DOT
@@ -345,13 +346,13 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 <START> {
     {Filler} { append(); }
     
-    classdef {
+    classdef /{Filler} {
         append();
         blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    function { startFunction(); blockStack.push(BlockType.FUNCTION); yybegin(YYINITIAL); }
+    function /{Filler} { startFunction(); blockStack.push(BlockType.FUNCTION); yybegin(YYINITIAL); }
     
     ( case
     | for
@@ -359,7 +360,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
     | parfor
     | switch
     | try
-    | while ) { append(); blockStack.push(BlockType.OTHER); yybegin(YYINITIAL); }
+    | while )  /{Filler}  { append(); blockStack.push(BlockType.OTHER); yybegin(YYINITIAL); }
     
     . | \n { yypushback(1); yybegin(YYINITIAL); }
     
@@ -447,13 +448,13 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 }
 
 <YYINITIAL> {
-    {KeywordPrefix} classdef {
+    {KeywordPrefix} classdef  /{Filler} {
         append();
         blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    {KeywordPrefix} end {
+    {KeywordPrefix} end  /{Filler} {
         append();
         if(!blockStack.isEmpty()) {
             if(blockStack.peek() == BlockType.FUNCTION) {
@@ -465,9 +466,9 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 }
 
 <INSIDE_CLASS> {
-    {KeywordPrefix} classdef { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
+    {KeywordPrefix} classdef /{Filler} { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
-    {KeywordPrefix} end {
+    {KeywordPrefix} end /{Filler} {
         append();
         if(!blockStack.isEmpty()) {
             if(blockStack.peek() == BlockType.FUNCTION) {
@@ -486,7 +487,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 <YYINITIAL, INSIDE_CLASS> {
     //from matlab "iskeyword" function
     
-    {KeywordPrefix} function { startFunction(); blockStack.push(BlockType.FUNCTION); }
+    {KeywordPrefix} function /{Filler}  { startFunction(); blockStack.push(BlockType.FUNCTION); }
     
     {KeywordPrefix} ( case
                     | for
@@ -494,7 +495,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
                     | parfor
                     | switch
                     | try
-                    | while ) { append(); blockStack.push(BlockType.OTHER); }
+                    | while )  /{Filler}  { append(); blockStack.push(BlockType.OTHER); }
     
     //distinguish these from identifiers because their action is different
     {KeywordPrefix} ( break
