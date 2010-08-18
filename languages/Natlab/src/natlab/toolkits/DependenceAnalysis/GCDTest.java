@@ -63,7 +63,7 @@ public class GCDTest {
             
 		//long gcd = 0;
 	    long r = 0;
-	    System.out.println("Size of the Array:::::"+cList.size());
+	    //System.out.println("Size of the Array:::::"+cList.size());
 	    AffineExpression aExpression[]=new AffineExpression[cList.size()];//(AffineExpression)cList.get(0);
 	    cList.toArray(aExpression);
 	    
@@ -75,7 +75,7 @@ public class GCDTest {
 	      }//end of if 
 	      else {
 	        r = u % v;
-	        System.out.println ("u " + u + ", v " + v + ", u % v " + r);
+	        //System.out.println ("u " + u + ", v " + v + ", u % v " + r);
 	        u = v;
 	        v = r;
 	      }//end of else 
@@ -95,14 +95,14 @@ public class GCDTest {
 	{
 		if(c%gcd==0)
 		{   isSolution=true;
-			System.out.println("Gcd Result" + c%gcd);
+			//System.out.println("Gcd Result" + c%gcd);
 			//try{raf.writeBytes("GCD result for the system of equations is:" + c%gcd +'\n');
 			//}catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch
 		}
 		else 
 		{isSolution=false;
-		 System.out.println("Gcd Result" + c%gcd);
-		 System.out.println("There is no integer solution for the system of equations");
+		// System.out.println("Gcd Result" + c%gcd);
+		 ///System.out.println("There is no integer solution for the system of equations");
 		 //try{raf.writeBytes("GCD result for the system of equations is:" + c%gcd +'\n');
 		  //   raf.writeBytes("There is no integer solution for the system of equations." +'\n');
 		 //  }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch

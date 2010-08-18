@@ -26,14 +26,14 @@ public class Interchange {
 	 return iMatrix;
   }
  
- public boolean applyInterchange(DependenceData lData){
+ public boolean applyInterchange(int[] array){
 	 /*LinkedList l=(LinkedList)lData.getDistanceVectors();
 	 for(int i=0;i<l.size();i++){
 		 int tArray[]=(int[])l.get(i);
 		 if(!multiply(tArray))return false;
 	 }*/
 	 
-	 int[] array =lData.getDistanceArray();
+	 //int[] array =lData.getDistanceArray();
 	 //for(int i=0;i<l.size();i++){
 		// int tArray[]=(int[])l.get(i);
 		 if(!multiply(array))return false;
