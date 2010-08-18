@@ -12,6 +12,7 @@ import ast.RangeExpr;
 
 import ast.MTimesExpr;
 
+import java.math.BigInteger;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -67,8 +68,8 @@ public ConstraintsToolBox(){
 
 public void setPTable(Hashtable<String, LinkedList<PredictedData>> table){
 		pTable = table;
-		Set s=pTable.entrySet();
-		Iterator it=s.iterator();
+		//Set s=pTable.entrySet();
+		//Iterator it=s.iterator();
 		//while(it.hasNext()){
 			//LinkedList list=(LinkedList)it.next();
 			///System.out.println((it.next()).getClass().toString());
@@ -113,41 +114,75 @@ private void setRangeInfo(boolean rangeInfo) {
 private boolean isRangeInfo(){
 	return rangeInfo;
 }
-private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vector<DependenceData> dataVector,boolean flag){
-   //int counter=0;	
-   boolean isNested=false; 
-   if(!pTable.isEmpty()){
+/*
+ * This function fills the dependence data object.
+ */
+private DependenceData getDependenceDataObject(DependenceData Data,int i,LinkedList<PredictedData> tList){
+	//if(pTable!=null){		   
+		 float lNo=Data.getLoopNo();  
+		 //if(pTable.containsKey(Float.toString(lNo))){		 
+			//setRangeInfo(true);	
+			//LinkedList<PredictedData> tList=pTable.get(Float.toString(Data.getLoopNo()));		
+			//for(int i=0;i<tList.size();i++){
+				PredictedData pData=tList.get(i);
+				DependenceData dData=(DependenceData)Data.clone();			
+				dData.setLVarName(pData.getLVName());
+				//dData.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+				//System.out.println("Accessed Statement::::"+dData.getArrayAccess());
+				dData.setStartRange(pData.getLowerBound());
+				dData.setEndRange(pData.getUpperBound());
+				//dData.setNestedLRanges(dData.getNestingLevel()+1);
+				float a=(float)0.1;
+				 for(int j=0;j<dData.getNestingLevel()+1;j++){	           
+						lNo=(float) (lNo+a);					
+						if(pTable.containsKey(Float.toString(lNo))){						
+							LinkedList<PredictedData> list=pTable.get(Float.toString(lNo));							
+							for(int k=0;k<list.size();k++){
+								PredictedData data=list.get(k);						
+								NestedLoop nLoop=dData.getNestedLoop();							
+							    nLoop.setLoopNo(data.getLoopNo());
+							    nLoop.setLVarName(data.getLVName());
+							    nLoop.setStartRange(data.getLowerBound());
+							    nLoop.setEndRange(data.getUpperBound());
+						  }//end of for
+						}//end of if 
+						a=(float)(a+(float)0.1);						
+					}//end of for
+				 //a=(float)(a+(float)0.1);
+			//}//end of for
+			return dData;
+		 // }//end of if		 
+	  // }//end of main if
+	//return null;
+}
+/*
+ * This function adds the data object to dependence data.
+ */
+/*private DependenceData prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,boolean flag){
+	
+   if(pTable!=null){
+	 DependenceData dData=null;  
 	 float lNo=Data.getLoopNo();  
 	 if(pTable.containsKey(Float.toString(lNo))){		 
 		setRangeInfo(true);	
 		LinkedList<PredictedData> tList=pTable.get(Float.toString(Data.getLoopNo()));		
 		for(int i=0;i<tList.size();i++){
 			PredictedData pData=tList.get(i);
-			DependenceData dData=(DependenceData)Data.clone();
-			//DependenceData dData=new DependenceData();
-			//dData.setLoopNo(Data.getLoopNo());
-			//dData.setNestingLevel(Data.getNestingLevel());
-			//dData.setStatementAccessed(Data.getStatementAccessed());
-			//System.out.println("New Data::::"+pData.getUpperBound()+"   "+tList.size() +dData.toString());
+			dData=(DependenceData)Data.clone();			
 			dData.setLVarName(pData.getLVName());
-			dData.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+			//dData.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
 			System.out.println("Accessed Statement::::"+dData.getArrayAccess());
 			dData.setStartRange(pData.getLowerBound());
 			dData.setEndRange(pData.getUpperBound());
 			//if(!isNested){	
 	          for(int j=0;j<dData.getNestingLevel();j++){	           
-					
-					//NestedLoop nLoop=dData.getNestedLoop();
-	        	    //isNested=true;
-					lNo=(float) (lNo+j+0.1);
-					//System.out.println("J::::"+lNo);
+					lNo=(float) (lNo+j+0.1);					
 					if(pTable.containsKey(Float.toString(lNo))){						
 						LinkedList<PredictedData> list=pTable.get(Float.toString(lNo));
 						dData.setNestedLRanges(list.size());
 						for(int k=0;k<list.size();k++){
 							PredictedData data=list.get(k);						
-							NestedLoop nLoop=dData.getNestedLoop();
-							//System.out.println("Nested Loop Data variable Name::::::"+data.getLVName());
+							NestedLoop nLoop=dData.getNestedLoop();							
 						    nLoop.setLoopNo(data.getLoopNo());
 						    nLoop.setLVarName(data.getLVName());
 						    nLoop.setStartRange(data.getLowerBound());
@@ -155,25 +190,94 @@ private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vec
 					  }//end of for
 					}//end of if 
 				}//end of for
-		     // }//end of if
-		    //else{
-		    	//System.out.println(" length;;;; "+Data.getNLoopArray().length);
-		    	//dData.setNLoopArray(Data.getNLoopArray());
-		    //}
+		     // }//end of if		    
 	        lNo=Data.getLoopNo();
 	        if(flag){makeEquationsForSubscriptExprs(aExpr,bExpr,dData);}
 	        else{
 	        	dData.setDependence("n");
 	        }
-			//int[] array=dData.getDistanceArray();
-			//for(int k=0;k<dData.getDistanceArray().length;k++){
-				//System.out.println("array value"+array[k]);
-			//}
 			dataVector.add(dData);
 		}//end of for
 	 }//end of 2nd if
+	 return dData;
    } //end of 1st if
+   else if(flag) {makeEquationsForSubscriptExprs(aExpr,bExpr,Data);}//case where no range info and same array access.
+   /*else if(!flag && pTable==null){ 
+	     Data.setDependence("n");
+	     //for(int i=0;i<forStmtArray.size();i++){
+	    	 if(Data.getNestingLevel()==0){
+	    		 AssignStmt aStmt=((ForStmt)forStmtArray.get(0)).getAssignStmt();
+	    		 if(aStmt.getRHS() instanceof RangeExpr){
+	    			 RangeExpr rExpr=(RangeExpr)aStmt.getRHS();	    			 
+	    			 Data.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+	    			 Data.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());
+	    		 }	    		 
+	    	  }//end of if
+	    	 else{
+	    		 AssignStmt aStmt=((ForStmt)forStmtArray.get(0)).getAssignStmt();
+	    		 if(aStmt.getRHS() instanceof RangeExpr){
+	    			 RangeExpr rExpr=(RangeExpr)aStmt.getRHS();	    			 
+	    			 Data.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+	    			 Data.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());
+	    		 }	   
+	    		 Data.setNestedLRanges(Data.getNestingLevel());
+	    		 for(int i=1;i<forStmtArray.size();i++){
+	    			 AssignStmt aStmt1=((ForStmt)forStmtArray.get(i)).getAssignStmt();
+	    			 NestedLoop nLData=Data.getNestedLoop();
+		    		 if(aStmt1.getRHS() instanceof RangeExpr){
+		    			 RangeExpr rExpr=(RangeExpr)aStmt1.getRHS();		    			
+		    			 nLData.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+		    			 nLData.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());
+		    	
+		    		 }	   
+	    		 }
+	    	 }//end of else 
+	    	//}
+	     //dataVector.add(Data);
+   }//end of else if*/
+  // return Data;
 
+//}
+
+/*
+ * This function is for the case where you have no range info and it fills the 
+ * bounds from the loops.
+ */
+private void fillDependenceDataObject(DependenceData Data){
+	//Data.setDependence("n");
+    //for(int i=0;i<forStmtArray.size();i++){
+   	 if(Data.getNestingLevel()==0){
+   		 AssignStmt aStmt=((ForStmt)forStmtArray.get(0)).getAssignStmt();
+   		 if(aStmt.getRHS() instanceof RangeExpr){
+   			 RangeExpr rExpr=(RangeExpr)aStmt.getRHS();	    			 
+   			 Data.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+   			 Data.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());
+   		 }	    		 
+   	  }//end of if
+   	 else{
+   		 AssignStmt aStmt=((ForStmt)forStmtArray.get(0)).getAssignStmt();
+   		 if(aStmt.getRHS() instanceof RangeExpr){
+   			 RangeExpr rExpr=(RangeExpr)aStmt.getRHS();	    			 
+   			 Data.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+   			 Data.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());
+   		 }	   
+   		 Data.setNestedLRanges(Data.getNestingLevel());
+   		 float a=(float)0.1;
+   		 for(int i=1;i<forStmtArray.size();i++){
+   			 AssignStmt aStmt1=((ForStmt)forStmtArray.get(i)).getAssignStmt();
+   			 NestedLoop nLData=Data.getNestedLoop();
+   			 float lNo=(float)Data.getLoopNo()+a;   			 
+   			 nLData.setLoopNo(lNo);
+	    		 if(aStmt1.getRHS() instanceof RangeExpr){
+	    			 RangeExpr rExpr=(RangeExpr)aStmt1.getRHS();		    			
+	    			 nLData.setStartRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getLower()).getValue()).getValue()).intValue()); 	 
+	    			 nLData.setEndRange(((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)rExpr.getUpper()).getValue()).getValue()).intValue());	    	
+	    		 }	   
+	    	}//end of for
+   		   a=(float)(a+(float)0.1);
+   	  }//end of else 
+
+	
 }
 
 
@@ -183,43 +287,109 @@ private void prepareDependenceData(Expr aExpr,Expr bExpr,DependenceData Data,Vec
 	 *  		a(i,j)=a(i+10,j-9)
 	 *  	end
 */	
-public boolean checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector){	
- boolean aFlag=false; //TODO:Needs to fix
+public void checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector,boolean flag){
+	
+ /*//TODO:1.Needs to look into setting the dependence for a Dataobject.
+ //TODO:2.Look into the case where this aExpr is not a instance of parameterized expression e.g
+  * ((U((i1 - 1), (j1 - 1)) + U((i1 + 1), (j1 - 1))) + (s2 * U(i1, (j1 - 1))))=U((1 : n), j1)
+  * 
+  */ 	
+	
+ Vector<ParameterizedExpr> params=new Vector<ParameterizedExpr>();
+ tokenizeExpression(bExpr,params);
+ Iterator it =params.iterator();
  
- //LinkedList aList[]=new LinkedList[dData.getNestingLevel()];
- if(aExpr instanceof ParameterizedExpr){ 	
-	Vector<ParameterizedExpr> params=new Vector<ParameterizedExpr>();
-	tokenizeExpression(bExpr,params);
-	Iterator it =params.iterator();
-	if(!it.hasNext()){
-	   	 prepareDependenceData(aExpr,bExpr,dData,dataVector,false);
-	 }
-    while(it.hasNext()){   
+ if(pTable!=null){ //This is the case where we have range info
+   //float inc=(float)0.0; 
+   float lNo=dData.getLoopNo(); 
+   //for(int l=0;l<dData.getNestingLevel()+1;l++){
+	 //lNo=lNo+inc;  
+	 if(pTable.containsKey(Float.toString(lNo))){		 
+		setRangeInfo(true);	
+		LinkedList<PredictedData> tList=pTable.get(Float.toString(lNo));
+		for(int i=0;i<tList.size();i++){
+	     DependenceData data=getDependenceDataObject(dData,i,tList);
+	     data.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+	     if(aExpr instanceof ParameterizedExpr){
+	    	 while(it.hasNext()){   
+	   	    	Expr tExpr=(Expr)it.next();   	    				
+	   	    	if(aExpr.getVarName().equals(tExpr.getVarName())){   	  
+	   			   //data=prepareDependenceData(aExpr,tExpr,data,true); //Same array access on LHS and RHS
+	   	    		makeEquationsForSubscriptExprs(aExpr,tExpr,data);	   		        
+	    		}//end of if
+	    	    else{   		   	  
+	    	       //data=prepareDependenceData(aExpr,tExpr,data,false); //same array is not accessed on LHS and RHS.
+	    	    	data.setDependence("n");	
+	    	    	
+	    	    }//end of else
+	    	  }//end of while
+	        }//end of if 
+	        data.setDependence("n");
+	        dataVector.add(data);
+	        it=params.iterator();
+		  }//end of for
+	  }//end of if
+	 //inc=inc+(float)0.1;
+    //}//end of outer for
+   }//end of main if
+ 
+ else if(pTable==null){//This is the case where we don't have range info
+	DependenceData dat=(DependenceData)dData.clone(); 
+	fillDependenceDataObject(dat); 
+	dat.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+	//System.out.println(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+	if(aExpr instanceof ParameterizedExpr){
+	  if(!it.hasNext()){ dat.setDependence("n");}	
+      while(it.hasNext()){   
+   	   	Expr tExpr=(Expr)it.next();   	    				
+   	   	if(aExpr.getVarName().equals(tExpr.getVarName())){   	
+   	    	 //makeEquationsForSubscriptExprs(aExpr,bExpr,dat);	   		        
+   	   	   makeEquationsForSubscriptExprs(aExpr,tExpr,dat);
+    	  }//end of if
+    	else{ dat.setDependence("n");}
+      }//end of while
+      dataVector.add(dat);
+  }//end of  if
+		
+	 
+}//end of if
+ 
+ /*if(aExpr instanceof ParameterizedExpr){	
+	/*if(!it.hasNext()){
+	   	 prepareDependenceData(aExpr,bExpr,data,dataVector,false);
+	   	 //return aFlag;
+	 }*///Don't need to handle this case bc this means LHS is an parameterized Expr where as RHS is not so there is no dependency. 
+	 
+    /*while(it.hasNext()){   
     	Expr tExpr=(Expr)it.next();   	    				
     	if(aExpr.getVarName().equals(tExpr.getVarName())){   	  
-		   prepareDependenceData(aExpr,tExpr,dData,dataVector,true);    		
+		   data=prepareDependenceData(aExpr,tExpr,dData,dataVector,true); //Same array access on LHS and RHS   		
 	  }//end of if
     	else{   		   	  
-    	   prepareDependenceData(aExpr,tExpr,dData,dataVector,false);	 
+    	   data=prepareDependenceData(aExpr,tExpr,dData,dataVector,false); //same array is not accessed on LHS and RHS.  	   
     	}
     }//end of while
+    dataVector.add(dData);
     
-  }//end of if
- 
-	 
- return aFlag;						
+  }//end of if	 
+ //else{
+	  // data=prepareDependenceData(aExpr,bExpr,dData,dataVector,false);
+// }
+ return data;*/						
 }//end of function checkSameArrayAccess.
 
 
 /*
  * ApplyTests function applies appropriate test on the graph for a statement and then prints the results.
  */
-public boolean ApplyTests(){
+public boolean ApplyTests(DependenceData data){
 	
  boolean issvpcApplicable,isApplicable,isAcyclicApplicable=false;	
  boolean dFlag=false;
+ //System.out.println("amnaisjfjsdjfisdjfuise");
  if(cGraph.getGraphSize()>0){
 	//ConstraintsGraph cGraph=cToolBox.getGraph();
+	//System.out.println("amnaisjfjsdjfisdjfuise1123123"); 
 	GCDTest gcdTest=new GCDTest();
 	gcdTest.calculateGcd(cGraph);
 	isApplicable=gcdTest.getIsSolution();
@@ -229,17 +399,17 @@ public boolean ApplyTests(){
 	   // bTest.directionVectorHierarchyDriver(cGraph); // same for this,need to change it.
 		SVPCTest svpcTest=new SVPCTest();			 
 		issvpcApplicable= svpcTest.checkDependence(cGraph);
-		dFlag=issvpcApplicable;
-		System.out.println("i am in SVPC test");			
-		if (!issvpcApplicable)
-		 {
+		dFlag=issvpcApplicable;		
+		data.setDependence("y");
+		////System.out.println("i am in SVPC test");			
+		if (!issvpcApplicable){
 		    System.out.println("Apply Acyclic test");
 			AcyclicTest acyclicTest=new AcyclicTest();
 			cGraph=acyclicTest.makeSubstituitionForVariable(cGraph);
 		    isAcyclicApplicable=acyclicTest.getisApplicable();
 		    dFlag=isAcyclicApplicable;
-			if(isAcyclicApplicable)
-			{   System.out.println("now apply SVPC Test");
+			if(isAcyclicApplicable){ 
+				System.out.println("now apply SVPC Test");
 				dFlag=svpcTest.checkDependence(cGraph);
 			}//end of 4th if				
 			//else{approximateRanges(cGraph);}
@@ -308,14 +478,15 @@ private void setBounds(AffineExpression aExpr,AffineExpression bExpr,DependenceD
 	    }//end of else
 	}	
 	if(dData.getNestingLevel()>0){
-	   NestedLoop[] nLoopArray=dData.getNLoopArray();	  
-	   for(int i=0;i<nLoopArray.length;i++){		   
-		if(aExpr.getLoopVariable().equals(nLoopArray[i].getLVarName())){
-			aExpr.setLBound(nLoopArray[i].getStartRange());  //Setting lower bound
-			bExpr.setLBound(nLoopArray[i].getStartRange());
+	   //NestedLoop[] nLoopArray=dData.getNLoopArray();	  
+	   LinkedList<NestedLoop> nLoopList=dData.getNLoopList();	
+	   for(int i=0;i<nLoopList.size();i++){		   
+		if(aExpr.getLoopVariable().equals(nLoopList.get(i).getLVarName())){
+			aExpr.setLBound(nLoopList.get(i).getStartRange());  //Setting lower bound
+			bExpr.setLBound(nLoopList.get(i).getStartRange());
 			
-			aExpr.setUBound(nLoopArray[i].getEndRange()); //Setting Upper bound.
-			bExpr.setUBound(nLoopArray[i].getEndRange());
+			aExpr.setUBound(nLoopList.get(i).getEndRange()); //Setting Upper bound.
+			bExpr.setUBound(nLoopList.get(i).getEndRange());
 			boolean flag=ApplyTests(aExpr,bExpr);
 			if(flag){
 				System.out.println("There is dependence for this equation");
@@ -340,10 +511,12 @@ private void setBounds(AffineExpression aExpr,AffineExpression bExpr,DependenceD
 		 * 
 		 */
 private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,DependenceData dData){
-			
+  boolean intLitFlag=false;			
   ParameterizedExpr paraLHSExpr=(ParameterizedExpr)LHSExpr;
   //resultArray=new boolean[paraLHSExpr.getNumArg()];   //instantiate a boolean array based on dimensions of array under dependence testing.
-  //System.out.println("I am in make Equations");
+  //System.out.println("LHS Expression" + LHSExpr.getPrettyPrinted()+"  "+LHSExpr.toString());
+  //System.out.println("RHS Expression" + RHSExpr.getPrettyPrinted()+"  "+RHSExpr.toString());
+  
   int size=paraLHSExpr.getNumArg();
   int[] array=new int[size];
   int count=0;
@@ -372,11 +545,7 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 			  }
 			 else{
 				 setUpperAndLowerBounds(aExpr1,aExpr2);//TODO:If range data is missing then call this function of upper and lower bounds,in the case where range data is present 
-			     //if(pExpr.getRHS() instanceof IntLiteralExpr){			       
-				   //array[count]=aExpr1.getC()-aExpr2.getC();
-				   //count++;					
-				   cGraph.addToGraph(aExpr1,aExpr2);							 
-				//}//end of nested if
+			     cGraph.addToGraph(aExpr1,aExpr2);			     
 			 }//end of else
 		 }//end of main if			
 		else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MinusExpr)
@@ -405,6 +574,32 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 				 //}//end of nested if	
 			  }//end of else
 		   }//end of main else if
+		else if(paraLHSExpr.getArg(i) instanceof MinusExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof NameExpr){
+			 NameExpr nExpr=(NameExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+			 aExpr2.setLoopVariable(nExpr.getVarName());
+			 MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)LHSExpr).getArg(i);
+			 aExpr1.setLoopVariable(mExpr.getLHS().getVarName());
+			 aExpr2.setC(0);			 
+			 aExpr2.setKey("t"+i);			
+			 aExpr2.setIndexExpr(nExpr);
+			 //MinusExpr mExpr=(MinusExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+			 aExpr1.setKey("t"+i);
+			 aExpr1.setIndexExpr(mExpr.getRHS());
+			 IntLiteralExpr iExpr=(IntLiteralExpr)mExpr.getLHS();				
+			 aExpr1.setC((iExpr.getValue().getValue().intValue()));
+			 array[count]=aExpr1.getC()+aExpr2.getC();
+			 count++;
+			 if(isRangeInfo()){
+				 setBounds(aExpr1,aExpr2,dData);				 
+			  }			 
+			 else{
+				 setUpperAndLowerBounds(aExpr1,aExpr2);			 
+				 //if(mExpr.getRHS() instanceof IntLiteralExpr){
+				 cGraph.addToGraph(aExpr1,aExpr2);
+				 //}//end of nested if	
+			  }//end of else
+		   }//end of main else if
+
 		else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof NameExpr){
 			 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);						 
 			 aExpr1.setLoopVariable(nExpr.getVarName());
@@ -422,8 +617,20 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 			 if(isRangeInfo())setBounds(aExpr1,aExpr2,dData);
 			 else setUpperAndLowerBounds(aExpr1, aExpr2);
 			 cGraph.addToGraph(aExpr1,aExpr2);						 
-		  }//end of main else if	
-		 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr){
+		  }//end of main else if
+		//This case U(i,1)=U(i,2).If constants are not equal then there is no dependence
+		else if((paraLHSExpr.getArg(i) instanceof IntLiteralExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof IntLiteralExpr)){
+			//System.out.println("I am an IntLiteralExpr");
+			int a=((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)paraLHSExpr.getArg(i)).getValue()).getValue()).intValue();
+			int b=((BigInteger)((IntNumericLiteralValue)((IntLiteralExpr)((ParameterizedExpr)RHSExpr).getArg(i)).getValue()).getValue()).intValue();
+			if(a!=b){
+				dData.setDependence("n");
+				intLitFlag=true;
+				///System.out.println("I am not equal");
+				break;			
+			}
+		}
+		 else if(paraLHSExpr.getArg(i) instanceof MTimesExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr){//Note:not an affine expression
 			 MTimesExpr mExpr=(MTimesExpr)paraLHSExpr.getArg(i);
 			 aExpr1.setLoopVariable(mExpr.getRHS().getVarName());						 
 			 aExpr1.setC(0);			 
@@ -442,8 +649,35 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 			 else{
 				 setUpperAndLowerBounds(aExpr1,aExpr2);						 				
 			     cGraph.addToGraph(aExpr1,aExpr2);
-			 }//end of else
+			 }//end of else		  	 
 		 }//end of main else if
+		
+		//This is not included bc it is not an affine Expression u(i,j)=u((i*10),(j+10))
+		/* else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr){
+			 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
+			 aExpr1.setLoopVariable(nExpr.getVarName());
+			 aExpr1.setC(0);
+			 array[count]=0;
+			 count++;
+			 aExpr1.setKey("t"+i);			
+			 aExpr1.setIndexExpr(nExpr);
+			 MTimesExpr mExpr=(MTimesExpr)((ParameterizedExpr)RHSExpr).getArg(i);
+			 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
+			 aExpr2.setKey("t"+i);
+			 aExpr2.setIndexExpr(mExpr);
+		     setUpperAndLowerBounds(aExpr1,aExpr2);						 				
+			 aExpr2.setC(0);
+			 array[count]=0;
+			 count++;
+			 if(isRangeInfo()){
+				 setBounds(aExpr1,aExpr2,dData);				 
+			 }
+			 else{
+				 setUpperAndLowerBounds(aExpr1,aExpr2);						 				
+			     cGraph.addToGraph(aExpr1,aExpr2);
+			 }//end of else
+			 												 
+		}//end of else if*/
 		
 		/*
 		 * TODO:Look into this case 2i=i+10
@@ -520,28 +754,11 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 			count++;
 			cGraph.addToGraph(aExpr1,aExpr2);
 						 //}//end of nested if						 
-		 }//end of main else if
+		 }//end of main else if*/
 
-		else if(paraLHSExpr.getArg(i) instanceof NameExpr && ((ParameterizedExpr)RHSExpr).getArg(i) instanceof MTimesExpr)
-		 {
-			 NameExpr nExpr=(NameExpr)paraLHSExpr.getArg(i);
-			 aExpr1.setLoopVariable(nExpr.getVarName());
-			 aExpr1.setC(0);
-			 array[count]=0;
-			 count++;
-			 aExpr1.setKey("t"+i);			
-			 aExpr1.setIndexExpr(nExpr);
-			 MTimesExpr mExpr=(MTimesExpr)((ParameterizedExpr)RHSExpr).getArg(i);
-			 aExpr2.setLoopVariable(mExpr.getRHS().getVarName());
-			 aExpr2.setKey("t"+i);
-			 aExpr2.setIndexExpr(mExpr);
-		     setUpperAndLowerBounds(aExpr1,aExpr2);						 				
-			 aExpr2.setC(0);
-			 array[count]=0;
-			 count++;
-			 cGraph.addToGraph(aExpr1,aExpr2);												 
-		}//end of else if*/		
+					
 	}//end of for			
+  if(!isRangeInfo() && !intLitFlag){ApplyTests(dData);}//case where there is no range info.
   dData.setDistanceArray(array);
 }//end of function makeEquationsForSubscriptExprs
 		
@@ -555,21 +772,17 @@ private void makeEquationsForSubscriptExprs(Expr LHSExpr,Expr RHSExpr,Dependence
 		 *  	end
 		 *  TODO:Look into this case a(i,j)=a(j-10,i+11).Consult notebook on which you have solved it.
 */							
-private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression aExpr2)
-{	
-	int upperBound=0;
-	int lowerBound=0;
-	for(int i=0;i<loopIndex;i++)
- 	{
+private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression aExpr2){	
+	
+	for(int i=0;i<loopIndex;i++){
     	AssignStmt assStmt= forStmtArray.get(i).getAssignStmt();					
 		if(assStmt.getVarName().equals(aExpr1.getLoopVariable())) //this is to compare array subscript with loop index variable.
 		{
 	      if(assStmt.getRHS() instanceof RangeExpr)		 		
 		   {
 			 RangeExpr rExpr=(RangeExpr) assStmt.getRHS();						
-			 if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr)
-			  {
-				System.out.println("I am a constraint bounded on both sides by variables of IntLiteralExpression");
+			 if(rExpr.getUpper() instanceof IntLiteralExpr && rExpr.getLower() instanceof IntLiteralExpr){
+				//System.out.println("I am a constraint bounded on both sides by variables of IntLiteralExpression");
 				IntLiteralExpr iExprUpper=(IntLiteralExpr) rExpr.getUpper();
 							//upperBound=iExprUpper.getValue().getValue().intValue();
 				IntLiteralExpr iExprLower=(IntLiteralExpr) rExpr.getLower();
@@ -579,8 +792,7 @@ private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression a
 				aExpr2.setUpperBound(iExprUpper);
 				aExpr2.setLowerBound(iExprLower);
 			}//end of 3rd if
-			else if(rExpr.getUpper() instanceof PlusExpr)
-			 {
+			else if(rExpr.getUpper() instanceof PlusExpr){
 				System.out.println("I am a constraint bounded on both sides by variables of PlusExpr");
 				PlusExpr pExpr=(PlusExpr)rExpr.getUpper();
 				aExpr1.setUpperBound(pExpr);
@@ -737,6 +949,11 @@ private void setUpperAndLowerBounds(AffineExpression aExpr1 , AffineExpression a
 	}//end of 1st if
   }//end of for loop		
 }//end of setUpperAndLowerBounds function.
+
+
+public Hashtable<String, LinkedList<PredictedData>> getPTable() {
+	return pTable;
+}
 
 
 

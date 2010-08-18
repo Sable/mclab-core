@@ -1,5 +1,9 @@
 package natlab.toolkits.DependenceAnalysis;
 
+import java.util.LinkedList;
+
+import ast.ForStmt;
+
 /*
  * This class contains loop Data which is then written to dependenceFile.xml
  * DateCreated:Mar31,2010
@@ -19,24 +23,32 @@ public class DependenceData implements Cloneable {
 	private String arrayAccess;
 	private int distanceArray[];
 	private String statementAccessed;
-	private NestedLoop nLoopArray[];
-	private int count=0;
+	private LinkedList<NestedLoop> nLoopList=new LinkedList<NestedLoop>();
+	//private int count=0;
 	private int nestedLRanges;
+	private ForStmt fNode;
+	private String par;
 	
+	public String getPar() {
+		return par;
+	}
+	public void setPar(String par) {
+		this.par = par;
+	}
 	public int getNestedLRanges() {
 		return nestedLRanges;
 	}
 	public void setNestedLRanges(int nestedLRanges) {
-		this.nestedLRanges = nestedLRanges;
-		nLoopArray=new NestedLoop[nestedLRanges];
+		//this.nestedLRanges = nestedLRanges;
+		//nLoopArray=new NestedLoop[nestedLRanges];
 	}
-	public NestedLoop[] getNLoopArray() {
+	/*public NestedLoop[] getNLoopArray() {
 		return nLoopArray;
 	}
 	public void setNLoopArray(NestedLoop[] array) {
 		//nLoopArray = new NestedLoop[nLevel];
 		nLoopArray=array;
-	}
+	}*/
 	public String getLVarName() {
 		return lVarName;
 	}
@@ -60,9 +72,9 @@ public class DependenceData implements Cloneable {
 	}	
 	public NestedLoop getNestedLoop() {
 	    nestedLoop=new NestedLoop();
-	    nLoopArray[count]=nestedLoop;
-	    System.out.println("Count size"+count);
-	    count++;
+	    nLoopList.add(nestedLoop);
+	    //System.out.println("Count size"+count);
+	    //count++;
 	    return nestedLoop;
 	}
 
@@ -142,6 +154,20 @@ public class DependenceData implements Cloneable {
 	}
 	public void setTransformation(String transformation) {
 		this.transformation = transformation;
+	}
+	public ForStmt getFNode() {
+		return fNode;
+	}
+	public void setFNode(ForStmt node) {
+		fNode = node.fullCopy();
+		//fNode.setAssignStmt(node.getAssignStmt());
+		//fNode.setStmtList(node.getStmtList());			
+	}
+	public LinkedList<NestedLoop> getNLoopList() {
+		return nLoopList;
+	}
+	public void setNLoopList(LinkedList<NestedLoop> loopList) {
+		nLoopList = loopList;
 	}
 
 

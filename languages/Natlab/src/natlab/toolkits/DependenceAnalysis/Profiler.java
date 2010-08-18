@@ -3,6 +3,7 @@ import ast.*;
 import natlab.toolkits.analysis.ForVisitor;
 import natlab.IntNumericLiteralValue;
 import java.math.*;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import natlab.NumericLiteralValue;
@@ -22,7 +23,7 @@ public class Profiler {
 	private ForStmt forNode;	
 	private String fileName;
 	private ExpressionFactory eFactory;	
-	private ForStmt[] forStmtArray;
+	private LinkedList<ForStmt> forStmtList;
 	private static int loopNo=0;
 	
 	public String getFileName() {
@@ -31,7 +32,7 @@ public class Profiler {
 	public void setFileName(String fName) {
 		StringTokenizer st = new StringTokenizer(fName,".");		
 		fileName=st.nextToken();
-		System.out.println(fileName);
+		//System.out.println(fileName);
 		/*this.fileName ="";		
 		for(int i=0;i<fName.length();i++)
 		{
@@ -41,68 +42,100 @@ public class Profiler {
 		}
 		fileName.trim();*/		
 	}
-	public Profiler()
-	{     
+	public Profiler(){     
 	    eFactory=new ExpressionFactory();    
 	    
-	}		
+	}
+	
+/*
+ * This function keeps track of all the variables 
+ * assigned in the loop to check for parallelization.
+ */
+public MTransposeExpr recordVariables(ForStmt fStmt){	
+	int size=fStmt.getNumStmt();
+	Row vRow=new Row();
+	for(int i=0;i<size;i++){
+	  if(fStmt.getStmt(i) instanceof AssignStmt){
+	    AssignStmt aStmt=(AssignStmt)fStmt.getStmt(i);
+	    if(aStmt.getLHS() instanceof NameExpr){     	
+	      vRow.addElement(new StringLiteralExpr(((NameExpr)aStmt.getLHS()).getVarName()));
+	      if(i!=size-1)vRow.addElement(new StringLiteralExpr(":"));
+	    }//end of NameExpr if	    
+	 }//end of if
+   }//end of for	
+   MatrixExpr vMExpr=new MatrixExpr();
+   vMExpr.addRow(vRow);
+   MTransposeExpr vMTExpr=new MTransposeExpr();
+   vMTExpr.setOperand(vMExpr);
+   return vMTExpr;
+}
 
 	
-	/*
-	 * This function annotates the loop with loop no
-	 */
-   public void insertLoopNo(ForStmt[] fStmtArray)
-   {	forStmtArray=fStmtArray;
-		Stmt stmt=forStmtArray[0].getStmt(0);
-		if(stmt instanceof AssignStmt)
-		{   
-			AssignStmt aStmt=(AssignStmt)stmt;
-			if(aStmt.getLHS() instanceof NameExpr)
-			{   NameExpr nExpr=(NameExpr)aStmt.getLHS();
-				if(!(nExpr.getName().getVarName().equals("lNum")))
-				{   insertStmt();					
-				}//end of 3rd if				
-			}//end of 2nd if
-			else insertStmt();
-		}//end of 1st if
-		else insertStmt();				
-	}
+/*
+*
+* This function annotates the loop with loop no
+* 
+*/
+public void insertLoopNo(LinkedList<ForStmt> fStmtList){
+   forStmtList=fStmtList;
+   int size=fStmtList.size();
+   Stmt stmt=fStmtList.get(size-1).getStmt(0);
+   if(stmt instanceof AssignStmt){   
+		AssignStmt aStmt=(AssignStmt)stmt;
+		if(aStmt.getLHS() instanceof NameExpr){
+			NameExpr nExpr=(NameExpr)aStmt.getLHS();
+			if(!(nExpr.getName().getVarName().equals("lNum"))){ 
+				insertStmt();					
+			}//end of 3rd if				
+		}//end of 2nd if
+		else insertStmt();
+	 }//end of 1st if
+	else insertStmt();				
+}
    /*
     * This function inserts the loop no variable into the loop body.
     */
-   private void insertStmt()
-   {
+private void insertStmt(){
 	    AssignStmt lNAStmt=new AssignStmt();
 		NameExpr lNExpr=eFactory.createNameExpr("lNum");
-		IntLiteralExpr lNoExpr=new IntLiteralExpr();
+		FPLiteralExpr lNoExpr=new FPLiteralExpr();
 		loopNo++;
-		Integer iObj=new Integer(loopNo);    		        											
-		lNoExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+		Float iObj=new Float(loopNo);    		        											
+		lNoExpr.setValue(new natlab.FPNumericLiteralValue(iObj.toString()));
 		lNAStmt.setLHS(lNExpr);
 		lNAStmt.setRHS(lNoExpr);
 		lNAStmt.setOutputSuppressed(true);
-		lNAStmt.setParent(forStmtArray[0]);			
+		int size=forStmtList.size();
+		lNAStmt.setParent(forStmtList.get(size-1));			
 		List tList=new List();
-		tList.insertChild(lNAStmt, 0);		
-		for(int i=0;i<forStmtArray[0].getNumStmt();i++)
-		{
-			tList.insertChild(forStmtArray[0].getStmt(i), i+1);				
+		int a=0;
+		if(forStmtList.get(size-1).getStmt(0) instanceof ExpandedAnnotation) {			
+			tList.insertChild(forStmtList.get(size-1).getStmt(0), 0);
+			tList.insertChild(lNAStmt, 1);
+			a=1;
 		}
-		forStmtArray[0].setStmtList(tList);
+		else {
+			tList.insertChild(lNAStmt, 0);
+			a=0;
+		}
+		for(int i=a;i<forStmtList.get(size-1).getNumStmt();i++){
+		  tList.insertChild(forStmtList.get(size-1).getStmt(i), i+1);							
+		}
+		forStmtList.get(size-1).setStmtList(tList);
    }
+
 	
 	
 	/*
 	 * This function inserts the following code into the ast
 	 * xmlCodeGenerator('test',1,lVariableName,lowerBound,loopIncFactor,upperBound,nestingLevel);
 	 */
-	public void insertFunctionCall(int nestingLevel,ForStmt[] fStmtArray,int maxLoopNo)
-	{
+public void insertFunctionCall(int nestingLevel,LinkedList<ForStmt> fStmtList,int maxLoopNo,MTransposeExpr mExpr){
 		int insertLevel=0;
 		ExprStmt fCExprStmt=new ExprStmt();
 		NameExpr fCNExpr=eFactory.createNameExpr("xmlDataGenerator");
 		List fCList=new List();
-		forStmtArray=fStmtArray;
+		//forStmtArray=fStmtArray;
 		
 		StringLiteralExpr fileNameExpr=new StringLiteralExpr();
 		fileNameExpr.setValue(fileName);//create an expression for fileName
@@ -133,43 +166,40 @@ public class Profiler {
 		fCList.insertChild(nLevelExpr, 5);
 		fCList.insertChild(lNoExpr, 6);
 		fCList.insertChild(mLExpr, 7);
+		fCList.insertChild(mExpr, 8);
 		
-		insertLevel=forStmtArray[0].getParent().getIndexOfChild(forStmtArray[0])+1;
+		insertLevel=forStmtList.get(0).getParent().getIndexOfChild(forStmtList.get(0))+1;		
 		ParameterizedExpr pExpr=eFactory.createParaExpr(fCNExpr, fCList);
 		
 		fCExprStmt.setExpr(pExpr);
 		fCExprStmt.setOutputSuppressed(true);	
-		fCExprStmt.setParent(forStmtArray[0].getParent());				
+		fCExprStmt.setParent(forStmtList.get(0).getParent());				
 		//System.out.println("Node Id is"+(forStmtArray[0].getParent().getIndexOfChild(forStmtArray[0])));
-		forStmtArray[0].getParent().insertChild(fCExprStmt, insertLevel);
+		forStmtList.get(0).getParent().insertChild(fCExprStmt, insertLevel);
 		//forStmtArray[0].getParent().insertChild(fCExprStmt, 4);
 		//prog.getChild(1).insertChild(dTAStmt1, 0);		
-	}
+}
 	
 	
 	/*
 	 * This function inserts following code into the program.
 	 * 1.lVariableName=['i','j','k']';
 	 */
-	private Expr createLoopVariableNameExpr(int nestingLevel)
-	{
+private Expr createLoopVariableNameExpr(int nestingLevel){
 		if(nestingLevel >=1){		  	
 			
 		  Row lVariableNamesRow=new Row();
 		  //for(int i=0;i<forStmtArray.length;i++)
 		  int level=nestingLevel+1;
-		  for(int i=0;i<level;i++)
-		  {			  
+		  for(int i=0;i<level;i++){			  
 			 AssignStmt aStmt=new AssignStmt();
-			 aStmt=forStmtArray[i].getAssignStmt();			  
+			 aStmt=forStmtList.get(i).getAssignStmt();			  
 			 if(aStmt.getLHS() instanceof NameExpr){
 			   StringLiteralExpr sExpr=new StringLiteralExpr();
 			   sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
 			   lVariableNamesRow.addElement(sExpr);
-			 }
-			 
-			 if(i<(nestingLevel)){lVariableNamesRow.addElement(new StringLiteralExpr(":"));}
-			 
+			 }			 
+			 if(i<(nestingLevel)){lVariableNamesRow.addElement(new StringLiteralExpr(":"));}			 
 		  }
 		  MatrixExpr lVariableNamesMExpr=new MatrixExpr();
 		  lVariableNamesMExpr.addRow(lVariableNamesRow);
@@ -179,18 +209,16 @@ public class Profiler {
 		  return lVariableNamesMExpr;
 		  
 		}
-		else //(nestingLevel==0)
-		{
-			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
-			  if(aStmt.getLHS() instanceof NameExpr)
-			   {
-				   StringLiteralExpr sExpr=new StringLiteralExpr();
-				    sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
-				   return sExpr;
-			   }
-			  return aStmt.getLHS();//TODO:needs to fix this 
+		else{
+		  AssignStmt aStmt=forStmtList.get(0).getAssignStmt();
+		  if(aStmt.getLHS() instanceof NameExpr){
+			   StringLiteralExpr sExpr=new StringLiteralExpr();
+			    sExpr.setValue(((NameExpr)aStmt.getLHS()).getName().getVarName());
+			   return sExpr;
+		   }
+		  return aStmt.getLHS();//TODO:needs to fix this 
 		}
-	}
+}
 	
 	/*
 	 * This function inserts following code into the program.
@@ -198,26 +226,21 @@ public class Profiler {
 	 * TODO:1.need to handle all the expression types
 	 *       
 	 */
-	private Expr createLoopIncExpr(int nestingLevel)
-	{
+private Expr createLoopIncExpr(int nestingLevel){
 		
-		if(nestingLevel >=1)
-		{
+		if(nestingLevel >=1){
 		  Row lIncRow=new Row();
 		  //for(int i=0;i<forStmtArray.length;i++)
-		  for(int i=0;i<nestingLevel+1;i++)
-		  {
-			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
-			 if(aStmt.getRHS() instanceof RangeExpr)
-			 {
+		  for(int i=0;i<nestingLevel+1;i++){
+			 AssignStmt aStmt=forStmtList.get(i).getAssignStmt();		     
+			 if(aStmt.getRHS() instanceof RangeExpr){
 			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();
 			   if(rExpr.hasIncr())lIncRow.addElement(rExpr.getIncr());
-			   else
-			   {      IntLiteralExpr incExpr=new IntLiteralExpr();
-					  Integer iObj=new Integer(1);        											
-					  incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
-					  lIncRow.addElement(incExpr);	   
-				    
+			   else{      
+				 IntLiteralExpr incExpr=new IntLiteralExpr();
+				 Integer iObj=new Integer(1);        											
+				 incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+				 lIncRow.addElement(incExpr);			    
 			   }
 			 }
 		  }
@@ -228,34 +251,29 @@ public class Profiler {
 		  return lIncMTExpr;
 		  
 		}
-		else 
-		{
-			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
-			  if(aStmt.getRHS() instanceof RangeExpr)
-			   {
+		else{
+			  AssignStmt aStmt=forStmtList.get(0).getAssignStmt();
+			  if(aStmt.getRHS() instanceof RangeExpr){
 				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 				   
 				   if(rExpr.hasIncr())return rExpr.getIncr();
-				   else
-				   {      IntLiteralExpr incExpr=new IntLiteralExpr();
-						  Integer iObj=new Integer(1);        											
-						  incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
-						  return incExpr;	   
-					    
+				   else{      
+					   IntLiteralExpr incExpr=new IntLiteralExpr();
+					   Integer iObj=new Integer(1);        											
+					   incExpr.setValue(new natlab.DecIntNumericLiteralValue(iObj.toString()));
+					   return incExpr;			    
 				   }
 			   }
-			  return aStmt.getRHS();//TODO:needs to fix this	  
-		
+			  return aStmt.getRHS();//TODO:needs to fix this
 		}	
 		
-	}
+}
 	
 	/*
 	 * This function inserts following code into the program.
 	 * 1.lowerBound =[1 2 3]'; %this is a lowerBound column vector which has following values(1,2,3) depending on nesting levels.
 	 *TODO:1.need to handle all the expression types 
 	 */
-	private Expr createLowerBoundExpr(int nestingLevel)
-	{
+private Expr createLowerBoundExpr(int nestingLevel){
 		//AssignStmt lBoundAStmt =new AssignStmt();
 		//lBoundNExpr=eFactory.createNameExpr("lowerBound");
 		//lBoundAStmt.setLHS(lBoundNExpr);
@@ -263,9 +281,8 @@ public class Profiler {
 		{
 			Row lBoundRow=new Row();
 		  //for(int i=0;i<forStmtArray.length;i++)
-		  for(int i=0;i<nestingLevel+1;i++)	
-		  {
-			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
+		  for(int i=0;i<nestingLevel+1;i++){
+			 AssignStmt aStmt=forStmtList.get(i).getAssignStmt();		     
 			 if(aStmt.getRHS() instanceof RangeExpr)
 			 {
 			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
@@ -283,13 +300,10 @@ public class Profiler {
 		  //return lBoundMExpr;
 		  
 		}
-		else //if(nestingLevel==0)
-		{
-			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
-			  if(aStmt.getRHS() instanceof RangeExpr)
-			   {
-				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
-				   //lBoundAStmt.setRHS(rExpr.getLower());
+		else{
+			  AssignStmt aStmt=forStmtList.get(0).getAssignStmt();
+			  if(aStmt.getRHS() instanceof RangeExpr){
+				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS(); 			   
 				   return rExpr.getLower();
 			   }
 			  return aStmt.getRHS();//TODO:needs to fix this 
@@ -301,12 +315,12 @@ public class Profiler {
 		//forStmtArray[0].getParent().insertChild(lBoundAStmt, ((forStmtArray[0].nestedLevel)+insertLevel));
 		//forStmtArray[0].getParent().insertChild(lBoundAStmt, 3);	
 		
-	}
+}
+
 	/*
 	 * This function prepares the upperBound parameter of the function call.
 	 */
-	private Expr createUpperBoundExpr(int nestingLevel)
-	{
+private Expr createUpperBoundExpr(int nestingLevel){
 		
 		if(nestingLevel >=1)
 		{
@@ -314,9 +328,8 @@ public class Profiler {
 		  //for(int i=0;i<forStmtArray.length;i++)
 		  for(int i=0;i<nestingLevel+1;i++)
 		  {
-			 AssignStmt aStmt=forStmtArray[i].getAssignStmt();		     
-			 if(aStmt.getRHS() instanceof RangeExpr)
-			 {
+			 AssignStmt aStmt=forStmtList.get(i).getAssignStmt();		     
+			 if(aStmt.getRHS() instanceof RangeExpr){
 			   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
 			   uBoundRow.addElement(rExpr.getUpper());
 			 }
@@ -328,21 +341,16 @@ public class Profiler {
 		  return uBoundMTExpr;	 
 		  
 		}
-		else //if(nestingLevel==0)
-		{
-			  AssignStmt aStmt=forStmtArray[0].getAssignStmt();
-			  if(aStmt.getRHS() instanceof RangeExpr)
-			   {
-				   RangeExpr rExpr=(RangeExpr) aStmt.getRHS();	 
-				  
-				   return rExpr.getUpper();
-			   }
-			  
-			 
-			  return aStmt.getRHS();
+		else{
+		  AssignStmt aStmt=forStmtList.get(0).getAssignStmt();
+	      if(aStmt.getRHS() instanceof RangeExpr){
+			  RangeExpr rExpr=(RangeExpr) aStmt.getRHS();			  
+			  return rExpr.getUpper();
+		  }		 
+			return aStmt.getRHS();
 		}
 		
-	}
+  }//end of function
 }
 	
 

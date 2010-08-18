@@ -101,13 +101,13 @@ public class SVPCTest {
         		System.out.println("lower bound is" + lowerBound+aExpr2.getLoopVariable());
         		if(lowerBound > iExprUpper.getValue().getValue().intValue())
         		 { dependencyFlag="No";
-                   System.out.println("There is no dependency for this system of Equations");
+                   //System.out.println("There is no dependency for this system of Equations");
                    /*try{//raf.writeBytes("Applying SVPC Test:"+'\n');	     
                        //raf.writeBytes("There is no dependency for this system of equations:"+'\n');
      		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch*/
                  }//end of 4th if
         		else 
-        		{System.out.println("There is dependency for this system of Equations");
+        		{//System.out.println("There is dependency for this system of Equations");
         		/*try{//raf.writeBytes("There is  dependency for this system of equations:"+'\n');
 		 	    }catch (IOException e) {System.out.println("IOException:Couldnot write to file");}//end of catch*/ 
         	   }//end of 4th else
@@ -173,9 +173,9 @@ public boolean checkDependence(AffineExpression aExpr,AffineExpression bExpr){
 		if(lowerBound >aExpr.getUBound()){ 
 		   dependencyFlag="No";
 		   isApplicable=false;
-           System.out.println("There is no dependency for this system of Equations");
+           //System.out.println("There is no dependency for this system of Equations");
          }//end of 4th if
-		else System.out.println("There is dependency for this system of Equations");
+		else //System.out.println("There is dependency for this system of Equations");
        isApplicable=true;        	         	   
        return isApplicable;		
  }//end of checkDependence function. 
