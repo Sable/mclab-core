@@ -346,7 +346,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 <START> {
     {Filler} { append(); }
     
-    classdef /{Filler} {
+    (classdef|aspect) /{Filler} {
         append();
         blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
@@ -448,7 +448,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 }
 
 <YYINITIAL> {
-    {KeywordPrefix} classdef  /{Filler} {
+    {KeywordPrefix} (classdef|aspect)  /{Filler} {
         append();
         blockStack.push(BlockType.CLASS); 
         saveStateAndTransition(INSIDE_CLASS);
@@ -466,7 +466,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 }
 
 <INSIDE_CLASS> {
-    {KeywordPrefix} classdef /{Filler} { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
+    {KeywordPrefix} (classdef|aspect) /{Filler} { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
     {KeywordPrefix} end /{Filler} {
         append();
