@@ -41,7 +41,7 @@ public class HeuristicEngineDriver {
 	}
 	
 	private void populateProfiledData(Element nestedElement){		
-		float lNo=Float.parseFloat(nestedElement.getAttribute("LoopNumber"));
+		float lNo=Float.parseFloat(nestedElement.getAttribute("Number"));
         ProfiledData inData=new ProfiledData();
         inData.setLoopNo(lNo); //setting loopNo in inData.
         
@@ -164,22 +164,23 @@ public class HeuristicEngineDriver {
         int lifEnd=Integer.parseInt(((Node)liftextLNList1.item(0)).getNodeValue());                              
         lif.setEnd(lifEnd);
         inData.setLoopIncFac(lif);
-        if(loopTable.containsKey(nestedElement.getAttribute("LoopNumber"))){ //get the already existing linked list for the key and add the value to it
+        if(loopTable.containsKey(nestedElement.getAttribute("Number"))){ //get the already existing linked list for the key and add the value to it
         	//this is to insert data from the different runs of the same loop into the same list.
-        	LinkedList<ProfiledData> tList=(LinkedList<ProfiledData>)loopTable.get(nestedElement.getAttribute("LoopNumber"));
+        	LinkedList<ProfiledData> tList=(LinkedList<ProfiledData>)loopTable.get(nestedElement.getAttribute("Number"));
         	tList.add(inData);           	
         }
         else{// create a new linked list for this key and insert it in the hashtable.
         	LinkedList<ProfiledData> list=new LinkedList<ProfiledData>();
         	list.add(inData);
-        	loopTable.put(nestedElement.getAttribute("LoopNumber"),list);            	
+        	//loopTable.put(nestedElement.getAttribute("LoopNumber"),list);            	
+        	loopTable.put(nestedElement.getAttribute("Number"),list);
         }       
         
  }//end of populateProfiledData function.
 	
 	public void parseXmlFile(){
-		StringTokenizer st = new StringTokenizer(fileName,".");		
-		dirName=st.nextToken();	  
+		//StringTokenizer st = new StringTokenizer(fileName,".");		
+		//dirName=st.nextToken();	  
 		
 		try{
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -218,16 +219,24 @@ public class HeuristicEngineDriver {
 	    t.printStackTrace ();
 	   } 
 	    
-	    callIntroSort();
+	    callIntroSort();	    
 	    HeuristicEngine hEngine=new HeuristicEngine(loopTable);
         table=hEngine.computeRegionDivisors();
+        //System.out.println("table size is"+table.size());
+        //Set s=table.entrySet();
+        //Iterator it=s.iterator();
+        //System.out.println(table.size());
+        //while(it.hasNext()){        	
+        	//PredictedData pData=(PredictedData)it.next();
+        //	System.out.println(pData.getLoopNo());
+       // }
 	    writeToXMLFile(table);
 	    
 
 	}
 	
 	
-	public Hashtable<String, LinkedList<PredictedData>> getTable() {
+	public Hashtable<String, LinkedList<PredictedData>> getTable() {		
 		return table;
 	}
 	/*
@@ -343,7 +352,7 @@ public class HeuristicEngineDriver {
 	
   public void writeToXMLFile(Hashtable pTable){
 	  
-		File file = new File(dirName+"/"+"RangeData"+fileName);		
+		File file = new File(dirName+ "/" + "RangeData" + fileName);		
 		try 
 		{   boolean exists = file.exists();	    
 		    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -351,19 +360,16 @@ public class HeuristicEngineDriver {
 		    Document document;
 		    //Element rootElement=null;
 		    //Node rElement=null;
-		    Collection c=pTable.values();
+		    Collection c=table.values();
     	    Iterator it=c.iterator();
 		    
-		    if(!exists) //if file doesnot exist.
-		    {      	
+		    if(!exists){ //if file doesnot exist.	    
 		     //  System.out.println("i am in xmlwrite"+htable.size()); 
-		       document = documentBuilder.newDocument();
-		       
+		       document = documentBuilder.newDocument();		       
 		    }
 		    else{//if file exist		   		    		
 		   	  document = documentBuilder.parse(file);	       	 
-		   	  document.normalizeDocument();
-		   	  
+		   	  document.normalizeDocument();		   	  
 		    }
 		       
 		       Element tsElement = document.createElement("RunNo"); // creates a element
@@ -446,6 +452,14 @@ public class HeuristicEngineDriver {
 		}//end of try
 		catch (Exception e) {System.out.println(e.getCause());}//end of for
  }//end of function call
+
+public String getDirName() {
+	return dirName;
+}
+
+public void setDirName(String dirName) {
+	this.dirName = dirName;
+}
 		
 		
 
