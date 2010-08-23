@@ -6,6 +6,7 @@ import ast.*;
 import natlab.server.*;
 import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
 import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
+import natlab.toolkits.DependenceAnalysis.McFlatDriver;
 import natlab.toolkits.DependenceAnalysis.Profiler;
 import natlab.toolkits.analysis.ForVisitor;
 
@@ -344,35 +345,13 @@ public class Main
                         //checks if dependence analysis flag is set.
                         //If the flag is set then the type of dependence test that needs to be applied.
                         if(options.danalysis()){                            
-                            Program prog = null;							
+                            //Program prog = null;
+                            dependenceAnalyzerOptions(options,file);
                             if( !quiet )
-                                System.err.println("Dependence Tester");
-                            
-                            if(options.gcd()){
-                            	//String tString="";
-                            	//for(int i=0;i<args.length;i++)
-                            	//{
-                            	//	tString=args[i];
-                            	//	if(tString.matches("[a-z].m")) break;
-                            	//}
-                                if( !quiet )	
-                                    System.err.println("Dependence Analysis with GCD Test");
-                                fileReader=translateFile(file,errors);
-                                prog = parseFile( file,  fileReader, errors );
-				
-                                if(prog!=null)
-                                    {
-                                		//System.out.println(file);
-                                		//System.out.println(tString);
-                                        String testType="gcd";
-                                        parseProgramNode(prog,testType,file);
-                                        //System.out.println("Out of parser for gcd testing");
-                                    }
-                            }
-                            
-                            if(options.bj()){
+                              System.err.println("Dependence Tester");
+                              if(options.bj()){
                                 if( !quiet )
-                                    System.err.println("Dependence Analysis with Banerjee's Test");
+                                 System.err.println("Dependence Analysis with Banerjee's Test");
                             } 
                         }
                         
@@ -514,6 +493,138 @@ public class Main
         }
     }
     
+/*  
+ *  
+ * This function computes dependence information on a bunch of files in a directory or on a single file..
+ * 
+ */ 
+        
+private static void dependenceAnalyzerOptions(Options options,String name){ //name is the directory name for dir option.
+  System.err.println("Dependence Analysis");  
+  if(options.dir()){	  
+	  File file = new File(name);	
+      boolean exists = file.exists();  
+      if(exists){
+    	  String[] fileName=file.list();
+    	  for(int i=0;i<fileName.length;i++){
+    		  if(!fileName[i].startsWith("drv") && fileName[i].endsWith(".m")){    			  
+    			  ArrayList errors=new ArrayList();
+    			  Reader fileReader = new StringReader("");
+    			  fileReader=translateFile(name + "/" + fileName[i],errors);
+    			  Program prog = parseFile(name +"/" + fileName[i],  fileReader, errors );	
+    			  if(options.prof()){    				
+    				  ProfilerDriver pDriver=new ProfilerDriver();
+    				  pDriver.setDirName("Dep"+name);
+    			      pDriver.setFileName(fileName[i]);
+    			      pDriver.traverseFile(prog);     			      
+    			      pDriver.generateInstrumentedFile(prog); 
+    			  }
+    			  if(options.auto()){
+    				  McFlatDriver mDriver=new McFlatDriver();
+    				  mDriver.setDirName("Dep"+name);//this sets the directory name where all files will be placed after dependence calculation.
+    				  mDriver.setFileName(fileName[i]);
+    				  mDriver.setFlag(true);
+    				  mDriver.checkFiles(prog,true); //if this flag is true apply loop transformations automatically  
+    			  }
+    			  if(options.anno()){
+    				  McFlatDriver mDriver=new McFlatDriver();
+    				  mDriver.setDirName("Dep"+name);//this sets the directory name where all files will be placed after dependence calculation.
+    				  mDriver.setFileName(fileName[i]);
+    				  mDriver.setFlag(false);
+    				  mDriver.checkFiles(prog,false); //if this flag is true apply loop transformations automatically  
+    			  }   			      			  
+    			  if(options.heur()){
+    				  StringTokenizer st = new StringTokenizer(fileName[i],".");		
+    				  String fName=st.nextToken();    				  
+    				  File file1 = new File(name+"/"+fName+".xml");	
+    			      boolean exists1 = file1.exists();      
+    				  if(exists1){ //this step will generate rangeData.xml 
+    					HeuristicEngineDriver hDriver=new HeuristicEngineDriver(fileName[i]);
+    					hDriver.setDirName("Dep"+name);
+    					hDriver.parseXmlFile();
+    				  }
+    				  else{
+    					System.out.println("Heuristic Engine:InComplete information Data file not present");    					
+    				  }	  
+    			  }//end of if*/
+    			 /* if(options.sda()){
+    				  //System.out.println("Compiletime dependence analysis");    				  
+    				  McFlatDriver mDriver=new McFlatDriver();
+    				  mDriver.setDirName("Dep"+name);//this sets the directory name where all files will be placed after dependence calculation.
+    				  mDriver.setFileName(fileName[i]);
+    				  mDriver.checkFiles(prog,false); 
+    				  //System.out.println(prog.getPrettyPrinted());
+    			   }//end of if */ 
+    		  }//end of if
+    	  }//end of for  	  
+      }//end of if      
+      System.exit(0);
+  }//end of if 
+  
+  if(options.prof()){ //This is the option when dependence calculation needs to be done on a single file
+	  ArrayList errors=new ArrayList();
+	  Reader fileReader = new StringReader("");
+	  fileReader=translateFile(name ,errors);
+	  Program prog = parseFile(name ,  fileReader, errors );  
+	if(prog!=null){
+	  System.out.println("Profiling in file");	
+	  ProfilerDriver pDriver=new ProfilerDriver();
+	  StringTokenizer st = new StringTokenizer(name,".");
+	  String dirName=st.nextToken();
+	  pDriver.setDirName("Dep"+dirName);
+      pDriver.setFileName(name);
+      pDriver.traverseFile(prog);      
+      pDriver.generateInstrumentedFile(prog);
+    }//end of if
+  }//end of if
+  
+  if(options.heur()){
+	  ArrayList errors=new ArrayList();
+	  Reader fileReader = new StringReader("");
+	  StringTokenizer st = new StringTokenizer(name,".");
+	  String dirName=st.nextToken();
+	  fileReader=translateFile(name ,errors);
+	  Program prog = parseFile( name ,  fileReader, errors );
+	  System.out.println("heuristic engine");
+	  File file = new File("Dep"+dirName+"/"+name+".xml");	
+      boolean exists = file.exists();      
+	  if(exists){ //this step will generate rangeData.xml 
+		HeuristicEngineDriver hDriver=new HeuristicEngineDriver(name+".m");
+		hDriver.parseXmlFile();
+	  }
+	  else{
+		System.out.println("Heuristic Engine:InComplete information Data file not present");
+		return;
+	  }	  
+  }//end of if*/
+  
+  /*if(options.rda()){
+	  ArrayList errors=new ArrayList();
+	  Reader fileReader = new StringReader("");
+	  fileReader=translateFile(name,errors);
+	  Program prog = parseFile( name,  fileReader, errors );
+	  System.out.println("Runtime dependence analysis");
+	  parseProgramNode(prog,name,true);	    
+   }//end of if*/  
+  
+  /*if(options.sda()){
+	  System.out.println("Compiletime dependence analysis");
+	  ArrayList errors=new ArrayList();
+	  Reader fileReader = new StringReader("");
+	  fileReader=translateFile(name ,errors);
+	  Program prog = parseFile(name ,  fileReader, errors );
+	  McFlatDriver mDriver=new McFlatDriver();
+	  mDriver.setDirName("Dep"+name);//this sets the directory name where all files will be placed after dependence calculation.
+	  mDriver.setFileName(name);
+	  mDriver.checkFiles(prog,false);  
+	  //parseProgramNode(prog,fileName,false);	    
+   }*/  
+  //cal = Calendar.getInstance();        
+  //System.out.println(cal.getTime());
+  System.exit(0);
+     
+ }//end of function
+    
     
     /*
      * This program serves as a driver program for LoopAnalysis and Transformation framework.
@@ -523,7 +634,7 @@ public class Main
      * 4.Then writes the transformed code to a new file.
      * 
      */
-private static void parseProgramNode(Program prog,String testType,String fileName){
+/*private static void parseProgramNode(Program prog,String testType,String fileName){
 	
     	ProfilerDriver pDriver=new ProfilerDriver();
     	pDriver.setFileName(fileName);
@@ -584,7 +695,7 @@ private static void parseProgramNode(Program prog,String testType,String fileNam
     	//prof.changeAST();
     	//ProfilerDriver profDriver =new ProfilerDriver(prog);
     	//profDriver.traverseProgram();
-    }
+    //}
     
     /**
      * Perform the reading and translation of a given file.
