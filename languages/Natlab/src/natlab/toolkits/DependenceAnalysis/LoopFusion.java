@@ -13,31 +13,33 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 import ast.ASTNode;
+import ast.AndExpr;
 import ast.AssignStmt;
+import ast.ElseBlock;
 import ast.FPLiteralExpr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.LEExpr;
+import ast.List;
+import ast.MinusExpr;
+import ast.Name;
 import ast.NameExpr;
 import ast.Opt;
 import ast.ForStmt;
 import ast.IntLiteralExpr;
+import ast.PlusExpr;
 import ast.RangeExpr;
 import ast.Stmt;
 
 public class LoopFusion {
 	
-//private ForStmt forStmt1;
-//private ForStmt forStmt2;
-private LinkedList<ForStmt> fList=new LinkedList<ForStmt>();
-//private Vector<DependenceData> dataVector;
-private LinkedList<Vector<DependenceData>> vList=new LinkedList<Vector<DependenceData>>();
+private static LinkedList<ForStmt> fList=new LinkedList<ForStmt>();
+private static LinkedList<Vector<DependenceData>> vList=new LinkedList<Vector<DependenceData>>();
+private IfStmt ifStmt=new IfStmt();
 	
-//public Vector<DependenceData> getDataVector() {
-	//return dataVector;
-//}
-//public void setDataVector(Vector<DependenceData> dataVector) {
-	//this.dataVector = dataVector;
-//}
-public LoopFusion(LinkedList<ForStmt> list){						
-	fList=list;	
+
+public LoopFusion(){						
+	//fList=list;	
 }
 /*
  * This method does the following.
@@ -46,52 +48,88 @@ public LoopFusion(LinkedList<ForStmt> list){
 		2.Else return an error �Two loops cannot be fused�.
 	2.Once two loops are combined into one loop,remove the second loop from the AST and send the transformed AST to pretty printer for generating new MATLAB code from the transformed AST.
  */
-public void ApplyLoopFusion(){	
+public void ApplyLoopFusion(){
 	
-		if(TestLoopLimits()){
-			ast.List<Stmt> forList1=fList.get(0).getStmtList();
-			forList1.removeChild(0);
-			ast.List<Stmt> forList2=fList.get(1).getStmtList();
-			forList2.removeChild(0);	
-			for(int k=0;k<vList.get(0).size();k++){
-			AssignStmt aStmt1= fList.get(0).getAssignStmt();//This gives the assignment statement of the loop
-			DependenceData data=((DependenceData)((Vector<DependenceData>)vList.get(0)).get(k));
-			IntLiteralExpr incExpr=new IntLiteralExpr();
-			int value=data.getEndRange();
-			BigInteger incValue=new BigInteger(Integer.toString(value));			  		
-			incExpr.setValue(new natlab.DecIntNumericLiteralValue(incValue.toString()));
-			((RangeExpr)aStmt1.getRHS()).setUpper(incExpr);
-			//AssignStmt assStmt2= fList.get(1).getAssignStmt();//This gives the assignment statement of the loop			
-			
-			//int no= assStmt2.getNumChild();
-			int no=fList.get(1).getNumStmt();
-			//System.out.println("No of statements in loop2 " + no);
-			for(int i=0;i<no;i++){
-			    fList.get(0).addStmt(fList.get(1).getStmt(i));
-			}	
-				
-			ASTNode parent = fList.get(1).getParent(); //get the parent of the second loop 
-			int loc = parent.getIndexOfChild(fList.get(1));
-				
-			if (loc>=0) parent.removeChild(loc); //remove the second loop from the AST
-		 }//end of for
-	 }
-			
-		else{
-			System.out.println("Two loops cannot be fused because their loop limits are different");
-		}
-		
-		
-		
-	}
+	((ForStmt)fList.get(0)).getStmtList().removeChild(0);
+	//((ForStmt)fList.get(0)).getStmtList().removeChild(0);
+	((ForStmt)fList.get(1)).getStmtList().removeChild(0);
+	//((ForStmt)fList.get(1)).getStmtList().removeChild(0);
+	
+    for(int k=0;k<vList.get(0).size();k++){
+    	DependenceData data1=((DependenceData)((Vector<DependenceData>)vList.get(0)).get(k));
+    	DependenceData data2=((DependenceData)((Vector<DependenceData>)vList.get(1)).get(k));
+    	if(data1.getEndRange()== data2.getEndRange()){  //This checks the loop bounds of the two loops,if equal then they are fused.
+    		data2.setTransformation("LoopFusion");
+    		data1.setTransformation("LoopFusion");    		
+    		ForStmt forStmt = ((ForStmt)fList.get(0)).fullCopy();    		
+    		int no=fList.get(1).getNumStmt();    		
+    		for(int i=0;i<no;i++){
+    		   forStmt.addStmt(fList.get(1).getStmt(i));
+    		}    		
+    		addConditions(data1,forStmt);
+      }//end of if	
+    }//end of for
+ }//end of function
+
+
+/*
+ * This function adds dynamic guards(If conditions) around fused loop.
+ */
+private void addConditions(DependenceData data,ForStmt forStmt){		
+ 
+  LEExpr eqExpr1=new LEExpr();	
+  String vName="";
+  
+  
+  if(((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper() instanceof NameExpr){
+	  vName=((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper().getVarName();
+	  
+  }
+  
+  
+  else if(((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper() instanceof PlusExpr){
+	  if(((PlusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getRHS() instanceof NameExpr) vName=((PlusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getRHS().getVarName();
+	  else if(((PlusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getLHS() instanceof NameExpr) vName=((PlusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getLHS().getVarName();	  
+  }
+  
+  else if(((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper() instanceof MinusExpr){
+	  if(((MinusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getRHS() instanceof NameExpr) vName=((MinusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getRHS().getVarName();
+	  else if(((MinusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getLHS() instanceof NameExpr) vName=((MinusExpr)((RangeExpr)forStmt.getAssignStmt().getRHS()).getUpper()).getLHS().getVarName();
+  }
+  
+  
+  IfBlock ifBlock=new IfBlock();
+  LEExpr eqExpr=new LEExpr();  
+  NameExpr nExpr=new NameExpr();
+  Name name=new Name();
+  name.setID(vName);
+  nExpr.setName(name); 
+  IntLiteralExpr incExpr=new IntLiteralExpr();					
+  BigInteger incValue=new BigInteger(new Integer(data.getEndRange()).toString());						
+  incExpr.setValue(new natlab.DecIntNumericLiteralValue(incValue.toString()));
+  eqExpr.setLHS(nExpr);
+  eqExpr.setRHS(incExpr);
+  List<Stmt> ifList=new List<Stmt>();
+  ifList.insertChild(forStmt, 0);  
+  ifBlock.setCondition(eqExpr);
+  ifBlock.setStmtList(ifList);
+  ifStmt.addIfBlock(ifBlock);
+  
+}//end of function
+
+
+
 /*
  * This method does the following.
  * 1.Check the loop bounds of the two loops that need to be fused.
-*/	
+	
 private boolean TestLoopLimits(){
+	
+    	
+	
 		
-	if(vList.get(0).containsAll(vList.get(1))) return true;
-	return false;
+	//if(vList.get(0).containsAll(vList.get(1))) return true;
+	//return false;
 		/*AssignStmt assStmt1= fList.get(0).getAssignStmt();//This gives the assignment statement of the loop
 		AssignStmt assStmt2= fList.get(1).getAssignStmt();//This gives the assignment statement of the loop
 	    if(assStmt1.getRHS() instanceof RangeExpr && assStmt2.getRHS() instanceof RangeExpr){	    	
@@ -169,9 +207,9 @@ private boolean TestLoopLimits(){
 	   // return false;
 		
 		
-	}
+	//}
 	
-	private boolean checkExprOpt(RangeExpr expr1,RangeExpr expr2){
+/*	private boolean checkExprOpt(RangeExpr expr1,RangeExpr expr2){
 		boolean flag=false;
 		if(expr1.hasIncr() && expr2.hasIncr())
 		{						
@@ -213,12 +251,26 @@ private boolean TestLoopLimits(){
 		return flag;
 
 		
-	}
+	}*/
 	public LinkedList<Vector<DependenceData>> getVList() {
 		return vList;
 	}
 	public void setVList(Vector<DependenceData> data) {
 		vList.add(data);
+	}
+	public static LinkedList<ForStmt> getFList() {
+		return fList;
+	}
+	public static void setFList(ForStmt fStmt) {
+		ForStmt forStmt = fStmt.fullCopy();
+		forStmt.getStmtList().removeChild(0); //remove the annotations from the loop body.		
+		fList.add(forStmt);
+	}
+	public IfStmt getIfStmt() {
+		return ifStmt;
+	}
+	public void setIfStmt(IfStmt ifStmt) {
+		this.ifStmt = ifStmt;
 	}
 
 }

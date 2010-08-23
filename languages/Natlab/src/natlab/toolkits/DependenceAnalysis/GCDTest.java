@@ -210,7 +210,7 @@ public class GCDTest {
 	      }//end of if 
 	      else {
 	        r = u % v;
-	        System.out.println ("u " + u + ", v " + v + ", u % v " + r);
+	        //System.out.println ("u " + u + ", v " + v + ", u % v " + r);
 	        u = v;
 	        v = r;
 	      }//end of else 

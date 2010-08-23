@@ -251,13 +251,14 @@ public class HeuristicEngine {
 	 * 
 	 */
 	private void markImpRegions(LinkedList<Hashtable<String,LinkedList<ProfiledData>>> impList,int nValues){		
-		int threshold=(nValues) * 30/100;
+		int threshold=(nValues) * 2/100;
 		for(int i=0;i<impList.size();i++){
 			Hashtable<String,LinkedList<ProfiledData>> table=(Hashtable<String,LinkedList<ProfiledData>>)impList.get(i);
 			Set s=table.keySet();
 			Iterator it=s.iterator();
 			while(it.hasNext()){
 		      LinkedList<ProfiledData> tList=(LinkedList<ProfiledData>)table.get(it.next());
+		      //System.out.println(tList.size());
 		      if(tList.size()>=threshold){
 		    	PredictedData pData=new PredictedData();
 		    	ProfiledData tpData=(ProfiledData)tList.getLast();		    		

@@ -1,6 +1,7 @@
 package natlab.toolkits.DependenceAnalysis;
 
 import java.io.*;
+import java.util.LinkedList;
 import ast.ASTNode;
 import ast.ForStmt;
 import ast.IfStmt;
@@ -12,36 +13,43 @@ import natlab.toolkits.analysis.*;
 public class ProfilerDriver extends ForVisitor{
 	//private Program program;
 	private ForStmt forStmt;
-	private ForStmt forStmtArray[];	
+	private LinkedList<ForStmt> forStmtList;	
 	private int loopIndex=0;
-	private static Profiler prof=new Profiler();
+	//private static Profiler prof=new Profiler();
+	private Profiler prof=new Profiler();
 	private String fileName;	
 	private int maxLoopNo=0;
 	//public ProfilerDriver(ForStmt fStmt)
-	
+	private String dirName;
+	public String getDirName() {
+		return dirName;
+	}
+
+	public void setDirName(String dirName) {
+		this.dirName = dirName;
+	}
+
 	public ProfilerDriver(){	
 
 	}
 
-	public void traverseFile(Program prog){
-		//ForVisitor forVisitor ;//= new ForVisitor();
-		
-	    prog.apply(this);    
-	   
+public void traverseFile(Program prog){	
+    prog.apply(this);    	   
+}
+public void caseLoopStmt(ASTNode node){		
+	if (node instanceof ForStmt){					
+		ForStmt fNode=(ForStmt) node;
+		forStmtList=new LinkedList<ForStmt>();
+		loopIndex=0;
+		forStmt=fNode;
+		forStmtList.add(forStmt);
+		maxLoopNo++;
+		traverseForNode();
 	}
-	public void caseLoopStmt(ASTNode node){
-		
-		if (node instanceof ForStmt){
-			//System.out.println("Dependence Analyzer caseLoopStmt is called by "+ node.getClass().getName());			
-			ForStmt fNode=(ForStmt) node;
-			forStmt=fNode;
-			maxLoopNo++;
-			traverseForNode();
-		}
-		else{
-			node.applyAllChild(this);
-		}
+	else{
+		node.applyAllChild(this);
 	}
+}
 
 	public void caseIfStmt(IfStmt node){
 		//System.out.println("caseLoopStmt is called by "+ node.getClass().getName());
@@ -65,29 +73,29 @@ public class ProfilerDriver extends ForVisitor{
 	 * 1.Checks for tightly nested loops.
 	 */	
  private void isTightlyNestedLoop(ForStmt fStmt){
-      Stmt stmt=fStmt.getStmt(0);
-      //System.out.println(stmt.toString());
-      if(stmt instanceof ForStmt && stmt!=null)
-        { loopIndex++;			  
+      Stmt stmt=fStmt.getStmt(0);      
+      if(stmt instanceof ForStmt){ 			  
 		  ForStmt tForStmt=(ForStmt)stmt;
-		  forStmtArray[loopIndex]=tForStmt;
+		  forStmtList.add(tForStmt);
+		  loopIndex++;
 		  forStmt=tForStmt;				  
 		  isTightlyNestedLoop(tForStmt);				  
-         }//end of if
+       }//end of if
 	}//end of function
     
-	public void traverseForNode()
-	{
+	public void traverseForNode(){
 		 //forStmt=fStmt;
-		 loopIndex=0;
+		 //loopIndex=0;
 		 //System.out.println("3333"+forStmt.getPrettyPrinted());
-         forStmtArray=new ForStmt[forStmt.getNumChild()+1];		
+         //forStmtArray=new ForStmt[forStmt.getNumChild()+1];		
          //System.out.println("33336666666666:::::"+forStmt.getNumChild()+loopIndex);
-		 forStmtArray[loopIndex]=forStmt;		  
+		 //forStmtArray[loopIndex]=forStmt;		  
 		 isTightlyNestedLoop(forStmt);		 
-		 //prof.setFileName(fileName);//This is already done in Main.java		 
-		 prof.insertLoopNo(forStmtArray);
-		 prof.insertFunctionCall(loopIndex,forStmtArray,maxLoopNo);         
+		 //prof.setFileName(fileName);//This is already done in Main.java
+		
+		 prof.insertLoopNo(forStmtList);
+		 //prof.recordVariables(forStmt);
+		 prof.insertFunctionCall(loopIndex,forStmtList,maxLoopNo,prof.recordVariables(forStmt));         
 	    //call a function in profiler with nesting level added to it
 	    //nesting level would be forStmtArray.size;		
 	}
@@ -112,12 +120,12 @@ public class ProfilerDriver extends ForVisitor{
 	 */
 	public void generateInstrumentedFile(Program prog){
 			
-	    File f = new File(fileName);//this checks for the presence of directory	    
+	    File f = new File(dirName);//this checks for the presence of directory	    
 		if(!f.exists()){
            f.mkdir();
 		}
            Writer output;        
-           File file = new File(fileName+"/"+"Profiled"+ fileName + ".m");
+           File file = new File(dirName+"/"+"Profiled"+ fileName + ".m");
            try {
 			  output = new BufferedWriter(new FileWriter(file));
 			  output.write(prog.getPrettyPrinted());

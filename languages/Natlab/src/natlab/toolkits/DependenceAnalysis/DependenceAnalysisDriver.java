@@ -58,13 +58,24 @@ public class DependenceAnalysisDriver extends ForVisitor{
 	private String dirName;
 	private boolean rangeInfo=false;
 	private int index=0;	
-	//private Program program;
+	private Program program;
 	private int childNo=0;
 	private boolean isRepeat=false;
+	private int lId=0;
 	private boolean aTrans=false;
 	private LegalityTest lTest;
+	private String transformation="";
+	private int maxLoop;
 
 	
+public int getMaxLoop() {
+		return maxLoop;
+	}
+
+	public void setMaxLoop(int maxLoop) {
+		this.maxLoop = maxLoop;
+	}
+
 public DependenceAnalysisDriver(){	
 		cToolBox=new ConstraintsToolBox();
 }
@@ -75,21 +86,37 @@ public DependenceAnalysisDriver(){
  * 
  */
 public void setFileName(String fName){
-	fileName="Profiled";
-	//StringTokenizer st = new StringTokenizer(fName,".");
-	//dirName=st.nextToken();
-	fileName+=fName+".m";
-	//System.out.println("File for heuristic Engine is "+fileName);
+	fileName="Profiled";	
+	fileName+=fName+".m";	
 }
 
 public String getFileName() {	
 	return dirName+"/"+fileName;
 }
 
-public void traverseFile(Program prog){	
-    prog.apply(this);  
-    
+/*
+ * This function traverses the input file for loops. This function is called with 
+ * auto mode.
+ * 
+ */
+public void traverseFile(Program prog,int no,String trans){	
+  program=prog;
+  lId=no;
+  transformation=trans;
+  program.apply(this);    
 }
+
+
+/*
+ * This function traverses the input file for loops. This function is called with 
+ * anno mode.
+ * 
+ */
+public void traverseFile(Program prog){	
+	  program=prog;	  
+	  program.apply(this);    
+}
+
 
 public void caseLoopStmt(ASTNode node){
 	
@@ -161,23 +188,6 @@ private void isTightlyNestedLoop(ForStmt forStmt){
 		  break;
 	    }//end of else if	    		  
   }//end of for
-	 
-	// }//end of ist if  
-	 /* else if(isNested){
-	   ForStmt tForStmt=null;	  
-	   for(int j=0;j<forStmt.getNumStmt();j++){	  
-	     Stmt stmt=forStmt.getStmt(j);
-	     if(stmt instanceof ForStmt){      			  
-		   tForStmt=(ForStmt)stmt;
-		   //forStmtArray[loopIndex]=tForStmt;
-		   forStmtArray.add(tForStmt);
-		   forNode=tForStmt;	  
-		   loopIndex++;
-		   break;
-	    }//end of if
-	  }//end of for
-	   isTightlyNestedLoop(tForStmt);
-	 }//end of else if*/
  }//end of if
 			
 }//end of function
@@ -222,7 +232,7 @@ public void traverseLoopStatements(){
 				 }//end of if
 			  else{
 				Stmt bStmt=forNode.getStmt(j);
-			    if(bStmt instanceof AssignStmt){  //TODO:Needs to handle when there is an if statement in the loop.
+			    if(bStmt instanceof AssignStmt){  
 			       //System.out.println("i am in different statements block");
 				   AssignStmt aStmt2=(AssignStmt)bStmt;
 				   //System.out.println(aStmt1.getPrettyPrinted());
@@ -250,7 +260,7 @@ public void traverseLoopStatements(){
 					 }//end of if
 				  else{
 					Stmt bStmt=forNode.getStmt(j);
-				    if(bStmt instanceof AssignStmt){  //TODO:Needs to handle when there is an if statement in the loop.				       
+				    if(bStmt instanceof AssignStmt){  				       
 					   AssignStmt aStmt2=(AssignStmt)bStmt;					   
 					   cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getRHS(),dData,dataVector,false); //compare LHS(previousStmt) with RHS(nextStmt)			   
 					   cToolBox.checkSameArrayAccess(aStmt1.getLHS(),aStmt2.getLHS(),dData,dataVector,false);//compare LHS(previousStmt) with LHS(nextStmt)			   
@@ -263,33 +273,68 @@ public void traverseLoopStatements(){
 	  }//end of else if			
   }//end of for
 	
- //LegalityTest lTest=new LegalityTest();	
  lTest.setRangeInfo(this.isRangeInfo());
  lTest.setFileName(fileName);
  lTest.setDirName(dirName);	
- lTest.setForStmt(forStmtArray);
- lTest.setDataVector(dataVector);
- lTest.testParallelization();
- //lTest.setPTable(cToolBox.getPTable());
- lTest.checkForLoopAnnotations();
- if(aTrans) lTest.testLegality(); 
- if(dataVector.size()!=0){	 
+ LegalityTest.setForStmt(forStmtArray);
+ lTest.setDataVector(dataVector); 
+ //lTest.testParallelization();
+ if(aTrans) {
+	 lTest.testParallelization(true);
+	 testLegality(dataVector); 
+ }
+ else if(!aTrans){	 
+	 //lTest.testParallelization(false);
+	 boolean flag=lTest.checkForLoopAnnotations();
+	 if(dataVector.size()!=0){		 	 
+		 writeToXMLFile(dataVector);
+	  }//end of if
+	 if(flag){
+	   transformation=lTest.getATrans();
+	   lId=(int)loopNumber;
+	   writeToFile(program);
+	   flag=false;
+	 }	 
+ }
+ 
+ //if(dataVector.size()!=0){	 
 	 //lTest.setDataVector(dataVector);	 
-	 writeToXMLFile(dataVector);
-  }//end of if 
+	// writeToXMLFile(dataVector);
+  //}//end of if 
 }//end of traverseLoopStatements function
 
-/*
- * This function 
- */
+private void testLegality(Vector<DependenceData> dataVector){
+	if(lId==(int)loopNumber && !transformation.equals("All")){
+		boolean flag=lTest.testLegality(transformation);
+		if(flag){
+			writeToFile(program);
+			if(dataVector.size()!=0){	 
+				 //lTest.setDataVector(dataVector);	 
+				 writeToXMLFile(dataVector);
+			  }//end of if
+		}
+	}
+	else if(transformation.equals("All") && lId==getMaxLoop()){
+		boolean flag=lTest.testLegality(transformation);
+		if(flag){
+			writeToFile(program);
+		}
+	}
+}
 
+
+/*
+ * This function writes specialized version with loop transformations applied to a file
+ */
 private void writeToFile(Program prog){
+	  StringTokenizer st = new StringTokenizer(fileName,".");
+      String name =st.nextToken();
 	  File f = new File(dirName);//this checks for the presence of directory	    
 	  if(!f.exists()){
 	     f.mkdir();
 	  }
 	  Writer output;        
-	  File file = new File(dirName+"/"+ fileName + ".m");
+	  File file = new File(dirName+"/"+lId+transformation+name+".m");
 	  try {
 		  output = new BufferedWriter(new FileWriter(file));
 		  output.write(prog.getPrettyPrinted());
@@ -298,59 +343,10 @@ private void writeToFile(Program prog){
 		 e.printStackTrace();
 	  }
 		
-	}
-
-
-
-/*public static void checkForLoopFusion(){
-	
-	LinkedList<ForStmt> fList=LegalityTest.getFusionList();
-	float lNo;
-	float l1=0,l2=0;
-	if(fList.size()>0){
-		for(int i=0;i<fList.size();i++){
-			ForStmt fStmt=fList.get(i);
-			
-			//l1=fStmt.getFL1();//TODO:add this to ForStmt 
-			//l2=fStmt.getFL2();//TODO:add this to ForStmt
-			if((int)l1==(int)l2){ //This means fuse the two nested loops which i am not sure will take place or not
-				
-			}
-			else{
-				for(int j=i;j<fList.size();j++){
-					ForStmt fStmt2=fList.get(j);
-					if(fStmt2.getStmt(0) instanceof AssignStmt){
-					  AssignStmt aStmt=(AssignStmt)fStmt.getStmt(0);
-					  lNo=((FPLiteralExpr)aStmt.getRHS()).getValue().getValue().floatValue();
-					  if(l2==lNo){//apply loop fusion on these two loops.
-						LoopFusion lfusion=new LoopFusion(fStmt,fStmt2);
-				     	lfusion.ApplyLoopFusion();    		
-					   }//end of if
-					 }//end of for					
-				  }//end of 2nd for
-			 }//end of else		
-		}//end of 1st for
-	}	
- }//end of loop fusion*/
-
-/*private void writeTransformedCode(){
-	
-	File file = new File(dirName+"/"+"transformed"+dirName+".m");
-	Writer output;
-	try{  
-		boolean exists = file.exists();	
-		if(!exists){
-			output = new BufferedWriter(new FileWriter(file));
-			output.write(node.getPrettyPrinted());
-	        output.close();			
-		}
-	} catch (Exception e) {System.out.println(e.getMessage());}
-}*/
-
-
+}
 
 /*
- *This function writes the dependence information to a file. 
+ *This function writes the dependence information to a .xml file. 
  */
 
 private void writeToXMLFile(Vector<DependenceData> dataVector){
@@ -385,8 +381,7 @@ private void writeToXMLFile(Vector<DependenceData> dataVector){
 	        rangeElement.setAttribute(new String("Start"), Integer.toString(data.getStartRange()));            
 	        rangeElement.setAttribute(new String("End"), Integer.toString(data.getEndRange()));
 	        rangeElement.setAttribute(new String("Dependence"),data.getDependence());
-	        rangeElement.setAttribute(new String("Parallel"), data.getPar());
-	        
+	        rangeElement.setAttribute(new String("Parallel"), data.getPar());	        
 	        //if(data.getTransformation().equals("")){
 	          rangeElement.setAttribute(new String("ValidTransformation"),data.getTransformation());
 	       // }      
@@ -492,77 +487,4 @@ public boolean isATrans() {
 public void setATrans(boolean trans) {
 	aTrans = trans;
 }
-	
-	/*
-	 * ApplyTests function applies appropriate test on the graph for a statement and then prints the results.
-	 */
-/*public void ApplyTests(ConstraintsToolBox cToolBox,File f)
-{	boolean issvpcApplicable,isApplicable,isAcyclicApplicable=false;		
-	if(cToolBox.getGraph()!=null)
-	{
-		ConstraintsGraph cGraph=cToolBox.getGraph();
-		gcdTest=new GCDTest(f);
-		gcdTest.calculateGcd(cGraph);
-		isApplicable=gcdTest.getIsSolution();
-		if(isApplicable)
-		{
-		   //BanerjeeTest bTest=new BanerjeeTest(forStmtArray); //this should not be called here.Need to change its location. 
-		   // bTest.directionVectorHierarchyDriver(cGraph); // same for this,need to change it.
-			svpcTest=new SVPCTest(f);			 
-			issvpcApplicable= svpcTest.checkDependence(cGraph);			
-			System.out.println("i am in SVPC test");			
-			if (!issvpcApplicable)
-			 {
-			    System.out.println("Apply Acyclic test");
-				acyclicTest=new AcyclicTest(f);
-				cGraph=acyclicTest.makeSubstituitionForVariable(cGraph);
-			    isAcyclicApplicable=acyclicTest.getisApplicable();
-				if(isAcyclicApplicable)
-				{   System.out.println("now apply SVPC Test");
-					svpcTest.checkDependence(cGraph);
-				}//end of 4th if				
-				//else{approximateRanges(cGraph);}
-			}//end of 3rd if
-		  }//end of 2nd if
-	 }//end of if 1st if
- }//end of ApplyTests function
-
-
-/*
- * This function does the following
- * 1.This function calculates the results for different ranges of variables involved in loop bounds.
- * 2.Creates mapping for the loopRanges and Result's file.
- * 3.Then applies the tests on the new Ranges. 
- */
-/*public void approximateRanges(ConstraintsGraph cGraph)
- {
-	RangeApproximation rApprox=new RangeApproximation();
-	int lRange=0,uRange=0;
-	File file;
-	RandomAccessFile raf=null;
-	for(int i=0;i<260;i+=10)
-	{ lRange=i+1;
-	  uRange=i+10;
-	  rApprox.substituteVariablesWithConstantValues(cGraph,lRange,uRange);
-	  try {
-	       file = new File("Range"+lRange+"-"+uRange+".txt");
-           raf = new RandomAccessFile(file, "rw");
-           raf.writeBytes("Applying Tests for the following range"+ lRange + "-" + uRange +'\n');
-      }catch (IOException e) 
-      {
-      	System.out.println("IOException:Couldnot open the new file");
-          e.printStackTrace();
-       }//end of catch
-      LoopBounds lBounds=new LoopBounds();
-      lBounds.setLowerBound(lRange);
-      lBounds.setUpperBound(uRange);
-      RangeMap rMap=new RangeMap();
-      rMap.createMapping(lBounds, "Range"+lRange+"-"+uRange+".txt");
-	  ApplyTests(cToolBox,file);
-	  try{
-		  raf.close();
-	  }catch(IOException e){System.out.println("IOException:Couldnot close the file");}
-   }//end of for
- }//end of function call.*/
-
 }

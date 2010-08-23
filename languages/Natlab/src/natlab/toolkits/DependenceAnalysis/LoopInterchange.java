@@ -135,7 +135,7 @@ private void addConditions(DependenceData data,LinkedList<ForStmt>forStmtList,in
 	  
 	  else if(((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper() instanceof MinusExpr){
 		  if(((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getRHS() instanceof NameExpr) vName=((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getRHS().getVarName();
-		  else if(((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getLHS() instanceof NameExpr) vName=((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getRHS().getVarName();
+		  else if(((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getLHS() instanceof NameExpr) vName=((MinusExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getLHS().getVarName();
 	  }
 	  
 	  //String vName=((NameExpr)((RangeExpr)forStmtList.get(0).getAssignStmt().getRHS()).getUpper()).getVarName();//((NameExpr)((RangeExpr)aStmt[0].getLHS()).getUpper()).getVarName();
@@ -170,12 +170,8 @@ private void addConditions(DependenceData data,LinkedList<ForStmt>forStmtList,in
 			     vName1=((MinusExpr)((RangeExpr)forStmtList.get(1).getAssignStmt().getRHS()).getUpper()).getLHS().getVarName();
 			     //System.out.println("vName1"+vName1);
 		  }
-	  }
-	  
-	  
-	  
-	  //System.out.println("Size is:::" + data.getNLoopList().size());
-	  
+	  }	  
+	  //System.out.println("Size is:::" + data.getNLoopList().size());	  
 	  int size=data.getNLoopList().size();
 	  LinkedList<NestedLoop> list=data.getNLoopList();
 	  for(int j=0;j<size;j++){
@@ -211,7 +207,7 @@ private void addConditions(DependenceData data,LinkedList<ForStmt>forStmtList,in
 	  //System.out.println("aExpr"+aExpr.getPrettyPrinted());
 	  
 	
-	  System.out.println(ifStmt.getPrettyPrinted());
+	  //System.out.println(ifStmt.getPrettyPrinted());
  }//end of function
 
  public IfStmt getIfStmt() {
@@ -221,5 +217,13 @@ private void addConditions(DependenceData data,LinkedList<ForStmt>forStmtList,in
  public void setIfStmt(IfStmt ifStmt) {
 	this.ifStmt = ifStmt;
  }
+
+public ForStmt getForStmt() {
+	return forStmt;
+}
+
+public void setForStmt(ForStmt forStmt) {
+	this.forStmt = forStmt;
+}
 
 }

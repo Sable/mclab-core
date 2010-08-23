@@ -287,13 +287,7 @@ private void fillDependenceDataObject(DependenceData Data){
 	 *  		a(i,j)=a(i+10,j-9)
 	 *  	end
 */	
-public void checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector,boolean flag){
-	
- /*//TODO:1.Needs to look into setting the dependence for a Dataobject.
- //TODO:2.Look into the case where this aExpr is not a instance of parameterized expression e.g
-  * ((U((i1 - 1), (j1 - 1)) + U((i1 + 1), (j1 - 1))) + (s2 * U(i1, (j1 - 1))))=U((1 : n), j1)
-  * 
-  */ 	
+public void checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vector<DependenceData> dataVector,boolean flag){ 	
 	
  Vector<ParameterizedExpr> params=new Vector<ParameterizedExpr>();
  tokenizeExpression(bExpr,params);
@@ -310,6 +304,7 @@ public void checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vect
 		for(int i=0;i<tList.size();i++){
 	     DependenceData data=getDependenceDataObject(dData,i,tList);
 	     data.setArrayAccess(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
+	     //System.out.println(aExpr.getPrettyPrinted()+"	 =	"+bExpr.getPrettyPrinted());
 	     if(aExpr instanceof ParameterizedExpr){
 	    	 while(it.hasNext()){   
 	   	    	Expr tExpr=(Expr)it.next();   	    				
@@ -319,12 +314,11 @@ public void checkSameArrayAccess(Expr aExpr,Expr bExpr,DependenceData dData,Vect
 	    		}//end of if
 	    	    else{   		   	  
 	    	       //data=prepareDependenceData(aExpr,tExpr,data,false); //same array is not accessed on LHS and RHS.
-	    	    	data.setDependence("n");	
-	    	    	
+	    	    	data.setDependence("n");	    	    	
 	    	    }//end of else
 	    	  }//end of while
 	        }//end of if 
-	        data.setDependence("n");
+	     else{data.setDependence("n");}
 	        dataVector.add(data);
 	        it=params.iterator();
 		  }//end of for
@@ -450,7 +444,7 @@ public boolean ApplyTests(AffineExpression aExpr,AffineExpression bExpr){
 	  SVPCTest svpcTest=new SVPCTest();			 
 	  issvpcApplicable= svpcTest.checkDependence(aExpr,bExpr);
 	  dFlag=issvpcApplicable;
-	  System.out.println("i am in SVPC test");
+	  //System.out.println("i am in SVPC test");
    }    
    return dFlag; 
 }

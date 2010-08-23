@@ -43,8 +43,10 @@ import org.xml.sax.SAXParseException;
 
 import beaver.Parser;
 
+import annotations.ast.Annotation;
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.ExpandedAnnotation;
 import ast.FPLiteralExpr;
 import ast.ForStmt;
 import ast.IfStmt;
@@ -61,7 +63,15 @@ public class McFlatDriver extends ForVisitor{
 private String fileName;
 private Document doc;
 private String dirName;
+private int count=0;
+private boolean flag;
 
+public boolean isFlag() {
+	return flag;
+}
+public void setFlag(boolean flag) {
+	this.flag = flag;
+}
 public String getFileName() {
 	return fileName;
 }
@@ -173,12 +183,9 @@ public void traverseFile(Program prog){
 public void caseLoopStmt(ASTNode node){
 	
 	if (node instanceof ForStmt){
-		ForStmt fNode=(ForStmt)node;
-		parseXmlFile(fNode);
+		count++;	
 	}
-	else{
-		//ForVisitor fVisitor=new ForVisitor(); 
-		//node.applyAllChild(fVisitor);
+	else{		
 		node.applyAllChild(this);
 	}
 }
@@ -211,70 +218,70 @@ private void writeToFile(Program prog){
  * 
  */
 public void checkFiles(Program prog,boolean flag){
-	//if (checkForDependenceFile() && !flag){//This is the case where all information is present and you just have to present it and analy flag is set false by user.
-		//1.Load xml file.
-		//doc=loadXmlFile();
-		//prog.apply(this);
-		
-		
-	//}//end of if
-	//else if(flag){// THis is the case when user ask to do DA at runtime.          	  
-    	  if(!checkForProfiledFile()){     		  
-    		  ProfilerDriver pDriver=new ProfilerDriver();
-    		  pDriver.setDirName(dirName);
-    	      pDriver.setFileName(fileName+".m");
-    	      pDriver.traverseFile(prog);
-    	      pDriver.generateInstrumentedFile(prog);
-    	      //System.out.println("Generate the Data file and then place it in the same directory as ProfiledFile.m");
-    	  }
-    	  //else{
-	      //if(checkForDataFile()){
-    		  HeuristicEngineDriver hDriver=new HeuristicEngineDriver(fileName+".m");
-    		  hDriver.setDirName(dirName);
-    		  hDriver.parseXmlFile();
-    		  DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
-    		  dDriver.setFileName(fileName); //this step is when dataFile is present
-    		  //String fName=dDriver.getFileName();
-    		  dDriver.setPredictedLoopValues(hDriver.getTable());//same is the case when data file is present.
-    		  ArrayList errors = new ArrayList();
-    		  String fName=dirName+"/"+"Profiled"+fileName+".m";
-    		  try{    			  
-                  Reader fileReader = new FileReader( fName);
-                  Program program = parseFile(fName,  fileReader, errors );    
-                  dDriver.setDirName(dirName);
-                  dDriver.setATrans(flag);
-          		  dDriver.traverseFile(program);
-          		  
-          		  //System.out.println(program.getPrettyPrinted());
-          		  writeToFile(program);
-              }catch(FileNotFoundException e){
-                  System.err.println("File "+fName+" not found!\nAborting");
-                  System.exit(1);
-                }	    		  
-	    	// }//end of if
-	    	// else{ 
-	    		 //System.out.println("Data file doesnot exist,doing the data dependence computation at runtime"); 
-	    		// DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
-	    		 // ArrayList errors = new ArrayList();
-	    		 // String fName=dirName+"/"+"Profiled"+fileName+".m";
-	    		 // try{    			  
-	              //    Reader fileReader = new FileReader( fName);
-	               //   Program program = parseFile(fName,  fileReader, errors );
-	               //   dDriver.setDirName(dirName);
-	               //   dDriver.setFileName(fileName);	                  
-	          		//  dDriver.traverseFile(program);	
-	          		  //System.out.println(program.getPrettyPrinted());
-	             // }catch(FileNotFoundException e){
-	             //     System.err.println("File "+fName+" not found!\nAborting");
-	              //    System.exit(1);
-	             // }
-	           // }//end of else
-         //}//end of elseif.
-	  //}//end of else.
-	
- }//end of function.
+ if(!checkForProfiledFile()){     		  
+	  ProfilerDriver pDriver=new ProfilerDriver();
+	  pDriver.setDirName(dirName);
+      pDriver.setFileName(fileName+".m");
+      pDriver.traverseFile(prog);
+      pDriver.generateInstrumentedFile(prog);
+  }
+  
+  HeuristicEngineDriver hDriver=new HeuristicEngineDriver(fileName+".m");
+  hDriver.setDirName(dirName);
+  hDriver.parseXmlFile();
+  DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
+  dDriver.setFileName(fileName); //this step is when dataFile is present  
+  dDriver.setPredictedLoopValues(hDriver.getTable());//same is the case when data file is present.
+  ArrayList errors = new ArrayList();
+  String fName=dirName+"/"+"Profiled"+fileName+".m";
+  try{    			  
+      Reader fileReader = new FileReader( fName);
+      Program program = parseFile(fName,  fileReader, errors );    
+      dDriver.setDirName(dirName);
+      dDriver.setATrans(flag);
+	  //dDriver.traverseFile(program);
+	  traverseFile(program); //this is called to get the number of loops in the program.
+	  if(flag) ApplyTransformations(dDriver,program);
+	  else if(!flag) dDriver.traverseFile(program);
+	  //System.out.println(program.getPrettyPrinted());
+	  //writeToFile(program);
+  }catch(FileNotFoundException e){
+      System.err.println("File "+fName+" not found!\nAborting");
+      System.exit(1);
+  }
+}//end of function.
 
-private Document loadXmlFile(){	
+
+
+
+/*
+ * This function makes calls to loop transformer module,taking one loop at a time. This method is called with auto mode. 
+ */
+private void ApplyTransformations(DependenceAnalysisDriver driver, Program program){
+	String[] transValues = new String[4];
+	Program prog=null;
+	driver.setMaxLoop(count);
+	transValues[0]="R";transValues[1]="I";transValues[2]="IR";transValues[3]="All";
+	for(int i=0;i<count;i++){
+	 for(int j=0;j<4;j++){	
+		try{
+			if(transValues[j].equals("All") && count>1){
+			  prog=(Program)program.fullCopy();
+			  driver.traverseFile(prog,i+1,transValues[j]);
+			}
+			else if(count>=1  && !transValues[j].equals("All")){
+			 prog=(Program)program.fullCopy();			 
+			 driver.traverseFile(prog,i+1,transValues[j]);
+			}			
+		}catch(Exception e){System.out.println(e.getCause());}		
+	  }//end of for
+	}//end of for
+	
+}
+
+
+
+/*private Document loadXmlFile(){	
 	try{
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -297,7 +304,7 @@ private Document loadXmlFile(){
 		    return doc;	    
 }
 
-private void parseXmlFile(ForStmt fStmt){
+/private void parseXmlFile(ForStmt fStmt){
 	
    int start,end;
 	AssignStmt assStmt= fStmt.getAssignStmt();//This gives the assignment statement of the loop                       	 		
@@ -348,6 +355,10 @@ private void parseXmlFile(ForStmt fStmt){
    	    }//end of 2nd for
       }//end of 1st if
     }//end of main if
- }//end of function.
+ }//end of function.*/
+
+/*
+ * This is an inner class which contains information about 
+ */
 
 }

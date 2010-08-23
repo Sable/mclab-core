@@ -1,6 +1,11 @@
 package natlab.toolkits.DependenceAnalysis;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
 import ast.List;
 import java.util.*;
 
@@ -20,6 +25,7 @@ import ast.Expr;
 import ast.ForStmt;
 import ast.IntLiteralExpr;
 import ast.ParameterizedExpr;
+import ast.Program;
 import ast.RangeExpr;
 
 
@@ -29,16 +35,24 @@ private String dirName;
 private Vector<DependenceData> dataVector;
 private Hashtable<String,LinkedList<PredictedData>> pTable; 
 private Vector<int[]> distanceVector=new Vector<int[]>();
-private LinkedList<ForStmt> forStmtList; 
-private LinkedList<ForStmt> fusionList=new LinkedList<ForStmt>();
+private static LinkedList<ForStmt> forStmtList; 
+private static LinkedList<ForStmt> fusionList=new LinkedList<ForStmt>();
 private boolean rangeInfo=false;
-private int fusionCount=0;
+private static int fusionCount=0;
 private String fileName;
 private static int childNo=0;
 private float lNo;
 private boolean fFlag=false;
-private LoopFusion lFusion=new LoopFusion(fusionList);
+//private LoopFusion lFusion=new LoopFusion(fusionList);
+private LoopFusion lFusion=new LoopFusion();
+private String aTrans="";
 
+public String getATrans() {
+	return aTrans;
+}
+public void setATrans(String trans) {
+	aTrans = trans;
+}
 public boolean isFFlag() {
 	return fFlag;
 }
@@ -78,8 +92,8 @@ public LinkedList<ForStmt> getForStmt() {
 	return forStmtList;
 }
 
-public void setForStmt(LinkedList<ForStmt> forStmt) {
-	this.forStmtList = forStmt;
+public static void setForStmt(LinkedList<ForStmt> forStmt) {
+	forStmtList = forStmt;
 } 
 private void quickSort(int low, int n){
 	int hi=n-1;
@@ -116,7 +130,27 @@ private void quickSort(int low, int n){
  * This function tests whether a loop is parallelizable or not. 
  * 
  */
-public void testParallelization(){
+public void testParallelization(boolean tFlag){
+ if(tFlag){ //This means auto mode is on 	 
+	if(((ForStmt)forStmtList.get(0)).getStmt(0) instanceof ForStmt){
+		ForStmt fStmt = ((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0));
+		fStmt.getStmtList().removeChild(0);
+	}
+	else{
+		((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+	}
+ }//end of if
+ /*else if(!tFlag){ //This means anno mode is on
+    if(((ForStmt)forStmtList.get(0)).getStmt(0) instanceof ForStmt){
+	  ForStmt fStmt = ((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0));
+	  fStmt.getStmtList().removeChild(0);
+	  fStmt.getStmtList().removeChild(0);
+	}
+   else{
+	  ((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+	  ((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+    }	 
+ }*/
 	int tCount=0;
 	if(parTest1())tCount++;
 	if(parTest3())tCount++;
@@ -130,6 +164,7 @@ public void testParallelization(){
 	   		  if(tempArr[j]==0) count++; 	
 	   		}//end of for
 	   		if(count==tempArr.length && tCount==2) {data.setPar("parallelizable");System.out.println("Parallelizable");}
+	   		else data.setPar("non-parallelizable");
 	   	}//end of else if
 	}//end of for
 }//end of function
@@ -141,28 +176,44 @@ private boolean parTest1(){
 	DependenceData data=(DependenceData)dataVector.get(0);
 	LinkedList<String> vList=new LinkedList<String>();
 	vList.add(data.getLVarName());
-	if(data.getNestingLevel()>1){	  
-	  for(int k=0;k<data.getNestingLevel()+1;k++){
+	if(data.getNestingLevel()>=1){	  
+	  for(int k=0;k<data.getNestingLevel();k++){
 		  NestedLoop nLoop=data.getNLoopList().get(k);
 		  vList.add(nLoop.getLVarName());
 	  }//end of for
-	}//end of if	
+	}//end of if
 	
-	for(int i=0;i<forStmt.getNumStmt();i++){
-		//System.out.println(forStmt.getStmt(i).getPrettyPrinted());
-	  if(!(forStmt.getStmt(i) instanceof ForStmt)){	
-		if(((AssignStmt)forStmt.getStmt(i)).getLHS() instanceof ParameterizedExpr){
+	int  x =forStmt.getNumStmt();
+	if(data.getNestingLevel()>=1){
+	  ForStmt tStmt=((ForStmt)forStmt.getStmt(0));	
+	  x= tStmt.getNumStmt();
+	  for(int i=0;i<x;i++){	  
+	    if(((AssignStmt)tStmt.getStmt(i)).getLHS() instanceof ParameterizedExpr){
+			ParameterizedExpr pExpr=(ParameterizedExpr)((AssignStmt)tStmt.getStmt(i)).getLHS();
+			List<Expr> list=(List<Expr>)pExpr.getArgList();
+			eList=new LinkedList<Expr>();
+			for(int l=0;l<list.getNumChild();l++){
+				eList.add(list.getChild(l));
+			}			
+			//if(eList.containsAll(vList) && vList.size()>=1)return false;			
+			if(eList.size()==vList.size() && vList.size()>=1)return false;
+		 }//end of if
+		}//end of for
+	}//end of if
+	else{
+	for(int i=0;i<x;i++){	  
+	 if(((AssignStmt)forStmt.getStmt(i)).getLHS() instanceof ParameterizedExpr){
 			ParameterizedExpr pExpr=(ParameterizedExpr)((AssignStmt)forStmt.getStmt(i)).getLHS();
 			List<Expr> list=(List<Expr>)pExpr.getArgList();
 			eList=new LinkedList<Expr>();
 			for(int l=0;l<list.getNumChild();l++){
 				eList.add(list.getChild(l));
 			}			
-			if(eList.containsAll(vList) && vList.size()>1)return false;			
+			if(eList.containsAll(vList) && vList.size()>=1)return false;			
 		}//end of if
-	}//end of for
-  }//end of if
-	return true;
+	}//end of for	   
+  }//end of else
+  return true;
 }
 
 /*
@@ -185,14 +236,23 @@ private boolean parTest3(){
  * transformation annotations.If annotations are present the calls the respective transformation.
  * 
  */
-public void checkForLoopAnnotations(){
+public boolean checkForLoopAnnotations(){
 	
    for(int i=0;i<forStmtList.size();i++){	   
 	ForStmt forStmt=forStmtList.get(i);	
 	if(forStmt.isEligibleForLoopReversal()){		
 	 	if(!this.isRangeInfo()){}   	    
 	 	else{	 
-	 		LoopReversal lreversal=new LoopReversal();	 		
+	 		LoopReversal lreversal=new LoopReversal();
+	 		((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+	 		if(((ForStmt)forStmtList.get(0)).getStmt(0) instanceof ForStmt){	 			
+	 			//((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+	 			((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
+	 		}
+	 		else{
+	 			forStmt.getStmtList().removeChild(0);
+	 			//forStmt.getStmtList().removeChild(0);
+	 		}
 			int upper=0;		
 			quickSort(0,dataVector.size());
 			for(int k=0;k<dataVector.size();k++){
@@ -200,74 +260,121 @@ public void checkForLoopAnnotations(){
 			 if(upper!=data.getEndRange() && data.getDependence().equals("n")){
 			   data.setFNode(forStmt);		     				  
 		       data.setTransformation("LoopReversal");
-		       lreversal.ApplyLoopReversal(data,forStmt);	     	  
+		       aTrans="LoopReversal";		       
+		       lreversal.ApplyLoopReversal(data,forStmt,true);	     	  
 			 }//end of if
 			   //lower=data.getStartRange();
 			   upper=data.getEndRange();		
 			}//end of for		   
 			ASTNode node=forStmt.getParent();
-			int a=node.getIndexOfChild(forStmt);			
+			int a=node.getIndexOfChild(forStmt);
+			node.removeChild(a);
+			//forStmt.getStmtList().removeChild(0);
+			
+			//forStmt.getStmtList().removeChild(0);
 			ElseBlock eBlock=new ElseBlock();
 			eBlock.addStmt(forStmt);
-			(lreversal.getIfStmt()).setElseBlock(eBlock);
-			//System.out.println(lreversal.getIfStmt().getPrettyPrinted());
-			node.removeChild(a);
+			(lreversal.getIfStmt()).setElseBlock(eBlock);					
 			if(a<0)node.insertChild(lreversal.getIfStmt(), 0);
 			else node.insertChild(lreversal.getIfStmt(), a);
+			node.removeChild(a+1);
 			//setChildNo(a+1); 
 	   }//end of else
+	 	this.testParallelization(false);
+	 	return true;
      }//end of LoopReversal.	
 	else if(forStmt.isEligibleForLoopInterchange()){  	
 		if(!this.isRangeInfo()){}
 		else{//needs to change this for range info.
-			LoopInterchange lInterchange=new LoopInterchange();	 		
+			LoopInterchange lInterchange=new LoopInterchange();
+			((ForStmt)forStmtList.get(0)).getStmtList().removeChild(0);
+			((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
 			int upper=0;		
 			quickSort(0,dataVector.size());
 			for(int k=0;k<dataVector.size();k++){
 			 DependenceData data=(DependenceData)dataVector.get(k);			 
 			 if(upper!=data.getEndRange() && data.getDependence().equals("n")){			
 		     	data.setTransformation("LoopInterchange");
+		     	aTrans="LoopInterchange";
 		     	lInterchange.ApplyLoopInterchange(data, forStmtList, k);		     	
 			  }//end of if
+			 if(data.getDependence().equals("y")){//if there is dependence then check lexicographical order of the vectors.
+				distanceVector.add(data.getDistanceArray());
+				  if(applyInterchange(data)){
+					 data.setTransformation("LoopInterchange");
+					 lInterchange.ApplyLoopInterchange(data,forStmtList,2);
+					 aTrans="LoopInterchange";
+				  }
+		    }
 			 upper=data.getEndRange();
 			}//end of for
 			ASTNode node=forStmtList.get(0).getParent();
 			int a=node.getIndexOfChild(forStmtList.get(0));			
+			//int b=node.getIndexOfChild(forStmtList.get(1));
+			//((ForStmt)fusionList.get(0)).getStmtList().removeChild(0); //remove the annotations from the loop body.
+			//((ForStmt)fusionList.get(1)).getStmtList().removeChild(0); //remove the annotations from the loop body.
 			ElseBlock eBlock=new ElseBlock();
 			eBlock.addStmt(forStmtList.get(0));
+			//eBlock.addStmt(fusionList.get(1));
 			(lInterchange.getIfStmt()).setElseBlock(eBlock);			
 			node.removeChild(a);
+			//node.removeChild(b);
 			if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
 			else node.insertChild(lInterchange.getIfStmt(), a);
-		}//end of else		 
+			node.removeChild(a+1);
+		}//end of else
+		this.testParallelization(false);
+		return true;
      }//end of LoopInterchange.
 	
 	else if(forStmt.isEligibleForLoopFusion()){
-		
+		fusionCount++;			
+		lFusion.setFList(forStmt);
+		lFusion.setVList(dataVector);
+		fusionList.add(forStmt);
 		if(fusionCount==2){
 			fusionCount=0;			
-			lFusion.ApplyLoopFusion();
-			fusionList=new LinkedList<ForStmt>(); //reset the list
-		}
-		else{
-			fusionCount++;
-			fusionList.add(forStmt);
-			lFusion.setVList(dataVector);
-		}		
+			aTrans="LoopFusion";
+			lFusion.ApplyLoopFusion();			
+		    ASTNode parent = fusionList.get(0).getParent(); //get the parent of the second loop			        
+			int loc = parent.getIndexOfChild(fusionList.get(0));
+			parent.removeChild(loc); //remove the second loop from the AST
+			parent.removeChild(loc+1); //remove the second loop from the AST
+			int a=parent.getIndexOfChild(fusionList.get(1));
+			parent.removeChild(a);			
+			if (a>=0){			 			  
+			  parent.insertChild(lFusion.getIfStmt(), a);
+			  ElseBlock eBlock=new ElseBlock();
+			  ((ForStmt)fusionList.get(0)).getStmtList().removeChild(0);
+			  ((ForStmt)fusionList.get(0)).getStmtList().removeChild(0);
+			  ((ForStmt)fusionList.get(1)).getStmtList().removeChild(0);
+			  ((ForStmt)fusionList.get(1)).getStmtList().removeChild(0);
+			  eBlock.addStmt(fusionList.get(0));
+			  eBlock.addStmt(fusionList.get(1));
+			  (lFusion.getIfStmt()).setElseBlock(eBlock);
+			//fusionList=new LinkedList<ForStmt>(); //reset the list
+			  parent.removeChild(a+1);
+		 }//end of if
+			this.testParallelization(false);
+			return true;
+	   }//end of outer if
+		return false;
 	}//end of LoopFusion
 	
     else if(forStmt.isEligibleForLoopFission()){    	
     	for(int k=0;k<dataVector.size();k++){
 			DependenceData data=(DependenceData)dataVector.get(k);
 			if(data.getDependence().equals("n")){
-     	      LoopFission lfission=new LoopFission(forStmt,i);//i indicates the loop that needs to be divided into two.
+     	     LoopFission lfission=new LoopFission(forStmt,i);//i indicates the loop that needs to be divided into two.
+     	     aTrans="LoopFission";
      	     data.setTransformation("LoopFission");
      	      lfission.ApplyLoopFission();
 		   }//end of if
     	}//end of for
      }//end of LoopFission	
    }//end of for
-   //checkForLoopFusion(forStmtList.get(0));    
+   //checkForLoopFusion(forStmtList.get(0));
+   return false;
 }
 //private void checkForLoopFusion(ForStmt fStmt){
 	
@@ -288,9 +395,12 @@ private boolean screenInput(int value){
 	  }//end of if
   }//end of for
   return false;
-  
-  
 }
+
+/*
+ * This function write each version with transformations applied to a file 
+ */
+
 
 
 /*
@@ -298,55 +408,68 @@ private boolean screenInput(int value){
  * 1.This function tests legality of a transformation.If transformation is legal it then passes it to the transformer.
  * 2.This function is called only with -auto flag.
 */
-public void testLegality(){	
+public boolean testLegality(String trans){	
 	quickSort(0,dataVector.size());
     DependenceData dData=(DependenceData)dataVector.get(0);
     int nLevel=dData.getNestingLevel();	
 	int upper=0;	
 	boolean flag=false;
-	if(nLevel==0){  //This is for reversal of single loop
-	   LoopReversal lreversal = new LoopReversal();
-	   ForStmt forStmt=forStmtList.get(0);	
+	
+	//if(nLevel==0){  //This is for reversal of single loop
+	  if(trans.equals("R")){
+	   boolean rFlag=false;	  
+	   LoopReversal lreversal = new LoopReversal();	   
+	   ForStmt forStmt=forStmtList.get(0);
+	   //if(forStmt.getStmt(0) instanceof ForStmt){			
+		//	//((ForStmt)forStmt.getStmt(0)).getStmtList().removeChild(0);
+		//}
+		//else{			
+		//	forStmt.getStmtList().removeChild(0);
+		//}
+	   ForStmt fStmt=forStmt.fullCopy();
+	   ElseBlock eBlock=new ElseBlock();
+	   eBlock.addStmt(fStmt);	   
        for(int i=0;i<dataVector.size();i++){		
 		 DependenceData data=(DependenceData)dataVector.get(i);	
 		 if(upper!=data.getEndRange()){
-			 flag=screenInput(data.getEndRange());
-			 upper=data.getEndRange();
+			 flag=screenInput(data.getEndRange());			 
+			 upper=data.getEndRange();			 
 			 if(!flag){ //if no dependence
 			    data.setTransformation("LoopReversal");
-			    lreversal.ApplyLoopReversal(data,forStmt);	
-			    
-			 }//end of if
-		 }//end of if
-		 if(flag){//if there is dependence then check lexicographical order of the vectors.
-			 distanceVector.add(data.getDistanceArray());
-			 if(applyReversal(data)){
-				   data.setTransformation("LoopReversal");
-				   lreversal.ApplyLoopReversal(data, forStmt);
-			 }//end of if
-		 }//end of if		 	 
-   	 } //end of for
-     ASTNode node=forStmt.getParent();
-	 int a=node.getIndexOfChild(forStmt);
-	 //ASTNode node1=node.getChild(a+1);
-	 node.removeChild(a+1);
-	 ElseBlock eBlock=new ElseBlock();
-	 eBlock.addStmt(forStmt);
-	 (lreversal.getIfStmt()).setElseBlock(eBlock);	
-	 node.removeChild(a);
-	 
-	 //node.removeChild(a+1);
-	 //System.out.println(node.getChild(a+1).getPrettyPrinted());
-	 if(a<0)node.insertChild(lreversal.getIfStmt(), 0);
-	else node.insertChild(lreversal.getIfStmt(), a);  
+			    lreversal.ApplyLoopReversal(data,forStmt,false);
+			    rFlag=true;
+			 //}//end of if
+		 //}//end of if
+		 //if(flag){//if there is dependence then check lexicographical order of the vectors.
+			// distanceVector.add(data.getDistanceArray());
+			// if(applyReversal(data)){
+			//	data.setTransformation("LoopReversal");
+			//	lreversal.ApplyLoopReversal(data, forStmt);
+		//	 }//end of if
+		// }//end of if
+      }//end of if
+	 }//end of if
+    } //end of for
+    if(rFlag){
+    	ASTNode node=forStmt.getParent();
+   	 int a=node.getIndexOfChild(forStmt);
+   	 //ASTNode node1=node.getChild(a+1);
+   	 node.removeChild(a+1);	 
+   	 (lreversal.getIfStmt()).setElseBlock(eBlock);	
+   	 node.removeChild(a);	 
+   	if(a<0)node.insertChild(lreversal.getIfStmt(), 0);
+   	else node.insertChild(lreversal.getIfStmt(), a);	
+    }
+    return rFlag;
    }//end of if
 	
-  else{ //This is when we have a nested loop,then explore the possibility of interchange and reversal
-	  //Case1:Try Apply Loop Interchange if the loop is nested 
-	  //System.out.println(forStmtList.get(0).getPrettyPrinted());	 
+  else if(trans.equals("I") && nLevel>=1){ //This is when we have a nested loop,then explore the possibility of interchange 
+	  //Case1:Try Apply Loop Interchange if the loop is nested
+	  boolean iFlag=false;
 	  int count=0;
 	  LoopInterchange lInterchange=new LoopInterchange();
-	  pairData();
+	  //((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
+	  //pairData();
 	  for(int i=0;i<dataVector.size();i++){		
 	    DependenceData data=(DependenceData)dataVector.get(i);
 	    //DependenceData[] datArray=new DependenceData[2];	    
@@ -356,30 +479,324 @@ public void testLegality(){
 		   if(!flag){ //if no dependence
 			  data.setTransformation("LoopInterchange");
 			  lInterchange.ApplyLoopInterchange(data,forStmtList,count);
+			  iFlag=true;
 			  count++;
-			 }//end of if
-		 }//end of if
+			  /*ASTNode node=forStmtList.get(0).getParent();
+			   int a=node.getIndexOfChild(forStmtList.get(0));
+			   //node.removeChild(a+1);
+			   ElseBlock eBlock=new ElseBlock();
+			   eBlock.addStmt(forStmtList.get(0));
+			   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+			   node.removeChild(a);
+			   node.removeChild(a+1);
+			   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
+			   else node.insertChild(lInterchange.getIfStmt(), a);
+			   return iFlag;*/
+			}//end of if		   
+		 //}//end of if
 		if(flag){//if there is dependence then check lexicographical order of the vectors.
 		  distanceVector.add(data.getDistanceArray());
-		   if(applyInterchange(data)){
+		  if(applyInterchange(data)){
 			 data.setTransformation("LoopInterchange");
 			 lInterchange.ApplyLoopInterchange(data,forStmtList,count);
+			 iFlag=true;
 			 count++;
-			 }//end of if
-		  }//end of if		 	 
-	   } //end of for
+			 /*ASTNode node=forStmtList.get(0).getParent();
+			   int a=node.getIndexOfChild(forStmtList.get(0));
+			   //node.removeChild(a+1);
+			   ElseBlock eBlock=new ElseBlock();
+			   eBlock.addStmt(forStmtList.get(0));
+			   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+			   node.removeChild(a);
+			   node.removeChild(a+1);
+			   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
+			   else node.insertChild(lInterchange.getIfStmt(), a);
+			   return iFlag;*/
+		   }//end of if		  
+	     }//end of if		 	 
+	   //} //end of for
+	  }//end of if 
+	 //}//end of if
+    } //end of for	
+	if(iFlag){
 	   ASTNode node=forStmtList.get(0).getParent();
-	   int a=node.getIndexOfChild(forStmtList.get(0));			
+	   int a=node.getIndexOfChild(forStmtList.get(0));
+	   //node.removeChild(a+1);
 	   ElseBlock eBlock=new ElseBlock();
 	   eBlock.addStmt(forStmtList.get(0));
-	   (lInterchange.getIfStmt()).setElseBlock(eBlock);
-	   //System.out.println(lInterchange.getIfStmt().getPrettyPrinted());
-	   node.removeChild(a);
-	   node.removeChild(a+1);
+	   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+	   node.removeChild(a);	   
 	   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
 	   else node.insertChild(lInterchange.getIfStmt(), a);
-  }//end of else.   	
+	   node.removeChild(a+1);
+	   return iFlag;
+	}//end of if
+  }//end of else. 
+	  
+  else if(trans.equals("IR") && nLevel>=1){ //This is when we have a nested loop,then explore the possibility of interchange and reversal
+	  //Case1:Try Apply Loop Interchange and then reversal if the loop is nested 
+	  //System.out.println(forStmtList.get(0).getPrettyPrinted());	 
+	  int count=0;
+	  LoopInterchange lInterchange=new LoopInterchange();
+	  LoopReversal lReversal= new LoopReversal();
+	  //((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
+	  boolean irFlag=false;
+	  //pairData();
+	  for(int i=0;i<dataVector.size();i++){		
+	    DependenceData data=(DependenceData)dataVector.get(i);
+	    //DependenceData[] datArray=new DependenceData[2];	    
+		if(upper!=data.getEndRange()){
+		   flag=screenInput(data.getEndRange());
+		   upper=data.getEndRange();
+		   if(!flag){ //if no dependence
+			  data.setTransformation("LoopInterchange+Reversal");
+			  lInterchange.ApplyLoopInterchange(data,forStmtList,count);			  
+			  lReversal.ApplyLoopReversal(data, lInterchange.getForStmt(),false);
+			  irFlag=true;
+			  count++;
+			  /*ASTNode node=forStmtList.get(0).getParent();
+				 int a=node.getIndexOfChild(forStmtList.get(0));		 
+				 ElseBlock eBlock=new ElseBlock();
+				 eBlock.addStmt(forStmtList.get(0));
+				 (lReversal.getIfStmt()).setElseBlock(eBlock);	
+				 node.removeChild(a);
+				 node.removeChild(a+1);
+				 if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+				else node.insertChild(lReversal.getIfStmt(), a);
+				 return true;*/
+			 }//end of if
+		// }//end of if
+		if(flag){//if there is dependence then check lexicographical order of the vectors.
+		  distanceVector.add(data.getDistanceArray());
+		   if(applyUniModularTransformations(data)){
+			  data.setTransformation("LoopInterchange+Reversal");
+		     lInterchange.ApplyLoopInterchange(data,forStmtList,count);			  
+			 lReversal.ApplyLoopReversal(data, lInterchange.getForStmt(),false);
+			 irFlag=true;
+		     count++;
+		     /*ASTNode node=forStmtList.get(0).getParent();
+			 int a=node.getIndexOfChild(forStmtList.get(0));		 
+			 ElseBlock eBlock=new ElseBlock();
+			 eBlock.addStmt(forStmtList.get(0));
+			 (lReversal.getIfStmt()).setElseBlock(eBlock);	
+			 node.removeChild(a);
+			 node.removeChild(a+1);
+			 if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+			else node.insertChild(lReversal.getIfStmt(), a);
+			 return true;*/
+		   }//end of if
+	     }//end of if		     
+	 //}//end of if
+	}//end of if
+  } //end of for
+  if(irFlag){
+	  ASTNode node=forStmtList.get(0).getParent();
+		 int a=node.getIndexOfChild(forStmtList.get(0));		 
+		 ElseBlock eBlock=new ElseBlock();
+		 eBlock.addStmt(forStmtList.get(0));
+		 (lReversal.getIfStmt()).setElseBlock(eBlock);	
+		 node.removeChild(a);		 
+		 if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+		else node.insertChild(lReversal.getIfStmt(), a);
+		 node.removeChild(a+1); 
+		return irFlag;
+	}
+ }//end of else.
+  else if(trans.equals("All")){ //This is when we have a nested loop,then explore the possibility of interchange and reversal
+     return applyAllTransformations(trans);	  
+  }
+ return false;
+	  
 }//end of function
+
+/*
+ * This function applies all the loop transformations on a single file
+ */
+private boolean applyAllTransformations(String trans){
+	quickSort(0,dataVector.size());
+    DependenceData dData=(DependenceData)dataVector.get(0);
+    int nLevel=dData.getNestingLevel();	
+	int upper=0;	
+	boolean flag=false;
+	if(nLevel==0){
+	   boolean rFlag=false;	  
+	   LoopReversal lreversal = new LoopReversal();
+	   ForStmt forStmt=forStmtList.get(0);
+	  // if(forStmt.getStmt(0) instanceof ForStmt){			
+		//	((ForStmt)forStmt.getStmt(0)).getStmtList().removeChild(0);
+		//}
+		//else{			
+		//	forStmt.getStmtList().removeChild(0);
+		//}
+	   ForStmt fStmt=forStmt.fullCopy();
+	   ElseBlock eBlock=new ElseBlock();
+	   eBlock.addStmt(fStmt);	   
+       for(int i=0;i<dataVector.size();i++){		
+		 DependenceData data=(DependenceData)dataVector.get(i);	
+		 if(upper!=data.getEndRange()){
+			 flag=screenInput(data.getEndRange());			 
+			 upper=data.getEndRange();			 
+			 if(!flag){ //if no dependence
+			    data.setTransformation("LoopReversal");
+			    lreversal.ApplyLoopReversal(data,forStmt,false);
+			    rFlag=true;				 
+           }//end of if
+	     }//end of if
+       } //end of for
+    if(rFlag){
+    	ASTNode node=forStmt.getParent();
+   	 int a=node.getIndexOfChild(forStmt);
+   	 //ASTNode node1=node.getChild(a+1);
+   	 node.removeChild(a+1);	 
+   	 (lreversal.getIfStmt()).setElseBlock(eBlock);	
+   	 node.removeChild(a);	 
+   	if(a<0)node.insertChild(lreversal.getIfStmt(), 0);
+   	else node.insertChild(lreversal.getIfStmt(), a);	
+   	return rFlag;
+     }	
+	}//end of if
+    else if(nLevel>=1){ //This is when we have a nested loop,then explore the possibility of interchange 
+  	  //Case1:Try Apply Loop Interchange if the loop is nested
+  	  boolean iFlag=false;
+  	  int count=0;
+  	  LoopInterchange lInterchange=new LoopInterchange();
+  	//((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
+  	  //pairData();
+  	  for(int i=0;i<dataVector.size();i++){		
+  	    DependenceData data=(DependenceData)dataVector.get(i);
+  	    //DependenceData[] datArray=new DependenceData[2];	    
+  		if(upper!=data.getEndRange()){
+  		   flag=screenInput(data.getEndRange());
+  		   upper=data.getEndRange();
+  		   if(!flag){ //if no dependence
+  			  data.setTransformation("LoopInterchange");
+  			  lInterchange.ApplyLoopInterchange(data,forStmtList,count);
+  			  iFlag=true;
+  			  count++;
+  			  /*ASTNode node=forStmtList.get(0).getParent();
+  			   int a=node.getIndexOfChild(forStmtList.get(0));
+  			   //node.removeChild(a+1);
+  			   ElseBlock eBlock=new ElseBlock();
+  			   eBlock.addStmt(forStmtList.get(0));
+  			   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+  			   node.removeChild(a);
+  			   node.removeChild(a+1);
+  			   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
+  			   else node.insertChild(lInterchange.getIfStmt(), a);
+  			   return iFlag;*/
+  			}//end of if		   
+  		 //}//end of if
+  		if(flag){//if there is dependence then check lexicographical order of the vectors.
+  		  distanceVector.add(data.getDistanceArray());
+  		  if(applyInterchange(data)){
+  			 data.setTransformation("LoopInterchange");
+  			 lInterchange.ApplyLoopInterchange(data,forStmtList,count);
+  			 iFlag=true;
+  			 count++;
+  			 /*ASTNode node=forStmtList.get(0).getParent();
+  			   int a=node.getIndexOfChild(forStmtList.get(0));
+  			   //node.removeChild(a+1);
+  			   ElseBlock eBlock=new ElseBlock();
+  			   eBlock.addStmt(forStmtList.get(0));
+  			   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+  			   node.removeChild(a);
+  			   node.removeChild(a+1);
+  			   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
+  			   else node.insertChild(lInterchange.getIfStmt(), a);
+  			   return iFlag;*/
+  		   }//end of if		  
+  	     }//end of if		 	 
+  	   //} //end of for
+  	  }//end of if 
+  	 //}//end of if
+      } //end of for	
+  	if(iFlag){
+  	   ASTNode node=forStmtList.get(0).getParent();
+  	   int a=node.getIndexOfChild(forStmtList.get(0));
+  	   //node.removeChild(a+1);
+  	   ElseBlock eBlock=new ElseBlock();
+  	   eBlock.addStmt(forStmtList.get(0));
+  	   (lInterchange.getIfStmt()).setElseBlock(eBlock);	   
+  	   node.removeChild(a);
+  	   node.removeChild(a+1);
+  	   if(a<0)node.insertChild(lInterchange.getIfStmt(), 0);
+  	   else node.insertChild(lInterchange.getIfStmt(), a);
+  	   return iFlag;
+  	}//end of if
+    }//end of else. 
+  	  
+    else if(nLevel>=1){ //This is when we have a nested loop,then explore the possibility of interchange and reversal
+  	  //Case1:Try Apply Loop Interchange and then reversal if the loop is nested 
+  	  //System.out.println(forStmtList.get(0).getPrettyPrinted());	 
+  	  int count=0;
+  	  LoopInterchange lInterchange=new LoopInterchange();
+  	  LoopReversal lReversal= new LoopReversal();
+  	//((ForStmt)((ForStmt)forStmtList.get(0)).getStmt(0)).getStmtList().removeChild(0);
+  	  boolean irFlag=false;
+  	  //pairData();
+  	  for(int i=0;i<dataVector.size();i++){		
+  	    DependenceData data=(DependenceData)dataVector.get(i);
+  	    //DependenceData[] datArray=new DependenceData[2];	    
+  		if(upper!=data.getEndRange()){
+  		   flag=screenInput(data.getEndRange());
+  		   upper=data.getEndRange();
+  		   if(!flag){ //if no dependence
+  			  //System.out.println("i am in interchange reversal"); 
+  			  data.setTransformation("LoopInterchange+Reversal");
+  			  lInterchange.ApplyLoopInterchange(data,forStmtList,count);			  
+  			  lReversal.ApplyLoopReversal(data, lInterchange.getForStmt(),false);
+  			  irFlag=true;
+  			  count++;
+  			  /*ASTNode node=forStmtList.get(0).getParent();
+  				 int a=node.getIndexOfChild(forStmtList.get(0));		 
+  				 ElseBlock eBlock=new ElseBlock();
+  				 eBlock.addStmt(forStmtList.get(0));
+  				 (lReversal.getIfStmt()).setElseBlock(eBlock);	
+  				 node.removeChild(a);
+  				 node.removeChild(a+1);
+  				 if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+  				else node.insertChild(lReversal.getIfStmt(), a);
+  				 return true;*/
+  			 }//end of if
+  		// }//end of if
+  		if(flag){//if there is dependence then check lexicographical order of the vectors.
+  		  distanceVector.add(data.getDistanceArray());
+  		   if(applyUniModularTransformations(data)){
+  			  data.setTransformation("LoopInterchange+Reversal");
+  		     lInterchange.ApplyLoopInterchange(data,forStmtList,count);			  
+  			 lReversal.ApplyLoopReversal(data, lInterchange.getForStmt(),false);
+  			 irFlag=true;
+  		     count++;
+  		     /*ASTNode node=forStmtList.get(0).getParent();
+  			 int a=node.getIndexOfChild(forStmtList.get(0));		 
+  			 ElseBlock eBlock=new ElseBlock();
+  			 eBlock.addStmt(forStmtList.get(0));
+  			 (lReversal.getIfStmt()).setElseBlock(eBlock);	
+  			 node.removeChild(a);
+  			 node.removeChild(a+1);
+  			 if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+  			else node.insertChild(lReversal.getIfStmt(), a);
+  			 return true;*/
+  		   }//end of if
+  	     }//end of if		     
+  	 //}//end of if
+  	}//end of if
+    } //end of for
+    if(irFlag){
+  	  ASTNode node=forStmtList.get(0).getParent();
+  	  int a=node.getIndexOfChild(forStmtList.get(0));		 
+  	  ElseBlock eBlock=new ElseBlock();
+  	  eBlock.addStmt(forStmtList.get(0));
+  	  (lReversal.getIfStmt()).setElseBlock(eBlock);	
+  	  node.removeChild(a);
+  	  node.removeChild(a+1);
+  	  if(a<0)node.insertChild(lReversal.getIfStmt(), 0);
+  	 else node.insertChild(lReversal.getIfStmt(), a);
+  	 return irFlag;
+  	}
+   }//end of else.
+ return false;	
+}
 
 /*
  * This function makes pairs for nested loop ranges.
@@ -414,7 +831,7 @@ private boolean applyInterchange(DependenceData lData){
    * 
    * 
    */
-  private void applyUniModularTransformations(DependenceData lData){
+  private boolean applyUniModularTransformations(DependenceData lData){
 	  
 	  /*
 	   * Case:Apply reversal on all the loops starting from the outermost loop.
@@ -427,16 +844,16 @@ private boolean applyInterchange(DependenceData lData){
 	  int count=0;
 	  int level=1;//This field tells on which nested loop to apply reversal.level1 means apply reversal on loop 1 or outermost loop.
 	  TransformationCombinations tCombination=new TransformationCombinations();
-	  for(int i=0;i<lData.getNestingLevel();i++){
+	  //for(int i=0;i<lData.getNestingLevel();i++){
 		  tCombination.createReversalInterchangeMatrix(level, lData.getNestingLevel());		  
-          for(int j=1;j<=lData.getNestingLevel();j++){		  
-			  for(int k=0;k<distanceVector.size();k++){			  
-				  //Case4:Apply loop reversal on loop1 and then interchange the two loops.		  		  
+          //for(int j=1;j<=lData.getNestingLevel();j++){		  
+			  for(int k=0;k<distanceVector.size();k++){				  		  		  
 				  if(tCombination.applyCombination(distanceVector.get(k))){//{writeToXMLFile(lData,"Reversal+Interchange");return;}		
 					  count++;
+					  return true;
 				  }//end of if   
-			   }//end of for
-			  if(count==dataVector.size()){ 
+			  }//end of for
+			  /*if(count==dataVector.size()){ 
 				  ForStmt fStmt=forStmtList.get(i);
 				  //LoopReversal reversal=new LoopReversal(fStmt);
 				  //reversal.ApplyLoopReversal();
@@ -449,11 +866,12 @@ private boolean applyInterchange(DependenceData lData){
 			   }//end of if
 			  count=0;
           }//end of 2nd for
-          level++;
-	  }//end of 1st for
+          level++;*/
+	    return false;		  
+	  //}//end of 1st for
 	  
-	  System.out.println("Reversal+Interchange not applicable");
-      applyUniModularTransformations(lData,level);		  
+	  //System.out.println("Reversal+Interchange not applicable");
+      //applyUniModularTransformations(lData,level);		  
 	  
 	  
 		  /*else

@@ -24,7 +24,8 @@ public class Profiler {
 	private String fileName;
 	private ExpressionFactory eFactory;	
 	private LinkedList<ForStmt> forStmtList;
-	private static int loopNo=0;
+	//private static int loopNo=0;
+	private int loopNo=0;
 	
 	public String getFileName() {
 		return fileName;
