@@ -16,14 +16,14 @@
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
 				<!-- DIFF: these excludes don't exist on jastadd -->
-				<exclude name="**/Annotations.jrag" />
-				<exclude name="**/NameResolution.jrag" />
-				<exclude name="**/NameResolution.jadd" />
-				<exclude name="**/SymbolTableFill.jrag" /> 
-				<exclude name="**/TypeInference.jrag" />
+				<!-- <exclude name="**/Annotations.jrag" /> --> 
+				<exclude name="**/NameResolution.jrag" /> <!-- these are necessary! -->
+				<exclude name="**/NameResolution.jadd" /> 
+				<!-- <exclude name="**/SymbolTableFill.jrag" /> --> 
+				<!-- <exclude name="**/TypeInference.jrag" /> -->
 				<!-- exclude some Aspect related files
 				<exclude name="**/Aspects.ast" /> -->
-				<exclude name="**/AspectsInheritedEquations.jrag" /> 
+				<!-- <exclude name="**/AspectsInheritedEquations.jrag" /> -->
 			</fileset>
 			<fileset dir="${test.dir}">
 				<include name="**/*.ast" />
@@ -61,7 +61,6 @@
 	<!-- Gen - parser+beaver: jflex, parser+beaver, jastadd, and options -->
 <!-- SAME AS gen IN gen.xml -->
         <target name="gen2" depends="jflex, parser, jastadd2" />
-	
 <!-- SAME AS compile IN compile.xml EXCEPT DIFF-->
 	<target name="compile2" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
@@ -72,7 +71,8 @@
 			<src path="${test.dir}" />
 			<include name="**/*.java" />
 <!-- THIS FILE WAS EXCLUDED -->
-			<exclude name="**/LookupLValue*.java" />
+			<exclude name="**/LookupLValue*.java" /> 
+<!--this causes some errors because looklvalue itself seems missing ?! -->
 		</javac>
 	</target>
 	
