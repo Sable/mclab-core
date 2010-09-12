@@ -8,11 +8,11 @@ import java.io.*;
 public abstract class AbstractExtensionFileFilter implements FileFilter, FilenameFilter
 {
 
-    protected String[] okFileExtensions = new String[0];
+    public abstract String[] getOkFileExtensions();
 
     public boolean accept(File file)
     {
-        for (String extension : okFileExtensions){
+        for (String extension : getOkFileExtensions()){
             if (file.getName().toLowerCase().endsWith(extension)){
                 return true;
             }
@@ -22,7 +22,7 @@ public abstract class AbstractExtensionFileFilter implements FileFilter, Filenam
     
     public boolean accept(File dir, String name)
     {
-        for (String extension : okFileExtensions){
+        for (String extension : getOkFileExtensions()){
             if (name.toLowerCase().endsWith(extension)){
                 return true;
             }

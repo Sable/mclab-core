@@ -7,7 +7,7 @@ import java.io.*;
  */
 public class MatlabFileFilter extends AbstractExtensionFileFilter
 {
-
-    private final String[] okFileExtensions = new String[] {"m"};
-
+    public String[] getOkFileExtensions() {
+        return new String[] {"m"};
+    }
 }

@@ -89,8 +89,8 @@ public class FlowAnalysisTestTool
         }
         
         //create the analysis
-        analysis = analysisType.getConstructor( ASTNode.class ).newInstance(ast);
-        this.ast = ast;
+        analysis = analysisType.getConstructor( ASTNode.class ).newInstance(cu);
+        this.ast = cu;
     }                                     
     /**
      * Runs the analysis and returns the resulting string. Will only

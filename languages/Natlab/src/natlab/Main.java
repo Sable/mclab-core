@@ -706,7 +706,7 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
      * @return A reader object giving access to the translated
      * source.
      */
-    public static Reader translateFile(String fName, ArrayList errList)
+    public static Reader translateFile(String fName, ArrayList<CompilationProblem> errList)
     {
         BufferedReader in = null;
         PositionMap prePosMap = null;
@@ -758,7 +758,7 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
      * @return A reader object giving access to the translated
      * source.
      */
-    public static Reader translateFile(String fName, String source, ArrayList errList)
+    public static Reader translateFile(String fName, String source, ArrayList<CompilationProblem> errList)
     {
         BufferedReader in = null;
         PositionMap prePosMap = null;
@@ -797,6 +797,36 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
         
         return finishTranslateFile(fName, in, prePosMap, errList);
     }
+    /**
+     * Perform the translation from a given Reader containing source code.
+     *
+     * @param fName    The name of the file to which the source belongs.
+     * @param source   The string containing the source code.
+     * @param errList  A list of errors for error collection.
+     * 
+     * @return A reader object giving access to the translated
+     * source.
+     */
+    public static Reader translateFile(String fName, Reader source, ArrayList<CompilationProblem> errList)
+    {
+    	//we'll just build a String out of the source and call the method that takes a String
+    	//TODO - this should be done directly from the reader
+    	BufferedReader buffer = new BufferedReader(source);
+    	StringBuilder builder = new StringBuilder();
+    	try{
+    		while(true){
+    			String line = buffer.readLine();
+    			if (line == null) break;
+    			builder.append(line);
+    		}
+    	}catch(IOException e){
+    		CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+    		errList.add(IOcerror);
+    		return null;    
+    	}
+    	return translateFile(fName,builder.toString(),errList);
+    }
+    
     /**
      * Translate a given file and return a reader to access the
      * translated version. This method is used by the translateFile
@@ -862,7 +892,7 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
      * @return The Program node for the given file being parsed if no
      * errors. If an error occurs then null is returned. 
      */
-    public static Program parseFile(String fName, Reader file, ArrayList errList )
+    public static Program parseFile(String fName, Reader file, ArrayList<CompilationProblem> errList )
     {
         NatlabParser parser = new NatlabParser();
         NatlabScanner scanner = null;
@@ -911,11 +941,73 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
             return null;
         }
         catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
+            CompilationProblem IOcerror = new CompilationProblem("Error parsing "+fName+"\n"+e.getMessage());
             errList.add( IOcerror);
             return null;
         }
     }
+
+    /**
+     * Parse a given file and return the Program ast node. This
+     * expects the program to already be in natlab syntax.
+     *
+     * @param fName  The name of the file being parsed.
+     * @param errList   A list of errors for error collection.
+     *
+     * @return The Program node for the given file being parsed if no
+     * errors. If an error occurs then null is returned. 
+     */
+    public static Program parseFile(String fName, ArrayList<CompilationProblem> errList ){
+    	try {
+    		FileReader reader = new FileReader(fName);
+    		Program program = parseFile(fName,reader,errList);    	
+    		if (program == null){
+    		    System.err.println(errList);    		    
+    		}
+    		
+    		return program;
+    	} catch (FileNotFoundException e){
+    	    System.err.println("File "+fName+" not found!");
+    	    return null;
+    	}    
+    }
+    
+    /**
+     * Parse a given file as a Matlab file and return the Program ast node.
+     *
+     * @param fName  The name of the file being parsed.
+     * @param errList   A list of errors for error collection.
+     *
+     * @return The Program node for the given file being parsed if no
+     * errors. If an error occurs then null is returned. 
+     */
+    public static Program parseMatlabFile(String fName, ArrayList<CompilationProblem> errList ){
+    	Reader source = Main.translateFile( fName, errList );
+        if( source == null ) return null;
+        Program program = Main.parseFile( fName, source, errList );
+        return program;
+    }
+    
+    
+    /**
+     * Parse a given file as a Matlab file and return the Program ast node.
+     *
+     * @param fName  The name of the file being parsed.
+     * @param file   The reader object containing the source being
+     * parsed.
+     * @param errList   A list of errors for error collection.
+     *
+     * @return The Program node for the given file being parsed if no
+     * errors. If an error occurs then null is returned. 
+     */
+    public static Program parseMatlabFile(String fName, Reader file, ArrayList<CompilationProblem> errList ){
+    	//TODO - something should be done about the mapping file
+    	//translate into natlab
+    	Reader natlabFile = translateFile(fName, file, errList);
+    	//parse natlab
+    	return parseFile( fName,  natlabFile,  errList );
+    }
+
     
     private static boolean processCmdLine(String[] args)
     {

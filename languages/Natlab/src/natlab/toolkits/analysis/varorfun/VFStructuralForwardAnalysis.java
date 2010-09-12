@@ -86,6 +86,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
                 VFPreorderAnalysis.DEBUG = true;
                 System.out.println("starting preorder analysis  --struct analysis\n*******************");
             }
+            //we use the preorder analysis as a first approximation for the structural analysis
             functionAnalysis = new VFPreorderAnalysis( node );
             functionAnalysis.analyze();
             if(DEBUG)
@@ -99,6 +100,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
         currentInSet = newInitialFlow();
         currentOutSet = newInitialFlow();
         caseASTNode( node );
+        
     }
 
 
