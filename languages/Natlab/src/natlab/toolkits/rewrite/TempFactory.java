@@ -29,7 +29,9 @@ public class TempFactory
      */
     private static Name makeNameNode( String name )
     {
-        return new Name( name );
+        Name newName = new Name( name );
+        newName.tmpVar = true;
+        return newName;
     }
  
     public TempFactory()
@@ -49,7 +51,9 @@ public class TempFactory
      */
     public NameExpr genNameExpr()
     {
-        return new NameExpr( genName() );
+        NameExpr newName = new NameExpr( genName() );
+        newName.tmpVar = true;
+        return newName;
     }
     /**
      * Gives a Sring name for this temporary.

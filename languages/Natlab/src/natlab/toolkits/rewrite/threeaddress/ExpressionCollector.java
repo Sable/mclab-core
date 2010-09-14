@@ -18,68 +18,109 @@ import natlab.toolkits.analysis.varorfun.VFDatum;
  */
 public class ExpressionCollector extends AbstractLocalRewrite
 {
-        private boolean isSub = false;
-        private LinkedList<AssignStmt> newAssignments;
-        private VFFlowset<String, VFDatum> resolvedNames;
+    private boolean isSub = false;
+    private LinkedList<AssignStmt> newAssignments;
+    private VFFlowset<String, VFDatum> resolvedNames;
+    
+    public ExpressionCollector( ASTNode tree, 
+                                VFFlowset<String, VFDatum> resolvedNames )
+    {
+        super( tree );
+        this.resolvedNames = resolvedNames;
+        newAssignments = new LinkedList<AssignStmt>();
+    }
+    
+    public LinkedList<AssignStmt> getNewAssignments()
+    {
+        return newAssignments;
+    }
+    public void possibleSubExprHandler(Expr node, Expr target, List<Expr> args)
+    {
+        if( isSub ){
+            subExprHandler( node );
+        }
+        else{
+            rewrite(target);
+            isSub = true;
+            //rewriteChildren( node );
+            rewrite(args);
+            isSub = false;
+        }
+    }
+    public void subExprHandler(Expr node)
+    {
+        TempFactory tmp = TempFactory.genFreshTempFactory();
+        AssignStmt newAssign = new AssignStmt( tmp.genNameExpr(), node );
+        newAssignments.add( newAssign );
+        newNode = new TransformedNode( tmp.genNameExpr() );
+    }
+    public void caseParameterizedExpr( ParameterizedExpr node )
+    {
+        possibleSubExprHandler( node, node.getTarget(), node.getArgs() );
+    }
+    public void caseCellIndexExpr( CellIndexExpr node )
+    {
+        possibleSubExprHandler( node, node.getTarget(), node.getArgs() );
+    }
 
-        public ExpressionCollector( ASTNode tree, 
-                                    VFFlowset<String, VFDatum> resolvedNames )
-        {
-            super( tree );
-            this.resolvedNames = resolvedNames;
-            newAssignments = new LinkedList<AssignStmt>();
+    public void caseRangeExpr( RangeExpr node )
+    {
+        if( isSub ){
+            subExprHandler( node );
         }
+        else{
+            Expr newLower = node.getLower();
+            Opt newIncr = node.getIncrOpt();
+            Expr newUpper = node.getUpper();
+            boolean changed = false;
 
-        public LinkedList<AssignStmt> getNewAssignments()
-        {
-            return newAssignments;
-        }
-        public void possibleSubExprHandler(Expr node, Expr target, List<Expr> args)
-        {
-            if( isSub ){
-                subExprHandler( node );
+            isSub = true;
+            rewrite( node.getLower() );
+            if( newNode!=null ){
+                newLower = (Expr)newNode.getSingleNode();
+                changed = true;
             }
-            else{
-                rewrite(target);
-                isSub = true;
-                //rewriteChildren( node );
-                rewrite(args);
-                isSub = false;
-            }
-        }
-        public void subExprHandler(Expr node)
-        {
-            TempFactory tmp = TempFactory.genFreshTempFactory();
-            AssignStmt newAssign = new AssignStmt( tmp.genNameExpr(), node );
-            newAssignments.add( newAssign );
-            newNode = new TransformedNode( tmp.genNameExpr() );
-        }
-        public void caseParameterizedExpr( ParameterizedExpr node )
-        {
-            possibleSubExprHandler( node, node.getTarget(), node.getArgs() );
-        }
-        public void caseCellIndexExpr( CellIndexExpr node )
-        {
-            possibleSubExprHandler( node, node.getTarget(), node.getArgs() );
-        }
-        public void caseNameExpr( NameExpr node )
-        {
-            if( isSub ){
-                VFDatum datum = resolvedNames.contains( node.getName().getID() );
-                if( datum == null || !datum.isVariable() ){
-                    subExprHandler( node );
+            if( node.hasIncr() ){
+                rewrite( node.getIncr() );
+                if( newNode!=null ){
+                    newIncr = new Opt((Expr)newNode.getSingleNode());
+                    changed = true;
                 }
             }
+            rewrite( node.getUpper() );
+            if( newNode != null ){
+                newUpper = (Expr)newNode.getSingleNode();
+                changed = true;
+            }
+            isSub = false;
+
+            if( changed ){
+                RangeExpr newRange = new RangeExpr(newLower,newIncr,newUpper);
+                newNode = new TransformedNode(newRange);
+            }
         }
-        public void caseExpr( Expr node )
-        {
-            if( isSub )
+        
+    }
+    public void caseNameExpr( NameExpr node )
+    {
+        if( isSub ){
+            VFDatum datum = resolvedNames.contains( node.getName().getID() );
+            if( !node.tmpVar && ( datum == null || !datum.isVariable() ) ){
                 subExprHandler( node );
-            else
-                rewriteChildren( node );
+            }
         }
-        public void caseLiteralExpr( LiteralExpr node )
-        {
-            return;
-        }
+    }
+    public void caseExpr( Expr node )
+    {
+        if( isSub )
+            subExprHandler( node );
+        else
+            rewriteChildren( node );
+    }
+    public void caseLiteralExpr( LiteralExpr node )
+    {
+        return;
+    }
+    
+        
 }
