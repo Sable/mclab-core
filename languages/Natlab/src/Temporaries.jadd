@@ -1,0 +1,8 @@
+
+aspect Temporaries
+{
+
+    public boolean Name.tmpVar = false;
+    public boolean NameExpr.tmpVar = false;
+
+}
