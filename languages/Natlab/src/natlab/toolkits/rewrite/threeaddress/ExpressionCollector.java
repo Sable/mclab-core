@@ -101,6 +101,37 @@ public class ExpressionCollector extends AbstractLocalRewrite
         }
         
     }
+    public void caseBinaryExpr( BinaryExpr node )
+    {
+        if( isSub )
+            subExprHandler( node );
+        else{
+            Expr lhs = node.getLHS();
+            Expr rhs = node.getRHS();
+            
+            Expr newLhs = lhs;
+            Expr newRhs = rhs;
+            boolean changed = false;
+            
+            isSub = true;
+            rewrite( lhs );
+            if( newNode != null ){
+                newLhs = (Expr)newNode.getSingleNode();
+                changed = true;
+            }
+            rewrite( rhs );
+            if( newNode != null ){
+                newRhs = (Expr)newNode.getSingleNode();
+                changed = true;
+            }
+            if( changed ){
+                node.setLHS(newLhs);
+                node.setRHS(newRhs);
+                newNode = new TransformedNode(node);
+            }
+        }
+    }
+
     public void caseNameExpr( NameExpr node )
     {
         if( isSub ){
@@ -118,6 +149,10 @@ public class ExpressionCollector extends AbstractLocalRewrite
             rewriteChildren( node );
     }
     public void caseLiteralExpr( LiteralExpr node )
+    {
+        return;
+    }
+    public void caseColonExpr( ColonExpr node )
     {
         return;
     }
