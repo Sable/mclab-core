@@ -71,7 +71,27 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
     public void caseForStmt( ForStmt node )
     {
         rewrite( node.getStmts() );
+
+        AssignStmt loopAssign = node.getAssignStmt();
+        Expr rhs = loopAssign.getRHS();
+
+
+        ExpressionCollector ec;
+        ec = new ExpressionCollector( rhs, nameResolver.getInFlowSets().get(loopAssign) );
+
+        Expr newRHS = (Expr)ec.transform();
+
+        if( ec.getNewAssignments().size() > 0 ){
+            LinkedList<AssignStmt> newAssignments;
+            newAssignments = processAssignmentList( ec.getNewAssignments(),
+                                                    nameResolver.getInFlowSets().get(loopAssign) );
+            newNode = new TransformedNode( newAssignments );
+            loopAssign.setRHS( newRHS );
+            newNode.add( node );
+        }
     }
+
+    
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
                                                    VFFlowset<String,VFDatum> resolvedNames )
     {

@@ -51,6 +51,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
     {
         TempFactory tmp = TempFactory.genFreshTempFactory();
         AssignStmt newAssign = new AssignStmt( tmp.genNameExpr(), node );
+        newAssign.setOutputSuppressed(true);
         newAssignments.add( newAssign );
         newNode = new TransformedNode( tmp.genNameExpr() );
     }
