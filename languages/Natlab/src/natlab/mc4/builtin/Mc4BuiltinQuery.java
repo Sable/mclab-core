@@ -16,6 +16,8 @@ public class Mc4BuiltinQuery implements BuiltinQuery {
         builtins.add("zeros");
         builtins.add("sum");
         builtins.add("round");
+        builtins.add("sqrt");
+        builtins.add("i");
     }
     
     public boolean isBuiltin(String functionname) {

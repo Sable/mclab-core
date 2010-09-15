@@ -15,6 +15,6 @@ public class FunctionReferenceType extends FunctionType {
     }
     
     public String toString() {
-        return ref.toString();
+        return "call to: "+ref.toString();
     }
 }

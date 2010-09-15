@@ -33,6 +33,7 @@ public class FunctionFinder {
 	//private
 	File pwd;
 	BuiltinQuery builtin;
+	Options options;
 	final FilenameFilter MATLAB_FILE_FILTER = new MatlabFileFilter();
 	
 	//methods
@@ -43,6 +44,7 @@ public class FunctionFinder {
 	 * 
 	 */
 	public FunctionFinder(Options options,BuiltinQuery builtin){
+		this.options = options;
 		File file = new File((String)options.getFiles().getFirst()).getAbsoluteFile();
 		if (!file.isDirectory()){
             file = file.getParentFile();			
@@ -59,6 +61,15 @@ public class FunctionFinder {
 	public boolean isMatch(String name,File file){
 		String filename = file.getName(); //TODO there should be a cleaner way to do this
 		return (filename.substring(0, filename.length()-2).equalsIgnoreCase(name));
+	}
+	
+	/**
+	 * returns the main matlab file, i.e. the entry point.
+	 * @return the main matlab file as an absolute File.
+	 */
+	public File getMain(){
+		//TODO - so far only returns first
+		return (new File((String)options.getFiles().getFirst())).getAbsoluteFile();
 	}
 
 	/**

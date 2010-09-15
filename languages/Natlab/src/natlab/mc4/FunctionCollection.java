@@ -16,13 +16,14 @@ import natlab.toolkits.filehandling.FunctionFinder;
  * Parsing is done by this object
  * -> we refer to parsing as 'collecting', since we need to parse, build a basic symbol table
  *    and explore the path to find functions in one pass.
- *    At the end all Matlab functions should be in this collection.
+ *    At the end all used Matlab functions should be in this collection.
  */
 
 
 public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
-    HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
-    FunctionFinder functionFinder;
+    private HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
+    private FunctionFinder functionFinder;
+    private FunctionReference main = null; //denotes which function is the entry point
     
     /**
      * The function collection gets created via an options object
@@ -35,21 +36,25 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         //object that resolves function names to path        
         functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
         
-        //main file
-        File main = new File((String)(options.getFiles().getFirst())).getAbsoluteFile();
+        //get main file (entrypoint)
+        File main = functionFinder.getMain();
 
         //collect
         ArrayList<CompilationProblem> errors = new ArrayList<CompilationProblem>();
-        collect(main,errors);
+        collect(main,true,errors);
+
     }
     
+    /*** public stuff ***********************************************************************/
+    public FunctionReference getMain(){ return main; }
     
+    
+    /*** Collecting files *******************************************************************/
     /**
      * adds the matlab functions from the given filename to the collection
-     * @param filename
      * @return returns true on success
      */
-    public boolean collect(File file,ArrayList<CompilationProblem> errList){
+    public boolean collect(File file,boolean isMain,ArrayList<CompilationProblem> errList){
         //was the filename already loaded?
         if (loadedFiles.contains(file)) return true;
         
@@ -75,7 +80,11 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         
         
         loadedFiles.add(file);
-        boolean success = true;        
+        boolean success = true;
+        if (isMain){ //put main
+        	this.main = new FunctionReference(
+        			((FunctionList)program).getFunction(0).getName(),file);
+        }
         
         //turn functions into mc4 functions, and go through their function references recursively
         FunctionList functionList = (FunctionList)program;
@@ -100,8 +109,8 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         
         //collect references to other functions - update symbol table, recursively collect
         for (String otherName : function.getSymbolTable().getSymbols(
-                new SymbolTypeFilter() {
-                    public boolean accept(SymbolType symbolType) {
+                new SymbolFilter() {
+                    public boolean accept(Symbol symbolType) {
                         return symbolType instanceof FunctionType;
                     }
                 })){
@@ -121,7 +130,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
                 System.err.println("function "+otherName+" referring to nested function unsupported");
             
             //3 functionName could be a sibling function - which should already be loaded
-            } else if (function.getAst().getSiblings().containsKey(otherName)){             
+            } else if (function.getSiblings().contains(otherName)){             
                 function.getSymbolTable().put(otherName, 
                         new FunctionReferenceType(new FunctionReference(otherName,function.getFile())));
 
@@ -130,14 +139,14 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
                 //try to find it
                 File otherFunction = functionFinder.findName(otherName);
                 if (otherFunction != null){ // file found
-                    success = success && collect(otherFunction,errList); //recursively collect other function
+                    success = success && collect(otherFunction,false,errList); //recursively collect other function
                     function.getSymbolTable().put(otherName,  //update symbol table entry
                             new FunctionReferenceType(new FunctionReference(otherName,otherFunction)));
                     
                 } else { // file is builtin, or cannot be found
                     if (functionFinder.isBuiltin(otherName)){ //builtin
                         function.getSymbolTable().put(otherName, 
-                                new BuiltinReferenceType(otherName));
+                                new FunctionReferenceType(new FunctionReference(otherName)));
                     } else { //not found
                         Mc4.error("reference to "+otherName+" in "+function.getName()+" not found");
                         success = false;
@@ -147,7 +156,6 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         }        
         return success;
     }
-    
 }
 
 

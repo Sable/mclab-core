@@ -5,6 +5,6 @@ package natlab.mc4.symbolTable;
  * @author ant6n
  */
 
-public interface SymbolType {
+public interface Symbol {
 
 }

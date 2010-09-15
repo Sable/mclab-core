@@ -63,7 +63,8 @@ public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
                 else{
                     String msg = "Generic transformation case received non single nodes from " +
                         "transforming a child node. This should only happen when the current " +
-                        "case is for a list or otherwise expects this behavior.";
+                        "case is for a list or otherwise expects this behavior.\n"
+                        +node.getPrettyPrinted();
                     throw new UnsupportedOperationException(msg);
                 }
         }
