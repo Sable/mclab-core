@@ -68,6 +68,10 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
         }
     }
 
+    public void caseForStmt( ForStmt node )
+    {
+        rewrite( node.getStmts() );
+    }
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
                                                    VFFlowset<String,VFDatum> resolvedNames )
     {
