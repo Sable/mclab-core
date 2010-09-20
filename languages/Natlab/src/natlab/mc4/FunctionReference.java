@@ -9,6 +9,7 @@ import java.io.File;
  * This may refer to a funciton inside a matlab file on the path,
  * or a builtin
  *
+ * This is immutable
  */
 
 
@@ -38,6 +39,11 @@ public class FunctionReference {
     	this.isBuiltin = true;
     }
     
+    /**
+     * returns whether this function refers to a builtin
+     */
+    public boolean isBuiltin(){ return isBuiltin; }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof FunctionReference){
@@ -54,6 +60,11 @@ public class FunctionReference {
     public String toString() {
     	if (isBuiltin) return "builtin "+name;
     	else return "function "+name+"@"+path.getAbsolutePath();
+    }
+    
+    @Override
+    public int hashCode() {
+    	return name.hashCode()+path.hashCode()+(isBuiltin?1:0);
     }
 }
 

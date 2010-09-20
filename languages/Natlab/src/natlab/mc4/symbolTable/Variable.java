@@ -14,5 +14,10 @@ public class Variable implements Symbol {
 	public String toString(){
 		return "variable of type "+"unknown type"; //TODO
 	}
+
+	@Override
+	public Symbol copy() {
+		return new Variable();
+	}
 	
 }

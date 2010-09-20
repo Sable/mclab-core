@@ -14,7 +14,15 @@ public class FunctionReferenceType extends FunctionType {
         this.ref = ref;
     }
     
+    public FunctionReference getFunctionReference(){
+    	return ref;
+    }
+    
     public String toString() {
         return "call to: "+ref.toString();
     }
+
+	public FunctionReferenceType copy() {
+		return new FunctionReferenceType(ref);
+	}
 }

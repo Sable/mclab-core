@@ -156,6 +156,47 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         }        
         return success;
     }
+    
+    /**
+     * inlines all functions into the main function
+     */
+    public void inlineAll(){
+    	inlineAll(new HashSet<FunctionReference>(),getMain());
+    }
+    //inlines all calls inside the given function
+    //throws a unspported operation if there is an attempt to inline a function
+    //that is alraedy in the context -- cannot inline recursive functions
+    private void inlineAll(Set<FunctionReference> context,FunctionReference function){
+    	//error check
+    	if (context.contains(function)){
+    		throw new UnsupportedOperationException("trying to inline recursive function "+function);
+    	}
+    	if (!containsKey(function)){
+    		throw new UnsupportedOperationException("trying to inline function "+function+", which is not loaded");
+    	}
+    	if (function.isBuiltin) return;
+    	
+    	//add this call to the context
+    	context.add(function);
+    	
+    	//inline all called functions recursively
+    	SymbolTable table = get(function).getSymbolTable();    	
+    	for (String s : table.keySet()){
+    		if (table.get(s) instanceof FunctionReferenceType) {
+				FunctionReference ref = ((FunctionReferenceType)table.get(s)).getFunctionReference();
+				if (!ref.isBuiltin){
+					//inline recursively
+					inlineAll(context,ref);
+				}
+			}
+    	}
+    	
+    	//inline the calls to the given function
+    	get(function).inline(this);
+    	
+    	//remove this context
+    	context.remove(function);
+    }
 }
 
 

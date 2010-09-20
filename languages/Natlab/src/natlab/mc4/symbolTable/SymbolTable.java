@@ -16,8 +16,15 @@ import java.util.*;
  */
 
 public class SymbolTable extends HashMap<String,Symbol>{
-
-    
+	/**
+	 * a SymbolFilfer that filters all references to other functions
+	 */
+	public static final SymbolFilter NON_BUILTIN_FUNCTIONS = new SymbolFilter() {
+		public boolean accept(Symbol symbolType) {
+			if (!(symbolType instanceof FunctionReferenceType)) return false;
+			return !((FunctionReferenceType)symbolType).getFunctionReference().isBuiltin();
+		}
+	};
     
     /**
      * returns the symbols whose entries pass the filter
@@ -34,21 +41,32 @@ public class SymbolTable extends HashMap<String,Symbol>{
     /**
      * merges this symbol table with the given other symbol table
      * This will rename all symbols of the other symbol table that are
-     * already present in this symbol table. They get renamed with
-     * <prefix><original name><postfix>
+     * already present in this symbol table - unless they refer to the same function.
+     * They get renamed to <prefix><original name><postfix>,
      * where the prefix is a given argument, and the postfix are
      * some set of characters that ensure uniqueness.
+     * 
+     * The other symbol table does not get altered
      */
     public Map<String,String> merge(SymbolTable otherTable,String prefix){
-    	for (String oldName : otherTable.keySet()){
-    		String newName = oldName;
-    		if (this.containsKey(oldName)){
-    			//rename symbol
-    			newName = getNewName(prefix + oldName);
+    	HashMap<String,String> renameMap = new HashMap<String,String>();
+    	for (String name : otherTable.keySet()){
+    		if (this.containsKey(name)){ //name conflict
+    			if ((get(name) instanceof FunctionReferenceType)
+    				&& (otherTable.get(name) instanceof FunctionReferenceType)
+    				&& ((FunctionReferenceType)get(name)).equals(otherTable.get(name))){
+    				//both names refer to the same function - no need to put it there
+    			} else {    			
+    				//rename symbol and put
+    				String newName = getNewName(prefix + name);
+    				renameMap.put(name, newName);
+    				put(newName,otherTable.get(name).copy());
+    			}
+    		} else { //no name conflict
+    			put(name,otherTable.get(name).copy());
     		}
-    		put(newName,otherTable.get(oldName));
     	}
-    	return null;
+    	return renameMap;
     }
     
     /**

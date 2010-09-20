@@ -6,6 +6,7 @@ import java.util.*;
 import natlab.mc4.symbolTable.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
+import natlab.toolkits.rewrite.Inliner.InlineInfo;
 import natlab.toolkits.rewrite.threeaddress.*;
 
 import ast.*;
@@ -108,38 +109,44 @@ public class Mc4Function {
     
     
     /**
-     * Inlines a copy of the given function at the given node.
-     * That is, replaces the given Assignment Statement with a copy of the AST of
-     * the other node.
-     * 
-     * The Symbol table gets updated as well.
-     * This will add a couple of temporaries.
-     * The name expression has to have an assignment statement as a parent.
-     * 
-     * 
-     * nargin, .. etc. replacer
-     * need - ast inliner
-     * need symbol table magic
-     * need something that sets
-     * 
-     * @param otherFunction the function to be inlined
-     * @param node the node which is the call to be replaced
-     * 
+     * inlines a copy of all functions that are in the given map,
+     * and which are called from this function
      */
-    public void inline(Mc4Function otherFunction,AssignStmt node){
+    public void inline(Map<FunctionReference, Mc4Function> map){
+    	HashMap<String, Function> inlinerMap = new HashMap<String,Function>();
     	
+    	//get all function references in this' symbol table
+    	for (String name : symbolTable.getSymbols(SymbolTable.NON_BUILTIN_FUNCTIONS)){
+    		FunctionReference ref = ((FunctionReferenceType)symbolTable.get(name)).getFunctionReference();
+    		if (map.containsKey(ref)){
+    			//ref is in the map and is called from this - we need to inline it
+    			Mc4Function otherFunction = map.get(ref);
+    			
+    			//merge symbol tables
+    			Map<String, String> renameMap = symbolTable.merge(
+    					otherFunction.getSymbolTable(), otherFunction.name.substring(0,4)+"_");
+    	    	
+    			Mc4.debug("rename map to inline "+ref+" in "+this.name+"\n"+renameMap);
+    			
+    			//rename symbols in other function
+    	    	RenameSymbols rename = new RenameSymbols(otherFunction.getAst().copy(), renameMap);
+    	    	Function otherAst = (Function)rename.transform();
+    			    			
+    			//put it in the inline list
+    	    	inlinerMap.put(name, otherAst);
+    		}
+    	}
     	
-    	//merge symbol table
-    	Map renameMap = symbolTable.merge(
-    			otherFunction.getSymbolTable(), otherFunction.name.substring(0,4)+"_");
-    	
-    	//rename
-    	RenameSymbols rename = new RenameSymbols(otherFunction.getAst().copy(), renameMap);
-    	
-    	//acutally inline
+    	//actually inline
+    	Inliner inliner = new Inliner(this.function, inlinerMap, new Inliner.Query() {
+			public boolean doInline(InlineInfo inlineInfo) {
+				return true;
+			}
+		});
+    	this.function = (Function)inliner.transform();
     }
     
-    
+        
     @Override
     public String toString() {
         return 

@@ -6,4 +6,9 @@ public class UnknownFunction extends FunctionType {
     public String toString() {
         return "unknown function";
     }
+
+	@Override
+	public UnknownFunction copy() {
+		return new UnknownFunction();
+	}
 }

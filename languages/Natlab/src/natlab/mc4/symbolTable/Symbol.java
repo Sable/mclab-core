@@ -6,5 +6,5 @@ package natlab.mc4.symbolTable;
  */
 
 public interface Symbol {
-
+	public Symbol copy();
 }

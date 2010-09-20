@@ -64,8 +64,11 @@ public class Mc4 {
 	public static void main(Options options){	    
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(options);
+	    	    
+	    //inline all
+	    functions.inlineAll();
 	    
 	    //print result for now
-	    System.out.println(functions);
+	    System.out.println(functions.get(functions.getMain()));
 	}
 }
