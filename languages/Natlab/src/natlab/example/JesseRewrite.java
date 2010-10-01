@@ -92,8 +92,7 @@ public class JesseRewrite
                     node.insertChild( newChild.getChild( j ), i );
                     i++;
                 }
-                if( newChild.getNumChild() > 0 )
-                  i--;
+                i--;
             }
             else
                 node.setChild( newChild, i );

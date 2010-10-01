@@ -12,6 +12,16 @@ import natlab.toolkits.analysis.ForVisitor;
 
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.analysis.example.*;
+import natlab.toolkits.analysis.test.*;
+import natlab.toolkits.analysis.handlepropagation.*;
+import natlab.toolkits.analysis.callgraph.*;
+import natlab.example.*;
+import natlab.toolkits.rewrite.multireturn.*;
+import natlab.toolkits.rewrite.threeaddress.*;
+import natlab.toolkits.analysis.isscalar.*;
+
+
+import natlab.toolkits.filehandling.*;
 
 /*import matlab.MatlabParser;
 import matlab.TranslationProblem;
@@ -318,6 +328,10 @@ public class Main
                     if(!quiet)
                         System.err.println( "server shutdown" );
                 }
+                // FOR JESSE PLAY
+                //else if( options.play() ){
+                    //Play.run();
+                //}
                 else if( options.getFiles().size() == 0 ){
                     System.err.println("No files provided, must have at least one file.");
                 }
@@ -483,8 +497,91 @@ public class Main
                     }
                     else if( options.run() ){
                         //This is for 621 example
-                        FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, DefiniteAssignment.class );
-                        System.out.println( testTool.run());
+                        /*FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, DefiniteAssignment.class );
+                        //System.out.println( testTool.run());
+
+                        System.out.println("********************");
+
+                        testTool = new FlowAnalysisTestTool( cu, LiveVar.class );
+                        //System.out.println( testTool.run());
+                        System.out.println("********************");
+
+
+                        System.out.println( JesseRewrite.addInstruments( cu ).getPrettyPrinted() );*/
+                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, IsScalarSimpleAnalysis.class );
+                        //System.out.println( testTool.run() );
+                        
+                        /*MultiReturnRewrite rr = new MultiReturnRewrite( cu );
+                        ASTNode rrDone = rr.transform();
+                        System.out.println( rrDone.getPrettyPrinted() );*/
+                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, VFStructuralForwardAnalysis.class );
+                        //System.out.println( testTool.run() );
+
+                        //RightThreeAddressRewrite rtar = new RightThreeAddressRewrite( cu );
+                        //ASTNode rtarDone = rtar.transform();
+                        //System.out.println( rtarDone.getPrettyPrinted() );
+                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, HandlePropagationAnalysis.class );
+                        //System.out.println( "running");
+                        //System.out.println( testTool.run() );
+                        //System.out.println("\n\n********\n");
+                        HashMap<String,ASTNode> programNameMap = new HashMap();
+                        String fname;
+                        for( int i = 0; i<fileNames.size(); i++ ){
+                            String pname;
+                            fname = fileNames.get(i);
+                            ASTNode prog = cu.getProgram(i);
+                            if( prog instanceof Script ){
+                                pname = new File(fname).getName();
+                                pname = pname.substring(0,pname.length()-2);
+                                programNameMap.put(pname, prog);
+                            }
+                            else{
+                                FunctionList funclist = (FunctionList)prog;
+                                for( Function func : funclist.getFunctions() )
+                                    programNameMap.put(func.getName(),func);
+                            }
+                        }
+                        CallGraphBuilder graph = new CallGraphBuilder( cu, programNameMap );
+                        graph.run();
+                        System.out.println(graph);
+                        FileWriter dotfile;
+                        try{
+                            dotfile = new FileWriter( new File( "graph1.dot" ) );
+                            dotfile.write( graph.toDot(true));
+                            dotfile.close();
+                            dotfile = new FileWriter( new File( "graph2.dot" ) );
+                            dotfile.write( graph.toDot(false));
+                            dotfile.close();
+                        }catch( IOException e){
+                            System.err.println("no dot output produced for call graph");
+                        }
+                    }
+                    else if( options.df() ){
+                        String mainFileName = "";
+                        if( options.main().length()>0 ){
+                            mainFileName = options.main();
+                        }
+                        else if( options.in().size()>0 ){
+                            mainFileName = (String)options.in().get(0);
+                        }
+                        else{
+                            System.err.println("no main file given, aborting!");
+                            System.exit(1);
+                        }
+
+                        List<String> inFileNames = options.in();
+                        List<String> pathEntries = options.lp();
+
+                        File f1 = new File("foo/../bar/");
+                        File f2 = new File("bar/");
+                        File f3 = new File("bar");
+
+                        System.out.println( f1.compareTo(f2) );
+                        System.out.println( f2.compareTo(f3) );
+                        System.out.println( (new DirectoryFileFilter()).accept(f2) );
+                        System.out.println( (new DirectoryFileFilter()).accept(f3) );
+                            
+                            
                     }
                 }
             }
@@ -683,7 +780,7 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
 		//System.out.println(program.dumpTreeAll());
 		//dDriver.traverseFile(program);	
         
-        //pDriver.traverseProgram(fileName);
+        //pDriver.traverseProgram(fileName); 
         //System.out.println(prog.getPrettyPrinted());
     	
     	

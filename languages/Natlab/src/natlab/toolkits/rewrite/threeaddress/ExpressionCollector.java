@@ -8,11 +8,10 @@ import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 
 /**
- * Used to collect sub expressions from a left hand side
- * expression. For each appropriate sub expression it builds a new
- * assignment statement to a temporary and puts it in a list. It
- * then replaces the expression with the temporary that was
- * created for the assignment statement.
+ * Used to collect sub expressions from an expression. For each
+ * appropriate sub expression it builds a new assignment statement to
+ * a temporary and puts it in a list. It then replaces the expression
+ * with the temporary that was created for the assignment statement.
  */
 public class ExpressionCollector extends AbstractLocalRewrite
 {

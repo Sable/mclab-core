@@ -1,5 +1,5 @@
 
-<?xml-stylesheet type="text/xsl" href="soot_options.xsl"  ?>
+<?xml-sheet type="text/xsl" href="soot_options.xsl"  ?>
 <options>
   <intro>
     <p>Natlab</p>
@@ -215,5 +215,43 @@ No static linking is done.
       <name>run analysis</name>
       <alias>run</alias>
     </boolopt>
+  </section>
+  <section>
+    <name>play</name>
+    <boolopt>
+      <name>play</name>
+      <alias>play</alias>
+    </boolopt>
+    <boolopt>
+      <name>Discover Files</name>
+      <alias>df</alias>
+    </boolopt>
+  </section>
+  <section>
+    <name>path and file options</name>
+    <listopt>
+      <name>Lookup path</name>
+      <alias>lpath</alias>
+      <alias>lp</alias>
+      <set_arg_label>path</set_arg_label>
+      <short_desc>Path of locations to find matlab files</short_desc>
+    </listopt>
+    <listopt>
+      <name>Input files</name>
+      <alias>in</alias>
+      <set_arg_label>file(s)</set_arg_label>
+      <short_desc>Files to be used as input</short_desc>
+      <long_desc>Files to be used as input. If no main file is specified then the first 
+        file is taken to be the main.</long_desc>
+    </listopt>
+    <stropt>
+      <name>main file</name>
+      <alias>main</alias>
+      <short_desc>file taken to be the main file and entry point of the program</short_desc>
+      <long_desc>
+        File taken to be the main file and entry point of the program. 
+        Note: this can also be specified by a single file as argument to the compiler.
+      </long_desc>
+    </stropt>
   </section>
 </options>
