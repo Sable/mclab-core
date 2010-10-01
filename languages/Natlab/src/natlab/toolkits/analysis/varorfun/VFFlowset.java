@@ -113,8 +113,10 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     {
         if( dest == this && dest == other )
             return;
-        if( this == other )
+        if( this == other ){
             copy(dest);
+            return;
+        }
 
         VFFlowset<V,D> tmpDest = new VFFlowset();
 

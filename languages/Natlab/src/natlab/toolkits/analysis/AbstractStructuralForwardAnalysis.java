@@ -134,6 +134,12 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             currentOutSet = newOut;
 
             //loop until there is no change
+            if(DEBUG){
+                System.out.println("*****\ndone iteration");
+                System.out.println("prev: "+previousOut);
+                System.out.println("new: "+newOut);
+                System.out.println("*****");
+            }
         }while( !previousOut.equals( newOut ) );
 
         if(DEBUG)

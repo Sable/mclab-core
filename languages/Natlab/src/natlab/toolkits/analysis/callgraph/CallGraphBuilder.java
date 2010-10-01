@@ -1,0 +1,372 @@
+package natlab.toolkits.analysis.callgraph;
+
+import java.util.*;
+import natlab.*;
+import natlab.toolkits.analysis.*;
+import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.handlepropagation.*;
+import ast.*;
+
+/**
+ *
+ */
+public class CallGraphBuilder
+{
+
+    protected ASTNode tree;
+
+    protected CompilationProblem error = null;
+
+    protected HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap = new HashMap();
+    protected HashMap<ASTNode, CallSiteLabel> labelMap = new HashMap();
+    protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap = new HashMap();
+    protected HashMap<String, ASTNode> programNameMap;
+    protected HashMap<ASTNode, String> nameOfProgMap = new HashMap();
+
+    protected LinkedList<ASTNode> workList = new LinkedList();
+
+    protected VFStructuralForwardAnalysis nameResolver;
+    protected HandlePropagationAnalysis handleResolver;
+
+    public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap )
+    {
+        this.tree = tree;
+        this.programNameMap = programNameMap;
+
+        for( Map.Entry<String,ASTNode> e : programNameMap.entrySet() )
+            nameOfProgMap.put( e.getValue(), e.getKey());
+
+        nameResolver = new VFStructuralForwardAnalysis(tree);
+        nameResolver.analyze();
+        handleResolver = new HandlePropagationAnalysis(tree);
+        handleResolver.analyze();
+    }
+    public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap, 
+                             VFStructuralForwardAnalysis nameResolver )
+    {
+        this.tree = tree;
+        this.programNameMap = programNameMap;
+        this.nameResolver = nameResolver;
+        if( !tree.equals(nameResolver.getTree()) )
+            error = new CompilationProblem("Given tree inconsistent with given VFStructuralForwardAnalysis's tree");
+        if( !nameResolver.isAnalyzed() )
+            nameResolver.analyze();
+        handleResolver = new HandlePropagationAnalysis(tree);
+        handleResolver.analyze();
+    }
+    public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap, 
+                             HandlePropagationAnalysis handleResolver)
+    {
+        this.tree = tree;
+        this.programNameMap = programNameMap;
+        nameResolver = new VFStructuralForwardAnalysis(tree);
+        nameResolver.analyze();
+        this.handleResolver = handleResolver;
+        if( !tree.equals( handleResolver.getTree() ) )
+            error = new CompilationProblem("Given tree inconsistent with given HandlePropagationAnalysis's tree");
+        if( !handleResolver.isAnalyzed() )
+            handleResolver.analyze();
+    }
+    public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap,
+                             VFStructuralForwardAnalysis nameResolver, 
+                             HandlePropagationAnalysis handleResolver)
+    {
+        this.tree = tree;
+        this.programNameMap = programNameMap;
+        this.nameResolver = nameResolver;
+        if( !tree.equals(nameResolver.getTree()) )
+            error = new CompilationProblem("Given tree inconsistent with given VFStructuralForwardAnalysis's tree");
+        if( !nameResolver.isAnalyzed() )
+            nameResolver.analyze();
+        this.handleResolver = handleResolver;
+        if( !tree.equals( handleResolver.getTree() ) )
+            error = new CompilationProblem("Given tree inconsistent with given HandlePropagationAnalysis's tree");
+        if( !handleResolver.isAnalyzed() )
+            handleResolver.analyze();
+    }
+    public void run()
+    {
+        System.out.println("running");
+        workList.clear();
+        workList.addAll( programNameMap.values() );
+        GraphNodeBuilder nodeBuilder;
+        while( !workList.isEmpty() ){
+            nodeBuilder = new GraphNodeBuilder( workList.remove(0) );
+            nodeBuilder.analyze();
+        }
+    }
+    
+    public String toString()
+    {
+        StringBuffer s = new StringBuffer();
+        boolean first = true;
+        s.append("{");
+        for( Map.Entry<ASTNode,TreeSet<CallSiteLabel>> e : programLabelMap.entrySet() ){
+            if( first )
+                first = false;
+            else
+                s.append(", ");
+            s.append( nameOfProgMap.get( e.getKey() ) );
+            s.append("=");
+            s.append( e.getValue() );
+        }
+        s.append("}");
+
+        s.append("\n{");
+        first = true;
+        for( Map.Entry<CallSiteLabel,MayMustTreeSet<ASTNode>> e : targetMap.entrySet() ){
+            if( first )
+                first=false;
+            else
+                s.append(", ");
+            s.append( e.getKey() );
+            s.append("=");
+            s.append( e.getValue().isMust()?"Must:":"May:");
+            s.append("[");
+            first = true;
+            for( ASTNode n : e.getValue() ){
+                if(first)
+                    first=false;
+                else
+                    s.append(", ");
+                s.append( nameOfProgMap.get( n ) );
+            }
+            first = false;
+            s.append("]");
+        }
+        s.append("}");
+        return s.toString();
+
+    }
+    /**
+     * Generates a graph diagram specification for graphviz dot.
+     */
+    public String toDot( boolean deadEnds)
+    {
+        StringBuffer s = new StringBuffer();
+        StringBuffer nodeDefs = new StringBuffer();
+        StringBuffer edgeDefs = new StringBuffer();
+
+        int deadentcounter = 0;
+        s.append("digraph G{\n");
+        s.append("  node [shape=record];\n");
+        s.append("  rankdir=LR;\n");
+        for( Map.Entry<ASTNode,TreeSet<CallSiteLabel>> e : programLabelMap.entrySet() ){
+            String nname = nameOfProgMap.get( e.getKey() );
+            nodeDefs.append("  "+nname + " [label=\"" + nname + " | { | {");
+            boolean first = true;
+            for( CallSiteLabel label : e.getValue() ){
+                MayMustTreeSet<ASTNode> targetSet = targetMap.get( label );
+                if( deadEnds || !targetSet.isEmpty() ){
+                    if( first )
+                        first = false;
+                    else
+                        nodeDefs.append(" | ");
+                    nodeDefs.append("<"+label+"> "+label);
+                }
+
+                if(deadEnds && targetSet.isEmpty()){
+                    edgeDefs.append("  "+nname + ":"+label+" -> x"+deadentcounter +" [arrowhead=obox];\n");
+                    edgeDefs.append("  x"+deadentcounter+" [style=invis, constraint=false];\n");
+                    deadentcounter++;
+                }
+                for( ASTNode target : targetSet ){
+                    edgeDefs.append("  "+nname+":"+label+" -> "+nameOfProgMap.get(target));
+                    if( targetSet.isMay() )
+                        edgeDefs.append("[color=red];\n");
+                    else
+                        edgeDefs.append(";\n");
+                }
+            }
+            nodeDefs.append("}}\"];\n");
+        }
+        s.append(nodeDefs);
+        s.append(edgeDefs);
+        s.append("}\n");
+        return s.toString();
+    }
+    /**
+     * Builds the graph for a given script or function. It will
+     * populate the maps and build up the worklist.
+     */
+    private class GraphNodeBuilder extends AbstractPreorderAnalysis<HashSetFlowSet<String>>
+    {
+        GraphNodeBuilder( ASTNode tree )
+        {
+            super(tree);
+        }
+
+        private Stmt currentStmt = null;
+        private Function currentFunction = null;
+        private ASTNode currentCallable = null;
+        private boolean inFunction = false;
+        
+        public HashSetFlowSet<String> newInitialFlow()
+        {
+            return new HashSetFlowSet();
+        }
+
+        public void caseFunction( Function node )
+        {
+            inFunction = true;
+            for( Function f : node.getNestedFunctions() ){
+                workList.add(f);
+                nameOfProgMap.put( f, f.getName() );
+            }
+            Function previousFunction = currentFunction;
+            ASTNode previousCallable = currentCallable;
+            currentFunction = node;
+            currentCallable = node;
+            node.getStmts().analyze(this);
+            currentFunction = previousFunction;
+            currentCallable = previousCallable;
+        }
+        public void caseScript( Script node )
+        {
+            inFunction = false;
+            currentCallable = node;
+            caseASTNode( node );
+        }
+        public void caseStmt( Stmt node )
+        {
+            Stmt previousStmt = currentStmt;
+            currentStmt = node;
+            caseASTNode( node );
+            currentStmt = previousStmt;
+        }
+        public void caseNameExpr( NameExpr node )
+        {
+            String id = node.getName().getID();
+            VFDatum datum =  nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+            if( datum == null ){
+                CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
+                addToLabelMaps( label, node );
+                addTargetsToMaps( label, id, false );
+                //if( inFunction )
+                System.out.println("I found a possible function call to " + id + " maybe!" );
+            }
+            else if( datum.isFunction() ){
+                CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
+                addToLabelMaps( label, node );
+                addTargetsToMaps( label, id, true );
+                System.out.println("I found a possible function call to " +id );
+            }
+        }
+
+
+        public void caseParameterizedExpr( ParameterizedExpr node )
+        {
+            if( node.getTarget() instanceof NameExpr ){
+                //This is the only case currently dealt with
+                String id = ((NameExpr)node.getTarget()).getName().getID();
+                VFDatum datum = nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+                if( datum == null ){
+                    CallSiteLabel label = CallSiteLabel.makeUnknownLabel();
+                    addToLabelMaps( label, node );
+                    addTargetsToMaps( label, id, false );
+                    System.out.println("I found a possible function call to " + id + " maybe!" );
+                }
+                else if( datum.isFunction() ){
+                    CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
+                    addToLabelMaps( label, node );
+                    addTargetsToMaps( label, id, true );
+                    System.out.println("I found a possible function call to " +id );
+                }
+                else if( datum.isVariable() && 
+                         handleResolver.getInFlowSets().get( currentStmt ).containsKey( id ) ){
+
+                    CallSiteLabel label = CallSiteLabel.makeHandleLabel();
+                    addToLabelMaps( label, node );
+
+                    MayMustTreeSet<HandleTarget> handleTargets;
+                    handleTargets = handleResolver.getInFlowSets().get( currentStmt ).get( id );
+                    addTargetsToMaps( label, handleTargets );
+                    
+                    System.out.println("I found a possible fn handle call from " + id );
+                }
+                        
+            }
+        }
+        /**
+         * Adds target for a given set of handle targets to the
+         * targetMap using a given label as the key.
+        */ 
+        private void addTargetsToMaps( CallSiteLabel label, MayMustTreeSet<HandleTarget> handleTargets )
+        {
+            ASTNode target = null;
+            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet();
+            System.out.println(handleTargets);
+            for( HandleTarget ht : handleTargets ){
+                if( ht instanceof NamedHandleTarget ){
+                    target = programNameMap.get( ((NamedHandleTarget)ht).getName() );
+                }
+                else if( ht instanceof AnonymousHandleTarget ){
+                    target = ((AnonymousHandleTarget)ht).getLambdaExpr();
+                    nameOfProgMap.put( target, ((AnonymousHandleTarget)ht).getNodeString() );
+                }
+                if( target==null )
+                    targetSet.makeMay();
+                targetSet.add( target );
+            }
+            if( handleTargets.isMay())
+                targetSet.makeMay();
+            targetMap.put( label, targetSet );
+        }
+        /**
+         * Adds the target for a given callable name to the targetMap
+         * using a given label as the key.
+         */
+        private void addTargetsToMaps( CallSiteLabel label, String targetName, boolean mustBeCall )
+        {
+            ASTNode target;
+            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet();
+            if( inFunction ){
+                target = currentFunction.lookupFunction( targetName );
+                if( target == null )
+                    target = programNameMap.get( targetName );
+                if( target == null ){
+                    target = new Name(targetName);
+                    targetSet.add(target);
+                    nameOfProgMap.put(target, targetName);
+
+                    targetSet.makeMay();
+                }
+                else
+                    targetSet.add( target );
+            }
+            else{
+                target = programNameMap.get( targetName );
+                if( target == null ){
+                    target = new Name(targetName);
+                    targetSet.add(target);
+                    nameOfProgMap.put(target, targetName);
+                    targetSet.makeMay();
+                }
+                else{
+                    targetSet.add( target );
+                    if( !mustBeCall )
+                        targetSet.makeMay();
+                }
+            }
+            targetMap.put(label, targetSet);
+        }
+        /**
+         * Adds a given label for a given node to the appropriate
+         * maps. This includes the labelMap and programLabelMap.
+         */
+        private void addToLabelMaps( CallSiteLabel label, ASTNode node ){
+            labelMap.put(node, label);
+            TreeSet<CallSiteLabel> labelSet;
+            labelSet = programLabelMap.get(currentCallable);
+                if(labelSet==null)
+                    labelSet = new TreeSet();
+            labelSet.add(label);
+            programLabelMap.put(currentCallable,labelSet);
+        }
+        public void caseCondition( Expr condExpr )
+        {
+            caseASTNode( condExpr );
+        }
+    }
+                    
+}

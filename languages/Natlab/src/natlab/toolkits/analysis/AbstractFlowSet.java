@@ -156,17 +156,19 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         FlowSet other = (FlowSet) o;
         if (size() != other.size())
             return false;
-        for( D i : toList() )
+        for( D i : toList() ){
             if( ! other.contains( i ) )
                 return false;
+        }
         return true;
     }
     
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        for( D i : toList() )
+        for( D i : toList() ){
             result = PRIME * result + i.hashCode();
+        }
         return result;
     }
     

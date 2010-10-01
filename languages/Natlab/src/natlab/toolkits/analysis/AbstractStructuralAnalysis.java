@@ -13,7 +13,7 @@ public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends Abst
     protected A currentInSet;
     protected Map<ASTNode,A> outFlowSets, inFlowSets;
     protected ASTNode tree;
-    private AnalysisHelper helper;
+    protected AnalysisHelper helper;
 
     protected boolean analyzed = false;
 
