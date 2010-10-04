@@ -2,6 +2,9 @@ package natlab.toolkits.analysis.callgraph;
 
 import java.util.*;
 import ast.*;
+import natlab.toolkits.analysis.*;
+import natlab.toolkits.analysis.callgraph.*;
+import natlab.toolkits.analysis.handlepropagation.*;
 
 public class CallGraph
 {
@@ -10,7 +13,7 @@ public class CallGraph
     protected HashMap<ASTNode, CallSiteLabel> labelMap;
     protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap;
 
-    public CallGgraph( HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap,
+    public CallGraph( HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap,
                        HashMap<ASTNode, CallSiteLabel> labelMap,
                        HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap )
     {
@@ -25,7 +28,7 @@ public class CallGraph
      */
     public TreeSet<CallSiteLabel> getCallSiteLabelsForCallables( ASTNode n )
     {
-        return programLabelMap.get(ASTNode n);
+        return programLabelMap.get(n);
     }
     /**
      * Gets call site label for a given call node, either a
@@ -39,7 +42,7 @@ public class CallGraph
     /**
      * Gets call targets by the call site label.
      */
-    public MayMustTreeSet<ASTNode> getTargets( CallSiteLabel )
+    public MayMustTreeSet<ASTNode> getTargets( CallSiteLabel label )
     {
         return targetMap.get( label );
     }
