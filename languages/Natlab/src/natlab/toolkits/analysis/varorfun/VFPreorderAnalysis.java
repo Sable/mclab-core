@@ -76,12 +76,8 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
 
     public void caseFunctionList( FunctionList node )
     {
-	LookupFile.clearFile();
-	if (node.getFunctions().getNumChild()>1) 
-	    System.out.println("Multiple functions!!"+node.getFunctions().getChild(0).getName());
-        for( Function f : node.getFunctions() ){
-	    LookupFile.addToFile(f.getName());
-	}
+	LookupFile.setCurrentProgram(node);
+
         for( Function f : node.getFunctions() ){
             currentSet = newInitialFlow();
             f.analyze(this);
