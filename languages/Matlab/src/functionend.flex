@@ -316,7 +316,7 @@ CloseBracketComment = %\}
 ShellCommand=[!].*
 
 StmtTerminator = [\r\n,;]
-Filler = [\t\f ] | {EscapedLineTerminator}
+Filler = [\t\f ] | {EscapedLineTerminator} 
 
 KeywordPrefix= {StmtTerminator} {Filler}*
 
@@ -454,7 +454,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
         saveStateAndTransition(INSIDE_CLASS);
     }
     
-    {KeywordPrefix} end  /{Filler} {
+    {KeywordPrefix} end /!({Digit}|{Letter}) {
         append();
         if(!blockStack.isEmpty()) {
             if(blockStack.peek() == BlockType.FUNCTION) {
@@ -468,7 +468,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
 <INSIDE_CLASS> {
     {KeywordPrefix} (classdef|aspect) /{Filler} { append(); blockStack.push(BlockType.OTHER); } //don't push CLASS or we won't know when to leave this state
     
-    {KeywordPrefix} end /{Filler} {
+    {KeywordPrefix} end /!({Digit}|{Letter}) {
         append();
         if(!blockStack.isEmpty()) {
             if(blockStack.peek() == BlockType.FUNCTION) {
