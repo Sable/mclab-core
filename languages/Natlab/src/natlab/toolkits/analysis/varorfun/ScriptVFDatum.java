@@ -66,6 +66,16 @@ public class ScriptVFDatum extends AbstractVFDatum
     }
 
     /**
+     * Make value a load variable. If value is BOT, assign LDVAR to value. 
+     * Otherwise do nothing.
+     */
+    public void makeLDVar()
+    {
+        if( Value.BOT.equals( value ))
+            value = Value.LDVAR;
+    }
+
+    /**
      * Check if datum is considered a variable. It will be considered
      * a variable if it is either a VAR or an AVAR.
      *
@@ -135,6 +145,10 @@ public class ScriptVFDatum extends AbstractVFDatum
         else if( Value.BOT.equals( ov ) )
             return new ScriptVFDatum( value );
         //not equal, neither are TOP or BOT
+	else if( Value.LDVAR.equals(value) && (Value.FUN.equals( ov )  || Value.VAR.equals( ov )  || Value.AVAR.equals( ov )))
+	    return new ScriptVFDatum(ov);
+	else if( Value.LDVAR.equals(ov) && (Value.FUN.equals( value )  || Value.VAR.equals( value )  || Value.AVAR.equals( value )))
+	    return new ScriptVFDatum(value);
         else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
             return new ScriptVFDatum( Value.TOP );
         //not equal and each is either AVAR or VAR, so one must be VAR

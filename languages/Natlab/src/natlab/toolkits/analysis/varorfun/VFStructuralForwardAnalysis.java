@@ -167,5 +167,7 @@ public class VFStructuralForwardAnalysis extends AbstractSimpleStructuralForward
         //copy( currentInSet, currentOutSet );
         return;
     }
+    
+
 }
         

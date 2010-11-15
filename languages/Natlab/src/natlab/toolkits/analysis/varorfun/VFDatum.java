@@ -7,7 +7,7 @@ package natlab.toolkits.analysis.varorfun;
 public interface VFDatum
 {
 
-    public enum Value {TOP, VAR, AVAR, FUN, BOT};
+    public enum Value {TOP, VAR, AVAR, FUN, LDVAR, BOT};
 
     /**
      * Make the value a variable

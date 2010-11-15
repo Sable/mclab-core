@@ -1,7 +1,7 @@
 package natlab.toolkits.analysis.varorfun;
 
 /**
- * Concrete implementation of VFDatum for Script semantics.
+ * Concrete implementation of VFDatum for Function semantics.
  * The lattice of values for the values are as follows.
  * BOT &lt AVAR &lt VAR &lt TOP
  * BOT &lt FUN &lt TOP
@@ -22,6 +22,7 @@ public class FunctionVFDatum extends AbstractVFDatum
     {
         return new FunctionVFDatum( value );
     }
+
     /**
      * Make value a variable. If value is BOT or AVAR then change to
      * VAR. If the value is FUN then change to TOP. Otherwise do
@@ -31,7 +32,8 @@ public class FunctionVFDatum extends AbstractVFDatum
     {
         if( Value.FUN.equals( value ) )
             value = Value.TOP;
-        else if( Value.BOT.equals( value ) || Value.AVAR.equals( value ))
+
+        else if( Value.BOT.equals( value ) || Value.AVAR.equals( value ) || Value.LDVAR.equals(value) )
             value = Value.VAR;
     }
 
@@ -42,11 +44,22 @@ public class FunctionVFDatum extends AbstractVFDatum
      */
     public void makeAssignedVariable()
     {
-        if( Value.BOT.equals( value ) || Value.VAR.equals( value ) )
+        if( Value.BOT.equals( value ) || Value.VAR.equals( value ) || Value.LDVAR.equals(value) )
             value = Value.AVAR;
         else if( Value.FUN.equals( value ) )
             value = Value.TOP;
     }
+
+    /**
+     * Make value an assigned variable. If value is TOP or AVAR, then
+     * do nothing. If value is FUN then make value TOP. Otherwise make
+     * value AVAR.
+     */
+    public void makeBottom()
+    {
+	value = Value.BOT;
+    }
+
 
     /**
      * Make value a function. If value is BOT, assign FUN to value. If
@@ -54,10 +67,20 @@ public class FunctionVFDatum extends AbstractVFDatum
      */
     public void makeFunction()
     {
-        if( Value.BOT.equals( value ) )
+        if( Value.BOT.equals( value ) || Value.LDVAR.equals( value) )
             value = Value.FUN;
         else if( Value.VAR.equals( value ) || Value.AVAR.equals( value ) )
             value = Value.TOP;
+    }
+   
+    /**
+     * Make value a load variable. If value is BOT, assign LDVAR to value. 
+     * Otherwise do nothing.
+     */
+    public void makeLDVar()
+    {
+        if( Value.BOT.equals( value ))
+            value = Value.LDVAR;
     }
 
     /**
@@ -118,6 +141,10 @@ public class FunctionVFDatum extends AbstractVFDatum
         else if( Value.BOT.equals( ov ) )
             return new FunctionVFDatum( value );
         //not equal, neither are TOP or BOT
+	else if( Value.LDVAR.equals(value) && (Value.FUN.equals( ov )  || Value.VAR.equals( ov )  || Value.AVAR.equals( ov )))
+	    return new FunctionVFDatum(ov);
+	else if( Value.LDVAR.equals(ov) && (Value.FUN.equals( value )  || Value.VAR.equals( value )  || Value.AVAR.equals( value )))
+	    return new FunctionVFDatum(value);
         else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
             return new FunctionVFDatum( Value.TOP );
         //not equal and each is either AVAR or VAR, so one must be VAR

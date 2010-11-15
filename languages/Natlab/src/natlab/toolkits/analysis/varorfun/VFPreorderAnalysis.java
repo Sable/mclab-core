@@ -2,7 +2,7 @@ package natlab.toolkits.analysis.varorfun;
 
 import ast.*;
 import natlab.toolkits.analysis.*;
-
+import natlab.*;
 /** 
  * An implementation of a preorder analysis for the var or fun
  * analysis. Note this implementation uses the FunctionVFDatum and not
@@ -23,18 +23,35 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
 
         currentSet = newInitialFlow();
     }
+    
     public FunctionVFDatum newVariableDatum()
     {
         FunctionVFDatum d = new FunctionVFDatum();
         d.makeVariable();
         return d;
     }
+
+    public FunctionVFDatum newBottomDatum()
+    {
+        FunctionVFDatum d = new FunctionVFDatum();
+	d.makeBottom();
+        return d;
+    }
+
+    public FunctionVFDatum newLDVar()
+    {
+        FunctionVFDatum d = new FunctionVFDatum();
+        d.makeLDVar();
+        return d;
+    }
+ 
     public FunctionVFDatum newAssignedVariableDatum()
     {
         FunctionVFDatum d = new FunctionVFDatum();
         d.makeAssignedVariable();
         return d;
     }
+
     public FunctionVFDatum newFunctionDatum()
     {
         FunctionVFDatum d = new FunctionVFDatum();
@@ -59,6 +76,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
 
     public void caseFunctionList( FunctionList node )
     {
+	LookupFile.clearFile();
+	if (node.getFunctions().getNumChild()>1) 
+	    System.out.println("Multiple functions!!"+node.getFunctions().getChild(0).getName());
+        for( Function f : node.getFunctions() ){
+	    LookupFile.addToFile(f.getName());
+	}
         for( Function f : node.getFunctions() ){
             currentSet = newInitialFlow();
             f.analyze(this);
@@ -137,5 +160,30 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     {
         currentSet.add( new ValueDatumPair( node.getName().getID(), newFunctionDatum() ) );
     }
+
+    public void caseParameterizedExpr( ParameterizedExpr node )
+    {
+	if (((NameExpr) node.getTarget()).getName().getID().equals("load"))
+	    if(node.getChild(1).getNumChild()==2 && StringLiteralExpr.class.isInstance(node.getChild(1).getChild(1)))
+		currentSet.add( new ValueDatumPair( ( (StringLiteralExpr) node.getChild(1).getChild(1)).getValue(), newLDVar() ) );
+	//	node.getChild(0).analyze(this);
+	//	node.getChild(1).analyze(this);
+        caseASTNode( node );	
+    }
+    
+    public void caseNameExpr( NameExpr node )
+    {
+	String s = node.getName().getID();
+	VFDatum d = currentSet.contains( s );
+	if (s!=null && d==null || VFDatum.Value.BOT.equals(d)){
+	    if (natlab.LookupFile.scriptOrFunctionExists(s)){
+		currentSet.add( new ValueDatumPair( s, newFunctionDatum()));
+	
+	    }
+	    else 
+		currentSet.add( new ValueDatumPair( s, newBottomDatum()));
+	}
+    }
+
 }
 

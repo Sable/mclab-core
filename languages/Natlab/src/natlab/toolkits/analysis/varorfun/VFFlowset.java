@@ -165,5 +165,6 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
 
         return s.toString();
     }
+    public HashMap<V,D> getMap(){return set;}
 
 }
