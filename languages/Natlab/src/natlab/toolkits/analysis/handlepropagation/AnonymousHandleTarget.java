@@ -17,7 +17,7 @@ public class AnonymousHandleTarget implements HandleTarget
     {
         this.node = node;
         nodeString = node.getStructureString();
-        hashCode = nodeString.hashCode();
+        hashCode = node.hashCode();
     }
     
     public LambdaExpr getLambdaExpr()
