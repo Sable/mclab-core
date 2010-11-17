@@ -16,7 +16,8 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     //in an @ expression and correspond to a visible function. Visible
     //functions will have to be estimated of course. This is only for
     //the function context, not scripts.
-
+    
+    private boolean inFunction=true;
     public VFPreorderAnalysis( ASTNode tree )
     {
         super( tree );
@@ -77,16 +78,24 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     public void caseFunctionList( FunctionList node )
     {
 	LookupFile.setCurrentProgram(node);
-
         for( Function f : node.getFunctions() ){
             currentSet = newInitialFlow();
             f.analyze(this);
         }
     }
 
+    public void caseScript( Script node )
+    {
+	currentSet = newInitialFlow();
+	LookupFile.setCurrentProgram(node);
+	inFunction=false;
+	node.getStmts().analyze(this);
+    }
+
 
     public void caseFunction( Function node )
     {
+	inFunction=true;
         if(DEBUG)
             System.err.println("in caseFunction");
         // Add output params to set
@@ -160,26 +169,37 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
 	if (((NameExpr) node.getTarget()).getName().getID().equals("load"))
-	    if(node.getChild(1).getNumChild()==2 && StringLiteralExpr.class.isInstance(node.getChild(1).getChild(1)))
-		currentSet.add( new ValueDatumPair( ( (StringLiteralExpr) node.getChild(1).getChild(1)).getValue(), newLDVar() ) );
-	//	node.getChild(0).analyze(this);
-	//	node.getChild(1).analyze(this);
+	    if(node.getChild(1).getNumChild()==2 && StringLiteralExpr.class.isInstance(node.getChild(1).getChild(1))){
+		String param = ((StringLiteralExpr) node.getChild(1).getChild(1)).getValue();
+		if (param.charAt(0)!='-')
+		    currentSet.add( new ValueDatumPair(param  , newLDVar() ) );
+	    }
         caseASTNode( node );	
     }
     
     public void caseNameExpr( NameExpr node )
     {
-	String s = node.getName().getID();
-	VFDatum d = currentSet.contains( s );
-	if (s!=null && d==null || VFDatum.Value.BOT.equals(d)){
-	    if (natlab.LookupFile.scriptOrFunctionExists(s)){
-		currentSet.add( new ValueDatumPair( s, newFunctionDatum()));
-	
+	if (inFunction){
+	    String s = node.getName().getID();
+	    VFDatum d = currentSet.contains( s );
+	    if (s!=null && d==null || VFDatum.Value.BOT.equals(d)){
+		if (natlab.LookupFile.scriptOrFunctionExists(s)){
+		    currentSet.add( new ValueDatumPair( s, newFunctionDatum()));
+		}
+		else 
+		    currentSet.add( new ValueDatumPair( s, newBottomDatum()));
 	    }
-	    else 
-		currentSet.add( new ValueDatumPair( s, newBottomDatum()));
+	}
+	else{
+	    String s = node.getName().getID();
+	    if (s!=null){
+		VFDatum d = currentSet.contains( s );
+		
+		if (d==null || VFDatum.Value.BOT.equals(d)){
+		    currentSet.add( new ValueDatumPair( s, newLDVar()));
+		}
+	    }
 	}
     }
-
 }
 
