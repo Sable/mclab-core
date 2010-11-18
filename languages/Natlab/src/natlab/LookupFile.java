@@ -1,4 +1,4 @@
-package OBnatlab;
+package natlab;
 import java.util.*;
 import java.io.*;
 import ast.*;
