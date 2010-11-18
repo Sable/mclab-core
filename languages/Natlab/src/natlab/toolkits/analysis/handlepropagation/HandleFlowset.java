@@ -2,6 +2,7 @@ package natlab.toolkits.analysis.handlepropagation;
 
 import java.util.*;
 import natlab.toolkits.analysis.*;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
 
 /**
  * Special implementation of FlowSet for HandlePropagation
@@ -14,128 +15,108 @@ import natlab.toolkits.analysis.*;
  *
  * @see HandleTarget
  */
-public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleTarget>>
+public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
 {
-    /**
-     * Generates a set containing only a TopHandleTarget.
-     */
-    public MayMustTreeSet<HandleTarget> makeTopSet()
-    {
-        MayMustTreeSet<HandleTarget> set = new MayMustTreeSet();
-        set.add( new TopHandleTarget() );
-        return set;
-    }
-    /**
-     * Generates a set containing only a TopNamedHandleTarget.
-     */
-    public MayMustTreeSet<HandleTarget> makeTopNamedSet()
-    {
-        MayMustTreeSet<HandleTarget> set = new MayMustTreeSet();
-        set.add( new TopNamedHandleTarget() );
-        return set;
-    }
-    /**
-     * Generates a set containing only a TopAnonymousHandleTarget.
-     */
-    public MayMustTreeSet<HandleTarget> makeTopAnonymousSet()
-    {
-        MayMustTreeSet<HandleTarget> set = new MayMustTreeSet();
-        set.add( new TopAnonymousHandleTarget() );
-        return set;
-    }
 
-    public void addAll( String key, Collection<HandleTarget> values )
+    public void addAll( String key, Collection<Value> values )
     {
         if( !map.containsKey(key) )
-            map.put(key, new MayMustTreeSet());
-        for( HandleTarget target: values ){
+            map.put(key, new TreeSet());
+        for( Value target: values ){
             add(key, target);
         }
-        if( values instanceof MayMustTreeSet && ((MayMustTreeSet)values).isMay() )
-            map.get(key).makeMay();
     }
-    public void add(String key, HandleTarget value)
+
+    /**
+     * Used to add an abstract DataValue to a given set. it keeps
+     * track of the fact that we want at most one such value in the
+     * set, and keeps track of the correct value to have in the set
+     * based on the partial order on the values. 
+     */
+    protected void addAbstractDataValue( AbstractValue value, TreeSet<Value> oldSet )
     {
-        MayMustTreeSet<HandleTarget> oldSet = map.get(key);
+        boolean hasDO, hasDHO, hasDWH;
+        hasDO = oldSet.contains(AbstractValue.newDataOnly());
+        hasDHO = oldSet.contains(AbstractValue.newDataHandleOnly());
+        hasDWH = oldSet.contains(AbstractValue.newDataWithHandles());
+
+        if( hasDWH )
+            return;
+        else if( hasDO && (value.isDataHandleOnly() || value.isDataWithHandles()) ){
+            oldSet.remove(AbstractValue.newDataOnly());
+            oldSet.add(AbstractValue.newDataWithHandles());
+            return;
+        }
+        else if( hasDHO && (value.isDataOnly() || value.isDataWithHandles()) ){
+            oldSet.remove(AbstractValue.newDataHandleOnly() );
+            oldSet.add(AbstractValue.newDataWithHandles());
+            return;
+        }
+        else if( !hasDO && !hasDHO && !hasDWH ){
+            oldSet.add(value);
+        }
+    }
+    public void add(String key, Value value)
+    {
+        TreeSet<Value> oldSet = map.get(key);
         if( oldSet == null ){
-            MayMustTreeSet<HandleTarget> set = new MayMustTreeSet();
+            TreeSet<Value> set = new TreeSet();
             set.add( value );
             map.put(key, set);
         }
         else{
-            // note this is using the ordering defined by the handle
-            // targets to ensure that if there are top elements in the
-            // set then there is only one. It will also merge top name
-            // targets and top anonymous targets into simply top
-            // targets.
             if( oldSet.size() == 0 )
                 oldSet.add( value );
-            else if( value instanceof TopHandleTarget )
-                map.put(key, makeTopSet());
+            else if( value instanceof AbstractValue ){
+                AbstractValue abstractValue = (AbstractValue)value;
+                if( abstractValue.isDataWithHandles() ||
+                    abstractValue.isDataOnly() ||
+                    abstractValue.isDataHandleOnly() )
+                    addAbstractDataValue( abstractValue, oldSet );
+                else
+                    oldSet.add( value );
+            }
             else{
-                HandleTarget last = oldSet.pollLast();
-                if( last instanceof TopHandleTarget )
-                    map.put(key, makeTopSet());
-                else if( last instanceof TopNamedHandleTarget )
-                    if( value instanceof TopAnonymousHandleTarget )
-                        map.put(key, makeTopSet());
-                    else
-                        map.put(key, makeTopAnonymousSet() );
-                else if( last instanceof TopAnonymousHandleTarget )
-                    if( value instanceof TopNamedHandleTarget )
-                        map.put(key, makeTopSet());
-                    else
-                        map.put(key,makeTopAnonymousSet());
-                else if( !(value instanceof NamedHandleTarget) &&
-                         !(value instanceof AnonymousHandleTarget) ){
-                    //value is a top element and the set had non top elements
-                    MayMustTreeSet<HandleTarget> set = new MayMustTreeSet();
-                    set.add( value );
-                    map.put(key, set);
-                }
-                else{
-                    oldSet.add(last);
-                    oldSet.add(value);
-                }
+                oldSet.add( value );
             }
         }
     }
-    public void add(Map.Entry<String, MayMustTreeSet<HandleTarget>> entry )
+    public void add(Map.Entry<String, TreeSet<Value>> entry )
     {
-        //make sure the set is correct with respect to having top
-        //elements. If problems then correct in favor of top elements.
-        
+        //make sure the set is correct with respect to the abstract
+        //data values, there should be only one
+
         //if it has 0 or 1 entry then it must be correct
         if( entry.getValue().size()==0 || entry.getValue().size()==1 )
             super.add(entry);
         else{
-            MayMustTreeSet<HandleTarget> set = entry.getValue();
-            //if it has a top in it then just make only have a top
-            if( set.last() instanceof TopHandleTarget )
-                entry = new AbstractMap.SimpleEntry( entry.getKey(), makeTopSet() );
-            else{
-                HandleTarget last = set.pollLast();
-                boolean lastIsTopNamed = last instanceof TopNamedHandleTarget;
-                boolean lastIsTopAnon = last instanceof TopAnonymousHandleTarget;
-                if( lastIsTopNamed || lastIsTopAnon ){
-                    if( ( lastIsTopNamed && set.last() instanceof TopAnonymousHandleTarget) ||
-                        ( lastIsTopAnon && set.last() instanceof TopNamedHandleTarget) )
-                        //if two conflicting top elements, make full
-                        //top
-                        entry = new AbstractMap.SimpleEntry( entry.getKey(), makeTopSet() );
-                    else{
-                        MayMustTreeSet<HandleTarget> newSet = new MayMustTreeSet();
-                        newSet.add(last);
-                        entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
-                    }
-                }
-                set.add(last);
+            TreeSet<Value> set = entry.getValue();
+            boolean hasDO, hasDHO, hasDWH;
+            hasDO = set.contains(AbstractValue.newDataOnly());
+            hasDHO = set.contains(AbstractValue.newDataHandleOnly());
+            hasDWH = set.contains(AbstractValue.newDataWithHandles());
+            if( hasDO && hasDHO ){
+                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                newSet.remove(AbstractValue.newDataOnly());
+                newSet.remove(AbstractValue.newDataHandleOnly());
+                newSet.add(AbstractValue.newDataWithHandles());
+                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
+            }
+            if( hasDO && hasDWH ){
+                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                newSet.remove(AbstractValue.newDataOnly());
+                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
+            }
+            if( hasDHO && hasDWH ){
+                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                newSet.remove(AbstractValue.newDataHandleOnly());
+                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
             }
             super.add(entry);
         }
-                     
     }
-    public void add(String key, MayMustTreeSet<HandleTarget> entry)
+
+    public void add(String key, TreeSet<Value> entry)
     {
         add( new AbstractMap.SimpleEntry( key, entry ) );
     }
@@ -143,9 +124,9 @@ public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleT
     /**
      * Remove the particular value from the set associated with key.
      */
-    public boolean remove( String key, HandleTarget value )
+    public boolean remove( String key, Value value )
     {
-        MayMustTreeSet<HandleTarget> set = map.get(key);
+        TreeSet<Value> set = map.get(key);
         if( set != null )
             return set.remove( value );
         else
@@ -156,16 +137,16 @@ public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleT
      * Checks if the particular value is in the set associated with
      * the given key.
      */
-    public boolean contains( String key, HandleTarget value )
+    public boolean contains( String key, Value value )
     {
-        MayMustTreeSet<HandleTarget> set = map.get(key);
+        TreeSet<Value> set = map.get(key);
         if( set != null )
             return set.contains( value );
         else
             return false;
     }
 
-    public MayMustTreeSet<HandleTarget> get( String key )
+    public TreeSet<Value> get( String key )
     {
         return map.get(key);
     }
@@ -180,8 +161,8 @@ public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleT
             return;
         else{
             other.clear();
-            for( Map.Entry<String,MayMustTreeSet<HandleTarget>> entry : map.entrySet() ){
-                other.add(entry.getKey(), entry.getValue().clone());
+            for( Map.Entry<String,TreeSet<Value>> entry : map.entrySet() ){
+                other.add(entry.getKey(), (TreeSet)entry.getValue().clone());
             }
         }
     }
@@ -206,27 +187,20 @@ public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleT
 
         HandleFlowset tmpDest = new HandleFlowset();
         
-        for( Map.Entry<String, MayMustTreeSet<HandleTarget>> entry : this.toList()){
+        for( Map.Entry<String, TreeSet<Value>> entry : this.toList()){
             String key = entry.getKey();
-            MayMustTreeSet set = (MayMustTreeSet)entry.getValue().clone();
-            if( !other.containsKey( key ) )
-                set.makeMay();
+            TreeSet set = (TreeSet)entry.getValue().clone();
             tmpDest.add( key, set );
         }
-        for( Map.Entry<String, MayMustTreeSet<HandleTarget>> entry : other.toList()){
+        for( Map.Entry<String, TreeSet<Value>> entry : other.toList()){
             if( tmpDest.containsKey( entry.getKey() ) ){
-                MayMustTreeSet tmpSet = tmpDest.get( entry.getKey() );
-                if( tmpSet.isEmpty() && !entry.getValue().isEmpty() )
-                    tmpSet.makeMay();
-                else if( !(tmpSet.isMust() && entry.getValue().isMust()) )
-                    tmpSet.makeMay();
-                for( HandleTarget value : entry.getValue() ){
+                TreeSet tmpSet = tmpDest.get( entry.getKey() );
+                for( Value value : entry.getValue() ){
                     tmpDest.add( entry.getKey(), value );
                 }
             }
             else{
-                MayMustTreeSet set = (MayMustTreeSet)entry.getValue().clone();
-                set.makeMay();
+                TreeSet set = (TreeSet)entry.getValue().clone();
                 tmpDest.add( entry.getKey(), set );
             }
         }
@@ -236,47 +210,49 @@ public class HandleFlowset extends HashMapFlowSet<String, MayMustTreeSet<HandleT
     public String toString()
     {
         StringBuffer s = new StringBuffer();
-        s.append("{");
+        s.append("(");
         boolean first = true;
         String key;
         int spaceSize;
         StringBuffer spaces;
-        for( Map.Entry<String,MayMustTreeSet<HandleTarget>> entry : map.entrySet() ){
+        for( Map.Entry<String,TreeSet<Value>> entry : map.entrySet() ){
             if( first ){
                 s.append("\n");
                 first = false;
             }
             else
                 s.append(", \n");
-            spaceSize = entry.getKey().length() + 8;
+            spaceSize = entry.getKey().length() + 4;
             spaces = new StringBuffer(spaceSize);
             for( int i=0; i<spaceSize; i++)
                 spaces.append(" ");
             s.append(" ");
             s.append( entry.getKey() );
             s.append(" : ");
-            s.append(entry.getValue().isMust()?"must":" may");
             s.append("{");
 
             boolean firstVal = true;
-            for( HandleTarget value : entry.getValue() ){
+            for( Value value : entry.getValue() ){
                 if( firstVal ){
-                    s.append("\n");
-                    first = false;
+                    //s.append("\n");
+                    firstVal = false;
                 }
-                else 
-                    s.append(", \n");
-                s.append( spaces );
-                s.append( "   " );
+                else {
+                    s.append(", ");
+                    //s.append(", \n");
+                }
+                //s.append( spaces );
+                //s.append( "   " );
                 s.append( value.toString() );
             }
-            if( !first ){
-                s.append("\n");
-                s.append(spaces);
+            //if( !firstVal ){
+            //    s.append("\n");
+            //    s.append(spaces);
                 s.append("}");
-            }
+                //}
         }
         s.append("\n}");
         return s.toString();
     }
+
 }

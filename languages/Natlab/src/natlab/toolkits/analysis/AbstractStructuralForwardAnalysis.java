@@ -44,11 +44,28 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
     public abstract A processBreaks();
     public abstract A processContinues();
 
+    /**
+     * Sets the in data associated with a given node. Abstracts away
+     * from how this is being done.
+     */
+    protected A setInFlow( ASTNode node, A flow )
+    {
+        return inFlowSets.put( node, flow );
+    }
+    /**
+     * Sets the out data associated with a given node.
+     */
+    protected A setOutFlow( ASTNode node, A flow )
+    {
+        return outFlowSets.put( node, flow );
+    }
+
+
     protected A saveInSet( ASTNode node )
     {
         A inSet = newInitialFlow();
         copy( currentInSet, inSet );
-        inFlowSets.put( node, inSet );
+        setInFlow( node, inSet );
         return inSet;
     }
     protected LoopFlowsets setupLoopStack( A loopIn, ForStmt node )
@@ -58,6 +75,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         loopStack.push( loopFlowsets );
         return loopFlowsets;
     }
+
 
     protected A backupSet(A outSet)
     {
@@ -147,7 +165,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         //set currentOut to the out of the entire loop, e.g. newOut
         currentOutSet = newOut;
         
-        outFlowSets.put( node, currentOutSet );
+        setOutFlow( node, currentOutSet );
         loopStack.pop();
     }
 
@@ -164,7 +182,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         //saving the in set of the loop
         A loopInSet = newInitialFlow();
         copy( currentInSet, loopInSet );
-        inFlowSets.put( node, loopInSet );
+        setInFlow( node, loopInSet );
         
         //process loop conditional and store result
         //note in will be the currentInSet == loopInSet
@@ -230,7 +248,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         //set currentOut to the out of the entire loop, e.g. newOut
         currentOutSet = newOut;
         
-        outFlowSets.put( node, currentOutSet );
+        setOutFlow( node, currentOutSet );
         loopStack.pop();
     }
 
@@ -298,7 +316,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         currentOutSet = mergedOuts;
         if(DEBUG)
             System.out.println("outset is " + currentOutSet.toString());
-        outFlowSets.put( node, currentOutSet );
+        setOutFlow( node, currentOutSet );
     }
     /**
        Represents the information associated with the containing loops

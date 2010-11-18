@@ -5,6 +5,7 @@ import natlab.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.analysis.handlepropagation.*;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
 import ast.*;
 
 /**
@@ -29,6 +30,8 @@ public class CallGraphBuilder
     protected HashMap<String, ASTNode> programNameMap;
     //Maps a callable node to it's name
     protected HashMap<ASTNode, String> nameOfProgMap = new HashMap();
+    //Maps call site labels to the callable nodes they belong to
+    protected TreeMap<CallSiteLabel, ASTNode> labelProgramMap = new TreeMap();
 
     protected CallGraph graph;
 
@@ -108,7 +111,7 @@ public class CallGraphBuilder
             nodeBuilder = new GraphNodeBuilder( workList.remove(0) );
             nodeBuilder.analyze();
         }
-        graph = new CallGraph( programLabelMap, labelMap, targetMap );
+        graph = new CallGraph( programLabelMap, labelMap, targetMap, labelProgramMap );
     }
     
     /**
@@ -259,34 +262,14 @@ public class CallGraphBuilder
         }
         public void caseNameExpr( NameExpr node )
         {
-            String id = node.getName().getID();
-            VFDatum datum =  nameResolver.getInFlowSets().get( currentStmt ).contains(id);
-            if( datum == null ){
-                CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
-                addToLabelMaps( label, node );
-                addTargetsToMaps( label, id, false );
-                //if( inFunction )
-                System.out.println("I found a possible function call to " + id + " maybe!" );
-            }
-            else if( datum.isFunction() ){
-                CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
-                addToLabelMaps( label, node );
-                addTargetsToMaps( label, id, true );
-                System.out.println("I found a possible function call to " +id );
-            }
-        }
-
-
-        public void caseParameterizedExpr( ParameterizedExpr node )
-        {
-            if( node.getTarget() instanceof NameExpr ){
-                //This is the only case currently dealt with
-                String id = ((NameExpr)node.getTarget()).getName().getID();
-                VFDatum datum = nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+            if( !inLvalues ){
+                String id = node.getName().getID();
+                VFDatum datum =  nameResolver.getInFlowSets().get( currentStmt ).contains(id);
                 if( datum == null ){
-                    CallSiteLabel label = CallSiteLabel.makeUnknownLabel();
+                    CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
                     addToLabelMaps( label, node );
                     addTargetsToMaps( label, id, false );
+                    //if( inFunction )
                     System.out.println("I found a possible function call to " + id + " maybe!" );
                 }
                 else if( datum.isFunction() ){
@@ -295,44 +278,114 @@ public class CallGraphBuilder
                     addTargetsToMaps( label, id, true );
                     System.out.println("I found a possible function call to " +id );
                 }
-                else if( datum.isVariable() && 
-                         handleResolver.getInFlowSets().get( currentStmt ).containsKey( id ) ){
-
-                    CallSiteLabel label = CallSiteLabel.makeHandleLabel();
-                    addToLabelMaps( label, node );
-
-                    MayMustTreeSet<HandleTarget> handleTargets;
-                    handleTargets = handleResolver.getInFlowSets().get( currentStmt ).get( id );
-                    addTargetsToMaps( label, handleTargets );
-                    
-                    System.out.println("I found a possible fn handle call from " + id );
-                }
-                        
             }
         }
+
+        protected boolean inLvalues = false;
+        public void caseAssignStmt( AssignStmt node )
+        {
+            Stmt previousStmt = currentStmt;
+            currentStmt = node;
+            inLvalues = true;
+            node.getLHS().analyze(this);
+            inLvalues = false;
+            node.getRHS().analyze(this);
+            currentStmt = previousStmt;
+        }
+        
+        public void caseParameterizedExpr( ParameterizedExpr node )
+        {
+            if( inLvalues ){
+                node.getTarget().analyze(this);
+                inLvalues = false;
+                node.getArgs().analyze(this);
+                inLvalues = true;
+            }
+            else{
+                if( node.getTarget() instanceof NameExpr ){
+                    //This is the only case currently dealt with
+                    String id = ((NameExpr)node.getTarget()).getName().getID();
+                    VFDatum datum = nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+                    if( datum == null ){
+                        CallSiteLabel label = CallSiteLabel.makeUnknownLabel();
+                        addToLabelMaps( label, node );
+                        addTargetsToMaps( label, id, false );
+                        System.out.println("I found a possible function call to " + id + " maybe!" );
+                    }
+                    else if( datum.isFunction() ){
+                        CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
+                        addToLabelMaps( label, node );
+                        addTargetsToMaps( label, id, true );
+                        System.out.println("I found a possible function call to " +id );
+                    }
+                    else if( datum.isVariable() && 
+                             handleResolver.getInFlowSets().get( currentStmt ).containsKey( id ) ){
+
+                        CallSiteLabel label = CallSiteLabel.makeHandleLabel();
+                        addToLabelMaps( label, node );
+
+                        TreeSet<Value> handleTargets;
+                        handleTargets = handleResolver.getInFlowSets().get( currentStmt ).get( id );
+                        addTargetsToMaps( label, handleTargets );
+                    
+                        System.out.println("I found a possible fn handle call from " + id );
+                    }
+                        
+                }
+            }
+        }
+        public void caseCellIndexExpr( CellIndexExpr node )
+        {
+            if( inLvalues ){
+                node.getTarget().analyze(this);
+                inLvalues = false;
+                node.getArgs().analyze(this);
+                inLvalues = true;
+            }
+            else
+                caseLValueExpr(node);
+        }
+        public void caseDotExpr( DotExpr node )
+        {
+            if( inLvalues ){
+                node.getTarget().analyze(this);
+            }
+            else
+                caseLValueExpr(node);
+        }
+        public void caseMatrixExpr( MatrixExpr node )
+        {
+            if( inLvalues ){
+                node.getRows().analyze(this);
+            }
+            else
+                caseLValueExpr(node);
+        }
+
         /**
          * Adds target for a given set of handle targets to the
          * targetMap using a given label as the key.
         */ 
-        private void addTargetsToMaps( CallSiteLabel label, MayMustTreeSet<HandleTarget> handleTargets )
+        private void addTargetsToMaps( CallSiteLabel label, TreeSet<Value> handleTargets )
         {
             ASTNode target = null;
             MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet();
             System.out.println(handleTargets);
-            for( HandleTarget ht : handleTargets ){
-                if( ht instanceof NamedHandleTarget ){
-                    target = programNameMap.get( ((NamedHandleTarget)ht).getName() );
+            for( Value ht : handleTargets ){
+                if( ht instanceof NamedHandleValue ){
+                    target = programNameMap.get( ((NamedHandleValue)ht).getName() );
                 }
-                else if( ht instanceof AnonymousHandleTarget ){
-                    target = ((AnonymousHandleTarget)ht).getLambdaExpr();
-                    nameOfProgMap.put( target, ((AnonymousHandleTarget)ht).getNodeString() );
+                else if( ht instanceof AnonymousHandleValue ){
+                    target = ((AnonymousHandleValue)ht).getLambdaExpr();
+                    nameOfProgMap.put( target, ((AnonymousHandleValue)ht).getNodeString() );
                 }
                 if( target==null )
                     targetSet.makeMay();
                 targetSet.add( target );
             }
-            if( handleTargets.isMay())
-                targetSet.makeMay();
+            //need some other way to do this
+            //if( handleTargets.isMay())
+            //    targetSet.makeMay();
             targetMap.put( label, targetSet );
         }
         /**
@@ -379,6 +432,7 @@ public class CallGraphBuilder
          */
         private void addToLabelMaps( CallSiteLabel label, ASTNode node ){
             labelMap.put(node, label);
+            labelProgramMap.put(label, currentCallable);
             TreeSet<CallSiteLabel> labelSet;
             labelSet = programLabelMap.get(currentCallable);
                 if(labelSet==null)

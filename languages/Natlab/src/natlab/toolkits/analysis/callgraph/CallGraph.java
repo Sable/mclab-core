@@ -12,14 +12,17 @@ public class CallGraph
     protected HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap;
     protected HashMap<ASTNode, CallSiteLabel> labelMap;
     protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap;
+    protected Map<CallSiteLabel, ASTNode> labelProgramMap;
 
     public CallGraph( HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap,
-                       HashMap<ASTNode, CallSiteLabel> labelMap,
-                       HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap )
+                      HashMap<ASTNode, CallSiteLabel> labelMap,
+                      HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap,
+                      Map<CallSiteLabel, ASTNode> labelProgramMap )
     {
         this.programLabelMap = programLabelMap;
         this.labelMap = labelMap;
         this.targetMap = targetMap;
+        this.labelProgramMap = labelProgramMap;
     }
 
     /**
@@ -60,6 +63,14 @@ public class CallGraph
             return null;
         else
             return targetMap.get( label );
+    }
+
+    /**
+     * Gets the Callable that contains the given call site label.
+     */
+    public ASTNode getCallableByLabel( CallSiteLabel label )
+    {
+        return labelProgramMap.get( label );
     }
     /**
      * Checks to see if the given node might represent a call site.
