@@ -130,4 +130,40 @@ aspect LValue
         return names;
     }
 
+    syn Set<NameExpr> ASTNode.getNameExpressions()
+    {
+        Set<NameExpr> symbols = new LinkedHashSet<NameExpr>();
+        for( int i = 0; i<getNumChild(); i++ )
+            symbols.addAll( getChild(i).getNameExpressions() );
+        return symbols;
+    }
+    syn Set<NameExpr> Expr.getNameExpressions()
+    {
+        Set<NameExpr> symbols = new LinkedHashSet<NameExpr>();
+        for( int i = 0; i<getNumChild(); i++ )
+            symbols.addAll( getChild(i).getNameExpressions() );
+        return symbols;
+    }
+
+    //getNameExpressions equations for Expressions
+    eq NameExpr.getNameExpressions()
+    {	
+        LinkedHashSet<NameExpr> names = new LinkedHashSet<NameExpr>();
+        names.add( this );
+        return names;
+    }
+    eq ParameterizedExpr.getNameExpressions() = getTarget().getNameExpressions();
+    eq CellIndexExpr.getNameExpressions() = getTarget().getNameExpressions();
+    eq DotExpr.getNameExpressions() = getTarget().getNameExpressions();
+    eq MatrixExpr.getNameExpressions()
+    {
+        LinkedHashSet<NameExpr> names = new LinkedHashSet<NameExpr>();
+        for( int i=0; i<getNumRow(); i++ ){
+            for( int j=0; j< getRow(i).getNumElement(); j++ ){
+                names.addAll( getRow(i).getElement(j).getNameExpressions() );
+            }
+        }
+        return names;
+    }
+
 }
