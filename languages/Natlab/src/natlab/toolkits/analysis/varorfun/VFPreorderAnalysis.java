@@ -96,6 +96,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     public void caseFunction( Function node )
     {
 	inFunction=true;
+	currentSet = newInitialFlow();
         if(DEBUG)
             System.err.println("in caseFunction");
         // Add output params to set

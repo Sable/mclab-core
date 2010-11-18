@@ -1,4 +1,4 @@
-package natlab;
+package OBnatlab;
 import java.util.*;
 import java.io.*;
 import ast.*;
@@ -7,6 +7,7 @@ public class LookupFile{
     private static HashMap<String, String> builtinClasses = initialize();
     private static HashMap<String, String> builtinFunctions;
     private static HashMap<String, String> builtinPackages;
+    private static HashMap<String, String> outputInfo;
     private static HashMap<String, Function> currentFile;
     private static HashMap<String, ASTNode> lib; 
     private static HashMap<String, String> initialize(){
@@ -17,6 +18,7 @@ public class LookupFile{
 	    builtinPackages = map.get("packages");
 	    builtinClasses = map.get("classes");
 	    builtinFunctions = map.get("functions");
+	    outputInfo = map.get("output_info");
 	    currentFile = new HashMap<String, Function>();
 	    lib = new HashMap<String, ASTNode>();
 	    return builtinClasses;
@@ -25,6 +27,12 @@ public class LookupFile{
 	}
 	return null;
     }; 
+
+    public static String getOutputInfo(String function){
+	if (outputInfo.containsKey(function))
+	    return outputInfo.get(function);
+	return "DWH,H";
+    }
 
     public static boolean scriptOrFunctionExists(String s){
 	if (currentFile.containsKey(s)) {
