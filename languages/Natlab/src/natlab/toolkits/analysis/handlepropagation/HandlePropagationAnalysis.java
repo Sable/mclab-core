@@ -18,6 +18,21 @@ import natlab.toolkits.analysis.varorfun.*;
  */
 public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAnalysis< HandleFlowset >
 {
+    /*
+      CONTRACT for the expression casses:
+      - At the end of a case the newHandleTargets should contain what
+      it previously contained plus what is intended to be added
+        - Don't clear it
+        - Only put values into the newHandleTargets set if they need to be
+        there at the end of the case. Do not pollute it.
+      - Do not depend on any values in the incoming
+      newHandleTargets. You can depend on values generated from
+      children and descendents though.
+        - This means that you can backup the newHandleTargets and
+        start with a fresh one when analyzing children.
+    */
+
+
     //flags to controll behaviour of how function call are handled
     protected boolean destructiveCalls = false;
     protected boolean doTypeLookup = false;
@@ -152,8 +167,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseExpr( Expr node )
     {
         caseASTNode( node );
-        newHandleTargets.clear();
-        newHandleTargets.addAll( newDOSet() );
+        //newHandleTargets.clear();
+        //newHandleTargets.addAll( newDOSet() );
     }
 
     /*public void caseExprStmt( ExprStmt node )
@@ -350,14 +365,16 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 newHandleTargets.addAll( handleUnknownFunctionCall() );
         }
     }
-    /*public void caseRangeExpr( RangeExpr node)
+    /*
+    public void caseRangeExpr( RangeExpr node)
     {
         newHandleTargets.addAll( newDOSet() );
-    }
+        }*/
     public void caseLiteralExpr( LiteralExpr node)
     {
         newHandleTargets.addAll( newDOSet() );
     }
+    /*
     public void caseUnaryExpr( UnaryExpr node)
     {
         //this assumes that Unary operators have not been overridden
@@ -418,7 +435,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         if( set.size() == 0 )
             return new TreeSet();
-        else if( set.size() == 1 && set.contains( AbstractValue.newDataOnly() ) )
+        else if( set.size() == 1 && 
+                 set.contains( AbstractValue.newDataOnly() ) )
             return (TreeSet)set.clone();
         else{
             boolean allHandles = true;
