@@ -761,7 +761,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      * if it's set of possible values contains UNDEF or if it has no
      * possible values and it's kind is ID (Bottom) or VAR.
      */
-    protected boolean isIdUndef( String id )
+    public boolean isIdUndef( String id )
     {
         TreeSet<Value> values = currentInSet.get(id);
         if( values != null && values.contains( AbstractValue.newUndef() ) )
