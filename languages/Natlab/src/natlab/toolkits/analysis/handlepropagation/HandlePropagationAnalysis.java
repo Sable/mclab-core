@@ -789,7 +789,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
     /**
      * Destroys the information in the current set due to a function
-     * call. 
+     * call. This is done by adding {H,DWH} to all sets.
      */
     protected void destroyInfo()
     {
