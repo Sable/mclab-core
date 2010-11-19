@@ -2,6 +2,7 @@ package natlab.toolkits.analysis.handlepropagation;
 
 
 import ast.*;
+
 import java.util.*;
 import natlab.LookupFile;
 import natlab.toolkits.analysis.*;
@@ -166,11 +167,80 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     public void caseExpr( Expr node )
     {
+        TreeSet<Value> handleBackup = newHandleTargets;
         caseASTNode( node );
-        //newHandleTargets.clear();
-        //newHandleTargets.addAll( newDOSet() );
+        newHandleTargets = handleBackup; //discard results of children...
+        newHandleTargets.add(AbstractValue.newDataOnly()); //..and force a a 'data' result
     }
 
+    
+    
+    /**
+     * case for cell index and struct access expressions
+     * DO in target -> DO
+     * DHO in target -> H
+     * DWH in target -> H,DWH
+     */
+    public void dataAccess(Expr target,ast.List<Expr> args){
+        TreeSet<Value> handleBackup = newHandleTargets;
+        newHandleTargets = new TreeSet<Value>();
+        
+        //analyze children, discard result, target last
+        for (ASTNode i :  args){
+            analyze(i);
+        }
+
+        newHandleTargets = new TreeSet<Value>();
+        analyze(target);
+        
+        //formulas
+        if (newHandleTargets.contains(AbstractValue.newDataOnly())){
+            handleBackup.add(AbstractValue.newDataOnly());
+        }
+        if (newHandleTargets.contains(AbstractValue.newDataHandleOnly())){
+            handleBackup.add(AbstractValue.newHandle());
+        }
+        if (newHandleTargets.contains(AbstractValue.newDataWithHandles())){
+            handleBackup.add(AbstractValue.newHandle());
+            handleBackup.add(AbstractValue.newDataWithHandles());
+        }
+        newHandleTargets = handleBackup;
+    }
+
+    /**
+     * case for cell index expressions
+     */
+    public void caseCellIndexExpr(CellIndexExpr node) {
+        dataAccess(node.getTarget(),node.getArgList());
+    }
+    
+    /**
+     * case for accessing structs
+     */
+    public void caseDotExpr(DotExpr node) {
+        dataAccess(node.getTarget(),new ast.List<Expr>()); //the arguments are empty...
+    }
+
+    
+    /**
+     * case cell array expr or array expr
+     * gen(node) = struct(union(gen(node.children)))
+     */    
+    public void arrayExpr(Expr node){
+        TreeSet<Value> handleBackup = newHandleTargets;
+        newHandleTargets = new TreeSet<Value>();
+        caseASTNode(node);
+        handleBackup.addAll(makeStructDataSet(newHandleTargets));
+        newHandleTargets = handleBackup;
+    }
+    public void caseCellArrayExpr(CellArrayExpr node) {
+        arrayExpr(node);
+    }    
+    public void caseMatrixExpr(MatrixExpr node) {
+        arrayExpr(node);
+    }
+    
+    
     /*public void caseExprStmt( ExprStmt node )
     {
         inAssignment = false;
@@ -181,7 +251,6 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         }*/
     public void caseGlobalStmt( GlobalStmt node )
     {
-        
         inFlowSets.put(node, currentInSet);
         HandleFlowset newOut = currentInSet.clone();
 
@@ -430,6 +499,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     /** Converts the values in a set into the struct data versions. So
      * if these values were in a struct, the result represents the
      * struct's possible values.
+     * Does not alter the argument.
      */
     public TreeSet<Value> makeStructDataSet( TreeSet<Value> set)
     {
