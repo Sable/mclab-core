@@ -766,6 +766,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected TreeSet<Value> handleFunctionCall( String name, ast.List<Expr> args )
     {
         if( name.equals( "load" ) ){
+            destroyInfo();
+            return newUndefSet();
         }
         
         return handleFunctionCall( name );
