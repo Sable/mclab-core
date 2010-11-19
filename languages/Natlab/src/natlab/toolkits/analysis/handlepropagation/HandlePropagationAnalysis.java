@@ -382,7 +382,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 if( kind != null ){
                     // Case 1
                     if( kind.isFunction() ){
-                        newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID() ) );
+                        newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ) );
                         return;
                     }
                 }
@@ -392,7 +392,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 //case 2.a
                 if( v instanceof NamedHandleValue ){
                     NamedHandleValue nhv = (NamedHandleValue)v;
-                    newHandleTargets.addAll( handleFunctionCall( nhv.getName() ) );
+                    newHandleTargets.addAll( handleFunctionCall( nhv.getName(), node.getArgs() ) );
                     break;
                 }
                 if( v instanceof AnonymousHandleValue ){
@@ -411,7 +411,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                             VFDatum kind = kinds.contains(nameExpr.getName().getID() );
                             if( kind != null ){
                                 if( !kind.isVariable() ){
-                                    newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID() ));
+                                    newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ));
                                     break;
                                 }
                             }
@@ -478,14 +478,114 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 
         killKeys( lvalues, newOutSet );
 
-        for( String lv : lvalues ){
+        handleLHS( newOutSet, node.getLHS(), tmpInSet );
+                
+        /*for( String lv : lvalues ){
             newOutSet.addAll( lv, newHandleTargets );
-        }
+            }*/
 
         inFlowSets.put(node, tmpInSet);
         outFlowSets.put(node, currentOutSet.clone());
         inAssignment = false;
         change = oldChange || change;
+    }
+
+    /**
+     * Does associates the correct data with the give lhs in the given
+     * set. 
+     * If lhs is a MatrixExpr, recurse on each expression.
+     *
+     * There are 4 cases for how to associate the date
+     * 1) lhs is a NameExpr, in which case you just associate the
+     * data directly.
+     * 2) lhs is a ParameterizedExpr, in which case the arguments must
+     * be analyzed for effects and then there are two cases
+     * 2.a) the target is a NameExpr, in which case the structured
+     * data from name's data merged with the structured version of the
+     * generated data are associated with the name.
+     * 2.b) recurse into the target
+     * 3) lhs is a cell indexing, deal with the arguments and
+     * 3.a) struct(in(name))Ustruct(generated data)
+     * 3.b) recurse
+     * 4) lhs is a field access so
+     * 4.a) structOnly(in(id))Ustruct(generated Data)
+     * 4.b) recurse
+     */
+    public void handleLHS( HandleFlowset set, Expr lhs, HandleFlowset in )
+    {
+        TreeSet<Value> backupTargets = newHandleTargets;
+        TreeSet<Value> data;
+        if( lhs instanceof MatrixExpr ){
+            MatrixExpr me = (MatrixExpr) lhs;
+            //is matrixExpr, since on LHS assume each row only has one
+            //element
+            for( Row r : me.getRows() )
+                handleLHS( set, r.getElement(0) , in );
+        }
+        //case 1
+        else if( lhs instanceof NameExpr )
+            storeDataToNameExpr( (NameExpr)lhs, set, newHandleTargets );
+        //case 2
+        else if( lhs instanceof ParameterizedExpr ){
+            ParameterizedExpr pe = (ParameterizedExpr)lhs;
+            newHandleTargets = new TreeSet();
+            for( Expr arg : pe.getArgs() )
+                analyze( arg );
+
+            newHandleTargets = backupTargets;
+            //case 2.a
+            if( pe.getTarget() instanceof NameExpr ){
+                String id = ((NameExpr)pe.getTarget()).getName().getID();
+                data = makeStructDataSet( newHandleTargets );
+                data.addAll( getStructuredDataOnly(in.get(id)) );
+                storeDataToNameExpr((NameExpr)pe.getTarget(), set, data);
+            }
+            //case 2.b
+            else
+                handleLHS( set, pe.getTarget() , in );
+        }
+        //case 3
+        else if( lhs instanceof CellIndexExpr ){
+            CellIndexExpr cie = (CellIndexExpr)lhs;
+            newHandleTargets = new TreeSet();
+            for( Expr arg : cie.getArgs() )
+                analyze( arg );
+
+            newHandleTargets = backupTargets;
+            //case 3.a
+            if( cie.getTarget() instanceof NameExpr ){
+                String id = ((NameExpr)cie.getTarget()).getName().getID();
+                data = makeStructDataSet( newHandleTargets );
+                data.addAll( makeStructDataSet(in.get(id)) );
+                storeDataToNameExpr((NameExpr)cie.getTarget(), set, data);
+            }
+            //case 3.b
+            else
+                handleLHS( set, cie.getTarget() , in );
+        }
+        //case 4
+        else if( lhs instanceof DotExpr ){
+            DotExpr de = (DotExpr)lhs;
+            //case 4.a
+            if( de.getTarget() instanceof NameExpr ){
+                String id = ((NameExpr)de.getTarget()).getName().getID();
+                data = makeStructDataSet( newHandleTargets );
+                data.addAll( getStructuredDataOnly(in.get(id)) );
+                storeDataToNameExpr((NameExpr)de.getTarget(), set, data);
+            }
+            //case 4.b
+            else
+                handleLHS( set, de.getTarget() , in );
+        }
+    }
+
+    /**
+     * Associates newHandleTargets to the given NameExpr in the given
+     * set. 
+     */
+    protected void storeDataToNameExpr( NameExpr nameExpr, HandleFlowset set, TreeSet<Value> values )
+    {
+        set.addAll( nameExpr.getName().getID(), values );
     }
     protected boolean killKeys( Collection<String> keys, HandleFlowset set )
     {
@@ -503,7 +603,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     public TreeSet<Value> makeStructDataSet( TreeSet<Value> set)
     {
-        if( set.size() == 0 )
+        if( set == null || set.size() == 0 )
             return new TreeSet();
         else if( set.size() == 1 && 
                  set.contains( AbstractValue.newDataOnly() ) )
@@ -536,7 +636,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public TreeSet<Value> getStructuredDataOnly( TreeSet<Value> set )
     {
         TreeSet<Value> newSet = new TreeSet();
-        
+        if( set == null )
+            return newSet;
         if(set.contains(AbstractValue.newDataOnly()))
             newSet.add( AbstractValue.newDataOnly());
         if(set.contains(AbstractValue.newDataHandleOnly()))
@@ -628,7 +729,14 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> handleFunctionCall( String name )
     {
-        if( destructiveCalls ){
+        if( name.equals("eval") )
+            destroyInfo();
+        if( name.equals("clear") )
+            //note, clear does not remove elements from global set
+            //because we don't check what type of clear it is, so it
+            //could be clear globals
+            undefAll();
+        else if( destructiveCalls ){
             destroyInfo();
         }
         else
@@ -648,6 +756,11 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         else
             return newGeneralAssignedSet();
     }
+    protected TreeSet<Value> handleFunctionCall( String name, ast.List<Expr> args )
+    {
+        return handleFunctionCall( name );
+    }
+    
     /**
      * Deals with the affects of function calls when the function name
      * is unknown. Works the same as hadleFunctionCall but without the
@@ -668,14 +781,23 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected void destroyInfo()
     {
-        for( TreeSet<Value> values : currentOutSet.values() ){
-            change = true;
-            values.clear();
-            values.addAll( newGeneralSet() );
-        }
         for( String id : currentOutSet.keySet() ){
             change = true;
             currentOutSet.add( id, newGeneralSet() );
+        }
+    }
+
+    /**
+     * Adds undef to all identifier's info
+     */
+    protected void undefAll()
+    {
+        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
+            change = true;
+            TreeSet<Value> values = new TreeSet();
+            values.addAll( e.getValue() );
+            values.add( AbstractValue.newUndef() );
+            currentOutSet.add( e.getKey(), values );
         }
     }
 
