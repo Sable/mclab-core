@@ -38,11 +38,16 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected boolean destructiveCalls = false;
     protected boolean doTypeLookup = false;
 
+    //flags to keep track of if a function or a script
+    protected boolean inScript = false;
+
     //public TreeSet<Value> newValues = new TreeSet();
     public TreeSet<Value> newHandleTargets = new TreeSet();
 
     //Set of global variable names.
     protected HashSet<String> globalNames = new HashSet();
+    //Set of persistent variable names.
+    protected HashSet<String> persistentNames = new HashSet();
 
     //current statement being operated on.
     protected Stmt currentStmt = null;
@@ -52,6 +57,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 
     //The kind analysis used to compute values.
     protected VFStructuralForwardAnalysis kindAnalysis;
+    protected VFPreorderAnalysis preorderKindAnalysis;
+    protected VFFlowset<String, FunctionVFDatum> preorderSet;
 
     public TreeSet<Value> allHandleTargets = new TreeSet();
     private boolean inAssignment = false;
@@ -110,6 +117,20 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 
     //Begin cases
 
+    public void caseFunctionList( FunctionList node )
+    {
+        LookupFile.setCurrentProgram(node);
+        caseASTNode(node);
+    }
+    public void caseScript( Script node )
+    {
+        LookupFile.setCurrentProgram(node);
+        preorderKindAnalysis = new VFPreorderAnalysis( node );
+        preorderKindAnalysis.analyze();
+        inScript = true;
+        caseASTNode(node);
+    }
+
     /**
      * Function case sets up the in data for the function body. It
      * does this based on the in and out parameters and the identifier
@@ -117,9 +138,16 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     public void caseFunction( Function node )
     {
+        inScript = false;
+        preorderKindAnalysis = new VFPreorderAnalysis( node );
+        preorderKindAnalysis.analyze();
+        preorderSet = preorderKindAnalysis.getFlowSets().get(node);
+
         HandleFlowset tmpInSet = currentInSet.clone();
         HandleFlowset newOutSet = tmpInSet.clone();
 
+        //for( ValueDatumPair<String, VFDatum> pair : preorderSet.toList() ){
+            
         for( Name out : node.getOutputParams() )
             newOutSet.add(out.getID(), newUndefSet() );
 
@@ -269,6 +297,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 
         for( Name n : node.getNames() ){
             newOut.add(n.getID(), newGeneralSet());
+            persistentNames.add( n.getID() );
         }
         currentOutSet = newOut;
         outFlowSets.put(node, currentOutSet);
@@ -305,27 +334,24 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseNameExpr( NameExpr node )
     {
         currentOutSet = currentInSet;
-        VFFlowset kinds =  kindAnalysis.getInFlowSets().get(currentStmt);
-        if( kinds != null ){
-            VFDatum kind = kinds.contains(node.getName().getID() );
-            if( kind != null ){
-                //case 1
-                if(kind.isVariable()){
-                    TreeSet<Value> namesTargets = new TreeSet();
-                    TreeSet<Value> inTargets = currentInSet.get( node.getName().getID() );
-                    if( inTargets != null )
-                        namesTargets.addAll(inTargets);
-                    namesTargets.remove(AbstractValue.newUndef());
-                    newHandleTargets.addAll( namesTargets );
-                    return;
-                }
-                //case 2
-                else if(kind.isFunction()){
-                    TreeSet<Value> functionResult = handleFunctionCall( node.getName().getID() );
-                    if( functionResult != null )
-                        newHandleTargets.addAll( functionResult );
-                    return;
-                }
+        VFDatum kind = getKindDatum( node );
+        if( kind != null ){
+            //case 1
+            if(kind.isVariable()){
+                TreeSet<Value> namesTargets = new TreeSet();
+                TreeSet<Value> inTargets = currentInSet.get( node.getName().getID() );
+                if( inTargets != null )
+                    namesTargets.addAll(inTargets);
+                namesTargets.remove(AbstractValue.newUndef());
+                newHandleTargets.addAll( namesTargets );
+                return;
+            }
+            //case 2
+            else if(kind.isFunction()){
+                TreeSet<Value> functionResult = handleFunctionCall( node.getName().getID() );
+                if( functionResult != null )
+                    newHandleTargets.addAll( functionResult );
+                return;
             }
         }
         //case 3
@@ -378,20 +404,17 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         for( Expr arg : node.getArgs() ){
             analyze(arg);
         }
-        if( node.getTarget() instanceof NameExpr ){
+        if( node.getTarget() instanceof NameExpr ) {
             //restore the correct newHandleTargets
             newHandleTargets = newHandleTargetsBackup;
-
+            
             NameExpr nameExpr = (NameExpr)node.getTarget();
-            VFFlowset kinds =  kindAnalysis.getInFlowSets().get(currentStmt);
-            if( kinds != null ){
-                VFDatum kind = kinds.contains(nameExpr.getName().getID() );
-                if( kind != null ){
-                    // Case 1
-                    if( kind.isFunction() ){
-                        newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ) );
-                        return;
-                    }
+            VFDatum kind = getKindDatum( nameExpr );
+            if( kind != null ){
+                // Case 1
+                if( kind.isFunction() ){
+                    newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ) );
+                    return;
                 }
             }
             //Case 2
@@ -414,13 +437,11 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                     }
                     //case 2.b
                     else if( av.isUndef() ){
-                        if( kinds != null ){
-                            VFDatum kind = kinds.contains(nameExpr.getName().getID() );
-                            if( kind != null ){
-                                if( !kind.isVariable() ){
-                                    newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ));
-                                    break;
-                                }
+                        kind = getKindDatum(nameExpr);
+                        if( kind != null ){
+                            if( !kind.isVariable() ){
+                                newHandleTargets.addAll( handleFunctionCall( nameExpr.getName().getID(), node.getArgs() ));
+                                break;
                             }
                         }
                     }
@@ -709,6 +730,32 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
 
     /**
+     * Abstracts getting a kind flowset. This is to deal with possible
+     * differences in getting it for scripts and functions.
+     */
+    protected VFFlowset getKindSet(){
+        return kindAnalysis.getInFlowSets().get(currentStmt);
+    }
+
+    /**
+     * Abstracts getting the kind datum for a given NameExpr.
+     */
+    protected VFDatum getKindDatum( NameExpr n )
+    {
+        if( inScript ){
+            ValueDatumPair vdp = preorderKindAnalysis.scriptResults.get(n.getName());
+            return (VFDatum)vdp.getDatum();
+        }
+        else{
+            return preorderSet.contains(n.getName().getID() );
+        }
+        /*VFFlowset kinds = getKindSet();
+        if( kinds==null )
+            return null;
+            return kinds.contains( n.getName().getID() );*/
+    }
+
+    /**
      * Checks if a given id has a possible undefined value. This is
      * done in the context of the current stmt. An id has such a value
      * if it's set of possible values contains UNDEF or if it has no
@@ -720,7 +767,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         if( values != null && values.contains( AbstractValue.newUndef() ) )
             return true;
         else if( values == null || values.size()==0){
-            VFDatum kind = kindAnalysis.getInFlowSets().get(currentStmt).contains(id);
+            VFDatum kind = getKindSet().contains(id);
             if( kind == null || kind.isBottom() || 
                 kind.isVariable() )
                 return true;
@@ -747,7 +794,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
             destroyInfo();
         }
         else
-            destroyGlobalInfo();
+            destroyGlobalAndPersistentInfo();
 
         if( doTypeLookup ){
             String returnInfo = LookupFile.getOutputInfo( name );
@@ -755,7 +802,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 return newDOSet();
             else if( returnInfo.equals("H") )
                 return newHSet();
-            else if( returnInfo.equals("DWH,H") )
+            else if( returnInfo.equals("DWH,H") || returnInfo.equals("H,DWH") )
                 return newGeneralAssignedSet();
             else
                 return newGeneralAssignedSet();
@@ -766,9 +813,26 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected TreeSet<Value> handleFunctionCall( String name, ast.List<Expr> args )
     {
         if( name.equals( "load" ) ){
+            /*if( args.getNumChild()>=2 ){
+                int start= 1;
+                //check not -ascii, and set start =2 if -mat
+                //HERE
+                for( int i = start; i< args.getNumChild(); i++ ){
+                    if( args.getChild(i) instanceof StringLiteralExpr ){
+                        String id = ((StringLiteralExpr)args.getChild(i)).getValue();
+                        
+                        
+                        return handleFunctionCall( ((StringLiteralExpr)args.getChild(1)).getValue() );
+                    }
+                }
+                }*/
             destroyInfo();
             return newUndefSet();
         }
+        if( name.equals( "feval" ) )
+            if( args.getNumChild()>0 )
+                if( args.getChild(0) instanceof StringLiteralExpr )
+                    return handleFunctionCall(((StringLiteralExpr)args.getChild(0)).getValue());
         
         return handleFunctionCall( name );
     }
@@ -783,7 +847,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         if( destructiveCalls )
             destroyInfo();
         else
-            destroyGlobalInfo();
+            destroyGlobalAndPersistentInfo();
 
         return newGeneralAssignedSet();
     }
@@ -819,7 +883,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     /**
      * Destroys the information in the current set for all globals. 
      */
-    protected void destroyGlobalInfo()
+    protected void destroyGlobalAndPersistentInfo()
     {
         for( String gname : globalNames ){
             change = true;
@@ -827,6 +891,13 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
             newSet.addAll( currentOutSet.get( gname ) );
             currentOutSet.add( gname, newSet );
         }
+        for( String pname : persistentNames ){
+            change = true;
+            TreeSet<Value> newSet = newGeneralSet();
+            newSet.addAll( currentOutSet.get( pname ) );
+            currentOutSet.add( pname, newSet );
+        }
+
             /*TreeSet<Value> values = currentOutSet.get( gname );
             //Should never equal null, since global.
             //Put here just in case
