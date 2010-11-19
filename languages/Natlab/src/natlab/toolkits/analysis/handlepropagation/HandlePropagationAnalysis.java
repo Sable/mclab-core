@@ -168,9 +168,10 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseExpr( Expr node )
     {
         TreeSet<Value> handleBackup = newHandleTargets;
+        newHandleTargets = new TreeSet();
         caseASTNode( node );
         newHandleTargets = handleBackup; //discard results of children...
-        newHandleTargets.add(AbstractValue.newDataOnly()); //..and force a a 'data' result
+        newHandleTargets.add(AbstractValue.newDataOnly()); //..and force a 'data' result
     }
 
     
@@ -311,21 +312,27 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 //case 1
                 if(kind.isVariable()){
                     TreeSet<Value> namesTargets = new TreeSet();
-                    namesTargets.addAll(currentInSet.get( node.getName().getID() ));
+                    TreeSet<Value> inTargets = currentInSet.get( node.getName().getID() );
+                    if( inTargets != null )
+                        namesTargets.addAll(inTargets);
                     namesTargets.remove(AbstractValue.newUndef());
                     newHandleTargets.addAll( namesTargets );
                     return;
                 }
                 //case 2
                 else if(kind.isFunction()){
-                    newHandleTargets.addAll( handleFunctionCall( node.getName().getID() ) );
+                    TreeSet<Value> functionResult = handleFunctionCall( node.getName().getID() );
+                    if( functionResult != null )
+                        newHandleTargets.addAll( functionResult );
                     return;
                 }
             }
         }
         //case 3
         if( !isIdUndef(node.getName().getID()) ){
-            newHandleTargets.addAll( currentInSet.get(node.getName().getID()) );
+            TreeSet<Value> inTargets = currentInSet.get(node.getName().getID());
+            if( inTargets != null)
+                newHandleTargets.addAll( inTargets );
             return;
         }
         
@@ -758,6 +765,9 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
     protected TreeSet<Value> handleFunctionCall( String name, ast.List<Expr> args )
     {
+        if( name.equals( "load" ) ){
+        }
+        
         return handleFunctionCall( name );
     }
     
@@ -781,9 +791,12 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected void destroyInfo()
     {
-        for( String id : currentOutSet.keySet() ){
+        //for( String id : currentOutSet.keySet() ){
+        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
             change = true;
-            currentOutSet.add( id, newGeneralSet() );
+            TreeSet<Value> newSet = newGeneralSet();
+            newSet.addAll( e.getValue() );
+            currentOutSet.add( e.getKey(), newGeneralSet() );
         }
     }
 
@@ -808,7 +821,9 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         for( String gname : globalNames ){
             change = true;
-            currentOutSet.add( gname, newGeneralSet() );
+            TreeSet<Value> newSet = newGeneralSet();
+            newSet.addAll( currentOutSet.get( gname ) );
+            currentOutSet.add( gname, newSet );
         }
             /*TreeSet<Value> values = currentOutSet.get( gname );
             //Should never equal null, since global.
