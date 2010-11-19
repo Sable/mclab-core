@@ -168,7 +168,8 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
     }
     /**
      * Creates a clone of the flowset, clones the sets in the map as
-     * well.
+     * well. If one set has an entry for an id and the other doesn't
+     * then Undef is added to the merged version.
      */
     public HandleFlowset clone()
     {
@@ -190,6 +191,8 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
         for( Map.Entry<String, TreeSet<Value>> entry : this.toList()){
             String key = entry.getKey();
             TreeSet set = (TreeSet)entry.getValue().clone();
+            if( !other.containsKey( entry.getKey() ) )
+                set.add( AbstractValue.newUndef() );
             tmpDest.add( key, set );
         }
         for( Map.Entry<String, TreeSet<Value>> entry : other.toList()){
@@ -201,6 +204,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
             }
             else{
                 TreeSet set = (TreeSet)entry.getValue().clone();
+                set.add( AbstractValue.newUndef());
                 tmpDest.add( entry.getKey(), set );
             }
         }
