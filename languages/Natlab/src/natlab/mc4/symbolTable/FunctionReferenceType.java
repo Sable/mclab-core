@@ -25,4 +25,11 @@ public class FunctionReferenceType extends FunctionType {
 	public FunctionReferenceType copy() {
 		return new FunctionReferenceType(ref);
 	}
+	
+	public boolean equals(Object obj) {
+		if (obj instanceof FunctionReferenceType) {
+			FunctionReferenceType fRef = (FunctionReferenceType) obj;
+			return fRef.ref.equals(ref);
+		}else return false;
+	}
 }

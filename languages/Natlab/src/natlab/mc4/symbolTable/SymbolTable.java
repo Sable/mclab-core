@@ -52,6 +52,13 @@ public class SymbolTable extends HashMap<String,Symbol>{
     	HashMap<String,String> renameMap = new HashMap<String,String>();
     	for (String name : otherTable.keySet()){
     		if (this.containsKey(name)){ //name conflict
+    			try{
+        		System.out.println(name+" "+
+        				(get(name) instanceof FunctionReferenceType)
+        				+" "+ (otherTable.get(name) instanceof FunctionReferenceType)
+        				+" "+ ((FunctionReferenceType)get(name)).equals(otherTable.get(name))
+        		);}catch(ClassCastException e){}
+    			
     			if ((get(name) instanceof FunctionReferenceType)
     				&& (otherTable.get(name) instanceof FunctionReferenceType)
     				&& ((FunctionReferenceType)get(name)).equals(otherTable.get(name))){

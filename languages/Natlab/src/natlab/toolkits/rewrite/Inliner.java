@@ -28,6 +28,7 @@ import ast.List;
  *       body of the function
  *       b1 = y1
  *       b2 = y2
+ *       ...
  *   
  * - the name of the function and the call do not have to be the same
  * 
