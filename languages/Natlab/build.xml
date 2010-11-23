@@ -196,7 +196,7 @@
 	</target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
-        <target name="jar" depends="clean, jar_noclean" description="creates an executable release jar" />
+        <target name="jar" depends="annotations.build, matlab.build, clean, jar_noclean" description="creates an executable release jar" />
 	<target name="jar_noclean" depends="gen, compile" description="creates an executable release jar without cleaning first">
 		<jar destfile="${entrypoint.jarname}">
 			<manifest>
