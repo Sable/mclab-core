@@ -65,6 +65,11 @@ public class ScriptVFDatum extends AbstractVFDatum
             value = Value.TOP;
     }
 
+
+    public void makeTop(){
+	value=Value.TOP;
+    }
+
     /**
      * Make value a load variable. If value is BOT, assign LDVAR to value. 
      * Otherwise do nothing.

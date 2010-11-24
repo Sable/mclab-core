@@ -24,6 +24,7 @@ public abstract class AbstractVFDatum implements VFDatum
     public abstract void makeAssignedVariable();
     public abstract void makeFunction();
     public abstract void makeLDVar();
+    public abstract void makeTop();
 
     public Value getValue()
     {

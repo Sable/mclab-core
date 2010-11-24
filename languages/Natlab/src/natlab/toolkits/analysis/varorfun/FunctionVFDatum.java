@@ -51,13 +51,20 @@ public class FunctionVFDatum extends AbstractVFDatum
     }
 
     /**
-     * Make value an assigned variable. If value is TOP or AVAR, then
-     * do nothing. If value is FUN then make value TOP. Otherwise make
-     * value AVAR.
+     * Make value an ID. 
      */
     public void makeBottom()
     {
 	value = Value.BOT;
+    }
+
+
+    /**
+     * Make a TOP. This represets a compile error.
+     */
+    public void makeTop()
+    {
+	value = Value.TOP;
     }
 
 
@@ -79,7 +86,7 @@ public class FunctionVFDatum extends AbstractVFDatum
      */
     public void makeLDVar()
     {
-        if( Value.BOT.equals( value ))
+        if( Value.BOT.equals( value ) )
             value = Value.LDVAR;
     }
 
@@ -141,10 +148,14 @@ public class FunctionVFDatum extends AbstractVFDatum
         else if( Value.BOT.equals( ov ) )
             return new FunctionVFDatum( value );
         //not equal, neither are TOP or BOT
-	else if( Value.LDVAR.equals(value) && (Value.FUN.equals( ov )  || Value.VAR.equals( ov )  || Value.AVAR.equals( ov )))
-	    return new FunctionVFDatum(ov);
-	else if( Value.LDVAR.equals(ov) && (Value.FUN.equals( value )  || Value.VAR.equals( value )  || Value.AVAR.equals( value )))
-	    return new FunctionVFDatum(value);
+	else if( Value.LDVAR.equals( value ) && (Value.FUN.equals( ov )  || 
+					       Value.VAR.equals( ov )  || 
+					       Value.AVAR.equals( ov ) ) )
+	    return new FunctionVFDatum( ov );
+	else if( Value.LDVAR.equals( ov ) && (Value.FUN.equals( value )  || 
+					    Value.VAR.equals( value )  || 
+					    Value.AVAR.equals( value ) ) )
+	    return new FunctionVFDatum( value );
         else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
             return new FunctionVFDatum( Value.TOP );
         //not equal and each is either AVAR or VAR, so one must be VAR

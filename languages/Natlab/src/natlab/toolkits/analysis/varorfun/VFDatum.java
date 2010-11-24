@@ -20,6 +20,11 @@ public interface VFDatum
     public void makeAssignedVariable();
 
     /**
+     * Make the value an assigned variable.
+     */
+    public void makeTop();
+
+    /**
      * Make the value a function
      */
     public void makeFunction();

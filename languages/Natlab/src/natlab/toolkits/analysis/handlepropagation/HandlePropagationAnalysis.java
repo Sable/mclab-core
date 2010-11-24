@@ -418,7 +418,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 }
             }
             //Case 2
-            for( Value v : currentInSet.get( nameExpr.getName().getID() ) ){
+	    Set<Value> s = currentInSet.get( nameExpr.getName().getID() );
+            if (s!=null)for( Value v : s ){
                 //case 2.a
                 if( v instanceof NamedHandleValue ){
                     NamedHandleValue nhv = (NamedHandleValue)v;
@@ -742,17 +743,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected VFDatum getKindDatum( NameExpr n )
     {
-        if( inScript ){
-            ValueDatumPair vdp = preorderKindAnalysis.scriptResults.get(n.getName());
-            return (VFDatum)vdp.getDatum();
-        }
-        else{
-            return preorderSet.contains(n.getName().getID() );
-        }
-        /*VFFlowset kinds = getKindSet();
-        if( kinds==null )
-            return null;
-            return kinds.contains( n.getName().getID() );*/
+	return preorderKindAnalysis.getFlowSets().get(n).contains(n.getName().getID());
     }
 
     /**
@@ -767,6 +758,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         if( values != null && values.contains( AbstractValue.newUndef() ) )
             return true;
         else if( values == null || values.size()==0){
+	    if ( getKindSet() == null )
+		return true;
             VFDatum kind = getKindSet().contains(id);
             if( kind == null || kind.isBottom() || 
                 kind.isVariable() )
@@ -888,13 +881,17 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         for( String gname : globalNames ){
             change = true;
             TreeSet<Value> newSet = newGeneralSet();
-            newSet.addAll( currentOutSet.get( gname ) );
+	    Set<Value> set = currentOutSet.get( gname );
+	    if (set!=null)
+		newSet.addAll( set );
             currentOutSet.add( gname, newSet );
         }
         for( String pname : persistentNames ){
             change = true;
             TreeSet<Value> newSet = newGeneralSet();
-            newSet.addAll( currentOutSet.get( pname ) );
+	    Set<Value> set = currentOutSet.get( pname ) ;
+	    if (set!=null)
+		newSet.addAll(set );
             currentOutSet.add( pname, newSet );
         }
 
