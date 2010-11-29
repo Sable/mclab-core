@@ -140,12 +140,17 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseFunction( Function node )
     {
         inScript = false;
+        for( Function f : node.getNestedFunctions() )
+          analyze( f );
+
         preorderKindAnalysis = new VFPreorderAnalysis( node );
         preorderKindAnalysis.analyze();
         preorderSet = preorderKindAnalysis.getFlowSets().get(node);
 
-        HandleFlowset tmpInSet = currentInSet.clone();
-        HandleFlowset newOutSet = tmpInSet.clone();
+        //HandleFlowset tmpInSet = currentInSet.clone();
+        //HandleFlowset newOutSet = tmpInSet.clone();
+        HandleFlowset tmpInSet = new HandleFlowset();
+        HandleFlowset newOutSet = new HandleFlowset();
 
         //for( ValueDatumPair<String, VFDatum> pair : preorderSet.toList() ){
             
@@ -155,10 +160,12 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         for( Name in : node.getInputParams() )
             newOutSet.add(in.getID(), newGeneralSet() );
 
-
         inFlowSets.put( node, tmpInSet );
         currentInSet = newOutSet;
-        caseASTNode(node);
+        currentOutSet = newOutSet;
+        //caseASTNode(node);
+        //caseASTNode(node.getStmts());
+        analyze(node.getStmts());
         outFlowSets.put( node, currentOutSet.clone());
     }
 
@@ -336,6 +343,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         currentOutSet = currentInSet;
         VFDatum kind = getKindDatum( node );
+        System.out.println( kind );
         if( kind != null ){
             //case 1
             if(kind.isVariable()){
@@ -553,6 +561,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
             //is matrixExpr, since on LHS assume exactly one row.
             Row row = me.getRow(0);
             for( Expr elmt : row.getElements() ){
+                //BREAKING
                 handleLHS( set, elmt , in );
             }
         }
@@ -748,6 +757,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected VFDatum getKindDatum( NameExpr n )
     {
+        System.out.println(preorderKindAnalysis.getFlowSets().get(n));
 	return preorderKindAnalysis.getFlowSets().get(n).contains(n.getName().getID());
     }
 
