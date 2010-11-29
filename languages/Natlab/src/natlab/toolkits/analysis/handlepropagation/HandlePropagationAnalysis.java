@@ -71,6 +71,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public HandlePropagationAnalysis( ASTNode tree )
     {
         super( tree );
+        DEBUG = true;
         kindAnalysis = new VFStructuralForwardAnalysis( tree );
         kindAnalysis.analyze();
         currentOutSet = newInitialFlow();
@@ -418,8 +419,10 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 }
             }
             //Case 2
-	    Set<Value> s = currentInSet.get( nameExpr.getName().getID() );
+            String id = nameExpr.getName().getID();
+	    Set<Value> s = currentInSet.get( id );
             if (s!=null)for( Value v : s ){
+
                 //case 2.a
                 if( v instanceof NamedHandleValue ){
                     NamedHandleValue nhv = (NamedHandleValue)v;
@@ -520,8 +523,9 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
 
     /**
-     * Does associates the correct data with the give lhs in the given
-     * set. 
+     * Associates the correct data with the give lhs with the given
+     * set.
+     *
      * If lhs is a MatrixExpr, recurse on each expression.
      *
      * There are 4 cases for how to associate the date
@@ -546,10 +550,11 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         TreeSet<Value> data;
         if( lhs instanceof MatrixExpr ){
             MatrixExpr me = (MatrixExpr) lhs;
-            //is matrixExpr, since on LHS assume each row only has one
-            //element
-            for( Row r : me.getRows() )
-                handleLHS( set, r.getElement(0) , in );
+            //is matrixExpr, since on LHS assume exactly one row.
+            Row row = me.getRow(0);
+            for( Expr elmt : row.getElements() ){
+                handleLHS( set, elmt , in );
+            }
         }
         //case 1
         else if( lhs instanceof NameExpr )
@@ -585,7 +590,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
             if( cie.getTarget() instanceof NameExpr ){
                 String id = ((NameExpr)cie.getTarget()).getName().getID();
                 data = makeStructDataSet( newHandleTargets );
-                data.addAll( makeStructDataSet(in.get(id)) );
+                data.addAll( getStructuredDataOnly(in.get(id)) );
                 storeDataToNameExpr((NameExpr)cie.getTarget(), set, data);
             }
             //case 3.b
