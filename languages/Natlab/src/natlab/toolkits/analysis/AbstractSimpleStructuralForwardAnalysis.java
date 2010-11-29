@@ -18,13 +18,14 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
     }
     /**
      * A simple implementation of the caseBreakStmt. It copies the
-     * in set to the out sets and adds it to the break list.
+     * in set to the out sets and adds it to the break list. 
      */
     public void caseBreakStmt( BreakStmt node )
     {
-        currentOutSet = newInitialFlow();
-        copy( currentInSet, currentOutSet );
-        loopStack.peek().addBreakSet( currentOutSet );
+        A copiedOutSet = newInitialFlow();
+        copiedOutSet.clear();
+        copy( currentInSet, copiedOutSet );
+        loopStack.peek().addBreakSet( copiedOutSet );
     }
 
     /**
@@ -33,9 +34,10 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
      */
     public void caseContinueStmt( ContinueStmt node )
     {
-        currentOutSet = newInitialFlow();
-        copy( currentInSet, currentOutSet );
-        loopStack.peek().addBreakSet( currentOutSet );
+        A copiedOutSet = newInitialFlow();
+        copiedOutSet.clear();
+        copy( currentInSet, copiedOutSet );
+        loopStack.peek().addContinueSet( copiedOutSet );
     }
 
     /**
@@ -71,6 +73,7 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         for( A set : loopStack.peek().getBreakOutSets() ){
             if( mergedSets == null ){
                 mergedSets = newInitialFlow();
+                mergedSets.clear();
                 copy(set, mergedSets);
             }
             else

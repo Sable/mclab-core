@@ -119,6 +119,9 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         A mergedOut;
         A newOut;
         
+        //for debug
+        int iterCount = 0;
+        int countBad = 100;
 
         newOut = currentOutSet;
         if(DEBUG)
@@ -157,7 +160,14 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
                 System.out.println("prev: "+previousOut);
                 System.out.println("new: "+newOut);
                 System.out.println("*****");
+                if(iterCount>countBad){
+                    System.err.println("!!!!!!!!!!**********\nwoah too many iterations: "+ iterCount);
+                    System.err.println( node.getPrettyPrinted() );
+                    System.err.println("!!!!!!!!!!: " + iterCount);
+                    countBad *= 2;
+                }
             }
+            iterCount++;
         }while( !previousOut.equals( newOut ) );
 
         if(DEBUG)
@@ -198,9 +208,19 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         A mergedOut;
         A newOut;
 
+
+        int iterCount = 0;
+        int countBad = 100;
+
+        if(DEBUG)
+            System.out.println( "  whilestmt: starting fixed point");
         //going into the loop the current out will be the out of the
         //loop condition
         do{
+            if(DEBUG){
+                System.out.println(" whilestmt: currentOutSet at start: ");
+                System.out.println(currentOutSet);
+            }
             //store the current out in previousOut for later
             //comparison
             previousOut = newInitialFlow();
@@ -212,12 +232,25 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //analyze the body and collect the continue sets, merge
             //them into one out
             analyze( body );
+            if(DEBUG){
+                System.out.println(" whilestmt: currentOutSet after body: ");
+                System.out.println(currentOutSet);
+            }
             continueSet = processContinues();
+            if(DEBUG){
+                System.out.println(" whilestmt: continueSet: ");
+                System.out.println(continueSet);
+            }
             mergedOut = newInitialFlow();
             if( continueSet == null )
                 copy( currentOutSet, mergedOut );
             else
                 merge( currentOutSet, continueSet, mergedOut );
+            if(DEBUG){
+                System.out.println(" whilestmt: merged current and continue: ");
+                System.out.println(mergedOut);
+            }
+
 
             //setup the current out as the merged out
             //this is the current out before processing the loop
@@ -228,21 +261,50 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //first merge the mergedout with the loop in
             merge( loopInSet, mergedOut, mergedOut );
             currentInSet = (A)(mergedOut.clone());
+            if(DEBUG){
+                System.out.println(" whilestmt: merged loopInSet and mergedOut: ");
+                System.out.println(mergedOut);
+            }
+
 
             caseCondition( loopCond );
             
             //merge the loop condition out and break sets
             //use for new out
             breakSet = processBreaks();
+            if(DEBUG){
+                System.out.println(" whilestmt: breakSet: ");
+                System.out.println(breakSet);
+            }
+
             mergedOut = newInitialFlow();
             if( breakSet == null )
                 copy( currentOutSet, mergedOut );
             else
                 merge( currentOutSet, breakSet, mergedOut );
+            if(DEBUG){
+                System.out.println(" whilestmt: merged out of condition, and breaks: ");
+                System.out.println(mergedOut);
+            }
             newOut = mergedOut;
             //newOut is the new out of the entire loop
 
+            currentOutSet = newOut;
+
             //loop until there is no change
+            if( DEBUG )
+                if(iterCount>=countBad){
+                    System.err.println("!!!!!!!!!!**********\nwoah too many iterations: " + iterCount);
+                    System.err.println( node.getPrettyPrinted() );
+                    System.err.println("!!!!!!!!!!: " + iterCount);
+                    countBad*=2;
+                }
+            iterCount++;
+            if(DEBUG){
+                System.out.println(" whilestmt: previousOut and newOut: ");
+                System.out.println(previousOut);
+                System.out.println(newOut);
+            }
         }while( !previousOut.equals( newOut ) );
 
         //set currentOut to the out of the entire loop, e.g. newOut
