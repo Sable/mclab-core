@@ -62,6 +62,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 
     public TreeSet<Value> allHandleTargets = new TreeSet();
     private boolean inAssignment = false;
+    private boolean inExprStmt = false;
 
     public HandleFlowset newInitialFlow()
     {
@@ -277,15 +278,19 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         arrayExpr(node);
     }
     
-    
-    /*public void caseExprStmt( ExprStmt node )
+    /**
+     * Records that we are in an expr stmt and forwards to caseStmt.
+     */
+    public void caseExprStmt( ExprStmt node )
     {
-        inAssignment = false;
+        inExprStmt = true;
+        caseStmt( node );
+        /*inAssignment = false;
         boolean oldChange = change
         currentStmt = node;
         inFlowSets.put(node, currentInSet);
-        outFlowSets.put(node, currentOutSet);
-        }*/
+        outFlowSets.put(node, currentOutSet);*/
+    }
     public void caseGlobalStmt( GlobalStmt node )
     {
         inFlowSets.put(node, currentInSet);
@@ -784,7 +789,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
 
     /**
-     * Deals with the affects of function calls. All knowledge of
+     * Deals with the effects of function calls. All knowledge of
      * globals variables is destroyed. If set to do so then this will
      * destroy all knowledge of all identifiers. Will also return the
      * values resulting from the call.
@@ -834,7 +839,9 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                     }
                 }
                 }*/
-            destroyInfo();
+            if( inExprStmt ){
+                destroyInfo();
+            }
             return newUndefSet();
         }
         if( name.equals( "feval" ) )
@@ -845,6 +852,20 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         return handleFunctionCall( name );
     }
     
+
+    /**
+     * Determines what the load function can load.
+     * Returns either a set of variables to load or null. If it
+     * returns null then all variables could be changed and all
+     * information should be destroyed.
+     */
+    protected HashSet<String> loadWhat( ast.List<Expr> args ){
+        
+        if( args.getNumChild() >= 2 ){
+            //check not -ascii 
+        }
+        return null;
+    }
     /**
      * Deals with the affects of function calls when the function name
      * is unknown. Works the same as hadleFunctionCall but without the
