@@ -11,12 +11,14 @@ public class LoadFunction
     /**
      * Determines what the load function can load.
      * Returns either a set of variables to load or null. If it
-     * returns null then all variables could be changed and all
-     * information should be destroyed.
+     * returns null then it is unknown what variables are loaded. This
+     * is a conservative approximation. If a single variable with a
+     * wild card or regular expressions are used then it returns
+     * null. This might be over an approximation.
      */
     public static HashSet<String> loadWhat( ast.List<Expr> args )
     {
-        HashSet<String> set = new HashSet();
+        HashSet<String> set;
         String filename;
         if( args.getNumChild() >= 2 ){
             Expr e = args.getChild(0);
@@ -36,6 +38,8 @@ public class LoadFunction
             set = handleAsciiFlag(arg1, arg0);
             if( set!=null )
                 return set;
+
+            set = new HashSet();
 
             boolean noFlag = true;
             filename = arg0;

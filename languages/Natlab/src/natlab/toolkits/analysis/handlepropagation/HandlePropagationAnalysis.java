@@ -8,6 +8,7 @@ import natlab.LookupFile;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
 import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.loadfunction.*;
 
 /**
  * This is an intraprocedural function handle propagation analysis. 
@@ -840,7 +841,11 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                 }
                 }*/
             if( inExprStmt ){
-                destroyInfo();
+                HashSet<String> set = LoadFunction.loadWhat( args );
+                if( set == null )
+                    destroyInfo();
+                else
+                    destroyInfo(set);
             }
             return newUndefSet();
         }
@@ -853,19 +858,6 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     }
     
 
-    /**
-     * Determines what the load function can load.
-     * Returns either a set of variables to load or null. If it
-     * returns null then all variables could be changed and all
-     * information should be destroyed.
-     */
-    protected HashSet<String> loadWhat( ast.List<Expr> args ){
-        
-        if( args.getNumChild() >= 2 ){
-            //check not -ascii 
-        }
-        return null;
-    }
     /**
      * Deals with the affects of function calls when the function name
      * is unknown. Works the same as hadleFunctionCall but without the
@@ -886,13 +878,39 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected void destroyInfo()
     {
-        //for( String id : currentOutSet.keySet() ){
         for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
-            change = true;
-            TreeSet<Value> newSet = newGeneralSet();
-            newSet.addAll( e.getValue() );
-            currentOutSet.add( e.getKey(), newGeneralSet() );
+            destroyInfo( e.getKey(), e.getValue() );
         }
+    }
+    
+    /**
+     * Destroy the information for a given identifier in the current
+     * set. 
+     */
+    protected void destroyInfo( String id )
+    {
+        destroyInfo( id, currentOutSet.get( id ) );
+    }
+    /**
+     * Destroy the information for a given set of identifiers in the
+     * current set.
+     */
+    protected void destroyInfo( Set<String> set )
+    {
+        for( String s : set )
+            destroyInfo( s );
+    }
+    /**
+     * Destroy the information for a give identifier with a given set
+     * of values in the current set.
+     */
+    protected void destroyInfo( String id, TreeSet<Value> values )
+    {
+        change = true;
+        TreeSet<Value> newSet = newGeneralSet();
+        if( values != null )
+            newSet.addAll( values );
+        currentOutSet.add( id, newSet );
     }
 
     /**
