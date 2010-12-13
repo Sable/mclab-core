@@ -14,6 +14,9 @@ public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
 
     protected java.util.List multiNodes = null;
 
+    //What rewrite to use as the call back object for the visitor.
+    protected AbstractLocalRewrite callback;
+
     /**
      * Applies the rewrite to a particular node. Also does some book
      * keeping.
@@ -21,7 +24,7 @@ public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
     protected void rewrite( ASTNode node )
     {
         newNode = null;
-        node.analyze(this);
+        node.analyze(callback);
     }
 
     /**
@@ -35,8 +38,14 @@ public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
     public AbstractLocalRewrite( ASTNode tree )
     {
         oldTree = tree;
+        callback = this;
     }
 
+    public AbstractLocalRewrite( ASTNode tree, AbstractLocalRewrite callback )
+    {
+        oldTree = tree;
+        this.callback = callback;
+    }
 
     public ASTNode transform()
     {
