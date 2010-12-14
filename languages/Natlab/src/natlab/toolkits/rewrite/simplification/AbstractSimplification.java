@@ -1,4 +1,4 @@
-package natlab.toolkits.rewrite;
+package natlab.toolkits.rewrite.simplification;
 
 
 import java.lang.*;
@@ -27,6 +27,8 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     }
 
     public abstract Set<AbstractSimplification> getDependencies();
+    
+    //public void setKindAnalysis(
     
 
 }
