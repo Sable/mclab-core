@@ -763,7 +763,6 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected VFDatum getKindDatum( NameExpr n )
     {
-        System.out.println(preorderKindAnalysis.getFlowSets().get(n));
 	return preorderKindAnalysis.getFlowSets().get(n).contains(n.getName().getID());
     }
 
@@ -827,19 +826,6 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected TreeSet<Value> handleFunctionCall( String name, ast.List<Expr> args )
     {
         if( name.equals( "load" ) ){
-            /*if( args.getNumChild()>=2 ){
-                int start= 1;
-                //check not -ascii, and set start =2 if -mat
-                //HERE
-                for( int i = start; i< args.getNumChild(); i++ ){
-                    if( args.getChild(i) instanceof StringLiteralExpr ){
-                        String id = ((StringLiteralExpr)args.getChild(i)).getValue();
-                        
-                        
-                        return handleFunctionCall( ((StringLiteralExpr)args.getChild(1)).getValue() );
-                    }
-                }
-                }*/
             if( inExprStmt ){
                 HashSet<String> set = LoadFunction.loadWhat( args );
                 if( set == null )
