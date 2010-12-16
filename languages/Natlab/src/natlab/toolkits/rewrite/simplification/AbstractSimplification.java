@@ -12,6 +12,8 @@ import natlab.toolkits.analysis.varorfun.*;
  * A simplification specific implementation of
  * AbstractLocalRewrite. Adds dependencies and requires the kind
  * analysis. 
+ *
+ * @author Jesse Doherty
  */
 public abstract class AbstractSimplification extends AbstractLocalRewrite
 {
