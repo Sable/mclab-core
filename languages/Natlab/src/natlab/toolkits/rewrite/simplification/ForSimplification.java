@@ -3,7 +3,7 @@ package natlab.toolkits.rewrite.simplification;
 import java.util.*;
 
 import ast.*;
-import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.*;
 import natlab.toolkits.analysis.varorfun.*;
 
 /**
@@ -27,6 +27,18 @@ public class ForSimplification extends AbstractSimplification
         return new HashSet();
     }
 
+    /*
+      for v=E
+        ...
+      end
+      ==========
+      t1=E;
+      t2=size(t1);
+      t3=prod(t2(2:end));
+      for i=1:t3
+        ...
+      end
+     */
     public void caseForStmt( ForStmt node )
     {
         AssignStmt assignStmt = node.getAssignStmt();
@@ -34,11 +46,13 @@ public class ForSimplification extends AbstractSimplification
         Expr iterableExpr = assignStmt.getRHS();
         if( !(iterableExpr instanceof RangeExpr) ){
             
-            LinkedList<AssignStmt> newStmts;
+            LinkedList<AssignStmt> newStmts = new LinkedList();
 
-            //newStmts = buildTempAssigns( iterableExpr );
+            TempFactory t1Fact = TempFactory.genFreshTempFactory();
+            TempFactory t2Fact = TempFactory.genFreshTempFactory();
+            TempFactory t3Fact = TempFactory.genFreshTempFactory();
+
             
-            //RangeExpr = buildRangeExpr
         }
     }
 
