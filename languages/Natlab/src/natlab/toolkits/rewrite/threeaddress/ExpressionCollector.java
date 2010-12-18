@@ -129,6 +129,28 @@ public class ExpressionCollector extends AbstractLocalRewrite
             }
         }
     }
+    public void caseUnaryExpr( UnaryExpr node )
+    {
+        if( isSub )
+            subExprHandler( node );
+        else{
+            Expr operand = node.getOperand();
+            
+            Expr newOperand = operand;
+            boolean changed = false;
+            
+            isSub = true;
+            rewrite( operand );
+            if( newNode != null ){
+                newOperand = (Expr)newNode.getSingleNode();
+                changed = true;
+            }
+            if( changed ){
+                node.setOperand(newOperand);
+                newNode = new TransformedNode(node);
+            }
+        }
+    }
 
     public void caseNameExpr( NameExpr node )
     {
