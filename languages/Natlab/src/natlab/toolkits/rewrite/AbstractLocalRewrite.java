@@ -47,6 +47,11 @@ public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
         this.callback = callback;
     }
 
+    public void setTree( ASTNode tree )
+    {
+        oldTree = tree;
+    }
+
     public ASTNode transform()
     {
         rewrite( oldTree );
