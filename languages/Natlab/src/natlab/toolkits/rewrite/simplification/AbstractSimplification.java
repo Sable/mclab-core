@@ -18,19 +18,33 @@ import natlab.toolkits.analysis.varorfun.*;
 public abstract class AbstractSimplification extends AbstractLocalRewrite
 {
 
-    VFStructuralForwardAnalysis kindAnalysis;
+    VFPreorderAnalysis kindAnalysis;
 
     public AbstractSimplification( ASTNode tree, 
-                                   AbstractLocalRewrite callback, 
-                                   VFStructuralForwardAnalysis kind )
+                                   VFPreorderAnalysis kind )
     {
-        super(tree, callback);
+        super(tree);
         kindAnalysis = kind;
     }
 
-    public abstract Set<AbstractSimplification> getDependencies();
+    public abstract Set<Class<? extends AbstractSimplification>> getDependencies();
     
     //public void setKindAnalysis(
     
+
+    //TODO: use kind analysis to give an actual answer
+    public boolean isVar( Expr expr )
+    {
+        if( expr instanceof NameExpr ){
+            NameExpr nameExpr = (NameExpr)expr;
+            if( nameExpr.tmpVar )
+                return true;
+            else{
+                VFDatum kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
+                return (kind!=null) && kind.isVariable();
+            }
+        }
+        return false;
+    }
 
 }
