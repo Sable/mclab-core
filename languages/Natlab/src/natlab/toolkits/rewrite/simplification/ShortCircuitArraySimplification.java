@@ -43,7 +43,7 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
       ...
       end
       ==========
-      [t1 = E1 op E2]
+      [E1 op E2, t1]
       if t1
       ...
       end
@@ -92,21 +92,160 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
             
     }
 
-    protected LinkedList<Stmt> handleAnd( AndExpr cond, TempFactory condFact )
+    public void caseWhileStmt( WhileStmt node )
     {
-        AssignStmt tmpAssign = new AssignStmt( condFact.genNameExpr(), cond );
-        LinkedList<Stmt> newAssings = new LinkedList();
-        newAssings.add( tmpAssign );
-        return newAssings;
+        LinkedList<Stmt> newStmts = null;
+        TempFactory condFact = null;
+        ast.List<Stmt> body = node.getStmts();
+
+        //prepare new stmts if condition is an and or an or
+        Expr cond = node.getExpr();
+        if( cond instanceof AndExpr ){
+            condFact = TempFactory.genFreshTempFactory();
+            newStmts = handleAnd( (AndExpr)cond, condFact );
+        }
+        else if( cond instanceof OrExpr ){
+            condFact = TempFactory.genFreshTempFactory();
+            newStmts = handleOr( (OrExpr)cond, condFact );
+        }
+
+        //rewrite body
+        rewrite( body );
+        
+        if( newStmts != null ){
+            WhileStmt newWhileStmt;
+            newWhileStmt = new WhileStmt( condFact.genNameExpr(), body );
+            newStmts.add( newWhileStmt );
+            newNode = new TransformedNode( newStmts );
+        }
     }
-    protected LinkedList<Stmt> handleOr( OrExpr cond, TempFactory condFact )
+        
+
+    /**
+     * Determines what to do with the cond and temporary. It will
+     * either treat it as an or, and and, or just an expression. In
+     * all cases it the resulting value will be assigned to the
+     * temporary represented by the condFact. 
+     */
+    protected LinkedList<Stmt> handleExp( Expr cond, TempFactory condFact )
     {
-        AssignStmt tmpAssign = new AssignStmt( condFact.genNameExpr(), cond );
-        LinkedList<Stmt> newAssings = new LinkedList();
-        newAssings.add( tmpAssign );
-        return newAssings;
+        LinkedList<Stmt> newStmts;
+        if( cond instanceof AndExpr ){
+            newStmts = handleAnd( (AndExpr)cond, condFact );
+        }
+        else if( cond instanceof OrExpr ){
+            newStmts = handleOr( (OrExpr)cond, condFact );
+        }
+        else{
+            AssignStmt newAssignment = new AssignStmt( condFact.genNameExpr(),
+                                                       cond );
+            newAssignment.setOutputSuppressed( true );
+            newStmts = new LinkedList();
+            newStmts.add( newAssignment );
+        }
+        return newStmts;
     }
 
+    /*
+      [E1 & E2, t1]
+      ==========
+      [E1, t2]
+      if t2
+        [E2, t3]
+        t1 = t2 & t3;
+      else
+        t1 = t2;
+      end
+     */
+    protected LinkedList<Stmt> handleAnd( AndExpr cond, TempFactory condFact )
+    {
+        return handleAndOr( true, cond, condFact );
+    }
+    /*
+      [E1 | E2, t1]
+      ==========
+      [E1, t2]
+      if ~t2
+        [E2, t3]
+        t1 = t2 | t3;
+      else
+        t1 = t2;
+      end
+    */
+    protected LinkedList<Stmt> handleOr( OrExpr cond, TempFactory condFact )
+    {
+        return handleAndOr( false, cond, condFact );
+    }
+
+    /*
+      [E1 op E2, t1]
+      ==========
+      [E1, t2]
+      if [~]t2
+        [E2,t3]
+        t1 = t2 op t3;
+      else
+        t1 = t2;
+      end
+
+      the ~ will be used if op is |
+    */
+    protected LinkedList<Stmt> handleAndOr( boolean isAnd, BinaryExpr cond, TempFactory condFact )
+    {
+
+
+        Expr E1 = cond.getLHS();
+        Expr E2 = cond.getRHS();
+
+        TempFactory lhsTFact = TempFactory.genFreshTempFactory(); //t2
+        TempFactory rhsTFact = TempFactory.genFreshTempFactory(); //t3
+
+        LinkedList<Stmt> E1List = handleExp( E1, lhsTFact ); //[E1, t2]
+        LinkedList<Stmt> E2List = handleExp( E2, rhsTFact ); //[E2, t3]
+
+        //t1 = t2 op t3
+        Expr boolExpr;
+        if( isAnd )
+            boolExpr = new AndExpr( lhsTFact.genNameExpr(), rhsTFact.genNameExpr() );
+        else
+            boolExpr = new OrExpr( lhsTFact.genNameExpr(), rhsTFact.genNameExpr() );
+        AssignStmt thenAssign;
+        thenAssign = new AssignStmt( condFact.genNameExpr(), boolExpr );
+        thenAssign.setOutputSuppressed( true );
+
+        E2List.add( thenAssign ); 
+
+        //t1 = t2
+        AssignStmt elseAssign;
+        elseAssign = new AssignStmt( condFact.genNameExpr(),
+                                     rhsTFact.genNameExpr() );
+        elseAssign.setOutputSuppressed( true );
+
+        //[~]t2
+        Expr newCondExpr;
+        if( isAnd )
+            newCondExpr = lhsTFact.genNameExpr();
+        else
+            newCondExpr = new NotExpr( lhsTFact.genNameExpr() );
+
+        //new if
+        E1List.add( newIfStmt( newCondExpr,
+                               listToList( E2List ),
+                               new ast.List().add( elseAssign ) ) );
+        return E1List;
+
+    }
+
+    /**
+     * Generate an AST list from a java.util.list.
+     */
+    protected <T extends ASTNode> ast.List<T> listToList( java.util.List<T> l )
+    {
+        ast.List<T> newL = new ast.List();
+        for( T e : l )
+            newL.add( e );
+        return newL;
+    }
     /**
      * Generates a simple If then else.
      */
