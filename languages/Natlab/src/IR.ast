@@ -6,3 +6,8 @@
 VariableDecl : Stmt ::= <ID> <Type : annotations.ast.Type> <OriginalID>;
 FunctionDecl : Function ::= ParamDecl:VariableDecl*;
 //// DECLARATION EXTENSION - END ///////////////////////////////////////////////
+
+
+//Comma separated list node. Acts as a variable. 
+CSL : NameExpr;  
+EndCallExpr: Expr ::= Array:NameExpr <NumDim : int> <WhatDim : int>;
