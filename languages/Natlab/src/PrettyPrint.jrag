@@ -43,6 +43,13 @@ aspect PrettyPrint {
     syn String ASTNode.getPrettyPrintedLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()"); }
     
 
+    //IR
+    eq CSLExpr.getPrettyPrintedLessComments() = "CSL["+getName().getPrettyPrinted()+"]";
+    eq EndCallExpr.getPrettyPrintedLessComments() = "end("+getArray().getPrettyPrinted() + ", " + getNumDim() + ", " + getWhatDim() + ")";
+    eq CheckScalarStmt.getPrettyPrintedLessComments() = "check_scalar("+getNameExpr().getPrettyPrinted() + ")";
+
+    //AST
+
     eq CompilationUnits.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
 
@@ -794,4 +801,5 @@ aspect PrettyPrint {
         }
         return "" ;
     }
+
 }

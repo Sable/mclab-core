@@ -9,5 +9,6 @@ FunctionDecl : Function ::= ParamDecl:VariableDecl*;
 
 
 //Comma separated list node. Acts as a variable. 
-CSL : NameExpr;  
-EndCallExpr: Expr ::= Array:NameExpr <NumDim : int> <WhatDim : int>;
+CSLExpr : NameExpr;  
+EndCallExpr: Expr ::= Array:Expr <NumDim : int> <WhatDim : int>;
+CheckScalarStmt: Stmt ::= NameExpr;
