@@ -85,7 +85,7 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
         if( newStmts != null ){
             
             IfStmt newIfStmt;
-            newIfStmt = newIfStmt( condFact.genNameExpr(), thenBody, elseBlock );
+            newIfStmt = ASTHelpers.newIfStmt( condFact.genNameExpr(), thenBody, elseBlock );
             newStmts.add( newIfStmt );
             newNode = new TransformedNode( newStmts );
         }
@@ -229,58 +229,12 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
             newCondExpr = new NotExpr( lhsTFact.genNameExpr() );
 
         //new if
-        E1List.add( newIfStmt( newCondExpr,
-                               listToList( E2List ),
-                               new ast.List().add( elseAssign ) ) );
+        E1List.add( ASTHelpers.newIfStmt( newCondExpr,
+                                          ASTHelpers.listToList( E2List ),
+                                          new ast.List().add( elseAssign ) ) );
         return E1List;
 
     }
 
-    /**
-     * Generate an AST list from a java.util.list.
-     */
-    protected <T extends ASTNode> ast.List<T> listToList( java.util.List<T> l )
-    {
-        ast.List<T> newL = new ast.List();
-        for( T e : l )
-            newL.add( e );
-        return newL;
-    }
-    /**
-     * Generates a simple If then else.
-     */
-    protected IfStmt newIfStmt( Expr cond, ast.List<Stmt> thenBody, ast.List<Stmt> elseBody )
-    {
-        ElseBlock elseBlock = null;
-        if( elseBody != null )
-            elseBlock = new ElseBlock( elseBody );
-        return newIfStmt( cond, thenBody, elseBlock );
-    }
-    /**
-     * Generates a simple if then else.
-     */
-    protected IfStmt newIfStmt( Expr cond, ast.List<Stmt> thenBody, ElseBlock elseBlock )
-    {
-        return newIfStmt( new IfBlock( cond, thenBody ), elseBlock );
-    }
-    /**
-     * Generates a simple if then else.
-     */
-    protected IfStmt newIfStmt( IfBlock ifBlock, ElseBlock elseBlock )
-    {
-        Opt<ElseBlock> elseOpt;
-        if( elseBlock == null )
-            elseOpt = new Opt();
-        else
-            elseOpt = new Opt(elseBlock);
-        return newIfStmt( ifBlock, elseOpt );
-    }
-    /**
-     * Generates a simple if then else.
-     */
-    protected IfStmt newIfStmt( IfBlock ifBlock, Opt<ElseBlock> elseOpt )
-    {
-        return new IfStmt( new ast.List().add( ifBlock ), elseOpt );
-    }
 
 }

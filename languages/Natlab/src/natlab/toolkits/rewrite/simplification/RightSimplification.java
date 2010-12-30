@@ -10,7 +10,11 @@ import natlab.toolkits.analysis.varorfun.*;
 
 /**
  * Simplifies expressions so that there is at most one complex
- * operation, all operands must me literals or variables. 
+ * operation, all operands must me literals or variables. This makes
+ * short circuiting control flow explicit.
+ * 
+ * This simplification introduces the CheckScalar non-syntactic node for
+ * short-circuiting expansion.
  * @author Jesse Doherty
  */
 public class RightSimplification extends AbstractSimplification

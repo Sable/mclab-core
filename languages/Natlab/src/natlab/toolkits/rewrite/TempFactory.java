@@ -56,6 +56,15 @@ public class TempFactory
         return newName;
     }
     /**
+     * Gives a CSL node instance for this temporary.
+     */
+    public CSLExpr genCSLExpr()
+    {
+        CSLExpr newCSL = new CSLExpr( genName() );
+        newCSL.tmpVar = true;
+        return newCSL;
+    }
+    /**
      * Gives a Sring name for this temporary.
      */
     public String genString()
@@ -88,7 +97,9 @@ public class TempFactory
      */
     public static NameExpr genFreshTempNameExpr()
     {
-        return new NameExpr( genFreshTempName() );
+        NameExpr newNE = new NameExpr( genFreshTempName() );
+        newNE.tmpVar = true;
+        return newNE;
     }
     /**
      * Generates multiple NameExpr nodes with same string name.
@@ -97,9 +108,34 @@ public class TempFactory
     {
         Name[] names = genFreshTempName( amount );
         NameExpr[] nameExprs = new NameExpr[amount];
-        for( int i=0; i<amount; i++ )
+        for( int i=0; i<amount; i++ ){
             nameExprs[i] = new NameExpr( names[i] );
+            nameExprs[i].tmpVar = true;
+        }
         return nameExprs;
+    }
+    /**
+     * Generates a new temporary CSLExpr node. Each call returns a
+     * node with a fresh name.
+     */
+    public static CSLExpr genFreshTempCSLExpr()
+    {
+        CSLExpr newCSL = new CSLExpr( genFreshTempName() );
+        newCSL.tmpVar = true;
+        return newCSL;
+    }
+    /**
+     * Generates multiple CSLExpr nodes with the same string name.
+     */
+    public static CSLExpr[] genFreshTempCSLExpr( int amount )
+    {
+        Name[] names = genFreshTempName( amount );
+        CSLExpr[] cslExprs = new CSLExpr[amount];
+        for( int i=0; i<amount; i++ ){
+            cslExprs[i] = new CSLExpr( names[i] );
+            cslExprs[i].tmpVar = true;
+        }
+        return cslExprs;
     }
     /**
      * Generates a new temporary String name. Each call returns a

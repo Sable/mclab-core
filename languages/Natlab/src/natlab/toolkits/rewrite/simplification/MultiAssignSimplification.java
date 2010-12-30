@@ -37,5 +37,65 @@ public class MultiAssignSimplification extends AbstractSimplification
         dependencies.add( CommaSepListLeftSimplification.class );
         return dependencies;
     }
+    
+    public void caseAssignStmt( AssignStmt node )
+    {
+        rewriteChildren( node );
+
+        if( node.getLHS() instanceof MatrixExpr ){
+            //NOTE: assume lhs is a matrix expr with exactly 1 row
+            Row lhs = ((MatrixExpr)node.getLHS()).getRow(0);
+            Expr rhs = node.getRHS();
+            
+            boolean notSimplified;
+            notSimplified = !(lhs.getNumElement() <= 1 && rhs instanceof CSLExpr);
+            if( notSimplified ){
+
+                LinkedList<AssignStmt> newStmts = new LinkedList<AssignStmt>();
+                ArrayList<Expr> lvalues = new ArrayList<Expr>( lhs.getNumElement() );
+                
+                buildTempStatements( newStmts, lvalues, lhs.getElements() );
+                
+                if( newStmts.size() > 0 ){
+                    AssignStmt newAssign = ASTHelpers.buildMultiAssign( lvalues, rhs, 
+                                                                        node.isOutputSuppressed() );
+                    newStmts.add( 0, newAssign );
+                    newNode = new TransformedNode( newStmts );
+                }
+            }
+        }
+
+    }
+    /**
+     * Builds up the lists of new assignment statemens and a list of
+     * variable names to use in multi return assignment. 
+     *
+     * @param outNewStmts   the list to filled with new assignment
+     *                      statements
+     * @param outLValues    the list to be filled with variable names
+     * @param elements      AST List expressions from the lhs
+     */
+    private void buildTempStatements( LinkedList<AssignStmt> outNewStmts, 
+                                      ArrayList<Expr> outLValues, 
+                                      ast.List<Expr> elements )
+    {
+        HashSet<String> names = new HashSet<String>(elements.getNumChild());
+
+        for( Expr e : elements ){
+            if( e instanceof NameExpr ){
+                String name = ((NameExpr)e).getName().getID();
+                if( !names.contains( name ) ){
+                    names.add(name);
+                    outLValues.add( e );
+                    continue;
+                }
+            }
+            TempFactory tmp = TempFactory.genFreshTempFactory();
+            outLValues.add( tmp.genNameExpr() );
+            AssignStmt newAssign = new AssignStmt( e, tmp.genNameExpr() );
+            newAssign.setOutputSuppressed( true );
+            outNewStmts.add( newAssign );
+        }
+    }
 
 }

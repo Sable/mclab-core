@@ -32,7 +32,6 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     //public void setKindAnalysis(
     
 
-    //TODO: use kind analysis to give an actual answer
     public boolean isVar( Expr expr )
     {
         if( expr instanceof NameExpr ){
@@ -42,6 +41,19 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
             else{
                 VFDatum kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
                 return (kind!=null) && kind.isVariable();
+            }
+        }
+        return false;
+    }
+    public boolean isFun( Expr expr )
+    {
+        if( expr instanceof NameExpr ){
+            NameExpr nameExpr = (NameExpr)expr;
+            if( nameExpr.tmpVar )
+                return false;
+            else{
+                VFDatum kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
+                return (kind!=null) && kind.isFunction();
             }
         }
         return false;

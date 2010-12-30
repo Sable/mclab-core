@@ -35,7 +35,6 @@ public class LeftSimplification extends AbstractSimplification
     {
         HashSet<Class<? extends AbstractSimplification>> dependencies = new HashSet();
         dependencies.add( MultiAssignSimplification.class );
-        dependencies.add( EndSimplification.class );
         return dependencies;
     }
 
