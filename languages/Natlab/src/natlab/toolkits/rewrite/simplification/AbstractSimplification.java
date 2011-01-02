@@ -18,7 +18,7 @@ import natlab.toolkits.analysis.varorfun.*;
 public abstract class AbstractSimplification extends AbstractLocalRewrite
 {
 
-    VFPreorderAnalysis kindAnalysis;
+    protected VFPreorderAnalysis kindAnalysis;
 
     public AbstractSimplification( ASTNode tree, 
                                    VFPreorderAnalysis kind )

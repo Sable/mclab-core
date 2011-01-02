@@ -5,6 +5,7 @@ import java.util.*;
 import ast.*;
 import natlab.DecIntNumericLiteralValue;
 import natlab.toolkits.rewrite.*;
+import natlab.toolkits.rewrite.threeaddress.ExpressionCollector;
 import natlab.toolkits.analysis.varorfun.*;
 
 
@@ -35,7 +36,7 @@ public class EndSimplification extends AbstractSimplification
     public Set<Class<? extends AbstractSimplification>> getDependencies()
     {
         HashSet<Class<? extends AbstractSimplification>> dependencies = new HashSet();
-        dependencies.add( RightSimplification.class );
+        //dependencies.add( RightSimplification.class );
         return dependencies;
     }
 
@@ -79,17 +80,18 @@ public class EndSimplification extends AbstractSimplification
     //This and caseCellIndexExpr should be refactored.
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
-
         boolean change = false;
         ArrayList<Expr> newArgs = new ArrayList(node.getNumArg());
         if( canEndBind( node ) ){
             boolean oldHasEnd = hasEnd;
             TempFactory oldEndTempFact = endTempFact;
 
+            rewrite( node.getTarget() );
             int numDim = node.getNumArg();
             for( int i=0; i<numDim; i++ ){
                 rewriteArg( node.getArg(i) );
                 if( hasEnd ){
+                    node.setTarget( fixTarget( node.getTarget() ) );
                     addNewAssignment(node.getTarget(), numDim, i );
                     if( newNode != null )
                         newArgs.add( (Expr)newNode.getSingleNode() );
@@ -123,11 +125,14 @@ public class EndSimplification extends AbstractSimplification
         ArrayList<Expr> newArgs = new ArrayList(node.getNumArg());
         boolean oldHasEnd = hasEnd;
         TempFactory oldEndTempFact = endTempFact;
+        
+        rewrite( node.getTarget() );
 
         int numDim = node.getNumArg();
         for( int i=0; i<numDim; i++ ){
             rewriteArg( node.getArg(i) );
             if( hasEnd ){
+                node.setTarget( fixTarget( node.getTarget() ) );
                 addNewAssignment(node.getTarget(), numDim, i );
                 if( newNode != null )
                     newArgs.add( (Expr)newNode.getSingleNode() );
@@ -179,5 +184,18 @@ public class EndSimplification extends AbstractSimplification
         AssignStmt assign = new AssignStmt( endTempFact.genNameExpr(), end );
         assign.setOutputSuppressed( true );
         newStmts.add( assign );
+    }
+
+    /**
+     * Removes all argument used to compute the given target. Extracts
+     * them into temp variables and puts the assignments into the
+     * newStmts list. 
+     */
+    protected Expr fixTarget( Expr target )
+    {
+        ExpressionCollector ec = new ExpressionCollector( target, kindAnalysis );
+        Expr newTarget = (Expr)ec.transform();
+        newStmts.addAll( ec.getNewAssignments() );
+        return newTarget;
     }
 }

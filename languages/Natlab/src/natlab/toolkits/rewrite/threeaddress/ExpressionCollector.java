@@ -4,8 +4,7 @@ import java.util.LinkedList;
 
 import ast.*;
 import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.*;
 
 /**
  * Used to collect sub expressions from an expression. For each
@@ -18,13 +17,24 @@ public class ExpressionCollector extends AbstractLocalRewrite
     private boolean isSub = false;
     private LinkedList<AssignStmt> newAssignments;
     private VFFlowset<String, VFDatum> resolvedNames;
+    private VFPreorderAnalysis kindAnalysis;
     
     public ExpressionCollector( ASTNode tree, 
                                 VFFlowset<String, VFDatum> resolvedNames )
     {
         super( tree );
         this.resolvedNames = resolvedNames;
+        kindAnalysis = null;
         newAssignments = new LinkedList<AssignStmt>();
+    }
+
+    public ExpressionCollector( ASTNode tree,
+                                VFPreorderAnalysis kind )
+    {
+        super( tree );
+        kindAnalysis = kind;
+        resolvedNames = null;
+        newAssignments = new LinkedList();
     }
     
     public LinkedList<AssignStmt> getNewAssignments()
@@ -155,10 +165,25 @@ public class ExpressionCollector extends AbstractLocalRewrite
     public void caseNameExpr( NameExpr node )
     {
         if( isSub ){
-            VFDatum datum = resolvedNames.contains( node.getName().getID() );
-            if( !node.tmpVar && ( datum == null || !datum.isVariable() ) ){
+            //VFDatum datum = resolvedNames.contains( node.getName().getID() );
+            //if( !node.tmpVar && ( datum == null || !datum.isVariable() ) ){
+            if( !isVar( node ) ){
                 subExprHandler( node );
             }
+        }
+    }
+
+    protected boolean isVar( NameExpr nameExpr )
+    {
+        if( nameExpr.tmpVar )
+            return true;
+        else{
+            VFDatum kind;
+            if( resolvedNames == null )
+                kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
+            else
+                kind = resolvedNames.contains( nameExpr.getName().getID() );
+            return (kind!=null) && kind.isVariable();
         }
     }
     public void caseExpr( Expr node )

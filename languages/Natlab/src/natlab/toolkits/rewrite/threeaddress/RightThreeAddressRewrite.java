@@ -91,7 +91,11 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
         }
     }
 
-    
+
+    /**
+     * Recursively processes a list of assignments. Removes
+     * sub-expressions into temporaries. 
+     */
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
                                                    VFFlowset<String,VFDatum> resolvedNames )
     {

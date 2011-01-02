@@ -5,6 +5,7 @@ import java.util.*;
 import ast.*;
 import natlab.DecIntNumericLiteralValue;
 import natlab.toolkits.rewrite.*;
+import natlab.toolkits.rewrite.threeaddress.ExpressionCollector;
 import natlab.toolkits.analysis.varorfun.*;
 
 
@@ -35,7 +36,24 @@ public class LeftSimplification extends AbstractSimplification
     {
         HashSet<Class<? extends AbstractSimplification>> dependencies = new HashSet();
         dependencies.add( MultiAssignSimplification.class );
+        dependencies.add( EndSimplification.class );
         return dependencies;
+    }
+
+    public void caseAssignStmt( AssignStmt node )
+    {
+        rewriteChildren( node );
+        Expr lhs = node.getLHS();
+        Expr rhs = node.getRHS();
+        ExpressionCollector ec = null;
+        ec = new ExpressionCollector( lhs, kindAnalysis );
+
+        Expr newLHS = (Expr)ec.transform();
+        if( ec.getNewAssignments().size() > 0 ){
+            newNode = new TransformedNode( ec.getNewAssignments() );
+            node.setLHS( newLHS );
+            newNode.add( node );
+        }
     }
 
 }
