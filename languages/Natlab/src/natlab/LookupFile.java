@@ -12,7 +12,7 @@ public class LookupFile{
     private static HashMap<String, ASTNode> lib; 
     private static HashMap<String, String> initialize(){
 	try{
-	    FileInputStream fin=new FileInputStream("/home/2009/sradpo/builtin.ser");
+	    FileInputStream fin=new FileInputStream("C:\\Users\\ant6n\\workspace-mclab\\McLab\\languages\\Natlab\\builtin.ser");
 	    ObjectInputStream oin = new ObjectInputStream(fin);
 	    HashMap<String, HashMap<String, String>> map = (HashMap<String, HashMap<String, String>>) oin.readObject();
 	    builtinPackages = map.get("packages");
@@ -23,6 +23,7 @@ public class LookupFile{
 	    lib = new HashMap<String, ASTNode>();
 	    return builtinClasses;
 	}catch(Exception e){
+        System.err.println("Library definitions file not found.");
 	    System.out.println("Library definitions file not found.");
 	}
 	return null;

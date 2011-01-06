@@ -13,13 +13,10 @@ import ast.*;
  * @author ant6n
  *
  */
-public class IRCallStmt extends IRAbstractAssignStmt {
-    public IRCallStmt(NameExpr function,IRCommaSeparatedlist targets,IRCommaSeparatedlist args) {
-        super();
+public class IRCallStmt extends IRAbstractAssignToListStmt {
+    public IRCallStmt(NameExpr function,IRCommaSeparatedList targets,IRCommaSeparatedList args) {
         //set lhs
-        List<Row> rows = new List<Row>();
-        rows.add(new Row((targets)));
-        setLHS(new MatrixExpr(rows));
+        super(targets);
         
         //set rhs
         setRHS(new ParameterizedExpr(function, args));
@@ -32,19 +29,10 @@ public class IRCallStmt extends IRAbstractAssignStmt {
     public String getFunctionName(){
         return getFunctionNameExpr().getName().getID();
     }
-    
-    //get targets
-    public IRCommaSeparatedlist getTargets(){
-        ArrayList<String> list = new ArrayList<String>();
-        for (Expr e : ((MatrixExpr)getLHS()).getRow(0).getElementList()){
-            list.add(((NameExpr)e).getName().getID());
-        }
-        return (IRCommaSeparatedlist)(((MatrixExpr)getLHS()).getRow(0).getElementList());
-    }
-    
+        
     //get arguments
-    public IRCommaSeparatedlist getArguments(){
-         return (IRCommaSeparatedlist)(((ParameterizedExpr)getRHS()).getArgList());
+    public IRCommaSeparatedList getArguments(){
+         return (IRCommaSeparatedList)(((ParameterizedExpr)getRHS()).getArgList());
     }
 
 }

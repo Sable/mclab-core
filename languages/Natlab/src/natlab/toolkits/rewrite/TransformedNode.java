@@ -27,12 +27,19 @@ public class TransformedNode<T extends ast.ASTNode>
     }
     /**
      * Creates a multiple transformed node.
+     * If there is only one or zero element in the list, creates either a singleNode or emptyNode
      */
     public TransformedNode( T[] nodes ){
         this( Arrays.asList( nodes ) );
     }
     public <E extends T> TransformedNode( Collection<E> nodes ){
         multipleNodes = new LinkedList<T>( nodes );
+        if (multipleNodes.size() == 1){
+            singleNode = multipleNodes.get(0);
+            multipleNodes = null;
+        } else if (multipleNodes.size() == 0){
+            multipleNodes = null;
+        }
     }
 
     public boolean isEmptyNode()
@@ -83,5 +90,22 @@ public class TransformedNode<T extends ast.ASTNode>
             }
             multipleNodes.add( node );
         }
+    }
+    
+    
+    @Override
+    public String toString() {
+        String msg = "transformedNode with ";
+        if (singleNode != null){
+            msg += "single node: \n"+singleNode.getPrettyPrinted();
+        } else if (multipleNodes != null){
+            msg += "multiple nodes: \n";
+            for (T node : multipleNodes){
+                msg += "["+node.getPrettyPrinted()+"]\n";
+            }
+        } else {
+            msg += "no node (empty)";
+        }
+        return msg;
     }
 }

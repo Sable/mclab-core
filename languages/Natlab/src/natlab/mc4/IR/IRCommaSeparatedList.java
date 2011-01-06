@@ -13,9 +13,21 @@ import ast.*;
  */
 
 
-public class IRCommaSeparatedlist extends List<Expr>{
-    public IRCommaSeparatedlist(List<Expr> list){
-        //todo - check whether all elements have the right type
+public class IRCommaSeparatedList extends List<Expr>{
+    public IRCommaSeparatedList(){
+    }
+
+    public IRCommaSeparatedList(Expr... exprs){
+        this();
+        for (Expr e : exprs){
+            add(e);
+        }
+    }
+    
+    @Override
+    public List<Expr> add(Expr node) {
+        // TODO Auto-generated method stub
+        return super.add(node);
     }
     
     
@@ -57,6 +69,8 @@ public class IRCommaSeparatedlist extends List<Expr>{
         }
         return true;
     }
+    
+    
 }
 
 

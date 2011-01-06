@@ -8,8 +8,8 @@ import ast.*;
  * 
  */
 
-public class IRSetConstantStmt extends IRAbstractAssignToVarStmt {
-    public IRSetConstantStmt(NameExpr lhs,Expr rhs) {
+public class IRAssignLiteralStmt extends IRAbstractAssignToVarStmt {
+    public IRAssignLiteralStmt(NameExpr lhs,LiteralExpr rhs) {
         super(lhs);
         setRHS(rhs);
     }

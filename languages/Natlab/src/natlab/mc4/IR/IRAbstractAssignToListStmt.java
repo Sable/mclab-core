@@ -12,7 +12,7 @@ import ast.*;
  */
 
 public class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
-    public IRAbstractAssignToListStmt(IRCommaSeparatedlist targets) {
+    public IRAbstractAssignToListStmt(IRCommaSeparatedList targets) {
         super();
         //set lhs
         List<Row> rows = new List<Row>();
@@ -22,7 +22,7 @@ public class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
 
 
     //get targets
-    public IRCommaSeparatedlist getTargets(){
-        return (IRCommaSeparatedlist)((((MatrixExpr)getLHS()).getRow(0)).getElementList());
+    public IRCommaSeparatedList getTargets(){
+        return (IRCommaSeparatedList)((((MatrixExpr)getLHS()).getRow(0)).getElementList());
     }
 }

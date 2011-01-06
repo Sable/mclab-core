@@ -496,34 +496,14 @@ public class Main
                         System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
                     }
                     else if( options.run() ){
-                        //This is for 621 example
-                        /*FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, DefiniteAssignment.class );
-                        //System.out.println( testTool.run());
-
-                        System.out.println("********************");
-
-                        testTool = new FlowAnalysisTestTool( cu, LiveVar.class );
-                        //System.out.println( testTool.run());
-                        System.out.println("********************");
-
-
-                        System.out.println( JesseRewrite.addInstruments( cu ).getPrettyPrinted() );*/
-                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, IsScalarSimpleAnalysis.class );
-                        //System.out.println( testTool.run() );
+                        FlowAnalysisTestTool testTool = 
+                            new FlowAnalysisTestTool( cu, HandlePropagationAnalysis.class );
+                                               System.out.println( "running");
+                                               System.out.println( testTool.run() );
+                                               System.out.println("\n\n********\n");
                         
-                        /*MultiReturnRewrite rr = new MultiReturnRewrite( cu );
-                        ASTNode rrDone = rr.transform();
-                        System.out.println( rrDone.getPrettyPrinted() );*/
-                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, VFStructuralForwardAnalysis.class );
-                        //System.out.println( testTool.run() );
-
-                        //RightThreeAddressRewrite rtar = new RightThreeAddressRewrite( cu );
-                        //ASTNode rtarDone = rtar.transform();
-                        //System.out.println( rtarDone.getPrettyPrinted() );
-                        //FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, HandlePropagationAnalysis.class );
-                        //System.out.println( "running");
-                        //System.out.println( testTool.run() );
-                        //System.out.println("\n\n********\n");
+                        
+                        /*
                         HashMap<String,ASTNode> programNameMap = new HashMap();
                         String fname;
                         for( int i = 0; i<fileNames.size(); i++ ){
@@ -554,7 +534,7 @@ public class Main
                             dotfile.close();
                         }catch( IOException e){
                             System.err.println("no dot output produced for call graph");
-                        }
+                        }*/
                     }
                     else if( options.df() ){
                         String mainFileName = "";

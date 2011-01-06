@@ -18,6 +18,19 @@ public class Mc4BuiltinQuery implements BuiltinQuery {
         builtins.add("round");
         builtins.add("sqrt");
         builtins.add("i");
+        builtins.add("plus");     
+        builtins.add("uplus");      
+        builtins.add("minus");      
+        builtins.add("uminus");     
+        builtins.add("mtimes");     
+        builtins.add("times");      
+        builtins.add("mpower");     
+        builtins.add("power");      
+        builtins.add("mldivide");   
+        builtins.add("mrdivide");   
+        builtins.add("ldivide");    
+        builtins.add("rdivide");    
+        builtins.add("transpose");    
     }
     
     public boolean isBuiltin(String functionname) {

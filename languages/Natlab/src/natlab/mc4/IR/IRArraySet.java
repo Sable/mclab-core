@@ -13,7 +13,7 @@ import ast.*;
 
 
 public class IRArraySet extends IRAbstractAssignStmt {
-    IRArraySet(NameExpr array, IRCommaSeparatedlist indizes,NameExpr rhs){
+    public IRArraySet(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
         super();
         setLHS(new ParameterizedExpr(array,indizes));
         setRHS(rhs);

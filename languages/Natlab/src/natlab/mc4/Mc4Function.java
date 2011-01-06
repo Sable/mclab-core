@@ -3,6 +3,7 @@ package natlab.mc4;
 import java.io.File;
 import java.util.*;
 
+import natlab.mc4.IR.transform.ThreeAddressToIR;
 import natlab.mc4.symbolTable.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
@@ -85,6 +86,9 @@ public class Mc4Function {
     
     //transforms the underlying AST to 3 address code
     private void transformTo3Addr(){
+        System.out.println("\n\nbefore 3 addr trasformation:");
+        System.out.println(this.function.getPrettyPrinted());
+        
     	//so far 3 addr only works on Program nodes
     	FunctionList fList = new FunctionList();
     	fList.addFunction(function);
@@ -94,8 +98,24 @@ public class Mc4Function {
     	LeftThreeAddressRewrite lr = new LeftThreeAddressRewrite(fList);
     	System.out.println("rr:");
     	RightThreeAddressRewrite rr = new RightThreeAddressRewrite(lr.transform());
-    	this.function = ((FunctionList)rr.transform()).getFunction(0);
-    	//System.out.println(rr.transform().getPrettyPrinted());
+    	fList = ((FunctionList)rr.transform());
+    	
+    	//transform into IR 
+    	//TODO - is this the right place?
+        //System.out.println(rr.transform().getPrettyPrinted());
+
+    	System.out.println("after 3 addr trasformation:");
+        System.out.println(this.function.getPrettyPrinted());
+
+    	
+    	ThreeAddressToIR irTransform = new ThreeAddressToIR(fList);
+    	fList = (FunctionList)irTransform.transform();
+
+        System.out.println("after IR  trasformation:");
+        System.out.println(this.function.getPrettyPrinted());
+    	
+    	this.function = fList.getFunction(0);
+    	
     }
     
     

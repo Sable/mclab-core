@@ -17,7 +17,7 @@ import ast.*;
  */
 
 public class IRArrayGet extends IRAbstractAssignToVarStmt {
-    public IRArrayGet(NameExpr lhs,NameExpr rhs,IRCommaSeparatedlist indizes){
+    public IRArrayGet(NameExpr lhs,NameExpr rhs,IRCommaSeparatedList indizes){
         super(lhs);
         setRHS(new ParameterizedExpr(rhs,indizes));
     }
@@ -29,8 +29,8 @@ public class IRArrayGet extends IRAbstractAssignToVarStmt {
         return (NameExpr)(((ParameterizedExpr)getLHS()).getTarget());
     }
     
-    public IRCommaSeparatedlist getIndizes(){
-        return (IRCommaSeparatedlist)(((ParameterizedExpr)getLHS()).getArgList());
+    public IRCommaSeparatedList getIndizes(){
+        return (IRCommaSeparatedList)(((ParameterizedExpr)getLHS()).getArgList());
     }
 }
 
