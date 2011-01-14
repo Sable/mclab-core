@@ -230,6 +230,7 @@
                             <exclude name="META-INF/**" />
                           </patternset>
                         </zipfileset-->
+                        <fileset dir="resources" />
 		</jar>
                 <echo file="${entrypoint.script.name}">${entrypoint.script.header}
 java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
