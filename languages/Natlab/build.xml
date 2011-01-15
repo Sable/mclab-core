@@ -28,9 +28,12 @@
 	<import file="../shared/bindir.xml" />
 	<import file="../shared/options.xml" />
 	<import file="../shared/CodeGen.xml" />
-
 	<!-- Extend and override parts of gen.xml -->
 
+        <import optional="true" file="local.xml" />
+
+
+	<import file="../shared/CodeGen.xml" />
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac destdir="${ant.bin.dir}">
@@ -235,6 +238,7 @@
                 <echo file="${entrypoint.script.name}">${entrypoint.script.header}
 java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
                 <chmod file="${entrypoint.script.name}" perm="755" />
+
 	</target>
 
 	<!-- public versions of eclipse.xml targets -->

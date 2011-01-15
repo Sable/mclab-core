@@ -5,7 +5,7 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-
+import beaver.Symbol;
 aspect ASTtoXML {
 
 	private long ASTNode.uID = -1;
@@ -133,7 +133,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e1);
         
-		parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        parent.appendChild(e);
         return true;
     }
     
@@ -149,6 +150,7 @@ aspect ASTtoXML {
         for(Function func : getFunctions()) {
             func.getXML(doc, e);
         }
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -187,7 +189,7 @@ aspect ASTtoXML {
         for(Function func : getNestedFunctions()) {
             func.getXML(doc, e);
         }
-                
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));       
 	parent.appendChild(e);      
         return true;
     }
@@ -222,7 +224,7 @@ aspect ASTtoXML {
         for(ClassEvents events : getClassEvents()) {
             events.getXML(doc, e);
         }
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -240,7 +242,7 @@ aspect ASTtoXML {
         for(Property prop : getPropertys()) {
             prop.getXML(doc, e);
         }
-        
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     } 
@@ -264,8 +266,8 @@ aspect ASTtoXML {
         for(Function func : getFunctions()) {
             func.getXML(doc, e);
         }
-
-       parent.appendChild(e);
+       e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -289,7 +291,8 @@ aspect ASTtoXML {
         	}
 		e.appendChild(e2);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -328,7 +331,8 @@ aspect ASTtoXML {
             func.getXML(doc, e);
         }
            
-		parent.appendChild(e);   
+		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);   
         return true;
     }
     
@@ -347,21 +351,23 @@ aspect ASTtoXML {
             eve.getXML(doc, e);
         }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
      
     eq Attribute.getXML(Document doc, Element parent) {
     	long id = nodeCounter();
         setuID(id);
-	
+        
         	Element e = doc.createElement("Attribute");
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getKey());
 		
         getExpr().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -373,7 +379,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -387,7 +394,8 @@ aspect ASTtoXML {
 		
         getExpr().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -399,7 +407,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -413,7 +422,8 @@ aspect ASTtoXML {
         getFuncName().getXML(doc, e);
         getClassName().getXML(doc, e);
 
-            parent.appendChild(e);
+            e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
 		return true;
     }
     
@@ -426,7 +436,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("text", getText());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -441,10 +452,10 @@ aspect ASTtoXML {
         Element e = doc.createElement("ExprStmt");
         e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        
         getExpr().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -455,11 +466,12 @@ aspect ASTtoXML {
         	Element e = doc.createElement("AssignStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         getLHS().getXML(doc, e);
         getRHS().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
      
@@ -474,7 +486,7 @@ aspect ASTtoXML {
         for(Name name : getNames()) {
             name.getXML(doc, e);
         }
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -483,14 +495,14 @@ aspect ASTtoXML {
         long id = nodeCounter();
         setuID(id);
 
-		Element e = doc.createElement("PersistentStmt");
-		e.setAttribute("id", Long.toString(id));
+        Element e = doc.createElement("PersistentStmt");
+        e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         for(Name name : getNames()) {
             name.getXML(doc, e);
         }
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -498,12 +510,12 @@ aspect ASTtoXML {
     eq ShellCommandStmt.getXML(Document doc, Element parent) {
     	long id = nodeCounter();
         setuID(id);
-
-		Element e = doc.createElement("ShellCommandStmt");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("command", getCommand());
+        
+        Element e = doc.createElement("ShellCommandStmt");
+        e.setAttribute("id", Long.toString(id));
+        e.setAttribute("command", getCommand());
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -515,7 +527,7 @@ aspect ASTtoXML {
 		Element e = doc.createElement("BreakStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -527,7 +539,7 @@ aspect ASTtoXML {
 		Element e = doc.createElement("ContinueStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -538,6 +550,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("ReturnStmt");
 		e.setAttribute("id", Long.toString(id));
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
@@ -558,7 +571,7 @@ aspect ASTtoXML {
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-        
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -577,7 +590,7 @@ aspect ASTtoXML {
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-              
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -595,7 +608,7 @@ aspect ASTtoXML {
         if(hasElseBlock()) {
             getElseBlock().getXML(doc, e);
         } 
-     
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -615,7 +628,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e1);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -632,7 +646,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e1);
        	
-        parent.appendChild(e); 
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e); 
         return true;
     }
 
@@ -652,7 +667,8 @@ aspect ASTtoXML {
             getDefaultCaseBlock().getXML(doc, e);
         } 
     
-		parent.appendChild(e);
+		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -671,7 +687,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e1);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -688,7 +705,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e1); 
      
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -713,7 +731,7 @@ aspect ASTtoXML {
 	        }
 	        e.appendChild(e2);
 	    }
-
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         return true;
     }
@@ -732,7 +750,8 @@ aspect ASTtoXML {
         
        getUpper().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -743,7 +762,8 @@ aspect ASTtoXML {
 		Element e = doc.createElement("ColonExpr");
 		e.setAttribute("id", Long.toString(id));
 	
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -754,7 +774,8 @@ aspect ASTtoXML {
 		Element e = doc.createElement("EndExpr");
 		e.setAttribute("id", Long.toString(id));	
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -766,7 +787,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));	
 		e.setAttribute("nameId", getID());	
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -778,7 +800,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
         getName().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -792,7 +815,8 @@ aspect ASTtoXML {
       getTarget().getXML(doc, e);
 	getField().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -809,7 +833,8 @@ aspect ASTtoXML {
             arg.getXML(doc, e);
         }    
 
-		parent.appendChild(e);
+		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -826,7 +851,8 @@ aspect ASTtoXML {
             arg.getXML(doc, e);
         }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -841,7 +867,8 @@ aspect ASTtoXML {
             row.getXML(doc, e);
         }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -856,7 +883,8 @@ aspect ASTtoXML {
             row.getXML(doc, e);
         }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -871,7 +899,8 @@ aspect ASTtoXML {
             element.getXML(doc, e);
         }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -884,7 +913,8 @@ aspect ASTtoXML {
 
         getName().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -901,7 +931,8 @@ aspect ASTtoXML {
 
         getBody().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -913,7 +944,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue().getText());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -925,7 +957,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue().getText());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -937,7 +970,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -952,7 +986,8 @@ aspect ASTtoXML {
 
         getOperand().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -967,7 +1002,8 @@ aspect ASTtoXML {
         getLHS().getXML(doc, e);
         getRHS().getXML(doc, e);
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -979,7 +1015,8 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("text", getText());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
     
@@ -993,7 +1030,8 @@ aspect ASTtoXML {
 		//getanno().getXML(doc, e, nodeCounter());
         setNodeCounter(getanno().getNodeCounter());
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -1010,7 +1048,8 @@ aspect ASTtoXML {
                     e.setAttribute("type", getType().dumpString());
                 }
 
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
@@ -1058,7 +1097,8 @@ aspect ASTtoXML {
         }
         e.appendChild(e4);
         
-        parent.appendChild(e);
+        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+parent.appendChild(e);
         return true;
     }
 
