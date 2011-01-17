@@ -48,7 +48,14 @@ public class Mc4 {
 		//for now just open a file if no option is given .. eclipse is a pain
 		Options options = new Options();
 		if (args.length == 0){
-			args = new String[]{"-m","C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\McFor\\mcfor_test\\mbrt\\drv_mbrt.m"};
+			//try to get a file from the project folder
+			File file = new File("../Benchmarks/matlabBenchmarks/McFor/mcfor_test/mbrt/drv_mbrt.m");
+			if (file.exists()){
+				args = new String[]{"-m",file.getAbsolutePath()};
+			} else {
+				args = new String[]{"-m","C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\McFor\\mcfor_test\\mbrt\\drv_mbrt.m"};				
+			}
+			//if it doesn't exist, we're on anton's computer ...
 			options.parse(args);
 		} else {
 			options.parse(args);

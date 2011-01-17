@@ -24,6 +24,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
     private HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
     private FunctionFinder functionFinder;
     private FunctionReference main = null; //denotes which function is the entry point
+    private Options options;
     
     /**
      * The function collection gets created via an options object
@@ -32,6 +33,8 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
      */
     public FunctionCollection(Options options){
         super();
+        
+        this.options = options;
         
         //object that resolves function names to path        
         functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
@@ -59,7 +62,13 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         if (loadedFiles.contains(file)) return true;
         
         //parse file
-        Program program = natlab.Main.parseFile(file.getAbsolutePath(), errList);
+        Program program;
+        if (options.matlab()){
+            //program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList);
+            program = natlab.Main.parseFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
+        } else {
+        	program = natlab.Main.parseFile(file.getAbsolutePath(), errList);
+        }
         if (program == null){
             Mc4.error("cannot parse file "+file);
             return false;
