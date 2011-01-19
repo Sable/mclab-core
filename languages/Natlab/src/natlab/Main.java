@@ -98,10 +98,10 @@ public class Main
                         System.err.println("No files provided, must have at least one file.");
                         System.exit(1);
                     }
-                    System.out.println("compiling to fortran "+options.getFiles());
-                    String[] fargs = {"-d",(String)options.getFiles().get(0)};
-                    System.out.println("calling McFor with "+fargs);
-                    McFor.main(fargs);
+                    //System.out.println("compiling to fortran "+options.getFiles());
+                    //String[] fargs = {"-d",(String)options.getFiles().get(0)};
+                    //System.out.println("calling McFor with "+fargs);
+                    natlab.mc4.Mc4.main(options);
                     return;
                 } //end fortran
                 
