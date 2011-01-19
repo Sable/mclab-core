@@ -7,7 +7,7 @@ import natlab.mc4.IR.transform.ThreeAddressToIR;
 import natlab.mc4.symbolTable.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
-import natlab.toolkits.rewrite.Inliner.InlineInfo;
+import natlab.toolkits.rewrite.inline.*;
 import natlab.toolkits.rewrite.threeaddress.*;
 
 import ast.*;
@@ -158,11 +158,7 @@ public class Mc4Function {
     	}
     	
     	//actually inline
-    	Inliner inliner = new Inliner(this.function, inlinerMap, new Inliner.Query() {
-			public boolean doInline(InlineInfo inlineInfo) {
-				return true;
-			}
-		});
+    	Inliner<Function,Function> inliner = new Inliner<Function,Function>(this.function,inlinerMap);
     	this.function = (Function)inliner.transform();
     }
     

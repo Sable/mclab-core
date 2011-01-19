@@ -4,23 +4,8 @@
 package natlab.mc4;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
-import java.util.ArrayList;
-
-import natlab.CompilationProblem;
-import natlab.FlowAnalysisTestTool;
-import natlab.ProgramEntry;
 import natlab.options.Options;
-import natlab.toolkits.analysis.Analysis;
-import natlab.toolkits.analysis.FlowSet;
-import natlab.toolkits.analysis.StructuralAnalysis;
-import natlab.toolkits.analysis.varorfun.VFStructuralForwardAnalysis;
 
-import ast.Function;
-import ast.FunctionList;
-import ast.Program;
 
 /**
  * Mc4 Main and entry point.
@@ -51,9 +36,9 @@ public class Mc4 {
 			//try to get a file from the project folder
 			File file = new File("../Benchmarks/matlabBenchmarks/McFor/mcfor_test/mbrt/drv_mbrt.m");
 			if (file.exists()){
-				args = new String[]{"-m",file.getAbsolutePath()};
+				args = new String[]{file.getAbsolutePath()};
 			} else {
-				args = new String[]{"-m","C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\McFor\\mcfor_test\\mbrt\\drv_mbrt.m"};				
+				args = new String[]{"C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\McFor\\mcfor_test\\mbrt\\drv_mbrt.m"};				
 			}
 			//if it doesn't exist, we're on anton's computer ...
 			options.parse(args);

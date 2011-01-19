@@ -65,7 +65,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         Program program;
         if (options.matlab()){
             //program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList);
-            program = natlab.Main.parseFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
+            program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
         } else {
         	program = natlab.Main.parseFile(file.getAbsolutePath(), errList);
         }
