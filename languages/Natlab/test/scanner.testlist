@@ -6,7 +6,6 @@ scanner_keywords
 scanner_operators
 scanner_dot
 scanner_string
-scanner_badescape
 scanner_shell
 scanner_badbracketcomment
 scanner_statestack
