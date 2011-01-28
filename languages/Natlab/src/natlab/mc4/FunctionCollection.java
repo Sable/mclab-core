@@ -79,7 +79,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
             System.err.println("Mc4 does not suport scripts at this point."); //TODO
             return false;
         } else if (program instanceof ClassDef){
-            System.err.println("Mc4 does not support scripts at this point.");
+            System.err.println("Mc4 does not support classes at this point.");
         } else if (program instanceof EmptyProgram){
             System.err.println("Mc4 does not support empty files at this point."); //TODO
         } else if (!(program instanceof FunctionList)){

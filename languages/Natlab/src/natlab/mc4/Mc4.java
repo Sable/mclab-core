@@ -4,6 +4,14 @@
 package natlab.mc4;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.jar.JarEntry;
+
+import com.sun.org.apache.xml.internal.utils.URI;
+import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException;
+
 import natlab.options.Options;
 
 
@@ -32,19 +40,19 @@ public class Mc4 {
 	public static void main(String[] args) {
 		//for now just open a file if no option is given .. eclipse is a pain
 		Options options = new Options();
-		if (args.length == 0){
+		options.parse(args);
+		
+		//if no files are given, we will use some internal test files
+		if (options.getFiles().size() == 0){
 			//try to get a file from the project folder
-			File file = new File("../Benchmarks/matlabBenchmarks/McFor/mcfor_test/mbrt/drv_mbrt.m");
-			if (file.exists()){
-				args = new String[]{file.getAbsolutePath()};
-			} else {
-				args = new String[]{"C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\McFor\\mcfor_test\\mbrt\\drv_mbrt.m"};				
-			}
-			//if it doesn't exist, we're on anton's computer ...
+		    //where it is depends on whether we call from Project or natlab dir
+		    File thisDir = new File(System.getProperty("user.dir"));
+		    String main = (thisDir.getName().equals("McLab"))?
+		            "languages/Natlab/src/natlab/mc4/test/drv_mbrt.m"
+		            :"src/natlab/mc4/test/drv_mbrt.m";
+            args = new String[]{main};
 			options.parse(args);
-		} else {
-			options.parse(args);
-		}
+		} 
 		main(options);
 	}
 

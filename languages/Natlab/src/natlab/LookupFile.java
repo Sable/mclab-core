@@ -1,6 +1,8 @@
 package natlab;
 import java.util.*;
 import java.io.*;
+
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import ast.*;
 
 public class LookupFile{ 
@@ -51,6 +53,10 @@ public class LookupFile{
 	lib.putAll(progs);
     }
 
+    //TODO remove this - this does not capture names correctly in the case
+    //of nested functions exist - there should be separate methods
+    //setCurrentScript and setCurrentFunction, or something like that
+    @Deprecated
     public static void setCurrentProgram(Program f){
 	currentFile.clear();
 	if (!FunctionList.class.isInstance(f))
@@ -58,4 +64,19 @@ public class LookupFile{
 	for (Function function: ((FunctionList)f).getFunctions())
 	    currentFile.put(function.getName(), function);
     }
+    
+    
+    /**
+     * returns a FunctionOrScriptQuery object that allows querying
+     * which matlab functions exist in the file environment simulated
+     * by LookupFile.
+     */
+    public static FunctionOrScriptQuery getFunctionOrScriptQueryObject(){
+        return new FunctionOrScriptQuery() {
+            public boolean isFunctionOrScript(String name) {
+                return scriptOrFunctionExists(name);
+            }
+        };
+    }
 }
+

@@ -105,6 +105,7 @@ aspect NameResolution{
         Function f = getNested().get(name);
         if( f != null )
             return f;
+        if (getParentFunction() == null) return null;
         return getParentFunction().lookupFunction( name );
     }
     syn Function FunctionList.lookupFunction( String name )

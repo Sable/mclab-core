@@ -12,8 +12,8 @@ import natlab.options.Options;
  * 
  * 1 nested functions
  * 2 subfunctions (functions in the same directory)
- * 3 private functions (functions in pwd/private)
- * 4 functions in pwd
+ * 3 private functions (functions in <directory of calling function>/private)
+ * 4 functions in directory of current execution
  * 5 builtin functions
  * 6 path
  *
@@ -111,7 +111,7 @@ public class FunctionFinder {
 	//there is a method for each possible lookup
 	//it just takes the name
 	private File findInPrivate(String name){
-		return null; //TODO implement this
+		return null; //TODO implement this - has to be relative to current function
 	}
 	private File findInPwd(String name){
 		return findInDirectory(name,pwd);
@@ -129,6 +129,14 @@ public class FunctionFinder {
 			}
 		}
 		return null;
+	}
+	
+	public FunctionOrScriptQuery getFunctionOrScriptQuery(){
+	    return new FunctionOrScriptQuery(){
+            public boolean isFunctionOrScript(String name) {
+                return (findName(name) != null);
+            }
+	    };
 	}
 }
 

@@ -38,6 +38,7 @@ public class Mc4Function {
         this.symbolTable = new SymbolTable();
         this.name = function.getName();
         
+        
         //set siblings
         siblings = new HashSet<String>(function.getSiblings().keySet());
         

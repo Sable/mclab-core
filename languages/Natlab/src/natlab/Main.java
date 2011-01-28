@@ -94,14 +94,14 @@ public class Main
 		
                 //fortran neither uses the below parser, nor is a server
                 if( options.fortran() ){ //begin fortran
-                    if( options.getFiles().size() == 0 ){
-                        System.err.println("No files provided, must have at least one file.");
-                        System.exit(1);
-                    }
+                    //if( options.getFiles().size() == 0 ){
+                    //    System.err.println("No files provided, must have at least one file.");
+                    //    System.exit(1);
+                    //}
                     //System.out.println("compiling to fortran "+options.getFiles());
                     //String[] fargs = {"-d",(String)options.getFiles().get(0)};
                     //System.out.println("calling McFor with "+fargs);
-                    natlab.mc4.Mc4.main(options);
+                    natlab.mc4.Mc4.main(args);
                     return;
                 } //end fortran
                 
