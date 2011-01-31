@@ -31,6 +31,7 @@ public class Mc4Function {
      * 
      * @param function the AST of the function
      * @param source the file where it is from
+     * @param a function finder, to resolve IDs into Function references
      */
     public Mc4Function(Function function, File source) {
         this.function = function.fullCopy();
@@ -52,7 +53,8 @@ public class Mc4Function {
     //creates and puts first order approximation of the symbol table - variable or function
     private void createSymbolTable(){
         //perform variable or function analysis on function and get result
-        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function);
+        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,
+                Mc4.functionFinder.getFunctionOrScriptQuery());
         functionAnalysis.analyze();        
         VFFlowset<String, ? extends VFDatum> flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
@@ -66,10 +68,10 @@ public class Mc4Function {
                         
             if (vf.isExactlyFunction()){
                 symbolTable.put(name, new UnknownFunction());
-            } if (vf.isExactlyAssignedVariable() || vf.isExactlyVariable()){
+            } else if (vf.isVariable()){
                 symbolTable.put(name, new Variable());
             } else {
-                System.err.println("symbol "+name+" in "+name+" cannot be resolved as a function or variable");
+                System.err.println("symbol "+name+" in "+name+" cannot be resolved as a function or variable. vf:"+vf);
             }
         }        
         //...the rest are assumed to be functions for now

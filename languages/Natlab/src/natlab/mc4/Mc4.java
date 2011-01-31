@@ -12,7 +12,9 @@ import java.util.jar.JarEntry;
 import com.sun.org.apache.xml.internal.utils.URI;
 import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException;
 
+import natlab.mc4.builtin.Mc4BuiltinQuery;
 import natlab.options.Options;
+import natlab.toolkits.filehandling.FunctionFinder;
 
 
 /**
@@ -32,6 +34,7 @@ public class Mc4 {
         if (PRINT_STACK_ON_ERROR) Thread.dumpStack();
         if (EXIT_ON_ERROR) System.exit(1);
     }
+    protected static FunctionFinder functionFinder;
     
 
 	/**
@@ -61,7 +64,11 @@ public class Mc4 {
 	 * This is basically the entry point for mc4.
 	 * @param options A Natlab Options object defines the command line arguments to Mc4
 	 */
-	public static void main(Options options){	    
+	public static void main(Options options){	   	    
+        //object that resolves function names to files      
+        functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
+
+	    
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(options);
 	    	    

@@ -187,6 +187,7 @@ public class ThreeAddressToIR extends AbstractLocalRewrite {
             if (row.getNumElement() == 1){
                 rowTemps.add(pullOutLiteral(row.getElement(0), assignList));                
             }else{
+                //collect the row in tmp
                 TempFactory tmp = TempFactory.genFreshTempFactory();
                 assignList.add(
                         new IRCallStmt(new NameExpr(new Name("horzcat")),
@@ -198,11 +199,15 @@ public class ThreeAddressToIR extends AbstractLocalRewrite {
         
         //either there is one row or multiple
         if (matrix.getNumRow() == 1){
-            return (IRAbstractAssignStmt)assignList.remove();
+            //only one row - we pull out the assignment of that row, and get the right target
+            //in front of it
+            IRAbstractAssignStmt assign = (IRAbstractAssignStmt)assignList.removeLast();
+            assign.setLHS(target);
+            return assign;
         } else {
             TempFactory tmp = TempFactory.genFreshTempFactory();
             return new IRCallStmt(new NameExpr(new Name("vertcat")),
-                    new IRCommaSeparatedList(tmp.genNameExpr()),
+                    new IRCommaSeparatedList(target),
                     rowTemps);
         }
     }

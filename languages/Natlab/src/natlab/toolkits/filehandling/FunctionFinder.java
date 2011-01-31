@@ -131,10 +131,15 @@ public class FunctionFinder {
 		return null;
 	}
 	
+	/**
+	 * query object for Scripts and Functions.
+	 * Note that this also checks among the builtins.
+	 * @return
+	 */
 	public FunctionOrScriptQuery getFunctionOrScriptQuery(){
 	    return new FunctionOrScriptQuery(){
             public boolean isFunctionOrScript(String name) {
-                return (findName(name) != null);
+                return builtin.isBuiltin(name) || (findName(name) != null);
             }
 	    };
 	}

@@ -31,6 +31,8 @@ public class Mc4BuiltinQuery implements BuiltinQuery {
         builtins.add("ldivide");    
         builtins.add("rdivide");    
         builtins.add("transpose");    
+        builtins.add("colon");
+        builtins.add("horzcat");
     }
     
     public boolean isBuiltin(String functionname) {

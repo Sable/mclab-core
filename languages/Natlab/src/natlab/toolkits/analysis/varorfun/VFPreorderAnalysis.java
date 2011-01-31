@@ -29,11 +29,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
 
 
     /**
-     * initializes the VFPreorderAnalysis using LookupFile.getFunctionOrScriptQueryObectio().
+     * initializes the VFPreorderAnalysis using LookupFile.getFunctionOrScriptQueryObject().
      * This is deprecated, because using this lookupFile should be made explicit.
      * With this function, an environment is assumed that may not be intended by the user.
      * @param tree
      */
+    @Deprecated
     public VFPreorderAnalysis( ASTNode tree )
     {
         this(tree,LookupFile.getFunctionOrScriptQueryObject());

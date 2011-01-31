@@ -22,7 +22,6 @@ import natlab.toolkits.filehandling.FunctionFinder;
 
 public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
     private HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
-    private FunctionFinder functionFinder;
     private FunctionReference main = null; //denotes which function is the entry point
     private Options options;
     
@@ -36,11 +35,9 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         
         this.options = options;
         
-        //object that resolves function names to path        
-        functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
         
         //get main file (entrypoint)
-        File main = functionFinder.getMain();
+        File main = Mc4.functionFinder.getMain();
 
         //collect
         ArrayList<CompilationProblem> errors = new ArrayList<CompilationProblem>();
@@ -146,14 +143,14 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
             //4 functionName is a builtin or a function on the path    
             } else {
                 //try to find it
-                File otherFunction = functionFinder.findName(otherName);
+                File otherFunction = Mc4.functionFinder.findName(otherName);
                 if (otherFunction != null){ // file found
                     success = success && collect(otherFunction,false,errList); //recursively collect other function
                     function.getSymbolTable().put(otherName,  //update symbol table entry
                             new FunctionReferenceType(new FunctionReference(otherName,otherFunction)));
                     
                 } else { // file is builtin, or cannot be found
-                    if (functionFinder.isBuiltin(otherName)){ //builtin
+                    if (Mc4.functionFinder.isBuiltin(otherName)){ //builtin
                         function.getSymbolTable().put(otherName, 
                                 new FunctionReferenceType(new FunctionReference(otherName)));
                     } else { //not found
