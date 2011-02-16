@@ -21,10 +21,15 @@ public class Simplifier
 
     //List of simplifications. If applied in list order, then all
     //dependencies should be met.
-    LinkedList<AbstractSimplification> simplifications;
+    protected LinkedList<AbstractSimplification> simplifications;
 
-    ASTNode tree;
-    VFPreorderAnalysis kind;
+    public String simpsToStr()
+    {
+        return simplifications.toString();
+    }
+
+    protected ASTNode tree;
+    protected VFPreorderAnalysis kind;
 
     /**
      * Constructs a simplifier for a given set of simplification
@@ -44,11 +49,12 @@ public class Simplifier
             kind.analyze();
 
         this.tree = tree;
-        for( Class<? extends AbstractSimplification> simpClass : todo ){
+        buildDependencies( todo );
+        /*for( Class<? extends AbstractSimplification> simpClass : todo ){
             AbstractSimplification simpInst = constrSimp( simpClass );
             buildDependencies( simpInst, todo );
             simplifications.add( simpInst );
-        }
+            }*/
     }
 
     /**
@@ -58,6 +64,7 @@ public class Simplifier
     {
         ASTNode currentTree = tree;
         for( AbstractSimplification simp : simplifications ){
+            System.out.println( simp );
             simp.setTree( currentTree );
             currentTree = simp.transform();
         }
@@ -65,23 +72,44 @@ public class Simplifier
     }
 
     /**
+     * Builds the dependencies for a given start set.
+     */
+    protected void buildDependencies( Set<Class<? extends AbstractSimplification>> startSet )
+    {
+        Set<Class<? extends AbstractSimplification>> seenStartSet = new HashSet();
+        while( !startSet.isEmpty() ){
+            Iterator<Class<? extends AbstractSimplification>> iter = startSet.iterator();
+            Class<? extends AbstractSimplification> simpClass = iter.next();
+
+            AbstractSimplification simp = constrSimp(simpClass);
+            seenStartSet.add( simpClass );
+            iter.remove();
+            buildDependencies( simp, startSet, seenStartSet );
+        }
+    }
+    /**
      * Builds the dependencies for a given simplification, puts them
      * in the list of simplifications. Ensures that if the
      * simplifications in the list are executed in order, then all
      * dependencies will be met.
      *
      * Dependencies are assumed to form a tree. If a dependency is in
-     * the startSet then we stop recursing on that branch.
+     * the seenStartSet then we stop recursing on that branch.
      */
-    protected void buildDependencies( AbstractSimplification base, Set startSet )
+    protected void buildDependencies( AbstractSimplification base, 
+                                      Set<Class<? extends AbstractSimplification>> startSet,
+                                      Set<Class<? extends AbstractSimplification>> seenStartSet)
     {
         for( Class<? extends AbstractSimplification> depClass : base.getDependencies() ){
-            if( !startSet.contains(depClass) ){
+            if( !seenStartSet.contains( depClass )){
+                startSet.remove( depClass );
+                seenStartSet.add( depClass );
+                
                 AbstractSimplification depInst = constrSimp( depClass );
-                buildDependencies( depInst, startSet );
-                simplifications.add( depInst );
+                buildDependencies( depInst, startSet, seenStartSet );
             }
         }
+        simplifications.add( base );
     }
 
     /**
