@@ -36,7 +36,8 @@ public class LeftSimplification extends AbstractSimplification
     {
         HashSet<Class<? extends AbstractSimplification>> dependencies = new HashSet();
         dependencies.add( MultiAssignSimplification.class );
-        dependencies.add( EndSimplification.class );
+        dependencies.add(SimpleAssignment.class);
+        //dependencies.add( EndSimplification.class );
         return dependencies;
     }
 
@@ -46,7 +47,7 @@ public class LeftSimplification extends AbstractSimplification
         Expr lhs = node.getLHS();
         Expr rhs = node.getRHS();
         ExpressionCollector ec = null;
-        ec = new ExpressionCollector( lhs, kindAnalysis );
+        ec = new ExpressionCollector( lhs, kindAnalysis, true );
 
         Expr newLHS = (Expr)ec.transform();
         if( ec.getNewAssignments().size() > 0 ){

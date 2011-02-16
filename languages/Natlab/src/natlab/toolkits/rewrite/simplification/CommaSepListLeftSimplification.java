@@ -42,7 +42,7 @@ public class CommaSepListLeftSimplification extends AbstractSimplification
     /*
       [..., E1, ...] = E2
       ==========
-      [...,CSL{t1},...] = E3;
+      [...,CSL{t1},...] = E2;
       [E1] = CSL{t1};
 
       Where E1 is an expression that could possibly expand to a comma
