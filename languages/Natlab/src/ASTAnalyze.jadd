@@ -259,4 +259,18 @@ aspect ASTAnalyze
         visitor.caseRow(this);
     }
 
+    //Begin IR nodes
+
+    public void CSLExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseCSLExpr(this);
+    }
+    public void EndCallExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseEndCallExpr(this);
+    }
+    public void CheckScalarStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseCheckScalarStmt(this);
+    }
 }
