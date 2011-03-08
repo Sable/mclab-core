@@ -24,30 +24,19 @@ public class FunctionVFDatum extends AbstractVFDatum
     }
 
     /**
-     * Make value a variable. If value is BOT or AVAR then change to
-     * VAR. If the value is FUN then change to TOP. Otherwise do
-     * nothing.
+     * Make value a variable. 
      */
     public void makeVariable()
     {
-        if( Value.FUN.equals( value ) )
-            value = Value.TOP;
-
-        else if( Value.BOT.equals( value ) || Value.AVAR.equals( value ) || Value.LDVAR.equals(value) )
-            value = Value.VAR;
+	value = Value.VAR;
     }
 
     /**
-     * Make value an assigned variable. If value is TOP or AVAR, then
-     * do nothing. If value is FUN then make value TOP. Otherwise make
-     * value AVAR.
+     * Make value an assigned variable.
      */
     public void makeAssignedVariable()
     {
-        if( Value.BOT.equals( value ) || Value.VAR.equals( value ) || Value.LDVAR.equals(value) )
-            value = Value.AVAR;
-        else if( Value.FUN.equals( value ) )
-            value = Value.TOP;
+	value = Value.AVAR;
     }
 
     /**
@@ -74,20 +63,23 @@ public class FunctionVFDatum extends AbstractVFDatum
      */
     public void makeFunction()
     {
-        if( Value.BOT.equals( value ) || Value.LDVAR.equals( value) )
-            value = Value.FUN;
-        else if( Value.VAR.equals( value ) || Value.AVAR.equals( value ) )
-            value = Value.TOP;
+	value = Value.FUN;
+    }
+
+    /**
+     * Make value a prefix. 
+     */
+    public void makePrefix()
+    {
+	value = Value.PREFIX;
     }
    
     /**
-     * Make value a load variable. If value is BOT, assign LDVAR to value. 
-     * Otherwise do nothing.
+     * Make value a load variable.
      */
     public void makeLDVar()
     {
-        if( Value.BOT.equals( value ) )
-            value = Value.LDVAR;
+	value = Value.LDVAR;
     }
 
     /**
@@ -139,28 +131,19 @@ public class FunctionVFDatum extends AbstractVFDatum
         Value ov = that.getValue();
         if( value.equals( ov ) )
             return new FunctionVFDatum( value );
-        //not equal at this point
-        else if( Value.TOP.equals( value ) || Value.TOP.equals( ov ) )
-            return new FunctionVFDatum( Value.TOP );
-        //not equal and neither are TOP
-        else if( Value.BOT.equals( value ) )
+
+        if( Value.BOT.equals( value ) )
             return new FunctionVFDatum( ov );
-        else if( Value.BOT.equals( ov ) )
+	if( Value.BOT.equals( ov ) )
             return new FunctionVFDatum( value );
-        //not equal, neither are TOP or BOT
-	else if( Value.LDVAR.equals( value ) && (Value.FUN.equals( ov )  || 
-					       Value.VAR.equals( ov )  || 
-					       Value.AVAR.equals( ov ) ) )
+
+	if( Value.LDVAR.equals( value ) )
 	    return new FunctionVFDatum( ov );
-	else if( Value.LDVAR.equals( ov ) && (Value.FUN.equals( value )  || 
-					    Value.VAR.equals( value )  || 
-					    Value.AVAR.equals( value ) ) )
+
+	if( Value.LDVAR.equals( ov ) )
 	    return new FunctionVFDatum( value );
-        else if( Value.FUN.equals( value ) || Value.FUN.equals( ov ) )
-            return new FunctionVFDatum( Value.TOP );
-        //not equal and each is either AVAR or VAR, so one must be VAR
-        else
-            return new FunctionVFDatum( Value.VAR );
+
+	return new FunctionVFDatum( Value.TOP );
     }
 
     public static FunctionVFDatum merge(FunctionVFDatum in1, FunctionVFDatum in2)
