@@ -9,10 +9,7 @@ import natlab.toolkits.analysis.varorfun.*;
 
 
 /**
- * Does a full simplification. Ensures that in an assignments
- * statement, between the left and right hand sides, there is at most
- * one complex operation. Either the left or right hand side must be a
- * variable. 
+ * Dummy simplification, representing a full simplification.
  *
  * @author Jesse Doherty
  */
