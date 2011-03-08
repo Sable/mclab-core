@@ -80,4 +80,33 @@ public class ASTHelpers
         return newAssign;
     }
 
+
+    /**
+     * Tests if a given expression is a scalar short-circuit
+     * expression. 
+     */
+    public static boolean isScalarSC( Expr node )
+    {
+        if(node instanceof ShortCircuitAndExpr)
+            return true;
+        else if( node instanceof ShortCircuitOrExpr )
+            return true;
+        else if( node instanceof NotExpr )
+            return isScalarSC( ((NotExpr)node).getOperand() );
+        else
+            return false;
+    }
+
+    /**
+     * Builds a new boolean literal expression.
+     */
+    public static NameExpr buildBoolLit( boolean value )
+    {
+        if( value )
+            return new NameExpr( new Name( "true" ) );
+        else
+            return new NameExpr( new Name( "false" ) );
+    }
+
+
 }
