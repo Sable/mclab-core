@@ -671,4 +671,19 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         helpee.caseBody( node );
     }
+    public void caseCSLExpr(CSLExpr node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseCSLExpr( node );
+    }
+    public void caseEndCallExpr(EndCallExpr node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseEndCallExpr( node );
+    }
+    public void caseCheckScalarStmt(CheckScalarStmt node)
+    {
+        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
+        helpee.caseCheckScalarStmt( node );
+    }
 }

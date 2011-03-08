@@ -139,4 +139,7 @@ public interface NodeCaseHandler
     public void caseKnownExtentsShape(KnownExtentsShape node);
     public void caseKnownRank(KnownRank node);
     public void caseKnownExtents(KnownExtents node);
+    public void caseCSLExpr(CSLExpr node);
+    public void caseEndCallExpr(EndCallExpr node);
+    public void caseCheckScalarStmt(CheckScalarStmt node);
 }

@@ -518,4 +518,16 @@ public abstract class AbstractNodeCaseHandler implements NodeCaseHandler
     {
         caseExtents(node);
     }
+    public void caseCSLExpr(CSLExpr node)
+    {
+        caseNameExpr(node);
+    }
+    public void caseEndCallExpr(EndCallExpr node)
+    {
+        caseExpr(node);
+    }
+    public void caseCheckScalarStmt(CheckScalarStmt node)
+    {
+        caseStmt(node);
+    }
 }
