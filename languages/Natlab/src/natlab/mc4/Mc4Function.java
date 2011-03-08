@@ -56,7 +56,7 @@ public class Mc4Function {
         VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,
                 Mc4.functionFinder.getFunctionOrScriptQuery());
         functionAnalysis.analyze();        
-        VFFlowset<String, ? extends VFDatum> flowset; 
+        VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
         Mc4.debug("function "+name+" variable or function analysis result:\n"+flowset);
         
@@ -66,7 +66,7 @@ public class Mc4Function {
             VFDatum vf = pair.getDatum();
             String name = pair.getValue();
                         
-            if (vf.isExactlyFunction()){
+            if (vf.isFunction()){
                 symbolTable.put(name, new UnknownFunction());
             } else if (vf.isVariable()){
                 symbolTable.put(name, new Variable());

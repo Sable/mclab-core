@@ -18,41 +18,41 @@ import natlab.toolkits.analysis.*;
  */
 
 //TODO-JD make some operations unsupported 
-public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumPair<V,D>>
+public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
 {
 
     public static boolean DEBUG = false;
-    public void copy(VFFlowset<V, D> dest) {
+    public void copy(VFFlowset dest) {
     	if (this == dest) return;
         dest.clear();
-        for (ValueDatumPair<V,D> element : toList()){
+        for (ValueDatumPair<String,VFDatum> element : toList()){
             dest.add(element.clone());
         }
     }
-    protected HashMap<V, D> set;
+    protected HashMap<String, VFDatum> set;
     
     public VFFlowset()
     {
         set = new HashMap();
     }
 
-    public VFFlowset( HashMap<V, D> set )
+    public VFFlowset( HashMap<String, VFDatum> set )
     {
         this.set = set;
 
     }
     
-    public VFFlowset<V,D> clone()
+    public VFFlowset clone()
     {
-        HashMap<V, D> newSet = new HashMap();
+        HashMap<String, VFDatum> newSet = new HashMap();
 
-        for( Map.Entry<V, D> e : set.entrySet() )
-            newSet.put( e.getKey(), (D)(e.getValue().clone()) );
+        for( Map.Entry<String, VFDatum> e : set.entrySet() )
+            newSet.put( e.getKey(), e.getValue() );
 
         return new VFFlowset( newSet );
     }
     
-    public VFFlowset<V, D> emptySet()
+    public VFFlowset emptySet()
     {
         return new VFFlowset();
     }
@@ -70,14 +70,14 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
     {
         return set.size();
     }
-    public void add(ValueDatumPair<V,D> pair)
+    public void add(ValueDatumPair<String, VFDatum> pair)
     {
         if( DEBUG )
             System.out.println("adding " + pair);
-        D d = set.get( pair.getValue() );
+        VFDatum d = set.get( pair.getValue() );
         if( d != null ){
             //TODO-JD Is this safe?
-            d = (D)(d.merge( pair.getDatum() ));
+            d = (d.merge( pair.getDatum() ));
             if( DEBUG )
                 System.out.println("merged datum is " + d);
             set.put( pair.getValue(), d );
@@ -87,29 +87,29 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
         }
     }
 
-    public boolean remove( ValueDatumPair<V,D> pair )
+    public boolean remove( ValueDatumPair<String, VFDatum> pair )
     {
         return set.remove( pair.getValue() ) != null;
     }
-    public boolean contains( ValueDatumPair<V,D> pair)
+    public boolean contains( ValueDatumPair<String, VFDatum> pair)
     {
         return set.containsKey( pair.getValue() );
     }
-    public D contains( V value )
+    public VFDatum contains( String value )
     {
         return set.get(value);
     }
-    public List< ValueDatumPair<V,D> > toList()
+    public List< ValueDatumPair<String, VFDatum> > toList()
     {
-        List< ValueDatumPair<V,D> > list = new ArrayList( set.size() );
-        for( Map.Entry<V,D> entry : set.entrySet() ){
+        List< ValueDatumPair<String, VFDatum> > list = new ArrayList( set.size() );
+        for( Map.Entry<String ,VFDatum> entry : set.entrySet() ){
             list.add( new ValueDatumPair( entry.getKey(), entry.getValue() ) );
         }
         return list;
     }
 
-    public void union(VFFlowset<V,D> other, 
-                      VFFlowset<V,D> dest)
+    public void union(VFFlowset other, 
+                      VFFlowset dest)
     {
         if( dest == this && dest == other )
             return;
@@ -118,29 +118,16 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
             return;
         }
 
-        VFFlowset<V,D> tmpDest = new VFFlowset();
+        VFFlowset tmpDest = new VFFlowset();
 
         //add all the elements in this to the tmpDest
-        for( ValueDatumPair<V,D> pair : this.toList() ){
-            if( !other.contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
-                D newDatum = (D)(pair.getDatum().clone());
-                newDatum.makeVariable();
-                tmpDest.add( new ValueDatumPair( pair.getValue(), newDatum ) );
-            }
-            else
+        for( ValueDatumPair<String,VFDatum> pair : this.toList() ){
                 tmpDest.add( pair );
         }
         //add all elements in other to tmpDest
-        for( ValueDatumPair<V,D> pair : other.toList() ){
-            if( !contains( pair ) && pair.getDatum().isExactlyAssignedVariable() ){
-                D newDatum = (D)(pair.getDatum().clone());
-                newDatum.makeVariable();
-                tmpDest.add( new ValueDatumPair( pair.getValue(), newDatum ) );
-            }
-            else
+        for( ValueDatumPair<String,VFDatum> pair : other.toList() ){
                 tmpDest.add( pair );
         }
-        //copy tmpDest to dest
         tmpDest.copy(dest);
     }
     public String toString()
@@ -148,7 +135,7 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
         StringBuffer s = new StringBuffer();
         s.append("{");
         boolean first = true;
-        for( Map.Entry<V,D> entry : set.entrySet() ){
+        for( Map.Entry<String,VFDatum> entry : set.entrySet() ){
             if( first ){
                 s.append("\n");
                 first = false;
@@ -165,6 +152,6 @@ public class VFFlowset<V, D extends VFDatum> extends AbstractFlowSet<ValueDatumP
 
         return s.toString();
     }
-    public HashMap<V,D> getMap(){return set;}
+    public HashMap<String,VFDatum> getMap(){return set;}
 
 }

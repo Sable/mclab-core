@@ -2,7 +2,7 @@ package natlab.toolkits.analysis.varorfun;
 
 /**
  * A simple pair class used by the VFFlowset. All comparison or
- * hashing is done on the value or first member of the pair. 
+ * hashing is done on the value or first member of the pair. Datum must be Immutable 
  */
 
 public class ValueDatumPair< V, D extends VFDatum>
@@ -47,7 +47,7 @@ public class ValueDatumPair< V, D extends VFDatum>
      */
     public ValueDatumPair<V, D> clone()
     {
-        return new ValueDatumPair( value, datum.clone() );
+        return new ValueDatumPair( value, datum);
     }
 
     public static <A extends VFDatum> String toString(Object v, A d){

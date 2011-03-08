@@ -470,8 +470,7 @@ public class Main
                         System.out.println(cu.getPrettyPrinted());
                         System.out.println( a.getCurrentSet().toString() );
 
-                        FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, VFStructuralForwardAnalysis.class );
-                        System.out.println( testTool.run() );
+			/*
 
                         System.out.println( "********\ndoing vf data collection");
                         VFDataCollector vfdata = new VFDataCollector( cu );
@@ -493,6 +492,7 @@ public class Main
                         System.out.println( "assigned "+adata.getCurrentSet().toString() );
                         counts = adata.countData("USE");
                         System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
+			*/
                     }
                     else if( options.run() ){
                         FlowAnalysisTestTool testTool = 
@@ -1064,7 +1064,17 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
         return program;
     }
     
-    
+    public static CompilationUnits parseFiles(List<String> fileList,   ArrayList<CompilationProblem> errList ){
+	CompilationUnits cu = new CompilationUnits();
+	for (String fName: fileList){
+	    Reader natlabFile = Main.translateFile(fName, errList);
+	    //parse natlab
+	    Program p=Main.parseFile( fName,  natlabFile,  errList );
+	    cu.addProgram(p);
+	}
+	return cu;
+
+    }
     /**
      * Parse a given file as a Matlab file and return the Program ast node.
      *

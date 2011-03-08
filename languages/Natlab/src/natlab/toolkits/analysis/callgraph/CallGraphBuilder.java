@@ -37,7 +37,7 @@ public class CallGraphBuilder
 
     protected LinkedList<ASTNode> workList = new LinkedList();
 
-    protected VFStructuralForwardAnalysis nameResolver;
+    protected VFPreorderAnalysis nameResolver;
     protected HandlePropagationAnalysis handleResolver;
 
     public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap )
@@ -48,19 +48,19 @@ public class CallGraphBuilder
         for( Map.Entry<String,ASTNode> e : programNameMap.entrySet() )
             nameOfProgMap.put( e.getValue(), e.getKey());
 
-        nameResolver = new VFStructuralForwardAnalysis(tree);
+        nameResolver = new VFPreorderAnalysis(tree);
         nameResolver.analyze();
         handleResolver = new HandlePropagationAnalysis(tree);
         handleResolver.analyze();
     }
     public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap, 
-                             VFStructuralForwardAnalysis nameResolver )
+                             VFPreorderAnalysis nameResolver )
     {
         this.tree = tree;
         this.programNameMap = programNameMap;
         this.nameResolver = nameResolver;
         if( !tree.equals(nameResolver.getTree()) )
-            error = new CompilationProblem("Given tree inconsistent with given VFStructuralForwardAnalysis's tree");
+            error = new CompilationProblem("Given tree inconsistent with given VFPreorder's tree");
         if( !nameResolver.isAnalyzed() )
             nameResolver.analyze();
         handleResolver = new HandlePropagationAnalysis(tree);
@@ -71,7 +71,7 @@ public class CallGraphBuilder
     {
         this.tree = tree;
         this.programNameMap = programNameMap;
-        nameResolver = new VFStructuralForwardAnalysis(tree);
+        nameResolver = new VFPreorderAnalysis(tree);
         nameResolver.analyze();
         this.handleResolver = handleResolver;
         if( !tree.equals( handleResolver.getTree() ) )
@@ -80,14 +80,14 @@ public class CallGraphBuilder
             handleResolver.analyze();
     }
     public CallGraphBuilder( ASTNode tree, HashMap<String, ASTNode> programNameMap,
-                             VFStructuralForwardAnalysis nameResolver, 
+                             VFPreorderAnalysis nameResolver, 
                              HandlePropagationAnalysis handleResolver)
     {
         this.tree = tree;
         this.programNameMap = programNameMap;
         this.nameResolver = nameResolver;
         if( !tree.equals(nameResolver.getTree()) )
-            error = new CompilationProblem("Given tree inconsistent with given VFStructuralForwardAnalysis's tree");
+            error = new CompilationProblem("Given tree inconsistent with given VFPreorderAnalysis's tree");
         if( !nameResolver.isAnalyzed() )
             nameResolver.analyze();
         this.handleResolver = handleResolver;
@@ -264,7 +264,7 @@ public class CallGraphBuilder
         {
             if( !inLvalues ){
                 String id = node.getName().getID();
-                VFDatum datum =  nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+                VFDatum datum =  nameResolver.getFlowSets().get( currentStmt ).contains(id);
                 if( datum == null ){
                     CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
                     addToLabelMaps( label, node );
@@ -305,7 +305,7 @@ public class CallGraphBuilder
                 if( node.getTarget() instanceof NameExpr ){
                     //This is the only case currently dealt with
                     String id = ((NameExpr)node.getTarget()).getName().getID();
-                    VFDatum datum = nameResolver.getInFlowSets().get( currentStmt ).contains(id);
+                    VFDatum datum = nameResolver.getFlowSets().get( currentStmt ).contains(id);
                     if( datum == null ){
                         CallSiteLabel label = CallSiteLabel.makeUnknownLabel();
                         addToLabelMaps( label, node );

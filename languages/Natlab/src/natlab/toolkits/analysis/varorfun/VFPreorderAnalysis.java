@@ -4,23 +4,14 @@ import ast.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.*;
+
 /** 
  * An implementation of a preorder analysis for the var or fun
- * analysis. Note this implementation uses the FunctionVFDatum and not
- * the ScriptVFDatum. This is because the preorder analysis only makes
- * sense in the function case, so a script version is not needed.
+ * analysis. 
  * 
- * TODO - does the above make sense, is it up to date?
  */
-public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<String, FunctionVFDatum> >
+public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset >
 {
-
-    //TODO-JD add case for handling new RHS names that aren't involved
-    //in an @ expression and correspond to a visible function. Visible
-    //functions will have to be estimated of course. This is only for
-    //the function context, not scripts.
-
-
     private boolean inFunction=true;
     private boolean endExpr=false;
     private Function currentFunction = null;
@@ -47,47 +38,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         currentSet = newInitialFlow();
     }
     
-    public FunctionVFDatum newVariableDatum()
-    {
-        FunctionVFDatum d = new FunctionVFDatum();
-        d.makeVariable();
-        return d;
-    }
-
-    public FunctionVFDatum newBottomDatum()
-    {
-        FunctionVFDatum d = new FunctionVFDatum();
-        d.makeBottom();
-        return d;
-    }
-
-    public FunctionVFDatum newLDVar()
-    {
-        FunctionVFDatum d = new FunctionVFDatum();
-        d.makeLDVar();
-        return d;
-    }
-
-    public FunctionVFDatum newAssignedVariableDatum()
-    {
-        FunctionVFDatum d = new FunctionVFDatum();
-        d.makeAssignedVariable();
-        return d;
-    }
-
-    public FunctionVFDatum newFunctionDatum()
-    {
-        FunctionVFDatum d = new FunctionVFDatum();
-        d.makeFunction();
-        return d;
-    }
-
-    public VFPreorderAnalysis()
-    {
-        currentSet = newInitialFlow();
-    }
-
-    public VFFlowset<String, FunctionVFDatum> newInitialFlow()
+    public VFFlowset newInitialFlow()
     {
         return new VFFlowset();
     }
@@ -114,7 +65,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         currentScript=null;
     }
 
-    public void caseEndExpr( Script node ){
+    public void caseEndExpr( EndExpr node ){
         endExpr=true;
     }
 
@@ -129,12 +80,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
             System.err.println("in caseFunction");
         // Add output params to set
         for( Name n : node.getOutputParams() ){
-            currentSet.add( new ValueDatumPair(n.getID(), newVariableDatum() ) );
+            currentSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
         }
 
         // Add input params to set
         for( Name n : node.getInputParams() ){
-            currentSet.add( new ValueDatumPair(n.getID(), newVariableDatum() ) );
+            currentSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
         }
 
         // Process body
@@ -146,13 +97,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         //TODO 
 
         //backup currentSet
-        VFFlowset<String, FunctionVFDatum> myFlowSet = currentSet;
+        VFFlowset myFlowSet = currentSet;
         //Create a set consisting solely of values with variable
         //datums.
-        VFFlowset<String, FunctionVFDatum> initForNested = newInitialFlow();
-
-        for( ValueDatumPair<String, FunctionVFDatum> pair : currentSet.toList() ){
-            if( pair.getDatum().isVariable() )
+        VFFlowset initForNested = newInitialFlow();
+        for( ValueDatumPair<String, VFDatum> pair : currentSet.toList() ){
+            if( pair.getDatum()==VFDatum.VAR )
                 initForNested.add( pair.clone() );
         }
 
@@ -177,7 +127,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         node.getRHS().analyze( this );
 
         for( String s : lhs.getSymbols() )
-            currentSet.add( new ValueDatumPair( s, newVariableDatum() ) );
+            currentSet.add( new ValueDatumPair( s, VFDatum.VAR ) );
 
         node.getLHS().analyze( this );
 
@@ -186,20 +136,20 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
     public void caseGlobalStmt( GlobalStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair( n.getID(), newVariableDatum() ) );
+            currentSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
         }
     }
 
     public void casePersistentStmt( PersistentStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair( n.getID(), newVariableDatum() ) );
+            currentSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
         }
     }
 
     public void caseFunctionHandleExpr( FunctionHandleExpr node )
     {
-        currentSet.add( new ValueDatumPair( node.getName().getID(), newFunctionDatum() ) );
+        currentSet.add( new ValueDatumPair( node.getName().getID(), VFDatum.FUN ) );
     }
 
     public void caseParameterizedExpr( ParameterizedExpr node )
@@ -219,7 +169,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
                 {
                     String param = ( (StringLiteralExpr) node.getChild( 1 ).getChild( 1 ) ).getValue();
                     if (param.charAt(0)!='-')
-                        currentSet.add( new ValueDatumPair( param  , newLDVar() ) );
+                        currentSet.add( new ValueDatumPair( param  , VFDatum.LDVAR ) );
                 }
             }
 
@@ -228,16 +178,14 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
                 VFDatum d =  currentSet.contains( targetName );
                 if ( d==null )
                 {
-                    d = newLDVar();
-                    d.makeTop();
-                    currentSet.add( new ValueDatumPair( targetName, d ) );
+                    currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP ) );
                 }
 
-                if (VFDatum.Value.BOT.equals( d ) || VFDatum.Value.LDVAR.equals( d ) || 
-                        VFDatum.Value.VAR.equals( d ) )
+                if (VFDatum.BOT.equals(d) || VFDatum.LDVAR.equals( d) || 
+		    VFDatum.VAR.equals(d) )
                 {
                     endExpr = false;
-                    currentSet.add( new ValueDatumPair( targetName, newVariableDatum() ) );
+                    currentSet.add( new ValueDatumPair( targetName, VFDatum.VAR ) );
                 }
             }
         }
@@ -250,23 +198,23 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         {
             String s = node.getName().getID();
             VFDatum d = currentSet.contains( s );
-            if ( s!=null && d==null || VFDatum.Value.BOT.equals( d ) )
+            if ( s!=null && d==null || VFDatum.BOT.equals( d ) )
             {
                 if ( scriptOrFunctionExists( s ) ) 
                 {
-                    currentSet.add( new ValueDatumPair( s, newFunctionDatum() ) );
+                    currentSet.add( new ValueDatumPair( s, VFDatum.FUN ) );
                 }
                 else 
-                    currentSet.add( new ValueDatumPair( s, newBottomDatum() ) );
+                    currentSet.add( new ValueDatumPair( s, VFDatum.BOT ) );
             }
             flowSets.put( node, currentSet );	
         }
         else{
             String s = node.getName().getID();
             VFDatum d = currentSet.contains( s );		    
-            if ( d==null || VFDatum.Value.BOT.equals(d) )
+            if ( d==null || VFDatum.BOT.equals(d) )
             {
-                currentSet.add( new ValueDatumPair( s, newLDVar() ) );
+                currentSet.add( new ValueDatumPair( s, VFDatum.LDVAR ) );
             }
             flowSets.put( node, currentSet.clone() );	
         }
@@ -279,7 +227,3 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset<Stri
         || lookupQuery.isFunctionOrScript(name);
     }
 }
-
-
-
-

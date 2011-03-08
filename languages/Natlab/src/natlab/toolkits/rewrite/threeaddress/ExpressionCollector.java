@@ -25,7 +25,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
 {
     private boolean isSub = false;
     private LinkedList<AssignStmt> newAssignments;
-    private VFFlowset<String, VFDatum> resolvedNames;
+    private VFFlowset resolvedNames;
     private VFPreorderAnalysis kindAnalysis;
     protected boolean isLHS = false;
     protected boolean rewritingEnds = false;
@@ -49,7 +49,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
     }
 
     public ExpressionCollector( ASTNode tree, 
-                                VFFlowset<String, VFDatum> resolvedNames )
+                                VFFlowset resolvedNames )
     {
         super( tree );
         this.resolvedNames = resolvedNames;

@@ -17,7 +17,9 @@ import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
  */
 public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
 {
-
+    public HashMap<String, TreeSet<Value>> getMap(){
+	return map;
+    }
     public void addAll( String key, Collection<Value> values )
     {
         if( !map.containsKey(key) )

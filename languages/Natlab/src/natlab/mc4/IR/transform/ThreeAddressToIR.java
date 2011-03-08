@@ -3,7 +3,7 @@ package natlab.mc4.IR.transform;
 import java.util.*;
 
 import natlab.mc4.IR.*;
-import natlab.toolkits.analysis.varorfun.VFStructuralForwardAnalysis;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.*;
 import ast.*;
 
@@ -28,10 +28,10 @@ public class ThreeAddressToIR extends AbstractLocalRewrite {
     /**
      * case program - get new name resolver
      */
-    VFStructuralForwardAnalysis nameResolver;
+    VFPreorderAnalysis nameResolver;
     public void caseProgram( Program node )
     {
-        nameResolver = new VFStructuralForwardAnalysis( node );
+        nameResolver = new VFPreorderAnalysis( node );
         nameResolver.analyze();
         rewriteChildren( node );
     }

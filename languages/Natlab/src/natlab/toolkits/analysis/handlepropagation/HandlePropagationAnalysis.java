@@ -57,9 +57,9 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected boolean change = false;
 
     //The kind analysis used to compute values.
-    protected VFStructuralForwardAnalysis kindAnalysis;
+    protected VFPreorderAnalysis kindAnalysis;
     protected VFPreorderAnalysis preorderKindAnalysis;
-    protected VFFlowset<String, FunctionVFDatum> preorderSet;
+    protected VFFlowset preorderSet;
 
     public TreeSet<Value> allHandleTargets = new TreeSet();
     private boolean inAssignment = false;
@@ -73,8 +73,8 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public HandlePropagationAnalysis( ASTNode tree )
     {
         super( tree );
-        DEBUG = true;
-        kindAnalysis = new VFStructuralForwardAnalysis( tree );
+        DEBUG = false;
+        kindAnalysis = new VFPreorderAnalysis( tree );
         kindAnalysis.analyze();
         currentOutSet = newInitialFlow();
     }
@@ -87,7 +87,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         this.doTypeLookup = doTypeLookup;
     }
 
-    public HandlePropagationAnalysis( ASTNode tree, VFStructuralForwardAnalysis kind,
+    public HandlePropagationAnalysis( ASTNode tree, VFPreorderAnalysis kind,
                                       boolean destructiveCalls, boolean doTypeLookup )
     {
         this(tree, kind);
@@ -95,7 +95,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         this.doTypeLookup = doTypeLookup;
     }
 
-    public HandlePropagationAnalysis( ASTNode tree, VFStructuralForwardAnalysis kind )
+    public HandlePropagationAnalysis( ASTNode tree, VFPreorderAnalysis kind )
     {
         super( tree );
         kindAnalysis = kind;
@@ -349,7 +349,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         currentOutSet = currentInSet;
         VFDatum kind = getKindDatum( node );
-        System.out.println( kind );
+	//        System.out.println( kind );
         if( kind != null ){
             //case 1
             if(kind.isVariable()){
@@ -755,7 +755,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      * differences in getting it for scripts and functions.
      */
     protected VFFlowset getKindSet(){
-        return kindAnalysis.getInFlowSets().get(currentStmt);
+        return kindAnalysis.getFlowSets().get(currentStmt);
     }
 
     /**
@@ -781,7 +781,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
 	    if ( getKindSet() == null )
 		return true;
             VFDatum kind = getKindSet().contains(id);
-            if( kind == null || kind.isBottom() || 
+            if( kind == null || kind.isID() || 
                 kind.isVariable() )
                 return true;
         }

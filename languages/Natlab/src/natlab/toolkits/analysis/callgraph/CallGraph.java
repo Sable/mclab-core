@@ -9,9 +9,9 @@ import natlab.toolkits.analysis.handlepropagation.*;
 public class CallGraph
 {
 
-    protected HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap;
-    protected HashMap<ASTNode, CallSiteLabel> labelMap;
-    protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap;
+    public HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap;
+    public HashMap<ASTNode, CallSiteLabel> labelMap;
+    public HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap;
     protected Map<CallSiteLabel, ASTNode> labelProgramMap;
 
     public CallGraph( HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap,

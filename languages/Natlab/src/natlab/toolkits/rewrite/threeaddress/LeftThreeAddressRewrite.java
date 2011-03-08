@@ -6,7 +6,7 @@ import java.lang.NullPointerException;
 import ast.*;
 import natlab.toolkits.analysis.AbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.VFStructuralForwardAnalysis;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 
@@ -14,7 +14,7 @@ import natlab.toolkits.analysis.varorfun.VFDatum;
 
 public class LeftThreeAddressRewrite extends AbstractLocalRewrite
 {
-    private VFStructuralForwardAnalysis nameResolver;
+    private VFPreorderAnalysis nameResolver;
 
     public LeftThreeAddressRewrite( ASTNode tree )
     {
@@ -23,7 +23,7 @@ public class LeftThreeAddressRewrite extends AbstractLocalRewrite
 
     public void caseProgram( Program node )
     {
-        nameResolver = new VFStructuralForwardAnalysis( node );
+        nameResolver = new VFPreorderAnalysis( node );
         nameResolver.analyze();
         rewriteChildren( node );
     }
@@ -35,7 +35,7 @@ public class LeftThreeAddressRewrite extends AbstractLocalRewrite
         Expr rhs = node.getRHS();
         ExpressionCollector ec = null;
         try{
-            ec = new ExpressionCollector( lhs, nameResolver.getInFlowSets().get(node) );
+            ec = new ExpressionCollector( lhs, nameResolver.getFlowSets().get(node) );
         }catch(NullPointerException e){
             rethrowWithMoreInfoNR( nameResolver, e );
         }
@@ -48,9 +48,9 @@ public class LeftThreeAddressRewrite extends AbstractLocalRewrite
         }
     }
 
-    private void rethrowWithMoreInfoNR( VFStructuralForwardAnalysis nr, NullPointerException e)
+    private void rethrowWithMoreInfoNR( VFPreorderAnalysis nr, NullPointerException e)
     {
-        if( nr==null || nr.getInFlowSets()==null ){
+        if( nr==null || nr.getFlowSets()==null ){
             String m = "nameResolver not initialized correctly, was this rewriter constructed with an " +
                 "ASTNode containing a Program node? Because it's supposed to be!";
             throw new NullPointerException(m);
