@@ -37,13 +37,17 @@ public class LookupFile{
 	return "DWH,H";
     }
 
+    public static boolean packageExists(String s){
+	if (builtinPackages.containsKey(s)) return true; 
+	return false;
+    }
+
     public static boolean scriptOrFunctionExists(String s){
 	if (currentFile.containsKey(s)) {
 	    return true;
 	}
 	if (lib.containsKey(s)) return true; 
 	if (builtinClasses.containsKey(s)) return true; 
-	if (builtinPackages.containsKey(s)) return true; 
 	if (builtinFunctions.containsKey(s)) return true; 
 	return false; 
     } 
