@@ -46,7 +46,8 @@ aspect PrettyPrint {
     //IR
     eq CSLExpr.getPrettyPrintedLessComments() = "CSL["+getName().getPrettyPrinted()+"]";
     eq EndCallExpr.getPrettyPrintedLessComments() = "end("+getArray().getPrettyPrinted() + ", " + getNumDim() + ", " + getWhatDim() + ")";
-    eq CheckScalarStmt.getPrettyPrintedLessComments() = "check_scalar("+getNameExpr().getPrettyPrinted() + ")";
+
+    eq CheckScalarStmt.getPrettyPrintedLessComments() = getIndent() + "check_scalar("+getNameExpr().getPrettyPrinted() + ")"+ (isOutputSuppressed() ? ";" : "");
 
     //AST
 
