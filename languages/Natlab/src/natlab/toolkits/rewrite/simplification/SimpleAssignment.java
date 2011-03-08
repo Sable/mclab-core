@@ -9,6 +9,11 @@ import natlab.toolkits.analysis.varorfun.*;
 
 
 /**
+ * Simplifies assignment statements. Ensures that in an assignments
+ * statement, between the left and right hand sides, there is at most
+ * one complex operation. Either the left or right hand side must be a
+ * variable or literal.
+ *
  * @author Jesse Doherty
  */
 public class SimpleAssignment extends AbstractSimplification
