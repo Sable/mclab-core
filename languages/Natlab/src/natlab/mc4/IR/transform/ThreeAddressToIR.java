@@ -5,6 +5,9 @@ import java.util.*;
 import natlab.mc4.IR.*;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.*;
+import natlab.toolkits.rewrite.simplification.AbstractSimplification;
+import natlab.toolkits.rewrite.simplification.FullSimplification;
+import natlab.toolkits.rewrite.simplification.RightSimplification;
 import ast.*;
 
 /**
@@ -20,21 +23,28 @@ import ast.*;
  * 
  */
 
-public class ThreeAddressToIR extends AbstractLocalRewrite {
-    public ThreeAddressToIR(ASTNode tree) {
-        super(tree);
+public class ThreeAddressToIR extends AbstractSimplification {
+    public ThreeAddressToIR(ASTNode<?> tree, VFPreorderAnalysis nameResolver) {
+        super(tree,nameResolver);
     }
+
+    @Override
+    public Set<Class<? extends AbstractSimplification>> getDependencies() {
+        HashSet<Class<? extends AbstractSimplification>> dependencies = 
+                new HashSet<Class<? extends AbstractSimplification>>();
+        dependencies.add( FullSimplification.class );
+        return dependencies;
+    }
+    
     
     /**
      * case program - get new name resolver
-     */
-    VFPreorderAnalysis nameResolver;
     public void caseProgram( Program node )
     {
         nameResolver = new VFPreorderAnalysis( node );
         nameResolver.analyze();
         rewriteChildren( node );
-    }
+    }*/
         
     
     /**
@@ -134,7 +144,10 @@ public class ThreeAddressToIR extends AbstractLocalRewrite {
                 
             //colon expressions
             if(node.getRHS() instanceof RangeExpr){
-                //TODO
+                RangeExpr re = (RangeExpr)node.getRHS();
+                
+                
+                
             } else
                 
             //something not implemented
@@ -277,14 +290,18 @@ public class ThreeAddressToIR extends AbstractLocalRewrite {
         return false;
     }
     
+    
+    //TODO remove this - part of simplification
     /**
      * returns true if the given name expression refers to a variable
      * - otherwise it is assumed to be a function
      */
-    private boolean isVar(NameExpr nameExpr){
-        if (nameExpr.tmpVar) return true;
-        return true; //TODO
-    }
+    //private boolean isVar(NameExpr nameExpr){
+    //    if (nameExpr.tmpVar) return true;
+    //    return true; //TODO
+    //}
+
+
     
 }
 

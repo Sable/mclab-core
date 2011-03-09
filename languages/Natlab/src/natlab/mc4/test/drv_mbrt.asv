@@ -18,8 +18,8 @@ time = (t2-t1)*[0, 0, 86400, 3600, 60, 1]';
 output = {mean(mean(set(:)))};
 
 % Validate the result
-t = Nmax*N;
-if abs(sum(sum(set))/(t)-0.37429481997515) < 0.01;
+e = abs(sum(sum(set))/(Nmax*N)-0.37429481997515)
+if e < 0.01;
 	valid = 'PASS';
 else
 	valid = 'FAIL';

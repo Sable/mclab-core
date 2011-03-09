@@ -9,7 +9,10 @@ public class Mc4BuiltinQuery implements BuiltinQuery {
     
     public Mc4BuiltinQuery(){
         builtins = new HashSet<String>();
-        builtins.add("mean");        
+        builtins.add("false");
+        builtins.add("true");
+        builtins.add("and");
+        builtins.add("mean");
         builtins.add("clock");
         builtins.add("exp");        
         builtins.add("abs");
@@ -33,6 +36,7 @@ public class Mc4BuiltinQuery implements BuiltinQuery {
         builtins.add("transpose");    
         builtins.add("colon");
         builtins.add("horzcat");
+        builtins.add("lt");
     }
     
     public boolean isBuiltin(String functionname) {

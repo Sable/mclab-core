@@ -4,17 +4,17 @@
 package natlab.mc4;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.jar.JarEntry;
+import java.util.Random;
 
-import com.sun.org.apache.xml.internal.utils.URI;
-import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException;
 
 import natlab.mc4.builtin.Mc4BuiltinQuery;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.FunctionFinder;
+import natlab.toolkits.filehandling.genericFile.ZippedFile;
 
 
 /**
@@ -30,18 +30,34 @@ public class Mc4 {
         if (DEBUG) System.out.println(message);
     }
     public static void error(String message){
-        System.err.println(message);
+        System.err.println("mc4 error: "+message);
         if (PRINT_STACK_ON_ERROR) Thread.dumpStack();
         if (EXIT_ON_ERROR) System.exit(1);
     }
     protected static FunctionFinder functionFinder;
+    
+    
+    //TODO get rid of this
+    public static void fiddle() throws Exception{
+        URL location = Mc4.class.getProtectionDomain().getCodeSource().getLocation();
+        System.out.println(location);
+        System.out.println(location.getFile());
+        
+        System.out.println(natlab.Main.class.getResource("Main.class"));
+        
+        System.out.println(
+                new ZippedFile("C:\\classes\\COMP 621.ZIP","ass2/ass2.pdf"));
+        
+        
+    }
     
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//for now just open a file if no option is given .. eclipse is a pain
+
+        //for now just open a file if no option is given .. eclipse is a pain
 		Options options = new Options();
 		options.parse(args);
 		
@@ -68,7 +84,6 @@ public class Mc4 {
         //object that resolves function names to files      
         functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
 
-	    
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(options);
 	    	    

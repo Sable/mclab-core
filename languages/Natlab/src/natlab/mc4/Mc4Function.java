@@ -8,6 +8,7 @@ import natlab.mc4.symbolTable.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.inline.*;
+import natlab.toolkits.rewrite.simplification.FullSimplification;
 import natlab.toolkits.rewrite.threeaddress.*;
 
 import ast.*;
@@ -58,7 +59,7 @@ public class Mc4Function {
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
-        Mc4.debug("function "+name+" variable or function analysis result:\n"+flowset);
+        Mc4.debug("create symbol table - function "+name+" variable or function analysis result:\n"+flowset);
         
         //go through all symbols, and put them in the symbol table
         //TODO the var analysis only captures variables - get those first...
@@ -71,7 +72,7 @@ public class Mc4Function {
             } else if (vf.isVariable()){
                 symbolTable.put(name, new Variable());
             } else {
-                System.err.println("symbol "+name+" in "+name+" cannot be resolved as a function or variable. vf:"+vf);
+                System.err.println("symbol table: "+name+" in "+this.name+" cannot be resolved as a function or variable. vf:"+vf);
             }
         }        
         //...the rest are assumed to be functions for now
@@ -97,22 +98,22 @@ public class Mc4Function {
     	fList.addFunction(function);
     	
     	//do transform - first left, then right
-    	System.out.println("lr:");
-    	LeftThreeAddressRewrite lr = new LeftThreeAddressRewrite(fList);
-    	System.out.println("rr:");
-    	RightThreeAddressRewrite rr = new RightThreeAddressRewrite(lr.transform());
-    	fList = ((FunctionList)rr.transform());
+    	//System.out.println("lr:");
+    	//LeftThreeAddressRewrite lr = new LeftThreeAddressRewrite(fList);
+    	//System.out.println("rr:");
+    	//RightThreeAddressRewrite rr = new RightThreeAddressRewrite(lr.transform());
+    	
+    	Simplifier simplifier =
+    	    new Simplifier(fList, ThreeAddressToIR.class);
+    	fList = ((FunctionList)simplifier.simplify());
     	
     	//transform into IR 
     	//TODO - is this the right place?
         //System.out.println(rr.transform().getPrettyPrinted());
-
-    	System.out.println("after 3 addr trasformation:");
-        System.out.println(this.function.getPrettyPrinted());
-
-    	
-    	ThreeAddressToIR irTransform = new ThreeAddressToIR(fList);
-    	fList = (FunctionList)irTransform.transform();
+    	//System.out.println("after 3 addr trasformation:");
+        //System.out.println(this.function.getPrettyPrinted());
+        //ThreeAddressToIR irTransform = new ThreeAddressToIR(fList);
+    	//fList = (FunctionList)irTransform.transform();
 
         System.out.println("after IR  trasformation:");
         System.out.println(this.function.getPrettyPrinted());
