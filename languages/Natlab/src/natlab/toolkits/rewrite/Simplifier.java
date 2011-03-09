@@ -31,6 +31,26 @@ public class Simplifier
     protected ASTNode tree;
     protected VFPreorderAnalysis kind;
 
+    
+    /**
+     * Helper constructor where the Set of classes gets specified using varargs
+     */
+    public Simplifier(ASTNode tree,Class<? extends AbstractSimplification> ... todo){
+        this(tree,new HashSet<Class<? extends AbstractSimplification>>(Arrays.asList(todo)));
+    }
+
+    /**
+     * Helper constructor where the Set of classes gets specified using varargs
+     */
+    public Simplifier(ASTNode tree,
+            VFPreorderAnalysis kindAnalysis,
+            Class<? extends AbstractSimplification> ... todo){
+        this(tree,
+             new HashSet<Class<? extends AbstractSimplification>>(Arrays.asList(todo)),
+             kindAnalysis);
+    }
+
+    
     /**
      * Constructs a simplifier for a given set of simplification
      * classes. 
