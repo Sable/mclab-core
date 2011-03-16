@@ -22,7 +22,7 @@ import natlab.toolkits.filehandling.genericFile.ZippedFile;
  * @author ant6n
  *
  */
-public class Mc4 {
+public class Mc4 {    
     public static boolean DEBUG = true;
     public static boolean PRINT_STACK_ON_ERROR = true;
     public static boolean EXIT_ON_ERROR = true;
@@ -56,7 +56,7 @@ public class Mc4 {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+	    
         //for now just open a file if no option is given .. eclipse is a pain
 		Options options = new Options();
 		options.parse(args);

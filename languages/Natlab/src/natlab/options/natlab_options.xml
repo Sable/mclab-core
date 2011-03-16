@@ -104,6 +104,7 @@ No static linking is done.
         using a the heartbeat signal.</long_desc>
     </boolopt>
   </section>
+  
   <section>
     <name>Directory Search</name>
     <boolopt>
@@ -188,8 +189,11 @@ No static linking is done.
       </long_desc>
     </boolopt>
   </section>
+
+
+  <!-- static stuff ********************************************** -->
   <section>
-    <name>Fortran Generator Options</name>
+    <name>Static/Fortran Generator Options</name>
     <boolopt>
       <name>Generate Fortran</name>
       <alias>f</alias>
@@ -200,6 +204,25 @@ No static linking is done.
         representation of the input sounce.
       </long_desc>
     </boolopt>
+		<multiopt>
+			<name>static</name>
+			<alias>static</alias>
+			<alias>static phases</alias>
+				<value>
+					<name>collect</name>
+					<alias>c</alias>
+					<alias>collect</alias>
+					<short_desc>collects all required .m files, and flattens output into one directory</short_desc>
+				</value>
+				<value>
+					<name>transform to IR</name>
+					<alias>ir</alias>
+					<short_desc>outputs files after IR transformation</short_desc>
+				</value>
+			<default>none</default>
+			<short_desc>Performs static compiler passes up to specified pass and outputs files</short_desc>
+			<long_desc>This option ...</long_desc>
+		</multiopt>
   </section>
   <section>
     <name>Testing</name>
