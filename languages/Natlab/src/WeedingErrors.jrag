@@ -291,10 +291,16 @@ aspect WeedingErrors {
     	
 		if(lhs instanceof LValueExpr) {
 			if(lhs instanceof MatrixExpr){
+                            if( ((MatrixExpr)lhs).getNumRow() == 1 )
+                                //TODO: make sure only contains LValueExpr
 				lhs.getWeedingErrors();
+                            else
+                                error(lhs.getPosString(), "Ill formed multiple left-hand side assignment");
 			}
+                        else
+                            lhs.getWeedingErrors();
     	} else {
-    		error(lhs.getPosString(), "Left hand side of assignment statement is not a valid expression");			
+    		error(lhs.getPosString(), "Left hand side of assignment statement is not a valid LValue expression");			
     	}
     	
     	return true;
