@@ -101,7 +101,7 @@ public class Main
                     //System.out.println("compiling to fortran "+options.getFiles());
                     //String[] fargs = {"-d",(String)options.getFiles().get(0)};
                     //System.out.println("calling McFor with "+fargs);
-                    natlab.mc4.Mc4.main(args);
+                    natlab.Static.mc4.Mc4.main(args);
                     return;
                 } //end fortran
                 
