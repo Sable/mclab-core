@@ -67,8 +67,8 @@ public class Mc4 {
 		    //where it is depends on whether we call from Project or natlab dir
 		    File thisDir = new File(System.getProperty("user.dir"));
 		    String main = (thisDir.getName().equals("McLab"))?
-		            "languages/Natlab/src/natlab/mc4/test/drv_mbrt.m"
-		            :"src/natlab/mc4/test/drv_mbrt.m";
+		            "languages/Natlab/src/natlab/Static/mc4/test/drv_mbrt.m"
+		            :"src/natlab/Static/mc4/test/drv_mbrt.m";
             args = new String[]{main};
 			options.parse(args);
 		} 
