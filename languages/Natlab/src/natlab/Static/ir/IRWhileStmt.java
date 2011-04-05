@@ -17,9 +17,10 @@ import ast.*;
  */
 
 
-public class IRWhileStmt extends WhileStmt implements IRNode {
-   public IRWhileStmt(NameExpr condition,IRStatementList body) {
-       this.setExpr(condition);
+public class IRWhileStmt extends WhileStmt implements IRStmt {
+   public IRWhileStmt(Name condition,IRStatementList body) {
+       super();
+       this.setExpr(new NameExpr(condition));
        this.setStmtList(body);
    }
    

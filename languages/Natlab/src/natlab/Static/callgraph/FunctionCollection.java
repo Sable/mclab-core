@@ -1,4 +1,4 @@
-package natlab.Static.mc4;
+package natlab.Static.callgraph;
 
 import java.io.File;
 import java.util.*;
@@ -6,21 +6,29 @@ import java.util.*;
 import ast.*;
 
 import natlab.CompilationProblem;
+import natlab.Static.mc4.Mc4;
 import natlab.Static.mc4.builtin.Mc4BuiltinQuery;
 import natlab.Static.mc4.symbolTable.*;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.FunctionFinder;
 
 /**
- * A FunctionCollection is a collection of Mc4Functions.
- * Parsing is done by this object
- * -> we refer to parsing as 'collecting', since we need to parse, build a basic symbol table
- *    and explore the path to find functions in one pass.
- *    At the end all used Matlab functions should be in this collection.
+ * A FunctionCollection is a collection of static function.
+ * The static collection of functions is done by this object.
+ * We refer to parsing as 'collecting', since we need to parse, resolve names as functions
+ * or variables and explore the path to find functions in one pass.
+ * 
+ * Given a main function, all functions that may be used during execution
+ * are in this collection. This can only be ensured if certain dynamic Matlab
+ * builtins are not used (thus this is part of the Static package):
+ * - cd into directories which have requried matlab functions
+ * - eval, ...
+ * - calls to builtin(..)
+ * - any creation of function handles to these builtins
+ * 
  */
 
-
-public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
+public class FunctionCollection extends HashMap<FunctionReference,StaticFunction>{
     private HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
     private FunctionReference main = null; //denotes which function is the entry point
     private Options options;
@@ -34,7 +42,6 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         super();
         
         this.options = options;
-        
         
         //get main file (entrypoint)
         File main = Mc4.functionFinder.getMain();
@@ -95,31 +102,27 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
         //turn functions into mc4 functions, and go through their function references recursively
         FunctionList functionList = (FunctionList)program;
         for (Function functionAst : functionList.getFunctions()){
-            //create/add function
-            Mc4Function function = new Mc4Function(functionAst, file);
-            this.put(new FunctionReference(function.getName(),file),function);
+            //create/add static function
+            FunctionReference ref = new FunctionReference(functionAst.getName(),file);
+            StaticFunction function = new StaticFunction(functionAst, ref);
+            this.put(ref,function);
 
             //recursively load referenced functions
             success = success && resolveFunctionsAndCollect(function,errList);
         }
 
         //TODO we should collect used siblings and get rid of unused ones
-        return true;
+        return success;
     }
     
     /**
      * resolves all calls to other functions within given function, and collects functions not in this collection
      */
-    private boolean resolveFunctionsAndCollect(Mc4Function function,ArrayList<CompilationProblem> errList){
+    private boolean resolveFunctionsAndCollect(StaticFunction function,ArrayList<CompilationProblem> errList){
         boolean success = true;
         
         //collect references to other functions - update symbol table, recursively collect
-        for (String otherName : function.getSymbolTable().getSymbols(
-                new SymbolFilter() {
-                    public boolean accept(Symbol symbolType) {
-                        return symbolType instanceof FunctionType;
-                    }
-                })){
+        for (String otherName : function.getCalledFunctions().keySet()){
             Mc4.debug("resolving "+otherName);
             
             //LOOKUP SEMANTICS:
@@ -127,8 +130,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
             //1 functionName could be the function itself
             if (otherName.equals(function.getName())){
                 //reference to itself
-                function.getSymbolTable().put(otherName, 
-                        new FunctionReferenceType(new FunctionReference(otherName,function.getFile())));
+                function.getCalledFunctions().put(otherName, function.getReference());
                 
             //2 functionName could be a nested function
             } else if (function.getAst().getNested().containsKey(otherName)){
@@ -137,8 +139,8 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
             
             //3 functionName could be a sibling function - which should already be loaded
             } else if (function.getSiblings().contains(otherName)){             
-                function.getSymbolTable().put(otherName, 
-                        new FunctionReferenceType(new FunctionReference(otherName,function.getFile())));
+                function.getCalledFunctions().put(otherName, 
+                        new FunctionReference(otherName,function.reference.path));
 
             //4 functionName is a builtin or a function on the path    
             } else {
@@ -146,20 +148,20 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
                 File otherFunction = Mc4.functionFinder.findName(otherName);
                 if (otherFunction != null){ // file found
                     success = success && collect(otherFunction,false,errList); //recursively collect other function
-                    function.getSymbolTable().put(otherName,  //update symbol table entry
-                            new FunctionReferenceType(new FunctionReference(otherName,otherFunction)));
+                    function.getCalledFunctions().put(otherName,  //update symbol table entry
+                            new FunctionReference(otherName,otherFunction));
                     
                 } else { // file is builtin, or cannot be found
                     if (Mc4.functionFinder.isBuiltin(otherName)){ //builtin
-                        function.getSymbolTable().put(otherName, 
-                                new FunctionReferenceType(new FunctionReference(otherName)));
+                        function.getCalledFunctions().put(otherName, 
+                                new FunctionReference(otherName));
                     } else { //not found
                         Mc4.error("reference to "+otherName+" in "+function.getName()+" not found");
                         success = false;
                     }
                 }
             }
-        }        
+        }
         return success;
     }
     
@@ -173,6 +175,7 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
     //throws a unspported operation if there is an attempt to inline a function
     //that is alraedy in the context -- cannot inline recursive functions
     private void inlineAll(Set<FunctionReference> context,FunctionReference function){
+        
     	//error check
     	if (context.contains(function)){
     		throw new UnsupportedOperationException("trying to inline recursive function "+function);
@@ -180,20 +183,16 @@ public class FunctionCollection extends HashMap<FunctionReference,Mc4Function>{
     	if (!containsKey(function)){
     		throw new UnsupportedOperationException("trying to inline function "+function+", which is not loaded");
     	}
-    	if (function.isBuiltin) return;
+    	if (function.isBuiltin()) return;
     	
     	//add this call to the context
     	context.add(function);
     	
     	//inline all called functions recursively
-    	SymbolTable table = get(function).getSymbolTable();    	
-    	for (String s : table.keySet()){
-    		if (table.get(s) instanceof FunctionReferenceType) {
-				FunctionReference ref = ((FunctionReferenceType)table.get(s)).getFunctionReference();
-				if (!ref.isBuiltin){
-					//inline recursively
-					inlineAll(context,ref);
-				}
+    	for (FunctionReference ref : get(function).getCalledFunctions().values()){
+			if (!ref.isBuiltin()){
+				//inline recursively
+				inlineAll(context,ref);
 			}
     	}
     	

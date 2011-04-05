@@ -11,6 +11,8 @@ import ast.NameExpr;
  * - cell array indexing gets expanded into multiple items: c{:}, c{t}
  * - struct array indexing might get expanded into multiple items: s.a(:), s.a(t)
  * 
+ * 
+ * ~ may also be represented here
  * @author ant6n
  */
 

@@ -17,6 +17,36 @@ import ast.NameExpr;
  */
 
 public class RenameSymbols extends AbstractLocalRewrite {
+    // *** Static helper funcitons *****************************************************
+    /**
+     * given a name, returns the same name with some numbers added at the end
+     * such that the returned name does not exist within the given sets of names
+     * (This may be slow - tries to find the numerical postfix with smallest positive value)
+     * The names should be supplied as a Collection<String>
+     */
+    @SuppressWarnings("unchecked")
+    public static String getNewName(String name, Collection ... names){
+        if (names.length == 0) return name;
+
+        int i = 1; //the postfix
+        boolean containsName = false; //flag whether the name is in the sets
+        
+        //try to an i such that name+i is not in the set
+        do{
+            for (Collection<String> set : names){
+                if (set.contains(name+i)){
+                    containsName = true;
+                    break;
+                }
+            }
+            if (containsName) i++;
+        } while(containsName);
+        return name+i;
+    }
+
+    
+    
+    // *** Actual Simplification methods ***********************************************
 	Map<String,String> map;
 	
 	/**

@@ -33,20 +33,24 @@ public class Simplifier
 
     
     /**
-     * Helper constructor where the Set of classes gets specified using varargs
+     * Helper constructor using varargs
+     * The varags have to be classes extending Simplfication (otherwise there will be a runtime exception)
      */
-    public Simplifier(ASTNode tree,Class<? extends AbstractSimplification> ... todo){
-        this(tree,new HashSet<Class<? extends AbstractSimplification>>(Arrays.asList(todo)));
+    @SuppressWarnings("unchecked")
+    public Simplifier(ASTNode tree,Class... todo){
+        this(tree,new HashSet<Class<? extends AbstractSimplification>>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)));
     }
 
     /**
      * Helper constructor where the Set of classes gets specified using varargs
+     * The varags have to be classes extending Simplfication (otherwise there will be a runtime exception)
      */
+    @SuppressWarnings("unchecked")
     public Simplifier(ASTNode tree,
             VFPreorderAnalysis kindAnalysis,
-            Class<? extends AbstractSimplification> ... todo){
+            Class ... todo){
         this(tree,
-             new HashSet<Class<? extends AbstractSimplification>>(Arrays.asList(todo)),
+             new HashSet<Class<? extends AbstractSimplification>>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
              kindAnalysis);
     }
 

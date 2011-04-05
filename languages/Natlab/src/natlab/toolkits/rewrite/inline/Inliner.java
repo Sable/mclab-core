@@ -6,9 +6,6 @@ import ast.List;
 import natlab.toolkits.rewrite.AbstractLocalRewrite;
 import natlab.toolkits.rewrite.TransformedNode;
 
-
-
-
 /**
  * Inlines every call to functions or scripts of given names into a function.
  * Every call to one of the given names is replaced with a copy of the corresponding 
@@ -45,9 +42,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 
 	/**
 	 * Constructs inliner from given Program (Script or Function) and Map from String. The
-	 * Inline action is always performed.
-	 * @param
-	 * @param
+	 * Inline action is always performed. The map does not get modified.
 	 */
 	public Inliner(TargetScriptOrFunction tree,Map<String, ScriptOrFunction> map) {
 		this(tree,map,new InlineQuery<ScriptOrFunction,TargetScriptOrFunction>(){

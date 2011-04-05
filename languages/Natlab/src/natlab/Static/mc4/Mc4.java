@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.Random;
 
 
+import natlab.Static.callgraph.FunctionCollection;
 import natlab.Static.mc4.builtin.Mc4BuiltinQuery;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.FunctionFinder;
@@ -34,7 +35,7 @@ public class Mc4 {
         if (PRINT_STACK_ON_ERROR) Thread.dumpStack();
         if (EXIT_ON_ERROR) System.exit(1);
     }
-    protected static FunctionFinder functionFinder;
+    public static FunctionFinder functionFinder;
     
     
     //TODO get rid of this

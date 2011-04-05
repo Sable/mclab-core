@@ -15,6 +15,10 @@ aspect ASTAnalyze
     {
         visitor.caseStmt(this);
     }
+    public void EmptyStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+        visitor.caseEmptyStmt(this);
+    }
+    
     public void BreakStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
     {
         visitor.caseBreakStmt(this);

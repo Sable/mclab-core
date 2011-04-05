@@ -8,12 +8,19 @@ import natlab.Static.ir.IRArraySet;
 import natlab.Static.ir.IRAssignLiteralStmt;
 import natlab.Static.ir.IRCallStmt;
 import natlab.Static.ir.IRCommaSeparatedList;
+import natlab.Static.ir.IRCommentStmt;
+import natlab.Static.ir.IRForStmt;
+import natlab.Static.ir.IRFunction;
+import natlab.Static.ir.IRIfStmt;
+import natlab.Static.ir.IRStatementList;
+import natlab.Static.ir.IRWhileStmt;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
 import natlab.toolkits.rewrite.simplification.FullSimplification;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
 import ast.*;
+import ast.List;
 
 /**
  * transforms a given AST, which already is in three address form,
@@ -42,23 +49,97 @@ public class ThreeAddressToIR extends AbstractSimplification {
     }
     
     
-    /**
-     * case program - get new name resolver
-    public void caseProgram( Program node )
-    {
-        nameResolver = new VFPreorderAnalysis( node );
-        nameResolver.analyze();
-        rewriteChildren( node );
-    }*/
+    @Override
+    public void caseFunction(Function node) {
+        rewriteChildren(node);
+        //collect nested functions
+        List<IRFunction> nesteds = new List<IRFunction>();
+        for (Function f : node.getNestedFunctions()){
+            nesteds.add((IRFunction)f);
+        }
+        //create IRFunction
+        newNode = new TransformedNode<ASTNode>(
+                new IRFunction(node.getOutputParamList(),node.getName(),node.getInputParamList(),
+                        node.getHelpCommentList(),new IRStatementList(node.getStmtList()),nesteds));
+    }
         
     
     /**
-     * For the for statement, we have to pull out whatever the initial assignment does
-     *
+     * case Statement - we should've implemented all statements so this shouldn't ever be called
+     */
+    @Override
+    public void caseStmt(Stmt node) {
+        throw new UnsupportedOperationException("IR Transformation received unimplemented statment "+node.getClass().getName()
+                +"\n"+node.getPrettyPrinted());
+    }
+    
+    /**
+     * empty statement - gets removed
+     */
+    @Override
+    public void caseEmptyStmt(EmptyStmt node) {
+        newNode = new TransformedNode<ASTNode>(new IRCommentStmt(node.getComments()));
+    }
+    
+    @Override
+    public void caseIfStmt(IfStmt node) {
+        //recursively rewrite children
+        rewriteChildren(node);
+
+        //pull out expression
+        LinkedList<AssignStmt> stmts = new LinkedList<AssignStmt>();
+        NameExpr condition = makeName(node.getIfBlock(0).getCondition(), stmts);
+
+        //get else block
+        List<Stmt> elseStmts = 
+            ((node.getElseBlock()!=null && node.getElseBlock().getStmtList()!=null)
+            ?(node.getElseBlock().getStmtList()) : (new List<Stmt>()));    
+
+        //we will assume that there is only one if block (via if simplification)
+        newNode = new TransformedNode<ASTNode>(stmts);
+        newNode.add(
+                new IRIfStmt(condition.getName(),
+                        new IRStatementList(node.getIfBlock(0).getStmtList()),
+                        new IRStatementList(elseStmts)));
+    }
+
+
     public void caseForStmt(ForStmt node) {
-        //do the initial "assignment"
-        rewrite(node.getAssignStmt());
-    }*/
+        //rewrite body
+        rewrite(node.getStmtList());
+                
+        //find range variables
+        RangeExpr range = (RangeExpr)node.getAssignStmt().getRHS();
+        LinkedList<AssignStmt> assigns = new LinkedList<AssignStmt>();
+               
+        NameExpr l = pullOutLiteral(range.getLower(),assigns);
+        NameExpr i = pullOutLiteral(range.hasIncr()?range.getIncr():null,assigns);
+        NameExpr u = pullOutLiteral(range.getUpper(),assigns);
+        
+        //build transformed node
+        newNode = new TransformedNode<ASTNode>(assigns);
+        newNode.add(new IRForStmt(((NameExpr)(node.getAssignStmt().getLHS())).getName(),
+                l.getName(), i!=null?i.getName():null, u.getName(), 
+                        new IRStatementList(node.getStmtList())));
+        
+    }
+    
+    public void caseWhileStmt(WhileStmt node) {
+        rewriteChildren(node);
+        
+        //pull out expr
+        LinkedList<AssignStmt> assign = new LinkedList<AssignStmt>();
+        NameExpr condition = makeName(node.getExpr(),assign);
+        
+        //copy list to end of body
+        for (AssignStmt a : assign){
+            node.getStmtList().add(a.copy());
+        }
+        
+        //construct transformed node
+        newNode = new TransformedNode<ASTNode>(assign);
+        newNode.add(new IRWhileStmt(condition.getName(), new IRStatementList(node.getStmtList())));
+    }
     
     
     public void caseAssignStmt(AssignStmt node) {
@@ -253,8 +334,11 @@ public class ThreeAddressToIR extends AbstractSimplification {
      * takes the given expression, which should be a name or a literal
      * - if it is a name expression, return it
      * - if it is a literal l, add t = i to literal Assignments, and return t
+     * - if its null, return null
      */
     private NameExpr pullOutLiteral(Expr exp,LinkedList<AssignStmt> literalAssignments){
+        if (exp == null) return null;
+        
         if (exp instanceof NameExpr){
             return (NameExpr)exp;
         } else if (exp instanceof LiteralExpr){
@@ -266,6 +350,21 @@ public class ThreeAddressToIR extends AbstractSimplification {
         } else {
             throw new UnsupportedOperationException("expected literal or name, received "+exp.getPrettyPrinted());
         }
+    }
+    
+    /**
+     * takes in a given expression, which may be a binary, unary, name or literal,
+     * and produces a correct assignment statement for it such that the statmenet
+     * becomes replaced with just a var
+     * for example:
+     * 
+     * (a + b)
+     * ==>
+     * [t] = plus(a,b)
+     * t
+     */
+    private NameExpr makeName(Expr exp,LinkedList<AssignStmt> assigns){
+        return (NameExpr)exp; //todo
     }
     
     /**
@@ -295,18 +394,6 @@ public class ThreeAddressToIR extends AbstractSimplification {
         return false;
     }
     
-    
-    //TODO remove this - part of simplification
-    /**
-     * returns true if the given name expression refers to a variable
-     * - otherwise it is assumed to be a function
-     */
-    //private boolean isVar(NameExpr nameExpr){
-    //    if (nameExpr.tmpVar) return true;
-    //    return true; //TODO
-    //}
-
-
     
 }
 

@@ -1,5 +1,6 @@
 package natlab.Static.mc4.symbolTable;
 
+import natlab.Static.callgraph.FunctionReference;
 import natlab.Static.mc4.*;
 
 /**

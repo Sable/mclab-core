@@ -1,4 +1,4 @@
-package natlab.Static.mc4;
+package natlab.Static.callgraph;
 
 import java.io.File;
 
@@ -9,7 +9,7 @@ import java.io.File;
  * This may refer to a funciton inside a matlab file on the path,
  * or a builtin
  *
- * This is immutable
+ * This class is immutable
  */
 
 
@@ -17,7 +17,7 @@ public class FunctionReference {
     File path;
     String name;
     boolean isBuiltin;
-
+    boolean isPrivate; //TODO - denote whether private, sibling, nested etc.
     
     /**
      * creates a Function Reference referring to a function inside a matlab file
@@ -29,6 +29,15 @@ public class FunctionReference {
         this.name = name;
         this.isBuiltin = false;
     }
+    
+    
+    /**
+     * returns the name of the function
+     */
+    public String getname(){
+        return name;
+    }
+    
     
     /**
      * creates a Functino Reference referring to a builtin matlab function
@@ -64,7 +73,7 @@ public class FunctionReference {
     
     @Override
     public int hashCode() {
-    	return name.hashCode()+path.hashCode()+(isBuiltin?1:0);
+    	return name.hashCode()+(isBuiltin?0:path.hashCode());
     }
 }
 
