@@ -92,11 +92,38 @@
     //attach all comments since last request to provided node
     private <T extends ASTNode> T annotateWithComments(T node) {
         if(node != null && commentBuffer != null) {
-            node.setComments(commentBuffer.pollAllComments());
+            //if the node is a statement, only attach if the statement starts
+            //on the same or an earlier line as the comment
+            //- otherwise it comments might be bound to too early statements
+            if (node instanceof Stmt){
+                while(!commentBuffer.isEmpty()
+                      && (ASTNode.getLine(commentBuffer.peekComment().getStart())
+                          <= ASTNode.getLine(node.getEnd()))){
+                    node.addComment(commentBuffer.pollComment()); //add to list
+                }
+            } else { 
+                node.setComments(commentBuffer.pollAllComments());
+            }
         }
         return node;
     }
-
+    
+    //attach comments to an empty statement -- need the separator symbol, because the
+    //empty statement itself seems to have no location information
+    private EmptyStmt annotateEmptyStmtWithComments(EmptyStmt node,Symbol location) {
+        if(node != null && commentBuffer != null) {
+            //if the node is a statement, only attach if the statement ends
+            //on the same or a later line as the comment
+            //- otherwise comments might be bound to too early statements
+            while(!commentBuffer.isEmpty()
+                    && (ASTNode.getLine(commentBuffer.peekComment().getStart())
+                            <= ASTNode.getLine(location.getEnd()))){
+                node.addComment(commentBuffer.pollComment()); //add to list
+            }
+        }
+        return node;
+    }
+    
     //AST really doesn't like null nodes, but beaver returns null for empty optional lists
     //Create an appropriate empty node to replace the null
     private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {

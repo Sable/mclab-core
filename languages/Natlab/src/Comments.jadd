@@ -14,4 +14,11 @@ aspect Comments {
     public boolean ASTNode.hasComments() {
         return !comments.isEmpty();
     }
+    
+    /**
+     * adds the given comment at the end of the list of comments
+     */
+    public void ASTNode.addComment(beaver.Symbol comment){
+        comments.add(comment);
+    }
 }

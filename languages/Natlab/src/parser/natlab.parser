@@ -189,8 +189,8 @@ Stmt last_stmt =
 //stmt followed by separator
 Stmt stmt =
      stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
-     //NB: not attaching comments to empty statements
-  |  stmt_separator.sep {: return sep.annotateStmt(new EmptyStmt()); :} //TODO-AC: how do we discard this?
+     //annotate comments to empty statements - give location information via the separator
+  |  stmt_separator.sep {: return annotateEmptyStmtWithComments((EmptyStmt)sep.annotateStmt(new EmptyStmt()),sep); :}
   ;
 
 //stmt not followed by separator

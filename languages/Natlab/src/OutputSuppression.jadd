@@ -1,8 +1,21 @@
 //Add a flag to each statement indicating whether or not it's output should be
 //suppressed (i.e. whether or not it is followed by a semicolon).
-//Defaults to false (i.e. show output).
+//Defaults to false (i.e. show output), although this default can be changed
 aspect OutputSuppression {
-    private boolean Stmt.outputSuppressed = false;
+    private boolean Stmt.outputSuppressed = defaultOutputSuppression;
+    private static boolean Stmt.defaultOutputSuppression = false;
+    
+    /**
+     * Sets the default output suppression for Statements. When Stmts get created,
+     * this will be the value assigned to them
+     * - in order to parse properly, the value has to be set to false, which is the initial value
+     * - for rewrites etc., it makes more sense to always suppress otuput for created nodes
+     * 
+     */
+    public static void Stmt.setDefaultOutputSuppression(boolean suppressOutput){
+        defaultOutputSuppression = suppressOutput;
+    }
+    public static boolean Stmt.getDefaultOutputSuppression(){ return defaultOutputSuppression; }
     
     public boolean Stmt.isOutputSuppressed() { return outputSuppressed; }
     public void Stmt.setOutputSuppressed(boolean outputSuppressed) { this.outputSuppressed = outputSuppressed; }

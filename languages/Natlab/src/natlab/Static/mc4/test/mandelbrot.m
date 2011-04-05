@@ -19,7 +19,6 @@ function set=mandelbrot(N, Nmax)
         set(y+1,x+1) = iterations(xa+x*dx+i*(ya+y*dy),Nmax);
      end
   end
-  set;
 end
 
 

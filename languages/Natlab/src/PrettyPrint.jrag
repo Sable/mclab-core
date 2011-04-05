@@ -5,13 +5,26 @@ aspect PrettyPrint {
     syn String ASTNode.getPrettyPrinted() {
         StringBuffer buf = new StringBuffer();
         for(beaver.Symbol comment : getComments()) {
-            buf.append(comment.value);
-            buf.append("\n");
+            buf.append(getIndent() + comment.value + "\n");
         }
         buf.append(getPrettyPrintedLessComments());
         return buf.toString();
     } 
 
+    //case Stmt - print comments after the statement
+    syn String Stmt.getPrettyPrinted(){
+        StringBuffer buf = new StringBuffer();
+        buf.append(getPrettyPrintedLessComments());
+        if (this instanceof EmptyStmt) buf.append(getIndent());        
+        //first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
+        String space = (this instanceof EmptyStmt)?"":"  ";
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(space + comment.value);
+            space = "\n"+getIndent(); //later comments -- full indent
+        }
+        return buf.toString();            
+    }
+    
     //Special case to deal with comments at the end of functions
     syn String Function.getPrettyPrinted() {
         StringBuffer buf = new StringBuffer();
