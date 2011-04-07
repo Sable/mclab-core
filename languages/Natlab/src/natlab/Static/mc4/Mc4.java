@@ -3,9 +3,7 @@
  */
 package natlab.Static.mc4;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
@@ -24,6 +22,7 @@ import natlab.toolkits.filehandling.genericFile.ZippedFile;
  *
  */
 public class Mc4 {    
+    public static final String outDir = "natlab_out";
     public static boolean DEBUG = true;
     public static boolean PRINT_STACK_ON_ERROR = true;
     public static boolean EXIT_ON_ERROR = true;
@@ -47,9 +46,7 @@ public class Mc4 {
         System.out.println(natlab.Main.class.getResource("Main.class"));
         
         System.out.println(
-                new ZippedFile("C:\\classes\\COMP 621.ZIP","ass2/ass2.pdf"));
-        
-        
+                new ZippedFile("C:\\classes\\COMP 621.ZIP","ass2/ass2.pdf"));                
     }
     
 
@@ -84,14 +81,30 @@ public class Mc4 {
 	public static void main(Options options){	   	    
         //object that resolves function names to files      
         functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
-
+        
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(options);
 	    	    
 	    //inline all
-	    functions.inlineAll();
+	    //functions.inlineAll();
 	    
 	    //print result for now
-	    System.out.println(functions.get(functions.getMain()));
+	    System.out.println(functions.getAsInlinedFunction().getPrettyPrinted());
+	   
+	    if (true){
+	        try{
+	            ast.Function function = functions.getAsInlinedFunction();
+	            (new File(outDir)).mkdir();
+	            FileWriter fstream = new FileWriter(outDir+"/"+function.getName()+".m");
+	            fstream.write(function.getPrettyPrinted());
+	            fstream.close();	        
+	        } catch(Exception e){
+	            System.err.println("output failed: "+e.getMessage());
+	        }
+	    }
 	}
 }
+
+
+
+

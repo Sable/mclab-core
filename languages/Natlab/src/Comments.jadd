@@ -3,8 +3,17 @@
 aspect Comments {
     private java.util.List<beaver.Symbol> ASTNode.comments = new java.util.ArrayList<beaver.Symbol>();
     
+    /**
+     * sets the comments for the given ast node by copying the the comments
+     * from the given list of comments.
+     * If the argument is null, sets an empty list as comments.
+     */
     public void ASTNode.setComments(java.util.List<beaver.Symbol> comments) {
-        this.comments = new java.util.ArrayList<beaver.Symbol>(comments);
+        if (comments != null){
+           this.comments = new java.util.ArrayList<beaver.Symbol>(comments);
+        } else {
+           this.comments =  new java.util.ArrayList<beaver.Symbol>();
+        }
     }
     
     public java.util.List<beaver.Symbol> ASTNode.getComments() {

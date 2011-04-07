@@ -6,7 +6,7 @@ aspect OperatorNames{
     /**
      * Returns the name of the matlab function which is associated with the operator as a String.
      */
-    syn String BinaryExpr.getOperatorName();
+    syn String BinaryExpr.getOperatorName(){ return ""; }
     
     syn String PlusExpr.getOperatorName(){ return "plus"; }
     syn String MinusExpr.getOperatorName(){ return "minus"; }
@@ -34,7 +34,7 @@ aspect OperatorNames{
     syn String EQExpr.getOperatorName(){ return "eq"; }
     syn String NEExpr.getOperatorName(){ return "ne"; }
     
-    syn String UnaryExpr.getOperatorName();
+    syn String UnaryExpr.getOperatorName(){ return ""; }
     syn String UMinusExpr.getOperatorName(){ return "uminus"; }
     syn String UPlusExpr.getOperatorName(){ return "uplus"; }
     syn String NotExpr.getOperatorName(){ return "not"; }

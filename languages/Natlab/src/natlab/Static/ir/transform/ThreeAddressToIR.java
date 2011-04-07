@@ -17,6 +17,7 @@ import natlab.Static.ir.IRWhileStmt;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
+import natlab.toolkits.rewrite.simplification.CommentSimplification;
 import natlab.toolkits.rewrite.simplification.FullSimplification;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
 import ast.*;
@@ -34,7 +35,6 @@ import ast.List;
  * 
  * 
  */
-
 public class ThreeAddressToIR extends AbstractSimplification {
     public ThreeAddressToIR(ASTNode<?> tree, VFPreorderAnalysis nameResolver) {
         super(tree,nameResolver);
@@ -111,10 +111,10 @@ public class ThreeAddressToIR extends AbstractSimplification {
         //find range variables
         RangeExpr range = (RangeExpr)node.getAssignStmt().getRHS();
         LinkedList<AssignStmt> assigns = new LinkedList<AssignStmt>();
-               
-        NameExpr l = pullOutLiteral(range.getLower(),assigns);
-        NameExpr i = pullOutLiteral(range.hasIncr()?range.getIncr():null,assigns);
-        NameExpr u = pullOutLiteral(range.getUpper(),assigns);
+        
+        NameExpr l = (NameExpr)pullOutLiteral(range.getLower(),assigns);
+        NameExpr i = (NameExpr)pullOutLiteral(range.hasIncr()?range.getIncr():null,assigns);
+        NameExpr u = (NameExpr)pullOutLiteral(range.getUpper(),assigns);
         
         //build transformed node
         newNode = new TransformedNode<ASTNode>(assigns);
@@ -331,12 +331,15 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     
     /**
-     * takes the given expression, which should be a name or a literal
+     * takes the given expression, which should be an expression that an 
+     * IRCommaSeparatedList can store, i.e. a name, literal, colon 
+     * TODO others?
      * - if it is a name expression, return it
      * - if it is a literal l, add t = i to literal Assignments, and return t
      * - if its null, return null
+     * - it is a colon expression, return it
      */
-    private NameExpr pullOutLiteral(Expr exp,LinkedList<AssignStmt> literalAssignments){
+    private Expr pullOutLiteral(Expr exp,LinkedList<AssignStmt> literalAssignments){
         if (exp == null) return null;
         
         if (exp instanceof NameExpr){
@@ -346,7 +349,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             literalAssignments.add(new IRAssignLiteralStmt(tmp.genNameExpr(), (LiteralExpr)exp));
             return tmp.genNameExpr();
         } else if (exp instanceof ColonExpr){
-            return new NameExpr(new Name("colon")); //TODO
+            return exp;
         } else {
             throw new UnsupportedOperationException("expected literal or name, received "+exp.getPrettyPrinted());
         }

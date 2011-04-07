@@ -1,7 +1,6 @@
 package natlab.Static.ir;
 
 import ast.*;
-import ast.AST.Opt;
 
 
 /**

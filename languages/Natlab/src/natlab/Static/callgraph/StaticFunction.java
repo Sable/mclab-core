@@ -9,6 +9,7 @@ import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.inline.*;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
+import natlab.toolkits.rewrite.simplification.CommentSimplification;
 
 import ast.*;
 
@@ -21,6 +22,7 @@ import ast.*;
  * 
  */
 public class StaticFunction implements Cloneable {
+    public static boolean DEBUG = false;
     Function function;
     FunctionReference reference; //reference to this function
     String name;
@@ -45,21 +47,9 @@ public class StaticFunction implements Cloneable {
         //set siblings
         siblings = new HashSet<String>(function.getSiblings().keySet());
         
-
-        for (Stmt s : this.function.getStmtList()){
-            System.out.println(s.getPrettyPrinted()+"| "+s.getClass().getName()+
-                    " "+s.getPosString());
-        }
-        System.out.println(this.function.getPrettyPrinted()); //print result
-
-        System.exit(0);
-        
         
         //transform to IR
         transformToIR();
-        
-        System.out.println(this.function.getPrettyPrinted()); //print result
-        System.exit(0);
         
         //create first symbol table
         findAndResolveFunctions();
@@ -86,7 +76,6 @@ public class StaticFunction implements Cloneable {
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
-        Mc4.debug("create symbol table - function "+name+" variable or function analysis result:\n"+flowset);
         
         //go through all symbols, and put them in the symbol table
         for (ValueDatumPair<String, ? extends VFDatum> pair : flowset.toList()){
@@ -98,33 +87,27 @@ public class StaticFunction implements Cloneable {
                 //TODO actually resolve names
             } else if (vf.isVariable()){
             } else {
-                System.err.println("symbol table: "+name+" in "+this.name+" cannot be resolved as a function or variable. vf:"+vf);
+                //System.err.println("symbol table: "+name+" in "+this.name+" cannot be resolved as a function or variable. vf:"+vf);
                 calledFunctions.put(name, null); 
             }
         }
         //TODO are there any other symbols?
-        
-        Mc4.debug(this.toString());
-        Mc4.debug("first symbol table for "+name+":"+calledFunctions);
         //TODO deal with errors
     }
     
     
     //apply simplification on the thing
     public void applySimplification(Class<? extends AbstractSimplification> simplification){
-        //TODO
-        
+        FunctionList fList = new FunctionList();
+        fList.addFunction(function);        
+        function = Simplifier.simplify(fList,simplification).getFunction(0);
     }
     
     
     //transforms the underlying AST to 3 address code
     private void transformToIR(){
-        FunctionList fList = new FunctionList();
-        fList.addFunction(function);
-        Simplifier simplifier =
-            new Simplifier(fList, ThreeAddressToIR.class);
-        fList = ((FunctionList)simplifier.simplify());
-    	this.function = fList.getFunction(0);
+        applySimplification(CommentSimplification.class);
+        applySimplification(ThreeAddressToIR.class);
     }
     
     
@@ -177,8 +160,12 @@ public class StaticFunction implements Cloneable {
     	}
     	
     	//actually inline
-    	Inliner<Function,Function> inliner = new Inliner<Function,Function>(this.function,inlinerMap);
+    	Inliner<Function,Function> inliner = 
+    	    new Inliner<Function,Function>(this.function,inlinerMap,new PutCommentsInlineQuery());
     	this.function = (Function)inliner.transform();
+    	
+    	//the inline creates non IR nodes, turn back into IR
+    	transformToIR();
     }
     
         
@@ -219,11 +206,6 @@ public class StaticFunction implements Cloneable {
         //build rename maps - find name conflicts
         for (String name : otherSymbols){
             if (symbols.contains(name)){ //name conflict
-                if (name.equals("abs")){
-                    System.err.println(calledFunctions.get(name));
-                    System.err.println(otherFunction.calledFunctions.get(name));
-                    System.err.println(otherFunction);
-                }
                 
                 boolean doRenameOther = true; //we always rename other except for the following cases               
                 //case: name is fun in other only - rename in this

@@ -3,7 +3,7 @@ package natlab.Static.callgraph;
 import java.io.File;
 
 /**
- * A function within a Matlab program can not uniquely identified by a name alone
+ * A function within a Matlab program can not be uniquely identified by a name alone
  * We add the source file as well
  * 
  * This may refer to a funciton inside a matlab file on the path,

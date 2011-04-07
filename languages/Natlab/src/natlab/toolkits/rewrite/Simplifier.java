@@ -18,7 +18,8 @@ import natlab.toolkits.analysis.varorfun.*;
  */
 public class Simplifier
 {
-
+    public static final boolean DEBUG = false;
+    
     //List of simplifications. If applied in list order, then all
     //dependencies should be met.
     protected LinkedList<AbstractSimplification> simplifications;
@@ -53,7 +54,26 @@ public class Simplifier
              new HashSet<Class<? extends AbstractSimplification>>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
              kindAnalysis);
     }
-
+    
+    /**
+     * Helper static method, simply applies simplifications and returns the new tree
+     * the list of classes have to extend AbstractSimplification
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends ASTNode> T simplify(T tree,
+            VFPreorderAnalysis kindAnalysis,
+            Class ... todo){
+        return (T)(new Simplifier(tree,kindAnalysis,todo).simplify());
+    }
+    /**
+     * Helper static method, simply applies simplifications and returns the new tree
+     * the list of classes have to extend AbstractSimplification
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends ASTNode> T simplify(T tree,
+            Class ... todo){
+        return (T)(new Simplifier(tree,todo).simplify());
+    }
     
     /**
      * Constructs a simplifier for a given set of simplification
@@ -88,7 +108,7 @@ public class Simplifier
     {
         ASTNode currentTree = tree;
         for( AbstractSimplification simp : simplifications ){
-            System.out.println( simp );
+            if (DEBUG) System.out.println( simp ); 
             simp.setTree( currentTree );
             currentTree = simp.transform();
         }

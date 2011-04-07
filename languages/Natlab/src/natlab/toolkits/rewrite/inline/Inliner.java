@@ -30,12 +30,15 @@ import natlab.toolkits.rewrite.TransformedNode;
  *   
  * - the name of the function and the call do not have to be the same
  * - a call to a script should have no input and no output
+ * - note that no name expressions will be renamed. This merely provides the copying of code,
+ *   conflicts should be resolved by other transformations.
  * 
  * @author ant6n
  *
  */
 
 public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction extends ASTNode> extends AbstractLocalRewrite {
+    public boolean DEBUG = false;
 	private Map<String, ScriptOrFunction> map;
 	InlineQuery<ScriptOrFunction,TargetScriptOrFunction> query;
 	TargetScriptOrFunction targetTree; //the program where functions/scripts are being inlined
@@ -73,7 +76,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 		if (node.getRHS() instanceof NameExpr){
 			String name = ((NameExpr)node.getRHS()).getName().getID();
 			if (map.containsKey(name)){
-				System.err.println("inlining found unparametric/assign call to "+name);
+				if (DEBUG) System.out.println("inlining found unparametric/assign call to "+name);
 				//build info object
 				Script s;
 				info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)), 
@@ -88,7 +91,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 				NameExpr nExpr = (NameExpr)pExpr.getTarget();
 				String name = nExpr.getName().getID();
 				if (map.containsKey(name)){ //..and the name is in the map
-					System.err.println("inlining found parametric/assign call to "+name);
+					if (DEBUG) System.err.println("inlining found parametric/assign call to "+name);
 					//build info object
 					info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 					        targetTree, node, pExpr.getArgList(), getLHSList(node.getLHS()), true);
@@ -140,7 +143,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 		if (node.getExpr() instanceof NameExpr){
 			String name = ((NameExpr)node.getExpr()).getName().getID();
 			if (map.containsKey(name)){
-				System.err.println("inlining found unparametric/assign call to "+name);
+				if (DEBUG) System.err.println("inlining found unparametric/assign call to "+name);
 				//build info object
 				InlineInfo info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 				        targetTree, node, new List<Expr>(), new List<LValueExpr>(), false);
@@ -154,7 +157,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 				NameExpr nExpr = (NameExpr)pExpr.getTarget();
 				String name = nExpr.getName().getID();
 				if (map.containsKey(name)){ //..and the name is in the map
-					System.err.println("inlining found parametric/assign call to "+name);
+					if (DEBUG) System.err.println("inlining found parametric/assign call to "+name);
 					//build info object
 					InlineInfo info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 					        targetTree, node, pExpr.getArgs(), new List<LValueExpr>(), true);

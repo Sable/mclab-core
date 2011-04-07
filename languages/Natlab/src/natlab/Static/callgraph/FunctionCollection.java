@@ -8,7 +8,6 @@ import ast.*;
 import natlab.CompilationProblem;
 import natlab.Static.mc4.Mc4;
 import natlab.Static.mc4.builtin.Mc4BuiltinQuery;
-import natlab.Static.mc4.symbolTable.*;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.FunctionFinder;
 
@@ -52,6 +51,20 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
 
     }
     
+    /**
+     * creates a deep copy of this function collection
+     */
+    public FunctionCollection(FunctionCollection other){
+        super();
+        this.loadedFiles.addAll(other.loadedFiles);
+        this.main = other.main;
+        this.options = other.options;
+        
+        for (FunctionReference ref : other.keySet()){
+            this.put(ref,other.get(ref).clone());
+        }
+    }
+    
     /*** public stuff ***********************************************************************/
     public FunctionReference getMain(){ return main; }
     
@@ -69,9 +82,9 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         Program program;
         if (options.matlab()){
             //program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList);
-            program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
+            program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
         } else {
-        	program = natlab.Main.parseFile(file.getAbsolutePath(), errList);
+        	program = natlab.Parse.parseFile(file.getAbsolutePath(), errList);
         }
         if (program == null){
             Mc4.error("cannot parse file "+file);
@@ -122,9 +135,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         boolean success = true;
         
         //collect references to other functions - update symbol table, recursively collect
-        for (String otherName : function.getCalledFunctions().keySet()){
-            Mc4.debug("resolving "+otherName);
-            
+        for (String otherName : function.getCalledFunctions().keySet()){            
             //LOOKUP SEMANTICS:
             //update symbol table entry based on what the reference is
             //1 functionName could be the function itself
@@ -202,6 +213,17 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
     	//remove this context
     	context.remove(function);
     }
+    
+    /**
+     * returns a single inlined function representing this function collection.
+     * Does not alter the the function collection.
+     */
+    public Function getAsInlinedFunction(){
+        FunctionCollection c = new FunctionCollection(this);
+        c.inlineAll();
+        return c.get(c.getMain()).getAst();
+    }
+    
 }
 
 

@@ -28,13 +28,8 @@ import matlab.TranslationProblem;
 import matlab.OffsetTracker;
 import matlab.TextPosition;*/
 import matlab.*;
-import matlab.FunctionEndScanner.NoChangeResult;
-import matlab.FunctionEndScanner.ProblemResult;
-import matlab.FunctionEndScanner.TranslationResult;
 
-import org.antlr.runtime.ANTLRReaderStream;
 
-import beaver.Parser;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -42,7 +37,6 @@ import java.util.List;
 
 import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
  
-import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -203,7 +197,7 @@ public class Main
                                 if( options.matlab() ){
                                     if( !quiet )
                                         System.err.println(" translating");
-                                    source = translateFile( fileName, serverErrors );
+                                    source = Parse.translateFile( fileName, serverErrors );
                                 }
                                 else{
                                     try{
@@ -236,7 +230,7 @@ public class Main
                                 if( options.matlab() ){
                                     if( !quiet )
                                         System.err.println(" translating");
-                                    source = translateFile( fileName, programText, serverErrors );
+                                    source = Parse.translateFile( fileName, programText, serverErrors );
                                 }
                                 else
                                     source = new StringReader( programText );
@@ -295,7 +289,7 @@ public class Main
                                 }
                                 if( !quiet )
                                     System.err.println(" parsing ");
-                                Program prog = parseFile( fileName, source, serverErrors );
+                                Program prog = Parse.parseFile( fileName, source, serverErrors );
                                 if( serverErrors.size() > 0){
                                     String serverEstr="";
                                     if( !quiet )
@@ -375,7 +369,7 @@ public class Main
                             //try{
                             if( !quiet )
                                 System.err.println("Translating "+file+" to Natlab");
-                            fileReader = translateFile( file, errors );
+                            fileReader = Parse.translateFile( file, errors );
                             
                             if( errors.size() > 0 )
                                 System.err.print( errors.toString() );
@@ -397,7 +391,7 @@ public class Main
                         if( !quiet )
                             System.err.println("Parsing: " + file);
                         //parse the file
-                        Program prog = parseFile( file,  fileReader, errors );
+                        Program prog = Parse.parseFile( file,  fileReader, errors );
                         
                         //report errors
                         if( errors.size() > 0 )
@@ -586,8 +580,8 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
     		  if(!fileName[i].startsWith("drv") && fileName[i].endsWith(".m")){    			  
     			  ArrayList errors=new ArrayList();
     			  Reader fileReader = new StringReader("");
-    			  fileReader=translateFile(name + "/" + fileName[i],errors);
-    			  Program prog = parseFile(name +"/" + fileName[i],  fileReader, errors );	
+    			  fileReader=Parse.translateFile(name + "/" + fileName[i],errors);
+    			  Program prog = Parse.parseFile(name +"/" + fileName[i],  fileReader, errors );	
     			  if(options.prof()){    				
     				  ProfilerDriver pDriver=new ProfilerDriver();
     				  pDriver.setDirName("Dep"+name);
@@ -640,8 +634,8 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
   if(options.prof()){ //This is the option when dependence calculation needs to be done on a single file
 	  ArrayList errors=new ArrayList();
 	  Reader fileReader = new StringReader("");
-	  fileReader=translateFile(name ,errors);
-	  Program prog = parseFile(name ,  fileReader, errors );  
+	  fileReader=Parse.translateFile(name ,errors);
+	  Program prog = Parse.parseFile(name ,  fileReader, errors );  
 	if(prog!=null){
 	  System.out.println("Profiling in file");	
 	  ProfilerDriver pDriver=new ProfilerDriver();
@@ -659,8 +653,8 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
 	  Reader fileReader = new StringReader("");
 	  StringTokenizer st = new StringTokenizer(name,".");
 	  String dirName=st.nextToken();
-	  fileReader=translateFile(name ,errors);
-	  Program prog = parseFile( name ,  fileReader, errors );
+	  fileReader=Parse.translateFile(name ,errors);
+	  Program prog = Parse.parseFile( name ,  fileReader, errors );
 	  System.out.println("heuristic engine");
 	  File file = new File("Dep"+dirName+"/"+name+".xml");	
       boolean exists = file.exists();      
@@ -772,328 +766,6 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
     	//ProfilerDriver profDriver =new ProfilerDriver(prog);
     	//profDriver.traverseProgram();
     //}
-    
-    /**
-     * Perform the reading and translation of a given file.
-     *
-     * @param fName    The name of the file to be translated.
-     * @param errList  A list of errors for error collection.
-     * 
-     * @return A reader object giving access to the translated
-     * source.
-     */
-    public static Reader translateFile(String fName, ArrayList<CompilationProblem> errList)
-    {
-        BufferedReader in = null;
-        PositionMap prePosMap = null;
-        try{
-            in = new BufferedReader( new FileReader( fName ) );
-            FunctionEndScanner prescanner = new FunctionEndScanner(in);
-            FunctionEndScanner.Result result = prescanner.translate();
-            in.close();
-            
-            if(result instanceof NoChangeResult){
-                in = new BufferedReader( new FileReader( fName ) );
-            }else {
-                in.close();
-                if(result instanceof ProblemResult){
-                    for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
-                        CompilationProblem translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob+"\n");
-                        errList.add(translationcproblem);
-                    }
-                    return null; //terminate early since extraction parser can't work without balanced 'end's
-                } else if(result instanceof TranslationResult){
-                    TranslationResult transResult = (TranslationResult) result;
-                    in = new BufferedReader(new StringReader(transResult.getText()));
-                    prePosMap = transResult.getPositionMap();
-                }
-            }
-        }catch(FileNotFoundException e){
-            CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
-            errList.add(FileNotFoundcerror);
-            return null;
-        }
-        catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
-            errList.add( IOcerror);
-            return null;
-        }
-        
-        return finishTranslateFile(fName, in, prePosMap, errList);
-        
-    }
-    /**
-     * Perform the translation of a given string containing source
-     * code.
-     *
-     * @param fName    The name of the file to which the source
-     * belongs.
-     * @param source   The string containing the source code.
-     * @param errList  A list of errors for error collection.
-     * 
-     * @return A reader object giving access to the translated
-     * source.
-     */
-    public static Reader translateFile(String fName, String source, ArrayList<CompilationProblem> errList)
-    {
-        BufferedReader in = null;
-        PositionMap prePosMap = null;
-        try{
-            in = new BufferedReader( new StringReader( source ) );
-            FunctionEndScanner prescanner = new FunctionEndScanner(in);
-            FunctionEndScanner.Result result = prescanner.translate();
-            in.close();
-            
-            if(result instanceof NoChangeResult){
-                in = new BufferedReader( new StringReader( source ) );
-            }else {
-                in.close();
-                if(result instanceof ProblemResult){
-                    for(TranslationProblem prob : ((ProblemResult) result).getProblems()){
-                        CompilationProblem translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob+"\n");
-                        errList.add(translationcproblem);
-                    }
-                    return null; //terminate early since extraction parser can't work without balanced 'end's
-                } else if(result instanceof TranslationResult){
-                    TranslationResult transResult = (TranslationResult) result;
-                    in = new BufferedReader(new StringReader(transResult.getText()));
-                    prePosMap = transResult.getPositionMap();
-                }
-            }
-        }catch(FileNotFoundException e){
-            CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
-            errList.add(FileNotFoundcerror);
-            return null;
-        }
-        catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
-            errList.add( IOcerror);
-            return null;
-        }
-        
-        return finishTranslateFile(fName, in, prePosMap, errList);
-    }
-    /**
-     * Perform the translation from a given Reader containing source code.
-     *
-     * @param fName    The name of the file to which the source belongs.
-     * @param source   The string containing the source code.
-     * @param errList  A list of errors for error collection.
-     * 
-     * @return A reader object giving access to the translated
-     * source.
-     */
-    public static Reader translateFile(String fName, Reader source, ArrayList<CompilationProblem> errList)
-    {
-    	//we'll just build a String out of the source and call the method that takes a String
-    	//TODO - this should be done directly from the reader
-    	BufferedReader buffer = new BufferedReader(source);
-    	StringBuilder builder = new StringBuilder();
-    	try{
-    		while(true){
-    			String line = buffer.readLine();
-    			if (line == null) break;
-    			builder.append(line);
-    		}
-    	}catch(IOException e){
-    		CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
-    		errList.add(IOcerror);
-    		return null;    
-    	}
-    	return translateFile(fName,builder.toString(),errList);
-    }
-    
-    /**
-     * Translate a given file and return a reader to access the
-     * translated version. This method is used by the translateFile
-     * methods and performs the final part of the translation.
-     *
-     * @param fName     The name of the file to which the source
-     * belongs.
-     * @param in        The source.
-     * @param prPosMap  The position map to map from the original
-     * translated file positions and original file positions.
-     * @param errList   A list of errors for error collection.
-     * 
-     * @return A reader object giving access to the translated
-     * source.
-     */
-    private static Reader finishTranslateFile(String fName, BufferedReader in, 
-                                              PositionMap prePosMap, ArrayList errList)
-    {
-        try{
-            OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-            List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-            String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
-            
-            if( problems.isEmpty() ){
-                PositionMap posMap = offsetTracker.buildPositionMap();
-                
-                if( prePosMap != null ){
-                    posMap = new CompositePositionMap(posMap, prePosMap);
-                }
-                //TODO-JD: do something with the posMap
-                return new StringReader(destText);
-            }
-            else{
-                for(TranslationProblem prob : problems){
-                    CompilationProblem Translationcproblem = new CompilationProblem(prob.getLine(),prob.getColumn(),prob.getMessage()+"\n");
-                    errList.add(Translationcproblem);
-                    
-                }
-                return null;
-            }
-        }catch(FileNotFoundException e){
-            CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
-            errList.add(FileNotFoundcerror);
-            return null;
-        }
-        catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error translating "+fName+"\n"+e.getMessage());
-            errList.add( IOcerror);
-            return null;
-        }
-        
-    }
-    
-    /**
-     * Parse a given file and return the Program ast node. This
-     * expects the program to already be in natlab syntax.
-     *
-     * @param fName  The name of the file being parsed.
-     * @param file   The reader object containing the source being
-     * parsed.
-     * @param errList   A list of errors for error collection.
-     *
-     * @return The Program node for the given file being parsed if no
-     * errors. If an error occurs then null is returned. 
-     */
-    public static Program parseFile(String fName, Reader file, ArrayList<CompilationProblem> errList )
-    {
-        NatlabParser parser = new NatlabParser();
-        NatlabScanner scanner = null;
-        CommentBuffer cb = new CommentBuffer();
-        
-        parser.setCommentBuffer(cb);
-        
-        try{
-            scanner = new NatlabScanner( file );
-            scanner.setCommentBuffer( cb );
-            try{
-                
-                Program prog = (Program)parser.parse(scanner);
-		
-                if( parser.hasError() ){
-                    String delim = "],[";
-                    for( String error : parser.getErrors()){
-                        //return an array of string with {line, column, msg}
-                        CompilationProblem parserError;
-                        try{
-                            String[] message = error.split(delim);
-                            parserError = new CompilationProblem( Integer.valueOf(message[0]).intValue(),
-                                                                  Integer.valueOf(message[1]).intValue(),
-                                                                  message[3]);
-                        }
-                        catch( PatternSyntaxException e ){
-                            parserError = new CompilationProblem( error );
-                        }
-                        errList.add(parserError);}
-                    prog = null;
-                }
-                return prog;
-                
-            }catch(Parser.Exception e){
-                String ErrorString= e.getMessage()+"\n";
-                for(String error : parser.getErrors()) {
-                    ErrorString+= error + "\n";
-                }
-                CompilationProblem Parsercerror = new CompilationProblem(ErrorString);
-                errList.add(Parsercerror);
-                return null;
-            } 
-        }catch(FileNotFoundException e){
-            CompilationProblem FileNotFoundcerror = new CompilationProblem("File "+fName+" not found!\nAborting\n");
-            errList.add(FileNotFoundcerror);
-            return null;
-        }
-        catch(IOException e){
-            CompilationProblem IOcerror = new CompilationProblem("Error parsing "+fName+"\n"+e.getMessage());
-            errList.add( IOcerror);
-            return null;
-        }
-    }
-
-    /**
-     * Parse a given file and return the Program ast node. This
-     * expects the program to already be in natlab syntax.
-     *
-     * @param fName  The name of the file being parsed.
-     * @param errList   A list of errors for error collection.
-     *
-     * @return The Program node for the given file being parsed if no
-     * errors. If an error occurs then null is returned. 
-     */
-    public static Program parseFile(String fName, ArrayList<CompilationProblem> errList ){
-    	try {
-    		FileReader reader = new FileReader(fName);
-    		Program program = parseFile(fName,reader,errList);    	
-    		if (program == null){
-    		    System.err.println(errList);    		    
-    		}
-    		
-    		return program;
-    	} catch (FileNotFoundException e){
-    	    System.err.println("File "+fName+" not found!");
-    	    return null;
-    	}    
-    }
-    
-    /**
-     * Parse a given file as a Matlab file and return the Program ast node.
-     *
-     * @param fName  The name of the file being parsed.
-     * @param errList   A list of errors for error collection.
-     *
-     * @return The Program node for the given file being parsed if no
-     * errors. If an error occurs then null is returned. 
-     */
-    public static Program parseMatlabFile(String fName, ArrayList<CompilationProblem> errList ){
-    	Reader source = Main.translateFile( fName, errList );
-        if( source == null ) return null;
-        Program program = Main.parseFile( fName, source, errList );
-        return program;
-    }
-    
-    public static CompilationUnits parseFiles(List<String> fileList,   ArrayList<CompilationProblem> errList ){
-	CompilationUnits cu = new CompilationUnits();
-	for (String fName: fileList){
-	    Reader natlabFile = Main.translateFile(fName, errList);
-	    //parse natlab
-	    Program p=Main.parseFile( fName,  natlabFile,  errList );
-	    cu.addProgram(p);
-	}
-	return cu;
-
-    }
-    /**
-     * Parse a given file as a Matlab file and return the Program ast node.
-     *
-     * @param fName  The name of the file being parsed.
-     * @param file   The reader object containing the source being
-     * parsed.
-     * @param errList   A list of errors for error collection.
-     *
-     * @return The Program node for the given file being parsed if no
-     * errors. If an error occurs then null is returned. 
-     */
-    public static Program parseMatlabFile(String fName, Reader file, ArrayList<CompilationProblem> errList ){
-    	//TODO - something should be done about the mapping file
-    	//translate into natlab
-    	Reader natlabFile = translateFile(fName, file, errList);
-    	//parse natlab
-    	return parseFile( fName,  natlabFile,  errList );
-    }
-
     
     private static boolean processCmdLine(String[] args)
     {

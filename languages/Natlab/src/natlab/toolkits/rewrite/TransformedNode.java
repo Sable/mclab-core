@@ -92,6 +92,10 @@ public class TransformedNode<T extends ast.ASTNode>
         }
     }
     
+    public void addAll(Collection<T> nodes){
+       for (T node : nodes){ add(node); } 
+    }
+    
     
     @Override
     public String toString() {

@@ -21,7 +21,9 @@ public class InlineInfo<InlinedScriptOrFunction extends ASTNode,TargetScriptOrFu
     private List<LValueExpr> targets;
     boolean isParametric;
     
-    //note - the inlinedFuctnion should be a copy
+    /**
+     * constructor: note - the inlinedFuctnion should be a copy
+     */
     protected InlineInfo(InlinedScriptOrFunction inlinedProgram,TargetScriptOrFunction target,
             Stmt callStatement, List<Expr> parameters, List<LValueExpr> targets,
             boolean isParametric){
