@@ -14,7 +14,7 @@ public class TransformedNodeTests extends TestCase
                 new ast.Name("jun")};
         return names;
     }
-    public void testMultipleEquality( TransformedNode<ast.ASTNode> trans, ast.ASTNode[] nodes )
+    public void testMultipleEquality( TransformedNode trans, ast.ASTNode[] nodes )
     {
         List<ast.ASTNode> newNodes = trans.getMultipleNodes();
         int i = 0;
@@ -59,7 +59,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_create2()
     {
         ast.Name name = new ast.Name("jesse");
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( name );
+        TransformedNode trans = new TransformedNode( name );
         assertSingle( trans );
     }
     /**
@@ -68,7 +68,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_create3()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
+        TransformedNode trans = new TransformedNode( names );
         assertMultiple( trans );
     }
     /**
@@ -77,7 +77,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_create4()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( Arrays.asList(names) );
+        TransformedNode trans = new TransformedNode( Arrays.asList(names) );
         assertMultiple( trans );
     }
     /**
@@ -86,7 +86,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_access1()
     {
         ast.Name name = new ast.Name("jesse");
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( name );
+        TransformedNode trans = new TransformedNode( name );
         
         assertEquals( name, trans.getSingleNode() );
     }
@@ -97,7 +97,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_access2()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
+        TransformedNode trans = new TransformedNode( names );
 
         List newNames = trans.getMultipleNodes();
         assertEquals( names.length , newNames.size() );
@@ -109,7 +109,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_access3()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
+        TransformedNode trans = new TransformedNode( names );
 
         testMultipleEquality(trans, names);
     }
@@ -120,7 +120,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_grow1()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names[0] );
+        TransformedNode trans = new TransformedNode( names[0] );
         for( int i=1; i<names.length; i++ )
             trans.add( names[i] );
 
@@ -138,7 +138,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodepass_grow2()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( names );
+        TransformedNode trans = new TransformedNode( names );
 
         ast.Name newName = new ast.Name( "maxime" );
         trans.add( newName );
@@ -170,7 +170,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodefail_access1()
     {
         ast.Name name = new ast.Name("jesse");
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>( name );
+        TransformedNode trans = new TransformedNode( name );
 
         try{
             trans.getMultipleNodes();
@@ -186,7 +186,7 @@ public class TransformedNodeTests extends TestCase
     public void test_transformednodefail_access2()
     {
         ast.Name[] names = genNameArray();
-        TransformedNode<ast.ASTNode> trans = new TransformedNode<ast.ASTNode>(names);
+        TransformedNode trans = new TransformedNode(names);
 
         try{
             trans.getSingleNode();

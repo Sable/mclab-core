@@ -6,7 +6,9 @@ package natlab.Static.mc4;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.Scanner;
 
 
 import natlab.Static.callgraph.FunctionCollection;
@@ -59,6 +61,29 @@ public class Mc4 {
 		Options options = new Options();
 		options.parse(args);
 		
+		
+		//try to do all benchmarks
+		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks";
+		File bFolder = new File(bFolderString);
+		for (File dir : bFolder.listFiles()){
+		    File[] list = dir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.matches("drv_.*m");
+                }
+            });
+		    if (list == null || list.length == 0) continue;
+		    String main = list[0].toString();
+		    System.err.println("reading "+main);
+		    args = new String[]{"-m",main};
+		    options = new Options();
+	        options.parse(args);
+	        main(options);
+		}
+		System.exit(0);
+		  
+		
+		
+		
 		//if no files are given, we will use some internal test files
 		if (options.getFiles().size() == 0){
 			//try to get a file from the project folder
@@ -89,15 +114,17 @@ public class Mc4 {
 	    //functions.inlineAll();
 	    
 	    //print result for now
-	    System.out.println(functions.getAsInlinedFunction().getPrettyPrinted());
+	    //System.out.println(functions.getAsInlinedFunction().getPrettyPrinted());
 	   
 	    if (true){
+	        FileWriter fstream = null;
 	        try{
 	            ast.Function function = functions.getAsInlinedFunction();
-	            (new File(outDir)).mkdir();
-	            FileWriter fstream = new FileWriter(outDir+"/"+function.getName()+".m");
+	            if (!(new File(outDir).exists())){ (new File(outDir)).mkdir(); }
+	            File file = new File(outDir+"/"+function.getName()+".m");
+	            fstream = new FileWriter(file);
 	            fstream.write(function.getPrettyPrinted());
-	            fstream.close();	        
+                fstream.close();	            
 	        } catch(Exception e){
 	            System.err.println("output failed: "+e.getMessage());
 	        }

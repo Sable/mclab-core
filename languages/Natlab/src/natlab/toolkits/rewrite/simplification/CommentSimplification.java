@@ -60,7 +60,7 @@ public class CommentSimplification extends AbstractSimplification {
     @Override
     public void caseStmt(Stmt node) {
         rewriteChildren(node); //recursively rewrite children
-        newNode = new TransformedNode<ASTNode>(node);
+        newNode = new TransformedNode(node);
         newNode.addAll(commentsToEmptyStmtList(removeComments(node)));
     }
     

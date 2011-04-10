@@ -81,13 +81,13 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         //parse file
         Program program;
         if (options.matlab()){
-            //program = natlab.Main.parseMatlabFile(file.getAbsolutePath(), errList);
-            program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
+            program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList);
+            //program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
         } else {
         	program = natlab.Parse.parseFile(file.getAbsolutePath(), errList);
         }
         if (program == null){
-            Mc4.error("cannot parse file "+file);
+            Mc4.error("cannot parse file "+file+":\n"+errList);
             return false;
         }
         
@@ -167,6 +167,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
                         function.getCalledFunctions().put(otherName, 
                                 new FunctionReference(otherName));
                     } else { //not found
+                        System.out.println(function.getAst().getPrettyPrinted());
                         Mc4.error("reference to "+otherName+" in "+function.getName()+" not found");
                         success = false;
                     }

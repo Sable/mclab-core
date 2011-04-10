@@ -101,6 +101,19 @@ public class RightSimplification extends AbstractSimplification
     }
     protected boolean inSCStmt = false;
 
+    
+    public void caseForStmt(ForStmt node) {
+        //rewrite statements
+        rewrite(node.getStmts());
+        
+        //get stuff out of the assignment statement
+        caseAssignStmt(node.getAssignStmt());
+        if (newNode != null){ //if there was a change to the assign stmt
+            AssignStmt assign = (AssignStmt)newNode.remove(newNode.size()-1);
+            newNode.add(new ForStmt(assign, node.getStmts()));
+        }
+    }
+    
     public void caseStmt( Stmt node )
     {
         newStmts = new LinkedList();
@@ -130,7 +143,7 @@ public class RightSimplification extends AbstractSimplification
             rewrite( workStmt );
             if( newNode != null )
                 if( newNode.isMultipleNodes() )
-                    exprsNewStmts.addAll(0, newNode.getMultipleNodes());
+                    exprsNewStmts.addAll(0, (Collection)newNode.getMultipleNodes());
                 else
                     exprsNewStmts.addFirst( (Stmt)newNode.getSingleNode() );
             else

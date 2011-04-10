@@ -461,8 +461,6 @@ aspect PrettyPrint {
     
     eq LambdaExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
-        String indent =  getIndent();
-        buf.append(indent);
         buf.append("(@(");
         boolean first = true;
         for(Name param : getInputParams()) {

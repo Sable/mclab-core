@@ -81,7 +81,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 				Script s;
 				info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)), 
 				        targetTree, node,new List<Expr>(), getLHSList(node.getLHS()), false);
-				if (query.doInline(info)) newNode = new TransformedNode<ASTNode>(inline(info));
+				if (query.doInline(info)) newNode = new TransformedNode(inline(info));
 			}
 		}
 		//node is of the case [x,..] = f(..)
@@ -95,7 +95,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 					//build info object
 					info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 					        targetTree, node, pExpr.getArgList(), getLHSList(node.getLHS()), true);
-					if (query.doInline(info)) newNode = new TransformedNode<ASTNode>(inline(info));
+					if (query.doInline(info)) newNode = new TransformedNode(inline(info));
 				}
 			}
 		}		
@@ -147,7 +147,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 				//build info object
 				InlineInfo info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 				        targetTree, node, new List<Expr>(), new List<LValueExpr>(), false);
-				if (query.doInline(info)) newNode = new TransformedNode<ASTNode>(inline(info));
+				if (query.doInline(info)) newNode = new TransformedNode(inline(info));
 			}
 		}
 		//node is of the case f(..)
@@ -161,7 +161,7 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 					//build info object
 					InlineInfo info = new InlineInfo<ScriptOrFunction,TargetScriptOrFunction>(copy(map.get(name)),
 					        targetTree, node, pExpr.getArgs(), new List<LValueExpr>(), true);
-					if (query.doInline(info)) newNode = new TransformedNode<ASTNode>(inline(info));
+					if (query.doInline(info)) newNode = new TransformedNode(inline(info));
 				}
 			}
 		}

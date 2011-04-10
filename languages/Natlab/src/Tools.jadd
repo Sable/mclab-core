@@ -1,0 +1,17 @@
+//Random usfeul tools
+aspect Comments {
+
+    /**
+     * overriding string method of list to pretty print the elements
+     */
+    public String List.toString(){
+        String s = super.toString()+":[";
+        for (int i = 0; i < getNumChild(); i ++){
+            s += getChild(i).getPrettyPrinted();
+            if (i < getNumChild() - 1){
+                s += ", ";
+            }
+        }
+        return s+"]";
+    }
+}

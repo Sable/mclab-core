@@ -97,7 +97,6 @@ public class ExpressionCollector extends AbstractLocalRewrite
      */
     public void possibleSubExprHandler(Expr node, Expr target, List<Expr> args, boolean isCell )
     {
-        //System.out.println("&& pseh "+ node.getPrettyPrinted() + " " + isSub + " " + isLHS + " " + isCell );
         if( isSub ){
             subExprHandler(node, target, args, isCell );
         }
@@ -122,7 +121,6 @@ public class ExpressionCollector extends AbstractLocalRewrite
             lastTarget = oldLastTarget;
             isSub = true;
             rewritingEnds = false;
-            //System.out.println("rewriting args");
             rewriteArgs(args);
             isSub = false;
             lastTarget = null;
@@ -147,7 +145,6 @@ public class ExpressionCollector extends AbstractLocalRewrite
             boolean change = false;
             lastDims = args.getNumChild();
             for( int i =0; i< lastDims; i++ ){
-                //System.out.println( args.getChild(i) + " " + args.getChild(i).getPrettyPrinted() );
                 lastIndex = i+1;
                 rewrite( args.getChild(i) );
                 if( newNode != null ){
@@ -219,10 +216,23 @@ public class ExpressionCollector extends AbstractLocalRewrite
      */
     protected void fixEndsAndRewrite(Expr node, List<Expr> args, boolean canExpand ){
         rewritingEnds = true;
+        boolean oldSub = isSub; //TODO is this correct??!?! preserve isSub
         isSub = true;
         rewriteArgs( args );
         rewritingEnds = false;
-        isSub = false;
+        //isSub = false;
+        isSub = oldSub; 
+        /**
+         * this was changed because it seemed that sometimes, expressions wouldn't 
+         * get properly expanded. Example
+         * zeros(lengh(a),(b+1))
+         * would be turned into
+         * t = length(a)
+         * zeros(t, (b+1))
+         * presumably this is because after dealing with 'length', it would come
+         * out as not in sub anymore, due to this assignment
+         */
+        
         rewriteSubExpr( node, canExpand );
         //Expr oldLastTarget = lastTarget;
         //lastTarget = null;
@@ -379,6 +389,86 @@ public class ExpressionCollector extends AbstractLocalRewrite
         }
     }
 
+    /**
+     * this is just a copy of BinaryExpression case, but with multiple args
+     */
+    @Override
+    public void caseMatrixExpr(MatrixExpr node) {
+        if (!isLHS){
+            if (isSub){
+                subExprHandler( node );
+            } else if (!isLHS){
+                List<ASTNode> newChildren = genericExprCase(node);
+                if (newChildren != null){
+                    newNode = new TransformedNode(new MatrixExpr((List)newChildren));
+                }
+            }
+        }
+    }
+    
+    
+    @Override
+    public void caseCellArrayExpr(CellArrayExpr node) {
+        if (isSub){
+            subExprHandler( node );
+        } else {
+            List<ASTNode> newChildren = genericExprCase(node);
+            if (newChildren != null){
+                newNode = new TransformedNode(new CellArrayExpr((List)newChildren));
+            }
+        }
+    }
+    
+    /**
+     * lambda expression
+     * do nothing to the expr, except pull it out if it's a subexpr
+     */
+    public void caseLambdaExpr(LambdaExpr node) {
+        if (isSub){
+            TempFactory tmp = TempFactory.genFreshTempFactory();
+            AssignStmt newAssign = new AssignStmt( tmp.genNameExpr(), node );
+            newAssign.setOutputSuppressed(true);
+            newAssignments.add(newAssign);
+            newNode = new TransformedNode( tmp.genNameExpr() );
+        }
+    }
+    
+    
+    /**
+     * does basically what happens in any case, for example Plus
+     * Returns the newNodes as a list, or null if it's unchanged
+     * @param children
+     */
+    public List<ASTNode> genericExprCase(ASTNode node){
+        List<ASTNode> children = new List<ASTNode>();
+        for (int i = 0; i < node.getNumChild(); i ++){
+            children.add(node.getChild(i));
+        }
+        List<ASTNode> newChildren = new List<ASTNode>();
+        for (ASTNode n : children){
+            newChildren.add(n);
+        }
+
+        boolean changed = false;
+
+        isSub = true;
+        for (int i = 0; i < children.getNumChild(); i++){
+            rewrite(newChildren.getChild(i));
+            if ( newNode != null){
+                newChildren.setChild(newNode.getSingleNode(),i);
+                changed = true;
+            }
+        }
+        if( changed ){
+            return newChildren;
+        } else {
+            return null;
+        }
+    }
+
+    
+    
+    
     public void caseNameExpr( NameExpr node )
     {
         if( isSub ){

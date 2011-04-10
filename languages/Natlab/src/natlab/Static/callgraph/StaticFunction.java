@@ -77,6 +77,7 @@ public class StaticFunction implements Cloneable {
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
         
+        
         //go through all symbols, and put them in the symbol table
         for (ValueDatumPair<String, ? extends VFDatum> pair : flowset.toList()){
             VFDatum vf = pair.getDatum();
@@ -106,8 +107,13 @@ public class StaticFunction implements Cloneable {
     
     //transforms the underlying AST to 3 address code
     private void transformToIR(){
-        applySimplification(CommentSimplification.class);
-        applySimplification(ThreeAddressToIR.class);
+        try{
+          applySimplification(CommentSimplification.class);
+          applySimplification(ThreeAddressToIR.class);
+        }catch (RuntimeException e){
+            System.out.println(function.getPrettyPrinted());
+            throw e;
+        }
     }
     
     

@@ -9,9 +9,9 @@ import ast.*;
  */
 
 public class IRAssignFunctionHandleStmt extends IRAbstractAssignToVarStmt {
-    public IRAssignFunctionHandleStmt(NameExpr lhs,NameExpr function) {
-        super(lhs);
-        FunctionHandleExpr fHandleExpr = new FunctionHandleExpr(function.getName());
+    public IRAssignFunctionHandleStmt(Name lhs,Name function) {
+        super(new NameExpr(lhs));
+        FunctionHandleExpr fHandleExpr = new FunctionHandleExpr(function);
         setRHS(fHandleExpr);
     }
     

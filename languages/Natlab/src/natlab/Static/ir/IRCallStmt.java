@@ -23,6 +23,12 @@ import ast.*;
  *
  */
 public class IRCallStmt extends IRAbstractAssignToListStmt {
+    public IRCallStmt(Name function,Expr target,Expr... args) {
+        this(new NameExpr(function),
+                new IRCommaSeparatedList(target),new IRCommaSeparatedList(args));
+    }
+    
+    
     public IRCallStmt(NameExpr function,IRCommaSeparatedList targets,IRCommaSeparatedList args) {
         //set lhs
         super(targets);

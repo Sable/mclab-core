@@ -39,6 +39,14 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
             if( nameExpr.tmpVar )
                 return true;
             else{
+                if (kindAnalysis.getFlowSets().containsKey(nameExpr)){
+                    /*if we don't find the node in the kindAnalasys, re-analyze
+                      TODO -- is this correct?
+                      this was added because a simplification added calls to 'false'
+                      which couldn't be found in the flow sets
+                    */
+                    kindAnalysis.analyze();
+                }
                 VFDatum kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
                 return (kind!=null) && kind.isVariable();
             }

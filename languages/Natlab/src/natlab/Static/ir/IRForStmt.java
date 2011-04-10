@@ -10,11 +10,10 @@ import ast.*;
  *   ...
  * end
  * 
- * where i,low,inc,up are variables, inc is optional
+ * where i,low,inc,up are variables, inc is optional - it may be null
  *
  * @author ant6n
  */
-
 public class IRForStmt extends ForStmt implements IRStmt {
     public IRForStmt(Name var,Name low,Name inc,Name up,IRStatementList stmts){
         super(new AssignStmt(

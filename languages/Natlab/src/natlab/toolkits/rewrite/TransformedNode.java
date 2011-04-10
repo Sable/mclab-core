@@ -2,15 +2,20 @@ package natlab.toolkits.rewrite;
 
 import java.util.*;
 import java.lang.UnsupportedOperationException;
+import ast.ASTNode;
 /**
  * A representation of the result of a node transformation. A
  * transformed node can be either empty, a single node or a list of
  * nodes. These two are mutually exclusive.
  */
-public class TransformedNode<T extends ast.ASTNode>
+public class TransformedNode extends ArrayList<ASTNode>
 {
-    private T singleNode = null;
-    private LinkedList<T> multipleNodes = null;
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Creates an empty transformed node e.g. the result of deleting a
@@ -22,43 +27,38 @@ public class TransformedNode<T extends ast.ASTNode>
     /**
      * Creates a single node.
      */
-    public TransformedNode( T node ){
-        singleNode = node;
+    public TransformedNode( ast.ASTNode node ){
+        super();
+        add(node);
     }
     /**
      * Creates a multiple transformed node.
      * If there is only one or zero element in the list, creates either a singleNode or emptyNode
      */
-    public TransformedNode( T[] nodes ){
+    public TransformedNode( ast.ASTNode[] nodes ){
         this( Arrays.asList( nodes ) );
     }
-    public <E extends T> TransformedNode( Collection<E> nodes ){
-        multipleNodes = new LinkedList<T>( nodes );
-        if (multipleNodes.size() == 1){
-            singleNode = multipleNodes.get(0);
-            multipleNodes = null;
-        } else if (multipleNodes.size() == 0){
-            multipleNodes = null;
-        }
+    public TransformedNode( Collection<? extends ASTNode> nodes ){
+        super(nodes);
     }
 
     public boolean isEmptyNode()
     {
-        return !isSingleNode() && !isMultipleNodes();
+        return isEmpty();
     }
     public boolean isSingleNode()
     {
-        return singleNode != null;
+        return size() == 1;
     }
     public boolean isMultipleNodes()
     {
-        return multipleNodes != null;
+        return size() > 1;
     }
 
-    public T getSingleNode()
+    public ast.ASTNode getSingleNode()
     {
         if( isSingleNode() )
-            return singleNode;
+            return get(0);
         else{
             String msg = "Attempted to getSingleNode from non single transformed node.";
             UnsupportedOperationException e;
@@ -66,10 +66,15 @@ public class TransformedNode<T extends ast.ASTNode>
             throw e;
         }
     }
-    public List<T> getMultipleNodes()
+    
+    /**
+     * returns
+     * @return
+     */
+    public List<ast.ASTNode> getMultipleNodes()
     {
         if( isMultipleNodes() )
-            return (List<T>)multipleNodes.clone();
+            return (List<ast.ASTNode>)super.clone();
         else{
             String msg = "Attempted to getMultipleNodes from a non multiple transformed node.";
             UnsupportedOperationException e;
@@ -77,39 +82,25 @@ public class TransformedNode<T extends ast.ASTNode>
             throw e;
         }
     }
-
-    public void add( T node )
-    {
-        if( isEmptyNode() )
-            singleNode = node;
-        else{
-            if( isSingleNode() ){
-                multipleNodes = new LinkedList();
-                multipleNodes.add( singleNode );
-                singleNode = null;
-            }
-            multipleNodes.add( node );
-        }
-    }
     
-    public void addAll(Collection<T> nodes){
-       for (T node : nodes){ add(node); } 
-    }
+   
     
     
     @Override
     public String toString() {
         String msg = "transformedNode with ";
-        if (singleNode != null){
-            msg += "single node: \n"+singleNode.getPrettyPrinted();
-        } else if (multipleNodes != null){
+        if (isSingleNode()){
+            msg += "single node: \n"+getSingleNode().getPrettyPrinted();
+        } else if (isMultipleNodes()){
             msg += "multiple nodes: \n";
-            for (T node : multipleNodes){
+            for (ast.ASTNode node : this){
                 msg += "["+node.getPrettyPrinted()+"]\n";
             }
         } else {
             msg += "no node (empty)";
         }
         return msg;
-    }
+    }    
 }
+
+
