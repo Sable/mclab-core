@@ -27,5 +27,6 @@ public interface FunctionOrScriptQuery {
      * @param name
      * @return true if such a function or script exists
      */
+	boolean isPackage(String name);
     boolean isFunctionOrScript(String name);
 }

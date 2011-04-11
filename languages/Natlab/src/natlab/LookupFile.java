@@ -13,48 +13,52 @@ public class LookupFile{
     private static HashMap<String, Function> currentFile;
     private static HashMap<String, ASTNode> lib; 
     private static HashMap<String, String> initialize(){
-	try{
-	    InputStream fin=LookupFile.class.getResourceAsStream("builtin.ser");
-	    ObjectInputStream oin = new ObjectInputStream(fin);
-	    HashMap<String, HashMap<String, String>> map = (HashMap<String, HashMap<String, String>>) oin.readObject();
-	    builtinPackages = map.get("packages");
-	    builtinClasses = map.get("classes");
-	    builtinFunctions = map.get("functions");
-	    outputInfo = map.get("output_info");
-	    currentFile = new HashMap<String, Function>();
-	    lib = new HashMap<String, ASTNode>();
-	    return builtinClasses;
-	}catch(Exception e){
-              e.printStackTrace();
-              System.err.println("Library definitions file not found.");
-	}
-	return null;
+        try{
+            InputStream fin=LookupFile.class.getResourceAsStream("builtin.ser");
+            ObjectInputStream oin = new ObjectInputStream(fin);
+            HashMap<String, HashMap<String, String>> map = (HashMap<String, HashMap<String, String>>) oin.readObject();
+            builtinPackages = map.get("packages");
+            builtinClasses = map.get("classes");
+            builtinFunctions = map.get("functions");
+            outputInfo = map.get("output_info");
+            currentFile = new HashMap<String, Function>();
+            lib = new HashMap<String, ASTNode>();
+            return builtinClasses;
+        }
+        catch(FileNotFoundException e){
+            e.printStackTrace();
+            System.err.println("Library definitions file not found.");
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error while loading library definition file");
+        }
+        return null;
     }; 
 
     public static String getOutputInfo(String function){
-	if (outputInfo.containsKey(function))
-	    return outputInfo.get(function);
-	return "DWH,H";
+        if (outputInfo.containsKey(function))
+            return outputInfo.get(function);
+        return "DWH,H";
     }
 
     public static boolean packageExists(String s){
-	if (builtinPackages.containsKey(s)) return true; 
-	return false;
+        if (builtinPackages.containsKey(s)) return true; 
+        return false;
     }
 
     public static boolean scriptOrFunctionExists(String s){
-	if (currentFile.containsKey(s)) {
-	    return true;
-	}
-	if (lib.containsKey(s)) return true; 
-	if (builtinClasses.containsKey(s)) return true; 
-	if (builtinFunctions.containsKey(s)) return true; 
-	return false; 
+        if (currentFile.containsKey(s)) {
+            return true;
+        }
+        if (lib.containsKey(s)) return true; 
+        if (builtinClasses.containsKey(s)) return true; 
+        if (builtinFunctions.containsKey(s)) return true; 
+        return false; 
     } 
 
     public static void setPrograms(HashMap<String, Program> progs){
-	lib.clear();
-	lib.putAll(progs);
+        lib.clear();
+        lib.putAll(progs);
     }
 
     //TODO remove this - this does not capture names correctly in the case
@@ -62,11 +66,11 @@ public class LookupFile{
     //setCurrentScript and setCurrentFunction, or something like that
     @Deprecated
     public static void setCurrentProgram(Program f){
-	currentFile.clear();
-	if (!FunctionList.class.isInstance(f))
-	    return;
-	for (Function function: ((FunctionList)f).getFunctions())
-	    currentFile.put(function.getName(), function);
+        currentFile.clear();
+        if (!FunctionList.class.isInstance(f))
+            return;
+        for (Function function: ((FunctionList)f).getFunctions())
+            currentFile.put(function.getName(), function);
     }
     
     
@@ -78,7 +82,13 @@ public class LookupFile{
     public static FunctionOrScriptQuery getFunctionOrScriptQueryObject(){
         return new FunctionOrScriptQuery() {
             public boolean isFunctionOrScript(String name) {
-                return scriptOrFunctionExists(name);
+                boolean res = scriptOrFunctionExists(name);
+                return res;
+            }
+
+            @Override
+            public boolean isPackage(String name) {
+                return packageExists(name);
             }
         };
     }

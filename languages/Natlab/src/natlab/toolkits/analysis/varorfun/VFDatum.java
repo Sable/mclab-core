@@ -5,7 +5,7 @@ package natlab.toolkits.analysis.varorfun;
 
 public enum VFDatum
 {
-    TOP, VAR, PREFIX, FUN, LDVAR, BOT;
+    TOP, VAR, PREFIX, FUN, LDVAR, BOT, WAR;
     public VFDatum merge(VFDatum ov){
         if( this == ov )
             return this;
@@ -21,6 +21,8 @@ public enum VFDatum
 
 	if (LDVAR == ov)
 	    return this;
+	if (this==WAR || ov == WAR )
+		return WAR;
 
 	return TOP;
     }
