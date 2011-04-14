@@ -486,7 +486,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
             VFDatum kind;
             if( resolvedNames == null )
                 try{
-                    kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
+                    kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).contains(nameExpr.getName().getID());
                 }catch( NullPointerException e ){
                     kind = null;
                 }
@@ -503,12 +503,12 @@ public class ExpressionCollector extends AbstractLocalRewrite
         else{
             VFDatum kind;
             if( resolvedNames == null ){
-                if (!kindAnalysis.getFlowSets().containsKey(nameExpr)){
+                if (!kindAnalysis.getFlowSets().containsKey(nameExpr.getName())){
                     kindAnalysis.analyze();
                     //TODO - not efficient, but probably better than making assumptiions!1
                 }
                 
-                kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
+                kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).contains(nameExpr.getName().getID());
                 
             }else
                 kind = resolvedNames.contains( nameExpr.getName().getID() );
