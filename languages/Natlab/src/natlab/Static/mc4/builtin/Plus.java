@@ -1,4 +1,4 @@
-package natlab.Static.mc4.builtin;
+package natlab.Static.builtin;
 
 public class Plus {
 
