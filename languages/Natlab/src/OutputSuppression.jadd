@@ -18,5 +18,7 @@ aspect OutputSuppression {
     public static boolean Stmt.getDefaultOutputSuppression(){ return defaultOutputSuppression; }
     
     public boolean Stmt.isOutputSuppressed() { return outputSuppressed; }
-    public void Stmt.setOutputSuppressed(boolean outputSuppressed) { this.outputSuppressed = outputSuppressed; }
+    public void Stmt.setOutputSuppressed(boolean outputSuppressed) { 
+        this.outputSuppressed = outputSuppressed; 
+    }
 }

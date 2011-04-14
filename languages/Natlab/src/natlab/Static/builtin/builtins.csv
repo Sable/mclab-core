@@ -1,0 +1,108 @@
+#name    parent
+#if no parent is specified then the most recent parent is assumed
+#preserves the most recent comment
+#all parent classes will be renamed as Abstract<Name>, except the root
+
+# the overal parent class
+builtin
+
+#pure functions have no side effects and always return the same value
+pureFunction, builtin
+
+# *** constants **************************************************
+constant, pureFunction     
+
+numericalConstant, constant
+i,
+j,
+pi,
+
+logicalConstant, constant
+true,
+false,
+
+
+#matlab operators
+operator, pureFunction
+
+# *** binary ops *************************************************
+binaryOperator, operator
+
+
+#relational ops
+relationalOperator, binaryOperator
+eq,,
+ne
+lt
+ge
+
+#logical operators - note there's no short circuit ops
+binaryLogicalOperator, binaryOperator
+and
+or
+xor
+
+
+
+
+#numerical binary oprators
+numericalBinaryOperator, binaryOperator
+#matrix operators
+matrixOperator, numericalBinaryOperator
+plus
+mtimes
+mpower
+mldivide
+mrdivide
+#array operators
+arrayOperator, numericalBinaryOperator
+times
+
+# *** unary operators ***************************************************
+unaryOperator, operator
+
+numericalUnaryOperator, unaryOperator
+uplus
+uminus
+transpose
+ctranspose
+conj
+
+logicalUnaryOperator, unaryOperator
+not
+any
+all
+
+
+# *** matrix operations ************************************************
+matrixOperation, pureFunction
+transcendentalFunction, matrixOperation
+exp
+log
+
+trigonometricFunction, transcendentalFunction
+sin
+cos
+tan
+
+inverseTrigonmetricFunction, transcendentalFunction
+asin
+acos
+atan
+
+
+real
+imag
+
+
+#should this be a builtin?
+toeplitz
+
+
+
+
+
+
+# *** opposite of pure functions *****************************************
+impureFunction, builtin
+
