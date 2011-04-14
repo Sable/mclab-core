@@ -30,9 +30,19 @@ public class RenameSymbols extends AbstractLocalRewrite {
 
         int i = 1; //the postfix
         boolean containsName = false; //flag whether the name is in the sets
+
+        //first check whether we can just use the name
+        for (Collection<String> set : names){
+            if (set.contains(name)){
+                containsName = true;
+                break;
+            }
+        }
+        if (!containsName) return name;
         
-        //try to an i such that name+i is not in the set
+        //try to find an i such that name+i is not in the set
         do{
+            containsName = false;
             for (Collection<String> set : names){
                 if (set.contains(name+i)){
                     containsName = true;

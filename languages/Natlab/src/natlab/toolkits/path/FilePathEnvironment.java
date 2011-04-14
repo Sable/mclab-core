@@ -1,13 +1,16 @@
-package natlab.toolkits.filehandling;
+package natlab.toolkits.path;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Collection;
 
 import natlab.options.Options;
+import natlab.toolkits.filehandling.*;
+import natlab.toolkits.filehandling.genericFile.*;
 
 /**
- * This class represents an object that allows finding matlab functions.
- * It does the look up resolution. Matlab functions and scripts are assumed
+ * This class represents a PathEnvironment that allows finding matlab functions.
+ * It does the look up resolution. Matlab functions, scripts and classes are assumed
  * to have the following precedence (i.e. if a function call is encountered):
  * 
  * 1 nested functions
@@ -21,18 +24,10 @@ import natlab.options.Options;
  * it has to be done by separate class, which only exists as an interface.
  *
  */
-
-public class FunctionFinder {
-	/**
-	 * an interface that allows finding whether a function is a builtin (#5)
-	 */
-	public interface BuiltinQuery{
-		boolean isBuiltin(String functionname);		
-	}
-
+public class FilePathEnvironment extends AbstractPathEnvironment {
 	//private
-	File pwd;
-	BuiltinQuery builtin;
+    GenericFile main;
+	GenericFile pwd;
 	Options options;
 	final FilenameFilter MATLAB_FILE_FILTER = new MatlabFileFilter();
 	
@@ -43,14 +38,11 @@ public class FunctionFinder {
 	 * pwd is assumed to be the directory where the first file is.
 	 * 
 	 */
-	public FunctionFinder(Options options,BuiltinQuery builtin){
+	public FilePathEnvironment(Options options,BuiltinQuery builtin){
+	    super(builtin);
 		this.options = options;
-		File file = new File((String)options.getFiles().getFirst()).getAbsoluteFile();
-		if (!file.isDirectory()){
-            file = file.getParentFile();			
-		}
-		pwd = file;
-		this.builtin = builtin;
+		main = GenericFile.create((String)options.getFiles().getFirst());
+		pwd = main.getParent();
 	}
 
 	/**
@@ -58,7 +50,7 @@ public class FunctionFinder {
 	 * (i.e. if the function name and .m file have the same name)
 	 * TODO: should this be case sensitive?
 	 */
-	public boolean isMatch(String name,File file){
+	public boolean isMatch(String name,GenericFile file){
 		String filename = file.getName(); //TODO there should be a cleaner way to do this
 		return (filename.substring(0, filename.length()-2).equalsIgnoreCase(name));
 	}
@@ -67,9 +59,10 @@ public class FunctionFinder {
 	 * returns the main matlab file, i.e. the entry point.
 	 * @return the main matlab file as an absolute File.
 	 */
-	public File getMain(){
+	@Override
+	public GenericFile getMain(){
 		//TODO - so far only returns first
-		return (new File((String)options.getFiles().getFirst())).getAbsoluteFile();
+		return main;
 	}
 
 	/**
@@ -77,8 +70,9 @@ public class FunctionFinder {
 	 * returns the filename as a String, or null if it cannot be found
 	 * or if it is a builtin
 	 */
-	public File findName(String name){
-		File file = null;
+	public GenericFile resolve(String name,GenericFile context){
+	    
+		GenericFile file = null;
 		//private
 		file = findInPrivate(name);
 		if (file != null) return file;
@@ -88,19 +82,25 @@ public class FunctionFinder {
 		if (file != null) return file;
 		
 		//builtin?
-		if (builtin.isBuiltin(name)){ return null; }
+		if (isBuiltin(name)){ return null; }
 		
 		//path
 		return findInPath(name);
+	}
+	
+	@Override
+	public GenericFile resolve(String name, String className,
+	        GenericFile context) {
+	    throw new UnsupportedOperationException("rsolve by classname");
 	}
 	
 	/**
 	 * returns true if the given matlab function name refers to a builtin function,
 	 * (even retuns false if it is a builtin
 	 */
-	public boolean isBuiltin(String name){
+	public boolean isStrictlyBuiltin(String name){
 		if (findInPrivate(name) == null && findInPwd(name) == null){
-			return builtin.isBuiltin(name);
+			return isBuiltin(name);
 		} else {
 			return false;
 		}
@@ -110,43 +110,34 @@ public class FunctionFinder {
 	//private methods
 	//there is a method for each possible lookup
 	//it just takes the name
-	private File findInPrivate(String name){
+	private GenericFile findInPrivate(String name){
 		return null; //TODO implement this - has to be relative to current function
 	}
-	private File findInPwd(String name){
+	private GenericFile findInPwd(String name){
 		return findInDirectory(name,pwd);
 	}
-	private File findInPath(String name){
+	private GenericFile findInPath(String name){
 		return null; //TODO implement this
 	}
-	private File findInDirectory(String name,File dir){
-		String[] list = dir.list(MATLAB_FILE_FILTER); //find all files in dir
+	private GenericFile findInDirectory(String name,GenericFile dir){
+		Collection<GenericFile> list = 
+		    dir.listChildren(GenericFileMatlabTools.MATLAB_FILE_FILTER); //find all files in dir
 		if (list == null) return null; //not a dir
-		for (String filename : list){ //go through every file, check if it's match
-			File file = new File(dir,filename);
+		for (GenericFile file : list){ //go through every file, check if it's match
 			if (isMatch(name,file)){
-				return file.getAbsoluteFile();
+				return file;
 			}
 		}
 		return null;
 	}
 	
-	/**
-	 * query object for Scripts and Functions.
-	 * Note that this also checks among the builtins.
-	 * @return
-	 */
-	public FunctionOrScriptQuery getFunctionOrScriptQuery(){
-	    return new FunctionOrScriptQuery(){
-            public boolean isFunctionOrScript(String name) {
-                return builtin.isBuiltin(name) || (findName(name) != null);
-            }
-            public boolean isPackage(String name) {
-                // TODO Auto-generated method stub
-                return false;
-            }
-	    };
-	}
+	
+    @Override
+    public Collection<GenericFile> getAllOverloaded(String className,
+            GenericFile cotntext) {
+        throw new UnsupportedOperationException("getAllOverloaded");
+    }
+	
 }
 
 

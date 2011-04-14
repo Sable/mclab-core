@@ -11,11 +11,11 @@ import java.util.Random;
 import java.util.Scanner;
 
 
+import natlab.Static.builtin.Mc4BuiltinQuery;
 import natlab.Static.callgraph.FunctionCollection;
-import natlab.Static.mc4.builtin.Mc4BuiltinQuery;
 import natlab.options.Options;
-import natlab.toolkits.filehandling.FunctionFinder;
 import natlab.toolkits.filehandling.genericFile.ZippedFile;
+import natlab.toolkits.path.FilePathEnvironment;
 
 
 /**
@@ -36,7 +36,7 @@ public class Mc4 {
         if (PRINT_STACK_ON_ERROR) Thread.dumpStack();
         if (EXIT_ON_ERROR) System.exit(1);
     }
-    public static FunctionFinder functionFinder;
+    public static FilePathEnvironment functionFinder;
     
     
     //TODO get rid of this
@@ -105,7 +105,7 @@ public class Mc4 {
 	 */
 	public static void main(Options options){	   	    
         //object that resolves function names to files      
-        functionFinder = new FunctionFinder(options, new Mc4BuiltinQuery());
+        functionFinder = new FilePathEnvironment(options, new Mc4BuiltinQuery());
         
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(options);
@@ -120,13 +120,17 @@ public class Mc4 {
 	        FileWriter fstream = null;
 	        try{
 	            ast.Function function = functions.getAsInlinedFunction();
+	            System.out.println("get inilined function success");
 	            if (!(new File(outDir).exists())){ (new File(outDir)).mkdir(); }
 	            File file = new File(outDir+"/"+function.getName()+".m");
 	            fstream = new FileWriter(file);
 	            fstream.write(function.getPrettyPrinted());
                 fstream.close();	            
-	        } catch(Exception e){
+	        } catch(IOException e){
 	            System.err.println("output failed: "+e.getMessage());
+	        } catch (UnsupportedOperationException e){
+	            System.err.println(e.getMessage());
+	            e.printStackTrace();
 	        }
 	    }
 	}

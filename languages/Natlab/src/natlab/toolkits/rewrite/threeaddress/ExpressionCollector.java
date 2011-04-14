@@ -502,9 +502,15 @@ public class ExpressionCollector extends AbstractLocalRewrite
             return false;
         else{
             VFDatum kind;
-            if( resolvedNames == null )
+            if( resolvedNames == null ){
+                if (!kindAnalysis.getFlowSets().containsKey(nameExpr)){
+                    kindAnalysis.analyze();
+                    //TODO - not efficient, but probably better than making assumptiions!1
+                }
+                
                 kind = kindAnalysis.getFlowSets().get(nameExpr).contains(nameExpr.getName().getID());
-            else
+                
+            }else
                 kind = resolvedNames.contains( nameExpr.getName().getID() );
             //System.out.println("kind: "+nameExpr.getPrettyPrinted() + " " + kind);
             return (kind!=null) && kind.isFunction();

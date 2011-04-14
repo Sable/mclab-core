@@ -4,7 +4,15 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-public class ZippedFile extends genericFile {
+/**
+ * This represents file inside a zipped archive, which includes files inside a .jar
+ * 
+ * One may think of the zip/jar acrhive as a partition. The file basically
+ * operates like a File Object within that partition.
+ *
+ */
+
+public class ZippedFile extends GenericFile {
     //static vars
     private static HashMap<File,ZipFile> archives = new HashMap<File,ZipFile>();
     private static HashMap<File,ZippedFile> roots = new HashMap<File,ZippedFile>();
@@ -117,7 +125,7 @@ public class ZippedFile extends genericFile {
     }
     
     
-    public genericFile getParent() {
+    public ZippedFile getParent() {
         return this.parent;
     }
 
@@ -143,22 +151,16 @@ public class ZippedFile extends genericFile {
     }
 
 
+
     @Override
-    public String getExtension() {
+    public String getName() {
         // TODO Auto-generated method stub
         return null;
     }
 
 
     @Override
-    public String getFilename() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public Collection<genericFile> listChildren() {
+    public Collection<GenericFile> listChildren() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -167,5 +169,10 @@ public class ZippedFile extends genericFile {
     @Override
     public String getPath() {
         return archive.getName()+"!/"+filename;
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.archive.hashCode()*31 + this.filename.hashCode();
     }
 }

@@ -55,6 +55,10 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     @Override
     public void caseFunction(Function node) {
+        //System.out.println("case function for 3A->IR, 3A produced this:");
+        //System.out.println(node.getPrettyPrinted());
+        
+        
         rewriteChildren(node);
         //collect nested functions
         List<IRFunction> nesteds = new List<IRFunction>();
@@ -344,10 +348,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
      * Returns the last assignment as an IRCallStmt (this one does not get added to assignList).
      */
     private IRAbstractAssignStmt expandMatrix(MatrixExpr matrix,NameExpr target,LinkedList<AssignStmt> assignList){
-        if (matrix.getNumRow() == 0){
-            throw new UnsupportedOperationException("can't assign empty matrizes yet -- todo");
-        } 
-        
+
         //collect rows
         IRCommaSeparatedList rowTemps = new IRCommaSeparatedList();
         
@@ -482,7 +483,5 @@ public class ThreeAddressToIR extends AbstractSimplification {
         }
         return false;
     }
-    
-    
 }
 

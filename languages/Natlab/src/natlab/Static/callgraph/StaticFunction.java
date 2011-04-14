@@ -23,12 +23,20 @@ import ast.*;
  */
 public class StaticFunction implements Cloneable {
     public static boolean DEBUG = false;
-    Function function;
+    Function function; //ast tree
     FunctionReference reference; //reference to this function
     String name;
     HashSet<String> siblings; //TODO - make these a hashmap<string,StaticFunction>
-    BiMap<String,FunctionReference> calledFunctions;
+
+    //references to functions being called
+    //this represents only non-class specific (overloaded) functions
+    //a FunctionReference of null signifies that the function could not be found
+    //(the kind is bottom)
+    //- either because it doesn't exist, or because it is only overloaded,
+    //  or is a variable coming from a script
+    BiMap<String,FunctionReference> calledFunctions; 
     
+
     /**
      * Creates a Mc4 Function, given an ast and the source file.
      * This transforms the function to 3 address code and builds the symbol table.
@@ -72,7 +80,7 @@ public class StaticFunction implements Cloneable {
     private void findAndResolveFunctions(){
         //perform variable or function analysis on function and get result
         VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,
-                Mc4.functionFinder.getFunctionOrScriptQuery());
+                Mc4.functionFinder.getFunctionOrScriptQuery(null));
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
@@ -145,6 +153,8 @@ public class StaticFunction implements Cloneable {
     public void inline(Map<FunctionReference, StaticFunction> map){
     	HashMap<String, Function> inlinerMap = new HashMap<String,Function>();
     	
+    	System.out.println("inlining everything in "+name);
+    	
     	//build inliner map
     	for (FunctionReference ref : map.keySet()){
     	    if (calledFunctions.containsValue(ref)){ //we need to inline ref
@@ -155,7 +165,8 @@ public class StaticFunction implements Cloneable {
     	        otherFunction = otherFunction.clone();
 
     	        //merge symbol tables
-    	        mergeSymbols(otherFunction, otherFunction.name.substring(0,4)+"_");
+    	        String oName = otherFunction.name;
+    	        mergeSymbols(otherFunction, oName.substring(0,Math.min(4,oName.length()))+"_");
 
     	        //for any name that maps to ref, we need to inline it
     	        for (String name : calledFunctions.getKeys(ref)){
@@ -164,14 +175,23 @@ public class StaticFunction implements Cloneable {
     	        }
     		}
     	}
-    	
-    	//actually inline
-    	Inliner<Function,Function> inliner = 
-    	    new Inliner<Function,Function>(this.function,inlinerMap,new PutCommentsInlineQuery());
-    	this.function = (Function)inliner.transform();
-    	
-    	//the inline creates non IR nodes, turn back into IR
-    	transformToIR();
+
+    	if (inlinerMap.size() > 0){
+    	    System.out.println("inlining in "+name+": "+inlinerMap.keySet());
+    	    //actually inline
+    	    Inliner<Function,Function> inliner = 
+    	        new Inliner<Function,Function>(this.function,inlinerMap,new PutCommentsInlineQuery());
+    	    this.function = (Function)inliner.transform();
+
+    	    System.out.println("finished inlining, transforming to IR");
+
+    	    //the inline creates non IR nodes, turn back into IR
+    	    transformToIR();
+
+    	    System.out.println("finished transforming to IR");
+    	} else {
+    	    System.out.println("nothing to inline");
+    	}
     }
     
         
@@ -208,7 +228,7 @@ public class StaticFunction implements Cloneable {
         
         Set<String> symbols = function.getSymbols();
         Set<String> otherSymbols = otherFunction.function.getSymbols();
-        
+                
         //build rename maps - find name conflicts
         for (String name : otherSymbols){
             if (symbols.contains(name)){ //name conflict
@@ -241,6 +261,7 @@ public class StaticFunction implements Cloneable {
                 }
             }
         }
+        
         
         //actually rename
         rename(renameThis);

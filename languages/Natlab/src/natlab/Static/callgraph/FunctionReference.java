@@ -1,6 +1,6 @@
 package natlab.Static.callgraph;
+import natlab.toolkits.filehandling.genericFile.*;
 
-import java.io.File;
 
 /**
  * A function within a Matlab program can not be uniquely identified by a name alone
@@ -14,7 +14,7 @@ import java.io.File;
 
 
 public class FunctionReference {
-    File path;
+    GenericFile path;
     String name;
     boolean isBuiltin;
     boolean isPrivate; //TODO - denote whether private, sibling, nested etc.
@@ -24,7 +24,7 @@ public class FunctionReference {
      * @param name the name of the function
      * @param path the path of the function (as an absolute File)
      */
-    public FunctionReference(String name, File path){
+    public FunctionReference(String name, GenericFile path){
         this.path = path;
         this.name = name;
         this.isBuiltin = false;
@@ -36,6 +36,14 @@ public class FunctionReference {
      */
     public String getname(){
         return name;
+    }
+    
+    /**
+     * returns the file where the Function which this FunctionReference refers
+     * to resides, or null if this file doesn't exist (for builtins).
+     */
+    public GenericFile getFile(){
+        return path;
     }
     
     
@@ -67,8 +75,8 @@ public class FunctionReference {
     
     @Override
     public String toString() {
-    	if (isBuiltin) return "builtin "+name;
-    	else return "function "+name+"@"+path.getAbsolutePath();
+    	if (isBuiltin) return name+"@builtin";
+    	else return name+"@"+path;
     }
     
     @Override

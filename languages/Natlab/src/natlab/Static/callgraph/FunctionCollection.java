@@ -1,15 +1,11 @@
 package natlab.Static.callgraph;
-
 import java.io.File;
 import java.util.*;
-
 import ast.*;
-
 import natlab.CompilationProblem;
 import natlab.Static.mc4.Mc4;
-import natlab.Static.mc4.builtin.Mc4BuiltinQuery;
 import natlab.options.Options;
-import natlab.toolkits.filehandling.FunctionFinder;
+import natlab.toolkits.filehandling.genericFile.*;
 
 /**
  * A FunctionCollection is a collection of static function.
@@ -28,7 +24,7 @@ import natlab.toolkits.filehandling.FunctionFinder;
  */
 
 public class FunctionCollection extends HashMap<FunctionReference,StaticFunction>{
-    private HashSet<File> loadedFiles = new HashSet<File>(); //files that were loaded so far
+    private HashSet<GenericFile> loadedFiles = new HashSet<GenericFile>(); //files that were loaded so far
     private FunctionReference main = null; //denotes which function is the entry point
     private Options options;
     
@@ -43,8 +39,8 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         this.options = options;
         
         //get main file (entrypoint)
-        File main = Mc4.functionFinder.getMain();
-
+        GenericFile main = Mc4.functionFinder.getMain();
+        
         //collect
         ArrayList<CompilationProblem> errors = new ArrayList<CompilationProblem>();
         collect(main,true,errors);
@@ -74,17 +70,19 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
      * adds the matlab functions from the given filename to the collection
      * @return returns true on success
      */
-    public boolean collect(File file,boolean isMain,ArrayList<CompilationProblem> errList){
+    public boolean collect(GenericFile file,boolean isMain,ArrayList<CompilationProblem> errList){
+        System.out.println("collecting "+file);
         //was the filename already loaded?
         if (loadedFiles.contains(file)) return true;
         
         //parse file
         Program program;
+        File javaFile = ((FileFile)file).getFileObject();
         if (options.matlab()){
-            program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList);
+            program = natlab.Parse.parseMatlabFile(javaFile.getAbsolutePath(), errList);
             //program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
         } else {
-        	program = natlab.Parse.parseFile(file.getAbsolutePath(), errList);
+        	program = natlab.Parse.parseFile(javaFile.getAbsolutePath(), errList);
         }
         if (program == null){
             Mc4.error("cannot parse file "+file+":\n"+errList);
@@ -133,6 +131,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
      */
     private boolean resolveFunctionsAndCollect(StaticFunction function,ArrayList<CompilationProblem> errList){
         boolean success = true;
+        LinkedList<String> unfoundFunctions = new LinkedList<String>();
         
         //collect references to other functions - update symbol table, recursively collect
         for (String otherName : function.getCalledFunctions().keySet()){            
@@ -156,7 +155,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
             //4 functionName is a builtin or a function on the path    
             } else {
                 //try to find it
-                File otherFunction = Mc4.functionFinder.findName(otherName);
+                GenericFile otherFunction = Mc4.functionFinder.resolve(otherName,null);
                 if (otherFunction != null){ // file found
                     success = success && collect(otherFunction,false,errList); //recursively collect other function
                     function.getCalledFunctions().put(otherName,  //update symbol table entry
@@ -167,12 +166,15 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
                         function.getCalledFunctions().put(otherName, 
                                 new FunctionReference(otherName));
                     } else { //not found
-                        System.out.println(function.getAst().getPrettyPrinted());
-                        Mc4.error("reference to "+otherName+" in "+function.getName()+" not found");
+                        unfoundFunctions.add(otherName);
                         success = false;
                     }
                 }
             }
+        }
+        if (unfoundFunctions.size() != 0){
+            System.out.println(function.getAst().getPrettyPrinted());
+            Mc4.error("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
         }
         return success;
     }
@@ -182,12 +184,12 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
      */
     public void inlineAll(){
     	inlineAll(new HashSet<FunctionReference>(),getMain());
+    	System.out.println("finished inlining all");
     }
     //inlines all calls inside the given function
     //throws a unspported operation if there is an attempt to inline a function
     //that is alraedy in the context -- cannot inline recursive functions
     private void inlineAll(Set<FunctionReference> context,FunctionReference function){
-        
     	//error check
     	if (context.contains(function)){
     		throw new UnsupportedOperationException("trying to inline recursive function "+function);
@@ -204,6 +206,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
     	for (FunctionReference ref : get(function).getCalledFunctions().values()){
 			if (!ref.isBuiltin()){
 				//inline recursively
+			    System.out.println("inlining "+ref);
 				inlineAll(context,ref);
 			}
     	}
@@ -212,7 +215,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
     	get(function).inline(this);
     	
     	//remove this context
-    	context.remove(function);
+    	context.remove(function);    	
     }
     
     /**
