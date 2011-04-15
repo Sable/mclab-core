@@ -117,7 +117,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseNorm(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
     public Ret caseRank(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
     public Ret caseDot(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
-    public Ret caseProd(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
+    public Ret caseCross(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
     
     //bit operators
     public Ret caseAbstractBitOperation(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }

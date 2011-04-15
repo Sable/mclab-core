@@ -128,7 +128,7 @@ eig
 norm
 rank
 dot
-prod
+cross
 
 # bit operators
 bitOperation, pureFunction

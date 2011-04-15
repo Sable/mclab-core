@@ -127,7 +127,7 @@ public abstract class Builtin {
         builtinMap.put("norm",new Norm());
         builtinMap.put("rank",new Rank());
         builtinMap.put("dot",new Dot());
-        builtinMap.put("prod",new Prod());
+        builtinMap.put("cross",new Cross());
         builtinMap.put("bitand",new Bitand());
         builtinMap.put("bitor",new Bitor());
         builtinMap.put("bitxor",new Bitxor());
@@ -1137,18 +1137,18 @@ public abstract class Builtin {
             return "dot";
         }
     }
-    public static class Prod extends AbstractMatrixComputation {
+    public static class Cross extends AbstractMatrixComputation {
         //creates a new instance of this class
         protected Builtin create(){
-            return new Prod();
+            return new Cross();
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseProd(this,arg);
+            return visitor.caseCross(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "prod";
+            return "cross";
         }
     }
     public static abstract class AbstractBitOperation extends AbstractPureFunction {
