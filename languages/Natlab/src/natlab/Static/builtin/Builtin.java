@@ -5,7 +5,7 @@ import java.util.HashMap;
 //import natlab.toolkits.path.BuiltinQuery;
 
 
-public abstract class Builtin /*implements BuiltinQuery*/ {
+public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
     public static void main(String[] args) {
         System.out.println(create("i"));
@@ -31,8 +31,9 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
      *
     public static BuiltinQuery getBuiltinQuery() {
         return new BuiltinQuery(){
-            isBuiltin(String functionname) { return builtinMap.containsKey(functionname); }
-        }
+            public boolean isBuiltin(String functionname) 
+              { return builtinMap.containsKey(functionname); }
+        };
     } /* */
 
     
@@ -75,14 +76,19 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         builtinMap.put("horzcat",new Horzcat());
         builtinMap.put("vertcat",new Vertcat());
         builtinMap.put("nargin",new Nargin());
+        builtinMap.put("nargout",new Nargout());
+        builtinMap.put("end",new End());
         builtinMap.put("eq",new Eq());
         builtinMap.put("ne",new Ne());
         builtinMap.put("lt",new Lt());
+        builtinMap.put("le",new Le());
         builtinMap.put("ge",new Ge());
+        builtinMap.put("gt",new Gt());
         builtinMap.put("and",new And());
         builtinMap.put("or",new Or());
         builtinMap.put("xor",new Xor());
         builtinMap.put("plus",new Plus());
+        builtinMap.put("minus",new Minus());
         builtinMap.put("mtimes",new Mtimes());
         builtinMap.put("mpower",new Mpower());
         builtinMap.put("mldivide",new Mldivide());
@@ -90,6 +96,8 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         builtinMap.put("times",new Times());
         builtinMap.put("ldivide",new Ldivide());
         builtinMap.put("rdivide",new Rdivide());
+        builtinMap.put("power",new Power());
+        builtinMap.put("mod",new Mod());
         builtinMap.put("uplus",new Uplus());
         builtinMap.put("uminus",new Uminus());
         builtinMap.put("transpose",new Transpose());
@@ -98,6 +106,7 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         builtinMap.put("real",new Real());
         builtinMap.put("imag",new Imag());
         builtinMap.put("abs",new Abs());
+        builtinMap.put("eps",new Eps());
         builtinMap.put("not",new Not());
         builtinMap.put("any",new Any());
         builtinMap.put("all",new All());
@@ -117,6 +126,8 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         builtinMap.put("eig",new Eig());
         builtinMap.put("norm",new Norm());
         builtinMap.put("rank",new Rank());
+        builtinMap.put("dot",new Dot());
+        builtinMap.put("prod",new Prod());
         builtinMap.put("bitand",new Bitand());
         builtinMap.put("bitor",new Bitor());
         builtinMap.put("bitxor",new Bitxor());
@@ -124,23 +135,38 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         builtinMap.put("bitget",new Bitget());
         builtinMap.put("bitshift",new Bitshift());
         builtinMap.put("sort",new Sort());
+        builtinMap.put("unique",new Unique());
+        builtinMap.put("isequal",new Isequal());
         builtinMap.put("ones",new Ones());
         builtinMap.put("zeros",new Zeros());
+        builtinMap.put("diag",new Diag());
+        builtinMap.put("eye",new Eye());
+        builtinMap.put("reshape",new Reshape());
+        builtinMap.put("squeeze",new Squeeze());
+        builtinMap.put("find",new Find());
         builtinMap.put("mean",new Mean());
         builtinMap.put("min",new Min());
+        builtinMap.put("max",new Max());
         builtinMap.put("numel",new Numel());
+        builtinMap.put("length",new Length());
         builtinMap.put("size",new Size());
         builtinMap.put("sum",new Sum());
         builtinMap.put("prod",new Prod());
+        builtinMap.put("isemtpy",new Isemtpy());
         builtinMap.put("clock",new Clock());
         builtinMap.put("tic",new Tic());
         builtinMap.put("toc",new Toc());
         builtinMap.put("error",new Error());
         builtinMap.put("fprintf",new Fprintf());
+        builtinMap.put("sprintf",new Sprintf());
+        builtinMap.put("load",new Load());
+        builtinMap.put("disp",new Disp());
         builtinMap.put("conv",new Conv());
         builtinMap.put("toeplitz",new Toeplitz());
         builtinMap.put("dyaddown",new Dyaddown());
         builtinMap.put("flipud",new Flipud());
+        builtinMap.put("linspace",new Linspace());
+        builtinMap.put("imwrite",new Imwrite());
     }    
     
     //the actual Builtin Classes:
@@ -301,6 +327,34 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "nargin";
         }
     }
+    public static class Nargout extends AbstractOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Nargout();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargout(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargout";
+        }
+    }
+    public static class End extends AbstractOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new End();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEnd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "end";
+        }
+    }
     public static abstract class AbstractBinaryOperator extends AbstractOperator {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -355,6 +409,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "lt";
         }
     }
+    public static class Le extends AbstractRelationalOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Le();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLe(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "le";
+        }
+    }
     public static class Ge extends AbstractRelationalOperator {
         //creates a new instance of this class
         protected Builtin create(){
@@ -367,6 +435,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "ge";
+        }
+    }
+    public static class Gt extends AbstractRelationalOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Gt();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGt(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "gt";
         }
     }
     public static abstract class AbstractBinaryLogicalOperator extends AbstractBinaryOperator {
@@ -441,6 +523,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "plus";
+        }
+    }
+    public static class Minus extends AbstractMatrixOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Minus();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMinus(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "minus";
         }
     }
     public static class Mtimes extends AbstractMatrixOperator {
@@ -545,6 +641,34 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "rdivide";
+        }
+    }
+    public static class Power extends AbstractArrayOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Power();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePower(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "power";
+        }
+    }
+    public static class Mod extends AbstractArrayOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Mod();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMod(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "mod";
         }
     }
     public static abstract class AbstractUnaryOperator extends AbstractOperator {
@@ -669,6 +793,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "abs";
+        }
+    }
+    public static class Eps extends AbstractNumericalUnaryOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Eps();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEps(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "eps";
         }
     }
     public static abstract class AbstractLogicalUnaryOperator extends AbstractUnaryOperator {
@@ -985,6 +1123,34 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "rank";
         }
     }
+    public static class Dot extends AbstractMatrixComputation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Dot();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDot(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "dot";
+        }
+    }
+    public static class Prod extends AbstractMatrixComputation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Prod();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseProd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "prod";
+        }
+    }
     public static abstract class AbstractBitOperation extends AbstractPureFunction {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1095,6 +1261,34 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "sort";
         }
     }
+    public static class Unique extends AbstractArrayOperation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Unique();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUnique(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "unique";
+        }
+    }
+    public static class Isequal extends AbstractArrayOperation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Isequal();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsequal(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isequal";
+        }
+    }
     public static abstract class AbstractArrayConstructor extends AbstractArrayOperation {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1127,6 +1321,76 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "zeros";
+        }
+    }
+    public static class Diag extends AbstractArrayConstructor {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Diag();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDiag(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "diag";
+        }
+    }
+    public static class Eye extends AbstractArrayConstructor {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Eye();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEye(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "eye";
+        }
+    }
+    public static class Reshape extends AbstractArrayConstructor {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Reshape();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseReshape(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "reshape";
+        }
+    }
+    public static class Squeeze extends AbstractArrayConstructor {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Squeeze();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSqueeze(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "squeeze";
+        }
+    }
+    public static class Find extends AbstractArrayConstructor {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Find();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFind(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "find";
         }
     }
     public static abstract class AbstractArrayQueryOperation extends AbstractArrayOperation {
@@ -1163,6 +1427,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "min";
         }
     }
+    public static class Max extends AbstractArrayQueryOperation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Max();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMax(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "max";
+        }
+    }
     public static class Numel extends AbstractArrayQueryOperation {
         //creates a new instance of this class
         protected Builtin create(){
@@ -1175,6 +1453,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "numel";
+        }
+    }
+    public static class Length extends AbstractArrayQueryOperation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Length();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLength(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "length";
         }
     }
     public static class Size extends AbstractArrayQueryOperation {
@@ -1217,6 +1509,20 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "prod";
+        }
+    }
+    public static class Isemtpy extends AbstractArrayQueryOperation {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Isemtpy();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsemtpy(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isemtpy";
         }
     }
     public static abstract class AbstractImpureFunction extends Builtin {
@@ -1313,6 +1619,48 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
             return "fprintf";
         }
     }
+    public static class Sprintf extends AbstractIoFunction {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Sprintf();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSprintf(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sprintf";
+        }
+    }
+    public static class Load extends AbstractIoFunction {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Load();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLoad(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "load";
+        }
+    }
+    public static class Disp extends AbstractIoFunction {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Disp();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDisp(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "disp";
+        }
+    }
     public static abstract class AbstractNotABuiltin extends Builtin {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1373,6 +1721,34 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
         //return name of builtin
         public String getName(){
             return "flipud";
+        }
+    }
+    public static class Linspace extends AbstractNotABuiltin {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Linspace();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLinspace(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "linspace";
+        }
+    }
+    public static class Imwrite extends AbstractNotABuiltin {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Imwrite();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImwrite(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "imwrite";
         }
     }
 }

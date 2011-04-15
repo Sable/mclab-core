@@ -16,7 +16,7 @@ import java.util.HashMap;
 //import natlab.toolkits.path.BuiltinQuery;
 
 
-public abstract class Builtin /*implements BuiltinQuery*/ {
+public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
     public static void main(String[] args) {
         System.out.println(create("i"));
@@ -42,8 +42,9 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
      *
     public static BuiltinQuery getBuiltinQuery() {
         return new BuiltinQuery(){
-            isBuiltin(String functionname) { return builtinMap.containsKey(functionname); }
-        }
+            public boolean isBuiltin(String functionname) 
+              { return builtinMap.containsKey(functionname); }
+        };
     } /* */
 
     

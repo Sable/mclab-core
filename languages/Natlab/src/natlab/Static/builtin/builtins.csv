@@ -31,7 +31,8 @@ colon
 horzcat
 vertcat
 nargin
-
+nargout
+end
 
 # *** binary ops *************************************************
 binaryOperator, operator
@@ -42,7 +43,9 @@ relationalOperator, binaryOperator
 eq
 ne
 lt
+le
 ge
+gt
 
 #logical operators - note there's no short circuit ops
 binaryLogicalOperator, binaryOperator
@@ -58,6 +61,7 @@ numericalBinaryOperator, binaryOperator
 #matrix operators
 matrixOperator, numericalBinaryOperator
 plus
+minus
 mtimes
 mpower
 mldivide
@@ -67,7 +71,8 @@ arrayOperator, numericalBinaryOperator
 times
 ldivide
 rdivide
-
+power
+mod
 
 # *** unary operators ***************************************************
 unaryOperator, operator
@@ -81,6 +86,7 @@ conj
 real
 imag
 abs
+eps
 
 
 logicalUnaryOperator, unaryOperator
@@ -121,6 +127,8 @@ matrixComputation, matrixOperation
 eig
 norm
 rank
+dot
+prod
 
 # bit operators
 bitOperation, pureFunction
@@ -135,19 +143,30 @@ bitshift
 # *** Arrat operations **************************************************
 arrayOperation, pureFunction
 sort
+unique
+isequal
 
 arrayConstructor, arrayOperation
 ones
 zeros
-
+diag
+eye
+# changing arrays
+reshape
+squeeze
+find
 
 arrayQueryOperation, arrayOperation
 mean
 min
+max
 numel
+length
 size
 sum
 prod
+# true/false queries - unary op?
+isemtpy
 
 
 # *** opposite of pure functions *****************************************
@@ -168,7 +187,9 @@ error
 
 ioFunction, impureFunction
 fprintf
-
+sprintf
+load
+disp
 
 # *** library funcitons that are not builtins!! TODO **********************
 notABuiltin, builtin
@@ -176,3 +197,5 @@ conv
 toeplitz
 dyaddown
 flipud
+linspace
+imwrite
