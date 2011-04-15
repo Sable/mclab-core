@@ -3,8 +3,9 @@
 #preserves the most recent comment
 #all parent classes will be renamed as Abstract<Name>, except the root
 
-# the overal parent class
-builtin
+# the overal parent class - is treated specially, so doesn't need to
+# specifically listed
+#builtin
 
 #pure functions have no side effects and always return the same value
 pureFunction, builtin
@@ -25,13 +26,20 @@ false,
 #matlab operators
 operator, pureFunction
 
+# spcieal operators ... not sure what to do with them
+colon
+horzcat
+vertcat
+nargin
+
+
 # *** binary ops *************************************************
 binaryOperator, operator
 
 
 #relational ops
 relationalOperator, binaryOperator
-eq,,
+eq
 ne
 lt
 ge
@@ -57,6 +65,9 @@ mrdivide
 #array operators
 arrayOperator, numericalBinaryOperator
 times
+ldivide
+rdivide
+
 
 # *** unary operators ***************************************************
 unaryOperator, operator
@@ -67,6 +78,10 @@ uminus
 transpose
 ctranspose
 conj
+real
+imag
+abs
+
 
 logicalUnaryOperator, unaryOperator
 not
@@ -76,7 +91,10 @@ all
 
 # *** matrix operations ************************************************
 matrixOperation, pureFunction
-transcendentalFunction, matrixOperation
+elementwiseMatrixOperation, matrixOperation
+sqrt
+
+transcendentalFunction, elementwiseMatrixOperation
 exp
 log
 
@@ -91,18 +109,70 @@ acos
 atan
 
 
-real
-imag
+RoundingOperation, elementwiseMatrixOperation
+fix
+round
+floor
+ceil
 
 
-#should this be a builtin?
-toeplitz
+# matrix computation algorithms
+matrixComputation, matrixOperation
+eig
+norm
+rank
+
+# bit operators
+bitOperation, pureFunction
+bitand
+bitor
+bitxor
+bitcmp
+bitget
+bitshift
 
 
+# *** Arrat operations **************************************************
+arrayOperation, pureFunction
+sort
+
+arrayConstructor, arrayOperation
+ones
+zeros
 
 
+arrayQueryOperation, arrayOperation
+mean
+min
+numel
+size
+sum
+prod
 
 
 # *** opposite of pure functions *****************************************
 impureFunction, builtin
 
+
+
+
+timeFunction, impureFunction
+clock
+tic
+toc
+
+
+reportFuncgion, impureFunction
+error
+
+
+ioFunction, impureFunction
+fprintf
+
+
+# *** library funcitons that are not builtins!! TODO **********************
+notABuiltin, builtin
+conv
+toeplitz
+dyaddown
+flipud

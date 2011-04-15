@@ -3,11 +3,8 @@ package natlab.Static.builtin;
 public abstract class BuiltinVisitor<Arg,Ret> {
    public abstract Ret caseBuiltin(Builtin builtin,Arg arg);
     
-    //the overal parent class
-    public Ret caseAbstractBuiltin(Builtin builtin,Arg arg){ return caseBuiltin(builtin,arg); }
-    
     //pure functions have no side effects and always return the same value
-    public Ret caseAbstractPureFunction(Builtin builtin,Arg arg){ return caseAbstractBuiltin(builtin,arg); }
+    public Ret caseAbstractPureFunction(Builtin builtin,Arg arg){ return caseBuiltin(builtin,arg); }
     
     //*** constants **************************************************
     public Ret caseAbstractConstant(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
@@ -22,7 +19,12 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseFalse(Builtin builtin,Arg arg){ return caseAbstractLogicalConstant(builtin,arg); }
     
     //matlab operators
-    public Ret caseAbstractOperator(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
+    public Ret caseAbstractOperator(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }    
+    //spcieal operators ... not sure what to do with them
+    public Ret caseColon(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
+    public Ret caseHorzcat(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
+    public Ret caseVertcat(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
+    public Ret caseNargin(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
     
     //*** binary ops *************************************************
     public Ret caseAbstractBinaryOperator(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
@@ -54,6 +56,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //array operators
     public Ret caseAbstractArrayOperator(Builtin builtin,Arg arg){ return caseAbstractNumericalBinaryOperator(builtin,arg); }
     public Ret caseTimes(Builtin builtin,Arg arg){ return caseAbstractArrayOperator(builtin,arg); }
+    public Ret caseLdivide(Builtin builtin,Arg arg){ return caseAbstractArrayOperator(builtin,arg); }
+    public Ret caseRdivide(Builtin builtin,Arg arg){ return caseAbstractArrayOperator(builtin,arg); }
     
     //*** unary operators ***************************************************
     public Ret caseAbstractUnaryOperator(Builtin builtin,Arg arg){ return caseAbstractOperator(builtin,arg); }
@@ -64,6 +68,9 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseTranspose(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
     public Ret caseCtranspose(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
     public Ret caseConj(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
+    public Ret caseReal(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
+    public Ret caseImag(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
+    public Ret caseAbs(Builtin builtin,Arg arg){ return caseAbstractNumericalUnaryOperator(builtin,arg); }
 
     public Ret caseAbstractLogicalUnaryOperator(Builtin builtin,Arg arg){ return caseAbstractUnaryOperator(builtin,arg); }
     public Ret caseNot(Builtin builtin,Arg arg){ return caseAbstractLogicalUnaryOperator(builtin,arg); }
@@ -73,7 +80,10 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //*** matrix operations ************************************************
     public Ret caseAbstractMatrixOperation(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
 
-    public Ret caseAbstractTranscendentalFunction(Builtin builtin,Arg arg){ return caseAbstractMatrixOperation(builtin,arg); }
+    public Ret caseAbstractElementwiseMatrixOperation(Builtin builtin,Arg arg){ return caseAbstractMatrixOperation(builtin,arg); }
+    public Ret caseSqrt(Builtin builtin,Arg arg){ return caseAbstractElementwiseMatrixOperation(builtin,arg); }
+
+    public Ret caseAbstractTranscendentalFunction(Builtin builtin,Arg arg){ return caseAbstractElementwiseMatrixOperation(builtin,arg); }
     public Ret caseExp(Builtin builtin,Arg arg){ return caseAbstractTranscendentalFunction(builtin,arg); }
     public Ret caseLog(Builtin builtin,Arg arg){ return caseAbstractTranscendentalFunction(builtin,arg); }
 
@@ -86,10 +96,62 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAsin(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAcos(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAtan(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }
-    public Ret caseReal(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }
-    public Ret caseImag(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }    
-    //should this be a builtin?
-    public Ret caseToeplitz(Builtin builtin,Arg arg){ return caseAbstractInverseTrigonmetricFunction(builtin,arg); }    
+
+    public Ret caseAbstractRoundingOperation(Builtin builtin,Arg arg){ return caseAbstractElementwiseMatrixOperation(builtin,arg); }
+    public Ret caseFix(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }
+    public Ret caseRound(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }
+    public Ret caseFloor(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }
+    public Ret caseCeil(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }
+    
+    //matrix computation algorithms
+    public Ret caseAbstractMatrixComputation(Builtin builtin,Arg arg){ return caseAbstractMatrixOperation(builtin,arg); }
+    public Ret caseEig(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
+    public Ret caseNorm(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
+    public Ret caseRank(Builtin builtin,Arg arg){ return caseAbstractMatrixComputation(builtin,arg); }
+    
+    //bit operators
+    public Ret caseAbstractBitOperation(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
+    public Ret caseBitand(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    public Ret caseBitor(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    public Ret caseBitxor(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    public Ret caseBitcmp(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    public Ret caseBitget(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    public Ret caseBitshift(Builtin builtin,Arg arg){ return caseAbstractBitOperation(builtin,arg); }
+    
+    //*** Arrat operations **************************************************
+    public Ret caseAbstractArrayOperation(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
+    public Ret caseSort(Builtin builtin,Arg arg){ return caseAbstractArrayOperation(builtin,arg); }
+
+    public Ret caseAbstractArrayConstructor(Builtin builtin,Arg arg){ return caseAbstractArrayOperation(builtin,arg); }
+    public Ret caseOnes(Builtin builtin,Arg arg){ return caseAbstractArrayConstructor(builtin,arg); }
+    public Ret caseZeros(Builtin builtin,Arg arg){ return caseAbstractArrayConstructor(builtin,arg); }
+
+    public Ret caseAbstractArrayQueryOperation(Builtin builtin,Arg arg){ return caseAbstractArrayOperation(builtin,arg); }
+    public Ret caseMean(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    public Ret caseMin(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    public Ret caseNumel(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    public Ret caseSize(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    public Ret caseSum(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    public Ret caseProd(Builtin builtin,Arg arg){ return caseAbstractArrayQueryOperation(builtin,arg); }
+    
     //*** opposite of pure functions *****************************************
-    public Ret caseImpureFunction(Builtin builtin,Arg arg){ return caseAbstractBuiltin(builtin,arg); }
+    public Ret caseAbstractImpureFunction(Builtin builtin,Arg arg){ return caseBuiltin(builtin,arg); }
+
+    public Ret caseAbstractTimeFunction(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
+    public Ret caseClock(Builtin builtin,Arg arg){ return caseAbstractTimeFunction(builtin,arg); }
+    public Ret caseTic(Builtin builtin,Arg arg){ return caseAbstractTimeFunction(builtin,arg); }
+    public Ret caseToc(Builtin builtin,Arg arg){ return caseAbstractTimeFunction(builtin,arg); }
+
+    public Ret caseAbstractReportFuncgion(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
+    public Ret caseError(Builtin builtin,Arg arg){ return caseAbstractReportFuncgion(builtin,arg); }
+
+    public Ret caseAbstractIoFunction(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
+    public Ret caseFprintf(Builtin builtin,Arg arg){ return caseAbstractIoFunction(builtin,arg); }
+    
+    //*** library funcitons that are not builtins!! TODO **********************
+    public Ret caseAbstractNotABuiltin(Builtin builtin,Arg arg){ return caseBuiltin(builtin,arg); }
+    public Ret caseConv(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseToeplitz(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseDyaddown(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseFlipud(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
 }

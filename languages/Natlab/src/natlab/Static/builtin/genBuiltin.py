@@ -6,6 +6,7 @@ def firstCaps(s):
    return s[0].capitalize()+s[1:]
 
 
+# function which constructs the Builtin.java file
 def printBuiltinJava(file,children,parents,abstract,comments):
     N = len(children);
     file.write("""
@@ -77,7 +78,7 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
     //static initializer fills in builtinMap
     static {
 """);
-    # print the classes
+    # print the placing of classes into the builtinMap
     for i in range(0,N):
         if (not abstract[i]):
             file.write('        builtinMap.put("%s",new %s());\n' % (children[i],firstCaps(children[i])))
@@ -88,8 +89,10 @@ public abstract class Builtin /*implements BuiltinQuery*/ {
     # print the classes
     for i in range(0,N):
         printClass(file,parents[i],children[i],abstract[i])
-    file.write( "}" )
+    file.write( "\n}" )
 
+# prints the static classes inside the Builtin class, for a given builtin operation
+# note that operations can either be asbtract or non abstract
 def printClass(file,parent,child,isAbstract):
     if (isAbstract):
         file.write( """
@@ -118,6 +121,7 @@ def printClass(file,parent,child,isAbstract):
     }""" % (firstCaps(child),firstCaps(parent),firstCaps(child),firstCaps(child),child) )
 
 
+# prints the visitor class walking up the class hierarchy as a default case
 def printBuiltinVisitorJava(file,children,parents,abstract,comments):
    N = len(children);
    file.write("""package natlab.Static.builtin;
@@ -133,11 +137,17 @@ public abstract class BuiltinVisitor<Arg,Ret> {
 }""")
     
 
+
+
+
+
+
+# the script that reads the csv and prints the stuff
 reader = csv.reader(open("builtins.csv"));
 list = []
 tree = {}
-currentParent = ''; # if no parent is defined, use the most recent one
-currentComment = '';
+currentParent = ''; # if no parent is defined, use the most child - no need to specify parents of leafs
+currentComment = ''; # comments are collected and output in the visitor class
 
 children = []
 parents = []
@@ -160,20 +170,29 @@ for row in reader:
         currentComment = '';
 
 
-# rename all prents that are occuring
+# rename all prents that are occuring, finding/setting the abstract classes
 abstract = [True if child in parents else False for child in children]
 children = ['abstract'+firstCaps(child)  if child in parents else child for child in children]
 parents  = ['abstract'+firstCaps(parent) for parent in parents]
-parents[0] = 'Builtin' # set overall parent
+
+#  overall parent is Builtin, treat it specially
+parents = ['Builtin' if parent == 'abstractBuiltin' else parent for parent in parents]
 
 
 # write Builtin.java
+print 'generating Builtin.java...'
 file = open('Builtin.java','w');
 printBuiltinJava(file,children,parents,abstract,comments)
 file.close();
 
+
 # write BuiltinVisitor.java
+print 'generating BuiltinVisitor.java...'
 file = open('BuiltinVisitor.java','w');
 printBuiltinVisitorJava(file,children,parents,abstract,comments)
 file.close();
 
+print 'genereated code for %d builtings (including abstract builtins)' % (len(children))
+
+for i in range(0,len(children)):
+   if not abstract[i]: print children[i]
