@@ -27,6 +27,11 @@ public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends Abst
         //setup helper visitor
         helper = new AnalysisHelper( this );
     }
+    
+    @Override
+    public void setCallback(NodeCaseHandler handler) {
+        helper.setCallback(handler);
+    }
 
     public ASTNode getTree()
     {

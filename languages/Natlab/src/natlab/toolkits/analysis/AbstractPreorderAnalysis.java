@@ -13,6 +13,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
     protected A currentSet;
     protected ASTNode tree;
     protected boolean analyzed = false;
+    protected NodeCaseHandler callback = this;
 
     public A getCurrentSet()
     {
@@ -25,6 +26,11 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
         this.tree = tree;
         flowSets = new HashMap<ASTNode, A>();
     }
+    @Override
+    public void setCallback(NodeCaseHandler handler) {
+        this.callback = handler;
+    }
+    
 
     public Map<ASTNode, A> getFlowSets()
     {
@@ -71,7 +77,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
     {
         //initialize set
         currentSet = newInitialFlow();
-        tree.analyze( this );
+        tree.analyze( callback );
 
         analyzed = true;
     }
@@ -87,7 +93,7 @@ public abstract class AbstractPreorderAnalysis<A extends FlowSet>
         //visit each child node in forward order
         for( int i = 0; i<node.getNumChild(); i++ ){
             if( node.getChild(i) != null )
-                node.getChild(i).analyze( this );
+                node.getChild(i).analyze( callback );
         }
     }
     

@@ -12,6 +12,8 @@ import ast.*;
  * where a loop variable might have multiple predecessor, the
  * containing node case, e.g. the for node, must deal with setting up
  * the correct currentInSet value.
+ * 
+ * This function allows to specify a different callback than the analysis itself
  */
 public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCaseHandler
 {
@@ -19,7 +21,9 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
     /** 
      * The analysis being helped
      */
-    private StructuralAnalysis helpee;
+    protected StructuralAnalysis helpee;
+    protected NodeCaseHandler callback;    
+    
 
     /**
      * Class constructor with given helpee.
@@ -30,660 +34,675 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
     {
         this.helpee = helpee;
     }
+    /**
+     * Class constructor with given helpee and callback.
+     *
+     * @param helpee  the analysis being helped.
+     * @param callback calls the corresponding case on the callback after bookkeeping
+     */
+    public AnalysisHelper( StructuralAnalysis helpee , NodeCaseHandler callback )
+    {
+        this.helpee = helpee;
+        this.callback = callback;
+    }
 
+    protected void setCallback(NodeCaseHandler callback){
+        this.callback = callback;
+    }
+    
     public void caseASTNode(ASTNode node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseASTNode( node );
+        callback.caseASTNode( node );
     }
     public void caseList( List node )
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseList( node );
+        callback.caseList( node );
     }
     public void caseProgram(Program node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseProgram( node );
+        callback.caseProgram( node );
     }
     public void caseStmt(Stmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseStmt( node );
+        callback.caseStmt( node );
     }
     public void caseBreakStmt(BreakStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseBreakStmt( node );
+        callback.caseBreakStmt( node );
     }
     public void caseContinueStmt(ContinueStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseContinueStmt( node );
+        callback.caseContinueStmt( node );
     }
     public void caseReturnStmt(ReturnStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseReturnStmt( node );
+        callback.caseReturnStmt( node );
     }
     public void caseForStmt(ForStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseForStmt( node );
+        callback.caseForStmt( node );
     }
     public void caseRangeForStmt(ForStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseRangeForStmt( node );
+        callback.caseRangeForStmt( node );
     }
     public void caseWhileStmt(WhileStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseWhileStmt( node );
+        callback.caseWhileStmt( node );
     }
     public void caseTryStmt(TryStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseTryStmt( node );
+        callback.caseTryStmt( node );
     }
     public void caseSwitchStmt(SwitchStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseSwitchStmt( node );
+        callback.caseSwitchStmt( node );
     }
     public void caseIfStmt(IfStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseIfStmt( node );
+        callback.caseIfStmt( node );
     }
     public void caseScript(Script node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseScript( node );
+        callback.caseScript( node );
     }
     public void caseFunctionList(FunctionList node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFunctionList( node );
+        callback.caseFunctionList( node );
     }
     public void caseExprStmt(ExprStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseExprStmt( node );
+        callback.caseExprStmt( node );
     }
     public void caseAssignStmt(AssignStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseAssignStmt( node );
+        callback.caseAssignStmt( node );
     }
     public void caseGlobalStmt(GlobalStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseGlobalStmt( node );
+        callback.caseGlobalStmt( node );
     }
     public void casePersistentStmt(PersistentStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.casePersistentStmt( node );
+        callback.casePersistentStmt( node );
     }
     public void caseShellCommandStmt(ShellCommandStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseShellCommandStmt( node );
+        callback.caseShellCommandStmt( node );
     }
     public void caseExpr(Expr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseExpr( node );
+        callback.caseExpr( node );
     }
     public void caseRangeExpr(RangeExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseRangeExpr( node );
+        callback.caseRangeExpr( node );
     }
     public void caseColonExpr(ColonExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseColonExpr( node );
+        callback.caseColonExpr( node );
     }
     public void caseEndExpr(EndExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEndExpr( node );
+        callback.caseEndExpr( node );
     }
     public void caseLValueExpr(LValueExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseLValueExpr( node );
+        callback.caseLValueExpr( node );
     }
     public void caseNameExpr(NameExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseNameExpr( node );
+        callback.caseNameExpr( node );
     }
     public void caseParameterizedExpr(ParameterizedExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseParameterizedExpr( node );
+        callback.caseParameterizedExpr( node );
     }
     public void caseCellIndexExpr(CellIndexExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCellIndexExpr( node );
+        callback.caseCellIndexExpr( node );
     }
     public void caseDotExpr(DotExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseDotExpr( node );
+        callback.caseDotExpr( node );
     }
     public void caseMatrixExpr(MatrixExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMatrixExpr( node );
+        callback.caseMatrixExpr( node );
     }
     public void caseCellArrayExpr(CellArrayExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCellArrayExpr( node );
+        callback.caseCellArrayExpr( node );
     }
     public void caseSuperClassMethodExpr(SuperClassMethodExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseSuperClassMethodExpr( node );
+        callback.caseSuperClassMethodExpr( node );
     }
     public void caseLiteralExpr(LiteralExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseLiteralExpr( node );
+        callback.caseLiteralExpr( node );
     }
     public void caseIntLiteralExpr(IntLiteralExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseIntLiteralExpr( node );
+        callback.caseIntLiteralExpr( node );
     }
     public void caseFPLiteralExpr(FPLiteralExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFPLiteralExpr( node );
+        callback.caseFPLiteralExpr( node );
     }
     public void caseStringLiteralExpr(StringLiteralExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseStringLiteralExpr( node );
+        callback.caseStringLiteralExpr( node );
     }
     public void caseUnaryExpr(UnaryExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUnaryExpr( node );
+        callback.caseUnaryExpr( node );
     }
     public void caseUMinusExpr(UMinusExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUMinusExpr( node );
+        callback.caseUMinusExpr( node );
     }
     public void caseUPlusExpr(UPlusExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUPlusExpr( node );
+        callback.caseUPlusExpr( node );
     }
     public void caseNotExpr(NotExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseNotExpr( node );
+        callback.caseNotExpr( node );
     }
     public void caseMTransposeExpr(MTransposeExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMTransposeExpr( node );
+        callback.caseMTransposeExpr( node );
     }
     public void caseArrayTransposeExpr(ArrayTransposeExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseArrayTransposeExpr( node );
+        callback.caseArrayTransposeExpr( node );
     }
     public void caseBinaryExpr(BinaryExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseBinaryExpr( node );
+        callback.caseBinaryExpr( node );
     }
     public void casePlusExpr(PlusExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.casePlusExpr( node );
+        callback.casePlusExpr( node );
     }
     public void caseMinusExpr(MinusExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMinusExpr( node );
+        callback.caseMinusExpr( node );
     }
     public void caseMTimesExpr(MTimesExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMTimesExpr( node );
+        callback.caseMTimesExpr( node );
     }
     public void caseMDivExpr(MDivExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMDivExpr( node );
+        callback.caseMDivExpr( node );
     }
     public void caseMLDivExpr(MLDivExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMLDivExpr( node );
+        callback.caseMLDivExpr( node );
     }
     public void caseMPowExpr(MPowExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMPowExpr( node );
+        callback.caseMPowExpr( node );
     }
     public void caseETimesExpr(ETimesExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseETimesExpr( node );
+        callback.caseETimesExpr( node );
     }
     public void caseEDivExpr(EDivExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEDivExpr( node );
+        callback.caseEDivExpr( node );
     }
     public void caseELDivExpr(ELDivExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseELDivExpr( node );
+        callback.caseELDivExpr( node );
     }
     public void caseEPowExpr(EPowExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEPowExpr( node );
+        callback.caseEPowExpr( node );
     }
     public void caseAndExpr(AndExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseAndExpr( node );
+        callback.caseAndExpr( node );
     }
     public void caseOrExpr(OrExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseOrExpr( node );
+        callback.caseOrExpr( node );
     }
     public void caseShortCircuitAndExpr(ShortCircuitAndExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseShortCircuitAndExpr( node );
+        callback.caseShortCircuitAndExpr( node );
     }
     public void caseShortCircuitOrExpr(ShortCircuitOrExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseShortCircuitOrExpr( node );
+        callback.caseShortCircuitOrExpr( node );
     }
     public void caseLTExpr(LTExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseLTExpr( node );
+        callback.caseLTExpr( node );
     }
     public void caseGTExpr(GTExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseGTExpr( node );
+        callback.caseGTExpr( node );
     }
     public void caseLEExpr(LEExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseLEExpr( node );
+        callback.caseLEExpr( node );
     }
     public void caseGEExpr(GEExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseGEExpr( node );
+        callback.caseGEExpr( node );
     }
     public void caseEQExpr(EQExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEQExpr( node );
+        callback.caseEQExpr( node );
     }
     public void caseNEExpr(NEExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseNEExpr( node );
+        callback.caseNEExpr( node );
     }
     public void caseFunctionHandleExpr(FunctionHandleExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFunctionHandleExpr( node );
+        callback.caseFunctionHandleExpr( node );
     }
     public void caseLambdaExpr(LambdaExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseLambdaExpr( node );
+        callback.caseLambdaExpr( node );
     }
     public void caseVariableDecl(VariableDecl node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseVariableDecl( node );
+        callback.caseVariableDecl( node );
     }
     public void caseFunctionDecl(FunctionDecl node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFunctionDecl( node );
+        callback.caseFunctionDecl( node );
     }
     public void caseFunction(Function node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFunction( node );
+        callback.caseFunction( node );
     }
     public void caseType(Type node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseType( node );
+        callback.caseType( node );
     }
     public void caseUnionType(UnionType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUnionType( node );
+        callback.caseUnionType( node );
     }
     public void caseIntersectionType(IntersectionType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseIntersectionType( node );
+        callback.caseIntersectionType( node );
     }
     public void caseArrowType(ArrowType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseArrowType( node );
+        callback.caseArrowType( node );
     }
     public void caseArgTupleType(ArgTupleType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseArgTupleType( node );
+        callback.caseArgTupleType( node );
     }
     public void caseUnitType(UnitType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUnitType( node );
+        callback.caseUnitType( node );
     }
     public void caseVarArgType(VarArgType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseVarArgType( node );
+        callback.caseVarArgType( node );
     }
     public void caseTupleType(TupleType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseTupleType( node );
+        callback.caseTupleType( node );
     }
     public void caseCellArrayType(CellArrayType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCellArrayType( node );
+        callback.caseCellArrayType( node );
     }
     public void caseMatrixType(MatrixType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMatrixType( node );
+        callback.caseMatrixType( node );
     }
     public void caseBaseType(BaseType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseBaseType( node );
+        callback.caseBaseType( node );
     }
     public void casePrimitiveType(PrimitiveType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.casePrimitiveType( node );
+        callback.casePrimitiveType( node );
     }
     public void caseTypeVarType(TypeVarType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseTypeVarType( node );
+        callback.caseTypeVarType( node );
     }
     public void caseHandleType(HandleType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseHandleType( node );
+        callback.caseHandleType( node );
     }
     public void caseUnknownType(UnknownType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseUnknownType( node );
+        callback.caseUnknownType( node );
     }
     public void caseStructType(StructType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseStructType( node );
+        callback.caseStructType( node );
     }
     public void caseIntType(IntType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseIntType( node );
+        callback.caseIntType( node );
     }
     public void caseInt8(Int8 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseInt8( node );
+        callback.caseInt8( node );
     }
     public void caseInt16(Int16 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseInt16( node );
+        callback.caseInt16( node );
     }
     public void caseInt32(Int32 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseInt32( node );
+        callback.caseInt32( node );
     }
     public void caseInt64(Int64 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseInt64( node );
+        callback.caseInt64( node );
     }
     public void caseFloatType(FloatType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFloatType( node );
+        callback.caseFloatType( node );
     }
     public void caseFloat32(Float32 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFloat32( node );
+        callback.caseFloat32( node );
     }
     public void caseFloat64(Float64 node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFloat64( node );
+        callback.caseFloat64( node );
     }
     public void caseCharType(CharType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCharType( node );
+        callback.caseCharType( node );
     }
     public void caseBoolType(BoolType node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseBoolType( node );
+        callback.caseBoolType( node );
     }
     public void caseFieldEntry(FieldEntry node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFieldEntry( node );
+        callback.caseFieldEntry( node );
     }
     public void caseShape(Shape node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseShape( node );
+        callback.caseShape( node );
     }
     public void caseKnownExtentsShape(KnownExtentsShape node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseKnownExtentsShape( node );
+        callback.caseKnownExtentsShape( node );
     }
     public void caseRank(Rank node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseRank( node );
+        callback.caseRank( node );
     }
     public void caseKnownRank(KnownRank node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseKnownRank( node );
+        callback.caseKnownRank( node );
     }
     public void caseExtents(Extents node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseExtents( node );
+        callback.caseExtents( node );
     }
     public void caseKnownExtents(KnownExtents node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseKnownExtents( node );
+        callback.caseKnownExtents( node );
     }
     public void caseExpandedAnnotation(ExpandedAnnotation node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseExpandedAnnotation( node );
+        callback.caseExpandedAnnotation( node );
     }
     public void caseAnnotation(Annotation node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseAnnotation( node );
+        callback.caseAnnotation( node );
     }
     public void caseEmptyStmt(EmptyStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEmptyStmt( node );
+        callback.caseEmptyStmt( node );
     }
     public void caseMultiLineHelpComment(MultiLineHelpComment node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMultiLineHelpComment( node );
+        callback.caseMultiLineHelpComment( node );
     }
     public void caseOneLineHelpComment(OneLineHelpComment node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseOneLineHelpComment( node );
+        callback.caseOneLineHelpComment( node );
     }
     public void caseClassEvents(ClassEvents node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseClassEvents( node );
+        callback.caseClassEvents( node );
     }
     public void casePropertyAccess(PropertyAccess node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.casePropertyAccess( node );
+        callback.casePropertyAccess( node );
     }
     public void caseSignature(Signature node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseSignature( node );
+        callback.caseSignature( node );
     }
     public void caseMethods(Methods node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseMethods( node );
+        callback.caseMethods( node );
     }
     public void caseProperties(Properties node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseProperties( node );
+        callback.caseProperties( node );
     }
     public void caseClassDef(ClassDef node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseClassDef( node );
+        callback.caseClassDef( node );
     }
     public void caseEmptyProgram(EmptyProgram node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEmptyProgram( node );
+        callback.caseEmptyProgram( node );
     }
     public void caseClassBody(ClassBody node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseClassBody( node );
+        callback.caseClassBody( node );
     }
     public void caseRow(Row node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseRow( node );
+        callback.caseRow( node );
     }
     public void caseElseBlock(ElseBlock node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseElseBlock( node );
+        callback.caseElseBlock( node );
     }
     public void caseIfBlock(IfBlock node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseIfBlock( node );
+        callback.caseIfBlock( node );
     }
     public void caseDefaultCaseBlock(DefaultCaseBlock node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseDefaultCaseBlock( node );
+        callback.caseDefaultCaseBlock( node );
     }
     public void caseSwitchCaseBlock(SwitchCaseBlock node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseSwitchCaseBlock( node );
+        callback.caseSwitchCaseBlock( node );
     }
     public void caseName(Name node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseName( node );
+        callback.caseName( node );
     }
     public void caseEvent(Event node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEvent( node );
+        callback.caseEvent( node );
     }
     public void caseProperty(Property node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseProperty( node );
+        callback.caseProperty( node );
     }
     public void caseSuperClass(SuperClass node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseSuperClass( node );
+        callback.caseSuperClass( node );
     }
     public void caseAttribute(Attribute node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseAttribute( node );
+        callback.caseAttribute( node );
     }
     public void caseCompilationUnits(CompilationUnits node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCompilationUnits( node );
+        callback.caseCompilationUnits( node );
     }
     public void caseHelpComment(HelpComment node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseHelpComment( node );
+        callback.caseHelpComment( node );
     }
     public void caseFunctionOrSignatureOrPropertyAccessOrStmt(FunctionOrSignatureOrPropertyAccessOrStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseFunctionOrSignatureOrPropertyAccessOrStmt( node );
+        callback.caseFunctionOrSignatureOrPropertyAccessOrStmt( node );
     }
     public void caseBody(Body node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseBody( node );
+        callback.caseBody( node );
     }
     public void caseCSLExpr(CSLExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCSLExpr( node );
+        callback.caseCSLExpr( node );
     }
     public void caseEndCallExpr(EndCallExpr node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseEndCallExpr( node );
+        callback.caseEndCallExpr( node );
     }
     public void caseCheckScalarStmt(CheckScalarStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        helpee.caseCheckScalarStmt( node );
+        callback.caseCheckScalarStmt( node );
     }
 }

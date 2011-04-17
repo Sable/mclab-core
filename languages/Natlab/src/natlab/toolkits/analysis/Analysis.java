@@ -49,4 +49,15 @@ public interface Analysis<A extends FlowSet> extends NodeCaseHandler
      * for flow sets.
      */
     public A newInitialFlow();
+    
+    
+    /**
+     * sets the NodeCaseHandler that gets called first by the node's analyze
+     * method. The given NodeCaseHandler is responsible for calling back to
+     * the corresponding node case of this analysis.
+     * 
+     * This should only be used internally.
+     */
+    public void setCallback(NodeCaseHandler handler);
+    
 }
