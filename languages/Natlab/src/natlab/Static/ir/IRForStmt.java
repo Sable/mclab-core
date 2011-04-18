@@ -1,5 +1,6 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -24,7 +25,14 @@ public class IRForStmt extends ForStmt implements IRStmt {
                         new NameExpr(up))),
                 stmts);
     }
-
+    
+    
+    
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRForStmt(this);
+    }
 }
 
 

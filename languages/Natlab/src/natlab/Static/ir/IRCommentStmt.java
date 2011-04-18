@@ -1,5 +1,6 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import beaver.*;
 import ast.*;
 
@@ -25,4 +26,10 @@ public class IRCommentStmt extends EmptyStmt implements IRStmt {
         this(new beaver.Symbol("% "+comment)); 
         //TODO - should be done via parsing the stmt "% "+comment  
     }
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRCommentStmt(this);
+    }
+
 }

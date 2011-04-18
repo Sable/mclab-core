@@ -1,5 +1,6 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.Expr;
 import ast.List;
 import ast.NameExpr;
@@ -17,7 +18,7 @@ import ast.NameExpr;
  */
 
 
-public class IRCommaSeparatedList extends List<Expr>{
+public class IRCommaSeparatedList extends List<Expr> implements IRNode {
     public IRCommaSeparatedList(){
     }
 
@@ -74,5 +75,11 @@ public class IRCommaSeparatedList extends List<Expr>{
         return true;
     }
     
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRCommaSeparatedList(this);
+    }
+
     
 }

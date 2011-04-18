@@ -2,6 +2,8 @@ package natlab.Static.ir;
 
 import java.util.ArrayList;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+
 
 import ast.*;
 
@@ -49,6 +51,13 @@ public class IRCallStmt extends IRAbstractAssignToListStmt {
     public IRCommaSeparatedList getArguments(){
          return (IRCommaSeparatedList)(((ParameterizedExpr)getRHS()).getArgList());
     }    
+    
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRCallStmt(this);
+    }
+
 }
 
 

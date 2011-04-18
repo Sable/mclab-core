@@ -1,5 +1,6 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.*;
 
 
@@ -24,6 +25,15 @@ public class IRIfStmt extends IfStmt implements IRStmt {
          new ast.Opt<ElseBlock>(new ElseBlock(ElseStmts))
       );
   }
+  
+  
+  
+  
+  @Override
+  public void irAnalyize(IRNodeCaseHandler irHandler) {
+      irHandler.caseIRIfStmt(this);
+  }
+
 }
 
 

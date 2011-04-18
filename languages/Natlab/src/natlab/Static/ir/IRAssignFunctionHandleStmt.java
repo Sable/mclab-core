@@ -1,4 +1,6 @@
 package natlab.Static.ir;
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.toolkits.analysis.NodeCaseHandler;
 import ast.*;
 
 /**
@@ -18,5 +20,12 @@ public class IRAssignFunctionHandleStmt extends IRAbstractAssignToVarStmt {
     public Name getFunction(){
         return ((FunctionHandleExpr)getRHS()).getName();
     }
+    
+
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRAssignFunctionHandleStmt(this);
+    }
+
 }
 

@@ -1,4 +1,5 @@
 package natlab.Static.ir;
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -14,5 +15,10 @@ public class IRAssignLiteralStmt extends IRAbstractAssignToVarStmt {
         setRHS(rhs);
     }
     
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRAssignLiteralStmt(this);
+    }
 }
 

@@ -2,9 +2,11 @@ package natlab.Static.ir;
 
 import java.util.Map;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+
 import ast.*;
 
-public class IRFunction extends Function {
+public class IRFunction extends Function implements IRNode {
     
     public IRFunction(List<Name> outputParams,String name,List<Name> inputParams,
             List<HelpComment> helpComments,IRStatementList stmts,List<IRFunction> nestedFunctions){
@@ -53,4 +55,12 @@ public class IRFunction extends Function {
     
     //*** setter methods ***********************************************************
     
+    
+    
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRFunction(this);
+    }
+
 }

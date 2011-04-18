@@ -1,0 +1,118 @@
+package natlab.Static.toolkits.analysis;
+
+import ast.ASTNode;
+import natlab.Static.ir.*;
+import natlab.toolkits.analysis.*;
+
+/**
+ * this is an extension of the AbstractSimpleStructuralForwardAnalysis which
+ * adds the IR nodes. Just like it's parent, this analysis provides fixed
+ * point cases; and analysis cases flow up to the parent case.
+ * 
+ * This handles the correct dispatch to the IR nodes, and the flow control 
+ * to the parent type node cases.
+ * 
+ * @author ant6n
+ * @param <F>
+ */
+
+
+abstract public class IRAbstractSimpleStructuralForwardAnalysis<F extends FlowSet> extends
+        AbstractSimpleStructuralForwardAnalysis<F> implements IRNodeCaseHandler {
+    IRNodeForwarder nodeForwarder = new IRNodeForwarder(this);
+    IRParentForwardingNodeCasehandler parentForwarder = new IRParentForwardingNodeCasehandler(this);
+    
+    public IRAbstractSimpleStructuralForwardAnalysis(ASTNode tree) {
+        super(tree);
+        super.setCallback(nodeForwarder);
+    }
+
+
+    /**
+     * setting the callback is idsallowed for ir analyses, and will throw an
+     * UnsupportedOperation exception.
+     */
+    @Override
+    public void setCallback(NodeCaseHandler handler) {
+        throw new UnsupportedOperationException(
+                "cannot override callback for "+this.getClass().getName()+
+                ", callback is already overriden.");
+    }
+
+    
+    
+    
+    //*** mixed in NodeCaseHandler, using the parentForwarder **********************
+    @Override
+    public void caseIRAbstractAssignStmt(IRAbstractAssignStmt node) {
+        parentForwarder.caseIRAbstractAssignStmt(node);
+    }
+    @Override
+    public void caseIRAbstractAssignToListStmt(IRAbstractAssignToListStmt node) {
+        parentForwarder.caseIRAbstractAssignStmt(node);
+    }
+    @Override
+    public void caseIRAbstractAssignToVarStmt(IRAbstractAssignToVarStmt node) {
+        parentForwarder.caseIRAbstractAssignToVarStmt(node);
+    }
+    @Override
+    public void caseIRArrayGetStmt(IRArrayGetStmt node) {
+        parentForwarder.caseIRArrayGetStmt(node);
+    }
+    @Override
+    public void caseIRArraySetStmt(IRArraySetStmt node) {
+        parentForwarder.caseIRArraySetStmt(node);
+    }
+    @Override
+    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
+        parentForwarder.caseIRAssignFunctionHandleStmt(node);
+    }
+    @Override
+    public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node) {
+        parentForwarder.caseIRAssignLiteralStmt(node);
+    }
+    @Override
+    public void caseIRCallStmt(IRCallStmt node) {
+        parentForwarder.caseIRCallStmt(node);
+    }
+    @Override
+    public void caseIRCellArrayGetStmt(IRCellArrayGet node) {
+        parentForwarder.caseIRCellArrayGetStmt(node);
+    }
+    @Override
+    public void caseIRCellArraySetStmt(IRCellArraySet node) {
+        parentForwarder.caseIRCellArraySetStmt(node);
+    }
+    @Override
+    public void caseIRCommaSeparatedList(IRCommaSeparatedList node) {
+        parentForwarder.caseIRCommaSeparatedList(node);
+    }
+    @Override
+    public void caseIRCommentStmt(IRCommentStmt node) {
+        parentForwarder.caseIRCommentStmt(node);
+    }
+    @Override
+    public void caseIRForStmt(IRForStmt node) {
+        parentForwarder.caseIRForStmt(node);
+    }
+    @Override
+    public void caseIRFunction(IRFunction node) {
+        parentForwarder.caseIRFunction(node);
+    }
+    @Override
+    public void caseIRIfStmt(IRIfStmt node) {
+        parentForwarder.caseIRIfStmt(node);
+    }
+    @Override
+    public void caseIRStatementList(IRStatementList node) {
+        parentForwarder.caseIRStatementList(node);
+    }
+    @Override
+    public void caseIRStmt(IRStmt node) {
+        parentForwarder.caseIRStmt(node);
+    }
+    @Override
+    public void caseIRWhileStmt(IRWhileStmt node) {
+        parentForwarder.caseIRStmt(node);
+    }
+}

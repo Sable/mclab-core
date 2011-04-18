@@ -2,7 +2,7 @@ package natlab.Static.ir;
 import ast.*;
 
 
-public class IRAbstractAssignToVarStmt extends IRAbstractAssignStmt {
+public abstract class IRAbstractAssignToVarStmt extends IRAbstractAssignStmt {
     public IRAbstractAssignToVarStmt(NameExpr lhs) {
         super();
         setLHS(lhs);

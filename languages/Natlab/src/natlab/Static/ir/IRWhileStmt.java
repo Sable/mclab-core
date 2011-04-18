@@ -1,5 +1,6 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -32,6 +33,12 @@ public class IRWhileStmt extends WhileStmt implements IRStmt {
        return (IRStatementList)super.getStmts();
    }
    
+   
+   
+   @Override
+   public void irAnalyize(IRNodeCaseHandler irHandler) {
+       irHandler.caseIRWhileStmt(this);
+   }
 }
 
 

@@ -2,6 +2,8 @@ package natlab.Static.ir;
 
 import java.util.ArrayList;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+
 
 import ast.*;
 
@@ -41,6 +43,14 @@ public class IRCellArrayGet extends IRAbstractAssignToListStmt {
     public IRCommaSeparatedList getArguments(){
          return (IRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
     }    
+    
+    
+    
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRCellArrayGetStmt(this);
+    }
+
 }
 
 

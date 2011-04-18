@@ -17,7 +17,7 @@ import ast.*;
  * but analyses should be aware of this.
  */
 
-public class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
+public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
     public IRAbstractAssignToListStmt(IRCommaSeparatedList targets) {
         super();
         //set lhs
@@ -78,5 +78,6 @@ public class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
                   +(isOutputSuppressed()?";":"");
         }
     }
+    
     
 }

@@ -1,8 +1,9 @@
 package natlab.Static.ir;
 
+import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
 import ast.*;
 
-public class IRStatementList extends List<Stmt> {
+public class IRStatementList extends List<Stmt> implements IRNode {
     public IRStatementList(List<Stmt> list){
         super();
         for (Stmt s : list){
@@ -26,4 +27,9 @@ public class IRStatementList extends List<Stmt> {
     }
     
     
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRStatementList(this);
+    }
+
 }
