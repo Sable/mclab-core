@@ -1,0 +1,17 @@
+if test1
+    disp('then part 1')
+else
+    if test2
+        disp('then part 2')
+    else
+        if test3
+            disp('then part 3')
+        else
+            if test4
+                disp('then part 4')
+            else
+                disp('else part')
+            end
+        end
+    end
+end

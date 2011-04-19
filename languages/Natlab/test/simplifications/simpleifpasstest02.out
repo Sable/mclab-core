@@ -1,0 +1,5 @@
+disp('befor if')
+if test
+    disp('then part')
+end
+disp('after if')
