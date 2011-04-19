@@ -13,14 +13,16 @@ public class AbstractRewritePassTestGenerator extends AbstractTestGenerator
     }
     protected String className;
     protected String transformationName;
-    protected String rewritePkg;
+    //protected String rewritePkg;
 
     protected void printHeader( PrintWriter testFileWriter )
     {
         testFileWriter.println("package natlab;");
         testFileWriter.println("");
         testFileWriter.println("import ast.*;");
-        testFileWriter.println("import natlab.toolkits.rewrite."+rewritePkg+".*;");
+        //testFileWriter.println("import natlab.toolkits.rewrite."+rewritePkg+".*;");
+        testFileWriter.println("import natlab.toolkits.rewrite.Simplifier;");
+        testFileWriter.println("import natlab.toolkits.rewrite.simplification.*;");
         testFileWriter.println("import natlab.Main;");
         testFileWriter.println("");
         testFileWriter.println("public class " + className + " extends RewritePassTestBase");
@@ -28,14 +30,15 @@ public class AbstractRewritePassTestGenerator extends AbstractTestGenerator
     }
     protected void printMethod( PrintWriter testFileWriter, String testName )
     {
-        String methodName = "test_" + testName;
+        String methodName = "test_" + testName.replace('/','_');
         String inFileName = "test/" + testName + ".in";
         String outFileName = "test/" + testName + ".out";
         testFileWriter.println("    public void " + methodName + "() throws Exception");
         testFileWriter.println("    {");
         testFileWriter.println("        ASTNode actual = parseFile( \"" + inFileName + "\" );");
-        testFileWriter.println("        "+transformationName+" rewrite = new "+transformationName+"( actual );");
-        testFileWriter.println("        actual = rewrite.transform();");
+        //testFileWriter.println("        "+transformationName+" rewrite = new "+transformationName+"( actual );");
+        testFileWriter.println("        Simplifier simp = new Simplifier( actual, "+transformationName+".getStartSet() );");
+        testFileWriter.println("        actual = simp.simplify();");
         testFileWriter.println("");
         testFileWriter.println("        ASTNode expected = parseFile( \"" + outFileName + "\");");
         testFileWriter.println("        ");

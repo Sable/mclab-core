@@ -28,8 +28,9 @@ public class AllTests {
                 //rewrite tests
                 suite.addTestSuite(TransformedNodeTests.class);
 
-                suite.addTestSuite(MultireturnSimplifyPassTests.class);
-                suite.addTestSuite(LeftThreeAddressSimplifyPassTests.class);
+                //suite.addTestSuite(MultireturnSimplifyPassTests.class);
+                //suite.addTestSuite(LeftThreeAddressSimplifyPassTests.class);
+                suite.addTestSuite(SimpleIfPassTests.class);
 
 		//$JUnit-END$
 		return suite;
