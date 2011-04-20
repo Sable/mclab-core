@@ -40,6 +40,20 @@ abstract public class AbstractPathEnvironment implements BuiltinQuery{
      */
     public abstract GenericFile resolve(String name, GenericFile context); 
 
+    
+    /**
+     * finds functions/scripts/classes based on its name and context,
+     * but does though for overloaded functions. Returns a map
+     * type -> file
+     * where the type is given as a String, an empty String refer to 
+     * not overloaded functions 
+     * resolveAll(a,b).get("") should be the same as resolve(a,b)
+     * 
+     * @param name - the name
+     * @param context - the location where this function is being called
+     * @return
+     */    
+    public abstract java.util.Map<String,GenericFile> resolveAll(String name,GenericFile context);    
 
     /**
      * resolves a function using resolve, and returns it as a FunctionReference

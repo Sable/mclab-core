@@ -3,6 +3,7 @@ package natlab.toolkits.path;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collection;
+import java.util.Map;
 
 import natlab.options.Options;
 import natlab.toolkits.filehandling.*;
@@ -92,6 +93,12 @@ public class FilePathEnvironment extends AbstractPathEnvironment {
 	public GenericFile resolve(String name, String className,
 	        GenericFile context) {
 	    throw new UnsupportedOperationException("rsolve by classname");
+	}
+	
+	
+	@Override
+	public Map<String, GenericFile> resolveAll(String name, GenericFile context) {
+        throw new UnsupportedOperationException("rsolve by classname");
 	}
 	
 	/**
