@@ -4,14 +4,11 @@
 package natlab.Static.mc4;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
 
 
-import natlab.Static.builtin.Mc4BuiltinQuery;
+import natlab.NatlabPreferences;
+import natlab.Static.builtin.Builtin;
 import natlab.Static.callgraph.FunctionCollection;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.genericFile.ZippedFile;
@@ -61,6 +58,12 @@ public class Mc4 {
 		Options options = new Options();
 		options.parse(args);
 		
+		//try the preferences stuff
+		try{
+		natlab.Main.main(new String[]{"-pref","-show_pref"});
+		} catch (Exception e) {
+        }
+		System.exit(0);
 		
 		//try to do all benchmarks
 		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks";
@@ -103,12 +106,12 @@ public class Mc4 {
 	 * This is basically the entry point for mc4.
 	 * @param options A Natlab Options object defines the command line arguments to Mc4
 	 */
-	public static void main(Options options){	   	    
+	public static void main(Options options){
         //object that resolves function names to files      
-        functionFinder = new FilePathEnvironment(options, new Mc4BuiltinQuery());
+        functionFinder = new FilePathEnvironment(options, Builtin.getBuiltinQuery());
         
 	    //collect all need matlab files
-	    FunctionCollection functions = new FunctionCollection(options);
+	    FunctionCollection functions = new FunctionCollection(functionFinder);
 	    	    
 	    //inline all
 	    //functions.inlineAll();
