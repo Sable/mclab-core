@@ -34,6 +34,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
  
@@ -51,6 +52,7 @@ public class Main
     private static final int SERVER_PORT = 47146; //default server port
     private static final long HEART_RATE = 4000; //in milliseconds
     private static final long HEART_DELAY = 5000; //delay till first heart beat check is made
+    
     
     /**
      * Main method deals with command line options and execution of
@@ -98,6 +100,12 @@ public class Main
                     natlab.Static.mc4.Mc4.main(args);
                     return;
                 } //end fortran
+                
+                //setting and getting of preferences
+                if (options.pref()){
+                    NatlabPreferences.modify(options);
+                    return;
+                }
                 
                 if( options.server() ){
                     //in server mode

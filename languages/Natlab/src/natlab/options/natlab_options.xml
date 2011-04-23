@@ -277,4 +277,41 @@ No static linking is done.
       </long_desc>
     </stropt>
   </section>
+
+
+  <section>
+    <name>Setting Natlab Stored Preferences</name>
+    <boolopt>
+      <name>perform preference operation</name>
+      <alias>preferences</alias>      
+      <alias>pref</alias>
+      <short_desc>perform preference operation</short_desc>
+      <long_desc>performs the specified preference operation(s), then exits</long_desc>
+    </boolopt>
+    <listopt>
+      <name>Set Matlab Path</name>
+      <alias>set_matlab_path</alias>
+      <set_arg_label>path</set_arg_label>
+      <short_desc>Set Path (all path dirs) of a Matlab installation</short_desc>
+    </listopt>
+    <listopt>
+      <name>Set Natlab Path</name>
+      <alias>set_natlab_path</alias>
+      <set_arg_label>path</set_arg_label>
+      <short_desc>Set path directories where to find source code and packages</short_desc>
+    </listopt>
+    <listopt>
+      <name>Add Natlab Path</name>
+      <alias>add_natlab_path</alias>
+      <set_arg_label>path</set_arg_label>
+      <short_desc>adds the given paths to the Natlab path</short_desc>
+    </listopt>
+    <boolopt>
+      <name>display preferences</name>
+      <alias>show_preferences</alias>      
+      <alias>show_pref</alias>
+      <short_desc>Display all stored preferences</short_desc>
+      <long_desc>Displays all the stored preferences</long_desc>
+    </boolopt>
+  </section>
 </options>

@@ -19,6 +19,7 @@ import ast.*;
  * It stores the AST of a function in IR form, it's location (via a FunctionReference),
  * and all the functions called (sort of a basic symbol table).
  * and other useful information.
+ * TODO - this should not use the IR - some users might want to work with the AST?
  * 
  */
 public class StaticFunction implements Cloneable {

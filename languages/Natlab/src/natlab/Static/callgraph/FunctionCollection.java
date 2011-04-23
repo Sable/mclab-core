@@ -3,13 +3,12 @@ import java.io.File;
 import java.util.*;
 import ast.*;
 import natlab.CompilationProblem;
-import natlab.Static.mc4.Mc4;
-import natlab.options.Options;
 import natlab.toolkits.filehandling.genericFile.*;
+import natlab.toolkits.path.AbstractPathEnvironment;
 
 /**
- * A FunctionCollection is a collection of static function.
- * The static collection of functions is done by this object.
+ * A FunctionCollection is a collection of static functions.
+ * The collection of functions is done by this object.
  * We refer to parsing as 'collecting', since we need to parse, resolve names as functions
  * or variables and explore the path to find functions in one pass.
  * 
@@ -26,20 +25,20 @@ import natlab.toolkits.filehandling.genericFile.*;
 public class FunctionCollection extends HashMap<FunctionReference,StaticFunction>{
     private HashSet<GenericFile> loadedFiles = new HashSet<GenericFile>(); //files that were loaded so far
     private FunctionReference main = null; //denotes which function is the entry point
-    private Options options;
+    private AbstractPathEnvironment path;
     
     /**
-     * The function collection gets created via an options object
-     * This will parse the first file in the options object and all associated files
-     * @param options Natlab Options - that's where the file is found
+     * The function collection gets created via a path environment object
+     * This will collect all the files, starting from the main function
+     * ('primary function')
      */
-    public FunctionCollection(Options options){
+    public FunctionCollection(AbstractPathEnvironment path){
         super();
         
-        this.options = options;
+        this.path = path;
         
         //get main file (entrypoint)
-        GenericFile main = Mc4.functionFinder.getMain();
+        GenericFile main = path.getMain();
         
         //collect
         ArrayList<CompilationProblem> errors = new ArrayList<CompilationProblem>();
@@ -54,7 +53,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         super();
         this.loadedFiles.addAll(other.loadedFiles);
         this.main = other.main;
-        this.options = other.options;
+        this.path = other.path;
         
         for (FunctionReference ref : other.keySet()){
             this.put(ref,other.get(ref).clone());
@@ -78,15 +77,9 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         //parse file
         Program program;
         File javaFile = ((FileFile)file).getFileObject();
-        if (options.matlab()){
-            program = natlab.Parse.parseMatlabFile(javaFile.getAbsolutePath(), errList);
-            //program = natlab.Parse.parseMatlabFile(file.getAbsolutePath(), errList); //TODO - matlab->natlab translation seems broken
-        } else {
-        	program = natlab.Parse.parseFile(javaFile.getAbsolutePath(), errList);
-        }
+        program = natlab.Parse.parseMatlabFile(javaFile.getAbsolutePath(), errList);
         if (program == null){
-            Mc4.error("cannot parse file "+file+":\n"+errList);
-            return false;
+            throw new UnsupportedOperationException("cannot parse file "+file+":\n"+errList);
         }
         
         //check whether the matlab file has a good type
@@ -155,14 +148,14 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
             //4 functionName is a builtin or a function on the path    
             } else {
                 //try to find it
-                GenericFile otherFunction = Mc4.functionFinder.resolve(otherName,null);
+                GenericFile otherFunction = path.resolve(otherName,null);
                 if (otherFunction != null){ // file found
                     success = success && collect(otherFunction,false,errList); //recursively collect other function
                     function.getCalledFunctions().put(otherName,  //update symbol table entry
                             new FunctionReference(otherName,otherFunction));
                     
                 } else { // file is builtin, or cannot be found
-                    if (Mc4.functionFinder.isBuiltin(otherName)){ //builtin
+                    if (path.isBuiltin(otherName)){ //builtin
                         function.getCalledFunctions().put(otherName, 
                                 new FunctionReference(otherName));
                     } else { //not found
@@ -174,7 +167,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         }
         if (unfoundFunctions.size() != 0){
             System.out.println(function.getAst().getPrettyPrinted());
-            Mc4.error("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
+            throw new UnsupportedOperationException("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
         }
         return success;
     }

@@ -34,7 +34,7 @@ public class FunctionReference {
     /**
      * returns the name of the function
      */
-    public String getname(){
+    protected String getname(){
         return name;
     }
     

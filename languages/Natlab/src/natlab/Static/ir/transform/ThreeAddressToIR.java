@@ -5,8 +5,8 @@ import java.util.*;
 import natlab.DecIntNumericLiteralValue;
 import natlab.IntNumericLiteralValue;
 import natlab.Static.ir.IRAbstractAssignStmt;
-import natlab.Static.ir.IRArrayGet;
-import natlab.Static.ir.IRArraySet;
+import natlab.Static.ir.IRArrayGetStmt;
+import natlab.Static.ir.IRArraySetStmt;
 import natlab.Static.ir.IRAssignFunctionHandleStmt;
 import natlab.Static.ir.IRAssignLiteralStmt;
 import natlab.Static.ir.IRCallStmt;
@@ -17,6 +17,7 @@ import natlab.Static.ir.IRForStmt;
 import natlab.Static.ir.IRFunction;
 import natlab.Static.ir.IRIfStmt;
 import natlab.Static.ir.IRStatementList;
+import natlab.Static.ir.IRStmt;
 import natlab.Static.ir.IRWhileStmt;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.*;
@@ -94,6 +95,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
         //recursively rewrite children
         rewriteChildren(node);
 
+        if (node instanceof IRStmt) return; //don't redo conversion
+        
         //pull out expression
         LinkedList<AssignStmt> stmts = new LinkedList<AssignStmt>();
         NameExpr condition = makeName(node.getIfBlock(0).getCondition(), stmts);
@@ -115,7 +118,9 @@ public class ThreeAddressToIR extends AbstractSimplification {
     public void caseForStmt(ForStmt node) {
         //rewrite body
         rewrite(node.getStmtList());
-                
+
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        
         //find range variables
         RangeExpr range = (RangeExpr)node.getAssignStmt().getRHS();
         LinkedList<AssignStmt> assigns = new LinkedList<AssignStmt>();
@@ -155,7 +160,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
     }
     
     public void caseBreakStmt(BreakStmt node) {
-        // TODO Auto-generated method stub
+        //newNode = new TransformedNode(new IRBreakStmt());
     }
     
     public void caseExprStmt(ExprStmt node) {
@@ -172,6 +177,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
     }
     
     public void caseAssignStmt(AssignStmt node) {
+        if (node instanceof IRStmt) return; //don't redo conversion
+        
         //we need to pull out the assignments to literals etc.
         LinkedList<AssignStmt> assignments = new LinkedList<AssignStmt>();
         
@@ -179,14 +186,14 @@ public class ThreeAddressToIR extends AbstractSimplification {
         if (isParameterizedVar(node.getLHS())){
             ParameterizedExpr param = (ParameterizedExpr)(node.getLHS());
             node.setRHS(pullOutLiteral(node.getRHS(),assignments));
-            node = new IRArraySet((NameExpr)(param.getTarget()), 
+            node = new IRArraySetStmt((NameExpr)(param.getTarget()), 
                     listToCommaSeparatedList(param.getArgList(), null, false), (NameExpr)node.getRHS());
             
         //CellArraySet
         } else if (node.getLHS() instanceof CellIndexExpr) {
             CellIndexExpr cell = (CellIndexExpr)(node.getLHS());
             node.setRHS(pullOutLiteral(node.getRHS(), assignments));
-            node = new IRArraySet((NameExpr)(cell.getTarget()), 
+            node = new IRArraySetStmt((NameExpr)(cell.getTarget()), 
                     listToCommaSeparatedList(cell.getArgList(), null, false), (NameExpr)node.getRHS());
         } else {
             //there can only be one or more vars on the left hand side
@@ -194,13 +201,13 @@ public class ThreeAddressToIR extends AbstractSimplification {
             //ArrayGet - rhs is a parametrized var
             if (isParameterizedVar(node.getRHS())){
                 ParameterizedExpr param = (ParameterizedExpr)node.getRHS();
-                node = new IRArrayGet((NameExpr)node.getLHS(),(NameExpr)param.getTarget(),
+                node = new IRArrayGetStmt((NameExpr)node.getLHS(),(NameExpr)param.getTarget(),
                         listToCommaSeparatedList(param.getArgList(),assignments,true));
             } else
                 
             //ArrayGet - rhs is a name expression
             if (node.getRHS() instanceof NameExpr && isVar((NameExpr)(node.getRHS()))){
-                node = new IRArrayGet((NameExpr)node.getLHS(),(NameExpr)node.getRHS(), new IRCommaSeparatedList());
+                node = new IRArrayGetStmt((NameExpr)node.getLHS(),(NameExpr)node.getRHS(), new IRCommaSeparatedList());
             } else
             
             //rhs is a cell index expr
