@@ -13,7 +13,7 @@ def printBuiltinJava(file,children,parents,abstract,comments):
 package natlab.Static.builtin;
 
 import java.util.HashMap;
-//import natlab.toolkits.path.BuiltinQuery;
+import natlab.toolkits.path.BuiltinQuery;
 
 
 public abstract class Builtin {
@@ -39,13 +39,13 @@ public abstract class Builtin {
     
     /**
      * returns a builtin query object returning true for all builtings in this class hierarchy
-     *
+     */
     public static BuiltinQuery getBuiltinQuery() {
         return new BuiltinQuery(){
             public boolean isBuiltin(String functionname) 
               { return builtinMap.containsKey(functionname); }
         };
-    } /* */
+    }
 
     
     /**

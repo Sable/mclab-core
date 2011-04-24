@@ -84,6 +84,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseNot(Builtin builtin,Arg arg){ return caseAbstractLogicalUnaryOperator(builtin,arg); }
     public Ret caseAny(Builtin builtin,Arg arg){ return caseAbstractLogicalUnaryOperator(builtin,arg); }
     public Ret caseAll(Builtin builtin,Arg arg){ return caseAbstractLogicalUnaryOperator(builtin,arg); }
+    public Ret caseIsempty(Builtin builtin,Arg arg){ return caseAbstractLogicalUnaryOperator(builtin,arg); }
     
     //*** matrix operations ************************************************
     public Ret caseAbstractMatrixOperation(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }

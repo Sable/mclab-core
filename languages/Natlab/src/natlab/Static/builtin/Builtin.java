@@ -2,7 +2,7 @@
 package natlab.Static.builtin;
 
 import java.util.HashMap;
-//import natlab.toolkits.path.BuiltinQuery;
+import natlab.toolkits.path.BuiltinQuery;
 
 
 public abstract class Builtin {
@@ -28,13 +28,13 @@ public abstract class Builtin {
     
     /**
      * returns a builtin query object returning true for all builtings in this class hierarchy
-     *
+     */
     public static BuiltinQuery getBuiltinQuery() {
         return new BuiltinQuery(){
             public boolean isBuiltin(String functionname) 
               { return builtinMap.containsKey(functionname); }
         };
-    } /* */
+    }
 
     
     /**
@@ -110,6 +110,7 @@ public abstract class Builtin {
         builtinMap.put("not",new Not());
         builtinMap.put("any",new Any());
         builtinMap.put("all",new All());
+        builtinMap.put("isempty",new Isempty());
         builtinMap.put("sqrt",new Sqrt());
         builtinMap.put("exp",new Exp());
         builtinMap.put("log",new Log());
@@ -855,6 +856,20 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "all";
+        }
+    }
+    public static class Isempty extends AbstractLogicalUnaryOperator {
+        //creates a new instance of this class
+        protected Builtin create(){
+            return new Isempty();
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsempty(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isempty";
         }
     }
     public static abstract class AbstractMatrixOperation extends AbstractPureFunction {

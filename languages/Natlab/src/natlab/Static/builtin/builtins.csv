@@ -93,7 +93,7 @@ logicalUnaryOperator, unaryOperator
 not
 any
 all
-
+isempty
 
 # *** matrix operations ************************************************
 matrixOperation, pureFunction
