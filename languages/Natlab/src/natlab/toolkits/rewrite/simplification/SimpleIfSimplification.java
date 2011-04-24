@@ -22,6 +22,12 @@ public class SimpleIfSimplification extends AbstractSimplification
         super( tree, kind );
     }
     
+    public static Set<Class<? extends AbstractSimplification>> getStartSet()
+    {
+        HashSet<Class<? extends AbstractSimplification>> set = new HashSet();
+        set.add( SimpleIfSimplification.class );
+        return set;
+    }
     public Set<Class<? extends AbstractSimplification>> getDependencies()
     {
         return new HashSet();
