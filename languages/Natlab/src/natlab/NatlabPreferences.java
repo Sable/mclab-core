@@ -56,7 +56,15 @@ public class NatlabPreferences {
             list.add(getNatlabPath());
             list.addAll(options.add_natlab_path());
             setNatlabPath(concatList(list));
-        }        
+        }
+        if (!options.add_matlab_path().isEmpty()){
+            List list = new LinkedList();
+            list.add(getMatlabPath());
+            list.addAll(options.add_matlab_path());
+            String s = concatList(list);
+            System.out.println(s.length()+" "+s);
+            setMatlabPath(s);
+        }
         if (options.show_pref()){
             Map<String,Object> prefs = NatlabPreferences.getAllPreferences();
             for (String key : prefs.keySet()){
@@ -88,32 +96,85 @@ public class NatlabPreferences {
      * @param path
      */
     public static void setMatlabPath(String path){
-        prefs.put(MATLAB_PATH_KEY,path);
+        putLongString(MATLAB_PATH_KEY,path);
     }
     /**
      * sets the Matlab path string, a set of directories of *.m file directories
      * of a matlab installation, separated by ;
      * @param path
      */
-    public static String getNatlabPath(){
-        return prefs.get(NATLAB_PATH_KEY,NATLAB_PATH_DEFAULT);
+    public static String getMatlabPath(){
+        return getLongString(MATLAB_PATH_KEY,NATLAB_PATH_DEFAULT);
     }
     /**
      * sets the Matlab path string, a set of directories of *.m file directories, separated by ;
      * @param path
      */
     public static void setNatlabPath(String path){
-        prefs.put(NATLAB_PATH_KEY,path);
+        putLongString(NATLAB_PATH_KEY,path);
     }
     /**
      * sets the Matlab path string, a set of directories of *.m file directories, separated by ;
      * @param path
      */
-    public static String getMatlabPath(){
-        return prefs.get(NATLAB_PATH_KEY,NATLAB_PATH_DEFAULT);
+    public static String getNatlabPath(){
+        return getLongString(NATLAB_PATH_KEY,NATLAB_PATH_DEFAULT);
     }
     
     
+    
+    //*** long strings **********************************************************
+    /** 
+     * stores a long string, across multiple entries, where the entries are
+     * key+"_COUNT" - the number of sub strings
+     * key+"_"+i    - each string, with 0 <= i < count
+     * otherwise these methods act like put/get
+     */
+    private static final String count = "_COUNT";
+    private static void putLongString(String key,String value){
+        //delete existing value
+        deleteLongString(key);
+        
+        //find how many strings we need
+        int length = prefs.MAX_VALUE_LENGTH;
+        int N = 1 + (value.length() / length);
+        System.out.println("put: "+N);
+        
+        //store the key
+        prefs.putInt(key+count, N);
+        
+        //store the substrings
+        for (int i = 0; i < N - 1; i++){
+            prefs.put(key+"_"+i, value.substring(length*i,length*(i+1)));
+        }
+        prefs.put(key+"_"+(N-1), value.substring(length*(N-1)));
+    }
+    private static String getLongString(String key,String defaultValue){
+        //find how many strings there are
+        int N = prefs.getInt(key+count, -1);
+        if (N == -1) return defaultValue;
+        System.out.println("get: "+N);
+                
+        //find the individual strings
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < N; i++){
+            System.out.println(prefs.get(key+"_"+i, "").length());
+            s.append(prefs.get(key+"_"+i, ""));
+        }
+        return s.toString();
+    }
+    private static void deleteLongString(String key){
+        //find how many strings there are
+        int N = prefs.getInt(key+count, 0);
+        
+        //delete count
+        prefs.remove(key+count);
+        
+        //delete individual strings
+        for (int i = 0; i < N; i++){
+            prefs.remove(key+"_"+i);
+        }
+    }
 }
 
 

@@ -295,6 +295,12 @@ No static linking is done.
       <short_desc>Set Path (all path dirs) of a Matlab installation</short_desc>
     </listopt>
     <listopt>
+      <name>Add Matlab Path</name>
+      <alias>add_matlab_path</alias>
+      <set_arg_label>path</set_arg_label>
+      <short_desc>adds the given paths to the Matlab installation path</short_desc>
+    </listopt>
+    <listopt>
       <name>Set Natlab Path</name>
       <alias>set_natlab_path</alias>
       <set_arg_label>path</set_arg_label>
