@@ -33,6 +33,7 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
     public AnalysisHelper( StructuralAnalysis helpee )
     {
         this.helpee = helpee;
+        this.callback = helpee;
     }
     /**
      * Class constructor with given helpee and callback.

@@ -6,8 +6,10 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import beaver.Symbol;
-aspect ASTtoXML {
+import natlab.toolkits.analysis.varorfun.*;
 
+aspect ASTtoXML {
+    
 	private long ASTNode.uID = -1;
 	public void ASTNode.setuID(long id) {
             uID = id;
@@ -33,6 +35,9 @@ aspect ASTtoXML {
         syn lazy long ASTNode.getuID();
         eq ASTNode.getuID() = makeUId();
         syn long CompilationUnits.makeUId() = 0;
+        protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
+        protected static ASTNode ASTNode.parentProgram = null;
+    
 	public long CompilationUnits.nodeCounter = 0;
 
 	/*public long ASTNode.nodeCounter() {
@@ -61,28 +66,32 @@ aspect ASTtoXML {
     
   	//syn Document ASTNode.ASTtoXML() {
 	public Document CompilationUnits.ASTtoXML() {
-		try {
+		try{
 	        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 	        Document doc = docBuilder.newDocument();
-
+            kind_analysis_sensitive=new VFFlowSensitiveAnalysis(this);
+            kind_analysis_sensitive.analyze();
+            parentProgram=null;
 	        long id = nodeCounter();
 			setuID(id);
 			
 			Element e = doc.createElement("CompilationUnits");
 			e.setAttribute("id", Long.toString(id));
-			
+			e.setAttribute("name", name);
 			for(Program p : getPrograms()){
 		    	p.getXML(doc, e);
 			}
 		    doc.appendChild(e);
-		    	
+		
+            parentProgram=null;
+            kind_analysis_sensitive=null;
+            	
 	        return doc;
-		} catch (Exception e) {
-            System.out.println(e);
-        }
-        return null;
-    }
+	        }catch (Exception e){
+	           throw new RuntimeException(e);
+	        }
+	}
     
     public String CompilationUnits.XMLtoString(Document doc) {
     	try {
@@ -90,7 +99,7 @@ aspect ASTtoXML {
 	    	transfac.setAttribute("indent-number", new Integer(4));
 	        Transformer trans = transfac.newTransformer();
 	        trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-	        trans.setOutputProperty(OutputKeys.INDENT, "yes");
+	        trans.setOutputProperty(OutputKeys.INDENT, "no");
 			//trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			
 	        StringWriter sw = new StringWriter();
@@ -100,10 +109,10 @@ aspect ASTtoXML {
 	        
 	        return sw.toString();
 	        
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return "";
+            }catch (Exception e){
+               throw new RuntimeException(e);
+            }
+        
     }
     
     
@@ -115,18 +124,24 @@ aspect ASTtoXML {
     }
 	
     eq Script.getXML(Document doc, Element parent) {
+        parentProgram=this;
         long id = nodeCounter();
         setuID(id);
 
-		Element e = doc.createElement("Script");
-		e.setAttribute("id", Long.toString(id));
-
-		getSymbolTableXML(doc, e);
-		
+        Element e = doc.createElement("Script");
+        e.setAttribute("id", Long.toString(id));
+        String[] parts=name.split(File.separator);
+        String filename= parts[parts.length-1];
+        e.setAttribute("fullpath", name);
+        if (filename!="")
+        e.setAttribute("name", filename.substring(0,filename.length()-2));
+        getSymbolTableXML(doc, e);
+                       
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
         }
         
+
         Element e1 = doc.createElement("StmtList");
         for(Stmt stmt : getStmts()) {
             stmt.getXML(doc, e1);
@@ -135,6 +150,7 @@ aspect ASTtoXML {
         
         e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
+        parentProgram=null;
         return true;
     }
     
@@ -144,8 +160,12 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("FunctionList");
 		e.setAttribute("id", Long.toString(id));
-		
-		getSymbolTableXML(doc, e);
+        String[] parts=name.split(File.separator);
+        String filename= parts[parts.length-1];
+        e.setAttribute("fullpath", name);
+        if (filename!="")
+        	e.setAttribute("name", filename.substring(0,filename.length()-2));
+        getSymbolTableXML(doc, e);
 		
         for(Function func : getFunctions()) {
             func.getXML(doc, e);
@@ -156,6 +176,8 @@ aspect ASTtoXML {
     }
     
     eq Function.getXML(Document doc, Element parent) {
+        ASTNode previous = parentProgram;
+        parentProgram=this;   
         long id = nodeCounter();
         setuID(id);
 		
@@ -190,7 +212,8 @@ aspect ASTtoXML {
             func.getXML(doc, e);
         }
         e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));       
-	parent.appendChild(e);      
+	    parent.appendChild(e);      
+	    parentProgram=previous;
         return true;
     }
     
@@ -795,11 +818,26 @@ parent.appendChild(e);
     eq NameExpr.getXML(Document doc, Element parent) {
         long id = nodeCounter();
         setuID(id);
+		Name t = getName();
 		
+        VFFlowset out_sensitive=null;
+        if (parentProgram!=null){
+            out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( parentProgram );
+        }   
+        else
+            out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( t );
+		String nameid = getName().getID();
+        VFDatum d =  out_sensitive.contains( nameid );
+        String kind=null;
+        if (d!=null){
+            kind=d.toString();        
+        }
+        
+        
 		Element e = doc.createElement("NameExpr");
 		e.setAttribute("id", Long.toString(id));
         getName().getXML(doc, e);
-
+        e.setAttribute("kind", ""+kind);
         e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
 parent.appendChild(e);
         return true;
