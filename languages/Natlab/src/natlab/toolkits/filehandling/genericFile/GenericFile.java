@@ -3,6 +3,7 @@ package natlab.toolkits.filehandling.genericFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,22 +11,32 @@ import java.util.Collection;
 
 /**
  * A generic file is a File object, but it may not necessarily represent a
- * file on the file directory. It may also represent a file inside a zip
+ * file on the file directory. It may for example also represent a file inside a zip
  * or jar file. Thus files can be read from the Natlab.jar, and treated
  * the same way as files in directories.
  * 
- * genericFile objects are absolute, even if the filenames provided by the
- * constructors are not. (is this a good idea?)
  * 
  * 
  * @author ant6n
  */
 
-public abstract class GenericFile {
+public abstract class GenericFile implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+
     /**
      * returns the parent directory
      */
     abstract public GenericFile getParent();
+    
+    /**
+     * Returns the child file for the given file, as if this file
+     * represents a directory.
+     * @param filename
+     * @return
+     */
+    abstract public GenericFile getChild(String name);
+    
     
     /**
      * returns a reader to the contents of the file
@@ -90,6 +101,16 @@ public abstract class GenericFile {
         return this.getClass().getSimpleName()+":"+getPath();
     }
     
+    /**
+     * returns the last modified date of the file
+     */
+    public abstract long lastModifiedDate();    
+        
+    /**
+     * returns true if the file exists
+     */
+    public abstract boolean exists();
+    
         
     public static GenericFile create(String filename){
         return new FileFile(filename); //TODO
@@ -104,4 +125,6 @@ public abstract class GenericFile {
     
     @Override
     abstract public int hashCode();
+    @Override
+    abstract public boolean equals(Object obj);
 }

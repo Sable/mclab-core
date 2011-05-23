@@ -31,5 +31,18 @@ public class GenericFileMatlabTools {
         }
     };
     
+    static final public GenericFileFilter PACKAGE_FILTER = new GenericFileFilter() {
+        public boolean accept(GenericFile file)
+        {
+            return file.isDir() && (file.getName().charAt(0) == '+');
+        }
+    };
+
+    static final public GenericFileFilter OBJECT_DIRECTORY_FILTER = new GenericFileFilter() {
+        public boolean accept(GenericFile file)
+        {
+            return file.isDir() && (file.getName().charAt(0) == '@');
+        }
+    };
     
 }

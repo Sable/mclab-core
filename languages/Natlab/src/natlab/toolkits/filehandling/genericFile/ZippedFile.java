@@ -13,6 +13,9 @@ import java.util.zip.*;
  */
 
 public class ZippedFile extends GenericFile {
+    //constants
+    public final static char FILENAME_DELIMITER = '/';
+    
     //static vars
     private static HashMap<File,ZipFile> archives = new HashMap<File,ZipFile>();
     private static HashMap<File,ZippedFile> roots = new HashMap<File,ZippedFile>();
@@ -24,19 +27,25 @@ public class ZippedFile extends GenericFile {
     private ZippedFile parent = null; //the zip file that's the parent
     private String filename = null; //the file name, "" is the root
     private HashSet<ZippedFile> children; //the files inside the dir, null if not a dir
+    private File archiveFile = null;
     
     //private constructors
-    private ZippedFile(String filename,ZipFile archive,ZippedFile parent,boolean isDir){
+    private ZippedFile(String filename,File archiveFile,ZipFile archive,ZippedFile parent,boolean isDir){
         this.archive = archive;
         this.filename = filename;
         this.parent = parent;
+        this.archiveFile = archiveFile;
         if (isDir) children = new HashSet<ZippedFile>();
     }
     
     
     //public constructor
     public ZippedFile(String zipFile,String fileInsideZip) throws IOException{
-        File file = (new File(zipFile)).getAbsoluteFile().getCanonicalFile();
+        this((new File(zipFile)).getAbsoluteFile().getCanonicalFile(),fileInsideZip);
+    }
+
+    //public constructor
+    public ZippedFile(File file,String fileInsideZip) throws IOException{
         //zip File is already loaded
         if (!archives.containsKey(file)){
             loadZipFile(file);
@@ -47,12 +56,14 @@ public class ZippedFile extends GenericFile {
             this.children = zf.children;
             this.filename = zf.filename;
             this.parent = zf.parent;
+            this.archiveFile = file;
         } else {
             throw new IOException();
         }
-        
     }
     
+    
+    //loads a .zip/.jar file
     private void loadZipFile(File zipFile) throws IOException {
         ZipFile archive = new ZipFile(zipFile);
         Enumeration<? extends ZipEntry> ze = archive.entries();
@@ -62,7 +73,7 @@ public class ZippedFile extends GenericFile {
         while(ze.hasMoreElements()){
             ZipEntry z = ze.nextElement();
             if (!z.isDirectory()){
-                ZippedFile zf = new ZippedFile(z.toString(), archive, null, false);
+                ZippedFile zf = new ZippedFile(z.toString(), zipFile, archive, null, false);
                 dirTree.put(zf.filename, zf);
                 putParents(dirTree,zf);
             }
@@ -74,11 +85,16 @@ public class ZippedFile extends GenericFile {
         allZippedFiles.put(zipFile, dirTree);
     }
     
+    //returns the zip entry for this file, or null if it doesn't exist
+    private ZipEntry getZipEntry(){
+        return archive.getEntry(filename);
+    }
+    
     //returns parent file of give file name, using the '/' char as delim
     //returns null for ""
     private String getParent(String file){
         if (file.equals("")) return null;
-        char delim = '/';
+        char delim = FILENAME_DELIMITER;
         if (file.length() > 0 &&
             file.charAt(file.length()-1)==delim) file = file.substring(0,file.length()-1);
         int i = file.lastIndexOf(delim);
@@ -102,14 +118,14 @@ public class ZippedFile extends GenericFile {
         if (parent == null){ //parent is root,
             if ( !file.filename.equals("")){ // but file is not root itself
                 if (!dirTree.containsKey("")){
-                    dirTree.put("",new ZippedFile("", file.archive, null, true));
+                    dirTree.put("",new ZippedFile("", file.archiveFile, file.archive, null, true));
                 }
                 dirTree.get("").children.add(file);
             }
         } else { //parent is not root
             if (!dirTree.containsKey(parent.toString())){
                 //construct parent and put in dir
-                ZippedFile parentDir = new ZippedFile(parent.toString(), file.archive, null, true);
+                ZippedFile parentDir = new ZippedFile(parent.toString(), file.archiveFile, file.archive, null, true);
                 dirTree.put(parent.toString(), parentDir);
                 
                 //recursively link/fill parents
@@ -121,7 +137,9 @@ public class ZippedFile extends GenericFile {
     
     
     public boolean isDir(){
-        return (children != null);
+        ZipEntry entry = getZipEntry();
+        if (entry == null) return false;
+        return entry.isDirectory();
     }
     
     
@@ -130,8 +148,13 @@ public class ZippedFile extends GenericFile {
     }
 
     public Reader getReader() throws IOException {
-        return new BufferedReader(
-                new InputStreamReader(archive.getInputStream(archive.getEntry(filename))));
+        ZipEntry entry = getZipEntry();
+        if (entry != null){
+            return new BufferedReader(
+                    new InputStreamReader(archive.getInputStream(entry)));
+        } else {
+            throw new FileNotFoundException(filename+" in "+archive.getName()+" not found");
+        }
     }
 
     
@@ -164,15 +187,43 @@ public class ZippedFile extends GenericFile {
         // TODO Auto-generated method stub
         return null;
     }
-
-
+    
     @Override
     public String getPath() {
-        return archive.getName()+"!/"+filename;
+        return archive.getName()+"!"+FILENAME_DELIMITER+filename;
+    }
+    
+    @Override
+    public ZippedFile getChild(String name) {
+        try {
+            return new ZippedFile(this.archiveFile, this.filename+FILENAME_DELIMITER+name);
+        } catch (Exception e) {
+        }
+        return null;
     }
     
     @Override
     public int hashCode() {
         return this.archive.hashCode()*31 + this.filename.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ZippedFile) {
+            ZippedFile o = (ZippedFile) obj;
+            return this.archive.equals(o.archive) && this.filename.equals(o.filename);
+        }
+        return false;
+    }
+
+
+    @Override
+    public long lastModifiedDate() {
+        ZipEntry entry = getZipEntry();
+        return entry.getTime();
+    }
+    
+    @Override
+    public boolean exists() {
+        return (getZipEntry() != null);
     }
 }

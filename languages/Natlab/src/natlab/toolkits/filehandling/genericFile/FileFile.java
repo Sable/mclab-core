@@ -1,9 +1,13 @@
 package natlab.toolkits.filehandling.genericFile;
 
+
 import java.io.*;
 import java.util.*;
-
+/**
+ * a FileFile is a GenericFile that uses a java.io.File as the underlying file object.
+ */
 public class FileFile extends GenericFile {
+    private static final long serialVersionUID = 1L;
     File file;
     
     public FileFile(File file){
@@ -27,6 +31,11 @@ public class FileFile extends GenericFile {
     @Override
     public FileFile getParent() {
         return new FileFile(file.getParentFile());
+    }
+    
+    @Override
+    public GenericFile getChild(String name) {
+        return new FileFile(new java.io.File(file,name));
     }
 
     @Override
@@ -60,4 +69,24 @@ public class FileFile extends GenericFile {
     public int hashCode() {
         return file.hashCode();
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof FileFile) {
+            FileFile o = (FileFile) obj;
+            return file.equals(o.file);
+        }
+        return false;
+    }
+
+    @Override
+    public long lastModifiedDate() {
+        return file.lastModified();
+    }
+    
+    @Override
+    public boolean exists() {
+        return file.exists();
+    }
 }
+
+
