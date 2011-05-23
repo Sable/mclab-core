@@ -7,12 +7,12 @@ import java.io.*;
 import java.net.URL;
 
 
-import natlab.NatlabPreferences;
-import natlab.Static.builtin.Builtin;
-import natlab.Static.callgraph.FunctionCollection;
+import natlab.*;
+import natlab.Static.builtin.*;
+import natlab.Static.callgraph.*;
 import natlab.options.Options;
-import natlab.toolkits.filehandling.genericFile.ZippedFile;
-import natlab.toolkits.path.FilePathEnvironment;
+import natlab.toolkits.filehandling.genericFile.*;
+import natlab.toolkits.path.*;
 
 
 /**
@@ -58,12 +58,17 @@ public class Mc4 {
 		Options options = new Options();
 		options.parse(args);
 		
-		//try the preferences stuff
-		try{
-		natlab.Main.main(new String[]{"-pref","-show_pref"});
-		} catch (Exception e) {
-        }
+		
+		/* play around with path
+		//MatlabPath path = MatlabPath.getMatlabPath(C:\classes\mclab\Benchmarks\matlabBenchmarks\adpt\drv_adpt.m);
+		CachedDirectory adir = DirectoryCache.get(new FileFile(
+		        "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\adpt"));
+		System.out.println(adir.listChildDirs()+"\n\n");
+        System.out.println(adir.listChildFiles());
+		
 		System.exit(0);
+		/* */
+		
 		
 		//try to do all benchmarks
 		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks";

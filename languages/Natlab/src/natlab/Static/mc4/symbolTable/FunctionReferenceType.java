@@ -1,7 +1,7 @@
 package natlab.Static.mc4.symbolTable;
 
-import natlab.Static.callgraph.FunctionReference;
 import natlab.Static.mc4.*;
+import natlab.toolkits.path.FunctionReference;
 
 /**
  * a symbol table entry that refers to another function via a function reference

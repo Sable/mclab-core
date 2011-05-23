@@ -6,6 +6,7 @@ import natlab.Static.ir.transform.ThreeAddressToIR;
 import natlab.Static.mc4.Mc4;
 import natlab.toolkits.BiMap;
 import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.inline.*;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
@@ -81,7 +82,7 @@ public class StaticFunction implements Cloneable {
     private void findAndResolveFunctions(){
         //perform variable or function analysis on function and get result
         VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,
-                Mc4.functionFinder.getFunctionOrScriptQuery(null));
+                Mc4.functionFinder.getFunctionOrScriptQuery(reference.getFile()));
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);

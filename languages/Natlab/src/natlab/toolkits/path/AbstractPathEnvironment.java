@@ -1,7 +1,5 @@
 package natlab.toolkits.path;
-import java.util.Collection;
-
-import natlab.Static.callgraph.FunctionReference;
+import java.util.*;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 
@@ -23,11 +21,12 @@ abstract public class AbstractPathEnvironment implements BuiltinQuery{
      * returns the location of the main file
      * - the matlab file where execution starts
      */
-    public abstract GenericFile getMain();
+    public abstract FunctionReference getMain();
     
 
     @Override
     public boolean isBuiltin(String functionname) {
+        if (builtinQuery == null) return false;
         return builtinQuery.isBuiltin(functionname);
     }
     
@@ -38,7 +37,7 @@ abstract public class AbstractPathEnvironment implements BuiltinQuery{
      * @param context - the location where this function is being called
      * @return
      */
-    public abstract GenericFile resolve(String name, GenericFile context); 
+    public abstract FunctionReference resolve(String name, GenericFile context); 
 
     
     /**
@@ -53,24 +52,7 @@ abstract public class AbstractPathEnvironment implements BuiltinQuery{
      * @param context - the location where this function is being called
      * @return
      */    
-    public abstract java.util.Map<String,GenericFile> resolveAll(String name,GenericFile context);    
-
-    /**
-     * resolves a function using resolve, and returns it as a FunctionReference
-     * @param name
-     * @param context
-     * @return
-     */
-    public FunctionReference resolveToFunctionReference(String name, GenericFile context){
-        GenericFile file = resolve(name,context);
-        if (file != null){
-            return new FunctionReference(name,file);
-        } else if (isBuiltin(name)){
-            return new FunctionReference(name);
-        } else {
-            return null;
-        }
-    }
+    public abstract Map<String,FunctionReference> resolveAll(String name,GenericFile context);    
     
     
     /**
@@ -82,14 +64,14 @@ abstract public class AbstractPathEnvironment implements BuiltinQuery{
      * @param context
      * @return a function reference to the overloaded function, or null if it cannot be found
      */
-    public abstract GenericFile resolve(String name, String className, GenericFile context);
+    public abstract FunctionReference resolve(String name, String className, GenericFile context);
 
     
     /**
-     * returns all .m files that are overloaded for the given class name
-     * 
+     * returns all .m files that are overloaded for the given class name, as a map,
+     * where the keys are the names of the functions and the values are the file locations
      */
-    public abstract Collection<GenericFile> getAllOverloaded(String className, GenericFile cotntext);
+    public abstract Map<String,FunctionReference> getAllOverloaded(String className, GenericFile cotntext);
     
     
     /**

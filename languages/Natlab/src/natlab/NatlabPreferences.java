@@ -7,7 +7,7 @@ import natlab.options.*;
 /**
  * This class represents the preferences of Natlab.
  * These are like options, except they are stored in a backing store, and
- * available across different calls (on the same system).
+ * available across different executions (on the same system/user).
  * 
  * Uses a java.util.prefs.Preferences object on this class
  * to store the preferences, so this represents a thin layer on top of the
@@ -17,10 +17,11 @@ import natlab.options.*;
  * This class defines a set of keys and default values for every option.
  * Every option can then be set and get.
  * 
- * User Preferences are used for this class.
+ * User Preferences are used for this class, rather than system ones.
  * 
  * 
  * TODO - this should eventually be generated automatically
+ * TODO - maybe options should be stored in a property file, rather than the registry
  */
 public class NatlabPreferences {
     //*** the keys and defaults for the options ********************************
@@ -62,7 +63,6 @@ public class NatlabPreferences {
             list.add(getMatlabPath());
             list.addAll(options.add_matlab_path());
             String s = concatList(list);
-            System.out.println(s.length()+" "+s);
             setMatlabPath(s);
         }
         if (options.show_pref()){
@@ -130,7 +130,7 @@ public class NatlabPreferences {
      * key+"_"+i    - each string, with 0 <= i < count
      * otherwise these methods act like put/get
      */
-    private static final String count = "_COUNT";
+    private static final String count = "_count";
     private static void putLongString(String key,String value){
         //delete existing value
         deleteLongString(key);
@@ -138,7 +138,6 @@ public class NatlabPreferences {
         //find how many strings we need
         int length = prefs.MAX_VALUE_LENGTH;
         int N = 1 + (value.length() / length);
-        System.out.println("put: "+N);
         
         //store the key
         prefs.putInt(key+count, N);
@@ -153,12 +152,10 @@ public class NatlabPreferences {
         //find how many strings there are
         int N = prefs.getInt(key+count, -1);
         if (N == -1) return defaultValue;
-        System.out.println("get: "+N);
                 
         //find the individual strings
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < N; i++){
-            System.out.println(prefs.get(key+"_"+i, "").length());
             s.append(prefs.get(key+"_"+i, ""));
         }
         return s.toString();

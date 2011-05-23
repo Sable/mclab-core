@@ -1,15 +1,19 @@
-package natlab.Static.callgraph;
+package natlab.toolkits.path;
 import natlab.toolkits.filehandling.genericFile.*;
 
 
 /**
- * A function within a Matlab program can not be uniquely identified by a name alone
- * We add the source file as well
+ * A function or script within a Matlab program can not be uniquely identified by a name alone
+ * We need a soruce file as well
  * 
- * This may refer to a funciton inside a matlab file on the path,
+ * This may refer to a funciton or script or class inside a matlab file on the path,
  * or a builtin
  *
  * This class is immutable
+ * 
+ * TODO - this should maybe be an enum, or the parent class of a set of different
+ * things.
+ * TODO - this should maybe store what class it belongs to
  */
 
 
@@ -27,6 +31,18 @@ public class FunctionReference {
     public FunctionReference(String name, GenericFile path){
         this.path = path;
         this.name = name;
+        this.isBuiltin = false;
+    }
+    
+    /**
+     * creates a Function Reference referring to a function or script inside
+     * a matlab file - it will refer to the funciton or script with the same name as the given
+     * one
+     */
+    public FunctionReference(GenericFile path){
+        this.path = path;
+        //TODO this should be done nicer - what if there is no extension?
+        this.name = path.getName().substring(0,path.getName().length()-path.getExtension().length()-1);
         this.isBuiltin = false;
     }
     

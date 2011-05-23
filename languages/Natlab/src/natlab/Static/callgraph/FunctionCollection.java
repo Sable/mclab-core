@@ -5,6 +5,7 @@ import ast.*;
 import natlab.CompilationProblem;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.AbstractPathEnvironment;
+import natlab.toolkits.path.FunctionReference;
 
 /**
  * A FunctionCollection is a collection of static functions.
@@ -38,11 +39,11 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         this.path = path;
         
         //get main file (entrypoint)
-        GenericFile main = path.getMain();
+        main = path.getMain();
         
         //collect
         ArrayList<CompilationProblem> errors = new ArrayList<CompilationProblem>();
-        collect(main,true,errors);
+        collect(main    ,errors);
 
     }
     
@@ -69,14 +70,14 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
      * adds the matlab functions from the given filename to the collection
      * @return returns true on success
      */
-    public boolean collect(GenericFile file,boolean isMain,ArrayList<CompilationProblem> errList){
+    public boolean collect(FunctionReference file,ArrayList<CompilationProblem> errList){
         System.out.println("collecting "+file);
         //was the filename already loaded?
         if (loadedFiles.contains(file)) return true;
         
         //parse file
         Program program;
-        File javaFile = ((FileFile)file).getFileObject();
+        File javaFile = ((FileFile)file.getFile()).getFileObject();
         program = natlab.Parse.parseMatlabFile(javaFile.getAbsolutePath(), errList);
         if (program == null){
             throw new UnsupportedOperationException("cannot parse file "+file+":\n"+errList);
@@ -96,18 +97,14 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         }
         
         
-        loadedFiles.add(file);
+        loadedFiles.add(file.getFile());
         boolean success = true;
-        if (isMain){ //put main
-        	this.main = new FunctionReference(
-        			((FunctionList)program).getFunction(0).getName(),file);
-        }
         
         //turn functions into mc4 functions, and go through their function references recursively
         FunctionList functionList = (FunctionList)program;
         for (Function functionAst : functionList.getFunctions()){
             //create/add static function
-            FunctionReference ref = new FunctionReference(functionAst.getName(),file);
+            FunctionReference ref = new FunctionReference(functionAst.getName(),file.getFile());
             StaticFunction function = new StaticFunction(functionAst, ref);
             this.put(ref,function);
 
@@ -143,25 +140,22 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
             //3 functionName could be a sibling function - which should already be loaded
             } else if (function.getSiblings().contains(otherName)){             
                 function.getCalledFunctions().put(otherName, 
-                        new FunctionReference(otherName,function.reference.path));
+                        new FunctionReference(otherName,function.reference.getFile()));
 
             //4 functionName is a builtin or a function on the path    
             } else {
                 //try to find it
-                GenericFile otherFunction = path.resolve(otherName,null);
+                FunctionReference otherFunction = path.resolve(otherName,null);
                 if (otherFunction != null){ // file found
-                    success = success && collect(otherFunction,false,errList); //recursively collect other function
-                    function.getCalledFunctions().put(otherName,  //update symbol table entry
-                            new FunctionReference(otherName,otherFunction));
-                    
-                } else { // file is builtin, or cannot be found
-                    if (path.isBuiltin(otherName)){ //builtin
-                        function.getCalledFunctions().put(otherName, 
-                                new FunctionReference(otherName));
-                    } else { //not found
-                        unfoundFunctions.add(otherName);
-                        success = false;
+                    if(!otherFunction.isBuiltin()){
+                        success = success && collect(otherFunction,errList); //recursively collect other function
+                        function.getCalledFunctions().put(otherName,otherFunction); //update symbol table entry
+                    } else { // file is builtin
+                        function.getCalledFunctions().put(otherName, otherFunction);
                     }
+                } else { //file not found
+                    unfoundFunctions.add(otherName);
+                    success = false;
                 }
             }
         }
