@@ -1,14 +1,8 @@
 package natlab.toolkits.path;
 
-import java.io.File;
 import java.util.*;
-
-import com.sun.beans.WeakCache;
-
-import matlab.MatlabTranslatorTests;
 import natlab.NatlabPreferences;
 import natlab.toolkits.filehandling.genericFile.*;
-import natlab.toolkits.persistent.PersistentlyCachedObject;
 
 
 /**
