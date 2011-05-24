@@ -4,8 +4,6 @@ import java.io.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.sun.corba.se.impl.orbutil.ObjectWriter;
-
 /**
  * Represents an object which is persistent 
  * - upon vm exit, an object of this type gets stored as a temp file
