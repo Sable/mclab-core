@@ -15,7 +15,7 @@ import natlab.Static.callgraph.*;
 import natlab.toolkits.path.FunctionReference;
 import annotations.ast.ASTNode;
 
-public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<?,Arg,Res>, Arg, Res> {
+public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {
 
     private StaticFunction function;
     private FAnalysis functionAnalysis;
@@ -118,7 +118,7 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<?,Ar
     public StaticFunction getFunction(){
         return function;
     }
-    public FunctionAnalysis<?, Arg, Res> getAnalysis(){
+    public FunctionAnalysis<Arg, Res> getAnalysis(){
         return functionAnalysis;
     }
     public CallString<Arg> getCallString(){

@@ -8,7 +8,7 @@ import natlab.toolkits.analysis.*;
 import natlab.toolkits.path.FunctionReference;
 
 public class CallStringAnalysis extends AbstractPreorderAnalysis<HashSetFlowSet<CallString<?>>>
-        implements FunctionAnalysis<HashSetFlowSet<CallString<?>>, CallString<?>, HashSetFlowSet<CallString<?>>>{
+        implements FunctionAnalysis<CallString<?>, HashSetFlowSet<CallString<?>>>{
 
     /**
      * factory for this object

@@ -17,7 +17,7 @@ import natlab.toolkits.analysis.FlowSet;
  * @param <Result> the result set that the analysis returns for that function
  */
 
-public interface FunctionAnalysis<Flow extends FlowSet,Arg,Result> extends Analysis<Flow>{
+public interface FunctionAnalysis<Arg,Result> extends Analysis{
    
     public Function getTree();
     

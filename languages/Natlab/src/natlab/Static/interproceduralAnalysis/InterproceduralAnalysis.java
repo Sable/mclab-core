@@ -21,7 +21,7 @@ import natlab.toolkits.path.FunctionReference;
  * @param <Res>
  */
 
-public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<?,Arg,Res>,Arg,Res> {
+public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<Arg,Res>,Arg,Res> {
     private FunctionCollection callgraph;
     private InterproceduralAnalysisFactory<Analysis, Arg, Res> factory;
     private Arg mainArgs;
@@ -39,7 +39,7 @@ public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<?,Arg,Res
     /**
      * factory method
      */
-    public static <Analysis extends FunctionAnalysis<?,Arg,Res>,Arg,Res>
+    public static <Analysis extends FunctionAnalysis<Arg,Res>,Arg,Res>
     InterproceduralAnalysis<Analysis,Arg,Res> create(
             InterproceduralAnalysisFactory<Analysis, Arg, Res> factory,
             FunctionCollection callgraph,
