@@ -50,7 +50,7 @@ public class FunctionReference {
     /**
      * returns the name of the function
      */
-    protected String getname(){
+    public String getname(){
         return name;
     }
     
