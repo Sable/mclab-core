@@ -40,23 +40,8 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         loopStack.peek().addContinueSet( copiedOutSet );
     }
 
-    /**
-     * A simple implementation of caseCondition. It simply treats it
-     * as an expression.
-     */
-    public void caseCondition( Expr condExpr )
-    {
-        caseExpr( condExpr );
-    }
-    public void caseLoopVarAsCondition( AssignStmt node )
-    {
-        caseAssignStmt( node );
-    }
-    public void caseLoopVarAsInit( AssignStmt node )
-    {
-        caseAssignStmt( node );
-    }
-    public void caseLoopVarAsUpdate( AssignStmt node )
+
+    public void caseLoopVar( AssignStmt node )
     {
         caseAssignStmt( node );
     }

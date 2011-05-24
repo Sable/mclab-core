@@ -4,7 +4,7 @@ import ast.*;
 import java.util.*;
 import natlab.toolkits.analysis.*;
 
-public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> extends AbstractStructuralAnalysis<A>
+public abstract class AbstractStructuralBackwardAnalysis<A> extends AbstractStructuralAnalysis<A>
 {
 
     public static boolean DEBUG = false;
@@ -13,7 +13,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
     public AbstractStructuralBackwardAnalysis(ASTNode tree){
         super( tree );
-        helper = new BackwardsAnalysisHelper( this );
+        helper = new BackwardsAnalysisHelper<A>( this );
     }
 
     public void caseASTNode(ASTNode node)
@@ -43,13 +43,13 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
     //protected abstract void setupContinues(A inFlow);
     public void setupBreaks()
     {
-        LoopFlowsets<A> loop = loopStack.peek();
+        LoopFlowsets loop = loopStack.peek();
 
         loop.setBreakInFlow( currentOutSet );
     }
     public void setupContinues()
     {
-        LoopFlowsets<A> loop = loopStack.peek();
+        LoopFlowsets loop = loopStack.peek();
         loop.setContinueInFlow( currentOutSet );
     }
 
@@ -188,7 +188,7 @@ public abstract class AbstractStructuralBackwardAnalysis<A extends FlowSet> exte
 
        @see AbstractStructuralForwardAnalysis.LoopFlowsets
     **/
-    protected class LoopFlowsets<A>
+    protected class LoopFlowsets
     {
         private A breakInFlow;
         private A loopInFlow;

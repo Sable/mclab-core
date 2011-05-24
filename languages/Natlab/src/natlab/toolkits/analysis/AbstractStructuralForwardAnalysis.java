@@ -3,7 +3,7 @@ package natlab.toolkits.analysis;
 import ast.*;
 import java.util.*;
 
-public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralAnalysis<A>
+public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStructuralAnalysis<A>
 {
 
     public static boolean DEBUG = false;
@@ -29,6 +29,68 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             if( node.getChild(i) != null )
                 analyze( node.getChild(i) );
         }
+    }
+
+    /**
+     * The out set of a condition if condition evals to true. This set
+     * is private because the programmer should never interact
+     * directly with it. If it is set, then {@code falseOutSet} should
+     * be set too, if they are set then the machinery should set the
+     * currentOutSet appropriately.
+     */
+    private A trueOutSet;
+    /**
+     * The out set of a condition if condition evals to false. This set
+     * is private because the programmer should never interact
+     * directly with it. If it is set, then {@code trueOutSet} should
+     * be set too, if they are set then the machinery should set the
+     * currentOutSet appropriately.
+     */
+    private A falseOutSet;
+    /**
+     * Sets the true and false out sets. Used to enforce the contract
+     * that either both are set or neither are set.
+     */
+    protected void setTrueFalseOutSet( A tSet, A fSet )
+    {
+        trueOutSet = tSet;
+        falseOutSet = fSet;
+    }
+    /**
+     * Un-sets the true and false out sets.
+     */
+    protected void unsetTrueFalseOutSet()
+    {
+        trueOutSet = null;
+        falseOutSet = null;
+    }
+    /**
+     * Gets the true out set. This should be used when creating a
+     * branching analysis. If no true out set is defined, returns
+     * null.
+     * NOTE: the machinery of the if and while cases sets the
+     * {@code currentOutSet} to the appropriate set. This is useful if
+     * those cases are being overwritten.
+     *
+     * @return the current {@code trueOutSet} or {@code null} if not set
+     */
+    protected A getTrueOutSet()
+    {
+        return trueOutSet;
+    }
+    /**
+     * Gets the false out set. This should be used when creating a
+     * branching analysis. If no false out set is defined, returns
+     * null.
+     * NOTE: the machinery of the if and while cases sets the
+     * {@code currentOutSet} to the appropriate set. This is useful if
+     * those cases are being overwritten.
+     *
+     * @return the current {@code falseOutSet} or {@code null} if not set
+     */
+    protected A getFalseOutSet()
+    {
+        return falseOutSet;
     }
 
     //program case
@@ -196,7 +258,7 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         
         //process loop conditional and store result
         //note in will be the currentInSet == loopInSet
-        caseCondition( loopCond );
+        caseWhileCondition( loopCond );
         
         //setup loop sets for loopstack
         LoopFlowsets loopFlowsets = new LoopFlowsets( node );
@@ -255,19 +317,19 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             //setup the current out as the merged out
             //this is the current out before processing the loop
             //condition
-            currentOutSet = (A)(mergedOut.clone());
+            currentOutSet = backupSet( mergedOut );
 
             //setup in for loop condition case
             //first merge the mergedout with the loop in
             merge( loopInSet, mergedOut, mergedOut );
-            currentInSet = (A)(mergedOut.clone());
+            currentInSet = backupSet( mergedOut );
             if(DEBUG){
                 System.out.println(" whilestmt: merged loopInSet and mergedOut: ");
                 System.out.println(mergedOut);
             }
 
 
-            caseCondition( loopCond );
+            caseWhileCondition( loopCond );
             
             //merge the loop condition out and break sets
             //use for new out
@@ -316,6 +378,11 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
 
     public void caseIfStmt( IfStmt node )
     {
+        //backup the true/false out sets and null them
+        A backupTrueSet = getTrueOutSet();
+        A backupFalseSet = getFalseOutSet();
+        unsetTrueFalseOutSet();
+
         Expr condition;
         ASTNode body;
 
@@ -335,9 +402,17 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             condition = block.getCondition();
             body = block.getStmts();
             currentInSet = backupSet( nextIn );
-            caseCondition( condition );
-            nextIn = backupSet( currentOutSet );
-            currentOutSet = backupSet( nextIn );
+            caseIfCondition( condition );
+            A trueOutSet = getTrueOutSet();
+            A falseOutSet = getFalseOutSet();
+            if( trueOutSet != null && falseOutSet != null ){
+                nextIn = backupSet( falseOutSet );
+                currentOutSet = backupSet( trueOutSet );
+            }
+            else{
+                nextIn = backupSet( currentOutSet );
+                currentOutSet = backupSet( nextIn );
+            }
             analyze( body );
             if( mergedOuts == null ){
                 mergedOuts = backupSet( currentOutSet );
@@ -355,14 +430,14 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
             body = block.getStmts();
             //currentOutSet will become the currentInSet for the body,
             //thanks to the AnalysisHelper
-            currentInSet = (A)(nextIn.clone());
-            currentOutSet = (A)(nextIn.clone());
+            currentInSet = backupSet( nextIn );
+            currentOutSet = backupSet( nextIn );
             if( DEBUG )
                 System.out.println( "!in before body "+currentInSet );
             analyze( body );
             if( DEBUG ){
                 System.out.println( "!in after body "+currentInSet );
-                System.out.println( "!out after body "+currentOutSet );
+                 System.out.println( "!out after body "+currentOutSet );
             }
             if(DEBUG)
                 System.out.println("merging " + currentOutSet.toString() );
@@ -379,6 +454,9 @@ public abstract class AbstractStructuralForwardAnalysis<A extends FlowSet> exten
         if(DEBUG)
             System.out.println("outset is " + currentOutSet.toString());
         setOutFlow( node, currentOutSet );
+
+        //restore the true/false out sets to their backups
+        setTrueFalseOutSet( backupTrueSet, backupFalseSet );
     }
     /**
        Represents the information associated with the containing loops

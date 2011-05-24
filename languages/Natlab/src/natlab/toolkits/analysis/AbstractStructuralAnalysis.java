@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Abstract implementation of a structural analysis. 
  */
-public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends AbstractNodeCaseHandler implements StructuralAnalysis<A>
+public abstract class AbstractStructuralAnalysis<A > extends AbstractNodeCaseHandler implements StructuralAnalysis<A>
 {
 
     protected A currentOutSet;
@@ -25,7 +25,7 @@ public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends Abst
         inFlowSets = new HashMap<ASTNode, A>();
 
         //setup helper visitor
-        helper = new AnalysisHelper( this );
+        helper = new AnalysisHelper<A>( this );
     }
     
     @Override
@@ -106,19 +106,48 @@ public abstract class AbstractStructuralAnalysis<A extends FlowSet> extends Abst
         currentInSet = inSet;
     }
 
+    public void caseLoopVar( AssignStmt loopVar )
+    {
+        caseAssignStmt( loopVar );
+    }
 
-    public abstract void caseLoopVarAsInit( AssignStmt loopVar );
+    public void caseLoopVarAsInit( AssignStmt loopVar )
+    {
+        caseLoopVar( loopVar );
+    }
     //process the loop variable in the initialization part of a for loop
     //eg  for i=start:step:stop
     //treat as i = start
-    public abstract void caseLoopVarAsUpdate( AssignStmt loopVar );
+    public void caseLoopVarAsUpdate( AssignStmt loopVar )
+    {
+        caseLoopVar( loopVar );
+    }
     //prosess in the update 
     //treat as i=i+step
-    public abstract void caseLoopVarAsCondition( AssignStmt loopVar );
+    public void caseLoopVarAsCondition( AssignStmt loopVar )
+    {
+        caseLoopVar( loopVar );
+    }
     //process as checking the condition
     //treat as i<=stop or i*sign(step)<=stop*sign(step)
 
-    public abstract void caseCondition( Expr condExpr );
+    public void caseIfCondition( Expr condExpr )
+    {
+        caseCondition( condExpr );
+    }
+    public void caseWhileCondition( Expr condExpr )
+    {
+        caseCondition( condExpr );
+    }
+    /**
+     * A simple implementation of caseCondition. It simply treats it
+     * as an expression.
+     */
+    public void caseCondition( Expr condExpr )
+    {
+        caseExpr( condExpr );
+    }
+
     public abstract A newInitialFlow();
 
     public void caseSwitchExpr( Expr switchExpr )

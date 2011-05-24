@@ -15,13 +15,13 @@ import ast.*;
  * 
  * This function allows to specify a different callback than the analysis itself
  */
-public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCaseHandler
+public class AnalysisHelper<A> implements NodeCaseHandler //extends AbstractNodeCaseHandler
 {
 
     /** 
      * The analysis being helped
      */
-    protected StructuralAnalysis helpee;
+    protected StructuralAnalysis<A> helpee;
     protected NodeCaseHandler callback;    
     
 
@@ -30,7 +30,7 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
      *
      * @param helpee  the analysis being helped.
      */
-    public AnalysisHelper( StructuralAnalysis helpee )
+    public AnalysisHelper( StructuralAnalysis<A> helpee )
     {
         this.helpee = helpee;
         this.callback = helpee;
@@ -41,7 +41,7 @@ public class AnalysisHelper implements NodeCaseHandler //extends AbstractNodeCas
      * @param helpee  the analysis being helped.
      * @param callback calls the corresponding case on the callback after bookkeeping
      */
-    public AnalysisHelper( StructuralAnalysis helpee , NodeCaseHandler callback )
+    public AnalysisHelper( StructuralAnalysis<A> helpee , NodeCaseHandler callback )
     {
         this.helpee = helpee;
         this.callback = callback;

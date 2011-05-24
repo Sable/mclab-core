@@ -17,16 +17,21 @@ public abstract class AbstractSimpleStructuralBackwardAnalysis<A extends FlowSet
         super( tree );
     }
 
+    public void caseLoopVar( AssignStmt node )
+    {
+        caseAssignStmt( node );
+    }
+
 
     public void caseBreakStmt( BreakStmt node )
     {
-        LoopFlowsets<A> loop = loopStack.peek();
+        LoopFlowsets loop = loopStack.peek();
         currentOutSet = newInitialFlow();
         copy( loop.getBreakInFlow(), currentOutSet );
     }
     public void caseContinueStmt( ContinueStmt node )
     {
-        LoopFlowsets<A> loop = loopStack.peek();
+        LoopFlowsets loop = loopStack.peek();
         currentOutSet = newInitialFlow();
         copy( loop.getBreakInFlow(), currentOutSet );
     }
@@ -36,15 +41,15 @@ public abstract class AbstractSimpleStructuralBackwardAnalysis<A extends FlowSet
     }
     public void caseLoopVarAsCondition( AssignStmt node )
     {
-        caseAssignStmt( node );
+        caseLoopVar( node );
     }
     public void caseLoopVarAsInit( AssignStmt node )
     {
-        caseAssignStmt( node );
+        caseLoopVar( node );
     }
     public void caseLoopVarAsUpdate( AssignStmt node )
     {
-        caseAssignStmt( node );
+        caseLoopVar( node );
     }
         
 }

@@ -13,7 +13,7 @@ import ast.*;
  * containing node case, e.g. the for node, must deal with setting up
  * the correct currentInSet value.
  */
-public class BackwardsAnalysisHelper extends AnalysisHelper
+public class BackwardsAnalysisHelper<A> extends AnalysisHelper<A>
 {
 
     /**
@@ -21,7 +21,7 @@ public class BackwardsAnalysisHelper extends AnalysisHelper
      *
      * @param helpee  the analysis being helped.
      */
-    public BackwardsAnalysisHelper( StructuralAnalysis helpee )
+    public BackwardsAnalysisHelper( StructuralAnalysis<A> helpee )
     {
         super( helpee );
     }
@@ -31,7 +31,7 @@ public class BackwardsAnalysisHelper extends AnalysisHelper
      * @param helpee  the analysis being helped.
      * @param callback calls the corresponding case on the callback after bookkeeping
      */
-    public BackwardsAnalysisHelper( StructuralAnalysis helpee , NodeCaseHandler callback )
+    public BackwardsAnalysisHelper( StructuralAnalysis<A> helpee , NodeCaseHandler callback )
     {
         super(helpee, callback);
     }
