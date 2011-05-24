@@ -7,6 +7,6 @@ import natlab.toolkits.analysis.FlowSet;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 
 
-public interface VFAnalysis extends Analysis<VFFlowset> {
+public interface VFAnalysis extends Analysis {
 	public VFDatum getResult(Name n);
 }
