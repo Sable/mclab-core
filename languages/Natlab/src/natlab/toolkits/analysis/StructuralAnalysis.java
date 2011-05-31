@@ -115,6 +115,15 @@ public interface StructuralAnalysis<A > extends Analysis
      */
     public void caseLoopVarAsCondition( AssignStmt loopVar );
 
+    /**
+     * Create a new initial flow set.
+     *
+     * @return A new initial flow set. This is used as starting value
+     * for flow sets.
+     */
+    public A newInitialFlow();
+    
+    
 
 
 }
