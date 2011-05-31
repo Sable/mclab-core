@@ -83,15 +83,6 @@ public interface Analysis extends NodeCaseHandler
 
 
     /**
-     * Create a new initial flow set.
-     *
-     * @return A new initial flow set. This is used as starting value
-     * for flow sets.
-     */
-    //public A newInitialFlow();
-    
-    
-    /**
      * sets the NodeCaseHandler that gets called first by the node's analyze
      * method. The given NodeCaseHandler is responsible for calling back to
      * the corresponding node case of this analysis.
