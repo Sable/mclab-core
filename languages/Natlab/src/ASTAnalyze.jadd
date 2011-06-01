@@ -262,6 +262,10 @@ aspect ASTAnalyze
     {
         visitor.caseRow(this);
     }
+    public void VariableDecl.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseVariableDecl(this);
+    }
 
     //Begin IR nodes
 
@@ -277,4 +281,258 @@ aspect ASTAnalyze
     {
         visitor.caseCheckScalarStmt(this);
     }
+
+    //SOME MISSING ONES!
+    public void CompilationUnits.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseCompilationUnits(this);
+    }
+    public void EmptyProgram.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseEmptyProgram(this);
+    }
+    public void Body.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseBody(this);
+    }
+    public void ClassBody.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseClassBody(this);
+    }
+    public void FunctionOrSignatureOrPropertyAccessOrStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFunctionOrSignatureOrPropertyAccessOrStmt(this);
+    }
+    public void ClassDef.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseClassDef(this);
+    }
+    public void Properties.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseProperties(this);
+    }
+    public void Property.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseProperty(this);
+    }
+    public void Methods.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseMethods(this);
+    }
+    public void Signature.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseSignature(this);
+    }
+    public void PropertyAccess.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.casePropertyAccess(this);
+    }
+    public void ClassEvents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseClassEvents(this);
+    }
+    public void Event.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseEvent(this);
+    }
+    public void HelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseHelpComment(this);
+    }
+    public void OneLineHelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseOneLineHelpComment(this);
+    }
+    public void MultiLineHelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseMultiLineHelpComment(this);
+    }
+    public void SwitchCaseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseSwitchCaseBlock(this);
+    }
+    public void DefaultCaseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseDefaultCaseBlock(this);
+    }
+    public void IfBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseIfBlock(this);
+    }
+    public void ElseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseElseBlock(this);
+    }
+    public void LValueExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseLValueExpr(this);
+    }
+    public void LiteralExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseLiteralExpr(this);
+    }
+    public void UnaryExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseUnaryExpr(this);
+    }
+    public void BinaryExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseBinaryExpr(this);
+    }
+    public void Annotation.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseAnnotation(this);
+    }
+    public void ExpandedAnnotation.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseExpandedAnnotation(this);
+    }
+    public void Expr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseExpr(this);
+    }
+    public void Attribute.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseAttribute(this);
+    }
+    public void SuperClass.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseSuperClass(this);
+    }
+
+
+    //TYPES
+    public void Type.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseType(this);
+    }
+    public void BaseType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseBaseType(this);
+    }
+    public void PrimitiveType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.casePrimitiveType(this);
+    }
+    public void IntType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseIntType(this);
+    }
+    public void FloatType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFloatType(this);
+    }
+    public void Shape.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseShape(this);
+    }
+    public void Rank.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseRank(this);
+    }
+    public void Extents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseExtents(this);
+    }
+    public void FieldEntry.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFieldEntry(this);
+    }
+    public void UnionType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseUnionType(this);
+    }
+    public void IntersectionType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseIntersectionType(this);
+    }
+    public void ArrowType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseArrowType(this);
+    }
+    public void ArgTupleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseArgTupleType(this);
+    }
+    public void UnitType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseUnitType(this);
+    }
+    public void VarArgType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseVarArgType(this);
+    }
+    public void TupleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseTupleType(this);
+    }
+    public void CellArrayType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseCellArrayType(this);
+    }
+    public void MatrixType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseMatrixType(this);
+    }
+    public void TypeVarType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseTypeVarType(this);
+    }
+    public void HandleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseHandleType(this);
+    }
+    public void UnknownType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseUnknownType(this);
+    }
+    public void StructType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseStructType(this);
+    }
+    public void Int8.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseInt8(this);
+    }
+    public void Int16.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseInt16(this);
+    }
+    public void Int32.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseInt32(this);
+    }
+    public void Int64.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseInt64(this);
+    }
+    public void Float32.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFloat32(this);
+    }
+    public void Float64.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseFloat64(this);
+    }
+    public void CharType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseCharType(this);
+    }
+    public void BoolType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseBoolType(this);
+    }
+    public void KnownExtentsShape.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseKnownExtentsShape(this);
+    }
+    public void KnownRank.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseKnownRank(this);
+    }
+    public void KnownExtents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    {
+        visitor.caseKnownExtents(this);
+    }
+
 }
