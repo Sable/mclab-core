@@ -5,7 +5,7 @@ package natlab.toolkits.analysis.varorfun;
  * hashing is done on the value or first member of the pair. Datum must be Immutable 
  */
 
-public class ValueDatumPair< V, D extends VFDatum>
+public class ValueDatumPair< V, D >
 {
     protected V value;
     protected D datum;
@@ -50,7 +50,7 @@ public class ValueDatumPair< V, D extends VFDatum>
         return new ValueDatumPair( value, datum);
     }
 
-    public static <A extends VFDatum> String toString(Object v, A d){
+    public static <A> String toString(Object v, A d){
         return "< " + v.toString() + ", " + d.toString() + " >";
     }
     public String toString()

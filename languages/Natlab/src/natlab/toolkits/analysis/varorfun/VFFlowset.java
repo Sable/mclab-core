@@ -1,3 +1,20 @@
+/*
+Copyright Jesse Doherty, Soroush Radpour and McGill University.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+*/
+
 package natlab.toolkits.analysis.varorfun;
 
 import java.util.*;
@@ -108,28 +125,6 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
         return list;
     }
 
-    public void union(VFFlowset other, 
-                      VFFlowset dest)
-    {
-        if( dest == this && dest == other )
-            return;
-        if( this == other ){
-            copy(dest);
-            return;
-        }
-
-        VFFlowset tmpDest = new VFFlowset();
-
-        //add all the elements in this to the tmpDest
-        for( ValueDatumPair<String,VFDatum> pair : this.toList() ){
-                tmpDest.add( pair );
-        }
-        //add all elements in other to tmpDest
-        for( ValueDatumPair<String,VFDatum> pair : other.toList() ){
-                tmpDest.add( pair );
-        }
-        tmpDest.copy(dest);
-    }
     public String toString()
     {
         StringBuffer s = new StringBuffer();

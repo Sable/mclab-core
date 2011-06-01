@@ -184,7 +184,7 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
         //for debug
         int iterCount = 0;
         int countBad = 100;
-
+        
         newOut = currentOutSet;
         if(DEBUG)
             System.out.println( "  forstmt: starting fixed point");

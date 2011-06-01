@@ -1,11 +1,40 @@
+/*
+Copyright 2011 of Jesse Doherty, Soroush Radpour and McGill University.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+*/
 import natlab.LocalFunctionLookupInterface;
+import natlab.toolkits.filehandling.genericFile.*;
 
 aspect NameResolutionAdditions
 {
     FunctionList implements LocalFunctionLookupInterface;
     Function implements LocalFunctionLookupInterface;
-    private String CompilationUnits.name="";
-    private String Script.name="";
-    private String FunctionList.name="";
+    
+    protected String CompilationUnits.name="";
+    public String CompilationUnits.getName(){return name;}
+    public void CompilationUnits.setName(String name){this.name=name;}
+    protected String Program.fullpath="";
+    protected String Program.name="";  
+    public void Program.setName(String name){this.name=name;}
+    //public void FunctionList.setName(String name){this.name=name;}
+    
+    public void Program.setFullPath(String file){this.fullpath=file;}   
+    public String Program.getName(){return name;}
+	public String Program.getFullPath(){return this.fullpath;}
+      
+
     public boolean Program.canDoDeclRewrites = true;
+
 }
