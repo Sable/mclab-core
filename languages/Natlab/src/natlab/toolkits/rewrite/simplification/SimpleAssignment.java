@@ -45,7 +45,7 @@ public class SimpleAssignment extends AbstractSimplification
       t1 = Exp2;
       Exp1 = t1
       ---------
-      if Exp1 and Exp2 are both not simple variables
+      if Exp1 and Exp2 are both not simple variables or Ex2 is not a literal
 
       Does not deal with multi assignment statements.
      */
@@ -54,14 +54,15 @@ public class SimpleAssignment extends AbstractSimplification
         Expr lhs = node.getLHS();
         Expr rhs = node.getRHS();
         if( !(lhs instanceof MatrixExpr) ){
-            if( !isVar(lhs) && !isVar(rhs) ){
-                TempFactory tempF = TempFactory.genFreshTempFactory();
-                AssignStmt a1 = new AssignStmt( tempF.genNameExpr(), rhs );
-                AssignStmt a2 = new AssignStmt( lhs, tempF.genNameExpr() );
-                
-                newNode = new TransformedNode( a1 );
-                newNode.add(a2);
-            }
+            if( !isVar(lhs)  )
+                if( !(rhs instanceof LiteralExpr) && !isVar(rhs) ){
+                    TempFactory tempF = TempFactory.genFreshTempFactory();
+                    AssignStmt a1 = new AssignStmt( tempF.genNameExpr(), rhs );
+                    AssignStmt a2 = new AssignStmt( lhs, tempF.genNameExpr() );
+                    
+                    newNode = new TransformedNode( a1 );
+                    newNode.add(a2);
+                }
         }
     }
 
