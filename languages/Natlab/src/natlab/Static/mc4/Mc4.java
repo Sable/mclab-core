@@ -10,6 +10,8 @@ import java.net.URL;
 import natlab.*;
 import natlab.Static.builtin.*;
 import natlab.Static.callgraph.*;
+import natlab.Static.interproceduralAnalysis.InterproceduralAnalysis;
+import natlab.Static.interproceduralAnalysis.examples.CallStringAnalysis;
 import natlab.options.Options;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.*;
@@ -117,7 +119,10 @@ public class Mc4 {
         
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(functionFinder);
-	    	    
+	    InterproceduralAnalysis<?,?,?> analysis = 
+	        InterproceduralAnalysis.create(new CallStringAnalysis.Factory(), functions, null);
+	    System.out.println(analysis.getMainNode().getResult());
+	    System.exit(0);
 	    //inline all
 	    //functions.inlineAll();
 	    

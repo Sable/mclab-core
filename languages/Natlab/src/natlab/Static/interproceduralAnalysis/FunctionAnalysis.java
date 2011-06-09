@@ -2,7 +2,6 @@ package natlab.Static.interproceduralAnalysis;
 
 import ast.Function;
 import natlab.toolkits.analysis.Analysis;
-import natlab.toolkits.analysis.FlowSet;
 
 /**
  * This interface represents an intra-procedural analysis, as used by a 
@@ -12,13 +11,13 @@ import natlab.toolkits.analysis.FlowSet;
  * InterproceduralAnalysisFactory
  * 
  * @author ant6n
- * @param <Flow> the FlowSet that this Analysis is parametric in
- * @param <Arg>  the argument set that is given to the function to run the analysis
- * @param <Result> the result set that the analysis returns for that function
+ * @param <A>  the argument set that is given to the function to run the analysis
+ * @param <R> the result set that the analysis returns for that function
  */
 
-public interface FunctionAnalysis<Arg,Result> extends Analysis{
-   
+public interface FunctionAnalysis<A,R> extends Analysis{
+    
+    
     public Function getTree();
     
     /**
@@ -26,7 +25,7 @@ public interface FunctionAnalysis<Arg,Result> extends Analysis{
      * Runs the analysis if it has not been computed.
      * @return
      */
-    public Result getResult();
+    public R getResult();
     
     /**
      * returns a default/empty result which should be an initial result
@@ -37,7 +36,7 @@ public interface FunctionAnalysis<Arg,Result> extends Analysis{
      * this will be called if a recursive call with the same arguments is found
      * while computing said result.
      */
-    public Result getDefaultResult();
+    public R getDefaultResult();
 }
 
 

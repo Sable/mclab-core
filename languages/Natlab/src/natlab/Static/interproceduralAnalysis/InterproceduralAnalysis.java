@@ -16,20 +16,20 @@ import natlab.toolkits.path.FunctionReference;
  * 
  * @author ant6n
  *
- * @param <Analysis>
- * @param <Arg>
- * @param <Res>
+ * @param <F> the FunctionAnalysis type used to analyse each function/argument pair
+ * @param <A>  the argument set that is given to the function to run the analysis
+ * @param <R> the result set that the analysis returns for that function
  */
 
-public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<Arg,Res>,Arg,Res> {
+public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     private FunctionCollection callgraph;
-    private InterproceduralAnalysisFactory<Analysis, Arg, Res> factory;
-    private Arg mainArgs;
+    private InterproceduralAnalysisFactory<F, A, R> factory;
+    private A mainArgs;
     
     public InterproceduralAnalysis(
-            InterproceduralAnalysisFactory<Analysis, Arg, Res> factory,
+            InterproceduralAnalysisFactory<F, A, R> factory,
             FunctionCollection callgraph,
-            Arg mainArgs) {
+            A mainArgs) {
         this.callgraph = callgraph;
         this.factory = factory;
         this.mainArgs = mainArgs;
@@ -52,29 +52,29 @@ public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<Arg,Res>,
      * run the analysis
      */
     private void analyze(){
-        new InterproceduralAnalysisNode<Analysis, Arg, Res>(
+        new InterproceduralAnalysisNode<F, A, R>(
                 this, callgraph, factory, callgraph.getMain(), 
-                new CallString<Arg>(callgraph.getMain(),mainArgs), mainArgs);
+                new CallString<A>(callgraph.getMain(),mainArgs), mainArgs);
     }
     
     /**
      * returns the node for the main
      */
-    public InterproceduralAnalysisNode<Analysis, Arg, Res> getMainNode(){
+    public InterproceduralAnalysisNode<F, A, R> getMainNode(){
         return getNode(callgraph.getMain(),mainArgs);
     }
     
     
     // TODO - should this be weak or something?
     // should it be a hashmap of hashmaps??
-    HashMap<Key,InterproceduralAnalysisNode<Analysis, Arg, Res>> nodes =
-        new HashMap<Key, InterproceduralAnalysisNode<Analysis,Arg,Res>>();
+    HashMap<Key,InterproceduralAnalysisNode<F, A, R>> nodes =
+        new HashMap<Key, InterproceduralAnalysisNode<F,A,R>>();
     /**
      * returns the node associated with the given function reference/argument pair.
      * If there is none, returns null.
      */
-    public InterproceduralAnalysisNode<Analysis, Arg, Res> getNode(
-            FunctionReference ref,Arg arg){
+    public InterproceduralAnalysisNode<F, A, R> getNode(
+            FunctionReference ref,A arg){
         return nodes.get(new Key(ref,arg));
     }
     
@@ -82,14 +82,14 @@ public class InterproceduralAnalysis<Analysis extends FunctionAnalysis<Arg,Res>,
      * puts the node into the analysis
      * TODO - add more info
      */
-    public void putNode(FunctionReference ref, Arg arg, InterproceduralAnalysisNode<Analysis, Arg, Res> node){
+    public void putNode(FunctionReference ref, A arg, InterproceduralAnalysisNode<F, A, R> node){
         nodes.put(new Key(ref,arg), node);
     }
     
     class Key{
         FunctionReference ref;
-        Arg arg;
-        private Key(FunctionReference ref,Arg arg){
+        A arg;
+        private Key(FunctionReference ref,A arg){
             this.ref = ref;
             this.arg = arg;
         }

@@ -7,6 +7,9 @@ package natlab.Static.interproceduralAnalysis;
  * - takes care of a map of <callsite,interproc analysis node>
  * 
  * TODO - flag something as recursive
+ * @param <F> the FunctionAnalysis type used to analyse each function/argument pair
+ * @param <A>  the argument set that is given to the function to run the analysis
+ * @param <R> the result set that the analysis returns for that function
  */
 
 
@@ -84,7 +87,7 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
      * Note that this should work even if the supplied callsite is null (but
      * call strings will be incomplete).
      */
-    public Res analyze(FunctionReference function,Arg arg,ASTNode<?> callsite){
+    public Res analyze(FunctionReference function,Arg arg,ASTNode callsite){
         Res result = null;
         InterproceduralAnalysisNode<FAnalysis, Arg, Res> node = null;
         
@@ -110,10 +113,17 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         }
         
         //register call site - will overwrite old, invalidated value
-        callsites.put(callsite, node);
+        setNodeForCallsite(callsite, node);
         return result;
     }
 
+    /**
+     * sets/overrides the callsite to call the given node
+     */
+    protected void setNodeForCallsite(ASTNode<?> callsite, 
+            InterproceduralAnalysisNode<FAnalysis, Arg, Res> node){
+        callsites.put(callsite, node);        
+    }
     
     public StaticFunction getFunction(){
         return function;
@@ -129,7 +139,10 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
      */
     public Res getResult(){
         return functionAnalysis.getResult();
-    }    
+    }
+    
+    
+    
 }
 
 

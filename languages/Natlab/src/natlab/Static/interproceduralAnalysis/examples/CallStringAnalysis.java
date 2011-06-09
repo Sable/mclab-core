@@ -1,36 +1,45 @@
-package natlab.Static.interproceduralAnalysis.callStringAnalysis;
+package natlab.Static.interproceduralAnalysis.examples;
 
-import annotations.ast.ASTNode;
+import java.util.LinkedHashSet;
+
 import ast.*;
 import natlab.Static.callgraph.StaticFunction;
 import natlab.Static.interproceduralAnalysis.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.path.FunctionReference;
 
-public class CallStringAnalysis extends AbstractPreorderAnalysis<HashSetFlowSet<CallString<?>>>
-        implements FunctionAnalysis<CallString<?>, HashSetFlowSet<CallString<?>>>{
+public class CallStringAnalysis extends AbstractDepthFirstAnalysis<CallStringAnalysis.CallStrings>
+        implements FunctionAnalysis<CallString<?>,CallStringAnalysis.CallStrings>{
+    
+    /**
+     * the flowset
+     */
+    public static class CallStrings extends LinkedHashSet<CallString<?>>{
+        private static final long serialVersionUID = 1L;
+        
+    }
 
     /**
      * factory for this object
      */
     public static class Factory implements InterproceduralAnalysisFactory
-    <CallStringAnalysis, CallString<?>, HashSetFlowSet<CallString<?>>>{
+    <CallStringAnalysis, CallString<?>, CallStrings>{
         @Override
         public CallStringAnalysis newFunctionAnalysis(
                 StaticFunction function,
                 CallString<?> argumentSet,
-                InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, HashSetFlowSet<CallString<?>>> node) {
+                InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, CallStrings> node) {
             return new CallStringAnalysis(function,node);
-        }
+        }        
     }
 
     private CallString<?> callstring; //current context
     private StaticFunction function; //need static function to resolve names
-    private HashSetFlowSet<CallString<?>> result; //we only flow one set
+    private CallStrings result; //we only flow one set
     private static final Object arg = new Object(); //argument dummy
-    private InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, HashSetFlowSet<CallString<?>>> node;
+    private InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, CallStrings> node;
     private CallStringAnalysis(StaticFunction function,
-            InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, HashSetFlowSet<CallString<?>>> node) {
+            InterproceduralAnalysisNode<CallStringAnalysis, CallString<?>, CallStrings> node) {
         super(function.getAst());
         this.node = node;
         this.callstring = node.getCallString();
@@ -53,7 +62,7 @@ public class CallStringAnalysis extends AbstractPreorderAnalysis<HashSetFlowSet<
                     result.add(callstring.add(ref, null, null)); //TODO
                 } else {
                     System.out.println(" call "+ref);
-                    result.union(this.node.analyze(ref, callstring, null));
+                    result.addAll(this.node.analyze(ref, callstring, null));
                 }
             }
         }
@@ -66,12 +75,12 @@ public class CallStringAnalysis extends AbstractPreorderAnalysis<HashSetFlowSet<
     }
 
     @Override
-    public HashSetFlowSet<CallString<?>> newInitialFlow() {
-        return new HashSetFlowSet<CallString<?>>();
+    public CallStrings newInitialFlow() {
+        return new CallStrings();
     }
 
     @Override
-    public HashSetFlowSet<CallString<?>> getDefaultResult() {
+    public CallStrings getDefaultResult() {
         return newInitialFlow();
     }
 
@@ -80,7 +89,7 @@ public class CallStringAnalysis extends AbstractPreorderAnalysis<HashSetFlowSet<
     };
     
     @Override
-    public HashSetFlowSet<CallString<?>> getResult() {
+    public CallStrings getResult() {
         return result;
     }
     

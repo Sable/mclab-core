@@ -21,6 +21,12 @@ import ast.*;
  * The pretty print method is overriden to still produce valid matlab code,
  * but analyses should be aware of this.
  * 
+ * TODO
+ * - while an IR node has to extend an existing node, it's children do not
+ * --> we can have IRnodes that have a different possible children,
+ * ---> we can deal with some things?
+ * 
+ * 
  * @author ant6n
  *
  */

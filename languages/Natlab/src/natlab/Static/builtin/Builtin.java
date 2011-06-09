@@ -67,6 +67,7 @@ public abstract class Builtin {
 
     //static initializer fills in builtinMap
     static {
+        builtinMap.put("isempty",new I());
         builtinMap.put("i",new I());
         builtinMap.put("j",new J());
         builtinMap.put("pi",new Pi());

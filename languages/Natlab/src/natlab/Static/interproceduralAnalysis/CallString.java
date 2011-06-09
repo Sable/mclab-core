@@ -9,23 +9,33 @@ import natlab.toolkits.path.FunctionReference;
  * This should be immutable
  * @author ant6n
  * 
- * TODO should this be parametric in arg?
  * TODO how to put the call site in there?
+ * TODO - deal with recursive well
+ * TODO - intern this?
+ * TODO - possibly keep a hashset of parents, to make containment checks faster?
+ * 
+ * @param <A> The argument set used for each call
  */
 
-public class CallString<Arg> {
-    Element<Arg> element = null;
+public class CallString<A> {
+    Element<A> element = null;
     
     public CallString(){
     }
     
-    public CallString(FunctionReference ref,Arg argumentSet){
-        this.element = new Element<Arg>(false,new CallString<Arg>(),ref,argumentSet);
+    public CallString(FunctionReference ref,A argumentSet){
+        this.element = new Element<A>(false,new CallString<A>(),ref,argumentSet);
     }
     
-    private CallString(Element<Arg> elt){
-        this.element = elt;
+    
+    public CallString(CallString<A> parent,FunctionReference ref,A argument,ASTNode callsite){
+        //TODO do recursive
+        this(new Element<A>(false,parent,ref,argument));
     }
+    
+    private CallString(Element<A> elt){
+        this.element = elt;
+    }    
     
     /**
      * returns a new call String where the given call gets added
@@ -33,16 +43,15 @@ public class CallString<Arg> {
      * @param argumentSet
      * @return
      */
-    public CallString<Arg> add(FunctionReference ref,Arg argumentSet,ASTNode<?> callsite){
-        //TODO recursive
-        return new CallString<Arg>(new Element<Arg>(false,this,ref,argumentSet));
+    public CallString<A> add(FunctionReference ref,A argumentSet,ASTNode callsite){
+        return new CallString<A>(this,ref,argumentSet,callsite);
     }
     
     /**
      * returns true if the call string contains the given
      * FunctionRefrence/Arg combination
      */
-    public boolean contains(FunctionReference ref,Arg arg){
+    public boolean contains(FunctionReference ref,A arg){
         return false; //todo
     }
     
