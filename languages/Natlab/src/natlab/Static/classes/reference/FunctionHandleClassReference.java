@@ -1,6 +1,6 @@
 package natlab.Static.classes.reference;
 
-public class FunctionHandleReference implements BuiltinClassReference {
+public class FunctionHandleClassReference implements BuiltinClassReference {
 
     @Override
     public String getName() {

@@ -1,6 +1,6 @@
 package natlab.Static.valueanalysis.value;
 
-import natlab.Static.classes.MatlabClass;
+import natlab.Static.classes.reference.*;
 
 
 /**
@@ -15,5 +15,5 @@ import natlab.Static.classes.MatlabClass;
  */
 
 public interface AbstractValue {
-    public MatlabClass getMatlabClass();
+    public ClassReference getMatlabClass();
 }

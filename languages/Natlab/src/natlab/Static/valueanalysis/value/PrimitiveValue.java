@@ -1,12 +1,11 @@
 package natlab.Static.valueanalysis.value;
 
-import natlab.Static.classes.MatlabClass;
+import natlab.Static.classes.reference.PrimitiveClassReference;
 
 public class PrimitiveValue implements AbstractValue {
 
     @Override
-    public MatlabClass getMatlabClass() {
-        // TODO Auto-generated method stub
+    public PrimitiveClassReference getMatlabClass() {
         return null;
     }
 
