@@ -26,13 +26,26 @@ false,
 #matlab operators
 operator, pureFunction
 
-# spcieal operators ... not sure what to do with them
+# special operators ... not sure what to do with them
 colon
 horzcat
 vertcat
 nargin
 nargout
 end
+cast
+
+# other operators
+isequalwithequalnans
+# same as isequal, but nan == nan
+isequal
+# recursive equal all
+subsasgn
+# explicit indexingops
+subsref
+structfun
+# map function across structs
+
 
 # *** binary ops *************************************************
 binaryOperator, operator
@@ -46,6 +59,7 @@ lt
 le
 ge
 gt
+
 
 #logical operators - note there's no short circuit ops
 binaryLogicalOperator, binaryOperator
@@ -72,6 +86,8 @@ times
 ldivide
 rdivide
 power
+pow2
+#scalbn, ldexp
 mod
 
 # *** unary operators ***************************************************
@@ -99,20 +115,67 @@ isempty
 matrixOperation, pureFunction
 elementwiseMatrixOperation, matrixOperation
 sqrt
+erf
+erfinv
+erfc
+erfcinv
+gammainc
+betainc
+
 
 transcendentalFunction, elementwiseMatrixOperation
 exp
 log
 
+#TODO group trigs together
 trigonometricFunction, transcendentalFunction
 sin
 cos
 tan
+cot
+sec
+csc
+
+decimalTrigonometricFunction, transcendentalFunction
+sind
+cosd
+tand
+cotd
+secd
+cscd
+
+hyperbolicTrigonometricFunction, transcendentalFunction
+sinh
+cosh
+tanh
+coth
+sech
+csch
 
 inverseTrigonmetricFunction, transcendentalFunction
 asin
 acos
 atan
+atan2
+acot
+asec
+acsc
+
+decimalInverseTrigonmetricFunction, transcendentalFunction
+asind
+acosd
+atand
+acotd
+asecd
+acscd
+
+hyperbolicInverseTrigonmetricFunction, transcendentalFunction
+asinh
+acosh
+atanh
+acoth
+asech
+acsch
 
 
 RoundingOperation, elementwiseMatrixOperation
@@ -129,6 +192,25 @@ norm
 rank
 dot
 cross
+schur
+#factorization
+ordschur
+lu
+# factorization
+linsolve
+# linear solve
+ifftn
+# n dimension inverse discrete fourier transform
+fftn
+# n dimensional discrete fourier transform
+rcond
+# condition number estimate
+
+# analytical matrix operators
+expm
+sqrtm
+logm
+
 
 # bit operators
 bitOperation, pureFunction
@@ -140,11 +222,33 @@ bitget
 bitshift
 
 
-# *** Arrat operations **************************************************
+# *** Constructors *****************************************************
+constructor, pureFunction
+primitiveConstructor, constructor
+double
+single
+char
+logical
+int8
+int16
+int32
+int64
+uint8
+uint16
+uint32
+uint64
+
+
+compoundConstructor, constructor
+cell
+struct
+
+
+# *** Array operations **************************************************
 arrayOperation, pureFunction
 sort
 unique
-isequal
+
 
 arrayConstructor, arrayOperation
 ones
@@ -167,13 +271,27 @@ sum
 prod
 # true/false queries - unary op?
 isemtpy
+isinteger
+
+
+# *** regulat expressions ************************************************
+regexpOperation, pureFunction
+regexptranslate
+regexp
+regexpi
 
 
 # *** opposite of pure functions *****************************************
 impureFunction, builtin
 
-
-
+# dunnno what to do with these
+superiorto
+#set superior to relationship in oldclass constructor
+exit
+quit
+# only really need one of quit/exit
+builtin
+# calls builtin - strict
 
 timeFunction, impureFunction
 clock
@@ -181,9 +299,17 @@ tic
 toc
 
 
-reportFuncgion, impureFunction
+reportFunction, impureFunction
 error
+warning
+echo
+# should this be here? - this could be a strict lib function?
+diary
+# something logging related
 
+randomFunction, impureFunction
+rand
+randi
 
 ioFunction, impureFunction
 fprintf
@@ -199,3 +325,5 @@ dyaddown
 flipud
 linspace
 imwrite
+
+
