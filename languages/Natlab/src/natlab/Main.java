@@ -1,3 +1,24 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
 package natlab;
 
 import natlab.options.Options;
@@ -20,6 +41,7 @@ import natlab.toolkits.rewrite.multireturn.*;
 import natlab.toolkits.rewrite.threeaddress.*;
 import natlab.toolkits.analysis.isscalar.*;
 
+import natlab.toolkits.rewrite.Validator;
 
 import natlab.toolkits.filehandling.*;
 
@@ -497,45 +519,16 @@ public class Main
 			*/
                     }
                     else if( options.run() ){
-                        FlowAnalysisTestTool testTool = 
-                            new FlowAnalysisTestTool( cu, HandlePropagationAnalysis.class );
-                                               System.out.println( "running");
-                                               System.out.println( testTool.run() );
-                                               System.out.println("\n\n********\n");
-                        
-                        
-                        /*
-                        HashMap<String,ASTNode> programNameMap = new HashMap();
-                        String fname;
-                        for( int i = 0; i<fileNames.size(); i++ ){
-                            String pname;
-                            fname = fileNames.get(i);
-                            ASTNode prog = cu.getProgram(i);
-                            if( prog instanceof Script ){
-                                pname = new File(fname).getName();
-                                pname = pname.substring(0,pname.length()-2);
-                                programNameMap.put(pname, prog);
-                            }
-                            else{
-                                FunctionList funclist = (FunctionList)prog;
-                                for( Function func : funclist.getFunctions() )
-                                    programNameMap.put(func.getName(),func);
-                            }
+                        Validator v = new Validator( cu );
+                        v.analyze();
+                        if( v.isValid() )
+                            System.out.println("VALID: The input is valid McLAST");
+                        else{
+                            System.out.println("INVALID: The input is not valid McLAST");
+                            System.out.println("reasons are:");
+                            System.out.println(v.getReasons());
                         }
-                        CallGraphBuilder graph = new CallGraphBuilder( cu, programNameMap );
-                        graph.run();
-                        System.out.println(graph);
-                        FileWriter dotfile;
-                        try{
-                            dotfile = new FileWriter( new File( "graph1.dot" ) );
-                            dotfile.write( graph.toDot(true));
-                            dotfile.close();
-                            dotfile = new FileWriter( new File( "graph2.dot" ) );
-                            dotfile.write( graph.toDot(false));
-                            dotfile.close();
-                        }catch( IOException e){
-                            System.err.println("no dot output produced for call graph");
-                        }*/
+                                               
                     }
                     else if( options.df() ){
                         String mainFileName = "";
