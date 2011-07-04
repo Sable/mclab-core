@@ -72,16 +72,16 @@ public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnaly
 		
 		// merge elements of in1 with corresponding elements of in2 and remove them from the remaining keys of in2 list
 		for (DataPair<String, IsScalarType> firstPair : in1.toList()) {
-			String id = firstPair.getKey();
-			IsScalarType secondType = in2.contains(id);
-	    	IsScalarType resultType = IsScalarHelper.butterfly(firstPair.getValue(), secondType);    	
-	    	out.add(new DataPair<String, IsScalarType>(id, resultType));
-	    	remainingKeysOfIn2.remove(id);
+                    String id = firstPair.getKey();
+                    IsScalarType secondType = in2.containsKey(id);
+                    IsScalarType resultType = IsScalarHelper.butterfly(firstPair.getValue(), secondType);    	
+                    out.add(new DataPair<String, IsScalarType>(id, resultType));
+                    remainingKeysOfIn2.remove(id);
 		}
 		
 		// add the IsScalarTypes for the remaining variables in in2
 		for (String key : remainingKeysOfIn2) {
-			IsScalarType type = in2.contains(key);
+			IsScalarType type = in2.containsKey(key);
 			out.add(new DataPair<String, IsScalarType>(key, type));
 		}
 	}
@@ -219,7 +219,7 @@ public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnaly
 				int i = 0;
 				for (String leftId : leftIds) {
 					String paramId = params.get(i);
-					IsScalarType returnType = returnedTypesWithWrongNames.contains(paramId);
+					IsScalarType returnType = returnedTypesWithWrongNames.containsKey(paramId);
 					returnedTypes.add(new DataPair<String, IsScalarType>(leftId, returnType));
 					i++;
 	        	}
@@ -289,9 +289,9 @@ public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnaly
 	        function.analyze(this);
 			
 			for (String id : globalOutParamLists.get(calledName)) {
-				IsScalarType returnType = currentOutSet.contains(id);
-				// use the wrong name in order to fulfil DataPair contract
-				returnedTypes.add(new DataPair<String, IsScalarType>(id, returnType));
+                            IsScalarType returnType = currentOutSet.containsKey(id);
+                            // use the wrong name in order to fulfil DataPair contract
+                            returnedTypes.add(new DataPair<String, IsScalarType>(id, returnType));
 			}
 			
 			copy(callerInSet, currentInSet);
@@ -307,13 +307,13 @@ public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnaly
 	 * computes and adds the IsScalarType for the given id and expression to the current outset
 	 */
 	private void addScalarTypeForIdAndExpr(String id, Expr expr) {
-       	IsScalarType oldType = currentOutSet.contains(id);
-    	IsScalarType newType = getScalarTypeForExpr(expr);
-    	IsScalarType resultType = IsScalarHelper.butterfly(oldType, newType);
-    	currentOutSet.add(new DataPair<String, IsScalarType>(id, resultType));
-    	if (resultType.isNonScalar()) {
+            IsScalarType oldType = currentOutSet.containsKey(id);
+            IsScalarType newType = getScalarTypeForExpr(expr);
+            IsScalarType resultType = IsScalarHelper.butterfly(oldType, newType);
+            currentOutSet.add(new DataPair<String, IsScalarType>(id, resultType));
+            if (resultType.isNonScalar()) {
     		nonScalarMap.put(id, (NonScalar) resultType);
-    	}
+            }
 	}
 	
 	/** 
@@ -383,11 +383,11 @@ public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnaly
 			}
 		}
 		if (expr instanceof NameExpr) {
-			IsScalarType type = currentInSet.contains(IsScalarHelper.getIdForExpr(expr));
-			if (type == null) {
-				type = IsScalarTypePool.bottom();
-			}
-			return type;
+                    IsScalarType type = currentInSet.containsKey(IsScalarHelper.getIdForExpr(expr));
+                    if (type == null) {
+                        type = IsScalarTypePool.bottom();
+                    }
+                    return type;
 		}
 		if (expr instanceof ParameterizedExpr) {
 			ParameterizedExpr paramExpr = ((ParameterizedExpr) expr);

@@ -209,12 +209,7 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
             
             caseLoopVarAsCondition( loopVar );
 
-            breakSet = processBreaks();
-            mergedOut = newInitialFlow();
-            mergedOut = mergeOuts( currentOutSet, breakSet );
-            newOut = mergedOut;  //newOut is the new out of the entire loop
-
-            currentOutSet = newOut;
+            newOut = currentOutSet;
 
             //loop until there is no change
             if(DEBUG){
@@ -234,9 +229,17 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
 
         if(DEBUG)
             System.out.println( "  forstmt: finished fixed point" );
-        //set currentOut to the out of the entire loop, e.g. newOut
-        currentOutSet = newOut;
-        
+
+        breakSet = processBreaks();
+        mergedOut = mergeOuts( currentOutSet, breakSet );
+
+        //set currentOut to the out of the FP computation and the
+        //result of processing breaks.
+        currentOutSet = mergedOut;
+
+
+
+
         setOutFlow( node, currentOutSet );
         loopStack.pop();
     }
@@ -331,27 +334,10 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
 
             caseWhileCondition( loopCond );
             
+
+            newOut = currentOutSet;
             //merge the loop condition out and break sets
             //use for new out
-            breakSet = processBreaks();
-            if(DEBUG){
-                System.out.println(" whilestmt: breakSet: ");
-                System.out.println(breakSet);
-            }
-
-            mergedOut = newInitialFlow();
-            if( breakSet == null )
-                copy( currentOutSet, mergedOut );
-            else
-                merge( currentOutSet, breakSet, mergedOut );
-            if(DEBUG){
-                System.out.println(" whilestmt: merged out of condition, and breaks: ");
-                System.out.println(mergedOut);
-            }
-            newOut = mergedOut;
-            //newOut is the new out of the entire loop
-
-            currentOutSet = newOut;
 
             //loop until there is no change
             if( DEBUG )
@@ -369,8 +355,22 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
             }
         }while( !previousOut.equals( newOut ) );
 
-        //set currentOut to the out of the entire loop, e.g. newOut
-        currentOutSet = newOut;
+
+        breakSet = processBreaks();
+        if(DEBUG){
+            System.out.println(" whilestmt: breakSet: ");
+            System.out.println(breakSet);
+        }
+        
+        mergedOut = mergeOuts( currentOutSet, breakSet );
+        if(DEBUG){
+            System.out.println(" whilestmt: merged out of condition, and breaks: ");
+            System.out.println(mergedOut);
+        }
+        
+        //set currentOut to the out of the FP computation and the
+        //result of processing breaks.
+        currentOutSet = mergedOut;
         
         setOutFlow( node, currentOutSet );
         loopStack.pop();

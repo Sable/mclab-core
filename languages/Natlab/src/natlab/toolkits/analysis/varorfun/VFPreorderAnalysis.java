@@ -110,7 +110,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         if (node.getParent().getParent() instanceof Function){
             for( ValueDatumPair<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).toList() ){
                 if( pair.getDatum()==VFDatum.VAR  || pair.getDatum()==VFDatum.BOT)
-                    currentSet.add( pair.clone() );
+                    currentSet.add( pair.copy() );
             }        	
         }
         if(DEBUG){
@@ -119,12 +119,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     	}
         // Add output params to set
         for( Name n : node.getOutputParams() ){
-            currentSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
         }
 
         // Add input params to set
         for( Name n : node.getInputParams() ){
-            currentSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
         }
         
         // Process body
@@ -147,7 +147,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         //analyze the rhs
         node.getRHS().analyze( this );
         for( NameExpr n : lhs.getNameExpressions() ){
-            currentSet.add( new ValueDatumPair( n.getName().getID(), VFDatum.VAR ) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getName().getID(), VFDatum.VAR ) );
             annotateNode(n.getName());
         }
         node.getLHS().analyze( this );
@@ -156,7 +156,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     public void caseGlobalStmt( GlobalStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
             annotateNode(n);
         }
     }
@@ -164,14 +164,14 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     public void casePersistentStmt( PersistentStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
             annotateNode(n);
         }
     }
 
     public void caseFunctionHandleExpr( FunctionHandleExpr node )
     {
-        currentSet.add( new ValueDatumPair( node.getName().getID(), VFDatum.FUN ) );
+        currentSet.add( new ValueDatumPair<String,VFDatum>( node.getName().getID(), VFDatum.FUN ) );
         annotateNode(node.getName());        
     }
     
@@ -185,8 +185,11 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     		target = ((ParameterizedExpr) node).getTarget();
     	else
     		System.err.println("in LValue without any target");
-    	
-    	NameExpr res = new ArrayList<NameExpr>(target.getNameExpressions()).get(0);
+        //getNameExpressions must return a set containing only
+        //NameExpr
+        @SuppressWarnings("unchecked")
+            Set<NameExpr> names = (Set<NameExpr>)target.getNameExpressions();
+    	NameExpr res = new ArrayList<NameExpr>(names).get(0);
     	
 	    String targetName=res.getName().getID();
 	    if (outerParameterizedExpr==null){
@@ -209,7 +212,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 	    		{		
 	    			String param = ( (StringLiteralExpr) node.getChild( 1 ).getChild( i ) ).getValue();
 	    			if (param.charAt(0)!='-'){
-	    				currentSet.add( new ValueDatumPair( param  , VFDatum.LDVAR ) );
+	    				currentSet.add( new ValueDatumPair<String,VFDatum>( param  , VFDatum.LDVAR ) );
 	    				annotateNode(res.getName());
 	    			}
 	    		}
@@ -223,7 +226,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 	    	if (d==VFDatum.VAR || d==VFDatum.BOT||d==null )
 	        {
 	            endExpr = false;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP) );
 	            annotateNode(res.getName());
 	        }
 	    	boundEndExprToID=false;
@@ -235,20 +238,20 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 	        {
 	            endExpr = false;
 	            boundEndExprToID=true;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.VAR) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.VAR) );
 	            annotateNode(res.getName());
 	        }
 	        if (VFDatum.VAR.equals(d) )
 	        {
 	            endExpr = false;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.VAR ) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.VAR ) );
 	            annotateNode(res.getName());
 	        }
 	    }
 		endExpr|=endExprBackup;
 	    if (outerParameterizedExpr==node){
 	    	if (endExpr){
-	    		currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP ) );
+	    		currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP ) );
 	    		annotateNode(res.getName());
 	    		endExpr=false;
 	    		boundEndExprToID=false;
@@ -260,10 +263,10 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     	caseMyLValue(node);
     }
     public void caseLambdaExpr(LambdaExpr node){
-    	VFFlowset backup = currentSet.clone();
+    	VFFlowset backup = currentSet.copy();
     	Set<String> inputSet=new TreeSet<String>();
     	for (Name inputParam: node.getInputParams()){
-    		currentSet.add(new ValueDatumPair(inputParam.getID(),VFDatum.VAR));
+    		currentSet.add(new ValueDatumPair<String,VFDatum>(inputParam.getID(),VFDatum.VAR));
     		inputSet.add(inputParam.getID());
     	}
     	caseASTNode(node);
@@ -283,7 +286,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 		String targetName=res.getName().getID();
 		/* END Expression */
 		if (boundEndExprToID){
-            currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP) );
+            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP) );
             annotateNode(res.getName());
             boundEndExprToID=false;
 		}
@@ -292,7 +295,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
             if (d == null || VFDatum.BOT.equals(d) || VFDatum.LDVAR.equals( d))
             {
                 endExpr = false;
-                currentSet.add( new ValueDatumPair( targetName, VFDatum.VAR ) );
+                currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.VAR ) );
                 annotateNode(res.getName());
                 boundEndExprToID=false;
             }
@@ -307,7 +310,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
             {
                 String param = ( (StringLiteralExpr) node.getChild( 1 ).getChild( 1 ) ).getValue();
                 if (param.charAt(0)!='-')
-                    currentSet.add( new ValueDatumPair( param  , VFDatum.LDVAR ) );
+                    currentSet.add( new ValueDatumPair<String,VFDatum>( param  , VFDatum.LDVAR ) );
             }
         }
         }
@@ -321,11 +324,11 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
             if ( s!=null && (d==null || VFDatum.BOT.equals( d ) ))
             {
             	if ( scriptOrFunctionExists( s ) ) 
-                    currentSet.add( new ValueDatumPair( s, VFDatum.FUN ) );
+                    currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.FUN ) );
             	else if ( packageExists( s ) ) 
-                   currentSet.add( new ValueDatumPair( s, VFDatum.PREFIX) );
+                   currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.PREFIX) );
                 else 
-                    currentSet.add( new ValueDatumPair( s, VFDatum.BOT ) );
+                    currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.BOT ) );
             }
         }
         else{
@@ -333,7 +336,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
             VFDatum d = currentSet.contains( s );		    
             if ( d==null || VFDatum.BOT.equals(d) )
             {
-                currentSet.add( new ValueDatumPair( s, VFDatum.LDVAR ) );
+                currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.LDVAR ) );
             }
         }
         annotateNode(node.getName());
@@ -355,7 +358,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         if (inFunction)
         	flowSets.put(n, currentSet);
         else
-        	flowSets.put(n, currentSet.clone());
+        	flowSets.put(n, currentSet.copy());
     }
     @Override
 	public VFDatum getResult(Name n) {

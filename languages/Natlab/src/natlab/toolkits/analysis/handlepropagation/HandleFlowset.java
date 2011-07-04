@@ -23,7 +23,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
     public void addAll( String key, Collection<Value> values )
     {
         if( !map.containsKey(key) )
-            map.put(key, new TreeSet());
+            map.put(key, new TreeSet<Value>());
         for( Value target: values ){
             add(key, target);
         }
@@ -62,7 +62,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
     {
         TreeSet<Value> oldSet = map.get(key);
         if( oldSet == null ){
-            TreeSet<Value> set = new TreeSet();
+            TreeSet<Value> set = new TreeSet<Value>();
             set.add( value );
             map.put(key, set);
         }
@@ -98,21 +98,21 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
             hasDHO = set.contains(AbstractValue.newDataHandleOnly());
             hasDWH = set.contains(AbstractValue.newDataWithHandles());
             if( hasDO && hasDHO ){
-                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                TreeSet<Value> newSet = new TreeSet<Value>(set);
                 newSet.remove(AbstractValue.newDataOnly());
                 newSet.remove(AbstractValue.newDataHandleOnly());
                 newSet.add(AbstractValue.newDataWithHandles());
-                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
+                entry = new AbstractMap.SimpleEntry<String,TreeSet<Value>>( entry.getKey(), newSet );
             }
             if( hasDO && hasDWH ){
-                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                TreeSet<Value> newSet = new TreeSet<Value>(set);
                 newSet.remove(AbstractValue.newDataOnly());
-                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
+                entry = new AbstractMap.SimpleEntry<String,TreeSet<Value>>( entry.getKey(), newSet );
             }
             if( hasDHO && hasDWH ){
-                TreeSet<Value> newSet = (TreeSet<Value>) set.clone();
+                TreeSet<Value> newSet = new TreeSet<Value>(set);
                 newSet.remove(AbstractValue.newDataHandleOnly());
-                entry = new AbstractMap.SimpleEntry( entry.getKey(), newSet );
+                entry = new AbstractMap.SimpleEntry<String,TreeSet<Value>>( entry.getKey(), newSet );
             }
             super.add(entry);
         }
@@ -120,7 +120,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
 
     public void add(String key, TreeSet<Value> entry)
     {
-        add( new AbstractMap.SimpleEntry( key, entry ) );
+        add( new AbstractMap.SimpleEntry<String,TreeSet<Value>>( key, entry ) );
     }
 
     /**
@@ -164,7 +164,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
         else{
             other.clear();
             for( Map.Entry<String,TreeSet<Value>> entry : map.entrySet() ){
-                other.add(entry.getKey(), (TreeSet)entry.getValue().clone());
+                other.add(entry.getKey(), new TreeSet<Value>(entry.getValue()));
             }
         }
     }
@@ -173,7 +173,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
      * well. If one set has an entry for an id and the other doesn't
      * then Undef is added to the merged version.
      */
-    public HandleFlowset clone()
+    public HandleFlowset copy()
     {
         HandleFlowset newSet = new HandleFlowset();
         copy(newSet);
@@ -192,20 +192,20 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
         
         for( Map.Entry<String, TreeSet<Value>> entry : this.toList()){
             String key = entry.getKey();
-            TreeSet set = (TreeSet)entry.getValue().clone();
+            TreeSet<Value> set = new TreeSet<Value>(entry.getValue());
             if( !other.containsKey( entry.getKey() ) )
                 set.add( AbstractValue.newUndef() );
             tmpDest.add( key, set );
         }
         for( Map.Entry<String, TreeSet<Value>> entry : other.toList()){
             if( tmpDest.containsKey( entry.getKey() ) ){
-                TreeSet tmpSet = tmpDest.get( entry.getKey() );
+                TreeSet<Value> tmpSet = tmpDest.get( entry.getKey() );
                 for( Value value : entry.getValue() ){
                     tmpDest.add( entry.getKey(), value );
                 }
             }
             else{
-                TreeSet set = (TreeSet)entry.getValue().clone();
+                TreeSet<Value> set = new TreeSet<Value>(entry.getValue());
                 set.add( AbstractValue.newUndef());
                 tmpDest.add( entry.getKey(), set );
             }

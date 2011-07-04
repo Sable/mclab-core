@@ -42,12 +42,11 @@ public class ValueDatumPair< V, D >
         return datum = d;
     }
     /**
-     * Clones the Pair, but only does a deep clone of the datum, not
-     * the value.
+     * Shallow copies the Pair.
      */
-    public ValueDatumPair<V, D> clone()
+    public ValueDatumPair<V, D> copy()
     {
-        return new ValueDatumPair( value, datum);
+        return new ValueDatumPair<V,D>( value, datum);
     }
 
     public static <A> String toString(Object v, A d){

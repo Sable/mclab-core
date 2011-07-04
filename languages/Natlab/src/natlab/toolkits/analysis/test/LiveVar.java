@@ -22,7 +22,7 @@ public class LiveVar extends AbstractSimpleStructuralBackwardAnalysis< HashSetFl
 
     public void caseAssignStmt( AssignStmt node )
     {
-        inFlowSets.put(node, currentInSet.clone() );
+        inFlowSets.put(node, currentInSet.copy() );
         currentOutSet = newInitialFlow();
 
         copy(currentInSet, currentOutSet);
@@ -41,7 +41,7 @@ public class LiveVar extends AbstractSimpleStructuralBackwardAnalysis< HashSetFl
         currentOutSet.difference( kill );
         currentOutSet.union( gen );
 
-        outFlowSets.put( node, currentOutSet.clone() );
+        outFlowSets.put( node, currentOutSet.copy() );
     }
 
     public void caseExpr( Expr node )

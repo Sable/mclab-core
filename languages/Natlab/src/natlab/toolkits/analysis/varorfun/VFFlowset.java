@@ -43,14 +43,14 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
     	if (this == dest) return;
         dest.clear();
         for (ValueDatumPair<String,VFDatum> element : toList()){
-            dest.add(element.clone());
+            dest.add(element.copy());
         }
     }
     protected HashMap<String, VFDatum> set;
     
     public VFFlowset()
     {
-        set = new HashMap();
+        set = new HashMap<String, VFDatum>();
     }
 
     public VFFlowset( HashMap<String, VFDatum> set )
@@ -59,9 +59,9 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
 
     }
     
-    public VFFlowset clone()
+    public VFFlowset copy()
     {
-        HashMap<String, VFDatum> newSet = new HashMap();
+        HashMap<String, VFDatum> newSet = new HashMap<String, VFDatum>();
 
         for( Map.Entry<String, VFDatum> e : set.entrySet() )
             newSet.put( e.getKey(), e.getValue() );
@@ -104,13 +104,14 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
         }
     }
 
-    public boolean remove( ValueDatumPair<String, VFDatum> pair )
+    public boolean remove( Object obj )
     {
-        return set.remove( pair.getValue() ) != null;
+        //return set.remove( pair.getValue() ) != null;
+        return set.entrySet().remove( obj );
     }
-    public boolean contains( ValueDatumPair<String, VFDatum> pair)
+    public boolean contains( Object pair)
     {
-        return set.containsKey( pair.getValue() );
+        return set.entrySet().contains( pair );
     }
     public VFDatum contains( String value )
     {
@@ -118,9 +119,9 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
     }
     public List< ValueDatumPair<String, VFDatum> > toList()
     {
-        List< ValueDatumPair<String, VFDatum> > list = new ArrayList( set.size() );
+        List< ValueDatumPair<String, VFDatum> > list = new ArrayList<ValueDatumPair<String, VFDatum>>( set.size() );
         for( Map.Entry<String ,VFDatum> entry : set.entrySet() ){
-            list.add( new ValueDatumPair( entry.getKey(), entry.getValue() ) );
+            list.add( new ValueDatumPair<String,VFDatum>( entry.getKey(), entry.getValue() ) );
         }
         return list;
     }
@@ -148,5 +149,25 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
         return s.toString();
     }
     public HashMap<String,VFDatum> getMap(){return set;}
+
+    public Iterator<ValueDatumPair<String,VFDatum>> iterator()
+    {
+        return new Iterator<ValueDatumPair<String,VFDatum>>(){
+            Iterator<Map.Entry<String,VFDatum>> mapIterator = set.entrySet().iterator();
+            public boolean hasNext()
+            {
+                return mapIterator.hasNext();
+            }
+            public ValueDatumPair<String,VFDatum> next()
+            {
+                Map.Entry<String,VFDatum> entry = mapIterator.next();
+                return new ValueDatumPair(entry.getKey(), entry.getValue() );
+            }
+            public void remove()
+            {
+                mapIterator.remove();
+            }
+        };
+    }
 
 }

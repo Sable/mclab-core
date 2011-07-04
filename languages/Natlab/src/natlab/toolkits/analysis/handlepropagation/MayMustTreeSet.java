@@ -56,7 +56,7 @@ public class MayMustTreeSet<E> extends TreeSet<E>
 
     public MayMustTreeSet<E> clone()
     {
-        return new MayMustTreeSet(this, must);
+        return new MayMustTreeSet<E>(this, must);
     }
 
     public void addAll( MayMustTreeSet<E> o )

@@ -20,22 +20,22 @@ public class CallGraphBuilder
 
     //maps callables(functions, scripts) to the set of call site
     //labels contained within. 
-    protected HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap = new HashMap();
+    protected HashMap<ASTNode, TreeSet<CallSiteLabel>> programLabelMap = new HashMap<ASTNode, TreeSet<CallSiteLabel>>();
     //Maps a call site node to a call site label object. Call site
     //nodes can be parametrized expressions or name expressions.
-    protected HashMap<ASTNode, CallSiteLabel> labelMap = new HashMap();
+    protected HashMap<ASTNode, CallSiteLabel> labelMap = new HashMap<ASTNode, CallSiteLabel>();
     //Maps a call site label to the set of targets
-    protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap = new HashMap();
+    protected HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>> targetMap = new HashMap<CallSiteLabel, MayMustTreeSet<ASTNode>>();
     //Maps a callable name to the callable node with that name.
     protected HashMap<String, ASTNode> programNameMap;
     //Maps a callable node to it's name
-    protected HashMap<ASTNode, String> nameOfProgMap = new HashMap();
+    protected HashMap<ASTNode, String> nameOfProgMap = new HashMap<ASTNode, String>();
     //Maps call site labels to the callable nodes they belong to
-    protected TreeMap<CallSiteLabel, ASTNode> labelProgramMap = new TreeMap();
+    protected TreeMap<CallSiteLabel, ASTNode> labelProgramMap = new TreeMap<CallSiteLabel, ASTNode>();
 
     protected CallGraph graph;
 
-    protected LinkedList<ASTNode> workList = new LinkedList();
+    protected LinkedList<ASTNode> workList = new LinkedList<ASTNode>();
 
     protected VFPreorderAnalysis nameResolver;
     protected HandlePropagationAnalysis handleResolver;
@@ -229,7 +229,7 @@ public class CallGraphBuilder
         
         public HashSetFlowSet<String> newInitialFlow()
         {
-            return new HashSetFlowSet();
+            return new HashSetFlowSet<String>();
         }
 
         public void caseFunction( Function node )
@@ -369,7 +369,7 @@ public class CallGraphBuilder
         private void addTargetsToMaps( CallSiteLabel label, TreeSet<Value> handleTargets )
         {
             ASTNode target = null;
-            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet();
+            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet<ASTNode>();
             System.out.println(handleTargets);
             for( Value ht : handleTargets ){
                 if( ht instanceof NamedHandleValue ){
@@ -395,7 +395,7 @@ public class CallGraphBuilder
         private void addTargetsToMaps( CallSiteLabel label, String targetName, boolean mustBeCall )
         {
             ASTNode target;
-            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet();
+            MayMustTreeSet<ASTNode> targetSet = new MayMustTreeSet<ASTNode>();
             if( inFunction ){
                 target = currentFunction.lookupFunction( targetName );
                 if( target == null )
@@ -436,7 +436,7 @@ public class CallGraphBuilder
             TreeSet<CallSiteLabel> labelSet;
             labelSet = programLabelMap.get(currentCallable);
                 if(labelSet==null)
-                    labelSet = new TreeSet();
+                    labelSet = new TreeSet<CallSiteLabel>();
             labelSet.add(label);
             programLabelMap.put(currentCallable,labelSet);
         }

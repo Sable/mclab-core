@@ -43,12 +43,12 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected boolean inScript = false;
 
     //public TreeSet<Value> newValues = new TreeSet();
-    public TreeSet<Value> newHandleTargets = new TreeSet();
+    public TreeSet<Value> newHandleTargets = new TreeSet<Value>();
 
     //Set of global variable names.
-    protected HashSet<String> globalNames = new HashSet();
+    protected HashSet<String> globalNames = new HashSet<String>();
     //Set of persistent variable names.
-    protected HashSet<String> persistentNames = new HashSet();
+    protected HashSet<String> persistentNames = new HashSet<String>();
 
     //current statement being operated on.
     protected Stmt currentStmt = null;
@@ -61,7 +61,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     protected VFPreorderAnalysis preorderKindAnalysis;
     protected VFFlowset preorderSet;
 
-    public TreeSet<Value> allHandleTargets = new TreeSet();
+    public TreeSet<Value> allHandleTargets = new TreeSet<Value>();
     private boolean inAssignment = false;
     private boolean inExprStmt = false;
 
@@ -168,7 +168,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         //caseASTNode(node);
         //caseASTNode(node.getStmts());
         analyze(node.getStmts());
-        outFlowSets.put( node, currentOutSet.clone());
+        outFlowSets.put( node, currentOutSet.copy());
     }
 
 
@@ -184,14 +184,14 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         boolean oldChange = change;
         change = false;
         currentStmt = node;
-        HandleFlowset backupIn =(HandleFlowset)currentInSet.clone();
+        HandleFlowset backupIn =(HandleFlowset)currentInSet.copy();
         caseASTNode( node );
         if( change )
             inFlowSets.put(node, backupIn);
         else
             inFlowSets.put(node, currentInSet);
             
-        outFlowSets.put(node, (HandleFlowset)currentOutSet.clone());
+        outFlowSets.put(node, (HandleFlowset)currentOutSet.copy());
         change = oldChange||change;
     }
 
@@ -206,7 +206,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseExpr( Expr node )
     {
         TreeSet<Value> handleBackup = newHandleTargets;
-        newHandleTargets = new TreeSet();
+        newHandleTargets = new TreeSet<Value>();
         caseASTNode( node );
         newHandleTargets = handleBackup; //discard results of children...
         newHandleTargets.add(AbstractValue.newDataOnly()); //..and force a 'data' result
@@ -295,7 +295,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void caseGlobalStmt( GlobalStmt node )
     {
         inFlowSets.put(node, currentInSet);
-        HandleFlowset newOut = currentInSet.clone();
+        HandleFlowset newOut = currentInSet.copy();
 
         for( Name n : node.getNames() ){
             newOut.add(n.getID(), newGeneralSet());
@@ -307,7 +307,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public void casePersistentStmt( PersistentStmt node )
     {
         inFlowSets.put(node, currentInSet);
-        HandleFlowset newOut = currentInSet.clone();
+        HandleFlowset newOut = currentInSet.copy();
 
         for( Name n : node.getNames() ){
             newOut.add(n.getID(), newGeneralSet());
@@ -353,7 +353,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         if( kind != null ){
             //case 1
             if(kind.isVariable()){
-                TreeSet<Value> namesTargets = new TreeSet();
+                TreeSet<Value> namesTargets = new TreeSet<Value>();
                 TreeSet<Value> inTargets = currentInSet.get( node.getName().getID() );
                 if( inTargets != null )
                     namesTargets.addAll(inTargets);
@@ -414,7 +414,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         //Store the incoming handle targets so deeper analysis doesn't
         //add anything to it.
         TreeSet<Value> newHandleTargetsBackup = newHandleTargets;
-        newHandleTargets = new TreeSet();
+        newHandleTargets = new TreeSet<Value>();
 
         for( Expr arg : node.getArgs() ){
             analyze(arg);
@@ -513,13 +513,13 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         boolean oldChange = change;
         change = false;
 
-        HandleFlowset tmpInSet = currentInSet.clone();
-        HandleFlowset newOutSet = tmpInSet.clone();
+        HandleFlowset tmpInSet = currentInSet.copy();
+        HandleFlowset newOutSet = tmpInSet.copy();
 
         Collection<String> lvalues = node.getLValues();
 
         currentOutSet = newOutSet;
-        newHandleTargets = new TreeSet();
+        newHandleTargets = new TreeSet<Value>();
         analyze( node.getRHS() );
 
         killKeys( lvalues, newOutSet );
@@ -531,7 +531,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
             }*/
 
         inFlowSets.put(node, tmpInSet);
-        outFlowSets.put(node, currentOutSet.clone());
+        outFlowSets.put(node, currentOutSet.copy());
         inAssignment = false;
         change = oldChange || change;
     }
@@ -577,7 +577,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         //case 2
         else if( lhs instanceof ParameterizedExpr ){
             ParameterizedExpr pe = (ParameterizedExpr)lhs;
-            newHandleTargets = new TreeSet();
+            newHandleTargets = new TreeSet<Value>();
             for( Expr arg : pe.getArgs() )
                 analyze( arg );
 
@@ -596,7 +596,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         //case 3
         else if( lhs instanceof CellIndexExpr ){
             CellIndexExpr cie = (CellIndexExpr)lhs;
-            newHandleTargets = new TreeSet();
+            newHandleTargets = new TreeSet<Value>();
             for( Expr arg : cie.getArgs() )
                 analyze( arg );
 
@@ -653,10 +653,10 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     public TreeSet<Value> makeStructDataSet( TreeSet<Value> set)
     {
         if( set == null || set.size() == 0 )
-            return new TreeSet();
+            return new TreeSet<Value>();
         else if( set.size() == 1 && 
                  set.contains( AbstractValue.newDataOnly() ) )
-            return (TreeSet)set.clone();
+            return new TreeSet<Value>(set);
         else{
             boolean allHandles = true;
             // test if all values are handles
@@ -669,7 +669,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
                     break;
                 }
             }
-            TreeSet newSet = new TreeSet();
+            TreeSet<Value> newSet = new TreeSet<Value>();
             if( allHandles )
                 newSet.add( AbstractValue.newDataHandleOnly() );
             else
@@ -684,7 +684,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     public TreeSet<Value> getStructuredDataOnly( TreeSet<Value> set )
     {
-        TreeSet<Value> newSet = new TreeSet();
+        TreeSet<Value> newSet = new TreeSet<Value>();
         if( set == null )
             return newSet;
         if(set.contains(AbstractValue.newDataOnly()))
@@ -702,7 +702,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> newGeneralAssignedSet()
     {
-        TreeSet<Value> set = new TreeSet();
+        TreeSet<Value> set = new TreeSet<Value>();
         set.add( AbstractValue.newHandle() );
         set.add( AbstractValue.newDataWithHandles());
         return set;
@@ -713,7 +713,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> newGeneralSet()
     {
-        TreeSet<Value> set = new TreeSet();
+        TreeSet<Value> set = new TreeSet<Value>();
         set.add( AbstractValue.newHandle() );
         set.add( AbstractValue.newDataWithHandles());
         set.add( AbstractValue.newUndef());
@@ -725,7 +725,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> newUndefSet()
     {
-        TreeSet<Value> set = new TreeSet();
+        TreeSet<Value> set = new TreeSet<Value>();
         set.add( AbstractValue.newUndef());
         return set;
     }
@@ -735,7 +735,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> newDOSet()
     {
-        TreeSet<Value> set = new TreeSet();
+        TreeSet<Value> set = new TreeSet<Value>();
         set.add( AbstractValue.newDataOnly());
         return set;
     }
@@ -745,7 +745,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected TreeSet<Value> newHSet()
     {
-        TreeSet<Value> set = new TreeSet();
+        TreeSet<Value> set = new TreeSet<Value>();
         set.add( AbstractValue.newDataOnly());
         return set;
     }
@@ -906,7 +906,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
             change = true;
-            TreeSet<Value> values = new TreeSet();
+            TreeSet<Value> values = new TreeSet<Value>();
             values.addAll( e.getValue() );
             values.add( AbstractValue.newUndef() );
             currentOutSet.add( e.getKey(), values );

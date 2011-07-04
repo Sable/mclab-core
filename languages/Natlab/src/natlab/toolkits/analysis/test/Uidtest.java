@@ -13,12 +13,12 @@ public class Uidtest extends AbstractNodeCaseHandler
 
     public Uidtest()
     {
-        ids = new TreeSet();
+        ids = new TreeSet<Long>();
     }
     public Uidtest( ASTNode tree )
     {
         this.tree = tree;
-        ids = new TreeSet();
+        ids = new TreeSet<Long>();
     }
 
     public void caseASTNode( ASTNode node ) 

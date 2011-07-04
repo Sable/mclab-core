@@ -39,9 +39,9 @@ public class DataPair< K, V >
     /**
      * Clones the Pair. Shallow clone.
      */
-    public DataPair<K, V> clone()
+    public DataPair<K, V> copy()
     {
-        return new DataPair( key, value );
+        return new DataPair<K,V>( key, value );
     }
 
     public static String toString(Object k, Object v){

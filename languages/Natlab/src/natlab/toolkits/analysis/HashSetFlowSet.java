@@ -26,12 +26,12 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
     }
     
     /**
-     * Clones the underlying HashSet
+     * Copies the underlying HashSet
      */
-    public HashSetFlowSet<D> clone()
+    public HashSetFlowSet<D> copy()
     {
-        HashSet<D> cloneSet = (HashSet<D>)set.clone();
-        return new HashSetFlowSet( cloneSet );
+        HashSet<D> copySet = new HashSet<D>(set);
+        return new HashSetFlowSet<D>( copySet );
     }
     
     /**
@@ -50,23 +50,45 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
     {
         return set.size();
     }
+    public void addAll(HashSetFlowSet<? extends D> fs)
+    {
+        set.addAll( fs.set );
+    }
+    public void addAll( Collection<? extends D> c )
+    {
+        set.addAll( c );
+    }
     public void add(D obj)
     {
         set.add(obj);
     }
-    public boolean remove( D obj )
+    public boolean remove( Object obj )
     {
         return set.remove( obj );
     }
-    public boolean contains( D obj )
+    public boolean contains( Object obj )
     {
         return set.contains( obj );
     }
     public List<D> toList()
     {
-        List<D> list = new ArrayList( set.size() );
+        List<D> list = new ArrayList<D>( set.size() );
         for( D i : set )
             list.add( i );
         return list;
+    }
+
+    /**
+     * Creates a set containing the contents of this flow-set.
+     *
+     * @return a new Set with the contents of this flow-set
+     */
+    public Set<D> getSet()
+    {
+        return new HashSet<D>( this.set );
+    }
+    public Iterator<D> iterator()
+    {
+        return set.iterator();
     }
 }

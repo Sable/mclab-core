@@ -3,6 +3,7 @@ package natlab.toolkits.analysis.varorfun;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
+import java.util.Set;
 
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -69,7 +70,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         currentOutSet = currentInSet;
         node.getStmts().analyze(this);
         currentScript=null;
-        outFlowSets.put( node, currentOutSet.clone() );
+        outFlowSets.put( node, currentOutSet.copy() );
     }
     
     public void caseEndExpr( EndExpr node ){
@@ -91,7 +92,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         if (node.getParent().getParent() instanceof Function){
             for( ValueDatumPair<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).toList() ){
                 if( pair.getDatum()==VFDatum.VAR  || pair.getDatum()==VFDatum.BOT)
-                    currentInSet.add( pair.clone() );
+                    currentInSet.add( pair.copy() );
             }        	
         }
         if(DEBUG){
@@ -99,12 +100,12 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     	}
         // Add output params to set
         for( Name n : node.getOutputParams() ){
-            currentInSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
+            currentInSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
         }
 
         // Add input params to set
         for( Name n : node.getInputParams() ){
-            currentInSet.add( new ValueDatumPair(n.getID(), VFDatum.VAR ) );
+            currentInSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
         }
         
         // Process body
@@ -151,7 +152,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         //analyze the rhs
         node.getRHS().analyze( this );
         for( NameExpr n : lhs.getNameExpressions() ){
-            currentOutSet.add( new ValueDatumPair( n.getName().getID(), VFDatum.VAR ) );
+            currentOutSet.add( new ValueDatumPair<String,VFDatum>( n.getName().getID(), VFDatum.VAR ) );
             annotateNode(n.getName());
         }
         outFlowSets.put(node, currentOutSet);
@@ -162,7 +163,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     public void caseGlobalStmt( GlobalStmt node )
     {
         for( Name n : node.getNames() ){
-            currentOutSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
+            currentOutSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
             annotateNode(n);
         }
     }
@@ -171,7 +172,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     public void casePersistentStmt( PersistentStmt node )
     {
     	for( Name n : node.getNames() ){
-            currentOutSet.add( new ValueDatumPair( n.getID(), VFDatum.VAR ) );
+            currentOutSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
             annotateNode(n);
         }
     }
@@ -179,7 +180,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     @Override
     public void caseFunctionHandleExpr( FunctionHandleExpr node )
     {
-    	currentOutSet.add( new ValueDatumPair( node.getName().getID(), VFDatum.FUN ) );
+    	currentOutSet.add( new ValueDatumPair<String,VFDatum>( node.getName().getID(), VFDatum.FUN ) );
         annotateNode(node.getName());
     }
 
@@ -194,11 +195,11 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
             if ( s!=null && d==null || VFDatum.BOT.equals( d ) )
             {
             	if ( scriptOrFunctionExists( s ) ) 
-                    currentOutSet.add( new ValueDatumPair( s, VFDatum.FUN ) );
+                    currentOutSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.FUN ) );
             	else if ( packageExists( s ) ) 
-            		currentOutSet.add( new ValueDatumPair( s, VFDatum.PREFIX) );
+            		currentOutSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.PREFIX) );
                 else 
-                    currentOutSet.add( new ValueDatumPair( s, VFDatum.BOT ) );
+                    currentOutSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.BOT ) );
             }
         }
         else{
@@ -206,7 +207,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
             VFDatum d = currentOutSet.contains( s );		    
             if ( d==null || VFDatum.BOT.equals(d) )
             {
-                currentOutSet.add( new ValueDatumPair( s, VFDatum.LDVAR ) );
+                currentOutSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.LDVAR ) );
             }
         }
         annotateNode(node.getName());
@@ -232,7 +233,11 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     	else
     		System.err.println("in LValue without any target");
     	
-    	NameExpr res = new ArrayList<NameExpr>(target.getNameExpressions()).get(0);
+        //getNameExpressions must return a set containing only
+        //NameExpr
+        @SuppressWarnings("unchecked")
+            Set<NameExpr> names = (Set<NameExpr>)target.getNameExpressions();
+    	NameExpr res = new ArrayList<NameExpr>(names).get(0);
 //    	System.out.println(res.getName().getID()+" EndExpr: "+endExpr+ " boundToID: " + boundEndExprToID + " backup: "+endExprBackup);
 //    	System.out.println(res.getName().getID()+" before: "+ currentSet);
 	    String targetName=res.getName().getID();
@@ -257,7 +262,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
 	    		{		
 	    			String param = ( (StringLiteralExpr) node.getChild( 1 ).getChild( i ) ).getValue();
 	    			if (param.charAt(0)!='-'){
-	    				currentSet.add( new ValueDatumPair( param  , VFDatum.VAR ) );
+	    				currentSet.add( new ValueDatumPair<String,VFDatum>( param  , VFDatum.VAR ) );
 	    				annotateNode(res.getName());
 	    			}
 	    		}
@@ -271,7 +276,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
 	    	if (d==VFDatum.VAR || d==VFDatum.BOT||d==null )
 	        {
 	            endExpr = false;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP) );
 	            annotateNode(res.getName());
 	        }
 	    	boundEndExprToID=false;
@@ -284,13 +289,13 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
 	            endExpr = false;
 	            if (inFunction)
 	            boundEndExprToID=true;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.WAR) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.WAR) );
 	            annotateNode(res.getName());
 	        }
 	        else if (VFDatum.VAR.equals(d)||VFDatum.WAR==d||(d==VFDatum.LDVAR && !inFunction))
 	        {
 	            endExpr = false;
-	            currentSet.add( new ValueDatumPair( targetName, VFDatum.VAR) );
+	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.VAR) );
 	            annotateNode(res.getName());
 	        }
 	    }
@@ -299,7 +304,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
 		endExpr|=endExprBackup;
 	    if (outerParameterizedExpr==node){
 	    	if (endExpr){
-	    		currentSet.add( new ValueDatumPair( targetName, VFDatum.TOP ) );
+	    		currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP ) );
 	    		annotateNode(res.getName());
 	    		endExpr=false;
 	    		boundEndExprToID=false;
@@ -329,19 +334,25 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
 		return currentOutSet;
 	}
 
+        
+	@Override
+	public void caseLoopVar(AssignStmt loopVar) {
+		loopVar.analyze(this);
+	}
+
 	@Override
 	public void caseLoopVarAsCondition(AssignStmt loopVar) {
-		loopVar.analyze(this);
+            caseLoopVar( loopVar );
 	}
 
 	@Override
 	public void caseLoopVarAsInit(AssignStmt loopVar) {
-		loopVar.analyze(this);;
+            caseLoopVar( loopVar );
 	}
 
 	@Override
 	public void caseLoopVarAsUpdate(AssignStmt loopVar) {
-		loopVar.analyze(this);
+            caseLoopVar( loopVar );
 	}
 
 	@Override

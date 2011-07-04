@@ -33,7 +33,7 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
 
     public void caseAssignStmt( AssignStmt node )
     {
-        inFlowSets.put(node, currentInSet.clone() );
+        inFlowSets.put(node, currentInSet.copy() );
         //This line was not in the slides, it is here to make sure that the assignStmt 
         //actually owns the outset it is modifying.
         currentOutSet = newInitialFlow();
@@ -41,7 +41,7 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
         for( String s: node.getLValues()){
             currentOutSet.add( s );
         }
-        outFlowSets.put(node, currentOutSet.clone() );
+        outFlowSets.put(node, currentOutSet.copy() );
     }
 
     //This method was not in the slides. It is there to add info for each statement.

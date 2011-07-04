@@ -16,7 +16,7 @@ public class IsScalarHelper {
 			return false;
 		}
 		for (DataPair<String, IsScalarType> pair : flowSet1.toList()) {
-			IsScalarType type2 = flowSet2.contains(pair.getKey());
+			IsScalarType type2 = flowSet2.containsKey(pair.getKey());
 			if (type2 != pair.getValue()) {
 				return false;
 			}
@@ -36,14 +36,14 @@ public class IsScalarHelper {
 		for (DataPair<String, IsScalarType> pair : oldSet.toList()) {
 			String id = pair.getKey();
 			IsScalarType oldType = pair.getValue();
-			IsScalarType newType = newSet.contains(id);
+			IsScalarType newType = newSet.containsKey(id);
 			IsScalarType addedType = IsScalarHelper.addTypes(oldType, newType);
 			out.add(new DataPair<String, IsScalarType>(id, addedType));
 			remainingKeys.remove(id);
 		}
 		
 		for (String key : remainingKeys) {
-			IsScalarType type = newSet.contains(key);
+			IsScalarType type = newSet.containsKey(key);
 			out.add(new DataPair<String, IsScalarType>(key, type));
 		}
 		

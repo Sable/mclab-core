@@ -5,7 +5,9 @@ import java.util.*;
 
 /**
  * An implementation of FlowSet that is based on a HashMap. This
- * implementation should be considered a set in terms of the key. 
+ * implementation should be considered a set in terms of the key.
+ * NOTE: union, intersection, difference probably don't behave as
+ * expected. 
  */
 public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
 {
@@ -27,12 +29,12 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     }
 
     /**
-     * Clones the underlying HashMap
+     * Shallow copies the underlying HashMap
      */
-    public HashMapFlowSet<K,V> clone()
+    public HashMapFlowSet<K,V> copy()
     {
-        HashMap<K,V> cloneMap = (HashMap<K,V>)map.clone();
-        return new HashMapFlowSet( cloneMap );
+        HashMap<K,V> cloneMap = new HashMap<K,V>(map);
+        return new HashMapFlowSet<K,V>( cloneMap );
     }
 
     /**
@@ -59,26 +61,18 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
         map.put(key, value);
     }
 
-    public boolean remove(Map.Entry<K,V> entry)
+    //public boolean remove(Map.Entry<K,V> entry)
+    public boolean remove(Object obj)
     {
-        V value = map.remove(entry.getKey());
-        if( value.equals(entry.getValue()) )
-            return true;
-        else if( value != null ){
-            add(entry);
-            return false;
-        }
-        else
-            return false;
+        return map.entrySet().remove(obj);
     }
     public boolean removeByKey(K key)
     {
         return map.remove(key) == null;
     }
-    public boolean contains( Map.Entry<K,V> entry )
+    public boolean contains( Object entry )
     {
-        V value = map.get( entry.getKey() );
-        return value.equals( entry.getValue() );
+        return map.entrySet().contains( entry );
     }
     public boolean containsKey( K key )
     {
@@ -87,7 +81,7 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
 
     public List<Map.Entry<K,V>> toList()
     {
-        return new ArrayList( map.entrySet() );
+        return new ArrayList<Map.Entry<K,V>>( map.entrySet() );
     }
     public Set<K> keySet()
     {
@@ -96,6 +90,10 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     public Collection<V> values()
     {
         return map.values();
+    }
+    public Iterator<Map.Entry<K,V>> iterator()
+    {
+        return map.entrySet().iterator();
     }
 
 }
