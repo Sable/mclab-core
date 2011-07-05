@@ -96,4 +96,8 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
         return map.entrySet().iterator();
     }
 
+    public HashMapFlowSet<K,V> emptySet()
+    {
+        return new HashMapFlowSet<K,V>( new HashMap<K,V>() );
+    }
 }

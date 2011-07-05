@@ -134,5 +134,4 @@ public interface FlowSet<D> extends FlowData, Iterable<D>
      */
     //public List<D> toList();
     
-    
 }

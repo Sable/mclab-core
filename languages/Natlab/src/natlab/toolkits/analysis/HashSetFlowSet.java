@@ -34,6 +34,11 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
         return new HashSetFlowSet<D>( copySet );
     }
     
+    public HashSetFlowSet<D> emptySet()
+    {
+        return new HashSetFlowSet<D>(new HashSet<D>());
+    }
+
     /**
      * Clears the underlying HashSet
      */
@@ -90,5 +95,15 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
     public Iterator<D> iterator()
     {
         return set.iterator();
+    }
+
+    public boolean equals(Object o){
+        if( o instanceof HashSetFlowSet )
+            return set.equals( ((HashSetFlowSet)o).set );
+        else
+            return super.equals(o);
+    }
+    public int hashCode() {
+        return set.hashCode();
     }
 }

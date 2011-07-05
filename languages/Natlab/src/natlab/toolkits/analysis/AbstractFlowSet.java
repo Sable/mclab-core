@@ -31,14 +31,13 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         return theCopy;
     }
     
-    /**
-     * implemented, but inefficient.
-     */
-    public AbstractFlowSet<D> emptySet() {
+    
+    abstract public AbstractFlowSet<D> emptySet();
+    /*public AbstractFlowSet<D> emptySet() {
         AbstractFlowSet<D> t = copy();
         t.clear();
         return t;
-    }
+        }*/
     
     public void copy(FlowSet<? super D> dest) {
     	if (this == dest) return;
@@ -52,7 +51,10 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
      * implemented, but *very* inefficient.
      */
     public void clear() {
-        for( D i : copy() )
+        List<D> data = new ArrayList<D>(size());
+        for( D i : this )
+            data.add(i);
+        for( D i : data )
             remove( i );
     }
     
@@ -194,7 +196,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         if (dest != this)
             copy(dest);
         dest.add(obj);
-    }/
+    }*/
     
     @Override
     public abstract boolean remove(Object obj);
