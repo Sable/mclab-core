@@ -130,4 +130,278 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
     abstract public boolean containsKey( Object key );
     abstract public Set<K> keySet();
     abstract public AbstractFlowMap<K,V> emptyMap();
+
+    /**
+     * Remove all data associated with any of the keys in the given
+     * collection. Returns true if the map has changed.
+     *
+     * @param keys  Collection of keys to be removed
+     * @return  Whether or not the map has changed
+     */
+    public boolean removeKeys( Collection<?> keys )
+    {
+        if( keys == null )
+            return false;
+        boolean changed = false;
+        for( Object key : keys )
+            if( remove( key ) != null )
+                changed = true;
+        return changed;
+    }
+    /**
+     * Creates and returns an object implementing the Merger
+     * interface. This merger checks if its inputs are mergable, and
+     * if so, uses their merge operation. Otherwise it thorws a {@code
+     * ClassCastException}.
+     *
+     * @return A Merger object that uses its inputs merge operation
+     */
+    private Merger<V> makeNaturalMerger(){
+        return new Merger<V>(){
+            public V merge( V v1, V v2 ){
+                if( v1 instanceof Mergable && v2 instanceof Mergable ){
+                    //cast is safe based assumptions made by
+                    //implementing Mergable
+                    @SuppressWarnings("unchecked")
+                        Mergable<V> mergableV1 = (Mergable<V>)v1;
+                    return mergableV1.merge(v2);
+                }
+                else
+                    throw new ClassCastException( "Values are not mergable and no merger was given" );
+            }
+        };
+    }
+
+    /**
+     * Checks if any of the inputs are null.
+     */
+    private <T> boolean anyNull( T... args )
+    {
+        for( T o : args )
+            if( o == null )
+                return true;
+        return false;
+    }
+
+    /**
+     * Checks if the input to one of the merge operations is
+     * correct. This means whether or not any of the inputs are
+     * null. If any argument is null, an IllegalArgumentException is
+     * thrown. 
+     *
+     * @throws IllegalArgumentException If any of the arguments are null
+     */
+    private void checkMergeInput( Merger<V> m, FlowMap<K,V>... maps )
+    {
+        if( m == null )
+            throw new IllegalArgumentException("Null merger was given as input");
+        else
+            checkMergeInput(maps);
+    }
+    /**
+     * Checks if the input to one of the merge operations is
+     * correct. This means whether or not any of the inputs are
+     * null. If any argument is null, an IllegalArgumentException is
+     * thrown. 
+     *
+     * @throws IllegalArgumentException If any of the arguments are null
+     */
+    private void checkMergeInput( FlowMap<K,V>... maps )
+    {
+        if( anyNull( maps ))
+            throw new IllegalArgumentException("Input FlowMap was null");
+    }
+
+    /**
+     * Unions {@code other} into {@code this}. Other cannot be
+     * null. The union will contain all the keys contained in either
+     * {@code other} or {@code this}. If the key was only in one, then
+     * the resulting value is the value from the map that had the
+     * key. If they both contained the key, the result is the merge of
+     * the two values. The merge operation is either from an available
+     * Merger, or, if the values implement the {@code Mergable} interface,
+     * their merge operation is used. If there is no merger, and the
+     * data does not implement {@code Mergable}, a {@code
+     * ClassCastException} is thrown.
+     *
+     * @throws ClassCastException If merging cannot be done
+     */
+    public void union(FlowMap<K,V> other){
+        checkMergeInput( other );
+        if( other == this )
+            return;
+        else if( merger != null )
+            union( merger, other );
+        else{
+            Merger<V> m = makeNaturalMerger();
+            union( m, other );
+        }
+    }
+    /**
+     * Unions {@code other} and {@code this} into {@code dest}. {@code
+     * other} and {@code dest} cannot be null. {@code dest} will be
+     * cleared during this operation. The union will contain all the
+     * keys contained in either {@code other} or {@code this}. If the
+     * key was only in one, then the resulting value is the value from
+     * the map that had the key. If they both contained the key, the
+     * result is the merge of the two values. The merge operation is
+     * either from an available Merger, or, if the values implement
+     * the {@code Mergable} interface, their merge operation is
+     * used. If there is no merger, and the data does not implement
+     * {@code Mergable}, a {@code ClassCastException} is thrown.
+     *
+     * @throws ClassCastException If merging cannot be done
+     */
+    public void union(FlowMap<K,V> other, FlowMap<K,V> dest){
+        checkMergeInput( other, dest );
+        if( other == dest && other == this )
+            return;
+        else if( other == this )
+            copy(dest);
+        else if( merger != null )
+            union( merger, other, dest );
+        else{
+            Merger<V> m = makeNaturalMerger();
+            union( m, other, dest );
+        }
+    }
+    /**
+     * Unions {@code other} into {@code this}. Other cannot be
+     * null. The union will contain all the keys contained in either
+     * {@code other} or {@code this}. If the key was only in one, then
+     * the resulting value is the value from the map that had the
+     * key. If they both contained the key, the result is the merge of
+     * the two values. The given {@link Merger} is used to perform the
+     * merge operation. 
+     */
+    public void union(Merger<V> m, FlowMap<K,V> other){
+        checkMergeInput( m, other );
+        if( this == other )
+            return;
+        else
+            for( K key : other.keySet() )
+                mergePut( m, key, other.get(key) );
+    }
+    /**
+     * Unions {@code other} and {@code this} into {@code dest}. {@code
+     * other} and {@code dest} cannot be null. {@code dest} will be
+     * cleared during this operation. The union will contain all the
+     * keys contained in either {@code other} or {@code this}. If the
+     * key was only in one, then the resulting value is the value from
+     * the map that had the key. If they both contained the key, the
+     * result is the merge of the two values. The given {@link Merger}
+     * is used to perform the merge operation.
+     */
+    public void union(Merger<V> m, FlowMap<K,V> other, FlowMap<K,V> dest){
+        checkMergeInput( m, other, dest );
+        if( this == other && this == dest )
+            return;
+        else if( this == dest )
+            union( m, other );
+        else if( other == dest )
+            for( K key : keySet() )
+                dest.mergePut(key, get(key));
+        else if( other == this ){
+            dest.clear();
+            copy(dest);
+        }
+        else{
+            dest.clear();
+            copy(dest);
+            for( K key : keySet() )
+                dest.mergePut( key, get(key) );
+        }
+    }
+
+    /**
+     * Unions {@code other} into {@code this}. Other cannot be
+     * null. The union will contain all the keys contained in either
+     * {@code other} or {@code this}. If the key was only in one, then
+     * the resulting value is the value from the map that had the
+     * key. If they both contained the key, the result is the merge of
+     * the two values. The merge operation is either from an available
+     * Merger, or, if the values implement the {@code Mergable} interface,
+     * their merge operation is used. If there is no merger, and the
+     * data does not implement {@code Mergable}, a {@code
+     * ClassCastException} is thrown.
+     *
+     * @throws ClassCastException If merging cannot be done
+     */
+    public void intersection(FlowMap<K,V> other){
+        checkMergeInput( other );
+        if( other == this )
+            return;
+        else if( merger != null )
+            intersection( merger, other );
+        else{
+            Merger<V> m = makeNaturalMerger();
+            intersection( m, other );
+        }
+    }
+    public void intersection(FlowMap<K,V> other, FlowMap<K,V> dest){
+        checkMergeInput( other, dest );
+        if( other == dest && other == this )
+            return;
+        else if( other == this )
+            copy(dest);
+        else if( merger != null )
+            intersection( merger, other, dest );
+        else{
+            Merger<V> m = makeNaturalMerger();
+            intersection( m, other, dest );
+        }
+    }
+    /**
+     * Intersect {@code m1} and {@code m2}, putting the result into
+     * {@code m2}. The Merger {@code m} is used for merging. This
+     * assumes that all inputs are not null.
+     */
+    private void intersect( Merger<V> m, FlowMap<K,V> m1, FlowMap<K,V> m2 )
+    {
+        if( m1 == m2 )
+            return;
+        else{
+            List<K> keysToRemove = new LinkedList<K>();
+            List<K> keysToMerge = new LinkedList<K>();
+            for( K key : m2.keySet() )
+                if( !m1.containsKey( key ) )
+                    keysToRemove.add( key );
+                else
+                    keysToMerge.add(key);
+            m2.removeKeys( keysToRemove );
+            for( K key : keysToMerge )
+                m2.mergePut( m, key, m1.get(key) );
+        }
+    }
+
+    public void intersection(Merger<V> m, FlowMap<K,V> other){
+        checkMergeInput( m, other );
+        if( this == other )
+            return;
+        else{
+            intersect(m, other, this);
+        }
+    }
+
+    public void intersection(Merger<V> m, FlowMap<K,V> other, FlowMap<K,V> dest){
+        checkMergeInput( m, other, dest );
+        if( other == dest && other == this )
+            return;
+        else if( other == dest ){
+            intersect(m, this, dest);
+        }
+        else if( this == dest )
+            intersection( m, other );
+        else if( this == other ){
+            dest.clear();
+            copy(dest);
+        }
+        else{
+            dest.clear();
+            for( K key : keySet() )
+                if( other.containsKey( key ) )
+                    dest.put( key, m.merge( get(key), other.get(key) ) );
+        }
+    }
+
 }

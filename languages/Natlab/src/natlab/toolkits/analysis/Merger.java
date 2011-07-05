@@ -13,7 +13,10 @@ public interface Merger<E>
 {
     /**
      * Merges two objects and returns the result. This should have no
-     * side effects. 
+     * side effects. If the merge cannot be performed, a {@code
+     * ClassCastException} should be thrown.
+     *
+     * @throws ClassCastException If the inputs cannot be merged
      */
     public E merge(E o1, E o2);
 }

@@ -115,6 +115,14 @@ public interface FlowMap<K,V> extends FlowData
      */
     public V remove( Object key );
     /**
+     * Removes all key value pairs associated with the keys in the
+     * given collection.
+     *
+     * @param keys  Collection of keys to be removed
+     * @return  Whether or not the map has changed
+     */
+    public boolean removeKeys( Collection<?> keys );
+    /**
      * Return {@code true} if this map contains data associated with
      * the given {@code key}.
      *
