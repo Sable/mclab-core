@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @see AbstractStructuralForwardAnalysis
  */
-public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet> extends AbstractStructuralForwardAnalysis<A>
+public abstract class AbstractSimpleStructuralForwardAnalysis<A> extends AbstractStructuralForwardAnalysis<A>
 {
 
     public AbstractSimpleStructuralForwardAnalysis(ASTNode tree){
@@ -23,7 +23,6 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
     public void caseBreakStmt( BreakStmt node )
     {
         A copiedOutSet = newInitialFlow();
-        copiedOutSet.clear();
         copy( currentInSet, copiedOutSet );
         loopStack.peek().addBreakSet( copiedOutSet );
     }
@@ -35,7 +34,6 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
     public void caseContinueStmt( ContinueStmt node )
     {
         A copiedOutSet = newInitialFlow();
-        copiedOutSet.clear();
         copy( currentInSet, copiedOutSet );
         loopStack.peek().addContinueSet( copiedOutSet );
     }
@@ -58,7 +56,6 @@ public abstract class AbstractSimpleStructuralForwardAnalysis<A extends FlowSet>
         for( A set : loopStack.peek().getBreakOutSets() ){
             if( mergedSets == null ){
                 mergedSets = newInitialFlow();
-                mergedSets.clear();
                 copy(set, mergedSets);
             }
             else

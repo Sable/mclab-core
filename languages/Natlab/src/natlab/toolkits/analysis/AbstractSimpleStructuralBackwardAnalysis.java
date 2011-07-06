@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @see AbstractStructuralBackwardAnalysis
  */
-public abstract class AbstractSimpleStructuralBackwardAnalysis<A extends FlowSet> extends AbstractStructuralBackwardAnalysis<A>
+public abstract class AbstractSimpleStructuralBackwardAnalysis<A> extends AbstractStructuralBackwardAnalysis<A>
 {
 
     public AbstractSimpleStructuralBackwardAnalysis(ASTNode tree){
