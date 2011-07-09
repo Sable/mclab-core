@@ -17,11 +17,19 @@
 # =========================================================================== #
 
 import csv;
+import processTags;
+
+
 
 # caps first letter
 def firstCaps(s):
    if (len(s) == 0): return ''
    return s[0].capitalize()+s[1:]
+
+
+# returns the children of the given name
+def getChildren(name,children,parents) :
+  return [children[i] for i in range(0,len(children)) if parents[i] == name]
 
 
 # function which constructs the Builtin.java file
@@ -37,11 +45,11 @@ import natlab.toolkits.path.BuiltinQuery;
 public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
     public static void main(String[] args) {
-        System.out.println(create("i"));
+        java.lang.System.out.println(create("i"));
         Builtin b = builtinMap.get("i");
-        System.out.println(b+"  "+b.create());
-        System.out.println("number of builtins "+builtinMap.size());
-        System.out.println(builtinMap);
+        java.lang.System.out.println(b+"  "+b.create());
+        java.lang.System.out.println("number of builtins "+builtinMap.size());
+        java.lang.System.out.println(builtinMap);
     }
 
     /**
@@ -107,24 +115,31 @@ public abstract class Builtin {
     """)
     # print the classes
     for i in range(0,N):
-        printClass(file,parents[i],children[i],abstract[i])
+        printClass(file,parents[i],children[i],abstract[i],tags[i])
     file.write( "\n}" )
+
+
+# used by printClass for tagMatching
+import re
+matchWord = re.compile('^\w*');
 
 # prints the static classes inside the Builtin class, for a given builtin operation
 # note that operations can either be asbtract or non abstract
-def printClass(file,parent,child,isAbstract):
+def printClass(file,parent,child,isAbstract,tags):
+    # first define code for either abstract or non-abstract class
+    # note that we reinsert %s, so that we can insert the 'implements' clause later
+    iset = set();
     if (isAbstract):
-        file.write( """
-    public static abstract class %s extends %s {
+        code =  """
+    public static abstract class %s extends %s %s {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.case%s(this,arg);
         }
-    }""" % (firstCaps(child),firstCaps(parent),firstCaps(child)) )
-
+        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child));
     else:
-        file.write( """
-    public static class %s extends %s {
+        code = """
+    public static class %s extends %s %s {
         //creates a new instance of this class
         protected Builtin create(){
             return new %s();
@@ -137,7 +152,24 @@ def printClass(file,parent,child,isAbstract):
         public String getName(){
             return "%s";
         }
-    }""" % (firstCaps(child),firstCaps(parent),firstCaps(child),firstCaps(child),child) )
+        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child),firstCaps(child),child);
+    # fill in code due to tags
+    for tagName in tags.keys():
+       tagArgs = tags[tagName];
+       # the function that deals with the tag needs to have the same name as the tag 
+       f = eval('processTags.'+tagName)
+       # calls with (name, java-name, parent-java-name, is-abstract, tag-arguments, implements-set, tag-map)
+       code += f(child,firstCaps(child),firstCaps(parent),isAbstract,tagArgs,iset,tags)
+
+    # other code that needs to be added to a class can be added here
+
+
+    # finish classes
+    implements = '';
+    if (len(iset) > 0):
+       implements = 'implements '+', '.join(iset)
+    file.write(code % (implements) + """
+    }""");
 
 
 # prints the visitor class walking up the class hierarchy as a default case
@@ -156,35 +188,82 @@ public abstract class BuiltinVisitor<Arg,Ret> {
 }""")
     
 
+# prints the the tree as a dot file
+def printTreeDot(file,children,parents,abstract,comments):
+   N = len(children);
+   file.write("""digraph builtins{
+       //size="10.25,7.75";
+       rankdir=LR;
+       graph [ranksep=0];
+       edge[ weight = 1.2 ];
+       Builtin;
+
+""");
+   list = [];
+   for i in range(0,N):
+      if (abstract[i]) :
+         file.write('\n')
+         shortName = children[i][8:] #removes the 'abstract'
+         if (len(comments[i]) > 0) : file.write('    \n    //%s' % comments[i])
+         file.write("""
+       %s[shape=plaintext,color=none,label="%s"];""" % (children[i],shortName));
+         file.write("""
+       %s -> %s;""" % (parents[i],children[i]));
+         # find the non abstract children - and insert new node for them
+         cs =  [children[j] for j in range(0,N) if parents[j] == children[i] and not abstract[j]]
+         if len(cs) >= 1 : 
+           file.write("""
+       %s[shape=box,label="%s",rank="max"];""" % (cs[0],"\\n".join(cs)));
+           file.write("""
+       %s -> %s;""" % (children[i],cs[0]));
+           list.append(cs[0])
+
+   file.write("""
+       //  {rank=same; %s }
+}""" % " ".join(list))
+    
+
 
 
 
 
 
 # the script that reads the csv and prints the stuff
-reader = csv.reader(open("builtins.csv"));
+reader = csv.reader(open("builtins.csv"), delimiter=';');
 list = []
 tree = {}
-currentParent = ''; # if no parent is defined, use the most child - no need to specify parents of leafs
+currentParent = ''; # if no parent is defined, use the most recent child - no need to specify parents of leafs
 currentComment = ''; # comments are collected and output in the visitor class
 
 children = []
 parents = []
 comments = []
+tags = [] # list of map of tags for every builtin - starts after 2nd entry (tagName -> tagArgs)
 
 # read through all rows, filling in tree
 for row in reader:
     if (len(row) == 0):
         3;
-    elif (row[0][0] == '#'):
+    elif (row[0][0] == '#'): #catch comment
         currentComment = row[0][1:].strip()
     else:
         children.append(row[0])
-        if ((len(row) < 2 or (len(row[1]) ==  0))):
+        # use most recent child (currentParent) if no parent i defined
+        if ((len(row) < 2 or (len(row[1].strip()) ==  0))):
             parents.append(currentParent)
         else:
             parents.append(row[1].strip());
             currentParent = children[-1];
+        taglist = ([s.strip() for s in row[2:] if s.strip() != '']) # read tags - remove empties and strip
+        t = {}
+        for tag in taglist:
+           # find first word
+           i = matchWord.match(tag).span();
+           tagName = tag[i[0]:i[1]];
+           tagArgs = tag[i[1]:].strip();
+           t[tagName] = tagArgs;
+        tags.append(t);
+        print t
         comments.append(currentComment);
         currentComment = '';
 
@@ -193,6 +272,10 @@ for row in reader:
 abstract = [True if child in parents else False for child in children]
 children = ['abstract'+firstCaps(child)  if child in parents else child for child in children]
 parents  = ['abstract'+firstCaps(parent) for parent in parents]
+
+
+
+
 
 #  overall parent is Builtin, treat it specially
 parents = ['Builtin' if parent == 'abstractBuiltin' else parent for parent in parents]
@@ -211,7 +294,16 @@ file = open('BuiltinVisitor.java','w');
 printBuiltinVisitorJava(file,children,parents,abstract,comments)
 file.close();
 
+
+# write the tree.dot
+print 'creating dot of tree'
+file = open('tree.dot','w');
+printTreeDot(file,children,parents,abstract,comments)
+file.close();
+
 print 'genereated code for %d builtings (including abstract builtins)' % (len(children))
 
 for i in range(0,len(children)):
    if not abstract[i]: print children[i]
+
+print 'number of Builtins generated: %d' % (len(children))
