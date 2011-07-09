@@ -1,76 +1,93 @@
-# =========================================================================== #
-#                                                                             #
-# Copyright 2011 Anton Dubrau and McGill University.                          #
-#                                                                             #
-#   Licensed under the Apache License, Version 2.0 (the "License");           #
-#   you may not use this file except in compliance with the License.          #
-#   You may obtain a copy of the License at                                   #
-#                                                                             #
-#       http://www.apache.org/licenses/LICENSE-2.0                            #
-#                                                                             #
-#   Unless required by applicable law or agreed to in writing, software       #
-#   distributed under the License is distributed on an "AS IS" BASIS,         #
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  #
-#   See the License for the specific language governing permissions and       #
-#  limitations under the License.                                             #
-#                                                                             #
-# =========================================================================== #
+# specifies builtins, in a tree structure, with annotated information
+# this list is used to generate the java code for the builtins (via 'genBuiltin.py') 
+# Syntax:
+# <name>; <parent>; <tag1>; <tag2>; ... ; <tagn>
+# - if no parent is specified then the most recent name is assumed
+# - the most recent comment gets preserved and annotated to the java code
+# - all parent classes will be renamed as Abstract<Name>, except the root
+# - all classes will have their first letter capitalized
+# - the overall parent class 'Builtin' - is treated specially, so doesn't need to
+#   specifically listed
+# - Tags are optional -- they specify extra properties that the builtins have.
+#   Both internal nodes (abstract builtins) and leafs (actual
+#   builtins) can have tags. a tag will force some extra code to be
+#   inserted into the buitin, and/or force it to implement some extra interface.
+#
+# tags:
+# - args, args(), args(n), args(m,n)
+#     Defines the allowable number of parameters, via the interface
+#     ArityDefined. args, args() will add the interface for abstract
+#     builtins, args(n) sets a fixed arity, args(m,n) a variadic
+#     range, 'inf' is infinity (i.e. args(2,inf) means 2 or more args)
+#
 
-#name    parent
-#if no parent is specified then the most recent parent is assumed
-#preserves the most recent comment
-#all parent classes will be renamed as Abstract<Name>, except the root
 
-# the overal parent class - is treated specially, so doesn't need to
-# specifically listed
-#builtin
+#
+# TODO
+# - class is not impure
+# - mfilename is matlab system
+# - better categorize matlab system stuff
+# - better categorize operator vs matrix operator, and the binary vs
+#     unary, and elementwise vs matrix
+#     also group by type (numerical, float, etc.)
+# - an operator is something that takes the same number of args,
+#     always ?
+# - group explicit indexing
+# - should I name <type>Result<..>?
+
+
 
 #pure functions have no side effects and always return the same value
-pureFunction, builtin
+pureFunction; builtin
 
 # *** constants **************************************************
-constant, pureFunction     
+constant; pureFunction;
 
-numericalConstant, constant
-i,
-j,
-pi,
+numericalConstant; constant; args(0)
+i
+j
+pi
 
-logicalConstant, constant
-true,
-false,
 
 
 #matlab operators
-operator, pureFunction
+operator; pureFunction
 
 # special operators ... not sure what to do with them
 colon
 horzcat
 vertcat
+cat
 nargin
 nargout
+mfilename
 end
-cast
+
 
 # other operators
 isequalwithequalnans
-# same as isequal, but nan == nan
+# same as isequal; but nan == nan
 isequal
 # recursive equal all
 subsasgn
 # explicit indexingops
 subsref
+
+histc
+
+
+mapOperator; operator;
 structfun
-# map function across structs
+arrayfun
+cellfun
 
 
 # *** binary ops *************************************************
-binaryOperator, operator
+binaryOperator; operator
 
 
 #relational ops
-relationalOperator, binaryOperator
+relationalOperator; binaryOperator
 eq
 ne
 lt
@@ -80,7 +97,7 @@ gt
 
 
 #logical operators - note there's no short circuit ops
-binaryLogicalOperator, binaryOperator
+binaryLogicalOperator; binaryOperator
 and
 or
 xor
@@ -89,9 +106,9 @@ xor
 
 
 #numerical binary oprators
-numericalBinaryOperator, binaryOperator
+numericalBinaryOperator; binaryOperator
 #matrix operators
-matrixOperator, numericalBinaryOperator
+matrixBinaryOperator; numericalBinaryOperator
 plus
 minus
 mtimes
@@ -99,54 +116,66 @@ mpower
 mldivide
 mrdivide
 #array operators
-arrayOperator, numericalBinaryOperator
+elementwiseBinaryOperator; numericalBinaryOperator
 times
 ldivide
 rdivide
 power
 pow2
-#scalbn, ldexp
+#scalbn; ldexp
 mod
+rem
+# only works with single; double
+hypot
 
 # *** unary operators ***************************************************
-unaryOperator, operator
+unaryOperator; operator
 
-numericalUnaryOperator, unaryOperator
+numericalUnaryOperator; unaryOperator
+elementwiseUnaryOperator; numericalUnaryOperator
 uplus
 uminus
-transpose
-ctranspose
 conj
 real
 imag
 abs
-eps
+
+matrixUnaryOperator; numericalUnaryOperator
+transpose
+ctranspose
+# analytical matrix operators
+expm
+sqrtm
+logm
 
 
-logicalUnaryOperator, unaryOperator
+
+logicalUnaryOperator; unaryOperator
 not
-any
-all
-isempty
+
 
 # *** matrix operations ************************************************
-matrixOperation, pureFunction
-elementwiseMatrixOperation, matrixOperation
+matrixOperation; pureFunction
+elementwiseMatrixOperation; matrixOperation
 sqrt
+realsqrt
 erf
 erfinv
 erfc
 erfcinv
+gamma
 gammainc
 betainc
-
-
-transcendentalFunction, elementwiseMatrixOperation
+gammaln
 exp
 log
+log2
+log10
 
-#TODO group trigs together
-trigonometricFunction, transcendentalFunction
+
+
+forwardTrigonometricFunction;elementwiseMatrixOperation 
+trigonometricFunction; forwardTrigonometricFunction
 sin
 cos
 tan
@@ -154,7 +183,7 @@ cot
 sec
 csc
 
-decimalTrigonometricFunction, transcendentalFunction
+decimalTrigonometricFunction; forwardTrigonometricFunction
 sind
 cosd
 tand
@@ -162,7 +191,7 @@ cotd
 secd
 cscd
 
-hyperbolicTrigonometricFunction, transcendentalFunction
+hyperbolicTrigonometricFunction; elementwiseMatrixOperation
 sinh
 cosh
 tanh
@@ -170,7 +199,8 @@ coth
 sech
 csch
 
-inverseTrigonmetricFunction, transcendentalFunction
+inverseTrigonmetricFunction; elementwiseMatrixOperation
+standardInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asin
 acos
 atan
@@ -179,7 +209,7 @@ acot
 asec
 acsc
 
-decimalInverseTrigonmetricFunction, transcendentalFunction
+decimalInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asind
 acosd
 atand
@@ -187,7 +217,7 @@ acotd
 asecd
 acscd
 
-hyperbolicInverseTrigonmetricFunction, transcendentalFunction
+hyperbolicInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asinh
 acosh
 atanh
@@ -196,7 +226,7 @@ asech
 acsch
 
 
-RoundingOperation, elementwiseMatrixOperation
+RoundingOperation; elementwiseMatrixOperation
 fix
 round
 floor
@@ -204,45 +234,77 @@ ceil
 
 
 # matrix computation algorithms
-matrixComputation, matrixOperation
+matrixComputation; matrixOperation
+inv
 eig
 norm
 rank
+det
 dot
 cross
+# factorization
+linsolve
+# linear solve
+# n dimensional discrete fourier transform
+rcond
+# condition number estimate
+tril
+triu
+eps
+
+fourierFunction; matrixComputation
+ifftn
+fftn
+fft
+
+
+factorization; matrixComputation
 schur
 #factorization
 ordschur
 lu
-# factorization
-linsolve
-# linear solve
-ifftn
-# n dimension inverse discrete fourier transform
-fftn
-# n dimensional discrete fourier transform
-rcond
-# condition number estimate
+chol
+qr
+svd
 
-# analytical matrix operators
-expm
-sqrtm
-logm
 
 
 # bit operators
-bitOperation, pureFunction
+bitOperation; pureFunction
 bitand
 bitor
 bitxor
 bitcmp
 bitget
 bitshift
+bitset
+
+
+# *** string operations **************************************************
+stringOperation; pureFunction
+strncmpi
+strcmp
+strcmpi
+strtrim
+strfind
+findstr
+strrep
+upper
+lower
+deblank
+
+
+# regulat expressions
+regexpOperation; stringOperation
+regexptranslate
+regexp
+regexpi
+tegexprep
 
 
 # *** Constructors *****************************************************
-constructor, pureFunction
-primitiveConstructor, constructor
+constructor; pureFunction
+primitiveConstructor; constructor
 double
 single
 char
@@ -257,50 +319,113 @@ uint32
 uint64
 
 
-compoundConstructor, constructor
+compoundConstructor; constructor
 cell
 struct
 
 
+conversionFunction; constructor
+cell2struct
+struct2cell
+typecast
+cast
+
+
+# *** struct operations ************************************************
+structOperation; pureFunction
+isfield
+
+
+# *** class operations **************************************************
+classOperation; pureFunction
+class
+
+classQueryOperation; classOperation
+methodnames
+fieldnames
+
+logicalClassQueryOperation; classQueryOperation
+isempty
+isobject
+isfloat
+isinteger
+islogical
+isstruct
+ischar
+iscell
+isa
+
+
 # *** Array operations **************************************************
-arrayOperation, pureFunction
+arrayOperation; pureFunction
 sort
 unique
-
-
-arrayConstructor, arrayOperation
-ones
-zeros
-diag
-eye
-# changing arrays
-reshape
-squeeze
 find
 
-arrayQueryOperation, arrayOperation
+arrayConstructor; arrayOperation
+diag
+# changing arrays
+reshape
+permute
+squeeze
+complex
+
+dimensionCollapsingOperation; arrayOperation
+prod
+sum
 mean
 min
 max
-numel
-length
+
+
+ShapeArrayConstructor; arrayConstructor
+# construct arrays via their dimensions; and possibly a type
+NumericalShapeAndTypeArrayConstructor; ShapeArrayConstructor
+ones
+zeros
+# eye takes at most 2 dims
+eye
+FloatShapeAndTypeArrayConstructor; NumericalShapeAndTypeArrayConstructor
+inf
+nan
+LogicalShapeArrayConstructor; ShapeArrayConstructor
+true
+false
+
+
+
+arrayQuery; arrayOperation
 size
-sum
-prod
-# true/false queries - unary op?
+nonzeros
+cumprod
+cumsum
+sign
+
+
+scalarResultArrayQuery; arrayQuery
+numericalScalarResultArrayQuery; scalarResultArrayQuery
+length
+ndims
+numel
+nnz
+
+logicalScalarResultArrayQuery; scalarResultArrayQuery
+any
+all
 isemtpy
-isinteger
+isnan
+isinf
+isfinite
+isvector
+isscalar
+isreal
+isnumeric
 
 
-# *** regulat expressions ************************************************
-regexpOperation, pureFunction
-regexptranslate
-regexp
-regexpi
 
 
 # *** opposite of pure functions *****************************************
-impureFunction, builtin
+impureFunction; builtin
 
 # dunnno what to do with these
 superiorto
@@ -311,37 +436,104 @@ quit
 builtin
 # calls builtin - strict
 
-timeFunction, impureFunction
+timeFunction; impureFunction
 clock
 tic
 toc
+cputime
 
 
-reportFunction, impureFunction
+matlabSystemFunction; impureFunction
+assert
+nargoutchk
+nargchk
+str2func
+pause
+
+
+dynamicMatlabFunction; matlabSystemFunction
+eval
+evalin
+feval
+assignin
+inputname
+
+matlabEnvironmentFunction; matlabSystemFunction
+import
+cd
+exist
+matlabroot
+whos
+which
+version
+clear
+
+
+reportFunction; impureFunction
+# errors should be seprated from warnings and displaying stuff?
+disp
+display
+clc
 error
 warning
 echo
 # should this be here? - this could be a strict lib function?
 diary
 # something logging related
+lastwarn
+lasterror
+format
 
-randomFunction, impureFunction
+
+randomFunction; impureFunction
 rand
 randi
+randn
 
-ioFunction, impureFunction
-fprintf
-sprintf
+
+systemFunction; impureFunction
+# should there be a separated operating system category?
+computer
+beep
+dir
+
+operatingSystemCallFunction; systemFunction
+unix
+dos
+system
+
+
+ioFunction; systemFunction
 load
-disp
+save
+input
+textscan
+
+
+posixIoFunction; ioFunction
+sprintf
+sscanf
+fprintf
+ftell
+ferror
+fopen
+fread
+frewind
+fscanf
+fseek
+fwrite
+fgetl
+fgets
+fclose
+
 
 # *** library funcitons that are not builtins!! TODO **********************
-notABuiltin, builtin
-conv
-toeplitz
-dyaddown
-flipud
-linspace
-imwrite
+#notABuiltin, builtin
+#conv
+#toeplitz
+#dyaddown
+#flipud
+#linspace
+#imwrite
 
 
