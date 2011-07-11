@@ -414,6 +414,8 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
                 currentOutSet = backupSet( nextIn );
             }
             analyze( body );
+            if ( DEBUG )
+                System.out.println("after IF block "+currentOutSet);
             if( mergedOuts == null ){
                 mergedOuts = backupSet( currentOutSet );
             }
@@ -440,7 +442,8 @@ public abstract class AbstractStructuralForwardAnalysis<A > extends AbstractStru
                  System.out.println( "!out after body "+currentOutSet );
             }
             if(DEBUG)
-                System.out.println("merging " + currentOutSet.toString() );
+                System.out.println("merging " + currentOutSet.toString()+
+                        "\n  and "+mergedOuts );
             merge( currentOutSet, mergedOuts, mergedOuts );
             if(DEBUG)
                 System.out.println("result " + mergedOuts.toString());

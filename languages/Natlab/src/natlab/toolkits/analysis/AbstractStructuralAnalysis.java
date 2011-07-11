@@ -42,10 +42,27 @@ public abstract class AbstractStructuralAnalysis<A > extends AbstractNodeCaseHan
         return outFlowSets;
     }
 
+    /**
+     * Associates the given out set with the given node. 
+     * @return the outsed previously associated with the node.
+     */
+    protected A associateOutSet(ASTNode node, A outSet){
+        return outFlowSets.put(node, outSet);
+    }
+    
     public Map<ASTNode, A> getInFlowSets(){
         return inFlowSets;
     }
 
+    /**
+     * Associates the given out set with the given node. 
+     * @return the outsed previously associated with the node.
+     */
+    protected A associateInSet(ASTNode node, A inSet){
+        return inFlowSets.put(node, inSet);
+    }
+
+    
     /**
      * Returns a boolean signifying whether or not the analysis has
      * been performed on a given AST. This does not take into account
