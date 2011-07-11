@@ -1,3 +1,4 @@
 
-t1 = bar();
-a( t1 ) = foo();
+t1 = foo();
+t2 = bar();
+a( t2 ) = t1;

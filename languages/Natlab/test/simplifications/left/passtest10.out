@@ -1,3 +1,4 @@
 
+t0 = blah();
 t2 = foo(bar);
-a(t2) = blah();
+a(t2) = t0;
