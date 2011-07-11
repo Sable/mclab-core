@@ -80,15 +80,16 @@
             <arg value="${gen.dir}" />
           </java>
         </target-->
-        <target name="gen.simpleif.pass.tests" depends="set.bin.dir">
-          <echo message="Generating simple if pass tests" />
-          <java classname="${simpleif.pass.test.generator.class}" classpath="${bin.dir}">
-            <arg value="${simpleif.pass.test.list.file}" />
+
+        <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
+          <echo message="generating simplifications pass tests" />
+          <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
+            <arg value="${simplifications.pass.test.master.file}" />
             <arg value="${gen.dir}" />
           </java>
-        </target>        
+        </target>
 
-        <target name="gen.simplification.tests" depends="gen.simpleif.pass.tests" />
+        <target name="gen.simplification.tests" depends="gen.simplifications.pass.tests" />
 	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.simplification.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
