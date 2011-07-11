@@ -30,7 +30,8 @@ public class AllTests {
 
                 //suite.addTestSuite(MultireturnSimplifyPassTests.class);
                 //suite.addTestSuite(LeftThreeAddressSimplifyPassTests.class);
-                suite.addTestSuite(SimpleIfPassTests.class);
+                //suite.addTestSuite(SimpleIfPassTests.class);
+                suite.addTestSuite(MultiRewritePassTests.class);
 
 		//$JUnit-END$
 		return suite;

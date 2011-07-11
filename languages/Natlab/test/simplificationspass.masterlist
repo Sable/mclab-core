@@ -1,0 +1,2 @@
+SimpleIfSimplification:test/simplifications/simpleifpass.testlist
+LeftSimplification:test/simplifications/leftsimplepass.testlist
