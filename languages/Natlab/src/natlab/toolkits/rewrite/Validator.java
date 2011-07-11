@@ -34,7 +34,24 @@ public class Validator extends AbstractDepthFirstAnalysis<Boolean>
      * Used to tell if, at a given point, the analysis is in the lhs
      * of an assignment. This should be maintained by analysis code.
      */
-    private boolean inAssignmentLHS = false;
+    private boolean inAssignLHS = false;
+
+    /**
+     * Used to query if it is in the lhs of an assignment. 
+     */
+    private boolean inAssignmentLHS()
+    {
+        return inAssignLHS;
+    }
+
+    /**
+     * Sets whether or not the analysis is in the lhs of an
+     * assignment. 
+     */
+    private void setInAssignmentLHS( boolean inLHS )
+    {
+        inAssignLHS = inLHS;
+    }
 
     private void fail()
     {
@@ -100,9 +117,9 @@ public class Validator extends AbstractDepthFirstAnalysis<Boolean>
             handleMultiAssigns( node, (MatrixExpr)node.getLHS(), node.getRHS() );
         else if( isName(node.getLHS()) || isNameOrValue(node.getRHS()) ){
             if( !isName(node.getLHS()) ){
-                inAssignmentLHS = true;
+                setInAssignmentLHS( true );
                 analyze( node.getLHS() );
-                inAssignmentLHS = false;
+                setInAssignmentLHS( false );
             }
             if( !isNameOrValue( node.getRHS() ) )
                 analyze( node.getRHS() );
@@ -157,7 +174,7 @@ public class Validator extends AbstractDepthFirstAnalysis<Boolean>
      */
     public void caseLiteralExpr( LiteralExpr node )
     {
-        if( inAssignmentLHS )
+        if( inAssignmentLHS() )
             fail(node, "no literals on LHS of assignment");
     }
     /**
@@ -192,7 +209,7 @@ public class Validator extends AbstractDepthFirstAnalysis<Boolean>
      */
     private boolean lhsTest(ASTNode node, String failReason)
     {
-        if( inAssignmentLHS ){
+        if( inAssignmentLHS() ){
             fail(node, failReason);
             return false;
         }
@@ -267,13 +284,31 @@ public class Validator extends AbstractDepthFirstAnalysis<Boolean>
     }
 
     /**
-     * Ensures that field accesses are simple. They can only be a
-     * single field deep, and the target must be a name.
+     * Ensures that field accesses are simple. This differs depending
+     * on whether or not it is on the left- or right-hand side of an
+     * assignment. 
+     * 
+     * On the right-hand side, they can only be a single field deep,
+     * and the target must be a name.
+     *
+     * On the left-hand side, they can be arbitrarily deep. The target
+     * can be either a name, another {@code DotExpr} or a {@code
+     * ParameterizedExpr}.
      */
     public void caseDotExpr( DotExpr node )
     {
-        if( !isName( node.getTarget() ) )
-            fail(node);
+        if( inAssignmentLHS() ){
+            if( isName( node.getTarget() ) )
+                return; //good so far
+            else if( node.getTarget() instanceof ParameterizedExpr ||
+                     node.getTarget() instanceof DotExpr )
+                analyze(node.getTarget());
+            else
+                fail(node);
+        }
+        else
+            if( !isName( node.getTarget() ) )
+                fail(node);
     }
     /**
      * Ensures that if stmts are simple. They must have at most one
