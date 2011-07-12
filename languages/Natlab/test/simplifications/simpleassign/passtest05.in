@@ -1,0 +1,4 @@
+
+for i = foo()
+    a(1) = foo();
+end

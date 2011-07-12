@@ -1,0 +1,8 @@
+
+t1 = foo;
+t2 = bar;
+while t1 > t2
+    foo()
+    t1 = foo;
+    t2 = bar;
+end

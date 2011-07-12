@@ -1,0 +1,23 @@
+
+t4 = A;
+if ~t4
+    t5 = B;
+    t2 = t4 | t5;
+else
+    t2 = t4;
+end
+if t2
+    t6 = C;
+    if ~t6
+        t7 = D;
+        t3 = t6 | t7;
+    else
+        t3 = t6;
+    end
+    t1 = t2 & t3;
+else
+    t1 = t2;
+end
+if t1
+    foo();
+end

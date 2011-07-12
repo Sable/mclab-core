@@ -1,0 +1,11 @@
+
+t1 = A;
+if ~t1
+    t2 = B;
+    t3 = t1 | t2;
+else
+    t3 = t1;
+end
+if t3
+    foo();
+end
