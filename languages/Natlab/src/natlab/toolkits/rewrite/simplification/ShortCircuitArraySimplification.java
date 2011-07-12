@@ -236,7 +236,7 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
         //t1 = t2
         AssignStmt elseAssign;
         elseAssign = new AssignStmt( condFact.genNameExpr(),
-                                     rhsTFact.genNameExpr() );
+                                     lhsTFact.genNameExpr() );
         elseAssign.setOutputSuppressed( true );
 
         //[~]t2

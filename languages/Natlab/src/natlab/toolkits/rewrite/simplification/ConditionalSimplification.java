@@ -71,7 +71,22 @@ public class ConditionalSimplification extends AbstractSimplification
         Expr cond = node.getExpr();
         rewrite( node.getStmts() );
         
-        if( !isVar( cond ) ){
+        if( !isSimpleCond( cond ) ){
+
+            CondSplitter splitter = new CondSplitter( cond );
+            java.util.List<Stmt> newStmts = new LinkedList(splitter.getNewAssigns());
+
+            ast.List<Stmt> newBody = node.getStmts();
+            for( Stmt s : splitter.getNewAssigns() )
+                newBody.add((Stmt)s.copy());
+
+            WhileStmt newWhile = new WhileStmt( splitter.getNewCond(), newBody );
+            newStmts.add( newWhile );
+            
+            newNode = new TransformedNode( newStmts );
+
+
+            /*
             LinkedList<Stmt> newStmts = new LinkedList();
             TempFactory tempF = TempFactory.genFreshTempFactory();
             Expr condClone = (Expr)cond.copy();
@@ -89,6 +104,7 @@ public class ConditionalSimplification extends AbstractSimplification
             newStmts.add( newWhile );
             
             newNode = new TransformedNode( newStmts );
+            */
         }
             
     }
@@ -118,26 +134,126 @@ public class ConditionalSimplification extends AbstractSimplification
 
         Expr cond = ifblock.getCondition(); //E
 
-        if( !isVar( cond ) ){
-            LinkedList<Stmt> newStmts = new LinkedList();
-            TempFactory tempF = TempFactory.genFreshTempFactory(); //t1
-            
-            //t1 = E;
-            AssignStmt condAssign = new AssignStmt( tempF.genNameExpr(), cond );
-            condAssign.setOutputSuppressed( true );
-
-            newStmts.add( condAssign );
+        if( !isSimpleCond( cond ) ){
+            CondSplitter splitter = new CondSplitter( cond );
+            java.util.List<Stmt> newStmts = new LinkedList(splitter.getNewAssigns());
 
             ElseBlock elseBlock = null;
             if( node.hasElseBlock() )
                 elseBlock = node.getElseBlock();
 
             IfStmt newIfStmt;
-            newIfStmt = ASTHelpers.newIfStmt( tempF.genNameExpr(), ifblock.getStmts(), elseBlock );
+            newIfStmt = ASTHelpers.newIfStmt( splitter.getNewCond(), ifblock.getStmts(), elseBlock );
             
             newStmts.add( newIfStmt );
-
+            
             newNode = new TransformedNode( newStmts );
         }
+        //otherwise do nothing
+    }
+
+    private boolean isValue( Expr expr )
+    {
+        return expr instanceof LiteralExpr;
+    }
+    private boolean isVarOrValue( Expr expr )
+    {
+        return isValue(expr) || isVar(expr);
+    }
+
+    private boolean isRelOp( Expr expr )
+    {
+        if( expr instanceof LTExpr )
+            return true;
+        if( expr instanceof GTExpr )
+            return true;
+        if( expr instanceof LEExpr )
+            return true;
+        if( expr instanceof GEExpr )
+            return true;
+        if( expr instanceof EQExpr )
+            return true;
+        if( expr instanceof NEExpr )
+            return true;
+        return false;
+    }
+
+    private boolean isSimpleRelOp( Expr expr )
+    {
+        if( isRelOp( expr ) ){
+            BinaryExpr bexpr = (BinaryExpr)expr;
+            return isVarOrValue(bexpr.getLHS()) && isVarOrValue(bexpr.getRHS());
+        }
+        else
+            return false;
+    }
+
+    private boolean isNeg( Expr expr )
+    {
+        return expr instanceof NotExpr;
+    }
+
+    private boolean isSimpleNeg( Expr expr )
+    {
+        if( isNeg( expr ) ){
+            NotExpr notExpr = (NotExpr)expr;
+            return isVarOrValue(notExpr.getOperand());
+        }
+        else
+            return false;
+    }
+
+    private boolean isSimpleCond( Expr expr )
+    {
+        return isVarOrValue(expr) || isSimpleNeg(expr) || isSimpleRelOp(expr);
+    }
+
+
+    private class CondSplitter
+    {
+        private Expr newCond;
+        private java.util.List<Stmt> newAssignments;
+        private CondSplitter( Expr cond ){
+            if( isSimpleCond( cond ) )
+                throw new IllegalArgumentException("Condition shouldn't be simple.");
+            newAssignments = new LinkedList<Stmt>();
+
+            if( isNeg( cond ) ){
+                TempFactory t1 = TempFactory.genFreshTempFactory();
+                NotExpr notExpr = (NotExpr)cond;
+                newAssignments.add( ASTHelpers.suppressOutput( new AssignStmt( t1.genNameExpr(), 
+                                                                               notExpr.getOperand() ) ) );
+                newCond = new NotExpr(t1.genNameExpr());
+            }
+            else if( isRelOp( cond ) ){
+                TempFactory t1 = TempFactory.genFreshTempFactory();
+                TempFactory t2 = TempFactory.genFreshTempFactory();
+                
+                BinaryExpr binExpr = (BinaryExpr)cond;
+                
+                if( !isVarOrValue( binExpr.getLHS() )){
+                    newAssignments.add( ASTHelpers.suppressOutput( new AssignStmt( t1.genNameExpr(), 
+                                                                                   binExpr.getLHS() )));
+                    binExpr.setLHS( t1.genNameExpr() );
+                }
+                if( !isVarOrValue( binExpr.getRHS() )){
+                    newAssignments.add( ASTHelpers.suppressOutput( new AssignStmt( t2.genNameExpr(), 
+                                                                                   binExpr.getRHS() )));
+                    binExpr.setRHS( t2.genNameExpr() );
+                }
+                newCond = binExpr;
+            }
+            else{
+                TempFactory t1 = TempFactory.genFreshTempFactory();
+                newAssignments.add( ASTHelpers.suppressOutput( new AssignStmt( t1.genNameExpr(), cond ) ) );
+                newCond = t1.genNameExpr();
+            }
+            
+        }
+
+        public java.util.List<Stmt> getNewAssigns()
+        { return newAssignments; }
+        public Expr getNewCond()
+        { return newCond; }
     }
 }

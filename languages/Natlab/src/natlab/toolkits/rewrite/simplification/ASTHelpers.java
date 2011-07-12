@@ -126,5 +126,13 @@ public class ASTHelpers
             return new NameExpr( new Name( "false" ) );
     }
 
+    /**
+     * Ensures that the node has Suppressed output.
+     */
+    public static <T extends Stmt> T suppressOutput( T node )
+    {
+        node.setOutputSuppressed(true);
+        return node;
+    }
 
 }
