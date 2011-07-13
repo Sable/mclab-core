@@ -3,3 +3,5 @@ LeftSimplification:test/simplifications/leftsimplepass.testlist
 SimpleAssignment:test/simplifications/simpleassignpass.testlist
 ShortCircuitArraySimplification:test/simplifications/scarraypass.testlist
 ConditionalSimplification:test/simplifications/condpass.testlist
+ForSimplification:test/simplifications/forpass.testlist
+RightSimplification:test/simplifications/rightpass.testlist

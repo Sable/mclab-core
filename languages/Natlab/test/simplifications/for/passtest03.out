@@ -1,0 +1,13 @@
+t1 = foo();
+t2 = size(t1);
+t3 = prod(t2(2:end));
+for t4 = 1:t3
+    i = t1(:,t4);
+    t5 = bar();
+    t6 = size(t5);
+    t7 = prod(t6(2:end));
+    for t8 = 1:t7
+        j = t5(:,t8);
+        foo(i,j);
+    end
+end
