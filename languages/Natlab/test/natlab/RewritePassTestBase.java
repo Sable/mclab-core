@@ -73,9 +73,13 @@ public class RewritePassTestBase extends TestCase {
             ASTNode tree1Next, tree2Next;
             ASTNode current = tree2Current;
             
+            //Check if they are the same class
             if( current.getClass().isInstance(node) ){
                 int numChild = node.getNumChild();
                 if( numChild == current.getNumChild() ){
+                    //if they are the same class and have the same
+                    //number of children, then loop each child and
+                    //check equiv
                     for( int i=0; i<numChild; i++ ){
                         tree1Next = node.getChild(i);
                         tree2Next = current.getChild(i);
@@ -86,6 +90,8 @@ public class RewritePassTestBase extends TestCase {
                     }
                 }
                 else{
+                    // if they have differing number of children,
+                    // figure out a failure reason and fail.
                     if( current instanceof List ){
                         reason = "Number of elements don't match for actual and expected lists\n";
                     }
@@ -98,10 +104,62 @@ public class RewritePassTestBase extends TestCase {
                     fail = true;
                 }
             }
+            // If they aren't the same class, figure out a failure
+            // reason, except when one is a CheckScalarStmt
             else{
                 if( current instanceof List || node instanceof List )
                     reason = "Node types don't match for actual node: "+node+"\n\n"+
                         "and expected: "+ current +"\n";
+                //see if one is a CheckScalarStmt
+                else if( current instanceof CheckScalarStmt || node instanceof CheckScalarStmt ){
+                    //if they both are then check the parameter
+                    if( current instanceof CheckScalarStmt && node instanceof CheckScalarStmt ){
+                        tree1Next = node.getChild(0);
+                        tree2Next = current.getChild(0);
+                        tree2Current = tree2Next;
+                        tree1Next.analyze(this);
+                    }
+                    //if only one is, make sure the other is a
+                    //ParameterizedExpr that looks like a CheckScalarStmt
+                    else{
+                        tree1Next = null;
+                        tree2Next = null;
+                        if( current instanceof CheckScalarStmt ){
+                            ParameterizedExpr paramExpr = getParamExpr( node );
+                            if( paramExpr != null && 
+                                checkIsScalar( paramExpr )){
+                                tree1Next = paramExpr.getArg(0);
+                                tree2Next = current.getChild(0);
+                            }
+                            else{
+                                fail = true;
+                            }
+                        }
+                        else{
+                            ParameterizedExpr paramExpr = getParamExpr( current );
+                            if( paramExpr != null &&
+                                checkIsScalar( paramExpr )){
+                                tree1Next = node.getChild(0);
+                                tree2Next = paramExpr.getArg(0);
+                            }
+                            else{
+                                fail = true;
+                            }
+                        }
+                        if( fail )
+                            reason = "check_scalar expected: \n\n"+
+                                node.getPrettyPrinted() + "\n\n"+
+                                "and expected subtree: \n\n" +
+                                current.getPrettyPrinted() + "\n";
+                        else{
+                            tree2Current = tree2Next;
+                            tree1Next.analyze(this);
+
+                            tree2Current = current;
+                            return;
+                        }
+                    }
+                }
                 else
                     reason = "Node types don't match for actual subtree: \n\n"+
                         node.getPrettyPrinted() + "\n\n"+
@@ -110,6 +168,34 @@ public class RewritePassTestBase extends TestCase {
                 fail = true;
             }
             tree2Current = current;
+        }
+        
+        /**
+         * Gets the ParameterizedExpr from a node if that node is an
+         * expression statement, returns null otherwise.
+         */
+        private ParameterizedExpr getParamExpr( ASTNode node ){
+            if( node instanceof ExprStmt )
+                if( node.getChild(0) instanceof ParameterizedExpr )
+                    return (ParameterizedExpr)node.getChild(0);
+            return null;
+        }
+
+        /**
+         * Checks if a given {@code ParameterizedExpr} is a valid
+         * {@code check_scalar} call. This is intended to deal with
+         * the fact that {@code CheckScalarStmt} nodes can't be placed
+         * in actual source code.
+         */
+        private boolean checkIsScalar( ParameterizedExpr expr )
+        {
+            if( expr.getTarget() instanceof NameExpr ){
+                NameExpr nameExpr = (NameExpr)expr.getTarget();
+                return nameExpr.getName().getID().equals("check_scalar") &&
+                    expr.getNumArg() == 1;
+            }
+            else
+                return false;
         }
                     
         public void caseFunction( Function node )
