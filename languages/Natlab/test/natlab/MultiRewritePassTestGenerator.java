@@ -64,16 +64,47 @@ public class MultiRewritePassTestGenerator extends AbstractRewritePassTestGenera
         printHeader(testFileWriter);
         for( Map.Entry<String,String> entry : masterMap.entrySet() ){
             transformationName = entry.getKey();
-
-            List<String> testNames = getTestNames( entry.getValue() );
+            printMethodHeader( testFileWriter, entry.getValue() );
+            List<String> testNames = getTestNames( entry.getValue()+".testlist" );
             for( String testName : testNames )
-                printMethod( testFileWriter, testName );
+                //printMethod( testFileWriter, testName );
+                printMethodBodyPart( testFileWriter, testName );
+            printMethodFooter( testFileWriter );
         }
         printFooter(testFileWriter);
         testFileWriter.close();
         System.exit(0);
     }
 
+    protected void printMethodHeader( PrintWriter testFileWriter, String testName )
+    {
+        String methodName = testName.replace('/','_');
+        testFileWriter.println("    public void " + methodName + "() throws Exception");
+        testFileWriter.println("    {");
+        testFileWriter.println("        ASTNode actual, expected;");
+        testFileWriter.println("        Simplifier simp;");
+        testFileWriter.println("        boolean test = true;");
+        testFileWriter.println("        StringBuilder errmsg = new StringBuilder();");
+        testFileWriter.println("        ");
+    }
+    protected void printMethodBodyPart( PrintWriter testFileWriter, String subTestName )
+    {
+        String cleanName = "test_" + subTestName.replace('/','_');
+        String inFileName = "test/" + subTestName + ".in";
+        String outFileName = "test/" + subTestName + ".out";
+
+        testFileWriter.println("        actual = parseFile( \"" + inFileName + "\" );");
+        testFileWriter.println("        simp = new Simplifier( actual, "+transformationName+".getStartSet() );");
+        testFileWriter.println("        actual = simp.simplify();");
+        testFileWriter.println("        expected = parseFile( \"" + outFileName + "\");");
+        testFileWriter.println("        test &= checkEquiv( actual, expected, \""+ cleanName +"\", errmsg);");
+        testFileWriter.println("");
+    }
+    protected void printMethodFooter( PrintWriter testFileWriter )
+    {
+        testFileWriter.println("        assertTrue( errmsg.toString(), test );");
+        testFileWriter.println("    }");
+    }
     /**
      * Reads in a master file and returns a map from simplification
      * class name to test list file name. The master file is assumed

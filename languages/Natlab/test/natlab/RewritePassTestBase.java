@@ -25,18 +25,56 @@ public class RewritePassTestBase extends TestCase {
 
     public void assertEquiv( ASTNode actual, ASTNode expected )
     {
-        TreeAplhaEquivTester tester = new TreeAplhaEquivTester( actual, expected );
-        Boolean test = tester.testEquiv();
-        String msg = tester.getReason();
-        assertTrue( msg+ "\n" +
-                    "ACTUAL: \n\n"+
-                    actual.getPrettyPrinted() + "\n\n"+
-                    "EXPECTED: \n\n"+
-                    expected.getPrettyPrinted() + "\n",
-                    test );
+        StringBuilder errmsg = new StringBuilder();
+        boolean test = checkEquiv( actual, expected, errmsg );
+        assertTrue( errmsg.toString(), test );
     }
 
+    /**
+     * Checks if the two given trees are equivalent. If they aren't,
+     * then an error message is appended to {@code errmsg}. It returns
+     * {@code true} if they are equivalent, and {@code false}
+     * otherwise.
+     */
+    protected boolean checkEquiv( ASTNode actual, ASTNode expected, StringBuilder errmsg )
+    {
+        if( errmsg == null || actual==null || expected == null )
+            throw new IllegalArgumentException("no arguments should be null");
 
+        TreeAplhaEquivTester tester = new TreeAplhaEquivTester( actual, expected );
+        boolean test = tester.testEquiv();
+        String msg = tester.getReason();
+        if( !test ){
+            errmsg.append( msg ).append( "\n" );
+            errmsg.append("ACTUAL: \n\n");
+            errmsg.append( actual.getPrettyPrinted() ).append( "\n\n" );
+            errmsg.append("EXPECTED: \n\n");
+            errmsg.append( expected.getPrettyPrinted() ).append( "\n" );
+        }
+        return test;
+    }
+
+    /**
+     * Checks if the two given trees are equivalent. If they aren't,
+     * an error message specific to the given test name is appended to
+     * {@code errmsg}. It returns {@code true} if they are equivalent,
+     * and {@code false} otherwise.
+     */
+    protected boolean checkEquiv( ASTNode actual, ASTNode expected, 
+                                  String testName, StringBuilder errmsg )
+    {
+        StringBuilder localErrmsg = new StringBuilder();
+        boolean test = checkEquiv(actual, expected, localErrmsg);
+        if( !test ){
+            errmsg.append("********************************************************************************\n");
+            errmsg.append("*                                                                              *\n");
+            errmsg.append( "  FAILED CASE: ").append( testName ).append("\n");
+            errmsg.append( localErrmsg );
+            errmsg.append("*                                                                              *\n");
+            errmsg.append("********************************************************************************\n");
+        }
+        return test;
+    }
     /**
      * Class used to verify that two ASTs are structurally the same up
      * to alpha renaming. This should only be used for testing the
