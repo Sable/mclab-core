@@ -46,10 +46,16 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
         return new HashSetFlowSet<String>();
     }
 
+    /**
+     * Gets a set of all uses for the given tree.
+     */
     public Set<String> getAllUses()
     {
         return fullSet.getSet();
     }
+    /**
+     * Gets a set of uses in the given statement. 
+     */
     public Set<String> getUses( Stmt node )
     {
         HashSetFlowSet<String> set = flowSets.get(node);
@@ -59,6 +65,10 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
             return set.getSet();
     }
 
+    /**
+     * Finds all uses in the given assignment. It makes sure that the
+     * target of the assignment isn't considered a use. 
+     */
     public void caseAssignStmt( AssignStmt node )
     {
         HashSetFlowSet<String> prevSet = currentSet;
@@ -76,6 +86,10 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
             prevSet.addAll( currentSet );
         currentSet = prevSet;
     }
+
+    /**
+     * Finds all uses in the given statement. 
+     */
     public void caseStmt( AssignStmt node )
     {
         HashSetFlowSet<String> prevSet = currentSet;
@@ -91,12 +105,22 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
         currentSet = prevSet;
     }
 
+    /**
+     * Makes sure that targets of assignments aren't considered
+     * uses. Also makes sure that the arguments are seen. 
+     */
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
         analyzeAsNotLHS( node.getArgs() );
         analyze( node.getTarget() );
     }
 
+    //NOT: More cases would be needed to make complete.
+
+    /**
+     * Checks if the name is possible a variable, and not the target
+     * of an assignment; if it is, adds it.
+     */
     public void caseNameExpr( NameExpr node )
     {
         if( !inLHS ){
@@ -105,7 +129,12 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
         }
     }
 
-    public void analyzeAsNotLHS( ASTNode node ) 
+    /**
+     * Helper method to analyze a given node, making sure it is
+     * treated like it isn't the target of an assignment. It saves and
+     * restores the state of {@code inLHS}
+     */
+    private void analyzeAsNotLHS( ASTNode node ) 
     {
         boolean bakInLHS = inLHS;
         inLHS = false;
