@@ -126,7 +126,7 @@ public class MaybeLive
         outFlowSets.put( node, currentOutSet );
         HashSetFlowSet myInSet = copy(currentOutSet);
 
-        caseAST( node );
+        caseASTNode( node );
 
         Set<String> useVars = useCollector.getUses( node );
 
