@@ -19,7 +19,15 @@
 package natlab.Static.classes.reference;
 
 public class FunctionHandleClassReference implements BuiltinClassReference {
-
+    public static FunctionHandleClassReference singleton = new FunctionHandleClassReference();
+    
+    private FunctionHandleClassReference(){        
+    }
+    
+    public static FunctionHandleClassReference getInstance(){
+        return singleton;
+    }
+    
     @Override
     public String getName() {
         return "function_handle";
@@ -28,6 +36,11 @@ public class FunctionHandleClassReference implements BuiltinClassReference {
     @Override
     public boolean isBuiltin() {
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }

@@ -43,4 +43,9 @@ public enum PrimitiveClassReference implements BuiltinClassReference {
     public boolean isBuiltin() {
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

@@ -22,14 +22,21 @@ public enum BuiltinCompoundClassReference implements BuiltinClassReference {
     STRUCT,
     CELL;
 
+    private String name = this.name().toLowerCase();
+    
     @Override
     public String getName() {
-        return this.name().toLowerCase();
+        return name;
     }
 
     @Override
     public boolean isBuiltin() {
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }

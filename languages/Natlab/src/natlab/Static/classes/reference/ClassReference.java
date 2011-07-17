@@ -26,6 +26,9 @@ package natlab.Static.classes.reference;
  * information provided by these references should also be independent of the
  * environment.
  * 
+ * toString() should have the same result as getName() - at least in the absence of
+ * packages.
+ * 
  * @author ant6n
  */
 public abstract interface ClassReference {
