@@ -46,6 +46,18 @@ public class ForSimplification extends AbstractSimplification
         return new HashSet();
     }
 
+    /**
+     * Builds a singleton start set containing this class.
+     */
+    public static Set<Class<? extends AbstractSimplification>> getStartSet()
+    {
+        //can suppress since it is a fresh HashSet
+        @SuppressWarnings("unchecked")
+        HashSet<Class<? extends AbstractSimplification>> dependencies = new HashSet();
+        dependencies.add( ForSimplification.class );
+        return dependencies;
+    }
+
     /*
       for v=E
         ...
@@ -56,13 +68,6 @@ public class ForSimplification extends AbstractSimplification
       t3=prod(t2(2:end));
       for t4=1:t3
         i = t1(t4);
-        ...
-      end
-      ========== if E is var
-      t1=size(E);
-      t2=prod(t1(2:end));
-      for t3=1:t2
-        i = E(t3);
         ...
       end
      */
@@ -101,7 +106,7 @@ public class ForSimplification extends AbstractSimplification
             newStmts.add( stopAssign );
 
             //build lvar assignment
-            AssignStmt lvarAssign = new AssignStmt( lhs, newParam( domUses[1], tlvarF.genNameExpr() ) );
+            AssignStmt lvarAssign = new AssignStmt( lhs, newParamFirstColon( domUses[1], tlvarF.genNameExpr() ) );
             lvarAssign.setOutputSuppressed( true );
 
             //build new for
@@ -131,19 +136,12 @@ public class ForSimplification extends AbstractSimplification
      */
     protected void prepDomain( NameExpr[] uses, Expr domExpr, LinkedList<Stmt> newStmts )
     {
-        if( isVar( domExpr )){
-            NameExpr domainVar = (NameExpr)domExpr;
-            uses[0] = domainVar;
-            uses[1] = new NameExpr( new Name(domainVar.getName().getID()) );
-        }
-        else{
-            NameExpr[] domainVar = TempFactory.genFreshTempNameExpr(3);
-            uses[0] = domainVar[0];
-            uses[1] = domainVar[1];
-            AssignStmt tmpDomAssign = new AssignStmt( domainVar[2], domExpr );
-            tmpDomAssign.setOutputSuppressed( true );
-            newStmts.add( tmpDomAssign );
-        }
+        NameExpr[] domainVar = TempFactory.genFreshTempNameExpr(3);
+        uses[0] = domainVar[0];
+        uses[1] = domainVar[1];
+        AssignStmt tmpDomAssign = new AssignStmt( domainVar[2], domExpr );
+        tmpDomAssign.setOutputSuppressed( true );
+        newStmts.add( tmpDomAssign );
     }
 
     /**
@@ -170,7 +168,17 @@ public class ForSimplification extends AbstractSimplification
      */
     protected ParameterizedExpr newParam( Expr target, Expr arg )
     {
-        return new ParameterizedExpr( target, new ast.List().add(arg) );
+        return new ParameterizedExpr( target, new ast.List<Expr>().add(arg) );
+    }
+
+    /**
+     * Generates a new ParameterizedExpr with two arguments, the first
+     * is a {@literal :} expression, and the second is given as {@code
+     * arg}. 
+     */
+    protected ParameterizedExpr newParamFirstColon( Expr target, Expr arg )
+    {
+        return new ParameterizedExpr( target, new ast.List<Expr>().add(new ColonExpr()).add(arg) );
     }
     /**
      * Generates a new ParameterizedExpr with a single argument and a
