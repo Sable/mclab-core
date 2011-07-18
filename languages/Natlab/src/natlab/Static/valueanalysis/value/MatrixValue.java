@@ -18,29 +18,72 @@
 
 package natlab.Static.valueanalysis.value;
 
-import natlab.Static.classes.reference.PrimitiveClassReference;
+import java.util.List;
+
+import natlab.Static.classes.reference.*;
 import natlab.Static.valueanalysis.constant.*;
+import natlab.toolkits.analysis.Mergable;
 
 /**
  * represents a primitive value, i.e. a value that has a primitive type.
- * At this level this class stores a matlab class, and a constant.
+ * At this level this class stores just a matlab class.
+ * Objects of this type are immutable.
+ * Use SimpleMatrixValue for an implementation that is non-abstract, and 
+ * which adds a constant.
+ * 
+ * Any actual implementation of this class has to be generic itself.
+ * Implementations have to provide a MatrixValueFactory. The convention
+ * is that every implementation of MatrixValue provides a factory as a public
+ * static final variable FACTORY (see SimpleMatrixValue).
+ * Note that any Value has to implement an equals method.
  * @author adubra
  */
-
-
-public class PrimitiveValue implements AbstractValue {
+public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> {
     PrimitiveClassReference classRef;
-    Constant constant;
     
     @Override
     public PrimitiveClassReference getMatlabClass() {
         return classRef;
     }
+    
+    /**
+     * creates a non constant matrix value with the given matlab class
+     * @param class reference
+     */
+    public MatrixValue(PrimitiveClassReference classRef){
+        this.classRef = classRef;
+    }
 
     
     @Override
-    public AbstractValue union(AbstractValue other) {
-        if (!other.getClass().equals(classRef)) return null;
-        return null; //TODO
-    }
+    abstract public D merge(Value<D> other);
+    
+    
+    //TODO - should this be part of Value?
+    public abstract boolean isConstant();
+    
+    /**
+     * returns the constant associated with this value, or null if it's not a constant
+     * @return
+     */
+    abstract public Constant getConstant();
+    
+    
+    @Override
+    abstract public D subsref(List<Value<D>> indizes);  
+    
+    
+    /**
+     * returns a Matrix Value representing the index i
+     * in the loop header
+     * for i = <this>:<inc>:<upper>
+     * inc is optional, and may be null
+     */
+    abstract public D forRange(D upper, D inc);
+    
 }
+
+
+
+
+

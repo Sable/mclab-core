@@ -44,9 +44,19 @@ public class DoubleConstant extends Constant {
     }
     
     @Override
-    public ClassReference getClassReference() {
+    public PrimitiveClassReference getMatlabClass() {
         return PrimitiveClassReference.DOUBLE;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof DoubleConstant)) return false;
+        return ((DoubleConstant)obj).value == value;
+    }
     
+    @Override
+    public boolean isScalar() {
+        return true;
+    }
 }

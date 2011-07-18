@@ -18,27 +18,57 @@
 
 package natlab.Static.valueanalysis.value;
 
+import java.util.HashSet;
+import java.util.List;
+
 import natlab.Static.classes.reference.FunctionHandleClassReference;
+import natlab.toolkits.path.FunctionReference;
 
 /**
  * This represents value which refers to a function handle.
  * Stores along with it the possible set of function hanldes that this can refer to.
+ * A null element refers to a reference to a function which is unknown.
  * 
+ * TODO - is it bad to have the null element?
  * @author adubra
- *
  */
 
-public class FunctionHandleValue implements AbstractValue {
-
-    @Override
-    public FunctionHandleClassReference getMatlabClass() {
-        return new FunctionHandleClassReference();
+public class FunctionHandleValue<D extends MatrixValue<D>> implements Value<D> {
+    HashSet<FunctionReference> functions = new HashSet<FunctionReference>();
+    
+    public FunctionHandleValue(){
+    }
+    public FunctionHandleValue(FunctionReference f){
+        functions.add(f);
+    }
+    public FunctionHandleValue(FunctionHandleValue<D> other){
+        functions.addAll(other.functions);
     }
     
     @Override
-    public AbstractValue union(AbstractValue other) {
-        // TODO Auto-generated method stub
-        return null;
+    public FunctionHandleClassReference getMatlabClass() {
+        return FunctionHandleClassReference.getInstance();
     }
 
+    @Override
+    public Value merge(Value v) {
+        if (v instanceof FunctionHandleValue){
+            FunctionHandleValue result = new FunctionHandleValue(this);
+            result.functions.addAll(((FunctionHandleValue)v).functions);
+            return result;
+        } else {
+            return null;
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return "(function_handle,"+functions+")";
+    }
+    
+    @Override
+    public Value<D> subsref(List<Value<D>> indizes) {
+        throw new UnsupportedOperationException("function handles do not support indexint");
+        //TODO - or should they support it - this is the same as calling a function
+    }
 }

@@ -58,6 +58,7 @@ public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>
    
     @Override
     public Constant caseTrue(Builtin builtin, List<Constant> arg) {
+        //TODO - deal with args
         return Constant.get(true);
     }
     @Override

@@ -33,7 +33,7 @@ public class CharConstant extends Constant {
     }
 
     @Override
-    public PrimitiveClassReference getClassReference() {
+    public PrimitiveClassReference getMatlabClass() {
         return PrimitiveClassReference.CHAR;
     }
 
@@ -41,5 +41,16 @@ public class CharConstant extends Constant {
     public String getValue() {
         return value;
     }
-
+    
+    @Override
+    public boolean isScalar() {
+        return (value.length() == 1);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof CharConstant)) return false;
+        return ((CharConstant)obj).value.equals(value);
+    }
 }

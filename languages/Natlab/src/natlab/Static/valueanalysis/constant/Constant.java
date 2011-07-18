@@ -18,8 +18,13 @@
 
 package natlab.Static.valueanalysis.constant;
 
+import ast.FPLiteralExpr;
+import ast.IntLiteralExpr;
+import ast.LiteralExpr;
+import ast.StringLiteralExpr;
 import natlab.Static.classes.*;
 import natlab.Static.classes.reference.ClassReference;
+import natlab.Static.classes.reference.PrimitiveClassReference;
 
 /**
  * represents an actual specific Matlab value.
@@ -42,21 +47,42 @@ public abstract class Constant {
     /**
      * returns the Matlab class of the constant
      */
-    public abstract ClassReference getClassReference();
+    public abstract PrimitiveClassReference getMatlabClass();
     
     /**
      * returns the union for this and the other constant
      * - i.e. it returns the same constant if this and the other are the same, null otherwise
      */
-    public Constant union(Constant other){
+    public Constant merge(Constant other){
         if (this.equals(other)) return this;
         return null;
     }
     
-    /* factory method */
+    
+    /**
+     * returns true if the constant is scalar
+     */
+    abstract public boolean isScalar();
+    
+    
+    /* factory methods */
     public static Constant get(boolean value){ return new LogicalConstant(value); }
     public static Constant get(double  value){ return new DoubleConstant(value); }
     public static Constant get(String  value){ return new CharConstant(value); }
+    public static Constant get(LiteralExpr literal){
+        if (literal instanceof FPLiteralExpr){
+            return Constant.get(((FPLiteralExpr)literal).getValue().getValue().doubleValue());
+        } else if (literal instanceof IntLiteralExpr) {
+            return Constant.get(((IntLiteralExpr)literal).getValue().getValue().doubleValue());
+        } else if (literal instanceof StringLiteralExpr){
+            return Constant.get(((StringLiteralExpr)literal).getValue());
+        } else {
+            throw new UnsupportedOperationException("encountered unsupported literal "+literal);
+        }
+    }
     
-    
+    @Override
+    public String toString() {
+        return getValue().toString();
+    }
 }

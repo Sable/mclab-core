@@ -34,12 +34,24 @@ public class LogicalConstant extends Constant {
     }
     
     @Override
-    public ClassReference getClassReference() {
+    public PrimitiveClassReference getMatlabClass() {
         return PrimitiveClassReference.LOGICAL;
     }
     
     @Override
     public Boolean getValue() {
         return value;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof LogicalConstant)) return false;
+        return ((LogicalConstant)obj).value == value;
+    }
+    
+    @Override
+    public boolean isScalar() {
+        return true;
     }
 }
