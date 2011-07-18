@@ -225,14 +225,21 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
     
     /**
      * returns a single inlined function representing this function collection.
-     * Does not alter the the function collection.
+     * Does not alter the the function collection. Only works for non-recursive callgraphs.
      */
     public Function getAsInlinedFunction(){
-        FunctionCollection c = new FunctionCollection(this);
-        c.inlineAll();
-        return c.get(c.getMain()).getAst();
+        return getAsInlinedStaticFunction().getAst();
     }
     
+    /**
+     * returns a single inlined StaticFunction representing this function collection.
+     * Does not alter the function collection. Only works for non-recursive callgraphs.
+     */
+    public StaticFunction getAsInlinedStaticFunction(){
+        FunctionCollection c = new FunctionCollection(this);
+        c.inlineAll();
+        return c.get(c.getMain());
+    }
 }
 
 

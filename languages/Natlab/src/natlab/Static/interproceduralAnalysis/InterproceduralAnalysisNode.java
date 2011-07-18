@@ -37,7 +37,6 @@ import natlab.toolkits.path.FunctionReference;
 import annotations.ast.ASTNode;
 
 public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {
-
     private StaticFunction function;
     private FAnalysis functionAnalysis;
     private CallString<Arg> callString;
