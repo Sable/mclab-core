@@ -53,8 +53,6 @@ public class IRWhileStmt extends WhileStmt implements IRStmt {
         return (IRStatementList)super.getStmts();
     }
 
-
-
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
         irHandler.caseIRWhileStmt(this);

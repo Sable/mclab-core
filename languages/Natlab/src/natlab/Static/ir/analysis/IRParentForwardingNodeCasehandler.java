@@ -77,7 +77,7 @@ public class IRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler
 
     @Override
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
-        irCallback.caseIRAbstractAssignToVarStmt(node);
+        irCallback.caseIRAbstractAssignToListStmt(node);
     }
 
     @Override

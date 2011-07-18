@@ -23,12 +23,17 @@ import ast.*;
 
 /**
  * an array get is a an assignment statement, which has
- * a name expression as the LHS and a parametric expression
+ * a list of name expressions as the LHS and a parametric expression
  * as the right hand side, which in turn targets a name expression,
  * whose arguments are again a name expressions; i.e. it is
  * of the form
  * 
- * n = m(i1,i2,...)
+ * [n1,n2] = m(i1,i2,...)
+ * 
+ * Note that for actual matrix indexing operations, there's always
+ * only one name on the left. Only if indexing is overloaded, or if
+ * m is a function handle, is it possible to get multiple results on
+ * the left.
  * 
  * TODO - deal with unparmetrized assignments
  * 
@@ -36,12 +41,12 @@ import ast.*;
  *
  */
 
-public class IRArrayGetStmt extends IRAbstractAssignToVarStmt {
+public class IRArrayGetStmt extends IRAbstractAssignToListStmt {
     private static final long serialVersionUID = 1L;
 
-    public IRArrayGetStmt(NameExpr lhs,NameExpr rhs,IRCommaSeparatedList indizes){
+    public IRArrayGetStmt(Name lhs,Name rhs,IRCommaSeparatedList indizes){
         super(lhs);
-        setRHS(new ParameterizedExpr(rhs,indizes));
+        setRHS(new ParameterizedExpr(new NameExpr(rhs),indizes));
     }
     
     public Name getArrayName(){

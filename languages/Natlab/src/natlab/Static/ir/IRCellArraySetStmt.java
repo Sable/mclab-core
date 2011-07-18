@@ -33,21 +33,16 @@ import ast.*;
 public class IRCellArraySetStmt extends IRAbstractAssignStmt {
     private static final long serialVersionUID = 1L;
     
-    public IRCellArraySetStmt(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
+    public IRCellArraySetStmt(Name array, IRCommaSeparatedList indizes,Name rhs){
         super();
-        setLHS(new CellIndexExpr(array,indizes));
-        setRHS(rhs);
+        setLHS(new CellIndexExpr(new NameExpr(array),indizes));
+        setRHS(new NameExpr(rhs));
     }
     
-    public NameExpr getCellArray(){
-        return (NameExpr)((CellIndexExpr)getLHS()).getTarget();
+    public Name getCellArrayName(){
+        return ((NameExpr)((CellIndexExpr)getLHS()).getTarget()).getName();
     }
-    
-    public String getCellArrayName(){
-        return getCellArray().getName().getID();
-    }
-    
-    
+        
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
         irHandler.caseIRCellArraySetStmt(this);

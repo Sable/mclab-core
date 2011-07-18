@@ -47,12 +47,8 @@ public class IRCellArrayGetStmt extends IRAbstractAssignToListStmt {
         setRHS(new CellIndexExpr(cell, indizes));
     }
     
-    //function name get
-    public NameExpr getCellNameExpr(){
-        return ((NameExpr)(((CellIndexExpr)getRHS()).getTarget()));
-    }
-    public String getFunctionName(){
-        return getCellNameExpr().getName().getID();
+    public Name getCellArrayName(){
+        return ((NameExpr)(((CellIndexExpr)getRHS()).getTarget())).getName();
     }
         
     //get arguments

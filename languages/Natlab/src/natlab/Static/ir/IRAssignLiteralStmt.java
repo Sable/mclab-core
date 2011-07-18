@@ -30,7 +30,7 @@ import ast.*;
 public class IRAssignLiteralStmt extends IRAbstractAssignToVarStmt {
     private static final long serialVersionUID = 1L;
     
-    public IRAssignLiteralStmt(NameExpr lhs,LiteralExpr rhs) {
+    public IRAssignLiteralStmt(Name lhs,LiteralExpr rhs) {
         super(lhs);
         setRHS(rhs);
     }

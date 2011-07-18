@@ -23,16 +23,16 @@ import ast.*;
 public abstract class IRAbstractAssignToVarStmt extends IRAbstractAssignStmt {
     private static final long serialVersionUID = 1L;
 
-    public IRAbstractAssignToVarStmt(NameExpr lhs) {
+    public IRAbstractAssignToVarStmt(Name lhs) {
         super();
-        setLHS(lhs);
+        setLHS(new NameExpr(lhs));
     }
     
     /**
      * returns the name of the variable which is on the LHS as a Name
      * @return
      */
-    public Name getTarget(){
+    public Name getTargetName(){
         return ((NameExpr)getLHS()).getName();
     }
 }

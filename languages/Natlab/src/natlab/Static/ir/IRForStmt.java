@@ -89,6 +89,10 @@ public class IRForStmt extends ForStmt implements IRStmt {
     public boolean hasIncr(){
          return ((RangeExpr)(getAssignStmt().getRHS())).hasIncr();
     }
+    
+    public IRStatementList getStatements(){
+        return (IRStatementList)getStmtList();
+    }
 }
 
 

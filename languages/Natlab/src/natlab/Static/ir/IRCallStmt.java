@@ -61,11 +61,8 @@ public class IRCallStmt extends IRAbstractAssignToListStmt {
     }
     
     //function name get
-    public NameExpr getFunctionNameExpr(){
-        return ((NameExpr)(((ParameterizedExpr)getRHS()).getTarget()));
-    }
-    public String getFunctionName(){
-        return getFunctionNameExpr().getName().getID();
+    public Name getFunctionName(){
+        return ((NameExpr)(((ParameterizedExpr)getRHS()).getTarget())).getName();
     }
         
     //get arguments

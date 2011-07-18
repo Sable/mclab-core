@@ -29,9 +29,10 @@ public class IRFunction extends Function implements IRNode {
     
     public IRFunction(List<Name> outputParams,String name,List<Name> inputParams,
             List<HelpComment> helpComments,IRStatementList stmts,List<IRFunction> nestedFunctions){
-        super(outputParams,name,inputParams,helpComments,stmts,makeNestedFunctilnList(nestedFunctions));
+        super(outputParams,name,inputParams,helpComments,stmts,makeNestedFunctionList(nestedFunctions));
     }
-    static private List<Function> makeNestedFunctilnList(List<IRFunction> nestedFunctions){
+    //helper method for above constructor
+    static private List<Function> makeNestedFunctionList(List<IRFunction> nestedFunctions){
         List<Function> list = new List<Function>();
         if (nestedFunctions == null) return list;
         for (IRFunction f : nestedFunctions){

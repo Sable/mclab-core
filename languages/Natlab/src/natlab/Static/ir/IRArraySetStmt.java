@@ -34,20 +34,16 @@ import ast.*;
 public class IRArraySetStmt extends IRAbstractAssignStmt {
     private static final long serialVersionUID = 1L;
 
-    public IRArraySetStmt(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
+    public IRArraySetStmt(Name array, IRCommaSeparatedList indizes,Name rhs){
         super();
-        setLHS(new ParameterizedExpr(array,indizes));
-        setRHS(rhs);
+        setLHS(new ParameterizedExpr(new NameExpr(array),indizes));
+        setRHS(new NameExpr(rhs));
     }
     
-    public NameExpr getArray(){
-        return (NameExpr)((ParameterizedExpr)getLHS()).getTarget();
+    public Name getArrayName(){
+        return ((NameExpr)((ParameterizedExpr)getLHS()).getTarget()).getName();
     }
-    
-    public String getArrayName(){
-        return getArray().getName().getID();
-    }
-    
+        
     
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {

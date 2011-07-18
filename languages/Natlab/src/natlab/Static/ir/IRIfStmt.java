@@ -34,8 +34,6 @@ import ast.*;
  * There will always only be one if block, and there will always be an else block
  * - which may be empty.
  */
-
-
 public class IRIfStmt extends IfStmt implements IRStmt {
 
     private static final long serialVersionUID = 1L;
@@ -47,9 +45,19 @@ public class IRIfStmt extends IfStmt implements IRStmt {
         );
     }
 
+    public Name getConditionVarName(){
+         return ((NameExpr)(this.getIfBlock(0).getCondition())).getName();
+    }
+    
+    public IRStatementList getIfStameents(){
+        return (IRStatementList)(this.getIfBlock(0).getStmtList());
+    }
+    
+    public IRStatementList getElseStatements(){
+        return (IRStatementList)(this.getElseBlock().getStmtList());
+    }
 
-
-
+    
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
         irHandler.caseIRIfStmt(this);

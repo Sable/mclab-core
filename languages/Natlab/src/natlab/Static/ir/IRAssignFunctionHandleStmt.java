@@ -31,7 +31,7 @@ public class IRAssignFunctionHandleStmt extends IRAbstractAssignToVarStmt {
     private static final long serialVersionUID = 1L;
 
     public IRAssignFunctionHandleStmt(Name lhs,Name function) {
-        super(new NameExpr(lhs));
+        super((lhs));
         FunctionHandleExpr fHandleExpr = new FunctionHandleExpr(function);
         setRHS(fHandleExpr);
     }

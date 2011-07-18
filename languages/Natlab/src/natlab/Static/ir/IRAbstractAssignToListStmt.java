@@ -28,12 +28,16 @@ import ast.*;
  * which is invalid Matlab.
  * The pretty print method is overriden to still produce valid matlab code,
  * but analyses should be aware of this.
+ * 
+ * 
+ * TODO
+ * - we should specialize on the case where the target is only one name
  */
 
 public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
     private static final long serialVersionUID = 1L;
 
-    public IRAbstractAssignToListStmt(IRCommaSeparatedList targets) {
+    public IRAbstractAssignToListStmt(IRCommaSeparatedList targets){
         super();
         //set lhs
         List<Row> rows = new List<Row>();
@@ -41,10 +45,19 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
         setLHS(new MatrixExpr(rows));
     }
 
+    
+    /**
+     * special constructor if there is only one value on the right
+     */
+    public IRAbstractAssignToListStmt(Name target){
+        this(new IRCommaSeparatedList(new NameExpr(target)));
+    }
 
+    
+    
     @SuppressWarnings("unchecked")
     @Override
-    public void setChild(ASTNode node, int i) {
+    public void setChild(ASTNode node, int i){
         if (i == 0 && !(node instanceof MatrixExpr)){
             throw new UnsupportedOperationException();
         }
@@ -56,7 +69,7 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
      * if the assigned LHS is not a matrix expression, put the expression into a matrix
      */
     @Override
-    public void setLHS(Expr node) {
+    public void setLHS(Expr node){
         if (node instanceof MatrixExpr){
             super.setLHS(node);
         } else {
@@ -64,6 +77,22 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
             rows.add(new Row((new List<Expr>()).add(node)));
             setLHS(new MatrixExpr(rows));            
         }
+    }
+    
+    /**
+     * returns true if there is only one name target
+     */
+    public boolean isAssignToVar(){
+        IRCommaSeparatedList targets = getTargets();
+        return targets.isAllNameExpressions() && targets.size() == 1;
+    }
+    
+    /**
+     * returns the single target name, if isAssignToVar is true. Otherwise, the
+     * result is undefined and may result in an exception.
+     */
+    public Name getTargetName(){
+        return ((NameExpr)(getTargets().getChild(0))).getName();
     }
     
     /**
@@ -83,7 +112,7 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
     
     
     
-    public String getPrettyPrintedLessComments() {
+    public String getPrettyPrintedLessComments(){
         if (this.getNumTargets() > 0){
             return super.getPrettyPrintedLessComments();
         } else {

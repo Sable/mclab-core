@@ -124,7 +124,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         }
         
         //put result assign/set flowsets
-        flow.put(node.getTarget().getID(), result);
+        flow.put(node.getTargetName().getID(), result);
         setCurrentOutSet(flow);
         associateInAndOut(node);
     }
@@ -133,7 +133,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     @Override
     public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
         //find var and remove
-        String targetName = node.getTarget().getID();
+        String targetName = node.getTargetName().getID();
         ValueFlowMap<D> flow = getCurrentInSet().copy();
         flow.remove(targetName);
         
@@ -160,7 +160,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
 
         //put in flow map
         ValueFlowMap<D> flow = getCurrentInSet().copy();
-        String targetName = node.getTarget().getID();
+        String targetName = node.getTargetName().getID();
         flow.remove(targetName);
         flow.put(targetName, factory.newValueSet(constant));
         

@@ -225,28 +225,30 @@ public class ThreeAddressToIR extends AbstractSimplification {
         if (isParameterizedVar(node.getLHS())){
             ParameterizedExpr param = (ParameterizedExpr)(node.getLHS());
             node.setRHS(pullOutLiteral(node.getRHS(),assignments));
-            node = new IRArraySetStmt((NameExpr)(param.getTarget()), 
-                    listToCommaSeparatedList(param.getArgList(), null, false), (NameExpr)node.getRHS());
+            node = new IRArraySetStmt(((NameExpr)(param.getTarget())).getName(), 
+                    listToCommaSeparatedList(param.getArgList(), null, false), ((NameExpr)node.getRHS()).getName());
             
         //CellArraySet
         } else if (node.getLHS() instanceof CellIndexExpr) {
             CellIndexExpr cell = (CellIndexExpr)(node.getLHS());
             node.setRHS(pullOutLiteral(node.getRHS(), assignments));
-            node = new IRArraySetStmt((NameExpr)(cell.getTarget()), 
-                    listToCommaSeparatedList(cell.getArgList(), null, false), (NameExpr)node.getRHS());
+            node = new IRArraySetStmt(((NameExpr)(cell.getTarget())).getName(), 
+                    listToCommaSeparatedList(cell.getArgList(), null, false), ((NameExpr)node.getRHS()).getName());
         } else {
             //there can only be one or more vars on the left hand side
             
             //ArrayGet - rhs is a parametrized var
             if (isParameterizedVar(node.getRHS())){
                 ParameterizedExpr param = (ParameterizedExpr)node.getRHS();
-                node = new IRArrayGetStmt((NameExpr)node.getLHS(),(NameExpr)param.getTarget(),
+                node = new IRArrayGetStmt(((NameExpr)node.getLHS()).getName(),((NameExpr)param.getTarget()).getName(),
                         listToCommaSeparatedList(param.getArgList(),assignments,true));
             } else
                 
             //ArrayGet - rhs is a name expression
             if (node.getRHS() instanceof NameExpr && isVar((NameExpr)(node.getRHS()))){
-                node = new IRArrayGetStmt((NameExpr)node.getLHS(),(NameExpr)node.getRHS(), new IRCommaSeparatedList());
+                node = new IRArrayGetStmt(
+                        ((NameExpr)node.getLHS()).getName(),
+                        ((NameExpr)node.getRHS()).getName(), new IRCommaSeparatedList());
             } else
             
             //rhs is a cell index expr
@@ -284,7 +286,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
 
             //assigning a literal
             if (node.getRHS() instanceof LiteralExpr){
-                node = new IRAssignLiteralStmt((NameExpr)(node.getLHS()),(LiteralExpr)(node.getRHS()));
+                node = new IRAssignLiteralStmt(((NameExpr)(node.getLHS())).getName(),
+                        (LiteralExpr)(node.getRHS()));
             } else
                 
             //rhs is a  binary operation
@@ -478,7 +481,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             return (NameExpr)exp;
         } else if (exp instanceof LiteralExpr){
             TempFactory tmp = TempFactory.genFreshTempFactory();
-            literalAssignments.add(new IRAssignLiteralStmt(tmp.genNameExpr(), (LiteralExpr)exp));
+            literalAssignments.add(new IRAssignLiteralStmt(tmp.genName(), (LiteralExpr)exp));
             return tmp.genNameExpr();
         } else if (exp instanceof ColonExpr){
             return exp;
