@@ -18,37 +18,56 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
- * statements of the form
+ * a cell array get is of the form
  * 
- * v{i1,i2,i3,..,in} = t;
+ * [lhs1,lhs2,...] = c{arg1,arg2,...}
  * 
- * where v is a cell array
+ * 
+ * @author ant6n
+ *
  */
-
-
-public class IRCellArraySet extends IRAbstractAssignStmt {
-    public IRCellArraySet(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
-        super();
-        setLHS(new CellIndexExpr(array,indizes));
-        setRHS(rhs);
+public class IRCellArrayGetStmt extends IRAbstractAssignToListStmt {
+    private static final long serialVersionUID = 1L;
+    
+    public IRCellArrayGetStmt(Name cell,Expr target,Expr... indizes) {
+        this(new NameExpr(cell),
+                new IRCommaSeparatedList(target),new IRCommaSeparatedList(indizes));
     }
     
-    public NameExpr getCellArray(){
-        return (NameExpr)((CellIndexExpr)getLHS()).getTarget();
+    
+    public IRCellArrayGetStmt(NameExpr cell,IRCommaSeparatedList targets,IRCommaSeparatedList indizes) {
+        //set lhs
+        super(targets);
+        
+        //set rhs
+        setRHS(new CellIndexExpr(cell, indizes));
     }
     
-    public String getCellArrayName(){
-        return getCellArray().getName().getID();
+    //function name get
+    public NameExpr getCellNameExpr(){
+        return ((NameExpr)(((CellIndexExpr)getRHS()).getTarget()));
     }
+    public String getFunctionName(){
+        return getCellNameExpr().getName().getID();
+    }
+        
+    //get arguments
+    public IRCommaSeparatedList getArguments(){
+         return (IRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
+    }    
+    
     
     
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
-        irHandler.caseIRCellArraySetStmt(this);
+        irHandler.caseIRCellArrayGetStmt(this);
     }
 
 }
+
+
+

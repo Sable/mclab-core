@@ -18,9 +18,12 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import java.util.*;
+
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.Expr;
 import ast.List;
+import ast.Name;
 import ast.NameExpr;
 
 /**
@@ -37,6 +40,8 @@ import ast.NameExpr;
 
 
 public class IRCommaSeparatedList extends List<Expr> implements IRNode {
+    private static final long serialVersionUID = 1L;
+
     public IRCommaSeparatedList(){
     }
 
@@ -74,13 +79,25 @@ public class IRCommaSeparatedList extends List<Expr> implements IRNode {
      * @param index
      * @return
      */
-    public String getName(int index){
+    public Name getName(int index){
         if (this.getChild(index) instanceof NameExpr) {
-            return ((NameExpr) this.getChild(index)).getName().getID();
+            return ((NameExpr) this.getChild(index)).getName();
         }
         return null;
     }
 
+    /**
+     * returns a list of all elements as names 
+     * causes an error if the elements are not all names
+     */
+    public java.util.List<Name> asNameList(){
+        ArrayList<Name> list = new ArrayList<Name>(this.numChildren());
+        for (int i = 0; i < numChildren(); i++){
+            list.add(getName(i));
+        }
+        return list;
+    }
+    
         
     /**
      * returns true if all the expressions in the list are just name expressions
@@ -99,5 +116,13 @@ public class IRCommaSeparatedList extends List<Expr> implements IRNode {
         irHandler.caseIRCommaSeparatedList(this);
     }
 
+    
+    /**
+     * returns the number of elements in the list
+     * @return
+     */
+    public int size(){
+        return getNumChild();
+    }
     
 }

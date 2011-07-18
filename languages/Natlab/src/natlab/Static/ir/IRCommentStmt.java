@@ -18,7 +18,7 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import beaver.*;
 import ast.*;
 
@@ -29,6 +29,8 @@ import ast.*;
  * Also acts as an empty line
  */
 public class IRCommentStmt extends EmptyStmt implements IRStmt {
+    private static final long serialVersionUID = 1L;
+
     public IRCommentStmt(){}
     public IRCommentStmt(java.util.List<Symbol> comments){
         this.setComments(comments);

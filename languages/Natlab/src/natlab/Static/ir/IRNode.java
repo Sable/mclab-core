@@ -18,7 +18,7 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 
 /**
  * top level interface for every node of the IR

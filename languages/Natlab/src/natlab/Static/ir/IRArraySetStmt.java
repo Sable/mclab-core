@@ -18,7 +18,7 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -32,6 +32,8 @@ import ast.*;
 
 
 public class IRArraySetStmt extends IRAbstractAssignStmt {
+    private static final long serialVersionUID = 1L;
+
     public IRArraySetStmt(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
         super();
         setLHS(new ParameterizedExpr(array,indizes));

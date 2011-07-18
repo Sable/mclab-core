@@ -18,58 +18,39 @@
 
 package natlab.Static.ir;
 
-import java.util.ArrayList;
-
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
-
-
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
- * a cell array get is of the form
+ * statements of the form
  * 
- * [lhs1,lhs2,...] = c{arg1,arg2,...}
+ * v{i1,i2,i3,..,in} = t;
  * 
- * 
- * @author ant6n
- *
+ * where v is a cell array
  */
-public class IRCellArrayGet extends IRAbstractAssignToListStmt {
-    public IRCellArrayGet(Name cell,Expr target,Expr... indizes) {
-        this(new NameExpr(cell),
-                new IRCommaSeparatedList(target),new IRCommaSeparatedList(indizes));
+
+
+public class IRCellArraySetStmt extends IRAbstractAssignStmt {
+    private static final long serialVersionUID = 1L;
+    
+    public IRCellArraySetStmt(NameExpr array, IRCommaSeparatedList indizes,NameExpr rhs){
+        super();
+        setLHS(new CellIndexExpr(array,indizes));
+        setRHS(rhs);
     }
     
-    
-    public IRCellArrayGet(NameExpr cell,IRCommaSeparatedList targets,IRCommaSeparatedList indizes) {
-        //set lhs
-        super(targets);
-        
-        //set rhs
-        setRHS(new CellIndexExpr(cell, indizes));
+    public NameExpr getCellArray(){
+        return (NameExpr)((CellIndexExpr)getLHS()).getTarget();
     }
     
-    //function name get
-    public NameExpr getCellNameExpr(){
-        return ((NameExpr)(((CellIndexExpr)getRHS()).getTarget()));
+    public String getCellArrayName(){
+        return getCellArray().getName().getID();
     }
-    public String getFunctionName(){
-        return getCellNameExpr().getName().getID();
-    }
-        
-    //get arguments
-    public IRCommaSeparatedList getArguments(){
-         return (IRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
-    }    
-    
     
     
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
-        irHandler.caseIRCellArrayGetStmt(this);
+        irHandler.caseIRCellArraySetStmt(this);
     }
 
 }
-
-
-

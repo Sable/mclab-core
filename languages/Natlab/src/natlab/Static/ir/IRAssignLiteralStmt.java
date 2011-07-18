@@ -17,7 +17,7 @@
 // =========================================================================== //
 
 package natlab.Static.ir;
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -28,9 +28,18 @@ import ast.*;
  */
 
 public class IRAssignLiteralStmt extends IRAbstractAssignToVarStmt {
+    private static final long serialVersionUID = 1L;
+    
     public IRAssignLiteralStmt(NameExpr lhs,LiteralExpr rhs) {
         super(lhs);
         setRHS(rhs);
+    }
+    
+    /**
+     * returns the rhs literal
+     */
+    public LiteralExpr getRHS(){
+        return (LiteralExpr)super.getRHS();
     }
     
     

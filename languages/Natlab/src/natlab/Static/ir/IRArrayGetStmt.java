@@ -18,9 +18,7 @@
 
 package natlab.Static.ir;
 
-import java.util.ArrayList;
-
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -39,20 +37,20 @@ import ast.*;
  */
 
 public class IRArrayGetStmt extends IRAbstractAssignToVarStmt {
+    private static final long serialVersionUID = 1L;
+
     public IRArrayGetStmt(NameExpr lhs,NameExpr rhs,IRCommaSeparatedList indizes){
         super(lhs);
         setRHS(new ParameterizedExpr(rhs,indizes));
     }
     
-    public String getArrayName(){
-        return ((NameExpr)(((ParameterizedExpr)getLHS())).getTarget()).getName().getID();
-    }
-    public NameExpr getArrayNameExpr(){
-        return (NameExpr)(((ParameterizedExpr)getLHS()).getTarget());
+    public Name getArrayName(){
+        return ((NameExpr)(((ParameterizedExpr)getRHS())).getTarget()).getName();
     }
     
+    
     public IRCommaSeparatedList getIndizes(){
-        return (IRCommaSeparatedList)(((ParameterizedExpr)getLHS()).getArgList());
+        return (IRCommaSeparatedList)(((ParameterizedExpr)getRHS()).getArgList());
     }
     
     

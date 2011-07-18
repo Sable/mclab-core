@@ -17,11 +17,6 @@
 // =========================================================================== //
 
 package natlab.Static.ir;
-
-import java.util.ArrayList;
-
-
-
 import ast.*;
 
 /**
@@ -36,6 +31,8 @@ import ast.*;
  */
 
 public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
+    private static final long serialVersionUID = 1L;
+
     public IRAbstractAssignToListStmt(IRCommaSeparatedList targets) {
         super();
         //set lhs
@@ -45,6 +42,7 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setChild(ASTNode node, int i) {
         if (i == 0 && !(node instanceof MatrixExpr)){

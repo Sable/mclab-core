@@ -18,7 +18,7 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 
@@ -37,21 +37,23 @@ import ast.*;
 
 
 public class IRIfStmt extends IfStmt implements IRStmt {
-  public IRIfStmt(Name conditionVar,IRStatementList IfStmts,IRStatementList ElseStmts){
-      super(
-         new List<IfBlock>().add(new IfBlock(new NameExpr(conditionVar),IfStmts)),
-         new ast.Opt<ElseBlock>(new ElseBlock(ElseStmts))
-      );
-  }
-  
-  
-  
-  
-  @Override
-  public void irAnalyize(IRNodeCaseHandler irHandler) {
-      irHandler.caseIRIfStmt(this);
-  }
 
+    private static final long serialVersionUID = 1L;
+
+    public IRIfStmt(Name conditionVar,IRStatementList IfStmts,IRStatementList ElseStmts){
+        super(
+                new List<IfBlock>().add(new IfBlock(new NameExpr(conditionVar),IfStmts)),
+                new ast.Opt<ElseBlock>(new ElseBlock(ElseStmts))
+        );
+    }
+
+
+
+
+    @Override
+    public void irAnalyize(IRNodeCaseHandler irHandler) {
+        irHandler.caseIRIfStmt(this);
+    }
 }
 
 

@@ -20,16 +20,11 @@ package natlab.Static.ir;
 
 import java.util.ArrayList;
 
-import natlab.toolkits.analysis.NodeCaseHandler;
 import ast.*;
 
 public abstract class IRAbstractAssignStmt extends AssignStmt implements IRStmt {
-    public void analyze(NodeCaseHandler visitor) {
-        // TODO Auto-generated method stub
-        super.analyze(visitor);
-    }
+    private static final long serialVersionUID = 1L;
 
-    
     public IRAbstractAssignStmt() {
         super();
     }

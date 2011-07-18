@@ -21,28 +21,10 @@ package natlab.Static.ir.transform;
 import java.util.*;
 
 import natlab.DecIntNumericLiteralValue;
-import natlab.IntNumericLiteralValue;
-import natlab.Static.ir.IRAbstractAssignStmt;
-import natlab.Static.ir.IRArrayGetStmt;
-import natlab.Static.ir.IRArraySetStmt;
-import natlab.Static.ir.IRAssignFunctionHandleStmt;
-import natlab.Static.ir.IRAssignLiteralStmt;
-import natlab.Static.ir.IRCallStmt;
-import natlab.Static.ir.IRCellArrayGet;
-import natlab.Static.ir.IRCommaSeparatedList;
-import natlab.Static.ir.IRCommentStmt;
-import natlab.Static.ir.IRForStmt;
-import natlab.Static.ir.IRFunction;
-import natlab.Static.ir.IRIfStmt;
-import natlab.Static.ir.IRStatementList;
-import natlab.Static.ir.IRStmt;
-import natlab.Static.ir.IRWhileStmt;
-import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.Static.ir.*;
+import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
-import natlab.toolkits.rewrite.simplification.AbstractSimplification;
-import natlab.toolkits.rewrite.simplification.CommentSimplification;
-import natlab.toolkits.rewrite.simplification.FullSimplification;
-import natlab.toolkits.rewrite.simplification.RightSimplification;
+import natlab.toolkits.rewrite.simplification.*;
 import ast.*;
 import ast.List;
 
@@ -117,7 +99,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
         
         //pull out expression
         LinkedList<AssignStmt> stmts = new LinkedList<AssignStmt>();
-        NameExpr condition = makeName(node.getIfBlock(0).getCondition(), stmts);
+        NameExpr condition = (NameExpr)(node.getIfBlock(0).getCondition());
 
         //get else block
         List<Stmt> elseStmts = 
@@ -158,9 +140,11 @@ public class ThreeAddressToIR extends AbstractSimplification {
     public void caseWhileStmt(WhileStmt node) {
         rewriteChildren(node);
         
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        
         //pull out expr
         LinkedList<AssignStmt> assign = new LinkedList<AssignStmt>();
-        NameExpr condition = makeName(node.getExpr(),assign);
+        NameExpr condition = (NameExpr)(node.getExpr());
         
         //copy list to end of body
         for (AssignStmt a : assign){
@@ -174,12 +158,49 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     
     public void caseReturnStmt(ReturnStmt node) {
-        //TODO - should there be an IRREturn statement? ... probably
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new IRReturnStmt());
     }
     
     public void caseBreakStmt(BreakStmt node) {
-        //newNode = new TransformedNode(new IRBreakStmt());
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new IRBreakStmt());
     }
+    
+    @Override
+    public void caseContinueStmt(ContinueStmt node) {
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new IRContinueStmt());
+    }
+    
+    @Override
+    public void casePersistentStmt(PersistentStmt node) {
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new IRPersistentSmt(node.getNameList()));
+    }
+    
+    @Override
+    public void caseGlobalStmt(GlobalStmt node) {
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new IRGlobalStmt(node.getNameList()));
+    }
+    
+    @Override
+    public void caseTryStmt(TryStmt node) {
+        rewriteChildren(node);
+        if (node instanceof IRStmt) return; //don't redo conversion        
+        
+        newNode = new TransformedNode(new IRTryStmt(
+                        new IRStatementList(node.getTryStmtList()),
+                        new IRStatementList(node.getCatchStmtList())));
+    }
+    
+    @Override
+    public void caseShellCommandStmt(ShellCommandStmt node) {
+        // TODO Auto-generated method stub
+        super.caseShellCommandStmt(node);
+    }
+    
     
     public void caseExprStmt(ExprStmt node) {
         //TODO
@@ -231,7 +252,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             //rhs is a cell index expr
             if (node.getRHS() instanceof CellIndexExpr){
                 CellIndexExpr cell = (CellIndexExpr)(node.getRHS());
-                node = new IRCellArrayGet((NameExpr)cell.getTarget(), 
+                node = new IRCellArrayGetStmt((NameExpr)cell.getTarget(), 
                         exprToCommaSeparatedList(node.getLHS()),
                         listToCommaSeparatedList(cell.getArgs(), assignments, true));
             } else
@@ -416,7 +437,6 @@ public class ThreeAddressToIR extends AbstractSimplification {
             assign.setLHS(target);
             return assign;
         } else {
-            TempFactory tmp = TempFactory.genFreshTempFactory();
             return new IRCallStmt(new NameExpr(new Name("vertcat")),
                     new IRCommaSeparatedList(target),
                     rowTemps);
@@ -467,20 +487,6 @@ public class ThreeAddressToIR extends AbstractSimplification {
         }
     }
     
-    /**
-     * takes in a given expression, which may be a binary, unary, name or literal,
-     * and produces a correct assignment statement for it such that the statmenet
-     * becomes replaced with just a var
-     * for example:
-     * 
-     * (a + b)
-     * ==>
-     * [t] = plus(a,b)
-     * t
-     */
-    private NameExpr makeName(Expr exp,LinkedList<AssignStmt> assigns){
-        return (NameExpr)exp; //todo
-    }
     
     /**
      * returns true if this expression is a parametrized expression where the

@@ -18,10 +18,13 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 public class IRStatementList extends List<Stmt> implements IRNode {
+    private static final long serialVersionUID = 1L;
+
+
     public IRStatementList(List<Stmt> list){
         super();
         for (Stmt s : list){
@@ -36,11 +39,10 @@ public class IRStatementList extends List<Stmt> implements IRNode {
     
     @Override
     public List<Stmt> add(Stmt node) {
-        /*
         if (!(node instanceof IRStmt)){
             throw new UnsupportedOperationException("attempting to put non IR stmt "
                     +(node.getClass().getName())+" in a IRStatementList");
-        }*/
+        }
         return super.add(node);
     }
     

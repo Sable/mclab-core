@@ -18,7 +18,7 @@
 
 package natlab.Static.ir;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -34,22 +34,60 @@ import ast.*;
  * @author ant6n
  */
 public class IRForStmt extends ForStmt implements IRStmt {
-    public IRForStmt(Name var,Name low,Name inc,Name up,IRStatementList stmts){
+    private static final long serialVersionUID = 1L;
+    
+    public IRForStmt(Name var,Name lower,Name inc,Name upper,IRStatementList stmts){
         super(new AssignStmt(
                 new NameExpr(var),
                 new RangeExpr(
-                        new NameExpr(low),
+                        new NameExpr(lower),
                         (inc==null)?new Opt<Expr>():new Opt<Expr>(new NameExpr(inc)),
-                        new NameExpr(up))),
+                        new NameExpr(upper))),
                 stmts);
     }
-    
-    
     
     
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
         irHandler.caseIRForStmt(this);
+    }
+    
+
+    /**
+     * returns the name of the loopvar in the loop header's 'for loopvar = low:inc:high'
+     */
+    public Name getLoopVarName(){
+        return ((NameExpr)(getAssignStmt().getLHS())).getName();
+    }
+    
+    /**
+     * returns the name of the low in the loop header's 'for loopvar = low:inc:high'
+     */
+    public Name getLowerName(){
+        return ((NameExpr)(((RangeExpr)(getAssignStmt().getRHS())).getLower())).getName();
+    }
+
+    /**
+     * returns the name of the inc in the loop header's 'for loopvar = low:inc:high',
+     * or null if it doesn't exist
+     */
+    public Name getIncName(){
+        if (!hasIncr()) return null;
+        return ((NameExpr)(((RangeExpr)(getAssignStmt().getRHS())).getIncr())).getName();
+    }
+
+    /**
+     * returns the name of the low in the loop header's 'for loopvar = low:inc:high'
+     */
+    public Name getUpperName(){
+        return ((NameExpr)(((RangeExpr)(getAssignStmt().getRHS())).getUpper())).getName();
+    }
+    
+    /**
+     * returns true if the loop header's range expression has an increment value
+     */
+    public boolean hasIncr(){
+         return ((RangeExpr)(getAssignStmt().getRHS())).hasIncr();
     }
 }
 

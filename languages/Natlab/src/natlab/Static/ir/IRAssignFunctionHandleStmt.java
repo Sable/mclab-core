@@ -17,8 +17,7 @@
 // =========================================================================== //
 
 package natlab.Static.ir;
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
-import natlab.toolkits.analysis.NodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**
@@ -29,12 +28,18 @@ import ast.*;
  */
 
 public class IRAssignFunctionHandleStmt extends IRAbstractAssignToVarStmt {
+    private static final long serialVersionUID = 1L;
+
     public IRAssignFunctionHandleStmt(Name lhs,Name function) {
         super(new NameExpr(lhs));
         FunctionHandleExpr fHandleExpr = new FunctionHandleExpr(function);
         setRHS(fHandleExpr);
     }
     
+    /**
+     * returns the Name (AST) of the function on the rhs
+     * @return
+     */
     public Name getFunction(){
         return ((FunctionHandleExpr)getRHS()).getName();
     }

@@ -17,7 +17,6 @@
 // =========================================================================== //
 
 package natlab.Static.ir;
-import ast.Stmt;
 
 
 /**
@@ -25,5 +24,4 @@ import ast.Stmt;
  * @author ant6n
  */
 public interface IRStmt extends IRNode {
-    //Stmt getStmt();
 }

@@ -20,11 +20,12 @@ package natlab.Static.ir;
 
 import java.util.Map;
 
-import natlab.Static.toolkits.analysis.IRNodeCaseHandler;
+import natlab.Static.ir.analysis.IRNodeCaseHandler;
 
 import ast.*;
 
 public class IRFunction extends Function implements IRNode {
+    private static final long serialVersionUID = 1L;
     
     public IRFunction(List<Name> outputParams,String name,List<Name> inputParams,
             List<HelpComment> helpComments,IRStatementList stmts,List<IRFunction> nestedFunctions){
