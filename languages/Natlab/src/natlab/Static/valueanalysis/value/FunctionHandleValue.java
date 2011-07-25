@@ -61,6 +61,14 @@ public class FunctionHandleValue<D extends MatrixValue<D>> implements Value<D> {
         }
     }
     
+    /**
+     * returns the set of possible functions this function handle represents
+     * @return
+     */
+    public HashSet<FunctionReference> getFunctions(){
+        return this.functions;
+    }
+    
     @Override
     public String toString() {
         return "(function_handle,"+functions+")";

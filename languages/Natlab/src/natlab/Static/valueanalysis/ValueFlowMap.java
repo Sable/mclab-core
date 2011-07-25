@@ -20,6 +20,10 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
         super(null);
     }
     
+    public static <D extends MatrixValue<D>> ValueFlowMap<D> newInstance(){
+        return new ValueFlowMap<D>();
+    }
+    
     public ValueFlowMap(Map<String, ValueSet<D>> aMap){
         super(null);
         this.putAll(aMap);

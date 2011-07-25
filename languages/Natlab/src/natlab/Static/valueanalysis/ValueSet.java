@@ -12,12 +12,13 @@ import natlab.toolkits.analysis.Mergable;
  * Objects of this class are immutable.
  * Note that this class uses factory method (newInstance) rather than constructors.
  * 
- * TODO - should this be generic in the value?, i.e. V extends AbstractValue
  * @author ant6n
  * 
  * Note about implementation: this will only actually use a map if there is more
  * than element stored by this set. If there is one, a singleton value is used.
  * This should be ok since this class is immutable.
+ * TODO - should the singleton be implemented by making the map a general map,
+ *        and using Collecitons.singletonMap?
  */
 public class ValueSet<D extends MatrixValue<D>> implements 
   Iterable<Value<D>>, Mergable<ValueSet<D>>{

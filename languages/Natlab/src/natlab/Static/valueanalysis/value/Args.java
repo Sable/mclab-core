@@ -18,7 +18,7 @@ import natlab.Static.classes.reference.ClassReference;
  * TODO
  * - globals?
  * TODO
- * - generate an overall (abstract?) parent class containing arg-info
+ * - generate an overall (abstract?) parent class containing arg-info?
  * 
  * @author ant6n
  */

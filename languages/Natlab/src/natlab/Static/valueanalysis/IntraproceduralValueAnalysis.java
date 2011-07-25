@@ -64,16 +64,13 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     /*********** statement cases *****************************************/
     @Override
     public void caseIRCallStmt(IRCallStmt node) {
-        //find all combinations of arguments
-        
-        
-        //LinkedList<LinkedList<Value<D>>> list;
-        
-        //for every combination, find which function actually gets called
-        //then analyze it etc.
-        
-        
-        //combine all the results
+        //find function
+        FunctionReference ref = function.getCalledFunctions().get(node.getFunctionName().getID());
+        //do call
+        setCurrentOutSet(
+                doFunctionCall(ref, getCurrentInSet(), node.getArguments(), node.getTargets()));
+        //associate flowsets
+        associateInAndOut(node);
     }
     
     
@@ -103,20 +100,24 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     
     @Override
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
-        ValueFlowMap<D> flow = getCurrentInSet().copy();
+        ValueFlowMap<D> flow = getCurrentInSet(); //note copied!
         ValueSet<D> array = flow.get(node.getArrayName().getID());
-        ValueSet<D> result = ValueSet.newInstance();
+        ValueFlowMap<D> result = ValueFlowMap.newInstance();
         //go through all possible array values
         for (Value<D> arrayValue : array){
             if (arrayValue instanceof MatrixValue<?>){
                 //go through all possible index sets
+                //TODO - deal with overloading etc.
+                //TODO - errors on assign - use is assign to var??
                 for (List<Value<D>> indizes : cross(flow,node.getIndizes())){
-                    result = result.add(arrayValue.subsref(indizes));
+                    result.merge(doAssign(flow,node.getTargets(),
+                            Collections.singleton(ValueSet.newInstance(arrayValue.subsref(indizes)))));
                 }
             } else if (arrayValue instanceof FunctionHandleValue<?>){
-                //TODO call function
-                throw new UnsupportedOperationException("indexing function handle");
-                
+                //go through all function handles this may represent and get the result
+                for (FunctionReference ref :((FunctionHandleValue<D>)arrayValue).getFunctions()){
+                  result.merge(doFunctionCall(ref, flow, node.getIndizes(), node.getTargets()));
+                }
             } else {
                 //TODO more possible values here
                 throw new UnsupportedOperationException("array get received unknown value "+arrayValue);
@@ -124,8 +125,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         }
         
         //put result assign/set flowsets
-        flow.put(node.getTargetName().getID(), result);
-        setCurrentOutSet(flow);
+        setCurrentOutSet(result);
         associateInAndOut(node);
     }
     
@@ -216,6 +216,44 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         }
         return ValueSet.cross(list);
     }
+    
+    
+    /**
+     * implements the flow equations for calling functions
+     * Returns a new value flow map which represents the outset of a call
+     */
+    private ValueFlowMap<D> doFunctionCall(
+            FunctionReference function,ValueFlowMap<D> flow,
+            IRCommaSeparatedList args,IRCommaSeparatedList targets){
+        
+        
+        return null;
+    }
+    
+    
+    /**
+     * assigns the given collection of values, to the targets represented
+     * by the comma separated list. Returns a new flowmap which is a copy
+     * of old one, except for the newly assigned valeus.
+     * 
+     * TODO - should this be part of ValueFlowMap?
+     */
+    private ValueFlowMap<D> doAssign(ValueFlowMap<D> flow, 
+            IRCommaSeparatedList targets, Collection<ValueSet<D>> values){
+       ValueFlowMap<D> result = flow.copy();
+       if (targets.isAllNameExpressions()){
+           Iterator<ValueSet<D>> iValues = values.iterator();
+           Iterator<Name> iNames = targets.asNameList().iterator();
+           while (iNames.hasNext()){
+               result.put(iNames.next().getID(), iValues.next());
+           }
+       } else {
+           throw new UnsupportedOperationException("no support for non-primitive assings");
+       }
+       return result;
+    }
+    
+    
 }
 
 
