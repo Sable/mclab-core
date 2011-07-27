@@ -45,21 +45,22 @@ import natlab.toolkits.path.BuiltinQuery;
 public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
     public static void main(String[] args) {
-        java.lang.System.out.println(create("i"));
+        java.lang.System.out.println(getInstance("i"));
         Builtin b = builtinMap.get("i");
-        java.lang.System.out.println(b+"  "+b.create());
+        java.lang.System.out.println(b);
         java.lang.System.out.println("number of builtins "+builtinMap.size());
         java.lang.System.out.println(builtinMap);
     }
 
     /**
-     * creates a builtin from the given name (case sensitive)
+     * returns the builtin from the given name (case sensitive)
+     * if there is no builtin, returns null.
      */
-    public static final Builtin create(String name){
+    public static final Builtin getInstance(String name){
         if (builtinMap.containsKey(name)){
-            return builtinMap.get(name).create();
+            return builtinMap.get(name);
         } else {
-            throw new UnsupportedOperationException("cannot create nonexistent builtin "+name);
+            return null;
         }
     }
     
@@ -108,7 +109,7 @@ public abstract class Builtin {
     # print the placing of classes into the builtinMap
     for i in range(0,N):
         if (not abstract[i]):
-            file.write('        builtinMap.put("%s",new %s());\n' % (children[i],firstCaps(children[i])))
+            file.write('        builtinMap.put("%s",%s.getInstance());\n' % (children[i],firstCaps(children[i])))
     file.write( """    }    
     
     //the actual Builtin Classes:
@@ -140,9 +141,11 @@ def printClass(file,parent,child,isAbstract,tags):
     else:
         code = """
     public static class %s extends %s %s {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new %s();
+        //returns the singleton instance of this class
+        private static %s singleton = null;
+        public static %s getInstance(){
+            if (singleton == null) singleton = new %s();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -152,7 +155,7 @@ def printClass(file,parent,child,isAbstract,tags):
         public String getName(){
             return "%s";
         }
-        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child),firstCaps(child),child);
+        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child),firstCaps(child),firstCaps(child),firstCaps(child),child);
     # fill in code due to tags
     for tagName in tags.keys():
        tagArgs = tags[tagName];

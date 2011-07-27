@@ -1,24 +1,3 @@
-// =========================================================================== //
-//                                                                             //
-// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
-//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
-//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
-//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
-//                                                                             //
-//   Licensed under the Apache License, Version 2.0 (the "License");           //
-//   you may not use this file except in compliance with the License.          //
-//   You may obtain a copy of the License at                                   //
-//                                                                             //
-//       http://www.apache.org/licenses/LICENSE-2.0                            //
-//                                                                             //
-//   Unless required by applicable law or agreed to in writing, software       //
-//   distributed under the License is distributed on an "AS IS" BASIS,         //
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
-//   See the License for the specific language governing permissions and       //
-//   limitations under the License.                                            //
-//                                                                             //
-// =========================================================================== //
-
 
 package natlab.Static.builtin;
 
@@ -29,21 +8,22 @@ import natlab.toolkits.path.BuiltinQuery;
 public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
     public static void main(String[] args) {
-        java.lang.System.out.println(create("i"));
+        java.lang.System.out.println(getInstance("i"));
         Builtin b = builtinMap.get("i");
-        java.lang.System.out.println(b+"  "+b.create());
+        java.lang.System.out.println(b);
         java.lang.System.out.println("number of builtins "+builtinMap.size());
         java.lang.System.out.println(builtinMap);
     }
 
     /**
-     * creates a builtin from the given name (case sensitive)
+     * returns the builtin from the given name (case sensitive)
+     * if there is no builtin, returns null.
      */
-    public static final Builtin create(String name){
+    public static final Builtin getInstance(String name){
         if (builtinMap.containsKey(name)){
-            return builtinMap.get(name).create();
+            return builtinMap.get(name);
         } else {
-            throw new UnsupportedOperationException("cannot create nonexistent builtin "+name);
+            return null;
         }
     }
     
@@ -88,289 +68,289 @@ public abstract class Builtin {
 
     //static initializer fills in builtinMap
     static {
-        builtinMap.put("i",new I());
-        builtinMap.put("j",new J());
-        builtinMap.put("pi",new Pi());
-        builtinMap.put("colon",new Colon());
-        builtinMap.put("horzcat",new Horzcat());
-        builtinMap.put("vertcat",new Vertcat());
-        builtinMap.put("cat",new Cat());
-        builtinMap.put("nargin",new Nargin());
-        builtinMap.put("nargout",new Nargout());
-        builtinMap.put("mfilename",new Mfilename());
-        builtinMap.put("end",new End());
-        builtinMap.put("isequalwithequalnans",new Isequalwithequalnans());
-        builtinMap.put("isequal",new Isequal());
-        builtinMap.put("subsasgn",new Subsasgn());
-        builtinMap.put("subsref",new Subsref());
-        builtinMap.put("histc",new Histc());
-        builtinMap.put("structfun",new Structfun());
-        builtinMap.put("arrayfun",new Arrayfun());
-        builtinMap.put("cellfun",new Cellfun());
-        builtinMap.put("eq",new Eq());
-        builtinMap.put("ne",new Ne());
-        builtinMap.put("lt",new Lt());
-        builtinMap.put("le",new Le());
-        builtinMap.put("ge",new Ge());
-        builtinMap.put("gt",new Gt());
-        builtinMap.put("and",new And());
-        builtinMap.put("or",new Or());
-        builtinMap.put("xor",new Xor());
-        builtinMap.put("plus",new Plus());
-        builtinMap.put("minus",new Minus());
-        builtinMap.put("mtimes",new Mtimes());
-        builtinMap.put("mpower",new Mpower());
-        builtinMap.put("mldivide",new Mldivide());
-        builtinMap.put("mrdivide",new Mrdivide());
-        builtinMap.put("times",new Times());
-        builtinMap.put("ldivide",new Ldivide());
-        builtinMap.put("rdivide",new Rdivide());
-        builtinMap.put("power",new Power());
-        builtinMap.put("pow2",new Pow2());
-        builtinMap.put("mod",new Mod());
-        builtinMap.put("rem",new Rem());
-        builtinMap.put("hypot",new Hypot());
-        builtinMap.put("uplus",new Uplus());
-        builtinMap.put("uminus",new Uminus());
-        builtinMap.put("conj",new Conj());
-        builtinMap.put("real",new Real());
-        builtinMap.put("imag",new Imag());
-        builtinMap.put("abs",new Abs());
-        builtinMap.put("transpose",new Transpose());
-        builtinMap.put("ctranspose",new Ctranspose());
-        builtinMap.put("expm",new Expm());
-        builtinMap.put("sqrtm",new Sqrtm());
-        builtinMap.put("logm",new Logm());
-        builtinMap.put("not",new Not());
-        builtinMap.put("sqrt",new Sqrt());
-        builtinMap.put("realsqrt",new Realsqrt());
-        builtinMap.put("erf",new Erf());
-        builtinMap.put("erfinv",new Erfinv());
-        builtinMap.put("erfc",new Erfc());
-        builtinMap.put("erfcinv",new Erfcinv());
-        builtinMap.put("gamma",new Gamma());
-        builtinMap.put("gammainc",new Gammainc());
-        builtinMap.put("betainc",new Betainc());
-        builtinMap.put("gammaln",new Gammaln());
-        builtinMap.put("exp",new Exp());
-        builtinMap.put("log",new Log());
-        builtinMap.put("log2",new Log2());
-        builtinMap.put("log10",new Log10());
-        builtinMap.put("sin",new Sin());
-        builtinMap.put("cos",new Cos());
-        builtinMap.put("tan",new Tan());
-        builtinMap.put("cot",new Cot());
-        builtinMap.put("sec",new Sec());
-        builtinMap.put("csc",new Csc());
-        builtinMap.put("sind",new Sind());
-        builtinMap.put("cosd",new Cosd());
-        builtinMap.put("tand",new Tand());
-        builtinMap.put("cotd",new Cotd());
-        builtinMap.put("secd",new Secd());
-        builtinMap.put("cscd",new Cscd());
-        builtinMap.put("sinh",new Sinh());
-        builtinMap.put("cosh",new Cosh());
-        builtinMap.put("tanh",new Tanh());
-        builtinMap.put("coth",new Coth());
-        builtinMap.put("sech",new Sech());
-        builtinMap.put("csch",new Csch());
-        builtinMap.put("asin",new Asin());
-        builtinMap.put("acos",new Acos());
-        builtinMap.put("atan",new Atan());
-        builtinMap.put("atan2",new Atan2());
-        builtinMap.put("acot",new Acot());
-        builtinMap.put("asec",new Asec());
-        builtinMap.put("acsc",new Acsc());
-        builtinMap.put("asind",new Asind());
-        builtinMap.put("acosd",new Acosd());
-        builtinMap.put("atand",new Atand());
-        builtinMap.put("acotd",new Acotd());
-        builtinMap.put("asecd",new Asecd());
-        builtinMap.put("acscd",new Acscd());
-        builtinMap.put("asinh",new Asinh());
-        builtinMap.put("acosh",new Acosh());
-        builtinMap.put("atanh",new Atanh());
-        builtinMap.put("acoth",new Acoth());
-        builtinMap.put("asech",new Asech());
-        builtinMap.put("acsch",new Acsch());
-        builtinMap.put("fix",new Fix());
-        builtinMap.put("round",new Round());
-        builtinMap.put("floor",new Floor());
-        builtinMap.put("ceil",new Ceil());
-        builtinMap.put("inv",new Inv());
-        builtinMap.put("eig",new Eig());
-        builtinMap.put("norm",new Norm());
-        builtinMap.put("rank",new Rank());
-        builtinMap.put("det",new Det());
-        builtinMap.put("dot",new Dot());
-        builtinMap.put("cross",new Cross());
-        builtinMap.put("linsolve",new Linsolve());
-        builtinMap.put("rcond",new Rcond());
-        builtinMap.put("tril",new Tril());
-        builtinMap.put("triu",new Triu());
-        builtinMap.put("eps",new Eps());
-        builtinMap.put("ifftn",new Ifftn());
-        builtinMap.put("fftn",new Fftn());
-        builtinMap.put("fft",new Fft());
-        builtinMap.put("schur",new Schur());
-        builtinMap.put("ordschur",new Ordschur());
-        builtinMap.put("lu",new Lu());
-        builtinMap.put("chol",new Chol());
-        builtinMap.put("qr",new Qr());
-        builtinMap.put("svd",new Svd());
-        builtinMap.put("bitand",new Bitand());
-        builtinMap.put("bitor",new Bitor());
-        builtinMap.put("bitxor",new Bitxor());
-        builtinMap.put("bitcmp",new Bitcmp());
-        builtinMap.put("bitget",new Bitget());
-        builtinMap.put("bitshift",new Bitshift());
-        builtinMap.put("bitset",new Bitset());
-        builtinMap.put("strncmpi",new Strncmpi());
-        builtinMap.put("strcmp",new Strcmp());
-        builtinMap.put("strcmpi",new Strcmpi());
-        builtinMap.put("strtrim",new Strtrim());
-        builtinMap.put("strfind",new Strfind());
-        builtinMap.put("findstr",new Findstr());
-        builtinMap.put("strrep",new Strrep());
-        builtinMap.put("upper",new Upper());
-        builtinMap.put("lower",new Lower());
-        builtinMap.put("deblank",new Deblank());
-        builtinMap.put("regexptranslate",new Regexptranslate());
-        builtinMap.put("regexp",new Regexp());
-        builtinMap.put("regexpi",new Regexpi());
-        builtinMap.put("tegexprep",new Tegexprep());
-        builtinMap.put("double",new Double());
-        builtinMap.put("single",new Single());
-        builtinMap.put("char",new Char());
-        builtinMap.put("logical",new Logical());
-        builtinMap.put("int8",new Int8());
-        builtinMap.put("int16",new Int16());
-        builtinMap.put("int32",new Int32());
-        builtinMap.put("int64",new Int64());
-        builtinMap.put("uint8",new Uint8());
-        builtinMap.put("uint16",new Uint16());
-        builtinMap.put("uint32",new Uint32());
-        builtinMap.put("uint64",new Uint64());
-        builtinMap.put("cell",new Cell());
-        builtinMap.put("struct",new Struct());
-        builtinMap.put("cell2struct",new Cell2struct());
-        builtinMap.put("struct2cell",new Struct2cell());
-        builtinMap.put("typecast",new Typecast());
-        builtinMap.put("cast",new Cast());
-        builtinMap.put("isfield",new Isfield());
-        builtinMap.put("class",new Class());
-        builtinMap.put("methodnames",new Methodnames());
-        builtinMap.put("fieldnames",new Fieldnames());
-        builtinMap.put("isempty",new Isempty());
-        builtinMap.put("isobject",new Isobject());
-        builtinMap.put("isfloat",new Isfloat());
-        builtinMap.put("isinteger",new Isinteger());
-        builtinMap.put("islogical",new Islogical());
-        builtinMap.put("isstruct",new Isstruct());
-        builtinMap.put("ischar",new Ischar());
-        builtinMap.put("iscell",new Iscell());
-        builtinMap.put("isa",new Isa());
-        builtinMap.put("sort",new Sort());
-        builtinMap.put("unique",new Unique());
-        builtinMap.put("find",new Find());
-        builtinMap.put("diag",new Diag());
-        builtinMap.put("reshape",new Reshape());
-        builtinMap.put("permute",new Permute());
-        builtinMap.put("squeeze",new Squeeze());
-        builtinMap.put("complex",new Complex());
-        builtinMap.put("prod",new Prod());
-        builtinMap.put("sum",new Sum());
-        builtinMap.put("mean",new Mean());
-        builtinMap.put("min",new Min());
-        builtinMap.put("max",new Max());
-        builtinMap.put("ones",new Ones());
-        builtinMap.put("zeros",new Zeros());
-        builtinMap.put("eye",new Eye());
-        builtinMap.put("inf",new Inf());
-        builtinMap.put("nan",new Nan());
-        builtinMap.put("true",new True());
-        builtinMap.put("false",new False());
-        builtinMap.put("size",new Size());
-        builtinMap.put("nonzeros",new Nonzeros());
-        builtinMap.put("cumprod",new Cumprod());
-        builtinMap.put("cumsum",new Cumsum());
-        builtinMap.put("sign",new Sign());
-        builtinMap.put("length",new Length());
-        builtinMap.put("ndims",new Ndims());
-        builtinMap.put("numel",new Numel());
-        builtinMap.put("nnz",new Nnz());
-        builtinMap.put("any",new Any());
-        builtinMap.put("all",new All());
-        builtinMap.put("isemtpy",new Isemtpy());
-        builtinMap.put("isnan",new Isnan());
-        builtinMap.put("isinf",new Isinf());
-        builtinMap.put("isfinite",new Isfinite());
-        builtinMap.put("isvector",new Isvector());
-        builtinMap.put("isscalar",new Isscalar());
-        builtinMap.put("isreal",new Isreal());
-        builtinMap.put("isnumeric",new Isnumeric());
-        builtinMap.put("superiorto",new Superiorto());
-        builtinMap.put("exit",new Exit());
-        builtinMap.put("quit",new Quit());
-        builtinMap.put("clock",new Clock());
-        builtinMap.put("tic",new Tic());
-        builtinMap.put("toc",new Toc());
-        builtinMap.put("cputime",new Cputime());
-        builtinMap.put("assert",new Assert());
-        builtinMap.put("nargoutchk",new Nargoutchk());
-        builtinMap.put("nargchk",new Nargchk());
-        builtinMap.put("str2func",new Str2func());
-        builtinMap.put("pause",new Pause());
-        builtinMap.put("eval",new Eval());
-        builtinMap.put("evalin",new Evalin());
-        builtinMap.put("feval",new Feval());
-        builtinMap.put("assignin",new Assignin());
-        builtinMap.put("inputname",new Inputname());
-        builtinMap.put("import",new Import());
-        builtinMap.put("cd",new Cd());
-        builtinMap.put("exist",new Exist());
-        builtinMap.put("matlabroot",new Matlabroot());
-        builtinMap.put("whos",new Whos());
-        builtinMap.put("which",new Which());
-        builtinMap.put("version",new Version());
-        builtinMap.put("clear",new Clear());
-        builtinMap.put("disp",new Disp());
-        builtinMap.put("display",new Display());
-        builtinMap.put("clc",new Clc());
-        builtinMap.put("error",new Error());
-        builtinMap.put("warning",new Warning());
-        builtinMap.put("echo",new Echo());
-        builtinMap.put("diary",new Diary());
-        builtinMap.put("lastwarn",new Lastwarn());
-        builtinMap.put("lasterror",new Lasterror());
-        builtinMap.put("format",new Format());
-        builtinMap.put("rand",new Rand());
-        builtinMap.put("randi",new Randi());
-        builtinMap.put("randn",new Randn());
-        builtinMap.put("computer",new Computer());
-        builtinMap.put("beep",new Beep());
-        builtinMap.put("dir",new Dir());
-        builtinMap.put("unix",new Unix());
-        builtinMap.put("dos",new Dos());
-        builtinMap.put("system",new System());
-        builtinMap.put("load",new Load());
-        builtinMap.put("save",new Save());
-        builtinMap.put("input",new Input());
-        builtinMap.put("textscan",new Textscan());
-        builtinMap.put("sprintf",new Sprintf());
-        builtinMap.put("sscanf",new Sscanf());
-        builtinMap.put("fprintf",new Fprintf());
-        builtinMap.put("ftell",new Ftell());
-        builtinMap.put("ferror",new Ferror());
-        builtinMap.put("fopen",new Fopen());
-        builtinMap.put("fread",new Fread());
-        builtinMap.put("frewind",new Frewind());
-        builtinMap.put("fscanf",new Fscanf());
-        builtinMap.put("fseek",new Fseek());
-        builtinMap.put("fwrite",new Fwrite());
-        builtinMap.put("fgetl",new Fgetl());
-        builtinMap.put("fgets",new Fgets());
-        builtinMap.put("fclose",new Fclose());
+        builtinMap.put("i",I.getInstance());
+        builtinMap.put("j",J.getInstance());
+        builtinMap.put("pi",Pi.getInstance());
+        builtinMap.put("colon",Colon.getInstance());
+        builtinMap.put("horzcat",Horzcat.getInstance());
+        builtinMap.put("vertcat",Vertcat.getInstance());
+        builtinMap.put("cat",Cat.getInstance());
+        builtinMap.put("nargin",Nargin.getInstance());
+        builtinMap.put("nargout",Nargout.getInstance());
+        builtinMap.put("mfilename",Mfilename.getInstance());
+        builtinMap.put("end",End.getInstance());
+        builtinMap.put("isequalwithequalnans",Isequalwithequalnans.getInstance());
+        builtinMap.put("isequal",Isequal.getInstance());
+        builtinMap.put("subsasgn",Subsasgn.getInstance());
+        builtinMap.put("subsref",Subsref.getInstance());
+        builtinMap.put("histc",Histc.getInstance());
+        builtinMap.put("structfun",Structfun.getInstance());
+        builtinMap.put("arrayfun",Arrayfun.getInstance());
+        builtinMap.put("cellfun",Cellfun.getInstance());
+        builtinMap.put("eq",Eq.getInstance());
+        builtinMap.put("ne",Ne.getInstance());
+        builtinMap.put("lt",Lt.getInstance());
+        builtinMap.put("le",Le.getInstance());
+        builtinMap.put("ge",Ge.getInstance());
+        builtinMap.put("gt",Gt.getInstance());
+        builtinMap.put("and",And.getInstance());
+        builtinMap.put("or",Or.getInstance());
+        builtinMap.put("xor",Xor.getInstance());
+        builtinMap.put("plus",Plus.getInstance());
+        builtinMap.put("minus",Minus.getInstance());
+        builtinMap.put("mtimes",Mtimes.getInstance());
+        builtinMap.put("mpower",Mpower.getInstance());
+        builtinMap.put("mldivide",Mldivide.getInstance());
+        builtinMap.put("mrdivide",Mrdivide.getInstance());
+        builtinMap.put("times",Times.getInstance());
+        builtinMap.put("ldivide",Ldivide.getInstance());
+        builtinMap.put("rdivide",Rdivide.getInstance());
+        builtinMap.put("power",Power.getInstance());
+        builtinMap.put("pow2",Pow2.getInstance());
+        builtinMap.put("mod",Mod.getInstance());
+        builtinMap.put("rem",Rem.getInstance());
+        builtinMap.put("hypot",Hypot.getInstance());
+        builtinMap.put("uplus",Uplus.getInstance());
+        builtinMap.put("uminus",Uminus.getInstance());
+        builtinMap.put("conj",Conj.getInstance());
+        builtinMap.put("real",Real.getInstance());
+        builtinMap.put("imag",Imag.getInstance());
+        builtinMap.put("abs",Abs.getInstance());
+        builtinMap.put("transpose",Transpose.getInstance());
+        builtinMap.put("ctranspose",Ctranspose.getInstance());
+        builtinMap.put("expm",Expm.getInstance());
+        builtinMap.put("sqrtm",Sqrtm.getInstance());
+        builtinMap.put("logm",Logm.getInstance());
+        builtinMap.put("not",Not.getInstance());
+        builtinMap.put("sqrt",Sqrt.getInstance());
+        builtinMap.put("realsqrt",Realsqrt.getInstance());
+        builtinMap.put("erf",Erf.getInstance());
+        builtinMap.put("erfinv",Erfinv.getInstance());
+        builtinMap.put("erfc",Erfc.getInstance());
+        builtinMap.put("erfcinv",Erfcinv.getInstance());
+        builtinMap.put("gamma",Gamma.getInstance());
+        builtinMap.put("gammainc",Gammainc.getInstance());
+        builtinMap.put("betainc",Betainc.getInstance());
+        builtinMap.put("gammaln",Gammaln.getInstance());
+        builtinMap.put("exp",Exp.getInstance());
+        builtinMap.put("log",Log.getInstance());
+        builtinMap.put("log2",Log2.getInstance());
+        builtinMap.put("log10",Log10.getInstance());
+        builtinMap.put("sin",Sin.getInstance());
+        builtinMap.put("cos",Cos.getInstance());
+        builtinMap.put("tan",Tan.getInstance());
+        builtinMap.put("cot",Cot.getInstance());
+        builtinMap.put("sec",Sec.getInstance());
+        builtinMap.put("csc",Csc.getInstance());
+        builtinMap.put("sind",Sind.getInstance());
+        builtinMap.put("cosd",Cosd.getInstance());
+        builtinMap.put("tand",Tand.getInstance());
+        builtinMap.put("cotd",Cotd.getInstance());
+        builtinMap.put("secd",Secd.getInstance());
+        builtinMap.put("cscd",Cscd.getInstance());
+        builtinMap.put("sinh",Sinh.getInstance());
+        builtinMap.put("cosh",Cosh.getInstance());
+        builtinMap.put("tanh",Tanh.getInstance());
+        builtinMap.put("coth",Coth.getInstance());
+        builtinMap.put("sech",Sech.getInstance());
+        builtinMap.put("csch",Csch.getInstance());
+        builtinMap.put("asin",Asin.getInstance());
+        builtinMap.put("acos",Acos.getInstance());
+        builtinMap.put("atan",Atan.getInstance());
+        builtinMap.put("atan2",Atan2.getInstance());
+        builtinMap.put("acot",Acot.getInstance());
+        builtinMap.put("asec",Asec.getInstance());
+        builtinMap.put("acsc",Acsc.getInstance());
+        builtinMap.put("asind",Asind.getInstance());
+        builtinMap.put("acosd",Acosd.getInstance());
+        builtinMap.put("atand",Atand.getInstance());
+        builtinMap.put("acotd",Acotd.getInstance());
+        builtinMap.put("asecd",Asecd.getInstance());
+        builtinMap.put("acscd",Acscd.getInstance());
+        builtinMap.put("asinh",Asinh.getInstance());
+        builtinMap.put("acosh",Acosh.getInstance());
+        builtinMap.put("atanh",Atanh.getInstance());
+        builtinMap.put("acoth",Acoth.getInstance());
+        builtinMap.put("asech",Asech.getInstance());
+        builtinMap.put("acsch",Acsch.getInstance());
+        builtinMap.put("fix",Fix.getInstance());
+        builtinMap.put("round",Round.getInstance());
+        builtinMap.put("floor",Floor.getInstance());
+        builtinMap.put("ceil",Ceil.getInstance());
+        builtinMap.put("inv",Inv.getInstance());
+        builtinMap.put("eig",Eig.getInstance());
+        builtinMap.put("norm",Norm.getInstance());
+        builtinMap.put("rank",Rank.getInstance());
+        builtinMap.put("det",Det.getInstance());
+        builtinMap.put("dot",Dot.getInstance());
+        builtinMap.put("cross",Cross.getInstance());
+        builtinMap.put("linsolve",Linsolve.getInstance());
+        builtinMap.put("rcond",Rcond.getInstance());
+        builtinMap.put("tril",Tril.getInstance());
+        builtinMap.put("triu",Triu.getInstance());
+        builtinMap.put("eps",Eps.getInstance());
+        builtinMap.put("ifftn",Ifftn.getInstance());
+        builtinMap.put("fftn",Fftn.getInstance());
+        builtinMap.put("fft",Fft.getInstance());
+        builtinMap.put("schur",Schur.getInstance());
+        builtinMap.put("ordschur",Ordschur.getInstance());
+        builtinMap.put("lu",Lu.getInstance());
+        builtinMap.put("chol",Chol.getInstance());
+        builtinMap.put("qr",Qr.getInstance());
+        builtinMap.put("svd",Svd.getInstance());
+        builtinMap.put("bitand",Bitand.getInstance());
+        builtinMap.put("bitor",Bitor.getInstance());
+        builtinMap.put("bitxor",Bitxor.getInstance());
+        builtinMap.put("bitcmp",Bitcmp.getInstance());
+        builtinMap.put("bitget",Bitget.getInstance());
+        builtinMap.put("bitshift",Bitshift.getInstance());
+        builtinMap.put("bitset",Bitset.getInstance());
+        builtinMap.put("strncmpi",Strncmpi.getInstance());
+        builtinMap.put("strcmp",Strcmp.getInstance());
+        builtinMap.put("strcmpi",Strcmpi.getInstance());
+        builtinMap.put("strtrim",Strtrim.getInstance());
+        builtinMap.put("strfind",Strfind.getInstance());
+        builtinMap.put("findstr",Findstr.getInstance());
+        builtinMap.put("strrep",Strrep.getInstance());
+        builtinMap.put("upper",Upper.getInstance());
+        builtinMap.put("lower",Lower.getInstance());
+        builtinMap.put("deblank",Deblank.getInstance());
+        builtinMap.put("regexptranslate",Regexptranslate.getInstance());
+        builtinMap.put("regexp",Regexp.getInstance());
+        builtinMap.put("regexpi",Regexpi.getInstance());
+        builtinMap.put("tegexprep",Tegexprep.getInstance());
+        builtinMap.put("double",Double.getInstance());
+        builtinMap.put("single",Single.getInstance());
+        builtinMap.put("char",Char.getInstance());
+        builtinMap.put("logical",Logical.getInstance());
+        builtinMap.put("int8",Int8.getInstance());
+        builtinMap.put("int16",Int16.getInstance());
+        builtinMap.put("int32",Int32.getInstance());
+        builtinMap.put("int64",Int64.getInstance());
+        builtinMap.put("uint8",Uint8.getInstance());
+        builtinMap.put("uint16",Uint16.getInstance());
+        builtinMap.put("uint32",Uint32.getInstance());
+        builtinMap.put("uint64",Uint64.getInstance());
+        builtinMap.put("cell",Cell.getInstance());
+        builtinMap.put("struct",Struct.getInstance());
+        builtinMap.put("cell2struct",Cell2struct.getInstance());
+        builtinMap.put("struct2cell",Struct2cell.getInstance());
+        builtinMap.put("typecast",Typecast.getInstance());
+        builtinMap.put("cast",Cast.getInstance());
+        builtinMap.put("isfield",Isfield.getInstance());
+        builtinMap.put("class",Class.getInstance());
+        builtinMap.put("methodnames",Methodnames.getInstance());
+        builtinMap.put("fieldnames",Fieldnames.getInstance());
+        builtinMap.put("isempty",Isempty.getInstance());
+        builtinMap.put("isobject",Isobject.getInstance());
+        builtinMap.put("isfloat",Isfloat.getInstance());
+        builtinMap.put("isinteger",Isinteger.getInstance());
+        builtinMap.put("islogical",Islogical.getInstance());
+        builtinMap.put("isstruct",Isstruct.getInstance());
+        builtinMap.put("ischar",Ischar.getInstance());
+        builtinMap.put("iscell",Iscell.getInstance());
+        builtinMap.put("isa",Isa.getInstance());
+        builtinMap.put("sort",Sort.getInstance());
+        builtinMap.put("unique",Unique.getInstance());
+        builtinMap.put("find",Find.getInstance());
+        builtinMap.put("diag",Diag.getInstance());
+        builtinMap.put("reshape",Reshape.getInstance());
+        builtinMap.put("permute",Permute.getInstance());
+        builtinMap.put("squeeze",Squeeze.getInstance());
+        builtinMap.put("complex",Complex.getInstance());
+        builtinMap.put("prod",Prod.getInstance());
+        builtinMap.put("sum",Sum.getInstance());
+        builtinMap.put("mean",Mean.getInstance());
+        builtinMap.put("min",Min.getInstance());
+        builtinMap.put("max",Max.getInstance());
+        builtinMap.put("ones",Ones.getInstance());
+        builtinMap.put("zeros",Zeros.getInstance());
+        builtinMap.put("eye",Eye.getInstance());
+        builtinMap.put("inf",Inf.getInstance());
+        builtinMap.put("nan",Nan.getInstance());
+        builtinMap.put("true",True.getInstance());
+        builtinMap.put("false",False.getInstance());
+        builtinMap.put("size",Size.getInstance());
+        builtinMap.put("nonzeros",Nonzeros.getInstance());
+        builtinMap.put("cumprod",Cumprod.getInstance());
+        builtinMap.put("cumsum",Cumsum.getInstance());
+        builtinMap.put("sign",Sign.getInstance());
+        builtinMap.put("length",Length.getInstance());
+        builtinMap.put("ndims",Ndims.getInstance());
+        builtinMap.put("numel",Numel.getInstance());
+        builtinMap.put("nnz",Nnz.getInstance());
+        builtinMap.put("any",Any.getInstance());
+        builtinMap.put("all",All.getInstance());
+        builtinMap.put("isemtpy",Isemtpy.getInstance());
+        builtinMap.put("isnan",Isnan.getInstance());
+        builtinMap.put("isinf",Isinf.getInstance());
+        builtinMap.put("isfinite",Isfinite.getInstance());
+        builtinMap.put("isvector",Isvector.getInstance());
+        builtinMap.put("isscalar",Isscalar.getInstance());
+        builtinMap.put("isreal",Isreal.getInstance());
+        builtinMap.put("isnumeric",Isnumeric.getInstance());
+        builtinMap.put("superiorto",Superiorto.getInstance());
+        builtinMap.put("exit",Exit.getInstance());
+        builtinMap.put("quit",Quit.getInstance());
+        builtinMap.put("clock",Clock.getInstance());
+        builtinMap.put("tic",Tic.getInstance());
+        builtinMap.put("toc",Toc.getInstance());
+        builtinMap.put("cputime",Cputime.getInstance());
+        builtinMap.put("assert",Assert.getInstance());
+        builtinMap.put("nargoutchk",Nargoutchk.getInstance());
+        builtinMap.put("nargchk",Nargchk.getInstance());
+        builtinMap.put("str2func",Str2func.getInstance());
+        builtinMap.put("pause",Pause.getInstance());
+        builtinMap.put("eval",Eval.getInstance());
+        builtinMap.put("evalin",Evalin.getInstance());
+        builtinMap.put("feval",Feval.getInstance());
+        builtinMap.put("assignin",Assignin.getInstance());
+        builtinMap.put("inputname",Inputname.getInstance());
+        builtinMap.put("import",Import.getInstance());
+        builtinMap.put("cd",Cd.getInstance());
+        builtinMap.put("exist",Exist.getInstance());
+        builtinMap.put("matlabroot",Matlabroot.getInstance());
+        builtinMap.put("whos",Whos.getInstance());
+        builtinMap.put("which",Which.getInstance());
+        builtinMap.put("version",Version.getInstance());
+        builtinMap.put("clear",Clear.getInstance());
+        builtinMap.put("disp",Disp.getInstance());
+        builtinMap.put("display",Display.getInstance());
+        builtinMap.put("clc",Clc.getInstance());
+        builtinMap.put("error",Error.getInstance());
+        builtinMap.put("warning",Warning.getInstance());
+        builtinMap.put("echo",Echo.getInstance());
+        builtinMap.put("diary",Diary.getInstance());
+        builtinMap.put("lastwarn",Lastwarn.getInstance());
+        builtinMap.put("lasterror",Lasterror.getInstance());
+        builtinMap.put("format",Format.getInstance());
+        builtinMap.put("rand",Rand.getInstance());
+        builtinMap.put("randi",Randi.getInstance());
+        builtinMap.put("randn",Randn.getInstance());
+        builtinMap.put("computer",Computer.getInstance());
+        builtinMap.put("beep",Beep.getInstance());
+        builtinMap.put("dir",Dir.getInstance());
+        builtinMap.put("unix",Unix.getInstance());
+        builtinMap.put("dos",Dos.getInstance());
+        builtinMap.put("system",System.getInstance());
+        builtinMap.put("load",Load.getInstance());
+        builtinMap.put("save",Save.getInstance());
+        builtinMap.put("input",Input.getInstance());
+        builtinMap.put("textscan",Textscan.getInstance());
+        builtinMap.put("sprintf",Sprintf.getInstance());
+        builtinMap.put("sscanf",Sscanf.getInstance());
+        builtinMap.put("fprintf",Fprintf.getInstance());
+        builtinMap.put("ftell",Ftell.getInstance());
+        builtinMap.put("ferror",Ferror.getInstance());
+        builtinMap.put("fopen",Fopen.getInstance());
+        builtinMap.put("fread",Fread.getInstance());
+        builtinMap.put("frewind",Frewind.getInstance());
+        builtinMap.put("fscanf",Fscanf.getInstance());
+        builtinMap.put("fseek",Fseek.getInstance());
+        builtinMap.put("fwrite",Fwrite.getInstance());
+        builtinMap.put("fgetl",Fgetl.getInstance());
+        builtinMap.put("fgets",Fgets.getInstance());
+        builtinMap.put("fclose",Fclose.getInstance());
     }    
     
     //the actual Builtin Classes:
@@ -401,9 +381,11 @@ public abstract class Builtin {
 
     }
     public static class I extends AbstractNumericalConstant  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new I();
+        //returns the singleton instance of this class
+        private static I singleton = null;
+        public static I getInstance(){
+            if (singleton == null) singleton = new I();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -416,9 +398,11 @@ public abstract class Builtin {
         
     }
     public static class J extends AbstractNumericalConstant  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new J();
+        //returns the singleton instance of this class
+        private static J singleton = null;
+        public static J getInstance(){
+            if (singleton == null) singleton = new J();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -431,9 +415,11 @@ public abstract class Builtin {
         
     }
     public static class Pi extends AbstractNumericalConstant  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Pi();
+        //returns the singleton instance of this class
+        private static Pi singleton = null;
+        public static Pi getInstance(){
+            if (singleton == null) singleton = new Pi();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -453,9 +439,11 @@ public abstract class Builtin {
         
     }
     public static class Colon extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Colon();
+        //returns the singleton instance of this class
+        private static Colon singleton = null;
+        public static Colon getInstance(){
+            if (singleton == null) singleton = new Colon();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -468,9 +456,11 @@ public abstract class Builtin {
         
     }
     public static class Horzcat extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Horzcat();
+        //returns the singleton instance of this class
+        private static Horzcat singleton = null;
+        public static Horzcat getInstance(){
+            if (singleton == null) singleton = new Horzcat();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -483,9 +473,11 @@ public abstract class Builtin {
         
     }
     public static class Vertcat extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Vertcat();
+        //returns the singleton instance of this class
+        private static Vertcat singleton = null;
+        public static Vertcat getInstance(){
+            if (singleton == null) singleton = new Vertcat();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -498,9 +490,11 @@ public abstract class Builtin {
         
     }
     public static class Cat extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cat();
+        //returns the singleton instance of this class
+        private static Cat singleton = null;
+        public static Cat getInstance(){
+            if (singleton == null) singleton = new Cat();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -513,9 +507,11 @@ public abstract class Builtin {
         
     }
     public static class Nargin extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nargin();
+        //returns the singleton instance of this class
+        private static Nargin singleton = null;
+        public static Nargin getInstance(){
+            if (singleton == null) singleton = new Nargin();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -528,9 +524,11 @@ public abstract class Builtin {
         
     }
     public static class Nargout extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nargout();
+        //returns the singleton instance of this class
+        private static Nargout singleton = null;
+        public static Nargout getInstance(){
+            if (singleton == null) singleton = new Nargout();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -543,9 +541,11 @@ public abstract class Builtin {
         
     }
     public static class Mfilename extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mfilename();
+        //returns the singleton instance of this class
+        private static Mfilename singleton = null;
+        public static Mfilename getInstance(){
+            if (singleton == null) singleton = new Mfilename();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -558,9 +558,11 @@ public abstract class Builtin {
         
     }
     public static class End extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new End();
+        //returns the singleton instance of this class
+        private static End singleton = null;
+        public static End getInstance(){
+            if (singleton == null) singleton = new End();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -573,9 +575,11 @@ public abstract class Builtin {
         
     }
     public static class Isequalwithequalnans extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isequalwithequalnans();
+        //returns the singleton instance of this class
+        private static Isequalwithequalnans singleton = null;
+        public static Isequalwithequalnans getInstance(){
+            if (singleton == null) singleton = new Isequalwithequalnans();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -588,9 +592,11 @@ public abstract class Builtin {
         
     }
     public static class Isequal extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isequal();
+        //returns the singleton instance of this class
+        private static Isequal singleton = null;
+        public static Isequal getInstance(){
+            if (singleton == null) singleton = new Isequal();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -603,9 +609,11 @@ public abstract class Builtin {
         
     }
     public static class Subsasgn extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Subsasgn();
+        //returns the singleton instance of this class
+        private static Subsasgn singleton = null;
+        public static Subsasgn getInstance(){
+            if (singleton == null) singleton = new Subsasgn();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -618,9 +626,11 @@ public abstract class Builtin {
         
     }
     public static class Subsref extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Subsref();
+        //returns the singleton instance of this class
+        private static Subsref singleton = null;
+        public static Subsref getInstance(){
+            if (singleton == null) singleton = new Subsref();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -633,9 +643,11 @@ public abstract class Builtin {
         
     }
     public static class Histc extends AbstractOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Histc();
+        //returns the singleton instance of this class
+        private static Histc singleton = null;
+        public static Histc getInstance(){
+            if (singleton == null) singleton = new Histc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -655,9 +667,11 @@ public abstract class Builtin {
         
     }
     public static class Structfun extends AbstractMapOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Structfun();
+        //returns the singleton instance of this class
+        private static Structfun singleton = null;
+        public static Structfun getInstance(){
+            if (singleton == null) singleton = new Structfun();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -670,9 +684,11 @@ public abstract class Builtin {
         
     }
     public static class Arrayfun extends AbstractMapOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Arrayfun();
+        //returns the singleton instance of this class
+        private static Arrayfun singleton = null;
+        public static Arrayfun getInstance(){
+            if (singleton == null) singleton = new Arrayfun();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -685,9 +701,11 @@ public abstract class Builtin {
         
     }
     public static class Cellfun extends AbstractMapOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cellfun();
+        //returns the singleton instance of this class
+        private static Cellfun singleton = null;
+        public static Cellfun getInstance(){
+            if (singleton == null) singleton = new Cellfun();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -714,9 +732,11 @@ public abstract class Builtin {
         
     }
     public static class Eq extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Eq();
+        //returns the singleton instance of this class
+        private static Eq singleton = null;
+        public static Eq getInstance(){
+            if (singleton == null) singleton = new Eq();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -729,9 +749,11 @@ public abstract class Builtin {
         
     }
     public static class Ne extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ne();
+        //returns the singleton instance of this class
+        private static Ne singleton = null;
+        public static Ne getInstance(){
+            if (singleton == null) singleton = new Ne();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -744,9 +766,11 @@ public abstract class Builtin {
         
     }
     public static class Lt extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Lt();
+        //returns the singleton instance of this class
+        private static Lt singleton = null;
+        public static Lt getInstance(){
+            if (singleton == null) singleton = new Lt();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -759,9 +783,11 @@ public abstract class Builtin {
         
     }
     public static class Le extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Le();
+        //returns the singleton instance of this class
+        private static Le singleton = null;
+        public static Le getInstance(){
+            if (singleton == null) singleton = new Le();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -774,9 +800,11 @@ public abstract class Builtin {
         
     }
     public static class Ge extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ge();
+        //returns the singleton instance of this class
+        private static Ge singleton = null;
+        public static Ge getInstance(){
+            if (singleton == null) singleton = new Ge();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -789,9 +817,11 @@ public abstract class Builtin {
         
     }
     public static class Gt extends AbstractRelationalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Gt();
+        //returns the singleton instance of this class
+        private static Gt singleton = null;
+        public static Gt getInstance(){
+            if (singleton == null) singleton = new Gt();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -811,9 +841,11 @@ public abstract class Builtin {
         
     }
     public static class And extends AbstractBinaryLogicalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new And();
+        //returns the singleton instance of this class
+        private static And singleton = null;
+        public static And getInstance(){
+            if (singleton == null) singleton = new And();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -826,9 +858,11 @@ public abstract class Builtin {
         
     }
     public static class Or extends AbstractBinaryLogicalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Or();
+        //returns the singleton instance of this class
+        private static Or singleton = null;
+        public static Or getInstance(){
+            if (singleton == null) singleton = new Or();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -841,9 +875,11 @@ public abstract class Builtin {
         
     }
     public static class Xor extends AbstractBinaryLogicalOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Xor();
+        //returns the singleton instance of this class
+        private static Xor singleton = null;
+        public static Xor getInstance(){
+            if (singleton == null) singleton = new Xor();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -870,9 +906,11 @@ public abstract class Builtin {
         
     }
     public static class Plus extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Plus();
+        //returns the singleton instance of this class
+        private static Plus singleton = null;
+        public static Plus getInstance(){
+            if (singleton == null) singleton = new Plus();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -885,9 +923,11 @@ public abstract class Builtin {
         
     }
     public static class Minus extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Minus();
+        //returns the singleton instance of this class
+        private static Minus singleton = null;
+        public static Minus getInstance(){
+            if (singleton == null) singleton = new Minus();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -900,9 +940,11 @@ public abstract class Builtin {
         
     }
     public static class Mtimes extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mtimes();
+        //returns the singleton instance of this class
+        private static Mtimes singleton = null;
+        public static Mtimes getInstance(){
+            if (singleton == null) singleton = new Mtimes();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -915,9 +957,11 @@ public abstract class Builtin {
         
     }
     public static class Mpower extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mpower();
+        //returns the singleton instance of this class
+        private static Mpower singleton = null;
+        public static Mpower getInstance(){
+            if (singleton == null) singleton = new Mpower();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -930,9 +974,11 @@ public abstract class Builtin {
         
     }
     public static class Mldivide extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mldivide();
+        //returns the singleton instance of this class
+        private static Mldivide singleton = null;
+        public static Mldivide getInstance(){
+            if (singleton == null) singleton = new Mldivide();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -945,9 +991,11 @@ public abstract class Builtin {
         
     }
     public static class Mrdivide extends AbstractMatrixBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mrdivide();
+        //returns the singleton instance of this class
+        private static Mrdivide singleton = null;
+        public static Mrdivide getInstance(){
+            if (singleton == null) singleton = new Mrdivide();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -967,9 +1015,11 @@ public abstract class Builtin {
         
     }
     public static class Times extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Times();
+        //returns the singleton instance of this class
+        private static Times singleton = null;
+        public static Times getInstance(){
+            if (singleton == null) singleton = new Times();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -982,9 +1032,11 @@ public abstract class Builtin {
         
     }
     public static class Ldivide extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ldivide();
+        //returns the singleton instance of this class
+        private static Ldivide singleton = null;
+        public static Ldivide getInstance(){
+            if (singleton == null) singleton = new Ldivide();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -997,9 +1049,11 @@ public abstract class Builtin {
         
     }
     public static class Rdivide extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Rdivide();
+        //returns the singleton instance of this class
+        private static Rdivide singleton = null;
+        public static Rdivide getInstance(){
+            if (singleton == null) singleton = new Rdivide();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1012,9 +1066,11 @@ public abstract class Builtin {
         
     }
     public static class Power extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Power();
+        //returns the singleton instance of this class
+        private static Power singleton = null;
+        public static Power getInstance(){
+            if (singleton == null) singleton = new Power();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1027,9 +1083,11 @@ public abstract class Builtin {
         
     }
     public static class Pow2 extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Pow2();
+        //returns the singleton instance of this class
+        private static Pow2 singleton = null;
+        public static Pow2 getInstance(){
+            if (singleton == null) singleton = new Pow2();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1042,9 +1100,11 @@ public abstract class Builtin {
         
     }
     public static class Mod extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mod();
+        //returns the singleton instance of this class
+        private static Mod singleton = null;
+        public static Mod getInstance(){
+            if (singleton == null) singleton = new Mod();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1057,9 +1117,11 @@ public abstract class Builtin {
         
     }
     public static class Rem extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Rem();
+        //returns the singleton instance of this class
+        private static Rem singleton = null;
+        public static Rem getInstance(){
+            if (singleton == null) singleton = new Rem();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1072,9 +1134,11 @@ public abstract class Builtin {
         
     }
     public static class Hypot extends AbstractElementwiseBinaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Hypot();
+        //returns the singleton instance of this class
+        private static Hypot singleton = null;
+        public static Hypot getInstance(){
+            if (singleton == null) singleton = new Hypot();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1108,9 +1172,11 @@ public abstract class Builtin {
         
     }
     public static class Uplus extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uplus();
+        //returns the singleton instance of this class
+        private static Uplus singleton = null;
+        public static Uplus getInstance(){
+            if (singleton == null) singleton = new Uplus();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1123,9 +1189,11 @@ public abstract class Builtin {
         
     }
     public static class Uminus extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uminus();
+        //returns the singleton instance of this class
+        private static Uminus singleton = null;
+        public static Uminus getInstance(){
+            if (singleton == null) singleton = new Uminus();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1138,9 +1206,11 @@ public abstract class Builtin {
         
     }
     public static class Conj extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Conj();
+        //returns the singleton instance of this class
+        private static Conj singleton = null;
+        public static Conj getInstance(){
+            if (singleton == null) singleton = new Conj();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1153,9 +1223,11 @@ public abstract class Builtin {
         
     }
     public static class Real extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Real();
+        //returns the singleton instance of this class
+        private static Real singleton = null;
+        public static Real getInstance(){
+            if (singleton == null) singleton = new Real();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1168,9 +1240,11 @@ public abstract class Builtin {
         
     }
     public static class Imag extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Imag();
+        //returns the singleton instance of this class
+        private static Imag singleton = null;
+        public static Imag getInstance(){
+            if (singleton == null) singleton = new Imag();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1183,9 +1257,11 @@ public abstract class Builtin {
         
     }
     public static class Abs extends AbstractElementwiseUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Abs();
+        //returns the singleton instance of this class
+        private static Abs singleton = null;
+        public static Abs getInstance(){
+            if (singleton == null) singleton = new Abs();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1205,9 +1281,11 @@ public abstract class Builtin {
         
     }
     public static class Transpose extends AbstractMatrixUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Transpose();
+        //returns the singleton instance of this class
+        private static Transpose singleton = null;
+        public static Transpose getInstance(){
+            if (singleton == null) singleton = new Transpose();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1220,9 +1298,11 @@ public abstract class Builtin {
         
     }
     public static class Ctranspose extends AbstractMatrixUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ctranspose();
+        //returns the singleton instance of this class
+        private static Ctranspose singleton = null;
+        public static Ctranspose getInstance(){
+            if (singleton == null) singleton = new Ctranspose();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1235,9 +1315,11 @@ public abstract class Builtin {
         
     }
     public static class Expm extends AbstractMatrixUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Expm();
+        //returns the singleton instance of this class
+        private static Expm singleton = null;
+        public static Expm getInstance(){
+            if (singleton == null) singleton = new Expm();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1250,9 +1332,11 @@ public abstract class Builtin {
         
     }
     public static class Sqrtm extends AbstractMatrixUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sqrtm();
+        //returns the singleton instance of this class
+        private static Sqrtm singleton = null;
+        public static Sqrtm getInstance(){
+            if (singleton == null) singleton = new Sqrtm();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1265,9 +1349,11 @@ public abstract class Builtin {
         
     }
     public static class Logm extends AbstractMatrixUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Logm();
+        //returns the singleton instance of this class
+        private static Logm singleton = null;
+        public static Logm getInstance(){
+            if (singleton == null) singleton = new Logm();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1287,9 +1373,11 @@ public abstract class Builtin {
         
     }
     public static class Not extends AbstractLogicalUnaryOperator  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Not();
+        //returns the singleton instance of this class
+        private static Not singleton = null;
+        public static Not getInstance(){
+            if (singleton == null) singleton = new Not();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1316,9 +1404,11 @@ public abstract class Builtin {
         
     }
     public static class Sqrt extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sqrt();
+        //returns the singleton instance of this class
+        private static Sqrt singleton = null;
+        public static Sqrt getInstance(){
+            if (singleton == null) singleton = new Sqrt();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1331,9 +1421,11 @@ public abstract class Builtin {
         
     }
     public static class Realsqrt extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Realsqrt();
+        //returns the singleton instance of this class
+        private static Realsqrt singleton = null;
+        public static Realsqrt getInstance(){
+            if (singleton == null) singleton = new Realsqrt();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1346,9 +1438,11 @@ public abstract class Builtin {
         
     }
     public static class Erf extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Erf();
+        //returns the singleton instance of this class
+        private static Erf singleton = null;
+        public static Erf getInstance(){
+            if (singleton == null) singleton = new Erf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1361,9 +1455,11 @@ public abstract class Builtin {
         
     }
     public static class Erfinv extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Erfinv();
+        //returns the singleton instance of this class
+        private static Erfinv singleton = null;
+        public static Erfinv getInstance(){
+            if (singleton == null) singleton = new Erfinv();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1376,9 +1472,11 @@ public abstract class Builtin {
         
     }
     public static class Erfc extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Erfc();
+        //returns the singleton instance of this class
+        private static Erfc singleton = null;
+        public static Erfc getInstance(){
+            if (singleton == null) singleton = new Erfc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1391,9 +1489,11 @@ public abstract class Builtin {
         
     }
     public static class Erfcinv extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Erfcinv();
+        //returns the singleton instance of this class
+        private static Erfcinv singleton = null;
+        public static Erfcinv getInstance(){
+            if (singleton == null) singleton = new Erfcinv();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1406,9 +1506,11 @@ public abstract class Builtin {
         
     }
     public static class Gamma extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Gamma();
+        //returns the singleton instance of this class
+        private static Gamma singleton = null;
+        public static Gamma getInstance(){
+            if (singleton == null) singleton = new Gamma();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1421,9 +1523,11 @@ public abstract class Builtin {
         
     }
     public static class Gammainc extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Gammainc();
+        //returns the singleton instance of this class
+        private static Gammainc singleton = null;
+        public static Gammainc getInstance(){
+            if (singleton == null) singleton = new Gammainc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1436,9 +1540,11 @@ public abstract class Builtin {
         
     }
     public static class Betainc extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Betainc();
+        //returns the singleton instance of this class
+        private static Betainc singleton = null;
+        public static Betainc getInstance(){
+            if (singleton == null) singleton = new Betainc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1451,9 +1557,11 @@ public abstract class Builtin {
         
     }
     public static class Gammaln extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Gammaln();
+        //returns the singleton instance of this class
+        private static Gammaln singleton = null;
+        public static Gammaln getInstance(){
+            if (singleton == null) singleton = new Gammaln();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1466,9 +1574,11 @@ public abstract class Builtin {
         
     }
     public static class Exp extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Exp();
+        //returns the singleton instance of this class
+        private static Exp singleton = null;
+        public static Exp getInstance(){
+            if (singleton == null) singleton = new Exp();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1481,9 +1591,11 @@ public abstract class Builtin {
         
     }
     public static class Log extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Log();
+        //returns the singleton instance of this class
+        private static Log singleton = null;
+        public static Log getInstance(){
+            if (singleton == null) singleton = new Log();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1496,9 +1608,11 @@ public abstract class Builtin {
         
     }
     public static class Log2 extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Log2();
+        //returns the singleton instance of this class
+        private static Log2 singleton = null;
+        public static Log2 getInstance(){
+            if (singleton == null) singleton = new Log2();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1511,9 +1625,11 @@ public abstract class Builtin {
         
     }
     public static class Log10 extends AbstractElementwiseMatrixOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Log10();
+        //returns the singleton instance of this class
+        private static Log10 singleton = null;
+        public static Log10 getInstance(){
+            if (singleton == null) singleton = new Log10();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1540,9 +1656,11 @@ public abstract class Builtin {
         
     }
     public static class Sin extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sin();
+        //returns the singleton instance of this class
+        private static Sin singleton = null;
+        public static Sin getInstance(){
+            if (singleton == null) singleton = new Sin();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1555,9 +1673,11 @@ public abstract class Builtin {
         
     }
     public static class Cos extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cos();
+        //returns the singleton instance of this class
+        private static Cos singleton = null;
+        public static Cos getInstance(){
+            if (singleton == null) singleton = new Cos();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1570,9 +1690,11 @@ public abstract class Builtin {
         
     }
     public static class Tan extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tan();
+        //returns the singleton instance of this class
+        private static Tan singleton = null;
+        public static Tan getInstance(){
+            if (singleton == null) singleton = new Tan();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1585,9 +1707,11 @@ public abstract class Builtin {
         
     }
     public static class Cot extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cot();
+        //returns the singleton instance of this class
+        private static Cot singleton = null;
+        public static Cot getInstance(){
+            if (singleton == null) singleton = new Cot();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1600,9 +1724,11 @@ public abstract class Builtin {
         
     }
     public static class Sec extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sec();
+        //returns the singleton instance of this class
+        private static Sec singleton = null;
+        public static Sec getInstance(){
+            if (singleton == null) singleton = new Sec();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1615,9 +1741,11 @@ public abstract class Builtin {
         
     }
     public static class Csc extends AbstractTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Csc();
+        //returns the singleton instance of this class
+        private static Csc singleton = null;
+        public static Csc getInstance(){
+            if (singleton == null) singleton = new Csc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1637,9 +1765,11 @@ public abstract class Builtin {
         
     }
     public static class Sind extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sind();
+        //returns the singleton instance of this class
+        private static Sind singleton = null;
+        public static Sind getInstance(){
+            if (singleton == null) singleton = new Sind();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1652,9 +1782,11 @@ public abstract class Builtin {
         
     }
     public static class Cosd extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cosd();
+        //returns the singleton instance of this class
+        private static Cosd singleton = null;
+        public static Cosd getInstance(){
+            if (singleton == null) singleton = new Cosd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1667,9 +1799,11 @@ public abstract class Builtin {
         
     }
     public static class Tand extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tand();
+        //returns the singleton instance of this class
+        private static Tand singleton = null;
+        public static Tand getInstance(){
+            if (singleton == null) singleton = new Tand();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1682,9 +1816,11 @@ public abstract class Builtin {
         
     }
     public static class Cotd extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cotd();
+        //returns the singleton instance of this class
+        private static Cotd singleton = null;
+        public static Cotd getInstance(){
+            if (singleton == null) singleton = new Cotd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1697,9 +1833,11 @@ public abstract class Builtin {
         
     }
     public static class Secd extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Secd();
+        //returns the singleton instance of this class
+        private static Secd singleton = null;
+        public static Secd getInstance(){
+            if (singleton == null) singleton = new Secd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1712,9 +1850,11 @@ public abstract class Builtin {
         
     }
     public static class Cscd extends AbstractDecimalTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cscd();
+        //returns the singleton instance of this class
+        private static Cscd singleton = null;
+        public static Cscd getInstance(){
+            if (singleton == null) singleton = new Cscd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1734,9 +1874,11 @@ public abstract class Builtin {
         
     }
     public static class Sinh extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sinh();
+        //returns the singleton instance of this class
+        private static Sinh singleton = null;
+        public static Sinh getInstance(){
+            if (singleton == null) singleton = new Sinh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1749,9 +1891,11 @@ public abstract class Builtin {
         
     }
     public static class Cosh extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cosh();
+        //returns the singleton instance of this class
+        private static Cosh singleton = null;
+        public static Cosh getInstance(){
+            if (singleton == null) singleton = new Cosh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1764,9 +1908,11 @@ public abstract class Builtin {
         
     }
     public static class Tanh extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tanh();
+        //returns the singleton instance of this class
+        private static Tanh singleton = null;
+        public static Tanh getInstance(){
+            if (singleton == null) singleton = new Tanh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1779,9 +1925,11 @@ public abstract class Builtin {
         
     }
     public static class Coth extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Coth();
+        //returns the singleton instance of this class
+        private static Coth singleton = null;
+        public static Coth getInstance(){
+            if (singleton == null) singleton = new Coth();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1794,9 +1942,11 @@ public abstract class Builtin {
         
     }
     public static class Sech extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sech();
+        //returns the singleton instance of this class
+        private static Sech singleton = null;
+        public static Sech getInstance(){
+            if (singleton == null) singleton = new Sech();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1809,9 +1959,11 @@ public abstract class Builtin {
         
     }
     public static class Csch extends AbstractHyperbolicTrigonometricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Csch();
+        //returns the singleton instance of this class
+        private static Csch singleton = null;
+        public static Csch getInstance(){
+            if (singleton == null) singleton = new Csch();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1838,9 +1990,11 @@ public abstract class Builtin {
         
     }
     public static class Asin extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asin();
+        //returns the singleton instance of this class
+        private static Asin singleton = null;
+        public static Asin getInstance(){
+            if (singleton == null) singleton = new Asin();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1853,9 +2007,11 @@ public abstract class Builtin {
         
     }
     public static class Acos extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acos();
+        //returns the singleton instance of this class
+        private static Acos singleton = null;
+        public static Acos getInstance(){
+            if (singleton == null) singleton = new Acos();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1868,9 +2024,11 @@ public abstract class Builtin {
         
     }
     public static class Atan extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Atan();
+        //returns the singleton instance of this class
+        private static Atan singleton = null;
+        public static Atan getInstance(){
+            if (singleton == null) singleton = new Atan();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1883,9 +2041,11 @@ public abstract class Builtin {
         
     }
     public static class Atan2 extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Atan2();
+        //returns the singleton instance of this class
+        private static Atan2 singleton = null;
+        public static Atan2 getInstance(){
+            if (singleton == null) singleton = new Atan2();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1898,9 +2058,11 @@ public abstract class Builtin {
         
     }
     public static class Acot extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acot();
+        //returns the singleton instance of this class
+        private static Acot singleton = null;
+        public static Acot getInstance(){
+            if (singleton == null) singleton = new Acot();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1913,9 +2075,11 @@ public abstract class Builtin {
         
     }
     public static class Asec extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asec();
+        //returns the singleton instance of this class
+        private static Asec singleton = null;
+        public static Asec getInstance(){
+            if (singleton == null) singleton = new Asec();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1928,9 +2092,11 @@ public abstract class Builtin {
         
     }
     public static class Acsc extends AbstractStandardInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acsc();
+        //returns the singleton instance of this class
+        private static Acsc singleton = null;
+        public static Acsc getInstance(){
+            if (singleton == null) singleton = new Acsc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1950,9 +2116,11 @@ public abstract class Builtin {
         
     }
     public static class Asind extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asind();
+        //returns the singleton instance of this class
+        private static Asind singleton = null;
+        public static Asind getInstance(){
+            if (singleton == null) singleton = new Asind();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1965,9 +2133,11 @@ public abstract class Builtin {
         
     }
     public static class Acosd extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acosd();
+        //returns the singleton instance of this class
+        private static Acosd singleton = null;
+        public static Acosd getInstance(){
+            if (singleton == null) singleton = new Acosd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1980,9 +2150,11 @@ public abstract class Builtin {
         
     }
     public static class Atand extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Atand();
+        //returns the singleton instance of this class
+        private static Atand singleton = null;
+        public static Atand getInstance(){
+            if (singleton == null) singleton = new Atand();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -1995,9 +2167,11 @@ public abstract class Builtin {
         
     }
     public static class Acotd extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acotd();
+        //returns the singleton instance of this class
+        private static Acotd singleton = null;
+        public static Acotd getInstance(){
+            if (singleton == null) singleton = new Acotd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2010,9 +2184,11 @@ public abstract class Builtin {
         
     }
     public static class Asecd extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asecd();
+        //returns the singleton instance of this class
+        private static Asecd singleton = null;
+        public static Asecd getInstance(){
+            if (singleton == null) singleton = new Asecd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2025,9 +2201,11 @@ public abstract class Builtin {
         
     }
     public static class Acscd extends AbstractDecimalInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acscd();
+        //returns the singleton instance of this class
+        private static Acscd singleton = null;
+        public static Acscd getInstance(){
+            if (singleton == null) singleton = new Acscd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2047,9 +2225,11 @@ public abstract class Builtin {
         
     }
     public static class Asinh extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asinh();
+        //returns the singleton instance of this class
+        private static Asinh singleton = null;
+        public static Asinh getInstance(){
+            if (singleton == null) singleton = new Asinh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2062,9 +2242,11 @@ public abstract class Builtin {
         
     }
     public static class Acosh extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acosh();
+        //returns the singleton instance of this class
+        private static Acosh singleton = null;
+        public static Acosh getInstance(){
+            if (singleton == null) singleton = new Acosh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2077,9 +2259,11 @@ public abstract class Builtin {
         
     }
     public static class Atanh extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Atanh();
+        //returns the singleton instance of this class
+        private static Atanh singleton = null;
+        public static Atanh getInstance(){
+            if (singleton == null) singleton = new Atanh();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2092,9 +2276,11 @@ public abstract class Builtin {
         
     }
     public static class Acoth extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acoth();
+        //returns the singleton instance of this class
+        private static Acoth singleton = null;
+        public static Acoth getInstance(){
+            if (singleton == null) singleton = new Acoth();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2107,9 +2293,11 @@ public abstract class Builtin {
         
     }
     public static class Asech extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Asech();
+        //returns the singleton instance of this class
+        private static Asech singleton = null;
+        public static Asech getInstance(){
+            if (singleton == null) singleton = new Asech();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2122,9 +2310,11 @@ public abstract class Builtin {
         
     }
     public static class Acsch extends AbstractHyperbolicInverseTrigonmetricFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Acsch();
+        //returns the singleton instance of this class
+        private static Acsch singleton = null;
+        public static Acsch getInstance(){
+            if (singleton == null) singleton = new Acsch();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2144,9 +2334,11 @@ public abstract class Builtin {
         
     }
     public static class Fix extends AbstractRoundingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fix();
+        //returns the singleton instance of this class
+        private static Fix singleton = null;
+        public static Fix getInstance(){
+            if (singleton == null) singleton = new Fix();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2159,9 +2351,11 @@ public abstract class Builtin {
         
     }
     public static class Round extends AbstractRoundingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Round();
+        //returns the singleton instance of this class
+        private static Round singleton = null;
+        public static Round getInstance(){
+            if (singleton == null) singleton = new Round();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2174,9 +2368,11 @@ public abstract class Builtin {
         
     }
     public static class Floor extends AbstractRoundingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Floor();
+        //returns the singleton instance of this class
+        private static Floor singleton = null;
+        public static Floor getInstance(){
+            if (singleton == null) singleton = new Floor();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2189,9 +2385,11 @@ public abstract class Builtin {
         
     }
     public static class Ceil extends AbstractRoundingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ceil();
+        //returns the singleton instance of this class
+        private static Ceil singleton = null;
+        public static Ceil getInstance(){
+            if (singleton == null) singleton = new Ceil();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2211,9 +2409,11 @@ public abstract class Builtin {
         
     }
     public static class Inv extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Inv();
+        //returns the singleton instance of this class
+        private static Inv singleton = null;
+        public static Inv getInstance(){
+            if (singleton == null) singleton = new Inv();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2226,9 +2426,11 @@ public abstract class Builtin {
         
     }
     public static class Eig extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Eig();
+        //returns the singleton instance of this class
+        private static Eig singleton = null;
+        public static Eig getInstance(){
+            if (singleton == null) singleton = new Eig();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2241,9 +2443,11 @@ public abstract class Builtin {
         
     }
     public static class Norm extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Norm();
+        //returns the singleton instance of this class
+        private static Norm singleton = null;
+        public static Norm getInstance(){
+            if (singleton == null) singleton = new Norm();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2256,9 +2460,11 @@ public abstract class Builtin {
         
     }
     public static class Rank extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Rank();
+        //returns the singleton instance of this class
+        private static Rank singleton = null;
+        public static Rank getInstance(){
+            if (singleton == null) singleton = new Rank();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2271,9 +2477,11 @@ public abstract class Builtin {
         
     }
     public static class Det extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Det();
+        //returns the singleton instance of this class
+        private static Det singleton = null;
+        public static Det getInstance(){
+            if (singleton == null) singleton = new Det();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2286,9 +2494,11 @@ public abstract class Builtin {
         
     }
     public static class Dot extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Dot();
+        //returns the singleton instance of this class
+        private static Dot singleton = null;
+        public static Dot getInstance(){
+            if (singleton == null) singleton = new Dot();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2301,9 +2511,11 @@ public abstract class Builtin {
         
     }
     public static class Cross extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cross();
+        //returns the singleton instance of this class
+        private static Cross singleton = null;
+        public static Cross getInstance(){
+            if (singleton == null) singleton = new Cross();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2316,9 +2528,11 @@ public abstract class Builtin {
         
     }
     public static class Linsolve extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Linsolve();
+        //returns the singleton instance of this class
+        private static Linsolve singleton = null;
+        public static Linsolve getInstance(){
+            if (singleton == null) singleton = new Linsolve();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2331,9 +2545,11 @@ public abstract class Builtin {
         
     }
     public static class Rcond extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Rcond();
+        //returns the singleton instance of this class
+        private static Rcond singleton = null;
+        public static Rcond getInstance(){
+            if (singleton == null) singleton = new Rcond();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2346,9 +2562,11 @@ public abstract class Builtin {
         
     }
     public static class Tril extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tril();
+        //returns the singleton instance of this class
+        private static Tril singleton = null;
+        public static Tril getInstance(){
+            if (singleton == null) singleton = new Tril();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2361,9 +2579,11 @@ public abstract class Builtin {
         
     }
     public static class Triu extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Triu();
+        //returns the singleton instance of this class
+        private static Triu singleton = null;
+        public static Triu getInstance(){
+            if (singleton == null) singleton = new Triu();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2376,9 +2596,11 @@ public abstract class Builtin {
         
     }
     public static class Eps extends AbstractMatrixComputation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Eps();
+        //returns the singleton instance of this class
+        private static Eps singleton = null;
+        public static Eps getInstance(){
+            if (singleton == null) singleton = new Eps();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2398,9 +2620,11 @@ public abstract class Builtin {
         
     }
     public static class Ifftn extends AbstractFourierFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ifftn();
+        //returns the singleton instance of this class
+        private static Ifftn singleton = null;
+        public static Ifftn getInstance(){
+            if (singleton == null) singleton = new Ifftn();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2413,9 +2637,11 @@ public abstract class Builtin {
         
     }
     public static class Fftn extends AbstractFourierFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fftn();
+        //returns the singleton instance of this class
+        private static Fftn singleton = null;
+        public static Fftn getInstance(){
+            if (singleton == null) singleton = new Fftn();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2428,9 +2654,11 @@ public abstract class Builtin {
         
     }
     public static class Fft extends AbstractFourierFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fft();
+        //returns the singleton instance of this class
+        private static Fft singleton = null;
+        public static Fft getInstance(){
+            if (singleton == null) singleton = new Fft();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2450,9 +2678,11 @@ public abstract class Builtin {
         
     }
     public static class Schur extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Schur();
+        //returns the singleton instance of this class
+        private static Schur singleton = null;
+        public static Schur getInstance(){
+            if (singleton == null) singleton = new Schur();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2465,9 +2695,11 @@ public abstract class Builtin {
         
     }
     public static class Ordschur extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ordschur();
+        //returns the singleton instance of this class
+        private static Ordschur singleton = null;
+        public static Ordschur getInstance(){
+            if (singleton == null) singleton = new Ordschur();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2480,9 +2712,11 @@ public abstract class Builtin {
         
     }
     public static class Lu extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Lu();
+        //returns the singleton instance of this class
+        private static Lu singleton = null;
+        public static Lu getInstance(){
+            if (singleton == null) singleton = new Lu();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2495,9 +2729,11 @@ public abstract class Builtin {
         
     }
     public static class Chol extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Chol();
+        //returns the singleton instance of this class
+        private static Chol singleton = null;
+        public static Chol getInstance(){
+            if (singleton == null) singleton = new Chol();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2510,9 +2746,11 @@ public abstract class Builtin {
         
     }
     public static class Qr extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Qr();
+        //returns the singleton instance of this class
+        private static Qr singleton = null;
+        public static Qr getInstance(){
+            if (singleton == null) singleton = new Qr();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2525,9 +2763,11 @@ public abstract class Builtin {
         
     }
     public static class Svd extends AbstractFactorization  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Svd();
+        //returns the singleton instance of this class
+        private static Svd singleton = null;
+        public static Svd getInstance(){
+            if (singleton == null) singleton = new Svd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2547,9 +2787,11 @@ public abstract class Builtin {
         
     }
     public static class Bitand extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitand();
+        //returns the singleton instance of this class
+        private static Bitand singleton = null;
+        public static Bitand getInstance(){
+            if (singleton == null) singleton = new Bitand();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2562,9 +2804,11 @@ public abstract class Builtin {
         
     }
     public static class Bitor extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitor();
+        //returns the singleton instance of this class
+        private static Bitor singleton = null;
+        public static Bitor getInstance(){
+            if (singleton == null) singleton = new Bitor();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2577,9 +2821,11 @@ public abstract class Builtin {
         
     }
     public static class Bitxor extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitxor();
+        //returns the singleton instance of this class
+        private static Bitxor singleton = null;
+        public static Bitxor getInstance(){
+            if (singleton == null) singleton = new Bitxor();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2592,9 +2838,11 @@ public abstract class Builtin {
         
     }
     public static class Bitcmp extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitcmp();
+        //returns the singleton instance of this class
+        private static Bitcmp singleton = null;
+        public static Bitcmp getInstance(){
+            if (singleton == null) singleton = new Bitcmp();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2607,9 +2855,11 @@ public abstract class Builtin {
         
     }
     public static class Bitget extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitget();
+        //returns the singleton instance of this class
+        private static Bitget singleton = null;
+        public static Bitget getInstance(){
+            if (singleton == null) singleton = new Bitget();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2622,9 +2872,11 @@ public abstract class Builtin {
         
     }
     public static class Bitshift extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitshift();
+        //returns the singleton instance of this class
+        private static Bitshift singleton = null;
+        public static Bitshift getInstance(){
+            if (singleton == null) singleton = new Bitshift();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2637,9 +2889,11 @@ public abstract class Builtin {
         
     }
     public static class Bitset extends AbstractBitOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Bitset();
+        //returns the singleton instance of this class
+        private static Bitset singleton = null;
+        public static Bitset getInstance(){
+            if (singleton == null) singleton = new Bitset();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2659,9 +2913,11 @@ public abstract class Builtin {
         
     }
     public static class Strncmpi extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strncmpi();
+        //returns the singleton instance of this class
+        private static Strncmpi singleton = null;
+        public static Strncmpi getInstance(){
+            if (singleton == null) singleton = new Strncmpi();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2674,9 +2930,11 @@ public abstract class Builtin {
         
     }
     public static class Strcmp extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strcmp();
+        //returns the singleton instance of this class
+        private static Strcmp singleton = null;
+        public static Strcmp getInstance(){
+            if (singleton == null) singleton = new Strcmp();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2689,9 +2947,11 @@ public abstract class Builtin {
         
     }
     public static class Strcmpi extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strcmpi();
+        //returns the singleton instance of this class
+        private static Strcmpi singleton = null;
+        public static Strcmpi getInstance(){
+            if (singleton == null) singleton = new Strcmpi();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2704,9 +2964,11 @@ public abstract class Builtin {
         
     }
     public static class Strtrim extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strtrim();
+        //returns the singleton instance of this class
+        private static Strtrim singleton = null;
+        public static Strtrim getInstance(){
+            if (singleton == null) singleton = new Strtrim();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2719,9 +2981,11 @@ public abstract class Builtin {
         
     }
     public static class Strfind extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strfind();
+        //returns the singleton instance of this class
+        private static Strfind singleton = null;
+        public static Strfind getInstance(){
+            if (singleton == null) singleton = new Strfind();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2734,9 +2998,11 @@ public abstract class Builtin {
         
     }
     public static class Findstr extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Findstr();
+        //returns the singleton instance of this class
+        private static Findstr singleton = null;
+        public static Findstr getInstance(){
+            if (singleton == null) singleton = new Findstr();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2749,9 +3015,11 @@ public abstract class Builtin {
         
     }
     public static class Strrep extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Strrep();
+        //returns the singleton instance of this class
+        private static Strrep singleton = null;
+        public static Strrep getInstance(){
+            if (singleton == null) singleton = new Strrep();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2764,9 +3032,11 @@ public abstract class Builtin {
         
     }
     public static class Upper extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Upper();
+        //returns the singleton instance of this class
+        private static Upper singleton = null;
+        public static Upper getInstance(){
+            if (singleton == null) singleton = new Upper();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2779,9 +3049,11 @@ public abstract class Builtin {
         
     }
     public static class Lower extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Lower();
+        //returns the singleton instance of this class
+        private static Lower singleton = null;
+        public static Lower getInstance(){
+            if (singleton == null) singleton = new Lower();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2794,9 +3066,11 @@ public abstract class Builtin {
         
     }
     public static class Deblank extends AbstractStringOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Deblank();
+        //returns the singleton instance of this class
+        private static Deblank singleton = null;
+        public static Deblank getInstance(){
+            if (singleton == null) singleton = new Deblank();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2816,9 +3090,11 @@ public abstract class Builtin {
         
     }
     public static class Regexptranslate extends AbstractRegexpOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Regexptranslate();
+        //returns the singleton instance of this class
+        private static Regexptranslate singleton = null;
+        public static Regexptranslate getInstance(){
+            if (singleton == null) singleton = new Regexptranslate();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2831,9 +3107,11 @@ public abstract class Builtin {
         
     }
     public static class Regexp extends AbstractRegexpOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Regexp();
+        //returns the singleton instance of this class
+        private static Regexp singleton = null;
+        public static Regexp getInstance(){
+            if (singleton == null) singleton = new Regexp();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2846,9 +3124,11 @@ public abstract class Builtin {
         
     }
     public static class Regexpi extends AbstractRegexpOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Regexpi();
+        //returns the singleton instance of this class
+        private static Regexpi singleton = null;
+        public static Regexpi getInstance(){
+            if (singleton == null) singleton = new Regexpi();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2861,9 +3141,11 @@ public abstract class Builtin {
         
     }
     public static class Tegexprep extends AbstractRegexpOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tegexprep();
+        //returns the singleton instance of this class
+        private static Tegexprep singleton = null;
+        public static Tegexprep getInstance(){
+            if (singleton == null) singleton = new Tegexprep();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2890,9 +3172,11 @@ public abstract class Builtin {
         
     }
     public static class Double extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Double();
+        //returns the singleton instance of this class
+        private static Double singleton = null;
+        public static Double getInstance(){
+            if (singleton == null) singleton = new Double();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2905,9 +3189,11 @@ public abstract class Builtin {
         
     }
     public static class Single extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Single();
+        //returns the singleton instance of this class
+        private static Single singleton = null;
+        public static Single getInstance(){
+            if (singleton == null) singleton = new Single();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2920,9 +3206,11 @@ public abstract class Builtin {
         
     }
     public static class Char extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Char();
+        //returns the singleton instance of this class
+        private static Char singleton = null;
+        public static Char getInstance(){
+            if (singleton == null) singleton = new Char();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2935,9 +3223,11 @@ public abstract class Builtin {
         
     }
     public static class Logical extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Logical();
+        //returns the singleton instance of this class
+        private static Logical singleton = null;
+        public static Logical getInstance(){
+            if (singleton == null) singleton = new Logical();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2950,9 +3240,11 @@ public abstract class Builtin {
         
     }
     public static class Int8 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Int8();
+        //returns the singleton instance of this class
+        private static Int8 singleton = null;
+        public static Int8 getInstance(){
+            if (singleton == null) singleton = new Int8();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2965,9 +3257,11 @@ public abstract class Builtin {
         
     }
     public static class Int16 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Int16();
+        //returns the singleton instance of this class
+        private static Int16 singleton = null;
+        public static Int16 getInstance(){
+            if (singleton == null) singleton = new Int16();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2980,9 +3274,11 @@ public abstract class Builtin {
         
     }
     public static class Int32 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Int32();
+        //returns the singleton instance of this class
+        private static Int32 singleton = null;
+        public static Int32 getInstance(){
+            if (singleton == null) singleton = new Int32();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -2995,9 +3291,11 @@ public abstract class Builtin {
         
     }
     public static class Int64 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Int64();
+        //returns the singleton instance of this class
+        private static Int64 singleton = null;
+        public static Int64 getInstance(){
+            if (singleton == null) singleton = new Int64();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3010,9 +3308,11 @@ public abstract class Builtin {
         
     }
     public static class Uint8 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uint8();
+        //returns the singleton instance of this class
+        private static Uint8 singleton = null;
+        public static Uint8 getInstance(){
+            if (singleton == null) singleton = new Uint8();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3025,9 +3325,11 @@ public abstract class Builtin {
         
     }
     public static class Uint16 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uint16();
+        //returns the singleton instance of this class
+        private static Uint16 singleton = null;
+        public static Uint16 getInstance(){
+            if (singleton == null) singleton = new Uint16();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3040,9 +3342,11 @@ public abstract class Builtin {
         
     }
     public static class Uint32 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uint32();
+        //returns the singleton instance of this class
+        private static Uint32 singleton = null;
+        public static Uint32 getInstance(){
+            if (singleton == null) singleton = new Uint32();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3055,9 +3359,11 @@ public abstract class Builtin {
         
     }
     public static class Uint64 extends AbstractPrimitiveConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Uint64();
+        //returns the singleton instance of this class
+        private static Uint64 singleton = null;
+        public static Uint64 getInstance(){
+            if (singleton == null) singleton = new Uint64();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3077,9 +3383,11 @@ public abstract class Builtin {
         
     }
     public static class Cell extends AbstractCompoundConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cell();
+        //returns the singleton instance of this class
+        private static Cell singleton = null;
+        public static Cell getInstance(){
+            if (singleton == null) singleton = new Cell();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3092,9 +3400,11 @@ public abstract class Builtin {
         
     }
     public static class Struct extends AbstractCompoundConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Struct();
+        //returns the singleton instance of this class
+        private static Struct singleton = null;
+        public static Struct getInstance(){
+            if (singleton == null) singleton = new Struct();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3114,9 +3424,11 @@ public abstract class Builtin {
         
     }
     public static class Cell2struct extends AbstractConversionFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cell2struct();
+        //returns the singleton instance of this class
+        private static Cell2struct singleton = null;
+        public static Cell2struct getInstance(){
+            if (singleton == null) singleton = new Cell2struct();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3129,9 +3441,11 @@ public abstract class Builtin {
         
     }
     public static class Struct2cell extends AbstractConversionFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Struct2cell();
+        //returns the singleton instance of this class
+        private static Struct2cell singleton = null;
+        public static Struct2cell getInstance(){
+            if (singleton == null) singleton = new Struct2cell();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3144,9 +3458,11 @@ public abstract class Builtin {
         
     }
     public static class Typecast extends AbstractConversionFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Typecast();
+        //returns the singleton instance of this class
+        private static Typecast singleton = null;
+        public static Typecast getInstance(){
+            if (singleton == null) singleton = new Typecast();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3159,9 +3475,11 @@ public abstract class Builtin {
         
     }
     public static class Cast extends AbstractConversionFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cast();
+        //returns the singleton instance of this class
+        private static Cast singleton = null;
+        public static Cast getInstance(){
+            if (singleton == null) singleton = new Cast();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3181,9 +3499,11 @@ public abstract class Builtin {
         
     }
     public static class Isfield extends AbstractStructOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isfield();
+        //returns the singleton instance of this class
+        private static Isfield singleton = null;
+        public static Isfield getInstance(){
+            if (singleton == null) singleton = new Isfield();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3203,9 +3523,11 @@ public abstract class Builtin {
         
     }
     public static class Class extends AbstractClassOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Class();
+        //returns the singleton instance of this class
+        private static Class singleton = null;
+        public static Class getInstance(){
+            if (singleton == null) singleton = new Class();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3225,9 +3547,11 @@ public abstract class Builtin {
         
     }
     public static class Methodnames extends AbstractClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Methodnames();
+        //returns the singleton instance of this class
+        private static Methodnames singleton = null;
+        public static Methodnames getInstance(){
+            if (singleton == null) singleton = new Methodnames();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3240,9 +3564,11 @@ public abstract class Builtin {
         
     }
     public static class Fieldnames extends AbstractClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fieldnames();
+        //returns the singleton instance of this class
+        private static Fieldnames singleton = null;
+        public static Fieldnames getInstance(){
+            if (singleton == null) singleton = new Fieldnames();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3262,9 +3588,11 @@ public abstract class Builtin {
         
     }
     public static class Isempty extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isempty();
+        //returns the singleton instance of this class
+        private static Isempty singleton = null;
+        public static Isempty getInstance(){
+            if (singleton == null) singleton = new Isempty();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3277,9 +3605,11 @@ public abstract class Builtin {
         
     }
     public static class Isobject extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isobject();
+        //returns the singleton instance of this class
+        private static Isobject singleton = null;
+        public static Isobject getInstance(){
+            if (singleton == null) singleton = new Isobject();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3292,9 +3622,11 @@ public abstract class Builtin {
         
     }
     public static class Isfloat extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isfloat();
+        //returns the singleton instance of this class
+        private static Isfloat singleton = null;
+        public static Isfloat getInstance(){
+            if (singleton == null) singleton = new Isfloat();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3307,9 +3639,11 @@ public abstract class Builtin {
         
     }
     public static class Isinteger extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isinteger();
+        //returns the singleton instance of this class
+        private static Isinteger singleton = null;
+        public static Isinteger getInstance(){
+            if (singleton == null) singleton = new Isinteger();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3322,9 +3656,11 @@ public abstract class Builtin {
         
     }
     public static class Islogical extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Islogical();
+        //returns the singleton instance of this class
+        private static Islogical singleton = null;
+        public static Islogical getInstance(){
+            if (singleton == null) singleton = new Islogical();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3337,9 +3673,11 @@ public abstract class Builtin {
         
     }
     public static class Isstruct extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isstruct();
+        //returns the singleton instance of this class
+        private static Isstruct singleton = null;
+        public static Isstruct getInstance(){
+            if (singleton == null) singleton = new Isstruct();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3352,9 +3690,11 @@ public abstract class Builtin {
         
     }
     public static class Ischar extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ischar();
+        //returns the singleton instance of this class
+        private static Ischar singleton = null;
+        public static Ischar getInstance(){
+            if (singleton == null) singleton = new Ischar();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3367,9 +3707,11 @@ public abstract class Builtin {
         
     }
     public static class Iscell extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Iscell();
+        //returns the singleton instance of this class
+        private static Iscell singleton = null;
+        public static Iscell getInstance(){
+            if (singleton == null) singleton = new Iscell();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3382,9 +3724,11 @@ public abstract class Builtin {
         
     }
     public static class Isa extends AbstractLogicalClassQueryOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isa();
+        //returns the singleton instance of this class
+        private static Isa singleton = null;
+        public static Isa getInstance(){
+            if (singleton == null) singleton = new Isa();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3404,9 +3748,11 @@ public abstract class Builtin {
         
     }
     public static class Sort extends AbstractArrayOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sort();
+        //returns the singleton instance of this class
+        private static Sort singleton = null;
+        public static Sort getInstance(){
+            if (singleton == null) singleton = new Sort();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3419,9 +3765,11 @@ public abstract class Builtin {
         
     }
     public static class Unique extends AbstractArrayOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Unique();
+        //returns the singleton instance of this class
+        private static Unique singleton = null;
+        public static Unique getInstance(){
+            if (singleton == null) singleton = new Unique();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3434,9 +3782,11 @@ public abstract class Builtin {
         
     }
     public static class Find extends AbstractArrayOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Find();
+        //returns the singleton instance of this class
+        private static Find singleton = null;
+        public static Find getInstance(){
+            if (singleton == null) singleton = new Find();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3456,9 +3806,11 @@ public abstract class Builtin {
         
     }
     public static class Diag extends AbstractArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Diag();
+        //returns the singleton instance of this class
+        private static Diag singleton = null;
+        public static Diag getInstance(){
+            if (singleton == null) singleton = new Diag();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3471,9 +3823,11 @@ public abstract class Builtin {
         
     }
     public static class Reshape extends AbstractArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Reshape();
+        //returns the singleton instance of this class
+        private static Reshape singleton = null;
+        public static Reshape getInstance(){
+            if (singleton == null) singleton = new Reshape();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3486,9 +3840,11 @@ public abstract class Builtin {
         
     }
     public static class Permute extends AbstractArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Permute();
+        //returns the singleton instance of this class
+        private static Permute singleton = null;
+        public static Permute getInstance(){
+            if (singleton == null) singleton = new Permute();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3501,9 +3857,11 @@ public abstract class Builtin {
         
     }
     public static class Squeeze extends AbstractArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Squeeze();
+        //returns the singleton instance of this class
+        private static Squeeze singleton = null;
+        public static Squeeze getInstance(){
+            if (singleton == null) singleton = new Squeeze();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3516,9 +3874,11 @@ public abstract class Builtin {
         
     }
     public static class Complex extends AbstractArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Complex();
+        //returns the singleton instance of this class
+        private static Complex singleton = null;
+        public static Complex getInstance(){
+            if (singleton == null) singleton = new Complex();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3538,9 +3898,11 @@ public abstract class Builtin {
         
     }
     public static class Prod extends AbstractDimensionCollapsingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Prod();
+        //returns the singleton instance of this class
+        private static Prod singleton = null;
+        public static Prod getInstance(){
+            if (singleton == null) singleton = new Prod();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3553,9 +3915,11 @@ public abstract class Builtin {
         
     }
     public static class Sum extends AbstractDimensionCollapsingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sum();
+        //returns the singleton instance of this class
+        private static Sum singleton = null;
+        public static Sum getInstance(){
+            if (singleton == null) singleton = new Sum();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3568,9 +3932,11 @@ public abstract class Builtin {
         
     }
     public static class Mean extends AbstractDimensionCollapsingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Mean();
+        //returns the singleton instance of this class
+        private static Mean singleton = null;
+        public static Mean getInstance(){
+            if (singleton == null) singleton = new Mean();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3583,9 +3949,11 @@ public abstract class Builtin {
         
     }
     public static class Min extends AbstractDimensionCollapsingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Min();
+        //returns the singleton instance of this class
+        private static Min singleton = null;
+        public static Min getInstance(){
+            if (singleton == null) singleton = new Min();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3598,9 +3966,11 @@ public abstract class Builtin {
         
     }
     public static class Max extends AbstractDimensionCollapsingOperation  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Max();
+        //returns the singleton instance of this class
+        private static Max singleton = null;
+        public static Max getInstance(){
+            if (singleton == null) singleton = new Max();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3627,9 +3997,11 @@ public abstract class Builtin {
         
     }
     public static class Ones extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ones();
+        //returns the singleton instance of this class
+        private static Ones singleton = null;
+        public static Ones getInstance(){
+            if (singleton == null) singleton = new Ones();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3642,9 +4014,11 @@ public abstract class Builtin {
         
     }
     public static class Zeros extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Zeros();
+        //returns the singleton instance of this class
+        private static Zeros singleton = null;
+        public static Zeros getInstance(){
+            if (singleton == null) singleton = new Zeros();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3657,9 +4031,11 @@ public abstract class Builtin {
         
     }
     public static class Eye extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Eye();
+        //returns the singleton instance of this class
+        private static Eye singleton = null;
+        public static Eye getInstance(){
+            if (singleton == null) singleton = new Eye();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3679,9 +4055,11 @@ public abstract class Builtin {
         
     }
     public static class Inf extends AbstractFloatShapeAndTypeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Inf();
+        //returns the singleton instance of this class
+        private static Inf singleton = null;
+        public static Inf getInstance(){
+            if (singleton == null) singleton = new Inf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3694,9 +4072,11 @@ public abstract class Builtin {
         
     }
     public static class Nan extends AbstractFloatShapeAndTypeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nan();
+        //returns the singleton instance of this class
+        private static Nan singleton = null;
+        public static Nan getInstance(){
+            if (singleton == null) singleton = new Nan();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3716,9 +4096,11 @@ public abstract class Builtin {
         
     }
     public static class True extends AbstractLogicalShapeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new True();
+        //returns the singleton instance of this class
+        private static True singleton = null;
+        public static True getInstance(){
+            if (singleton == null) singleton = new True();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3731,9 +4113,11 @@ public abstract class Builtin {
         
     }
     public static class False extends AbstractLogicalShapeArrayConstructor  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new False();
+        //returns the singleton instance of this class
+        private static False singleton = null;
+        public static False getInstance(){
+            if (singleton == null) singleton = new False();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3753,9 +4137,11 @@ public abstract class Builtin {
         
     }
     public static class Size extends AbstractArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Size();
+        //returns the singleton instance of this class
+        private static Size singleton = null;
+        public static Size getInstance(){
+            if (singleton == null) singleton = new Size();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3768,9 +4154,11 @@ public abstract class Builtin {
         
     }
     public static class Nonzeros extends AbstractArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nonzeros();
+        //returns the singleton instance of this class
+        private static Nonzeros singleton = null;
+        public static Nonzeros getInstance(){
+            if (singleton == null) singleton = new Nonzeros();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3783,9 +4171,11 @@ public abstract class Builtin {
         
     }
     public static class Cumprod extends AbstractArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cumprod();
+        //returns the singleton instance of this class
+        private static Cumprod singleton = null;
+        public static Cumprod getInstance(){
+            if (singleton == null) singleton = new Cumprod();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3798,9 +4188,11 @@ public abstract class Builtin {
         
     }
     public static class Cumsum extends AbstractArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cumsum();
+        //returns the singleton instance of this class
+        private static Cumsum singleton = null;
+        public static Cumsum getInstance(){
+            if (singleton == null) singleton = new Cumsum();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3813,9 +4205,11 @@ public abstract class Builtin {
         
     }
     public static class Sign extends AbstractArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sign();
+        //returns the singleton instance of this class
+        private static Sign singleton = null;
+        public static Sign getInstance(){
+            if (singleton == null) singleton = new Sign();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3842,9 +4236,11 @@ public abstract class Builtin {
         
     }
     public static class Length extends AbstractNumericalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Length();
+        //returns the singleton instance of this class
+        private static Length singleton = null;
+        public static Length getInstance(){
+            if (singleton == null) singleton = new Length();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3857,9 +4253,11 @@ public abstract class Builtin {
         
     }
     public static class Ndims extends AbstractNumericalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ndims();
+        //returns the singleton instance of this class
+        private static Ndims singleton = null;
+        public static Ndims getInstance(){
+            if (singleton == null) singleton = new Ndims();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3872,9 +4270,11 @@ public abstract class Builtin {
         
     }
     public static class Numel extends AbstractNumericalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Numel();
+        //returns the singleton instance of this class
+        private static Numel singleton = null;
+        public static Numel getInstance(){
+            if (singleton == null) singleton = new Numel();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3887,9 +4287,11 @@ public abstract class Builtin {
         
     }
     public static class Nnz extends AbstractNumericalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nnz();
+        //returns the singleton instance of this class
+        private static Nnz singleton = null;
+        public static Nnz getInstance(){
+            if (singleton == null) singleton = new Nnz();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3909,9 +4311,11 @@ public abstract class Builtin {
         
     }
     public static class Any extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Any();
+        //returns the singleton instance of this class
+        private static Any singleton = null;
+        public static Any getInstance(){
+            if (singleton == null) singleton = new Any();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3924,9 +4328,11 @@ public abstract class Builtin {
         
     }
     public static class All extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new All();
+        //returns the singleton instance of this class
+        private static All singleton = null;
+        public static All getInstance(){
+            if (singleton == null) singleton = new All();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3939,9 +4345,11 @@ public abstract class Builtin {
         
     }
     public static class Isemtpy extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isemtpy();
+        //returns the singleton instance of this class
+        private static Isemtpy singleton = null;
+        public static Isemtpy getInstance(){
+            if (singleton == null) singleton = new Isemtpy();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3954,9 +4362,11 @@ public abstract class Builtin {
         
     }
     public static class Isnan extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isnan();
+        //returns the singleton instance of this class
+        private static Isnan singleton = null;
+        public static Isnan getInstance(){
+            if (singleton == null) singleton = new Isnan();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3969,9 +4379,11 @@ public abstract class Builtin {
         
     }
     public static class Isinf extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isinf();
+        //returns the singleton instance of this class
+        private static Isinf singleton = null;
+        public static Isinf getInstance(){
+            if (singleton == null) singleton = new Isinf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3984,9 +4396,11 @@ public abstract class Builtin {
         
     }
     public static class Isfinite extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isfinite();
+        //returns the singleton instance of this class
+        private static Isfinite singleton = null;
+        public static Isfinite getInstance(){
+            if (singleton == null) singleton = new Isfinite();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -3999,9 +4413,11 @@ public abstract class Builtin {
         
     }
     public static class Isvector extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isvector();
+        //returns the singleton instance of this class
+        private static Isvector singleton = null;
+        public static Isvector getInstance(){
+            if (singleton == null) singleton = new Isvector();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4014,9 +4430,11 @@ public abstract class Builtin {
         
     }
     public static class Isscalar extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isscalar();
+        //returns the singleton instance of this class
+        private static Isscalar singleton = null;
+        public static Isscalar getInstance(){
+            if (singleton == null) singleton = new Isscalar();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4029,9 +4447,11 @@ public abstract class Builtin {
         
     }
     public static class Isreal extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isreal();
+        //returns the singleton instance of this class
+        private static Isreal singleton = null;
+        public static Isreal getInstance(){
+            if (singleton == null) singleton = new Isreal();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4044,9 +4464,11 @@ public abstract class Builtin {
         
     }
     public static class Isnumeric extends AbstractLogicalScalarResultArrayQuery  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Isnumeric();
+        //returns the singleton instance of this class
+        private static Isnumeric singleton = null;
+        public static Isnumeric getInstance(){
+            if (singleton == null) singleton = new Isnumeric();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4066,9 +4488,11 @@ public abstract class Builtin {
         
     }
     public static class Superiorto extends AbstractImpureFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Superiorto();
+        //returns the singleton instance of this class
+        private static Superiorto singleton = null;
+        public static Superiorto getInstance(){
+            if (singleton == null) singleton = new Superiorto();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4081,9 +4505,11 @@ public abstract class Builtin {
         
     }
     public static class Exit extends AbstractImpureFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Exit();
+        //returns the singleton instance of this class
+        private static Exit singleton = null;
+        public static Exit getInstance(){
+            if (singleton == null) singleton = new Exit();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4096,9 +4522,11 @@ public abstract class Builtin {
         
     }
     public static class Quit extends AbstractImpureFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Quit();
+        //returns the singleton instance of this class
+        private static Quit singleton = null;
+        public static Quit getInstance(){
+            if (singleton == null) singleton = new Quit();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4125,9 +4553,11 @@ public abstract class Builtin {
         
     }
     public static class Clock extends AbstractTimeFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Clock();
+        //returns the singleton instance of this class
+        private static Clock singleton = null;
+        public static Clock getInstance(){
+            if (singleton == null) singleton = new Clock();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4140,9 +4570,11 @@ public abstract class Builtin {
         
     }
     public static class Tic extends AbstractTimeFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Tic();
+        //returns the singleton instance of this class
+        private static Tic singleton = null;
+        public static Tic getInstance(){
+            if (singleton == null) singleton = new Tic();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4155,9 +4587,11 @@ public abstract class Builtin {
         
     }
     public static class Toc extends AbstractTimeFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Toc();
+        //returns the singleton instance of this class
+        private static Toc singleton = null;
+        public static Toc getInstance(){
+            if (singleton == null) singleton = new Toc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4170,9 +4604,11 @@ public abstract class Builtin {
         
     }
     public static class Cputime extends AbstractTimeFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cputime();
+        //returns the singleton instance of this class
+        private static Cputime singleton = null;
+        public static Cputime getInstance(){
+            if (singleton == null) singleton = new Cputime();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4192,9 +4628,11 @@ public abstract class Builtin {
         
     }
     public static class Assert extends AbstractMatlabSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Assert();
+        //returns the singleton instance of this class
+        private static Assert singleton = null;
+        public static Assert getInstance(){
+            if (singleton == null) singleton = new Assert();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4207,9 +4645,11 @@ public abstract class Builtin {
         
     }
     public static class Nargoutchk extends AbstractMatlabSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nargoutchk();
+        //returns the singleton instance of this class
+        private static Nargoutchk singleton = null;
+        public static Nargoutchk getInstance(){
+            if (singleton == null) singleton = new Nargoutchk();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4222,9 +4662,11 @@ public abstract class Builtin {
         
     }
     public static class Nargchk extends AbstractMatlabSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Nargchk();
+        //returns the singleton instance of this class
+        private static Nargchk singleton = null;
+        public static Nargchk getInstance(){
+            if (singleton == null) singleton = new Nargchk();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4237,9 +4679,11 @@ public abstract class Builtin {
         
     }
     public static class Str2func extends AbstractMatlabSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Str2func();
+        //returns the singleton instance of this class
+        private static Str2func singleton = null;
+        public static Str2func getInstance(){
+            if (singleton == null) singleton = new Str2func();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4252,9 +4696,11 @@ public abstract class Builtin {
         
     }
     public static class Pause extends AbstractMatlabSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Pause();
+        //returns the singleton instance of this class
+        private static Pause singleton = null;
+        public static Pause getInstance(){
+            if (singleton == null) singleton = new Pause();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4274,9 +4720,11 @@ public abstract class Builtin {
         
     }
     public static class Eval extends AbstractDynamicMatlabFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Eval();
+        //returns the singleton instance of this class
+        private static Eval singleton = null;
+        public static Eval getInstance(){
+            if (singleton == null) singleton = new Eval();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4289,9 +4737,11 @@ public abstract class Builtin {
         
     }
     public static class Evalin extends AbstractDynamicMatlabFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Evalin();
+        //returns the singleton instance of this class
+        private static Evalin singleton = null;
+        public static Evalin getInstance(){
+            if (singleton == null) singleton = new Evalin();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4304,9 +4754,11 @@ public abstract class Builtin {
         
     }
     public static class Feval extends AbstractDynamicMatlabFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Feval();
+        //returns the singleton instance of this class
+        private static Feval singleton = null;
+        public static Feval getInstance(){
+            if (singleton == null) singleton = new Feval();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4319,9 +4771,11 @@ public abstract class Builtin {
         
     }
     public static class Assignin extends AbstractDynamicMatlabFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Assignin();
+        //returns the singleton instance of this class
+        private static Assignin singleton = null;
+        public static Assignin getInstance(){
+            if (singleton == null) singleton = new Assignin();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4334,9 +4788,11 @@ public abstract class Builtin {
         
     }
     public static class Inputname extends AbstractDynamicMatlabFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Inputname();
+        //returns the singleton instance of this class
+        private static Inputname singleton = null;
+        public static Inputname getInstance(){
+            if (singleton == null) singleton = new Inputname();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4356,9 +4812,11 @@ public abstract class Builtin {
         
     }
     public static class Import extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Import();
+        //returns the singleton instance of this class
+        private static Import singleton = null;
+        public static Import getInstance(){
+            if (singleton == null) singleton = new Import();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4371,9 +4829,11 @@ public abstract class Builtin {
         
     }
     public static class Cd extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Cd();
+        //returns the singleton instance of this class
+        private static Cd singleton = null;
+        public static Cd getInstance(){
+            if (singleton == null) singleton = new Cd();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4386,9 +4846,11 @@ public abstract class Builtin {
         
     }
     public static class Exist extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Exist();
+        //returns the singleton instance of this class
+        private static Exist singleton = null;
+        public static Exist getInstance(){
+            if (singleton == null) singleton = new Exist();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4401,9 +4863,11 @@ public abstract class Builtin {
         
     }
     public static class Matlabroot extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Matlabroot();
+        //returns the singleton instance of this class
+        private static Matlabroot singleton = null;
+        public static Matlabroot getInstance(){
+            if (singleton == null) singleton = new Matlabroot();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4416,9 +4880,11 @@ public abstract class Builtin {
         
     }
     public static class Whos extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Whos();
+        //returns the singleton instance of this class
+        private static Whos singleton = null;
+        public static Whos getInstance(){
+            if (singleton == null) singleton = new Whos();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4431,9 +4897,11 @@ public abstract class Builtin {
         
     }
     public static class Which extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Which();
+        //returns the singleton instance of this class
+        private static Which singleton = null;
+        public static Which getInstance(){
+            if (singleton == null) singleton = new Which();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4446,9 +4914,11 @@ public abstract class Builtin {
         
     }
     public static class Version extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Version();
+        //returns the singleton instance of this class
+        private static Version singleton = null;
+        public static Version getInstance(){
+            if (singleton == null) singleton = new Version();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4461,9 +4931,11 @@ public abstract class Builtin {
         
     }
     public static class Clear extends AbstractMatlabEnvironmentFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Clear();
+        //returns the singleton instance of this class
+        private static Clear singleton = null;
+        public static Clear getInstance(){
+            if (singleton == null) singleton = new Clear();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4483,9 +4955,11 @@ public abstract class Builtin {
         
     }
     public static class Disp extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Disp();
+        //returns the singleton instance of this class
+        private static Disp singleton = null;
+        public static Disp getInstance(){
+            if (singleton == null) singleton = new Disp();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4498,9 +4972,11 @@ public abstract class Builtin {
         
     }
     public static class Display extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Display();
+        //returns the singleton instance of this class
+        private static Display singleton = null;
+        public static Display getInstance(){
+            if (singleton == null) singleton = new Display();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4513,9 +4989,11 @@ public abstract class Builtin {
         
     }
     public static class Clc extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Clc();
+        //returns the singleton instance of this class
+        private static Clc singleton = null;
+        public static Clc getInstance(){
+            if (singleton == null) singleton = new Clc();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4528,9 +5006,11 @@ public abstract class Builtin {
         
     }
     public static class Error extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Error();
+        //returns the singleton instance of this class
+        private static Error singleton = null;
+        public static Error getInstance(){
+            if (singleton == null) singleton = new Error();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4543,9 +5023,11 @@ public abstract class Builtin {
         
     }
     public static class Warning extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Warning();
+        //returns the singleton instance of this class
+        private static Warning singleton = null;
+        public static Warning getInstance(){
+            if (singleton == null) singleton = new Warning();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4558,9 +5040,11 @@ public abstract class Builtin {
         
     }
     public static class Echo extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Echo();
+        //returns the singleton instance of this class
+        private static Echo singleton = null;
+        public static Echo getInstance(){
+            if (singleton == null) singleton = new Echo();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4573,9 +5057,11 @@ public abstract class Builtin {
         
     }
     public static class Diary extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Diary();
+        //returns the singleton instance of this class
+        private static Diary singleton = null;
+        public static Diary getInstance(){
+            if (singleton == null) singleton = new Diary();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4588,9 +5074,11 @@ public abstract class Builtin {
         
     }
     public static class Lastwarn extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Lastwarn();
+        //returns the singleton instance of this class
+        private static Lastwarn singleton = null;
+        public static Lastwarn getInstance(){
+            if (singleton == null) singleton = new Lastwarn();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4603,9 +5091,11 @@ public abstract class Builtin {
         
     }
     public static class Lasterror extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Lasterror();
+        //returns the singleton instance of this class
+        private static Lasterror singleton = null;
+        public static Lasterror getInstance(){
+            if (singleton == null) singleton = new Lasterror();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4618,9 +5108,11 @@ public abstract class Builtin {
         
     }
     public static class Format extends AbstractReportFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Format();
+        //returns the singleton instance of this class
+        private static Format singleton = null;
+        public static Format getInstance(){
+            if (singleton == null) singleton = new Format();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4640,9 +5132,11 @@ public abstract class Builtin {
         
     }
     public static class Rand extends AbstractRandomFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Rand();
+        //returns the singleton instance of this class
+        private static Rand singleton = null;
+        public static Rand getInstance(){
+            if (singleton == null) singleton = new Rand();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4655,9 +5149,11 @@ public abstract class Builtin {
         
     }
     public static class Randi extends AbstractRandomFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Randi();
+        //returns the singleton instance of this class
+        private static Randi singleton = null;
+        public static Randi getInstance(){
+            if (singleton == null) singleton = new Randi();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4670,9 +5166,11 @@ public abstract class Builtin {
         
     }
     public static class Randn extends AbstractRandomFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Randn();
+        //returns the singleton instance of this class
+        private static Randn singleton = null;
+        public static Randn getInstance(){
+            if (singleton == null) singleton = new Randn();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4692,9 +5190,11 @@ public abstract class Builtin {
         
     }
     public static class Computer extends AbstractSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Computer();
+        //returns the singleton instance of this class
+        private static Computer singleton = null;
+        public static Computer getInstance(){
+            if (singleton == null) singleton = new Computer();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4707,9 +5207,11 @@ public abstract class Builtin {
         
     }
     public static class Beep extends AbstractSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Beep();
+        //returns the singleton instance of this class
+        private static Beep singleton = null;
+        public static Beep getInstance(){
+            if (singleton == null) singleton = new Beep();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4722,9 +5224,11 @@ public abstract class Builtin {
         
     }
     public static class Dir extends AbstractSystemFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Dir();
+        //returns the singleton instance of this class
+        private static Dir singleton = null;
+        public static Dir getInstance(){
+            if (singleton == null) singleton = new Dir();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4744,9 +5248,11 @@ public abstract class Builtin {
         
     }
     public static class Unix extends AbstractOperatingSystemCallFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Unix();
+        //returns the singleton instance of this class
+        private static Unix singleton = null;
+        public static Unix getInstance(){
+            if (singleton == null) singleton = new Unix();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4759,9 +5265,11 @@ public abstract class Builtin {
         
     }
     public static class Dos extends AbstractOperatingSystemCallFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Dos();
+        //returns the singleton instance of this class
+        private static Dos singleton = null;
+        public static Dos getInstance(){
+            if (singleton == null) singleton = new Dos();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4774,9 +5282,11 @@ public abstract class Builtin {
         
     }
     public static class System extends AbstractOperatingSystemCallFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new System();
+        //returns the singleton instance of this class
+        private static System singleton = null;
+        public static System getInstance(){
+            if (singleton == null) singleton = new System();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4796,9 +5306,11 @@ public abstract class Builtin {
         
     }
     public static class Load extends AbstractIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Load();
+        //returns the singleton instance of this class
+        private static Load singleton = null;
+        public static Load getInstance(){
+            if (singleton == null) singleton = new Load();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4811,9 +5323,11 @@ public abstract class Builtin {
         
     }
     public static class Save extends AbstractIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Save();
+        //returns the singleton instance of this class
+        private static Save singleton = null;
+        public static Save getInstance(){
+            if (singleton == null) singleton = new Save();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4826,9 +5340,11 @@ public abstract class Builtin {
         
     }
     public static class Input extends AbstractIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Input();
+        //returns the singleton instance of this class
+        private static Input singleton = null;
+        public static Input getInstance(){
+            if (singleton == null) singleton = new Input();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4841,9 +5357,11 @@ public abstract class Builtin {
         
     }
     public static class Textscan extends AbstractIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Textscan();
+        //returns the singleton instance of this class
+        private static Textscan singleton = null;
+        public static Textscan getInstance(){
+            if (singleton == null) singleton = new Textscan();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4863,9 +5381,11 @@ public abstract class Builtin {
         
     }
     public static class Sprintf extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sprintf();
+        //returns the singleton instance of this class
+        private static Sprintf singleton = null;
+        public static Sprintf getInstance(){
+            if (singleton == null) singleton = new Sprintf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4878,9 +5398,11 @@ public abstract class Builtin {
         
     }
     public static class Sscanf extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Sscanf();
+        //returns the singleton instance of this class
+        private static Sscanf singleton = null;
+        public static Sscanf getInstance(){
+            if (singleton == null) singleton = new Sscanf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4893,9 +5415,11 @@ public abstract class Builtin {
         
     }
     public static class Fprintf extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fprintf();
+        //returns the singleton instance of this class
+        private static Fprintf singleton = null;
+        public static Fprintf getInstance(){
+            if (singleton == null) singleton = new Fprintf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4908,9 +5432,11 @@ public abstract class Builtin {
         
     }
     public static class Ftell extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ftell();
+        //returns the singleton instance of this class
+        private static Ftell singleton = null;
+        public static Ftell getInstance(){
+            if (singleton == null) singleton = new Ftell();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4923,9 +5449,11 @@ public abstract class Builtin {
         
     }
     public static class Ferror extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Ferror();
+        //returns the singleton instance of this class
+        private static Ferror singleton = null;
+        public static Ferror getInstance(){
+            if (singleton == null) singleton = new Ferror();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4938,9 +5466,11 @@ public abstract class Builtin {
         
     }
     public static class Fopen extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fopen();
+        //returns the singleton instance of this class
+        private static Fopen singleton = null;
+        public static Fopen getInstance(){
+            if (singleton == null) singleton = new Fopen();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4953,9 +5483,11 @@ public abstract class Builtin {
         
     }
     public static class Fread extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fread();
+        //returns the singleton instance of this class
+        private static Fread singleton = null;
+        public static Fread getInstance(){
+            if (singleton == null) singleton = new Fread();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4968,9 +5500,11 @@ public abstract class Builtin {
         
     }
     public static class Frewind extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Frewind();
+        //returns the singleton instance of this class
+        private static Frewind singleton = null;
+        public static Frewind getInstance(){
+            if (singleton == null) singleton = new Frewind();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4983,9 +5517,11 @@ public abstract class Builtin {
         
     }
     public static class Fscanf extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fscanf();
+        //returns the singleton instance of this class
+        private static Fscanf singleton = null;
+        public static Fscanf getInstance(){
+            if (singleton == null) singleton = new Fscanf();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4998,9 +5534,11 @@ public abstract class Builtin {
         
     }
     public static class Fseek extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fseek();
+        //returns the singleton instance of this class
+        private static Fseek singleton = null;
+        public static Fseek getInstance(){
+            if (singleton == null) singleton = new Fseek();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -5013,9 +5551,11 @@ public abstract class Builtin {
         
     }
     public static class Fwrite extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fwrite();
+        //returns the singleton instance of this class
+        private static Fwrite singleton = null;
+        public static Fwrite getInstance(){
+            if (singleton == null) singleton = new Fwrite();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -5028,9 +5568,11 @@ public abstract class Builtin {
         
     }
     public static class Fgetl extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fgetl();
+        //returns the singleton instance of this class
+        private static Fgetl singleton = null;
+        public static Fgetl getInstance(){
+            if (singleton == null) singleton = new Fgetl();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -5043,9 +5585,11 @@ public abstract class Builtin {
         
     }
     public static class Fgets extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fgets();
+        //returns the singleton instance of this class
+        private static Fgets singleton = null;
+        public static Fgets getInstance(){
+            if (singleton == null) singleton = new Fgets();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -5058,9 +5602,11 @@ public abstract class Builtin {
         
     }
     public static class Fclose extends AbstractPosixIoFunction  {
-        //creates a new instance of this class
-        protected Builtin create(){
-            return new Fclose();
+        //returns the singleton instance of this class
+        private static Fclose singleton = null;
+        public static Fclose getInstance(){
+            if (singleton == null) singleton = new Fclose();
+            return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
