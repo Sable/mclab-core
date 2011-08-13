@@ -2,6 +2,9 @@
 	<!-- load properties -->
 	<property file="natlab.properties" />
 
+        <!-- setup a local basename -->
+        <dirname property="Natlab.basedir" file="${ant.file.Natlab}" />
+
 	<!-- useful paths -->
 	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
 	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
@@ -18,6 +21,26 @@
 		</fileset>
 	</path>
 
+
+	<!--=====================================================================-->
+	<!-- Analysis related things                                             -->
+	<!--=====================================================================-->
+        
+        <fileset id="natlab.analysis.jastadd.fileset" dir="${Natlab.basedir}">
+          <include name="${src.dir}/ASTAnalyze.jadd" />
+        </fileset>
+        
+
+        <!--=====================================================================-->
+	<!-- Some usefull filesets and paths                                     -->
+	<!--=====================================================================-->
+        <fileset id="natlab.general.jastadd.fileset" dir="${Natlab.basedir}/${src.dir}">
+	  <include name="Comments.jadd" />
+	  <include name="OutputSuppression.jadd" />
+	  <include name="PrettyPrint.jrag" />
+	  <include name="LValue.jrag" />
+        </fileset>
+        
 	<!--=====================================================================-->
 	<!-- Private Targets                                                     -->
 	<!--=====================================================================-->
@@ -196,6 +219,11 @@
 		</path>
 	</target>
 
+        <!-- setup a path for the ast files used in Natlab language -->
+          <fileset id="natlab.ast.fileset" dir="${Natlab.basedir}">
+            <include name="${src.dir}/**/*.ast" />
+          </fileset>
+             
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->
