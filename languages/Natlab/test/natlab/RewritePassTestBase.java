@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.io.*;
 
 import junit.framework.TestCase;
-import natlab.toolkits.analysis.AbstractNodeCaseHandler;
+import nodecases.AbstractNodeCaseHandler;
 import ast.*;
 
 public class RewritePassTestBase extends TestCase {
