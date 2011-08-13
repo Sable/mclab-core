@@ -19,7 +19,7 @@
 package natlab.toolkits.rewrite.multireturn;
 
 import ast.*;
-import natlab.toolkits.analysis.AbstractNodeCaseHandler;
+import nodecases.AbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.*;
 import java.util.LinkedList;
 import java.util.HashSet;

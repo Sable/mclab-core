@@ -4,6 +4,7 @@ import natlab.FlowAnalysisTestTool;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
+import analysis.*;
 import natlab.toolkits.analysis.*;
 
 

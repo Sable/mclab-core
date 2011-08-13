@@ -20,6 +20,8 @@ package natlab.Static.ir.analysis;
 
 
 import natlab.Static.ir.*;
+import analysis.*;
+import nodecases.*;
 import natlab.toolkits.analysis.*;
 import ast.*;
 

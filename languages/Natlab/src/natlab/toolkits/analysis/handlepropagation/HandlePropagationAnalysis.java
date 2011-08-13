@@ -5,6 +5,7 @@ import ast.*;
 
 import java.util.*;
 import natlab.LookupFile;
+import analysis.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
 import natlab.toolkits.analysis.varorfun.*;

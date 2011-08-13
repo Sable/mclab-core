@@ -21,7 +21,7 @@
 
 aspect AnalysisPrettyPrint {
 
-    syn String ASTNode.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    syn String ASTNode.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis )
     {
         StringBuffer buf = new StringBuffer();
         for(beaver.Symbol comment : getComments()) {
@@ -32,13 +32,13 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
 
-    syn String ASTNode.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    syn String ASTNode.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
     {
         //throw new UnsupportedOperationException( getClass().getName() + ".getAnalysisPrettyPrintedLessComments( analysis )");
         return getPrettyPrintedLessComments();
     }
 
-    eq CompilationUnits.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    eq CompilationUnits.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
     {
         StringBuffer buf = new StringBuffer();
 
@@ -55,16 +55,16 @@ aspect AnalysisPrettyPrint {
     }
 
     //program
-    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         return "";
     }
       
     // Variable Declaration
-    eq VariableDecl.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) = "%Declare " + getID();
+    eq VariableDecl.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) = "%Declare " + getID();
     
     
     // Script    
-    eq Script.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq Script.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
             buf.append(comment.getAnalysisPrettyPrinted( analysis ));
@@ -77,7 +77,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionList.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq FunctionList.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         for(Function func : getFunctions()) {
             buf.append(func.getAnalysisPrettyPrinted( analysis ));
@@ -86,7 +86,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionList.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq FunctionList.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
         for(beaver.Symbol comment : getComments()) {
@@ -96,7 +96,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionDecl.getAnalysisPrettyPrinted( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq FunctionDecl.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
                 
@@ -115,7 +115,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq Function.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq Function.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "function ");
@@ -159,18 +159,18 @@ aspect AnalysisPrettyPrint {
        
     //help comments
     
-    eq HelpComment.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) = getText();
+    eq HelpComment.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) = getText();
 
     //Stmts
 
-    eq Stmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    eq Stmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
     {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append( getPrettyPrintedLessComments() );
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){
@@ -191,11 +191,11 @@ aspect AnalysisPrettyPrint {
         }
         return buf.toString();
     }
-    eq EmptyStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis )
+    eq EmptyStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
     {
         return getPrettyPrintedLessComments();
     }
-    eq ForStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq ForStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "for ");
@@ -207,9 +207,9 @@ aspect AnalysisPrettyPrint {
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         buf.append(indent + "end");
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){
@@ -231,7 +231,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
 
-    eq WhileStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq WhileStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "while ");
@@ -242,9 +242,9 @@ aspect AnalysisPrettyPrint {
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         buf.append(indent + "end");
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " +this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){
@@ -267,7 +267,7 @@ aspect AnalysisPrettyPrint {
     }
 
     // if-elseif-else
-    eq IfStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq IfStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         boolean first = true;
@@ -282,9 +282,9 @@ aspect AnalysisPrettyPrint {
             buf.append(getElseBlock().getAnalysisPrettyPrinted( analysis ));
         }
         buf.append(indent + "end");
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){
@@ -306,7 +306,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
 
-    eq IfBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq IfBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "if ");
@@ -319,7 +319,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
 
-    eq ElseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq ElseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "else ");
@@ -332,7 +332,7 @@ aspect AnalysisPrettyPrint {
     }
 /////////////////////////////////////////////
     // switch-case
-    eq SwitchStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq SwitchStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "switch ");
@@ -345,9 +345,9 @@ aspect AnalysisPrettyPrint {
             buf.append(getDefaultCaseBlock().getAnalysisPrettyPrinted( analysis ));
         }
         buf.append( indent + "end");
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){
@@ -368,7 +368,7 @@ aspect AnalysisPrettyPrint {
         }
         return buf.toString();
     }
-    eq SwitchCaseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq SwitchCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "case ");
@@ -380,7 +380,7 @@ aspect AnalysisPrettyPrint {
         }
         return buf.toString();
     }
-    eq DefaultCaseBlock.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq DefaultCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "otherwise ");
@@ -393,7 +393,7 @@ aspect AnalysisPrettyPrint {
     }
 
     // try-catch
-    eq TryStmt.getAnalysisPrettyPrintedLessComments( natlab.toolkits.analysis.StructuralAnalysis analysis ) {
+    eq TryStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append( indent + "try ");
@@ -412,9 +412,9 @@ aspect AnalysisPrettyPrint {
             }
         }
         buf.append( indent + "end" );
-        natlab.toolkits.analysis.FlowSet in, out;
-        in = (natlab.toolkits.analysis.FlowSet)analysis.getInFlowSets().get( this );
-        out = (natlab.toolkits.analysis.FlowSet)analysis.getOutFlowSets().get( this );
+        Object in, out;
+        in = (Object)analysis.getInFlowSets().get( this );
+        out = (Object)analysis.getOutFlowSets().get( this );
         if( in != null && out != null ){
             buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
             if( in != null ){

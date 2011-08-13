@@ -22,7 +22,7 @@
 package natlab.toolkits.rewrite.endresolution;
 
 import ast.*;
-import natlab.toolkits.analysis.AbstractNodeCaseHandler;
+import nodecases.AbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.endresolution.indentedAccess;
 import natlab.toolkits.analysis.varorfun.*;

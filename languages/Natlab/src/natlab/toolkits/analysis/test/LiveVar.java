@@ -2,6 +2,7 @@ package natlab.toolkits.analysis.test;
 
 import ast.*;
 import java.util.*;
+import analysis.*;
 import natlab.toolkits.analysis.*;
 
 public class LiveVar extends AbstractSimpleStructuralBackwardAnalysis< HashSetFlowSet< String > >

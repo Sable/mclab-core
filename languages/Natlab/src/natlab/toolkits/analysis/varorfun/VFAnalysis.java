@@ -1,8 +1,8 @@
 package natlab.toolkits.analysis.varorfun;
 
 import ast.*;
+import analysis.*;
 import natlab.LookupFile;
-import natlab.toolkits.analysis.Analysis;
 import natlab.toolkits.analysis.FlowSet;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 

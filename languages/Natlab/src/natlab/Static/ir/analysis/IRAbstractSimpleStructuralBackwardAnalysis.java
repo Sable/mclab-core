@@ -20,8 +20,8 @@ package natlab.Static.ir.analysis;
 
 import ast.ASTNode;
 import natlab.Static.ir.*;
-import natlab.toolkits.analysis.AbstractSimpleStructuralBackwardAnalysis;
-import natlab.toolkits.analysis.NodeCaseHandler;
+import analysis.AbstractSimpleStructuralBackwardAnalysis;
+import nodecases.NodeCaseHandler;
 
 public abstract class IRAbstractSimpleStructuralBackwardAnalysis<F> extends
         AbstractSimpleStructuralBackwardAnalysis<F> implements IRNodeCaseHandler {

@@ -25,7 +25,7 @@ import ast.Row;
 import ast.Stmt;
 import ast.StringLiteralExpr;
 import ast.UnaryExpr;
-import natlab.toolkits.analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.varorfun.DataCollectFlowSet;
 import natlab.toolkits.analysis.varorfun.DataPair;
 

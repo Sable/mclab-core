@@ -24,7 +24,7 @@ package natlab.toolkits.rewrite.threeaddress;
 import java.util.*;
 
 import ast.*;
-import natlab.toolkits.analysis.AbstractNodeCaseHandler;
+import nodecases.AbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;

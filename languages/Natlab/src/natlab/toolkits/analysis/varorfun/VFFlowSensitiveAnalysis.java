@@ -22,7 +22,7 @@ import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
 import natlab.LookupFile;
-import natlab.toolkits.analysis.AbstractStructuralForwardAnalysis;
+import analysis.AbstractStructuralForwardAnalysis;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 
 public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<VFFlowset> implements VFAnalysis{

@@ -22,37 +22,37 @@
 
 aspect ASTAnalyze
 {
-    public void ASTNode.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+    public void ASTNode.analyze(nodecases.NodeCaseHandler visitor){
         visitor.caseASTNode(this);
     }
-    public void List.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+    public void List.analyze(nodecases.NodeCaseHandler visitor){
         visitor.caseList(this);
     }
-    public void Program.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+    public void Program.analyze(nodecases.NodeCaseHandler visitor){
         visitor.caseProgram(this);
     }
     
-    public void Stmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Stmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseStmt(this);
     }
-    public void EmptyStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor){
+    public void EmptyStmt.analyze(nodecases.NodeCaseHandler visitor){
         visitor.caseEmptyStmt(this);
     }
     
-    public void BreakStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void BreakStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBreakStmt(this);
     }
-    public void ContinueStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ContinueStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseContinueStmt(this);
     }
-    public void ReturnStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ReturnStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseReturnStmt(this);
     }
-    public void ForStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ForStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         Expr loopRange = getAssignStmt().getRHS();
         
@@ -61,497 +61,497 @@ aspect ASTAnalyze
         else
             visitor.caseForStmt(this);
     }
-    public void WhileStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void WhileStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseWhileStmt(this);
     }
-    public void TryStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void TryStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseTryStmt(this);
     }
-    public void SwitchStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void SwitchStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseSwitchStmt(this);
     }
-    public void IfStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void IfStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseIfStmt(this);
     }
 
-    public void Script.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Script.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseScript(this);
     }
-    public void FunctionList.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FunctionList.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFunctionList(this);
     }
-    public void ExprStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ExprStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseExprStmt(this);
     }
-    public void AssignStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void AssignStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseAssignStmt(this);
     }
-    public void GlobalStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void GlobalStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseGlobalStmt(this);
     }
-    public void PersistentStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void PersistentStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.casePersistentStmt(this);
     }
-    public void ShellCommandStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ShellCommandStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseShellCommandStmt(this);
     }
-    public void RangeExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void RangeExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseRangeExpr(this);
     }
-    public void ColonExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ColonExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseColonExpr(this);
     }
-    public void EndExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EndExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEndExpr(this);
     }
-    public void NameExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void NameExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseNameExpr(this);
     }
-    public void Name.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Name.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseName(this);
     }
-    public void ParameterizedExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ParameterizedExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseParameterizedExpr(this);
     }
-    public void CellIndexExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CellIndexExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCellIndexExpr(this);
     }
-    public void DotExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void DotExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseDotExpr(this);
     }
-    public void MatrixExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MatrixExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMatrixExpr(this);
     }
-    public void CellArrayExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CellArrayExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCellArrayExpr(this);
     }
-    public void SuperClassMethodExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void SuperClassMethodExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseSuperClassMethodExpr(this);
     }
-    public void IntLiteralExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void IntLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseIntLiteralExpr(this);
     }
-    public void FPLiteralExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FPLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFPLiteralExpr(this);
     }
-    public void StringLiteralExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void StringLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseStringLiteralExpr(this);
     }
-    public void UMinusExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UMinusExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUMinusExpr(this);
     }
-    public void UPlusExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UPlusExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUPlusExpr(this);
     }
-    public void NotExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void NotExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseNotExpr(this);
     }
-    public void MTransposeExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MTransposeExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMTransposeExpr(this);
     }
-    public void ArrayTransposeExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ArrayTransposeExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseArrayTransposeExpr(this);
     }
-    public void PlusExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void PlusExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.casePlusExpr(this);
     }
-    public void MinusExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MinusExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMinusExpr(this);
     }
-    public void MTimesExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MTimesExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMTimesExpr(this);
     }
-    public void MDivExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MDivExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMDivExpr(this);
     }
-    public void MLDivExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MLDivExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMLDivExpr(this);
     }
-    public void MPowExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MPowExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMPowExpr(this);
     }
-    public void ETimesExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ETimesExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseETimesExpr(this);
     }
-    public void EDivExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EDivExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEDivExpr(this);
     }
-    public void ELDivExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ELDivExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseELDivExpr(this);
     }
-    public void EPowExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EPowExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEPowExpr(this);
     }
-    public void AndExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void AndExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseAndExpr(this);
     }
-    public void OrExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void OrExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseOrExpr(this);
     }
-    public void ShortCircuitAndExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ShortCircuitAndExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseShortCircuitAndExpr(this);
     }
-    public void ShortCircuitOrExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ShortCircuitOrExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseShortCircuitOrExpr(this);
     }
-    public void LTExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void LTExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseLTExpr(this);
     }
-    public void GTExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void GTExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseGTExpr(this);
     }
-    public void LEExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void LEExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseLEExpr(this);
     }
-    public void GEExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void GEExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseGEExpr(this);
     }
-    public void EQExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EQExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEQExpr(this);
     }
-    public void NEExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void NEExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseNEExpr(this);
     }
-    public void FunctionHandleExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FunctionHandleExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFunctionHandleExpr(this);
     }
-    public void LambdaExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void LambdaExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseLambdaExpr(this);
     }
 
-    public void Function.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Function.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFunction(this);
     }
-    public void FunctionDecl.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FunctionDecl.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFunctionDecl(this);
     }
-    public void Row.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Row.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseRow(this);
     }
-    public void VariableDecl.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void VariableDecl.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseVariableDecl(this);
     }
 
     //Begin IR nodes
 
-    public void CSLExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CSLExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCSLExpr(this);
     }
-    public void EndCallExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EndCallExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEndCallExpr(this);
     }
-    public void CheckScalarStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CheckScalarStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCheckScalarStmt(this);
     }
 
     //SOME MISSING ONES!
-    public void CompilationUnits.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CompilationUnits.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCompilationUnits(this);
     }
-    public void EmptyProgram.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void EmptyProgram.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEmptyProgram(this);
     }
-    public void Body.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Body.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBody(this);
     }
-    public void ClassBody.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ClassBody.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseClassBody(this);
     }
-    public void FunctionOrSignatureOrPropertyAccessOrStmt.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FunctionOrSignatureOrPropertyAccessOrStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFunctionOrSignatureOrPropertyAccessOrStmt(this);
     }
-    public void ClassDef.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ClassDef.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseClassDef(this);
     }
-    public void Properties.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Properties.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseProperties(this);
     }
-    public void Property.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Property.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseProperty(this);
     }
-    public void Methods.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Methods.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMethods(this);
     }
-    public void Signature.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Signature.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseSignature(this);
     }
-    public void PropertyAccess.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void PropertyAccess.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.casePropertyAccess(this);
     }
-    public void ClassEvents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ClassEvents.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseClassEvents(this);
     }
-    public void Event.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Event.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseEvent(this);
     }
-    public void HelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void HelpComment.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseHelpComment(this);
     }
-    public void OneLineHelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void OneLineHelpComment.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseOneLineHelpComment(this);
     }
-    public void MultiLineHelpComment.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MultiLineHelpComment.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMultiLineHelpComment(this);
     }
-    public void SwitchCaseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void SwitchCaseBlock.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseSwitchCaseBlock(this);
     }
-    public void DefaultCaseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void DefaultCaseBlock.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseDefaultCaseBlock(this);
     }
-    public void IfBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void IfBlock.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseIfBlock(this);
     }
-    public void ElseBlock.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ElseBlock.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseElseBlock(this);
     }
-    public void LValueExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void LValueExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseLValueExpr(this);
     }
-    public void LiteralExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void LiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseLiteralExpr(this);
     }
-    public void UnaryExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UnaryExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUnaryExpr(this);
     }
-    public void BinaryExpr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void BinaryExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBinaryExpr(this);
     }
-    public void Annotation.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Annotation.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseAnnotation(this);
     }
-    public void ExpandedAnnotation.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ExpandedAnnotation.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseExpandedAnnotation(this);
     }
-    public void Expr.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Expr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseExpr(this);
     }
-    public void Attribute.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Attribute.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseAttribute(this);
     }
-    public void SuperClass.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void SuperClass.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseSuperClass(this);
     }
 
 
     //TYPES
-    public void Type.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Type.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseType(this);
     }
-    public void BaseType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void BaseType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBaseType(this);
     }
-    public void PrimitiveType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void PrimitiveType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.casePrimitiveType(this);
     }
-    public void IntType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void IntType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseIntType(this);
     }
-    public void FloatType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FloatType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFloatType(this);
     }
-    public void Shape.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Shape.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseShape(this);
     }
-    public void Rank.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Rank.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseRank(this);
     }
-    public void Extents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Extents.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseExtents(this);
     }
-    public void FieldEntry.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void FieldEntry.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFieldEntry(this);
     }
-    public void UnionType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UnionType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUnionType(this);
     }
-    public void IntersectionType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void IntersectionType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseIntersectionType(this);
     }
-    public void ArrowType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ArrowType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseArrowType(this);
     }
-    public void ArgTupleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void ArgTupleType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseArgTupleType(this);
     }
-    public void UnitType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UnitType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUnitType(this);
     }
-    public void VarArgType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void VarArgType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseVarArgType(this);
     }
-    public void TupleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void TupleType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseTupleType(this);
     }
-    public void CellArrayType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CellArrayType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCellArrayType(this);
     }
-    public void MatrixType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void MatrixType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseMatrixType(this);
     }
-    public void TypeVarType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void TypeVarType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseTypeVarType(this);
     }
-    public void HandleType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void HandleType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseHandleType(this);
     }
-    public void UnknownType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void UnknownType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseUnknownType(this);
     }
-    public void StructType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void StructType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseStructType(this);
     }
-    public void Int8.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Int8.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseInt8(this);
     }
-    public void Int16.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Int16.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseInt16(this);
     }
-    public void Int32.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Int32.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseInt32(this);
     }
-    public void Int64.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Int64.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseInt64(this);
     }
-    public void Float32.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Float32.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFloat32(this);
     }
-    public void Float64.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void Float64.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseFloat64(this);
     }
-    public void CharType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void CharType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCharType(this);
     }
-    public void BoolType.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void BoolType.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBoolType(this);
     }
-    public void KnownExtentsShape.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void KnownExtentsShape.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseKnownExtentsShape(this);
     }
-    public void KnownRank.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void KnownRank.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseKnownRank(this);
     }
-    public void KnownExtents.analyze(natlab.toolkits.analysis.NodeCaseHandler visitor)
+    public void KnownExtents.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseKnownExtents(this);
     }

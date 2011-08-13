@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import ast.*;
 import natlab.Static.callgraph.StaticFunction;
 import natlab.Static.interproceduralAnalysis.*;
+import analysis.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.path.FunctionReference;
 

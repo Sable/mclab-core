@@ -2,7 +2,7 @@ package natlab.toolkits.analysis.test;
 
 import ast.*;
 import java.util.*;
-import natlab.toolkits.analysis.*;
+import nodecases.*;
 
 public class Uidtest extends AbstractNodeCaseHandler
 {

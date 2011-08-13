@@ -19,7 +19,7 @@
 package natlab.Static.interproceduralAnalysis;
 
 import ast.Function;
-import natlab.toolkits.analysis.Analysis;
+import analysis.Analysis;
 
 /**
  * This interface represents an intra-procedural analysis, as used by a 

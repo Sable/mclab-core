@@ -17,7 +17,7 @@
 // =========================================================================== //
 package natlab.toolkits.rewrite;
 
-import natlab.toolkits.analysis.AbstractDepthFirstAnalysis;
+import analysis.AbstractDepthFirstAnalysis;
 import java.util.*;
 import java.lang.*;
 import ast.*;

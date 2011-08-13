@@ -2,6 +2,7 @@ package natlab.toolkits.analysis.example;
 
 import ast.*;
 import java.util.*;
+import analysis.*;
 import natlab.toolkits.analysis.*;
 
 public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis< HashSetFlowSet<String> >

@@ -19,7 +19,7 @@
 package natlab.toolkits.rewrite.clearresolution;
 
 import ast.*;
-import natlab.toolkits.analysis.AbstractNodeCaseHandler;
+import nodecases.AbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.analysis.varorfun.*;
 import java.util.LinkedList;

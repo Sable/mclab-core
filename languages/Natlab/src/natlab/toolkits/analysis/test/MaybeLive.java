@@ -18,6 +18,7 @@
 
 package natlab.toolkits.analysis.test;
 
+import analysis.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.analysis.varorfun.*;
 

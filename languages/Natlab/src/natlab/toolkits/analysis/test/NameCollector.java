@@ -2,7 +2,8 @@ package natlab.toolkits.analysis.test;
 
 import java.util.*;
 import ast.*;
-import natlab.toolkits.analysis.*;
+import analysis.*;
+import natlab.toolkits.analysis.HashSetFlowSet;
 
 /**
  * @author Jesse Doherty
