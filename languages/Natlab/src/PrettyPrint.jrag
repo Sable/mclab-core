@@ -478,7 +478,7 @@ aspect PrettyPrint {
     }
     
     //eq FunctionHandleExpr.getPrettyPrintedLessComments() = getIndent() + "@" + getName().getStructureString();
-    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getStructureString();
+    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getPrettyPrintedLessComments();
     
     eq LambdaExpr.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();

@@ -58,7 +58,7 @@ aspect ASTtoXML {
     
 	public long CompilationUnits.nodeCounter = 0;
 
-	/*public long ASTNode.nodeCounter() {
+	public long ASTNode.nodeCounter() {
 	    long counter = 0;
 	    ASTNode node = this;
 		while(node != null && !(node instanceof CompilationUnits))
@@ -68,9 +68,9 @@ aspect ASTtoXML {
 			counter =  ((CompilationUnits)node).nodeCounter++;
 	    }
 	    return counter;
-            }*/
+        }
 
-        syn long ASTNode.nodeCounter() = getuID();
+        //syn long ASTNode.nodeCounter() = getuID();
 
 	public void Annotation.setNodeCounter(long count){
 		ASTNode node = this;

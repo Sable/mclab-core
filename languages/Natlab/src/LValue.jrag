@@ -19,29 +19,29 @@ aspect LValue
 
     //getLValues methods, returns a Map of name to Name nodes of all L Value name nodes.
 
-    syn lazy Set<String> Script.getLValues()
+    syn lazy java.util.Set<String> Script.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumStmt(); i++ )
             names.addAll( getStmt(i).getLValues() );
         return names;
     }
-    syn lazy Set<String> Function.getLValues()
+    syn lazy java.util.Set<String> Function.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumStmt(); i++ )
             names.addAll( getStmt(i).getLValues() );
         return names;
     }
 
-    syn lazy Set<String> Stmt.getLValues() = new LinkedHashSet<String>();
+    syn lazy java.util.Set<String> Stmt.getLValues() = new java.util.LinkedHashSet<String>();
 
 
     //getLValues equations for Statements
     eq AssignStmt.getLValues() = getLHS().getSymbols();
     eq GlobalStmt.getLValues() 
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumName(); i++ ){
             names.add(getName(i).getID());
         }
@@ -49,7 +49,7 @@ aspect LValue
     }
     eq PersistentStmt.getLValues() 
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumName(); i++ ){
             names.add(getName(i).getID());
         }
@@ -57,7 +57,7 @@ aspect LValue
     }
     eq ForStmt.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         names.addAll( getAssignStmt().getLValues() );
         for( int i=0; i<getNumStmt(); i++ )
             names.addAll(getStmt(i).getLValues() );
@@ -65,14 +65,14 @@ aspect LValue
     }
     eq WhileStmt.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumStmt(); i++ )
             names.addAll(getStmt(i).getLValues() );
         return names;
     }
     eq IfStmt.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumIfBlock(); i++ ){
             for( int j=0; j<getIfBlock(i).getNumStmt(); j++ ){
                 names.addAll(getIfBlock(i).getStmt(j).getLValues());
@@ -85,7 +85,7 @@ aspect LValue
     }
     eq TryStmt.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumTryStmt(); i++ )
             names.addAll( getTryStmt(i).getLValues() );
         for( int i=0; i<getNumCatchStmt(); i++ )
@@ -94,7 +94,7 @@ aspect LValue
     }
     eq SwitchStmt.getLValues()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumSwitchCaseBlock(); i++){
             SwitchCaseBlock b = getSwitchCaseBlock(i);
             for( int j=0; j<b.getNumStmt(); j++ )
@@ -108,24 +108,24 @@ aspect LValue
         return names;
     }
    
-    syn Set<String> ASTNode.getSymbols()
+    syn java.util.Set<String> ASTNode.getSymbols()
     {
-        Set<String> symbols = new LinkedHashSet<String>();
+        java.util.Set<String> symbols = new java.util.LinkedHashSet<String>();
         for( int i = 0; i<getNumChild(); i++ )
             symbols.addAll( getChild(i).getSymbols() );
         return symbols;
     }
-    syn Set<String> Expr.getSymbols()
+    syn java.util.Set<String> Expr.getSymbols()
     {
-        Set<String> symbols = new LinkedHashSet<String>();
+        java.util.Set<String> symbols = new java.util.LinkedHashSet<String>();
         for( int i = 0; i<getNumChild(); i++ )
             symbols.addAll( getChild(i).getSymbols() );
         return symbols;
     }
 
-    syn Set<String> Name.getSymbols()
+    syn java.util.Set<String> Name.getSymbols()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         names.add( getID() );
         return names;
     }
@@ -137,7 +137,7 @@ aspect LValue
     eq DotExpr.getSymbols() = getTarget().getSymbols();
     eq MatrixExpr.getSymbols()
     {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<String>();
         for( int i=0; i<getNumRow(); i++ ){
             for( int j=0; j< getRow(i).getNumElement(); j++ ){
                 names.addAll( getRow(i).getElement(j).getSymbols() );
@@ -146,16 +146,16 @@ aspect LValue
         return names;
     }
 
-    syn Set<NameExpr> ASTNode.getNameExpressions()
+    syn java.util.Set<NameExpr> ASTNode.getNameExpressions()
     {
-        Set<NameExpr> symbols = new LinkedHashSet<NameExpr>();
+        java.util.Set<NameExpr> symbols = new java.util.LinkedHashSet<NameExpr>();
         for( int i = 0; i<getNumChild(); i++ )
             symbols.addAll( getChild(i).getNameExpressions() );
         return symbols;
     }
-    syn Set<NameExpr> Expr.getNameExpressions()
+    syn java.util.Set<NameExpr> Expr.getNameExpressions()
     {
-        Set<NameExpr> symbols = new LinkedHashSet<NameExpr>();
+        java.util.Set<NameExpr> symbols = new java.util.LinkedHashSet<NameExpr>();
         for( int i = 0; i<getNumChild(); i++ )
             symbols.addAll( getChild(i).getNameExpressions() );
         return symbols;
@@ -164,7 +164,7 @@ aspect LValue
     //getNameExpressions equations for Expressions
     eq NameExpr.getNameExpressions()
     {	
-        LinkedHashSet<NameExpr> names = new LinkedHashSet<NameExpr>();
+        java.util.LinkedHashSet<NameExpr> names = new java.util.LinkedHashSet<NameExpr>();
         names.add( this );
         return names;
     }
@@ -173,7 +173,7 @@ aspect LValue
     eq DotExpr.getNameExpressions() = getTarget().getNameExpressions();
     eq MatrixExpr.getNameExpressions()
     {
-        LinkedHashSet<NameExpr> names = new LinkedHashSet<NameExpr>();
+        java.util.LinkedHashSet<NameExpr> names = new java.util.LinkedHashSet<NameExpr>();
         for( int i=0; i<getNumRow(); i++ ){
             for( int j=0; j< getRow(i).getNumElement(); j++ ){
                 names.addAll( getRow(i).getElement(j).getNameExpressions() );
