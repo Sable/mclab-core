@@ -4,6 +4,8 @@ import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 import ast.*;
+import analysis.*;
+import nodecases.*;
 import natlab.toolkits.analysis.*;
 import natlab.CompilationProblem;
 import natlab.options.Options;
