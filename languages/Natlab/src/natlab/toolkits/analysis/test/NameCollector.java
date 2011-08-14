@@ -10,8 +10,8 @@ import natlab.toolkits.analysis.HashSetFlowSet;
  */
 public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<String>>
 {
-    private HashSetFlowSet<String> fullSet;
-    private boolean inLHS = false;
+    protected HashSetFlowSet<String> fullSet;
+    protected boolean inLHS = false;
 
     public NameCollector(ASTNode tree)
     {
