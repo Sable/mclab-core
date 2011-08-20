@@ -5,4 +5,5 @@ package natlab.Static.builtin;
  */
 public interface ClassPropagationDefined {
     public ClassPropTools.MC getMatlabClassPropagationInfo();    
+    public ClassPropTools.MC getParentMatlabClassPropagationInfo();    
 }
