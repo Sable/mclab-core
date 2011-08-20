@@ -65,18 +65,37 @@ public class ClassPropTools {
         MatchResult p1,p2; //parents
         ClassReference emittedClass;
         int numEmittedResults; //number of emmited results
+        /**
+         * default constructor
+         */
+        MatchResult(){}
+        /**
+         * constructor referring to parent, copying numMatched/numEmmited
+         */
+        MatchResult(MatchResult parent){
+            this.numMatched = parent.numMatched;
+            this.p1 = parent;
+            this.numEmittedResults = parent.numEmittedResults;
+        }
+        /**
+         * constructor referring to parent, copying numMatched and adding extra result
+         */
+        MatchResult(MatchResult parent,ClassReference emittedClass){
+            this.numMatched = parent.numMatched;
+            this.p1 = parent;
+            this.emittedClass = emittedClass;
+            this.numEmittedResults = parent.numEmittedResults+1;
+        }
         
-        /*** Match result class ***************************************************/
+        
         /**
          * returns the union of this and another MatchResult, but
          * only if the argIndex and number of result elements match
          */
         MatchResult union(MatchResult other){
             if (numMatched == other.numMatched && numEmittedResults == other.numEmittedResults){
-                MatchResult result = new MatchResult();
-                result.numMatched = numMatched;
-                result.p1 = this; result.p2 = other;
-                result.numEmittedResults = numEmittedResults;
+                MatchResult result = new MatchResult(this);
+                result.p2 = other;
                 return result;
             } else {
                 throw new UnsupportedOperationException(
@@ -87,10 +106,8 @@ public class ClassPropTools {
          * returns a MatchResult which advances argIndex by one, and refers back to this
          */
         MatchResult next(){
-            MatchResult result = new MatchResult();
+            MatchResult result = new MatchResult(this);
             result.numMatched = this.numMatched+1;
-            result.p1 = this;
-            result.numEmittedResults = numEmittedResults;
             return result;
         }
         
@@ -98,12 +115,7 @@ public class ClassPropTools {
          * returns a match result which adds the given result, and refers back to this
          */
         MatchResult emit(ClassReference classRef){
-            MatchResult result = new MatchResult();
-            result.emittedClass = classRef;
-            result.numMatched = this.numMatched;
-            result.p1 = this;
-            result.numEmittedResults = numEmittedResults+1;
-            return result;
+            return new MatchResult(this,classRef);
         }
         
         /**
@@ -257,20 +269,65 @@ public class ClassPropTools {
                         equals(inputClasses.get(num))) return previousMatchResult.next();
                 return null;
             } else { //isright
+                //TODO should catch the index out of bounds exception?
                 return previousMatchResult.emit(inputClasses.get(num));
             }
         }
     }
+    //none - matches anything without advancing the numMatched, emits nothing
+    public static class MCNone extends MC{
+        public String toString() { return "none"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+            return previousMatchResult;
+        }
+        
+    }
+    //coerce(list of argument MCBuiltin, target MCBuiltin, MC affeced expr)
+    //example: coerce([char,logical], double, (numerical&numerical)>double )
+    public static class MCCoerce extends MC{
+        HashSet<ClassReference> subsClasses = new HashSet<ClassReference>();
+        ClassReference targetClass;
+        MC tree;
+        public MCCoerce(Collection<MCBuiltin> from,MCBuiltin target,MC tree){
+            this.tree = tree;
+            this.targetClass = target.classRef;
+            for (MCBuiltin builtin : from){
+                subsClasses.add(builtin.classRef);
+            }
+        }
+        public String toString() {
+            return "coerce("+subsClasses+","+targetClass+","+tree+")";
+        }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+            //substitue arg values with coerced version and do match on the tree
+            ArrayList<ClassReference> newInputClasses = 
+                new ArrayList<ClassReference>(inputClasses.size());
+            for(int i = 0; i < inputClasses.size(); i++){
+                if (subsClasses.contains(inputClasses.get(i))){
+                    newInputClasses.add(targetClass);
+                } else {
+                    newInputClasses.add(inputClasses.get(i));
+                }
+            }
+            return tree.match(isLeft, previousMatchResult, newInputClasses, inputValues);
+        }
+        
+    }
+    
     
     
     /**
      * main for testing
      */
     public static void main(String[] args) {
-        MC dbl = new MCBuiltin("double");
-        MC chr = new MCBuiltin("char");
-        MC itg = new MCBuiltin("int16");
-        MC log = new MCBuiltin("logical");
+        MCBuiltin dbl = new MCBuiltin("double");
+        MCBuiltin chr = new MCBuiltin("char");
+        MCBuiltin itg = new MCBuiltin("int16");
+        MCBuiltin log = new MCBuiltin("logical");
         
         MC a = new MCMap(new MCUnion(dbl,chr),new MCChain(log,itg));
         System.out.println();
@@ -313,7 +370,37 @@ public class ClassPropTools {
         printMatch(e,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
         printMatch(e,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
         printMatch(e,PrimitiveClassReference.DOUBLE);
-    
+        
+        
+        MC f = (new MCChain(dbl,dbl));
+        System.out.println();
+        System.out.println(f);
+        printMatch(f,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f,PrimitiveClassReference.DOUBLE);
+
+        MC f2 = new MCMap(new MCChain(dbl,dbl),new MCNone());
+        System.out.println();
+        System.out.println(f2);
+        printMatch(f2,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f2,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f2,PrimitiveClassReference.DOUBLE);
+
+        MC f3 = new MCMap(new MCNone(), new MCChain(dbl,dbl));
+        System.out.println();
+        System.out.println(f3);
+        printMatch(f3,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f3,PrimitiveClassReference.DOUBLE);
+        printMatch(f3);
+
+        MC f4 = new MCCoerce(Arrays.asList(itg,chr), dbl, 
+                new MCMap(new MCChain(dbl,dbl),new MCChain(new MCNum(0),new MCNum(1))));
+        System.out.println();
+        System.out.println(f4);
+        printMatch(f4,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
+        printMatch(f4,PrimitiveClassReference.CHAR,PrimitiveClassReference.INT16);
+        printMatch(f4,PrimitiveClassReference.INT16,PrimitiveClassReference.CHAR);
+        
     }
     /**
      * for testing
