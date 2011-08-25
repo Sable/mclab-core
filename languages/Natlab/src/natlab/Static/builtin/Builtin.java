@@ -68,60 +68,30 @@ public abstract class Builtin {
 
     //static initializer fills in builtinMap
     static {
-        builtinMap.put("i",I.getInstance());
-        builtinMap.put("j",J.getInstance());
         builtinMap.put("pi",Pi.getInstance());
-        builtinMap.put("colon",Colon.getInstance());
-        builtinMap.put("horzcat",Horzcat.getInstance());
-        builtinMap.put("vertcat",Vertcat.getInstance());
-        builtinMap.put("cat",Cat.getInstance());
-        builtinMap.put("nargin",Nargin.getInstance());
-        builtinMap.put("nargout",Nargout.getInstance());
-        builtinMap.put("mfilename",Mfilename.getInstance());
-        builtinMap.put("end",End.getInstance());
-        builtinMap.put("isequalwithequalnans",Isequalwithequalnans.getInstance());
-        builtinMap.put("isequal",Isequal.getInstance());
-        builtinMap.put("subsasgn",Subsasgn.getInstance());
-        builtinMap.put("subsref",Subsref.getInstance());
-        builtinMap.put("histc",Histc.getInstance());
-        builtinMap.put("structfun",Structfun.getInstance());
-        builtinMap.put("arrayfun",Arrayfun.getInstance());
-        builtinMap.put("cellfun",Cellfun.getInstance());
-        builtinMap.put("eq",Eq.getInstance());
-        builtinMap.put("ne",Ne.getInstance());
-        builtinMap.put("lt",Lt.getInstance());
-        builtinMap.put("le",Le.getInstance());
-        builtinMap.put("ge",Ge.getInstance());
-        builtinMap.put("gt",Gt.getInstance());
-        builtinMap.put("and",And.getInstance());
-        builtinMap.put("or",Or.getInstance());
-        builtinMap.put("xor",Xor.getInstance());
+        builtinMap.put("test",Test.getInstance());
+        builtinMap.put("transpose",Transpose.getInstance());
+        builtinMap.put("ctranspose",Ctranspose.getInstance());
+        builtinMap.put("tril",Tril.getInstance());
+        builtinMap.put("triu",Triu.getInstance());
+        builtinMap.put("dimensionCollapsingAnyMatrixFunction",DimensionCollapsingAnyMatrixFunction.getInstance());
+        builtinMap.put("fix",Fix.getInstance());
+        builtinMap.put("round",Round.getInstance());
+        builtinMap.put("floor",Floor.getInstance());
+        builtinMap.put("ceil",Ceil.getInstance());
+        builtinMap.put("matrixUnaryNumericMatrixFunction",MatrixUnaryNumericMatrixFunction.getInstance());
         builtinMap.put("plus",Plus.getInstance());
         builtinMap.put("minus",Minus.getInstance());
-        builtinMap.put("mtimes",Mtimes.getInstance());
-        builtinMap.put("mpower",Mpower.getInstance());
-        builtinMap.put("mldivide",Mldivide.getInstance());
-        builtinMap.put("mrdivide",Mrdivide.getInstance());
         builtinMap.put("times",Times.getInstance());
         builtinMap.put("ldivide",Ldivide.getInstance());
         builtinMap.put("rdivide",Rdivide.getInstance());
-        builtinMap.put("power",Power.getInstance());
-        builtinMap.put("pow2",Pow2.getInstance());
         builtinMap.put("mod",Mod.getInstance());
         builtinMap.put("rem",Rem.getInstance());
-        builtinMap.put("hypot",Hypot.getInstance());
-        builtinMap.put("uplus",Uplus.getInstance());
-        builtinMap.put("uminus",Uminus.getInstance());
-        builtinMap.put("conj",Conj.getInstance());
-        builtinMap.put("real",Real.getInstance());
-        builtinMap.put("imag",Imag.getInstance());
-        builtinMap.put("abs",Abs.getInstance());
-        builtinMap.put("transpose",Transpose.getInstance());
-        builtinMap.put("ctranspose",Ctranspose.getInstance());
-        builtinMap.put("expm",Expm.getInstance());
-        builtinMap.put("sqrtm",Sqrtm.getInstance());
-        builtinMap.put("logm",Logm.getInstance());
-        builtinMap.put("not",Not.getInstance());
+        builtinMap.put("mtimes",Mtimes.getInstance());
+        builtinMap.put("mldivide",Mldivide.getInstance());
+        builtinMap.put("mrdivide",Mrdivide.getInstance());
+        builtinMap.put("min",Min.getInstance());
+        builtinMap.put("max",Max.getInstance());
         builtinMap.put("sqrt",Sqrt.getInstance());
         builtinMap.put("realsqrt",Realsqrt.getInstance());
         builtinMap.put("erf",Erf.getInstance());
@@ -173,122 +143,43 @@ public abstract class Builtin {
         builtinMap.put("acoth",Acoth.getInstance());
         builtinMap.put("asech",Asech.getInstance());
         builtinMap.put("acsch",Acsch.getInstance());
-        builtinMap.put("fix",Fix.getInstance());
-        builtinMap.put("round",Round.getInstance());
-        builtinMap.put("floor",Floor.getInstance());
-        builtinMap.put("ceil",Ceil.getInstance());
-        builtinMap.put("inv",Inv.getInstance());
+        builtinMap.put("logm",Logm.getInstance());
+        builtinMap.put("sqrtm",Sqrtm.getInstance());
+        builtinMap.put("expm",Expm.getInstance());
+        builtinMap.put("hypot",Hypot.getInstance());
+        builtinMap.put("cumsum",Cumsum.getInstance());
         builtinMap.put("eig",Eig.getInstance());
         builtinMap.put("norm",Norm.getInstance());
-        builtinMap.put("rank",Rank.getInstance());
-        builtinMap.put("det",Det.getInstance());
-        builtinMap.put("dot",Dot.getInstance());
-        builtinMap.put("cross",Cross.getInstance());
-        builtinMap.put("linsolve",Linsolve.getInstance());
+        builtinMap.put("cond",Cond.getInstance());
         builtinMap.put("rcond",Rcond.getInstance());
-        builtinMap.put("tril",Tril.getInstance());
-        builtinMap.put("triu",Triu.getInstance());
-        builtinMap.put("eps",Eps.getInstance());
-        builtinMap.put("ifftn",Ifftn.getInstance());
-        builtinMap.put("fftn",Fftn.getInstance());
-        builtinMap.put("fft",Fft.getInstance());
+        builtinMap.put("det",Det.getInstance());
+        builtinMap.put("linsolve",Linsolve.getInstance());
         builtinMap.put("schur",Schur.getInstance());
         builtinMap.put("ordschur",Ordschur.getInstance());
         builtinMap.put("lu",Lu.getInstance());
         builtinMap.put("chol",Chol.getInstance());
-        builtinMap.put("qr",Qr.getInstance());
         builtinMap.put("svd",Svd.getInstance());
-        builtinMap.put("bitand",Bitand.getInstance());
-        builtinMap.put("bitor",Bitor.getInstance());
-        builtinMap.put("bitxor",Bitxor.getInstance());
-        builtinMap.put("bitcmp",Bitcmp.getInstance());
-        builtinMap.put("bitget",Bitget.getInstance());
-        builtinMap.put("bitshift",Bitshift.getInstance());
-        builtinMap.put("bitset",Bitset.getInstance());
-        builtinMap.put("strncmpi",Strncmpi.getInstance());
-        builtinMap.put("strcmp",Strcmp.getInstance());
-        builtinMap.put("strcmpi",Strcmpi.getInstance());
-        builtinMap.put("strtrim",Strtrim.getInstance());
-        builtinMap.put("strfind",Strfind.getInstance());
-        builtinMap.put("findstr",Findstr.getInstance());
-        builtinMap.put("strrep",Strrep.getInstance());
-        builtinMap.put("upper",Upper.getInstance());
-        builtinMap.put("lower",Lower.getInstance());
-        builtinMap.put("deblank",Deblank.getInstance());
-        builtinMap.put("regexptranslate",Regexptranslate.getInstance());
-        builtinMap.put("regexp",Regexp.getInstance());
-        builtinMap.put("regexpi",Regexpi.getInstance());
-        builtinMap.put("tegexprep",Tegexprep.getInstance());
-        builtinMap.put("double",Double.getInstance());
-        builtinMap.put("single",Single.getInstance());
-        builtinMap.put("char",Char.getInstance());
-        builtinMap.put("logical",Logical.getInstance());
-        builtinMap.put("int8",Int8.getInstance());
-        builtinMap.put("int16",Int16.getInstance());
-        builtinMap.put("int32",Int32.getInstance());
-        builtinMap.put("int64",Int64.getInstance());
-        builtinMap.put("uint8",Uint8.getInstance());
-        builtinMap.put("uint16",Uint16.getInstance());
-        builtinMap.put("uint32",Uint32.getInstance());
-        builtinMap.put("uint64",Uint64.getInstance());
-        builtinMap.put("cell",Cell.getInstance());
-        builtinMap.put("struct",Struct.getInstance());
-        builtinMap.put("cell2struct",Cell2struct.getInstance());
-        builtinMap.put("struct2cell",Struct2cell.getInstance());
-        builtinMap.put("typecast",Typecast.getInstance());
-        builtinMap.put("cast",Cast.getInstance());
-        builtinMap.put("isfield",Isfield.getInstance());
-        builtinMap.put("class",Class.getInstance());
-        builtinMap.put("methodnames",Methodnames.getInstance());
-        builtinMap.put("fieldnames",Fieldnames.getInstance());
-        builtinMap.put("isempty",Isempty.getInstance());
-        builtinMap.put("isobject",Isobject.getInstance());
-        builtinMap.put("isfloat",Isfloat.getInstance());
-        builtinMap.put("isinteger",Isinteger.getInstance());
-        builtinMap.put("islogical",Islogical.getInstance());
-        builtinMap.put("isstruct",Isstruct.getInstance());
-        builtinMap.put("ischar",Ischar.getInstance());
-        builtinMap.put("iscell",Iscell.getInstance());
-        builtinMap.put("isa",Isa.getInstance());
-        builtinMap.put("sort",Sort.getInstance());
-        builtinMap.put("unique",Unique.getInstance());
-        builtinMap.put("find",Find.getInstance());
-        builtinMap.put("diag",Diag.getInstance());
-        builtinMap.put("reshape",Reshape.getInstance());
-        builtinMap.put("permute",Permute.getInstance());
-        builtinMap.put("squeeze",Squeeze.getInstance());
-        builtinMap.put("complex",Complex.getInstance());
-        builtinMap.put("prod",Prod.getInstance());
-        builtinMap.put("sum",Sum.getInstance());
-        builtinMap.put("mean",Mean.getInstance());
-        builtinMap.put("min",Min.getInstance());
-        builtinMap.put("max",Max.getInstance());
-        builtinMap.put("ones",Ones.getInstance());
-        builtinMap.put("zeros",Zeros.getInstance());
-        builtinMap.put("eye",Eye.getInstance());
-        builtinMap.put("inf",Inf.getInstance());
-        builtinMap.put("nan",Nan.getInstance());
-        builtinMap.put("true",True.getInstance());
-        builtinMap.put("false",False.getInstance());
-        builtinMap.put("size",Size.getInstance());
-        builtinMap.put("nonzeros",Nonzeros.getInstance());
-        builtinMap.put("cumprod",Cumprod.getInstance());
-        builtinMap.put("cumsum",Cumsum.getInstance());
-        builtinMap.put("sign",Sign.getInstance());
-        builtinMap.put("length",Length.getInstance());
-        builtinMap.put("ndims",Ndims.getInstance());
-        builtinMap.put("numel",Numel.getInstance());
+        builtinMap.put("qr",Qr.getInstance());
+        builtinMap.put("bitMatrixFunction",BitMatrixFunction.getInstance());
+        builtinMap.put("charMatrixFunction",CharMatrixFunction.getInstance());
+        builtinMap.put("eq",Eq.getInstance());
+        builtinMap.put("ne",Ne.getInstance());
+        builtinMap.put("lt",Lt.getInstance());
+        builtinMap.put("gt",Gt.getInstance());
+        builtinMap.put("le",Le.getInstance());
+        builtinMap.put("ge",Ge.getInstance());
+        builtinMap.put("and",And.getInstance());
+        builtinMap.put("or",Or.getInstance());
+        builtinMap.put("xor",Xor.getInstance());
+        builtinMap.put("constructor",Constructor.getInstance());
         builtinMap.put("nnz",Nnz.getInstance());
+        builtinMap.put("not",Not.getInstance());
         builtinMap.put("any",Any.getInstance());
         builtinMap.put("all",All.getInstance());
-        builtinMap.put("isemtpy",Isemtpy.getInstance());
-        builtinMap.put("isnan",Isnan.getInstance());
-        builtinMap.put("isinf",Isinf.getInstance());
-        builtinMap.put("isfinite",Isfinite.getInstance());
-        builtinMap.put("isvector",Isvector.getInstance());
-        builtinMap.put("isscalar",Isscalar.getInstance());
-        builtinMap.put("isreal",Isreal.getInstance());
-        builtinMap.put("isnumeric",Isnumeric.getInstance());
+        builtinMap.put("cellFunction",CellFunction.getInstance());
+        builtinMap.put("structFunction",StructFunction.getInstance());
+        builtinMap.put("objectFunction",ObjectFunction.getInstance());
+        builtinMap.put("matrixOrCellOfStringsFunction",MatrixOrCellOfStringsFunction.getInstance());
         builtinMap.put("superiorto",Superiorto.getInstance());
         builtinMap.put("exit",Exit.getInstance());
         builtinMap.put("quit",Quit.getInstance());
@@ -362,59 +253,28 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractConstant extends AbstractPureFunction  {
+    public static abstract class AbstractMatrixFunction extends AbstractPureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractAnyMatrixFunction extends AbstractMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractAnyMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractConstant extends AbstractAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractConstant(this,arg);
         }
         
     }
-    public static abstract class AbstractNumericalConstant extends AbstractConstant implements ArityDefined {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractNumericalConstant(this,arg);
-        }
-        
-        public int getMaxNumOfArgs(){ return 0; }
-        public int getMinNumOfArgs(){ return 0; }
-        public boolean isVariadic(){ return 0==0; }
-
-    }
-    public static class I extends AbstractNumericalConstant  {
-        //returns the singleton instance of this class
-        private static I singleton = null;
-        public static I getInstance(){
-            if (singleton == null) singleton = new I();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseI(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "i";
-        }
-        
-    }
-    public static class J extends AbstractNumericalConstant  {
-        //returns the singleton instance of this class
-        private static J singleton = null;
-        public static J getInstance(){
-            if (singleton == null) singleton = new J();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseJ(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "j";
-        }
-        
-    }
-    public static class Pi extends AbstractNumericalConstant  {
+    public static class Pi extends AbstractConstant  {
         //returns the singleton instance of this class
         private static Pi singleton = null;
         public static Pi getInstance(){
@@ -431,481 +291,399 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractOperator extends AbstractPureFunction  {
+    public static abstract class AbstractStrictAnyMatrixFunction extends AbstractAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractOperator(this,arg);
+            return visitor.caseAbstractStrictAnyMatrixFunction(this,arg);
         }
         
     }
-    public static class Colon extends AbstractOperator  {
+    public static abstract class AbstractUnaryAnyMatrixFunction extends AbstractStrictAnyMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryAnyMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryAnyMatrixFunction(this,arg);
+        }
+        
+    }
+    public static class Test extends AbstractElementalUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
-        private static Colon singleton = null;
-        public static Colon getInstance(){
-            if (singleton == null) singleton = new Colon();
+        private static Test singleton = null;
+        public static Test getInstance(){
+            if (singleton == null) singleton = new Test();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseColon(this,arg);
+            return visitor.caseTest(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "colon";
+            return "test";
         }
         
+        private final ClassPropTools.MC classPropInfo = getParentMatlabClassPropagationInfo();
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
     }
-    public static class Horzcat extends AbstractOperator  {
+    public static abstract class AbstractMatrixUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction implements ClassPropagationDefined {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixUnaryAnyMatrixFunction(this,arg);
+        }
+        
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double"));
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
+    }
+    public static class Transpose extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
-        private static Horzcat singleton = null;
-        public static Horzcat getInstance(){
-            if (singleton == null) singleton = new Horzcat();
+        private static Transpose singleton = null;
+        public static Transpose getInstance(){
+            if (singleton == null) singleton = new Transpose();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseHorzcat(this,arg);
+            return visitor.caseTranspose(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "horzcat";
+            return "transpose";
         }
         
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCNum(1)),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")));
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
     }
-    public static class Vertcat extends AbstractOperator  {
+    public static class Ctranspose extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
-        private static Vertcat singleton = null;
-        public static Vertcat getInstance(){
-            if (singleton == null) singleton = new Vertcat();
+        private static Ctranspose singleton = null;
+        public static Ctranspose getInstance(){
+            if (singleton == null) singleton = new Ctranspose();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseVertcat(this,arg);
+            return visitor.caseCtranspose(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "vertcat";
+            return "ctranspose";
         }
         
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCChain(getParentMatlabClassPropagationInfo(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNone()));
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
     }
-    public static class Cat extends AbstractOperator  {
+    public static class Tril extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
-        private static Cat singleton = null;
-        public static Cat getInstance(){
-            if (singleton == null) singleton = new Cat();
+        private static Tril singleton = null;
+        public static Tril getInstance(){
+            if (singleton == null) singleton = new Tril();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCat(this,arg);
+            return visitor.caseTril(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "cat";
+            return "tril";
         }
         
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCCoerce(java.util.Arrays.asList(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")));
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
     }
-    public static class Nargin extends AbstractOperator  {
+    public static class Triu extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
-        private static Nargin singleton = null;
-        public static Nargin getInstance(){
-            if (singleton == null) singleton = new Nargin();
+        private static Triu singleton = null;
+        public static Triu getInstance(){
+            if (singleton == null) singleton = new Triu();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNargin(this,arg);
+            return visitor.caseTriu(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "nargin";
+            return "triu";
+        }
+        
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")))),new ClassPropTools.MCBuiltin("double"));
+        private ClassPropTools.MC parentClassPropInfo = null;
+        
+        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
+            if(parentClassPropInfo == null){
+                try{ //check if parent implements ClassPropagationDefined, and get field if it does
+                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
+                        parentClassPropInfo =
+                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
+                    }
+                } catch (Exception e) {
+                    parentClassPropInfo = new ClassPropTools.MCNone();
+                }
+            }
+            return parentClassPropInfo;
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
+
+    }
+    public static abstract class AbstractFlexibleAnyMatrixFunction extends AbstractAnyMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFlexibleAnyMatrixFunction(this,arg);
         }
         
     }
-    public static class Nargout extends AbstractOperator  {
+    public static class DimensionCollapsingAnyMatrixFunction extends AbstractFlexibleAnyMatrixFunction  {
         //returns the singleton instance of this class
-        private static Nargout singleton = null;
-        public static Nargout getInstance(){
-            if (singleton == null) singleton = new Nargout();
+        private static DimensionCollapsingAnyMatrixFunction singleton = null;
+        public static DimensionCollapsingAnyMatrixFunction getInstance(){
+            if (singleton == null) singleton = new DimensionCollapsingAnyMatrixFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNargout(this,arg);
+            return visitor.caseDimensionCollapsingAnyMatrixFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "nargout";
+            return "dimensionCollapsingAnyMatrixFunction";
         }
         
     }
-    public static class Mfilename extends AbstractOperator  {
+    public static abstract class AbstractNumericMatrixFunction extends AbstractMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractStrictNumericMatrixFunction extends AbstractNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractStrictNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractUnaryNumericMatrixFunction extends AbstractStrictNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractElementalUnaryNumericMatrixFunction extends AbstractUnaryNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractRoundingOperation extends AbstractElementalUnaryNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRoundingOperation(this,arg);
+        }
+        
+    }
+    public static class Fix extends AbstractRoundingOperation  {
         //returns the singleton instance of this class
-        private static Mfilename singleton = null;
-        public static Mfilename getInstance(){
-            if (singleton == null) singleton = new Mfilename();
+        private static Fix singleton = null;
+        public static Fix getInstance(){
+            if (singleton == null) singleton = new Fix();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMfilename(this,arg);
+            return visitor.caseFix(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "mfilename";
+            return "fix";
         }
         
     }
-    public static class End extends AbstractOperator  {
+    public static class Round extends AbstractRoundingOperation  {
         //returns the singleton instance of this class
-        private static End singleton = null;
-        public static End getInstance(){
-            if (singleton == null) singleton = new End();
+        private static Round singleton = null;
+        public static Round getInstance(){
+            if (singleton == null) singleton = new Round();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseEnd(this,arg);
+            return visitor.caseRound(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "end";
+            return "round";
         }
         
     }
-    public static class Isequalwithequalnans extends AbstractOperator  {
+    public static class Floor extends AbstractRoundingOperation  {
         //returns the singleton instance of this class
-        private static Isequalwithequalnans singleton = null;
-        public static Isequalwithequalnans getInstance(){
-            if (singleton == null) singleton = new Isequalwithequalnans();
+        private static Floor singleton = null;
+        public static Floor getInstance(){
+            if (singleton == null) singleton = new Floor();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsequalwithequalnans(this,arg);
+            return visitor.caseFloor(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isequalwithequalnans";
+            return "floor";
         }
         
     }
-    public static class Isequal extends AbstractOperator  {
+    public static class Ceil extends AbstractRoundingOperation  {
         //returns the singleton instance of this class
-        private static Isequal singleton = null;
-        public static Isequal getInstance(){
-            if (singleton == null) singleton = new Isequal();
+        private static Ceil singleton = null;
+        public static Ceil getInstance(){
+            if (singleton == null) singleton = new Ceil();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsequal(this,arg);
+            return visitor.caseCeil(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isequal";
+            return "ceil";
         }
         
     }
-    public static class Subsasgn extends AbstractOperator  {
+    public static class MatrixUnaryNumericMatrixFunction extends AbstractUnaryNumericMatrixFunction  {
         //returns the singleton instance of this class
-        private static Subsasgn singleton = null;
-        public static Subsasgn getInstance(){
-            if (singleton == null) singleton = new Subsasgn();
+        private static MatrixUnaryNumericMatrixFunction singleton = null;
+        public static MatrixUnaryNumericMatrixFunction getInstance(){
+            if (singleton == null) singleton = new MatrixUnaryNumericMatrixFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSubsasgn(this,arg);
+            return visitor.caseMatrixUnaryNumericMatrixFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "subsasgn";
+            return "matrixUnaryNumericMatrixFunction";
         }
         
     }
-    public static class Subsref extends AbstractOperator  {
-        //returns the singleton instance of this class
-        private static Subsref singleton = null;
-        public static Subsref getInstance(){
-            if (singleton == null) singleton = new Subsref();
-            return singleton;
-        }
+    public static abstract class AbstractBinaryNumericMatrixFunction extends AbstractStrictNumericMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSubsref(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "subsref";
+            return visitor.caseAbstractBinaryNumericMatrixFunction(this,arg);
         }
         
     }
-    public static class Histc extends AbstractOperator  {
-        //returns the singleton instance of this class
-        private static Histc singleton = null;
-        public static Histc getInstance(){
-            if (singleton == null) singleton = new Histc();
-            return singleton;
-        }
+    public static abstract class AbstractElementalBinaryNumericMatrixFunction extends AbstractBinaryNumericMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseHistc(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "histc";
+            return visitor.caseAbstractElementalBinaryNumericMatrixFunction(this,arg);
         }
         
     }
-    public static abstract class AbstractMapOperator extends AbstractOperator  {
+    public static abstract class AbstractElemnetalBinaryArithmeticFunction extends AbstractElementalBinaryNumericMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractMapOperator(this,arg);
+            return visitor.caseAbstractElemnetalBinaryArithmeticFunction(this,arg);
         }
         
     }
-    public static class Structfun extends AbstractMapOperator  {
-        //returns the singleton instance of this class
-        private static Structfun singleton = null;
-        public static Structfun getInstance(){
-            if (singleton == null) singleton = new Structfun();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStructfun(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "structfun";
-        }
-        
-    }
-    public static class Arrayfun extends AbstractMapOperator  {
-        //returns the singleton instance of this class
-        private static Arrayfun singleton = null;
-        public static Arrayfun getInstance(){
-            if (singleton == null) singleton = new Arrayfun();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseArrayfun(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "arrayfun";
-        }
-        
-    }
-    public static class Cellfun extends AbstractMapOperator  {
-        //returns the singleton instance of this class
-        private static Cellfun singleton = null;
-        public static Cellfun getInstance(){
-            if (singleton == null) singleton = new Cellfun();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCellfun(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cellfun";
-        }
-        
-    }
-    public static abstract class AbstractBinaryOperator extends AbstractOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractBinaryOperator(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractRelationalOperator extends AbstractBinaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractRelationalOperator(this,arg);
-        }
-        
-    }
-    public static class Eq extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Eq singleton = null;
-        public static Eq getInstance(){
-            if (singleton == null) singleton = new Eq();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseEq(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "eq";
-        }
-        
-    }
-    public static class Ne extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Ne singleton = null;
-        public static Ne getInstance(){
-            if (singleton == null) singleton = new Ne();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNe(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ne";
-        }
-        
-    }
-    public static class Lt extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Lt singleton = null;
-        public static Lt getInstance(){
-            if (singleton == null) singleton = new Lt();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLt(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "lt";
-        }
-        
-    }
-    public static class Le extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Le singleton = null;
-        public static Le getInstance(){
-            if (singleton == null) singleton = new Le();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLe(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "le";
-        }
-        
-    }
-    public static class Ge extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Ge singleton = null;
-        public static Ge getInstance(){
-            if (singleton == null) singleton = new Ge();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseGe(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ge";
-        }
-        
-    }
-    public static class Gt extends AbstractRelationalOperator  {
-        //returns the singleton instance of this class
-        private static Gt singleton = null;
-        public static Gt getInstance(){
-            if (singleton == null) singleton = new Gt();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseGt(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "gt";
-        }
-        
-    }
-    public static abstract class AbstractBinaryLogicalOperator extends AbstractBinaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractBinaryLogicalOperator(this,arg);
-        }
-        
-    }
-    public static class And extends AbstractBinaryLogicalOperator  {
-        //returns the singleton instance of this class
-        private static And singleton = null;
-        public static And getInstance(){
-            if (singleton == null) singleton = new And();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAnd(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "and";
-        }
-        
-    }
-    public static class Or extends AbstractBinaryLogicalOperator  {
-        //returns the singleton instance of this class
-        private static Or singleton = null;
-        public static Or getInstance(){
-            if (singleton == null) singleton = new Or();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseOr(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "or";
-        }
-        
-    }
-    public static class Xor extends AbstractBinaryLogicalOperator  {
-        //returns the singleton instance of this class
-        private static Xor singleton = null;
-        public static Xor getInstance(){
-            if (singleton == null) singleton = new Xor();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseXor(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "xor";
-        }
-        
-    }
-    public static abstract class AbstractNumericalBinaryOperator extends AbstractBinaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractNumericalBinaryOperator(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractMatrixBinaryOperator extends AbstractNumericalBinaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractMatrixBinaryOperator(this,arg);
-        }
-        
-    }
-    public static class Plus extends AbstractMatrixBinaryOperator  {
+    public static class Plus extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Plus singleton = null;
         public static Plus getInstance(){
@@ -922,7 +700,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Minus extends AbstractMatrixBinaryOperator  {
+    public static class Minus extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Minus singleton = null;
         public static Minus getInstance(){
@@ -939,82 +717,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Mtimes extends AbstractMatrixBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Mtimes singleton = null;
-        public static Mtimes getInstance(){
-            if (singleton == null) singleton = new Mtimes();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMtimes(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "mtimes";
-        }
-        
-    }
-    public static class Mpower extends AbstractMatrixBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Mpower singleton = null;
-        public static Mpower getInstance(){
-            if (singleton == null) singleton = new Mpower();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMpower(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "mpower";
-        }
-        
-    }
-    public static class Mldivide extends AbstractMatrixBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Mldivide singleton = null;
-        public static Mldivide getInstance(){
-            if (singleton == null) singleton = new Mldivide();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMldivide(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "mldivide";
-        }
-        
-    }
-    public static class Mrdivide extends AbstractMatrixBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Mrdivide singleton = null;
-        public static Mrdivide getInstance(){
-            if (singleton == null) singleton = new Mrdivide();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMrdivide(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "mrdivide";
-        }
-        
-    }
-    public static abstract class AbstractElementwiseBinaryOperator extends AbstractNumericalBinaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractElementwiseBinaryOperator(this,arg);
-        }
-        
-    }
-    public static class Times extends AbstractElementwiseBinaryOperator  {
+    public static class Times extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Times singleton = null;
         public static Times getInstance(){
@@ -1031,7 +734,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Ldivide extends AbstractElementwiseBinaryOperator  {
+    public static class Ldivide extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Ldivide singleton = null;
         public static Ldivide getInstance(){
@@ -1048,7 +751,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Rdivide extends AbstractElementwiseBinaryOperator  {
+    public static class Rdivide extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Rdivide singleton = null;
         public static Rdivide getInstance(){
@@ -1065,41 +768,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Power extends AbstractElementwiseBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Power singleton = null;
-        public static Power getInstance(){
-            if (singleton == null) singleton = new Power();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.casePower(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "power";
-        }
-        
-    }
-    public static class Pow2 extends AbstractElementwiseBinaryOperator  {
-        //returns the singleton instance of this class
-        private static Pow2 singleton = null;
-        public static Pow2 getInstance(){
-            if (singleton == null) singleton = new Pow2();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.casePow2(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "pow2";
-        }
-        
-    }
-    public static class Mod extends AbstractElementwiseBinaryOperator  {
+    public static class Mod extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Mod singleton = null;
         public static Mod getInstance(){
@@ -1116,7 +785,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Rem extends AbstractElementwiseBinaryOperator  {
+    public static class Rem extends AbstractElemnetalBinaryArithmeticFunction  {
         //returns the singleton instance of this class
         private static Rem singleton = null;
         public static Rem getInstance(){
@@ -1133,277 +802,148 @@ public abstract class Builtin {
         }
         
     }
-    public static class Hypot extends AbstractElementwiseBinaryOperator  {
+    public static abstract class AbstractMatrixBinaryNumericMatrixFunction extends AbstractBinaryNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixBinaryNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractMatrixBinaryArithmeticFunction extends AbstractMatrixBinaryNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixBinaryArithmeticFunction(this,arg);
+        }
+        
+    }
+    public static class Mtimes extends AbstractMatrixBinaryArithmeticFunction  {
         //returns the singleton instance of this class
-        private static Hypot singleton = null;
-        public static Hypot getInstance(){
-            if (singleton == null) singleton = new Hypot();
+        private static Mtimes singleton = null;
+        public static Mtimes getInstance(){
+            if (singleton == null) singleton = new Mtimes();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseHypot(this,arg);
+            return visitor.caseMtimes(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "hypot";
+            return "mtimes";
         }
         
     }
-    public static abstract class AbstractUnaryOperator extends AbstractOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractUnaryOperator(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractNumericalUnaryOperator extends AbstractUnaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractNumericalUnaryOperator(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractElementwiseUnaryOperator extends AbstractNumericalUnaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractElementwiseUnaryOperator(this,arg);
-        }
-        
-    }
-    public static class Uplus extends AbstractElementwiseUnaryOperator  {
+    public static class Mldivide extends AbstractMatrixBinaryArithmeticFunction  {
         //returns the singleton instance of this class
-        private static Uplus singleton = null;
-        public static Uplus getInstance(){
-            if (singleton == null) singleton = new Uplus();
+        private static Mldivide singleton = null;
+        public static Mldivide getInstance(){
+            if (singleton == null) singleton = new Mldivide();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUplus(this,arg);
+            return visitor.caseMldivide(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "uplus";
+            return "mldivide";
         }
         
     }
-    public static class Uminus extends AbstractElementwiseUnaryOperator  {
+    public static class Mrdivide extends AbstractMatrixBinaryArithmeticFunction  {
         //returns the singleton instance of this class
-        private static Uminus singleton = null;
-        public static Uminus getInstance(){
-            if (singleton == null) singleton = new Uminus();
+        private static Mrdivide singleton = null;
+        public static Mrdivide getInstance(){
+            if (singleton == null) singleton = new Mrdivide();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUminus(this,arg);
+            return visitor.caseMrdivide(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "uminus";
+            return "mrdivide";
         }
         
     }
-    public static class Conj extends AbstractElementwiseUnaryOperator  {
+    public static abstract class AbstractFlexibleNumericMatrixFunction extends AbstractNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFlexibleNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractDimensionCollapsingNumericMatrixFunction extends AbstractFlexibleNumericMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionCollapsingNumericMatrixFunction(this,arg);
+        }
+        
+    }
+    public static class Min extends AbstractDimensionCollapsingNumericMatrixFunction  {
         //returns the singleton instance of this class
-        private static Conj singleton = null;
-        public static Conj getInstance(){
-            if (singleton == null) singleton = new Conj();
+        private static Min singleton = null;
+        public static Min getInstance(){
+            if (singleton == null) singleton = new Min();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseConj(this,arg);
+            return visitor.caseMin(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "conj";
+            return "min";
         }
         
     }
-    public static class Real extends AbstractElementwiseUnaryOperator  {
+    public static class Max extends AbstractDimensionCollapsingNumericMatrixFunction  {
         //returns the singleton instance of this class
-        private static Real singleton = null;
-        public static Real getInstance(){
-            if (singleton == null) singleton = new Real();
+        private static Max singleton = null;
+        public static Max getInstance(){
+            if (singleton == null) singleton = new Max();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseReal(this,arg);
+            return visitor.caseMax(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "real";
+            return "max";
         }
         
     }
-    public static class Imag extends AbstractElementwiseUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Imag singleton = null;
-        public static Imag getInstance(){
-            if (singleton == null) singleton = new Imag();
-            return singleton;
-        }
+    public static abstract class AbstractFloatMatrixFunction extends AbstractMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseImag(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "imag";
+            return visitor.caseAbstractFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Abs extends AbstractElementwiseUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Abs singleton = null;
-        public static Abs getInstance(){
-            if (singleton == null) singleton = new Abs();
-            return singleton;
-        }
+    public static abstract class AbstractStrictFloatMatrixFunction extends AbstractFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbs(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "abs";
+            return visitor.caseAbstractStrictFloatMatrixFunction(this,arg);
         }
         
     }
-    public static abstract class AbstractMatrixUnaryOperator extends AbstractNumericalUnaryOperator  {
+    public static abstract class AbstractUnaryFloatMatrixFunction extends AbstractStrictFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractMatrixUnaryOperator(this,arg);
+            return visitor.caseAbstractUnaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Transpose extends AbstractMatrixUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Transpose singleton = null;
-        public static Transpose getInstance(){
-            if (singleton == null) singleton = new Transpose();
-            return singleton;
-        }
+    public static abstract class AbstractElementalUnaryFloatMatrixFunction extends AbstractUnaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTranspose(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "transpose";
+            return visitor.caseAbstractElementalUnaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Ctranspose extends AbstractMatrixUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Ctranspose singleton = null;
-        public static Ctranspose getInstance(){
-            if (singleton == null) singleton = new Ctranspose();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCtranspose(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ctranspose";
-        }
-        
-    }
-    public static class Expm extends AbstractMatrixUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Expm singleton = null;
-        public static Expm getInstance(){
-            if (singleton == null) singleton = new Expm();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseExpm(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "expm";
-        }
-        
-    }
-    public static class Sqrtm extends AbstractMatrixUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Sqrtm singleton = null;
-        public static Sqrtm getInstance(){
-            if (singleton == null) singleton = new Sqrtm();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSqrtm(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "sqrtm";
-        }
-        
-    }
-    public static class Logm extends AbstractMatrixUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Logm singleton = null;
-        public static Logm getInstance(){
-            if (singleton == null) singleton = new Logm();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLogm(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "logm";
-        }
-        
-    }
-    public static abstract class AbstractLogicalUnaryOperator extends AbstractUnaryOperator  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractLogicalUnaryOperator(this,arg);
-        }
-        
-    }
-    public static class Not extends AbstractLogicalUnaryOperator  {
-        //returns the singleton instance of this class
-        private static Not singleton = null;
-        public static Not getInstance(){
-            if (singleton == null) singleton = new Not();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNot(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "not";
-        }
-        
-    }
-    public static abstract class AbstractMatrixOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractMatrixOperation(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractElementwiseMatrixOperation extends AbstractMatrixOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractElementwiseMatrixOperation(this,arg);
-        }
-        
-    }
-    public static class Sqrt extends AbstractElementwiseMatrixOperation  {
+    public static class Sqrt extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Sqrt singleton = null;
         public static Sqrt getInstance(){
@@ -1420,7 +960,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Realsqrt extends AbstractElementwiseMatrixOperation  {
+    public static class Realsqrt extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Realsqrt singleton = null;
         public static Realsqrt getInstance(){
@@ -1437,7 +977,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Erf extends AbstractElementwiseMatrixOperation  {
+    public static class Erf extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Erf singleton = null;
         public static Erf getInstance(){
@@ -1454,7 +994,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Erfinv extends AbstractElementwiseMatrixOperation  {
+    public static class Erfinv extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Erfinv singleton = null;
         public static Erfinv getInstance(){
@@ -1471,7 +1011,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Erfc extends AbstractElementwiseMatrixOperation  {
+    public static class Erfc extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Erfc singleton = null;
         public static Erfc getInstance(){
@@ -1488,7 +1028,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Erfcinv extends AbstractElementwiseMatrixOperation  {
+    public static class Erfcinv extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Erfcinv singleton = null;
         public static Erfcinv getInstance(){
@@ -1505,7 +1045,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Gamma extends AbstractElementwiseMatrixOperation  {
+    public static class Gamma extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Gamma singleton = null;
         public static Gamma getInstance(){
@@ -1522,7 +1062,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Gammainc extends AbstractElementwiseMatrixOperation  {
+    public static class Gammainc extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Gammainc singleton = null;
         public static Gammainc getInstance(){
@@ -1539,7 +1079,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Betainc extends AbstractElementwiseMatrixOperation  {
+    public static class Betainc extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Betainc singleton = null;
         public static Betainc getInstance(){
@@ -1556,7 +1096,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Gammaln extends AbstractElementwiseMatrixOperation  {
+    public static class Gammaln extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Gammaln singleton = null;
         public static Gammaln getInstance(){
@@ -1573,7 +1113,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Exp extends AbstractElementwiseMatrixOperation  {
+    public static class Exp extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Exp singleton = null;
         public static Exp getInstance(){
@@ -1590,7 +1130,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Log extends AbstractElementwiseMatrixOperation  {
+    public static class Log extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Log singleton = null;
         public static Log getInstance(){
@@ -1607,7 +1147,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Log2 extends AbstractElementwiseMatrixOperation  {
+    public static class Log2 extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Log2 singleton = null;
         public static Log2 getInstance(){
@@ -1624,7 +1164,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Log10 extends AbstractElementwiseMatrixOperation  {
+    public static class Log10 extends AbstractElementalUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
         private static Log10 singleton = null;
         public static Log10 getInstance(){
@@ -1641,7 +1181,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractForwardTrigonometricFunction extends AbstractElementwiseMatrixOperation  {
+    public static abstract class AbstractForwardTrigonometricFunction extends AbstractElementalUnaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractForwardTrigonometricFunction(this,arg);
@@ -1866,7 +1406,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractHyperbolicTrigonometricFunction extends AbstractElementwiseMatrixOperation  {
+    public static abstract class AbstractHyperbolicTrigonometricFunction extends AbstractForwardTrigonometricFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractHyperbolicTrigonometricFunction(this,arg);
@@ -1975,7 +1515,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractInverseTrigonmetricFunction extends AbstractElementwiseMatrixOperation  {
+    public static abstract class AbstractInverseTrigonmetricFunction extends AbstractElementalUnaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractInverseTrigonmetricFunction(this,arg);
@@ -2326,1868 +1866,117 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractRoundingOperation extends AbstractElementwiseMatrixOperation  {
+    public static abstract class AbstractMatrixUnaryFloatMatrixFunction extends AbstractUnaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractRoundingOperation(this,arg);
+            return visitor.caseAbstractMatrixUnaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Fix extends AbstractRoundingOperation  {
-        //returns the singleton instance of this class
-        private static Fix singleton = null;
-        public static Fix getInstance(){
-            if (singleton == null) singleton = new Fix();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFix(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "fix";
-        }
-        
-    }
-    public static class Round extends AbstractRoundingOperation  {
-        //returns the singleton instance of this class
-        private static Round singleton = null;
-        public static Round getInstance(){
-            if (singleton == null) singleton = new Round();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRound(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "round";
-        }
-        
-    }
-    public static class Floor extends AbstractRoundingOperation  {
-        //returns the singleton instance of this class
-        private static Floor singleton = null;
-        public static Floor getInstance(){
-            if (singleton == null) singleton = new Floor();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFloor(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "floor";
-        }
-        
-    }
-    public static class Ceil extends AbstractRoundingOperation  {
-        //returns the singleton instance of this class
-        private static Ceil singleton = null;
-        public static Ceil getInstance(){
-            if (singleton == null) singleton = new Ceil();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCeil(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ceil";
-        }
-        
-    }
-    public static abstract class AbstractMatrixComputation extends AbstractMatrixOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractMatrixComputation(this,arg);
-        }
-        
-    }
-    public static class Inv extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Inv singleton = null;
-        public static Inv getInstance(){
-            if (singleton == null) singleton = new Inv();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInv(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "inv";
-        }
-        
-    }
-    public static class Eig extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Eig singleton = null;
-        public static Eig getInstance(){
-            if (singleton == null) singleton = new Eig();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseEig(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "eig";
-        }
-        
-    }
-    public static class Norm extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Norm singleton = null;
-        public static Norm getInstance(){
-            if (singleton == null) singleton = new Norm();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNorm(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "norm";
-        }
-        
-    }
-    public static class Rank extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Rank singleton = null;
-        public static Rank getInstance(){
-            if (singleton == null) singleton = new Rank();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRank(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "rank";
-        }
-        
-    }
-    public static class Det extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Det singleton = null;
-        public static Det getInstance(){
-            if (singleton == null) singleton = new Det();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseDet(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "det";
-        }
-        
-    }
-    public static class Dot extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Dot singleton = null;
-        public static Dot getInstance(){
-            if (singleton == null) singleton = new Dot();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseDot(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "dot";
-        }
-        
-    }
-    public static class Cross extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Cross singleton = null;
-        public static Cross getInstance(){
-            if (singleton == null) singleton = new Cross();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCross(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cross";
-        }
-        
-    }
-    public static class Linsolve extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Linsolve singleton = null;
-        public static Linsolve getInstance(){
-            if (singleton == null) singleton = new Linsolve();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLinsolve(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "linsolve";
-        }
-        
-    }
-    public static class Rcond extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Rcond singleton = null;
-        public static Rcond getInstance(){
-            if (singleton == null) singleton = new Rcond();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRcond(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "rcond";
-        }
-        
-    }
-    public static class Tril extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Tril singleton = null;
-        public static Tril getInstance(){
-            if (singleton == null) singleton = new Tril();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTril(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "tril";
-        }
-        
-    }
-    public static class Triu extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Triu singleton = null;
-        public static Triu getInstance(){
-            if (singleton == null) singleton = new Triu();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTriu(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "triu";
-        }
-        
-    }
-    public static class Eps extends AbstractMatrixComputation  {
-        //returns the singleton instance of this class
-        private static Eps singleton = null;
-        public static Eps getInstance(){
-            if (singleton == null) singleton = new Eps();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseEps(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "eps";
-        }
-        
-    }
-    public static abstract class AbstractFourierFunction extends AbstractMatrixComputation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractFourierFunction(this,arg);
-        }
-        
-    }
-    public static class Ifftn extends AbstractFourierFunction  {
-        //returns the singleton instance of this class
-        private static Ifftn singleton = null;
-        public static Ifftn getInstance(){
-            if (singleton == null) singleton = new Ifftn();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIfftn(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ifftn";
-        }
-        
-    }
-    public static class Fftn extends AbstractFourierFunction  {
-        //returns the singleton instance of this class
-        private static Fftn singleton = null;
-        public static Fftn getInstance(){
-            if (singleton == null) singleton = new Fftn();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFftn(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "fftn";
-        }
-        
-    }
-    public static class Fft extends AbstractFourierFunction  {
-        //returns the singleton instance of this class
-        private static Fft singleton = null;
-        public static Fft getInstance(){
-            if (singleton == null) singleton = new Fft();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFft(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "fft";
-        }
-        
-    }
-    public static abstract class AbstractFactorization extends AbstractMatrixComputation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractFactorization(this,arg);
-        }
-        
-    }
-    public static class Schur extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Schur singleton = null;
-        public static Schur getInstance(){
-            if (singleton == null) singleton = new Schur();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSchur(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "schur";
-        }
-        
-    }
-    public static class Ordschur extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Ordschur singleton = null;
-        public static Ordschur getInstance(){
-            if (singleton == null) singleton = new Ordschur();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseOrdschur(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ordschur";
-        }
-        
-    }
-    public static class Lu extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Lu singleton = null;
-        public static Lu getInstance(){
-            if (singleton == null) singleton = new Lu();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLu(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "lu";
-        }
-        
-    }
-    public static class Chol extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Chol singleton = null;
-        public static Chol getInstance(){
-            if (singleton == null) singleton = new Chol();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseChol(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "chol";
-        }
-        
-    }
-    public static class Qr extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Qr singleton = null;
-        public static Qr getInstance(){
-            if (singleton == null) singleton = new Qr();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseQr(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "qr";
-        }
-        
-    }
-    public static class Svd extends AbstractFactorization  {
-        //returns the singleton instance of this class
-        private static Svd singleton = null;
-        public static Svd getInstance(){
-            if (singleton == null) singleton = new Svd();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSvd(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "svd";
-        }
-        
-    }
-    public static abstract class AbstractBitOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractBitOperation(this,arg);
-        }
-        
-    }
-    public static class Bitand extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitand singleton = null;
-        public static Bitand getInstance(){
-            if (singleton == null) singleton = new Bitand();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitand(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitand";
-        }
-        
-    }
-    public static class Bitor extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitor singleton = null;
-        public static Bitor getInstance(){
-            if (singleton == null) singleton = new Bitor();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitor(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitor";
-        }
-        
-    }
-    public static class Bitxor extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitxor singleton = null;
-        public static Bitxor getInstance(){
-            if (singleton == null) singleton = new Bitxor();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitxor(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitxor";
-        }
-        
-    }
-    public static class Bitcmp extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitcmp singleton = null;
-        public static Bitcmp getInstance(){
-            if (singleton == null) singleton = new Bitcmp();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitcmp(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitcmp";
-        }
-        
-    }
-    public static class Bitget extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitget singleton = null;
-        public static Bitget getInstance(){
-            if (singleton == null) singleton = new Bitget();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitget(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitget";
-        }
-        
-    }
-    public static class Bitshift extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitshift singleton = null;
-        public static Bitshift getInstance(){
-            if (singleton == null) singleton = new Bitshift();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitshift(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitshift";
-        }
-        
-    }
-    public static class Bitset extends AbstractBitOperation  {
-        //returns the singleton instance of this class
-        private static Bitset singleton = null;
-        public static Bitset getInstance(){
-            if (singleton == null) singleton = new Bitset();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBitset(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "bitset";
-        }
-        
-    }
-    public static abstract class AbstractStringOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractStringOperation(this,arg);
-        }
-        
-    }
-    public static class Strncmpi extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strncmpi singleton = null;
-        public static Strncmpi getInstance(){
-            if (singleton == null) singleton = new Strncmpi();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrncmpi(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strncmpi";
-        }
-        
-    }
-    public static class Strcmp extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strcmp singleton = null;
-        public static Strcmp getInstance(){
-            if (singleton == null) singleton = new Strcmp();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrcmp(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strcmp";
-        }
-        
-    }
-    public static class Strcmpi extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strcmpi singleton = null;
-        public static Strcmpi getInstance(){
-            if (singleton == null) singleton = new Strcmpi();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrcmpi(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strcmpi";
-        }
-        
-    }
-    public static class Strtrim extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strtrim singleton = null;
-        public static Strtrim getInstance(){
-            if (singleton == null) singleton = new Strtrim();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrtrim(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strtrim";
-        }
-        
-    }
-    public static class Strfind extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strfind singleton = null;
-        public static Strfind getInstance(){
-            if (singleton == null) singleton = new Strfind();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrfind(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strfind";
-        }
-        
-    }
-    public static class Findstr extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Findstr singleton = null;
-        public static Findstr getInstance(){
-            if (singleton == null) singleton = new Findstr();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFindstr(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "findstr";
-        }
-        
-    }
-    public static class Strrep extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Strrep singleton = null;
-        public static Strrep getInstance(){
-            if (singleton == null) singleton = new Strrep();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStrrep(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "strrep";
-        }
-        
-    }
-    public static class Upper extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Upper singleton = null;
-        public static Upper getInstance(){
-            if (singleton == null) singleton = new Upper();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUpper(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "upper";
-        }
-        
-    }
-    public static class Lower extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Lower singleton = null;
-        public static Lower getInstance(){
-            if (singleton == null) singleton = new Lower();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLower(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "lower";
-        }
-        
-    }
-    public static class Deblank extends AbstractStringOperation  {
-        //returns the singleton instance of this class
-        private static Deblank singleton = null;
-        public static Deblank getInstance(){
-            if (singleton == null) singleton = new Deblank();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseDeblank(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "deblank";
-        }
-        
-    }
-    public static abstract class AbstractRegexpOperation extends AbstractStringOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractRegexpOperation(this,arg);
-        }
-        
-    }
-    public static class Regexptranslate extends AbstractRegexpOperation  {
-        //returns the singleton instance of this class
-        private static Regexptranslate singleton = null;
-        public static Regexptranslate getInstance(){
-            if (singleton == null) singleton = new Regexptranslate();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRegexptranslate(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "regexptranslate";
-        }
-        
-    }
-    public static class Regexp extends AbstractRegexpOperation  {
-        //returns the singleton instance of this class
-        private static Regexp singleton = null;
-        public static Regexp getInstance(){
-            if (singleton == null) singleton = new Regexp();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRegexp(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "regexp";
-        }
-        
-    }
-    public static class Regexpi extends AbstractRegexpOperation  {
-        //returns the singleton instance of this class
-        private static Regexpi singleton = null;
-        public static Regexpi getInstance(){
-            if (singleton == null) singleton = new Regexpi();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseRegexpi(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "regexpi";
-        }
-        
-    }
-    public static class Tegexprep extends AbstractRegexpOperation  {
-        //returns the singleton instance of this class
-        private static Tegexprep singleton = null;
-        public static Tegexprep getInstance(){
-            if (singleton == null) singleton = new Tegexprep();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTegexprep(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "tegexprep";
-        }
-        
-    }
-    public static abstract class AbstractConstructor extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractConstructor(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractPrimitiveConstructor extends AbstractConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractPrimitiveConstructor(this,arg);
-        }
-        
-    }
-    public static class Double extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Double singleton = null;
-        public static Double getInstance(){
-            if (singleton == null) singleton = new Double();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseDouble(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "double";
-        }
-        
-    }
-    public static class Single extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Single singleton = null;
-        public static Single getInstance(){
-            if (singleton == null) singleton = new Single();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSingle(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "single";
-        }
-        
-    }
-    public static class Char extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Char singleton = null;
-        public static Char getInstance(){
-            if (singleton == null) singleton = new Char();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseChar(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "char";
-        }
-        
-    }
-    public static class Logical extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Logical singleton = null;
-        public static Logical getInstance(){
-            if (singleton == null) singleton = new Logical();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLogical(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "logical";
-        }
-        
-    }
-    public static class Int8 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Int8 singleton = null;
-        public static Int8 getInstance(){
-            if (singleton == null) singleton = new Int8();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInt8(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "int8";
-        }
-        
-    }
-    public static class Int16 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Int16 singleton = null;
-        public static Int16 getInstance(){
-            if (singleton == null) singleton = new Int16();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInt16(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "int16";
-        }
-        
-    }
-    public static class Int32 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Int32 singleton = null;
-        public static Int32 getInstance(){
-            if (singleton == null) singleton = new Int32();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInt32(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "int32";
-        }
-        
-    }
-    public static class Int64 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Int64 singleton = null;
-        public static Int64 getInstance(){
-            if (singleton == null) singleton = new Int64();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInt64(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "int64";
-        }
-        
-    }
-    public static class Uint8 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Uint8 singleton = null;
-        public static Uint8 getInstance(){
-            if (singleton == null) singleton = new Uint8();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUint8(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "uint8";
-        }
-        
-    }
-    public static class Uint16 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Uint16 singleton = null;
-        public static Uint16 getInstance(){
-            if (singleton == null) singleton = new Uint16();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUint16(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "uint16";
-        }
-        
-    }
-    public static class Uint32 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Uint32 singleton = null;
-        public static Uint32 getInstance(){
-            if (singleton == null) singleton = new Uint32();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUint32(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "uint32";
-        }
-        
-    }
-    public static class Uint64 extends AbstractPrimitiveConstructor  {
-        //returns the singleton instance of this class
-        private static Uint64 singleton = null;
-        public static Uint64 getInstance(){
-            if (singleton == null) singleton = new Uint64();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUint64(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "uint64";
-        }
-        
-    }
-    public static abstract class AbstractCompoundConstructor extends AbstractConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractCompoundConstructor(this,arg);
-        }
-        
-    }
-    public static class Cell extends AbstractCompoundConstructor  {
-        //returns the singleton instance of this class
-        private static Cell singleton = null;
-        public static Cell getInstance(){
-            if (singleton == null) singleton = new Cell();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCell(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cell";
-        }
-        
-    }
-    public static class Struct extends AbstractCompoundConstructor  {
-        //returns the singleton instance of this class
-        private static Struct singleton = null;
-        public static Struct getInstance(){
-            if (singleton == null) singleton = new Struct();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStruct(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "struct";
-        }
-        
-    }
-    public static abstract class AbstractConversionFunction extends AbstractConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractConversionFunction(this,arg);
-        }
-        
-    }
-    public static class Cell2struct extends AbstractConversionFunction  {
-        //returns the singleton instance of this class
-        private static Cell2struct singleton = null;
-        public static Cell2struct getInstance(){
-            if (singleton == null) singleton = new Cell2struct();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCell2struct(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cell2struct";
-        }
-        
-    }
-    public static class Struct2cell extends AbstractConversionFunction  {
-        //returns the singleton instance of this class
-        private static Struct2cell singleton = null;
-        public static Struct2cell getInstance(){
-            if (singleton == null) singleton = new Struct2cell();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseStruct2cell(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "struct2cell";
-        }
-        
-    }
-    public static class Typecast extends AbstractConversionFunction  {
-        //returns the singleton instance of this class
-        private static Typecast singleton = null;
-        public static Typecast getInstance(){
-            if (singleton == null) singleton = new Typecast();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTypecast(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "typecast";
-        }
-        
-    }
-    public static class Cast extends AbstractConversionFunction  {
-        //returns the singleton instance of this class
-        private static Cast singleton = null;
-        public static Cast getInstance(){
-            if (singleton == null) singleton = new Cast();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCast(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cast";
-        }
-        
-    }
-    public static abstract class AbstractStructOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractStructOperation(this,arg);
-        }
-        
-    }
-    public static class Isfield extends AbstractStructOperation  {
-        //returns the singleton instance of this class
-        private static Isfield singleton = null;
-        public static Isfield getInstance(){
-            if (singleton == null) singleton = new Isfield();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsfield(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isfield";
-        }
-        
-    }
-    public static abstract class AbstractClassOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractClassOperation(this,arg);
-        }
-        
-    }
-    public static class Class extends AbstractClassOperation  {
-        //returns the singleton instance of this class
-        private static Class singleton = null;
-        public static Class getInstance(){
-            if (singleton == null) singleton = new Class();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseClass(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "class";
-        }
-        
-    }
-    public static abstract class AbstractClassQueryOperation extends AbstractClassOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractClassQueryOperation(this,arg);
-        }
-        
-    }
-    public static class Methodnames extends AbstractClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Methodnames singleton = null;
-        public static Methodnames getInstance(){
-            if (singleton == null) singleton = new Methodnames();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMethodnames(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "methodnames";
-        }
-        
-    }
-    public static class Fieldnames extends AbstractClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Fieldnames singleton = null;
-        public static Fieldnames getInstance(){
-            if (singleton == null) singleton = new Fieldnames();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFieldnames(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "fieldnames";
-        }
-        
-    }
-    public static abstract class AbstractLogicalClassQueryOperation extends AbstractClassQueryOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractLogicalClassQueryOperation(this,arg);
-        }
-        
-    }
-    public static class Isempty extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isempty singleton = null;
-        public static Isempty getInstance(){
-            if (singleton == null) singleton = new Isempty();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsempty(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isempty";
-        }
-        
-    }
-    public static class Isobject extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isobject singleton = null;
-        public static Isobject getInstance(){
-            if (singleton == null) singleton = new Isobject();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsobject(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isobject";
-        }
-        
-    }
-    public static class Isfloat extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isfloat singleton = null;
-        public static Isfloat getInstance(){
-            if (singleton == null) singleton = new Isfloat();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsfloat(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isfloat";
-        }
-        
-    }
-    public static class Isinteger extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isinteger singleton = null;
-        public static Isinteger getInstance(){
-            if (singleton == null) singleton = new Isinteger();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsinteger(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isinteger";
-        }
-        
-    }
-    public static class Islogical extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Islogical singleton = null;
-        public static Islogical getInstance(){
-            if (singleton == null) singleton = new Islogical();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIslogical(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "islogical";
-        }
-        
-    }
-    public static class Isstruct extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isstruct singleton = null;
-        public static Isstruct getInstance(){
-            if (singleton == null) singleton = new Isstruct();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsstruct(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isstruct";
-        }
-        
-    }
-    public static class Ischar extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Ischar singleton = null;
-        public static Ischar getInstance(){
-            if (singleton == null) singleton = new Ischar();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIschar(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ischar";
-        }
-        
-    }
-    public static class Iscell extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Iscell singleton = null;
-        public static Iscell getInstance(){
-            if (singleton == null) singleton = new Iscell();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIscell(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "iscell";
-        }
-        
-    }
-    public static class Isa extends AbstractLogicalClassQueryOperation  {
-        //returns the singleton instance of this class
-        private static Isa singleton = null;
-        public static Isa getInstance(){
-            if (singleton == null) singleton = new Isa();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsa(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isa";
-        }
-        
-    }
-    public static abstract class AbstractArrayOperation extends AbstractPureFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractArrayOperation(this,arg);
-        }
-        
-    }
-    public static class Sort extends AbstractArrayOperation  {
-        //returns the singleton instance of this class
-        private static Sort singleton = null;
-        public static Sort getInstance(){
-            if (singleton == null) singleton = new Sort();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSort(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "sort";
-        }
-        
-    }
-    public static class Unique extends AbstractArrayOperation  {
-        //returns the singleton instance of this class
-        private static Unique singleton = null;
-        public static Unique getInstance(){
-            if (singleton == null) singleton = new Unique();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseUnique(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "unique";
-        }
-        
-    }
-    public static class Find extends AbstractArrayOperation  {
-        //returns the singleton instance of this class
-        private static Find singleton = null;
-        public static Find getInstance(){
-            if (singleton == null) singleton = new Find();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFind(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "find";
-        }
-        
-    }
-    public static abstract class AbstractArrayConstructor extends AbstractArrayOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractArrayConstructor(this,arg);
-        }
-        
-    }
-    public static class Diag extends AbstractArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Diag singleton = null;
-        public static Diag getInstance(){
-            if (singleton == null) singleton = new Diag();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseDiag(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "diag";
-        }
-        
-    }
-    public static class Reshape extends AbstractArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Reshape singleton = null;
-        public static Reshape getInstance(){
-            if (singleton == null) singleton = new Reshape();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseReshape(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "reshape";
-        }
-        
-    }
-    public static class Permute extends AbstractArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Permute singleton = null;
-        public static Permute getInstance(){
-            if (singleton == null) singleton = new Permute();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.casePermute(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "permute";
-        }
-        
-    }
-    public static class Squeeze extends AbstractArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Squeeze singleton = null;
-        public static Squeeze getInstance(){
-            if (singleton == null) singleton = new Squeeze();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSqueeze(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "squeeze";
-        }
-        
-    }
-    public static class Complex extends AbstractArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Complex singleton = null;
-        public static Complex getInstance(){
-            if (singleton == null) singleton = new Complex();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseComplex(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "complex";
-        }
-        
-    }
-    public static abstract class AbstractDimensionCollapsingOperation extends AbstractArrayOperation  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractDimensionCollapsingOperation(this,arg);
-        }
-        
-    }
-    public static class Prod extends AbstractDimensionCollapsingOperation  {
-        //returns the singleton instance of this class
-        private static Prod singleton = null;
-        public static Prod getInstance(){
-            if (singleton == null) singleton = new Prod();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseProd(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "prod";
-        }
-        
-    }
-    public static class Sum extends AbstractDimensionCollapsingOperation  {
-        //returns the singleton instance of this class
-        private static Sum singleton = null;
-        public static Sum getInstance(){
-            if (singleton == null) singleton = new Sum();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSum(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "sum";
-        }
-        
-    }
-    public static class Mean extends AbstractDimensionCollapsingOperation  {
-        //returns the singleton instance of this class
-        private static Mean singleton = null;
-        public static Mean getInstance(){
-            if (singleton == null) singleton = new Mean();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMean(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "mean";
-        }
-        
-    }
-    public static class Min extends AbstractDimensionCollapsingOperation  {
-        //returns the singleton instance of this class
-        private static Min singleton = null;
-        public static Min getInstance(){
-            if (singleton == null) singleton = new Min();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMin(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "min";
-        }
-        
-    }
-    public static class Max extends AbstractDimensionCollapsingOperation  {
-        //returns the singleton instance of this class
-        private static Max singleton = null;
-        public static Max getInstance(){
-            if (singleton == null) singleton = new Max();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMax(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "max";
-        }
-        
-    }
-    public static abstract class AbstractShapeArrayConstructor extends AbstractArrayConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractShapeArrayConstructor(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractNumericalShapeAndTypeArrayConstructor extends AbstractShapeArrayConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractNumericalShapeAndTypeArrayConstructor(this,arg);
-        }
-        
-    }
-    public static class Ones extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Ones singleton = null;
-        public static Ones getInstance(){
-            if (singleton == null) singleton = new Ones();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseOnes(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "ones";
-        }
-        
-    }
-    public static class Zeros extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Zeros singleton = null;
-        public static Zeros getInstance(){
-            if (singleton == null) singleton = new Zeros();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseZeros(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "zeros";
-        }
-        
-    }
-    public static class Eye extends AbstractNumericalShapeAndTypeArrayConstructor  {
-        //returns the singleton instance of this class
-        private static Eye singleton = null;
-        public static Eye getInstance(){
-            if (singleton == null) singleton = new Eye();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseEye(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "eye";
-        }
-        
-    }
-    public static abstract class AbstractFloatShapeAndTypeArrayConstructor extends AbstractNumericalShapeAndTypeArrayConstructor  {
+    public static abstract class AbstractSquareMatrixUnaryFloatMatrixFunction extends AbstractMatrixUnaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractFloatShapeAndTypeArrayConstructor(this,arg);
+            return visitor.caseAbstractSquareMatrixUnaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Inf extends AbstractFloatShapeAndTypeArrayConstructor  {
+    public static class Logm extends AbstractSquareMatrixUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
-        private static Inf singleton = null;
-        public static Inf getInstance(){
-            if (singleton == null) singleton = new Inf();
+        private static Logm singleton = null;
+        public static Logm getInstance(){
+            if (singleton == null) singleton = new Logm();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseInf(this,arg);
+            return visitor.caseLogm(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "inf";
+            return "logm";
         }
         
     }
-    public static class Nan extends AbstractFloatShapeAndTypeArrayConstructor  {
+    public static class Sqrtm extends AbstractSquareMatrixUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
-        private static Nan singleton = null;
-        public static Nan getInstance(){
-            if (singleton == null) singleton = new Nan();
+        private static Sqrtm singleton = null;
+        public static Sqrtm getInstance(){
+            if (singleton == null) singleton = new Sqrtm();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNan(this,arg);
+            return visitor.caseSqrtm(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "nan";
-        }
-        
-    }
-    public static abstract class AbstractLogicalShapeArrayConstructor extends AbstractShapeArrayConstructor  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractLogicalShapeArrayConstructor(this,arg);
+            return "sqrtm";
         }
         
     }
-    public static class True extends AbstractLogicalShapeArrayConstructor  {
+    public static class Expm extends AbstractSquareMatrixUnaryFloatMatrixFunction  {
         //returns the singleton instance of this class
-        private static True singleton = null;
-        public static True getInstance(){
-            if (singleton == null) singleton = new True();
+        private static Expm singleton = null;
+        public static Expm getInstance(){
+            if (singleton == null) singleton = new Expm();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTrue(this,arg);
+            return visitor.caseExpm(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "true";
+            return "expm";
         }
         
     }
-    public static class False extends AbstractLogicalShapeArrayConstructor  {
-        //returns the singleton instance of this class
-        private static False singleton = null;
-        public static False getInstance(){
-            if (singleton == null) singleton = new False();
-            return singleton;
-        }
+    public static abstract class AbstractBinaryFloatMatrixFunction extends AbstractStrictFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFalse(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "false";
+            return visitor.caseAbstractBinaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static abstract class AbstractArrayQuery extends AbstractArrayOperation  {
+    public static abstract class AbstractMatrixBinaryFloatMatrixFunction extends AbstractBinaryFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractArrayQuery(this,arg);
+            return visitor.caseAbstractMatrixBinaryFloatMatrixFunction(this,arg);
         }
         
     }
-    public static class Size extends AbstractArrayQuery  {
+    public static class Hypot extends AbstractMatrixBinaryFloatMatrixFunction  {
         //returns the singleton instance of this class
-        private static Size singleton = null;
-        public static Size getInstance(){
-            if (singleton == null) singleton = new Size();
+        private static Hypot singleton = null;
+        public static Hypot getInstance(){
+            if (singleton == null) singleton = new Hypot();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSize(this,arg);
+            return visitor.caseHypot(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "size";
+            return "hypot";
         }
         
     }
-    public static class Nonzeros extends AbstractArrayQuery  {
-        //returns the singleton instance of this class
-        private static Nonzeros singleton = null;
-        public static Nonzeros getInstance(){
-            if (singleton == null) singleton = new Nonzeros();
-            return singleton;
-        }
+    public static abstract class AbstractFlexibleFloatMatrixFunction extends AbstractFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNonzeros(this,arg);
+            return visitor.caseAbstractFlexibleFloatMatrixFunction(this,arg);
         }
-        //return name of builtin
-        public String getName(){
-            return "nonzeros";
-        }
         
     }
-    public static class Cumprod extends AbstractArrayQuery  {
-        //returns the singleton instance of this class
-        private static Cumprod singleton = null;
-        public static Cumprod getInstance(){
-            if (singleton == null) singleton = new Cumprod();
-            return singleton;
-        }
+    public static abstract class AbstractDimensionCollapsingFloaMatrixFunction extends AbstractFlexibleFloatMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCumprod(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "cumprod";
+            return visitor.caseAbstractDimensionCollapsingFloaMatrixFunction(this,arg);
         }
         
     }
-    public static class Cumsum extends AbstractArrayQuery  {
+    public static class Cumsum extends AbstractDimensionCollapsingFloaMatrixFunction  {
         //returns the singleton instance of this class
         private static Cumsum singleton = null;
         public static Cumsum getInstance(){
@@ -4204,89 +1993,492 @@ public abstract class Builtin {
         }
         
     }
-    public static class Sign extends AbstractArrayQuery  {
+    public static abstract class AbstractMatrixLibaryFunction extends AbstractFlexibleFloatMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixLibaryFunction(this,arg);
+        }
+        
+    }
+    public static class Eig extends AbstractMatrixLibaryFunction  {
         //returns the singleton instance of this class
-        private static Sign singleton = null;
-        public static Sign getInstance(){
-            if (singleton == null) singleton = new Sign();
+        private static Eig singleton = null;
+        public static Eig getInstance(){
+            if (singleton == null) singleton = new Eig();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseSign(this,arg);
+            return visitor.caseEig(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "sign";
+            return "eig";
         }
         
     }
-    public static abstract class AbstractScalarResultArrayQuery extends AbstractArrayQuery  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractScalarResultArrayQuery(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractNumericalScalarResultArrayQuery extends AbstractScalarResultArrayQuery  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractNumericalScalarResultArrayQuery(this,arg);
-        }
-        
-    }
-    public static class Length extends AbstractNumericalScalarResultArrayQuery  {
+    public static class Norm extends AbstractMatrixLibaryFunction  {
         //returns the singleton instance of this class
-        private static Length singleton = null;
-        public static Length getInstance(){
-            if (singleton == null) singleton = new Length();
+        private static Norm singleton = null;
+        public static Norm getInstance(){
+            if (singleton == null) singleton = new Norm();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseLength(this,arg);
+            return visitor.caseNorm(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "length";
+            return "norm";
         }
         
     }
-    public static class Ndims extends AbstractNumericalScalarResultArrayQuery  {
+    public static class Cond extends AbstractMatrixLibaryFunction  {
         //returns the singleton instance of this class
-        private static Ndims singleton = null;
-        public static Ndims getInstance(){
-            if (singleton == null) singleton = new Ndims();
+        private static Cond singleton = null;
+        public static Cond getInstance(){
+            if (singleton == null) singleton = new Cond();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNdims(this,arg);
+            return visitor.caseCond(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "ndims";
+            return "cond";
         }
         
     }
-    public static class Numel extends AbstractNumericalScalarResultArrayQuery  {
+    public static class Rcond extends AbstractMatrixLibaryFunction  {
         //returns the singleton instance of this class
-        private static Numel singleton = null;
-        public static Numel getInstance(){
-            if (singleton == null) singleton = new Numel();
+        private static Rcond singleton = null;
+        public static Rcond getInstance(){
+            if (singleton == null) singleton = new Rcond();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNumel(this,arg);
+            return visitor.caseRcond(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "numel";
+            return "rcond";
         }
         
     }
-    public static class Nnz extends AbstractNumericalScalarResultArrayQuery  {
+    public static class Det extends AbstractMatrixLibaryFunction  {
+        //returns the singleton instance of this class
+        private static Det singleton = null;
+        public static Det getInstance(){
+            if (singleton == null) singleton = new Det();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDet(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "det";
+        }
+        
+    }
+    public static class Linsolve extends AbstractMatrixLibaryFunction  {
+        //returns the singleton instance of this class
+        private static Linsolve singleton = null;
+        public static Linsolve getInstance(){
+            if (singleton == null) singleton = new Linsolve();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLinsolve(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "linsolve";
+        }
+        
+    }
+    public static abstract class AbstractFacotorizationFunction extends AbstractFlexibleFloatMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFacotorizationFunction(this,arg);
+        }
+        
+    }
+    public static class Schur extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Schur singleton = null;
+        public static Schur getInstance(){
+            if (singleton == null) singleton = new Schur();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSchur(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "schur";
+        }
+        
+    }
+    public static class Ordschur extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Ordschur singleton = null;
+        public static Ordschur getInstance(){
+            if (singleton == null) singleton = new Ordschur();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseOrdschur(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ordschur";
+        }
+        
+    }
+    public static class Lu extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Lu singleton = null;
+        public static Lu getInstance(){
+            if (singleton == null) singleton = new Lu();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLu(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "lu";
+        }
+        
+    }
+    public static class Chol extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Chol singleton = null;
+        public static Chol getInstance(){
+            if (singleton == null) singleton = new Chol();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseChol(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "chol";
+        }
+        
+    }
+    public static class Svd extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Svd singleton = null;
+        public static Svd getInstance(){
+            if (singleton == null) singleton = new Svd();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSvd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "svd";
+        }
+        
+    }
+    public static class Qr extends AbstractFacotorizationFunction  {
+        //returns the singleton instance of this class
+        private static Qr singleton = null;
+        public static Qr getInstance(){
+            if (singleton == null) singleton = new Qr();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseQr(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "qr";
+        }
+        
+    }
+    public static class BitMatrixFunction extends AbstractMatrixFunction  {
+        //returns the singleton instance of this class
+        private static BitMatrixFunction singleton = null;
+        public static BitMatrixFunction getInstance(){
+            if (singleton == null) singleton = new BitMatrixFunction();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitMatrixFunction(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "bitMatrixFunction";
+        }
+        
+    }
+    public static class CharMatrixFunction extends AbstractMatrixFunction  {
+        //returns the singleton instance of this class
+        private static CharMatrixFunction singleton = null;
+        public static CharMatrixFunction getInstance(){
+            if (singleton == null) singleton = new CharMatrixFunction();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCharMatrixFunction(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "charMatrixFunction";
+        }
+        
+    }
+    public static abstract class AbstractConversionFunction extends AbstractMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractConversionFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractConversionToLogicalFunction extends AbstractConversionFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractConversionToLogicalFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractBinaryConversionToLogicalFunction extends AbstractConversionToLogicalFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBinaryConversionToLogicalFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractElementalBinaryConversionToLogicalFunction extends AbstractBinaryConversionToLogicalFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryConversionToLogicalFunction(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractRelationalOperator extends AbstractElementalBinaryConversionToLogicalFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRelationalOperator(this,arg);
+        }
+        
+    }
+    public static class Eq extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Eq singleton = null;
+        public static Eq getInstance(){
+            if (singleton == null) singleton = new Eq();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEq(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "eq";
+        }
+        
+    }
+    public static class Ne extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Ne singleton = null;
+        public static Ne getInstance(){
+            if (singleton == null) singleton = new Ne();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNe(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ne";
+        }
+        
+    }
+    public static class Lt extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Lt singleton = null;
+        public static Lt getInstance(){
+            if (singleton == null) singleton = new Lt();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLt(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "lt";
+        }
+        
+    }
+    public static class Gt extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Gt singleton = null;
+        public static Gt getInstance(){
+            if (singleton == null) singleton = new Gt();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGt(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "gt";
+        }
+        
+    }
+    public static class Le extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Le singleton = null;
+        public static Le getInstance(){
+            if (singleton == null) singleton = new Le();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLe(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "le";
+        }
+        
+    }
+    public static class Ge extends AbstractRelationalOperator  {
+        //returns the singleton instance of this class
+        private static Ge singleton = null;
+        public static Ge getInstance(){
+            if (singleton == null) singleton = new Ge();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGe(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ge";
+        }
+        
+    }
+    public static abstract class AbstractLogicalOperator extends AbstractElementalBinaryConversionToLogicalFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractLogicalOperator(this,arg);
+        }
+        
+    }
+    public static class And extends AbstractLogicalOperator  {
+        //returns the singleton instance of this class
+        private static And singleton = null;
+        public static And getInstance(){
+            if (singleton == null) singleton = new And();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAnd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "and";
+        }
+        
+    }
+    public static class Or extends AbstractLogicalOperator  {
+        //returns the singleton instance of this class
+        private static Or singleton = null;
+        public static Or getInstance(){
+            if (singleton == null) singleton = new Or();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseOr(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "or";
+        }
+        
+    }
+    public static class Xor extends AbstractLogicalOperator  {
+        //returns the singleton instance of this class
+        private static Xor singleton = null;
+        public static Xor getInstance(){
+            if (singleton == null) singleton = new Xor();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseXor(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "xor";
+        }
+        
+    }
+    public static class Constructor extends AbstractConversionFunction  {
+        //returns the singleton instance of this class
+        private static Constructor singleton = null;
+        public static Constructor getInstance(){
+            if (singleton == null) singleton = new Constructor();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseConstructor(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "constructor";
+        }
+        
+    }
+    public static abstract class AbstractArrayQuery extends AbstractMatrixFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayQuery(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractDoubleResultArrayQuery extends AbstractArrayQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDoubleResultArrayQuery(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractScalarDoubleResultArrayQuery extends AbstractDoubleResultArrayQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarDoubleResultArrayQuery(this,arg);
+        }
+        
+    }
+    public static class Nnz extends AbstractScalarDoubleResultArrayQuery  {
         //returns the singleton instance of this class
         private static Nnz singleton = null;
         public static Nnz getInstance(){
@@ -4303,14 +2495,38 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractLogicalScalarResultArrayQuery extends AbstractScalarResultArrayQuery  {
+    public static abstract class AbstractLogicalResultArrayQuery extends AbstractArrayQuery  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractLogicalScalarResultArrayQuery(this,arg);
+            return visitor.caseAbstractLogicalResultArrayQuery(this,arg);
         }
         
     }
-    public static class Any extends AbstractLogicalScalarResultArrayQuery  {
+    public static abstract class AbstractScalarLogicalResultArrayQuery extends AbstractLogicalResultArrayQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarLogicalResultArrayQuery(this,arg);
+        }
+        
+    }
+    public static class Not extends AbstractScalarLogicalResultArrayQuery  {
+        //returns the singleton instance of this class
+        private static Not singleton = null;
+        public static Not getInstance(){
+            if (singleton == null) singleton = new Not();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNot(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "not";
+        }
+        
+    }
+    public static class Any extends AbstractScalarLogicalResultArrayQuery  {
         //returns the singleton instance of this class
         private static Any singleton = null;
         public static Any getInstance(){
@@ -4327,7 +2543,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class All extends AbstractLogicalScalarResultArrayQuery  {
+    public static class All extends AbstractScalarLogicalResultArrayQuery  {
         //returns the singleton instance of this class
         private static All singleton = null;
         public static All getInstance(){
@@ -4344,139 +2560,78 @@ public abstract class Builtin {
         }
         
     }
-    public static class Isemtpy extends AbstractLogicalScalarResultArrayQuery  {
+    public static class CellFunction extends AbstractPureFunction  {
         //returns the singleton instance of this class
-        private static Isemtpy singleton = null;
-        public static Isemtpy getInstance(){
-            if (singleton == null) singleton = new Isemtpy();
+        private static CellFunction singleton = null;
+        public static CellFunction getInstance(){
+            if (singleton == null) singleton = new CellFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsemtpy(this,arg);
+            return visitor.caseCellFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isemtpy";
+            return "cellFunction";
         }
         
     }
-    public static class Isnan extends AbstractLogicalScalarResultArrayQuery  {
+    public static class StructFunction extends AbstractPureFunction  {
         //returns the singleton instance of this class
-        private static Isnan singleton = null;
-        public static Isnan getInstance(){
-            if (singleton == null) singleton = new Isnan();
+        private static StructFunction singleton = null;
+        public static StructFunction getInstance(){
+            if (singleton == null) singleton = new StructFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsnan(this,arg);
+            return visitor.caseStructFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isnan";
+            return "structFunction";
         }
         
     }
-    public static class Isinf extends AbstractLogicalScalarResultArrayQuery  {
+    public static class ObjectFunction extends AbstractPureFunction  {
         //returns the singleton instance of this class
-        private static Isinf singleton = null;
-        public static Isinf getInstance(){
-            if (singleton == null) singleton = new Isinf();
+        private static ObjectFunction singleton = null;
+        public static ObjectFunction getInstance(){
+            if (singleton == null) singleton = new ObjectFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsinf(this,arg);
+            return visitor.caseObjectFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isinf";
+            return "objectFunction";
         }
         
     }
-    public static class Isfinite extends AbstractLogicalScalarResultArrayQuery  {
-        //returns the singleton instance of this class
-        private static Isfinite singleton = null;
-        public static Isfinite getInstance(){
-            if (singleton == null) singleton = new Isfinite();
-            return singleton;
-        }
+    public static abstract class AbstractVersatileFunction extends AbstractPureFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsfinite(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isfinite";
+            return visitor.caseAbstractVersatileFunction(this,arg);
         }
         
     }
-    public static class Isvector extends AbstractLogicalScalarResultArrayQuery  {
+    public static class MatrixOrCellOfStringsFunction extends AbstractVersatileFunction  {
         //returns the singleton instance of this class
-        private static Isvector singleton = null;
-        public static Isvector getInstance(){
-            if (singleton == null) singleton = new Isvector();
+        private static MatrixOrCellOfStringsFunction singleton = null;
+        public static MatrixOrCellOfStringsFunction getInstance(){
+            if (singleton == null) singleton = new MatrixOrCellOfStringsFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsvector(this,arg);
+            return visitor.caseMatrixOrCellOfStringsFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "isvector";
-        }
-        
-    }
-    public static class Isscalar extends AbstractLogicalScalarResultArrayQuery  {
-        //returns the singleton instance of this class
-        private static Isscalar singleton = null;
-        public static Isscalar getInstance(){
-            if (singleton == null) singleton = new Isscalar();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsscalar(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isscalar";
-        }
-        
-    }
-    public static class Isreal extends AbstractLogicalScalarResultArrayQuery  {
-        //returns the singleton instance of this class
-        private static Isreal singleton = null;
-        public static Isreal getInstance(){
-            if (singleton == null) singleton = new Isreal();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsreal(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isreal";
-        }
-        
-    }
-    public static class Isnumeric extends AbstractLogicalScalarResultArrayQuery  {
-        //returns the singleton instance of this class
-        private static Isnumeric singleton = null;
-        public static Isnumeric getInstance(){
-            if (singleton == null) singleton = new Isnumeric();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseIsnumeric(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "isnumeric";
+            return "matrixOrCellOfStringsFunction";
         }
         
     }

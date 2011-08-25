@@ -157,16 +157,10 @@ def printClass(file,parent,child,isAbstract,tags):
         }
         """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child),firstCaps(child),firstCaps(child),firstCaps(child),child);
     # fill in code due to tags
-    for tagName in tags.keys():
-       tagArgs = tags[tagName];
-       # the function that deals with the tag needs to have the same name as the tag 
-       f = eval('processTags.'+tagName)
-       # calls with (name, java-name, parent-java-name, is-abstract, tag-arguments, implements-set, tag-map)
-       code += f(child,firstCaps(child),firstCaps(parent),isAbstract,tagArgs,iset,tags)
-
+    code += processTags.processTags(child,firstCaps(child),firstCaps(parent),isAbstract,iset,tags)    
+    
     # other code that needs to be added to a class can be added here
-
-
+    
     # finish classes
     implements = '';
     if (len(iset) > 0):
@@ -266,7 +260,7 @@ for row in reader:
            tagArgs = tag[i[1]:].strip();
            t[tagName] = tagArgs;
         tags.append(t);
-        print t
+        print children[-1], t
         comments.append(currentComment);
         currentComment = '';
 
@@ -304,9 +298,9 @@ file = open('tree.dot','w');
 printTreeDot(file,children,parents,abstract,comments)
 file.close();
 
-print 'genereated code for %d builtings (including abstract builtins)' % (len(children))
+print 'genereated code for %d builtins (including abstract builtins)' % (len(children))
 
-for i in range(0,len(children)):
-   if not abstract[i]: print children[i]
+#for i in range(0,len(children)):
+#   if not abstract[i]: print children[i]
 
 print 'number of Builtins generated: %d' % (len(children))
