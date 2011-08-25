@@ -162,25 +162,27 @@ def aclass(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags):
   print "java: ", tree.toJava()
 
   return """
-        private final ClassPropTools.MC classPropInfo = {0};
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private final ClassPropTools.MC classPropInfo = {tree};
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOf{javaName}(){{
+            return this.classPropInfo;
+        }}
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){{
-            if(parentClassPropInfo == null){{
-                try{{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){{
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }}
-                }} catch (Exception e) {{
+            try{{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOf{parentJavaName}").invoke(this);
+            }} catch (Exception e) {{ //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }}
             }}
             return parentClassPropInfo;
         }}
         
         public ClassPropTools.MC getMatlabClassPropagationInfo(){{ return classPropInfo; }}
-""".format(tree.toJava());
+""".format(tree=tree.toJava(), javaName=javaName, parentJavaName=parentJavaName);
 
 
 

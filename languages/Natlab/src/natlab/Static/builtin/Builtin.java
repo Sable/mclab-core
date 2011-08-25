@@ -329,18 +329,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = getParentMatlabClassPropagationInfo();
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfTest(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractElementalUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
@@ -355,18 +357,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double"));
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
@@ -391,18 +395,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCNum(1)),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")));
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfTranspose(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
@@ -427,18 +433,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCChain(getParentMatlabClassPropagationInfo(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNone()));
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfCtranspose(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
@@ -463,18 +471,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCCoerce(java.util.Arrays.asList(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")));
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfTril(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
@@ -499,18 +509,20 @@ public abstract class Builtin {
         }
         
         private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")))),new ClassPropTools.MCBuiltin("double"));
-        private ClassPropTools.MC parentClassPropInfo = null;
+        private ClassPropTools.MC parentClassPropInfo;
+        
+        //method that explicitly returns tree for 
+        public final ClassPropTools.MC getMatlabClassPropInfoOfTriu(){
+            return this.classPropInfo;
+        }
         
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if(parentClassPropInfo == null){
-                try{ //check if parent implements ClassPropagationDefined, and get field if it does
-                    if(ClassPropagationDefined.class.isAssignableFrom(super.getClass())){
-                        parentClassPropInfo =
-                            (ClassPropTools.MC)(super.getClass().getField("classPropInfo").get(null));
-                    }
-                } catch (Exception e) {
+            try{
+                //try to access the explicit tree method for the parent
+                parentClassPropInfo = (ClassPropTools.MC)
+                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
+            } catch (Exception e) { //on error, the parent does not provide the class prop info
                     parentClassPropInfo = new ClassPropTools.MCNone();
-                }
             }
             return parentClassPropInfo;
         }
