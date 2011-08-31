@@ -16,6 +16,7 @@ import natlab.Static.valueanalysis.value.Value;
 
 public class ClassPropTools {
     static final boolean DEBUG = false;
+        
     /**
      * given a Matlab Class Propagation description and a set of argument values,
      * returns a list of sets of return matlab classes.
@@ -284,34 +285,81 @@ public class ClassPropTools {
         }
         
     }
-    //coerce(list of argument MCBuiltin, target MCBuiltin, MC affeced expr)
-    //example: coerce([char,logical], double, (numerical&numerical)>double )
+    //begin - matches if the current read-index is 0, emits nothing
+    public static class MCBegin extends MC{
+        public String toString() { return "begin"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+            return (previousMatchResult.numMatched == 0)?previousMatchResult:null;
+        }
+    }
+    //end - matches if all input elements have been matched, emits nothing
+    public static class MCEnd extends MC{
+        public String toString() { return "end"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+            return (previousMatchResult.numMatched == inputClasses.size())?previousMatchResult:null;
+        }
+    }
+    //any - matches the next input, no matter what it is - throws error if used as rhs
+    public static class MCAny extends MC{
+        public String toString() { return "any"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+            if (!isLeft) throw new UnsupportedOperationException("class propagation error: 'any' can not be used on the right hand side");
+            return previousMatchResult.next();
+        }
+    }
+    
+    
+    
+    //classOfString([builtin1,builtin2,builtin3,...])
+    //matches the next input if it is a String, and assumes it is a String denoting
+    //
+    //TODO - error?
+    //var(numeric|logical)&(classOfString(numeric)|)
+    //public Static Class MCClassOfString
+
+    
+    //coerce(MC match and replace for all args, MC affeced expr)
+    //the match and replace is run on all arguments separately, and have
+    //to either not match or result in one single result
+    //example: coerce(char|logical>double, numerical&numerical>double)
     public static class MCCoerce extends MC{
-        HashSet<ClassReference> subsClasses = new HashSet<ClassReference>();
-        ClassReference targetClass;
         MC tree;
-        public MCCoerce(Collection<MCBuiltin> from,MCBuiltin target,MC tree){
+        MC replaceTree;
+        public MCCoerce(MC replaceTree,MC tree){
             this.tree = tree;
-            this.targetClass = target.classRef;
-            for (MCBuiltin builtin : from){
-                subsClasses.add(builtin.classRef);
-            }
+            this.replaceTree = replaceTree;
         }
         public String toString() {
-            return "coerce("+subsClasses+","+targetClass+","+tree+")";
+            return "coerce("+replaceTree+","+tree+")";
         }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
                 List<ClassReference> inputClasses, List<Value<?>> inputValues) {
-            //substitue arg values with coerced version and do match on the tree
+            //try to match every arg, replacing if necessary
             ArrayList<ClassReference> newInputClasses = 
-                new ArrayList<ClassReference>(inputClasses.size());
+                new ArrayList<ClassReference>(inputClasses);
+            System.out.println(newInputClasses);
             for(int i = 0; i < inputClasses.size(); i++){
-                if (subsClasses.contains(inputClasses.get(i))){
-                    newInputClasses.add(targetClass);
-                } else {
-                    newInputClasses.add(inputClasses.get(i));
+                //do match for arg i
+                MatchResult match = 
+                    replaceTree.match(true, new MatchResult(), Collections.singletonList(inputClasses.get(i)), null);
+                //check whether it returned a match - and whether the match result is valid
+                if (match != null){
+                    if (match.numEmittedResults != 1 || match.emittedClass == null){
+                        throw new UnsupportedOperationException(
+                                "argument coercion for builtin class propagation must result in one ouput "
+                                +"for every argument, received "+match+" for "+this);
+                    }
+                    //override argument class with the singleton match result
+                    newInputClasses.set(i, match.emittedClass);                    
                 }
+                System.out.println(newInputClasses);
             }
             return tree.match(isLeft, previousMatchResult, newInputClasses, inputValues);
         }
@@ -393,14 +441,21 @@ public class ClassPropTools {
         printMatch(f3,PrimitiveClassReference.DOUBLE);
         printMatch(f3);
 
-        MC f4 = new MCCoerce(Arrays.asList(itg,chr), dbl, 
-                new MCMap(new MCChain(dbl,dbl),new MCChain(new MCNum(0),new MCNum(1))));
+        MC f4 = new MCCoerce(
+                    new MCMap(new MCUnion(chr,itg),dbl),
+                    new MCMap(new MCChain(dbl,dbl),new MCChain(new MCNum(0),new MCNum(1))));
         System.out.println();
         System.out.println(f4);
         printMatch(f4,PrimitiveClassReference.DOUBLE,PrimitiveClassReference.DOUBLE);
         printMatch(f4,PrimitiveClassReference.CHAR,PrimitiveClassReference.INT16);
         printMatch(f4,PrimitiveClassReference.INT16,PrimitiveClassReference.CHAR);
         
+        
+        System.out.println("(coerce([logical,char],double,double>double): "+Builtin.Tril.getInstance().getMatlabClassPropagationInfo());
+        System.out.println("parent&opt(double)-(double>double): "+Builtin.Ctranspose.getInstance().getMatlabClassPropagationInfo());
+        System.out.println("(double>double): "+Builtin.Ctranspose.getInstance().getParentMatlabClassPropagationInfo());
+        System.out.println("none:"+Builtin.Test.getInstance().getMatlabClassPropagationInfo());
+        System.out.println("none:"+Builtin.Test.getInstance().getParentMatlabClassPropagationInfo());
     }
     /**
      * for testing
