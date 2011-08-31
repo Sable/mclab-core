@@ -62,17 +62,18 @@ unaryAnyMatrixFunction; strictAnyMatrixFunction
 
 # elemental unary function operating on a general matrix
 elementalUnaryAnyMatrixFunction; unaryAnyMatrixFunction
-test;; aclass(parent)
+#TODO - the following class propagations are tests:
+test;; Class(parent)
 
 # matrix-wise unary function operating on a general matrix
-matrixUnaryAnyMatrixFunction; unaryAnyMatrixFunction;; aclass(double>double)
-transpose;;  aclass((double|single)&1>(double&logical))
-ctranspose;; aclass(parent&opt(double))
+matrixUnaryAnyMatrixFunction; unaryAnyMatrixFunction;; Class(double>double)
+transpose;;  Class((double|single)&1>(double&logical))
+ctranspose;; Class(parent&opt(double))
 
 
 # TODO take optional 2nd parameter k:
-tril;; aclass(coerce([logical,char],double,double>double))
-triu;; aclass(numeric|(double))
+tril;; Class(coerce(logical|char>double,double>double))
+triu;; Class(numeric|(double))
 
 
 
@@ -114,7 +115,7 @@ ceil
 matrixUnaryNumericMatrixFunction; unaryNumericMatrixFunction
 
 # binary numeric matrix function
-binaryNumericMatrixFunction; strictNumericMatrixFunction
+binaryNumericMatrixFunction; strictNumericMatrixFunction; Class(coerce(logical|char>double,(numeric&(double|0)>0)|((double|1)&numeric>1)))
 
 # elemental binary numeric matrix function
 elementalBinaryNumericMatrixFunction; binaryNumericMatrixFunction

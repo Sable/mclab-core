@@ -23,7 +23,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractStrictAnyMatrixFunction(builtin,arg); }
     
     //elemental unary function operating on a general matrix
-    public Ret caseAbstractElementalUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }
+    public Ret caseAbstractElementalUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }    
+    //TODO - the following class propagations are tests:
     public Ret caseTest(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryAnyMatrixFunction(builtin,arg); }
     
     //matrix-wise unary function operating on a general matrix

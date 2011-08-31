@@ -9,12 +9,17 @@ import sys
 #
 # functinos get called with the following arguments:
 # (name, java-name, parent-java-name, is-abstract, tag-arguments(string), implements-set(string-set), tag-map)
+DEBUG = True;
 def processTags(name, javaName, parentJavaName, isAbstract, iset, tags):
     code = "";
+    if (DEBUG and len(tags) > 0): print "\n***** tag processing for:",name,"*******\ndefined tags: ",tags
     for tagName in tags.keys():
        tagArgs = tags[tagName];
        # the function that deals with the tag needs to have the same name as the tag 
-       f = eval(tagName)
+       try:
+           f = eval(tagName)
+       except:
+           raise Exception("builtin tag "+tagName+" for function "+name+" not defined");
        # calls with (name, java-name, parent-java-name, is-abstract, tag-arguments, implements-set, tag-map)
        code += f(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags)
     return code;
@@ -34,7 +39,7 @@ def makeArgString(s):
   return s+','
 
 
-# *** processing tags ***********************************************
+# *** processing tags *********************************************************
 def s(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags):
   return ''
 
@@ -56,127 +61,128 @@ def args(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags):
         public boolean isVariadic(){{ return {0}=={1}; }}
 """.format(*minmax)
 
-# coreces numbers to a MatlabClassVar
-def coerceNum(a):          return MCNum(a) if isinstance(a, (long, int)) else a;
-# general matlab class used by the class tag (MC = MatlabClass)
+
+# **** class propagation 'Class' tag *******************************************
+# definition of the class propagation language - in a dictionary
+# helper method - converts numbers to a MatlabClassVar
+def convertNum(a):          return MCNum(a) if isinstance(a, (long, int)) else a;
+# 1) python classes
+# general matlab class used by the class tag (MC = MatlabClass) - defines the operators
 class MC():
-  def __or__  (self, other): return MCUnion(coerceNum(self),coerceNum(other));
-  def __ror__ (self, other): return MCUnion(coerceNum(self),coerceNum(other));
-  def __and__ (self, other): return MCChain(coerceNum(self),coerceNum(other));
-  def __rand__(self, other): return MCChain(coerceNum(self),coerceNum(other));
-  def __gt__  (self, other): return MCMap(coerceNum(self),coerceNum(other));
-  def __lt__  (self, other): return MCMap(coerceNum(other),coerceNum(self));
+  def __or__  (self, other): return MCUnion(convertNum(self),convertNum(other));
+  def __ror__ (self, other): return MCUnion(convertNum(self),convertNum(other));
+  def __and__ (self, other): return MCChain(convertNum(self),convertNum(other));
+  def __rand__(self, other): return MCChain(convertNum(self),convertNum(other));
+  def __gt__  (self, other): return MCMap(convertNum(self),convertNum(other));
+  def __lt__  (self, other): return MCMap(convertNum(other),convertNum(self));
   def __repr__(self):        return str(self);
-# class1 - represents Matlab builtin class
+# <class1> - represents Matlab builtin class
 class MCBuiltin(MC):
   def __init__(self,name):   self.name = name;
   def __str__ (self):        return self.name;
   def toJava(self):          return 'new ClassPropTools.MCBuiltin("'+self.name+'")';
 # class1 | clas2 - mulitple possibilities for one type
 class MCUnion(MC):
-  def __init__(self,a,b):    self.class1 = coerceNum(a); self.class2 = coerceNum(b);
+  def __init__(self,a,b):    self.class1 = convertNum(a); self.class2 = convertNum(b);
   def __str__ (self):        return '('+str(self.class1)+'|'+str(self.class2)+')';
-  def toJava(self):          return 'new ClassPropTools.MCUnion('+self.class1.toJava()+','+self.class2.toJava()+')';
+  def toJava  (self):        return 'new ClassPropTools.MCUnion('+self.class1.toJava()+','+self.class2.toJava()+')';
 # class1 & class2 - sequences of types
 class MCChain(MC):
-  def __init__(self,a,b):    self.class1 = coerceNum(a); self.class2 = coerceNum(b);
+  def __init__(self,a,b):    self.class1 = convertNum(a); self.class2 = convertNum(b);
   def __str__ (self):        return '('+str(self.class1)+')&('+str(self.class2)+')';   
-  def toJava(self):          return 'new ClassPropTools.MCChain('+self.class1.toJava()+','+self.class2.toJava()+')';
-# class1 > class2 - matches argument and return types
+  def toJava  (self):        return 'new ClassPropTools.MCChain('+self.class1.toJava()+','+self.class2.toJava()+')';
+# class1 > class2 - matches lhs, emits rhs
 class MCMap(MC):
-  def __init__(self,a,b):    self.args = coerceNum(a); self.res = coerceNum(b);
+  def __init__(self,a,b):    self.args = convertNum(a); self.res = convertNum(b);
   def __str__ (self):        return str(self.args)+'>'+str(self.res);   
-  def toJava(self):          return 'new ClassPropTools.MCMap('+self.args.toJava()+','+self.res.toJava()+')';
-# <n> - a specific other argument, defined by a number - negative is counted from back
+  def toJava  (self):        return 'new ClassPropTools.MCMap('+self.args.toJava()+','+self.res.toJava()+')';
+# <n> - a specific other argument, defined by a number - negative is counted from back (i.e. -1 is last)
 class MCNum(MC):
   def __init__(self,num):    self.num = num;
   def __str__ (self):        return str(self.num);
-  def toJava(self):          return 'new ClassPropTools.MCNum('+str(self.num)+')';
-# coerce(list of argument MCBuiltin, target MCBuiltin, MC affeced expr)
-# example: coerce([char,logical], double, (numerical&numerical)>double )
+  def toJava  (self):        return 'new ClassPropTools.MCNum('+str(self.num)+')';
+# coerce(MC denoting replacement expr for every argument, MC affeced expr)
+# example: coerce((char|logical)>double, (numerical&numerical)>double )
 class MCCoerce(MC):
-  def __init__(self,args,target,expr): self.args=args; self.target=target; self.expr=expr;
-  def __str__(self):         return 'coerce('+str(self.args)+','+str(self.target)+','+str(self.expr)+')'
-  def toJava(self):          return 'new ClassPropTools.MCCoerce(java.util.Arrays.asList('+','.join(map(MCBuiltin.toJava,self.args)) +\
-                                    '),'+self.target.toJava()+','+self.expr.toJava()+')'
-# none - matches anything without advancing, emits nothing
-class MCNone(MC):
-  def __str__ (self):        return str('none');
-  def toJava(self):          return 'new ClassPropTools.MCNone()';
-# parent - simply the tree of the parent
-class MCParent(MC):
-  def __str__ (self):        return str('parent');
-  def toJava(self):          return 'getParentMatlabClassPropagationInfo()'; #calls the method to return parent tree
+  def __init__(self,replaceExpr,expr): self.replaceExpr=replaceExpr; self.expr=expr;
+  def __str__ (self):         return 'coerce('+str(self.replaceExpr)+','+str(self.expr)+')'
+  def toJava  (self):         return 'new ClassPropTools.MCCoerce('+self.replaceExpr.toJava()+','+self.expr.toJava()+')'
+# unparametric expressions of the language - the string and java representation are given by the constructor
+class MCNonParametric(MC):
+  def __init__(self,str,java): self.str = str; self.java = java;
+  def __str__(self):          return self.str;
+  def toJava (self):          return self.java;
 
 
+# 2) set up keywords of the language in a dictionary
+# basic types:
+lang = dict(double=MCBuiltin('double'),single=MCBuiltin('single'),char=MCBuiltin('char'),logical=MCBuiltin('logical'),
+            uint8=MCBuiltin('int8'),uint16=MCBuiltin('uint16'),uint32=MCBuiltin('uint32'),uint64=MCBuiltin('uint64'),
+            int8=MCBuiltin('int8'),int16=MCBuiltin('uint16'),int32=MCBuiltin('uint32'),int64=MCBuiltin('uint64'),
+            function_handle=MCBuiltin('function_handle'))
+# union types
+lang.update(dict(float=lang['single']|lang['double'], uint=(lang['uint8']|lang['uint16']|lang['uint32']|lang['uint64']), 
+                 sint=(lang['int8']|lang['int16']|lang['int32']|lang['int64'])));  
+lang['int']    = (lang['uint']|lang['sint']);
+lang['numeric']= (lang['float']|lang['int']);
+lang['matrix'] = (lang['numeric']|lang['char']|lang['logical']);
+# non-parametric bits
+lang['none'] =   MCNonParametric('none',  'new ClassPropTools.MCNone()');
+lang['end'] =    MCNonParametric('end',   'new ClassPropTools.MCEnd()');
+lang['begin'] =  MCNonParametric('begin', 'new ClassPropTools.MCBegin()');
+lang['any'] =    MCNonParametric('any',   'new ClassPropTools.MCAny()');
+lang['parent'] = MCNonParametric('parent','getParentMatlabClassPropagationInfo()');
+# other bits of the language
+lang['coerce'] = lambda replaceExpr, expr: MCCoerce(replaceExpr,expr)
+lang['opt'] = lambda expr: (expr|lang['none']) #note: op(x), being (x|none), will cause an error on the rhs
 
-#none always matches, doesn't advance index
-#var('x',class) # if x exists, tries ot match x, if it doesn't tries to match class and stores x in result?
-#numericArgs(n,[max]]) # tries to match n numeric args, with int/single types having to be the same
-#opt(x) # optional match (tries first to match it, then tries without matching it) - complexity x 2
+# TODO - other possible language features
+#variables?
 #mult(x,[max],[min]) #tries to match as many as possible max,min may be 0
 #ClassOfStringArg(n,class) # assumes argument n is a string denoting a class, one of class 
 
-# turns a sequence of MC objects into MCUnion objects
+# helper method - turns a sequence of MC objects into MCUnion objects
 def tupleToMC(seq):
   if len(seq) == 1: return seq[0]
   return MCUnion(seq[0],tupleToMC(seq[1:]))
-
-def aclass(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags):
+# actual tag definition
+def Class(name, javaName, parentJavaName, isAbstract, tagArgs, iset, tags):
   # add the interface
   iset.add("ClassPropagationDefined");
-  # set up names
-  # arrays are multiple types: [double,int] is first a double, then an int
-  # sequences are union types: (double,int) is either a double or an int - types are mached in order
-  # basic types:
-  lang = dict(double=MCBuiltin('double'), single=MCBuiltin('single'), char=MCBuiltin('char'), logical=MCBuiltin('logical'),
-              uint8=MCBuiltin('int8'),uint16=MCBuiltin('uint16'),uint32=MCBuiltin('uint32'),uint64=MCBuiltin('uint64'),
-              int8=MCBuiltin('int8'),int16=MCBuiltin('uint16'),int32=MCBuiltin('uint32'),int64=MCBuiltin('uint64'),
-              function_handle=MCBuiltin('function_handle'))
-  # union types
-  lang.update(dict(float=lang['single']|lang['double'], uint=(lang['uint8']|lang['uint16']|lang['uint32']|lang['uint64']), 
-                   sint=(lang['int8']|lang['int16']|lang['int32']|lang['int64'])));  
-  lang['int']    = (lang['uint']|lang['sint']);
-  lang['numeric']= (lang['float']|lang['int']);
-  lang['matrix'] = (lang['numeric']|lang['char']|lang['logical']);
-  # other bits of the language
-  lang['none'] = MCNone();
-  lang['coerce'] = lambda args, target, expr: MCCoerce(args,target,expr)
-  lang['opt'] = lambda expr: (expr|lang['none']) #op(x) = (x|none) - will cause an error on the rhs
-  lang['parent'] = MCParent();
   
-  print
-  print tagArgs
   # parse arg
   try:
       args = makeArgString(tagArgs);
-      tree = eval(args,lang)
+      tree = convertNum(eval(args,lang))
   except:
-      sys.stderr.write("ERROR: cannot parse/build class propagation information for builtin: "+name+"\n");
-      sys.stderr.write("def:   "+tagArgs+"\n");
+      sys.stderr.write(("ERROR: cannot parse/build class propagation information for builtin: "+name+"\ndef: "+tagArgs+"\n"));
       raise
   # turn tuple into chain of Unions
   if isinstance(tree, tuple): tree = tupleToMC(tree)
-        
-  print "tree: ", tree
-  print "java: ", tree.toJava()
+  
+  if (DEBUG):  
+      print "Class args: ",tagArgs
+      print "tree:       ", tree
+      #print "java:       ", tree.toJava()
 
   return """
+        //class prop info stuff:
         private final ClassPropTools.MC classPropInfo = {tree};
         private ClassPropTools.MC parentClassPropInfo;
-        
-        //method that explicitly returns tree for 
+
+        //method that explicitly returns tree for this class - used by get parent class info
         public final ClassPropTools.MC getMatlabClassPropInfoOf{javaName}(){{
             return this.classPropInfo;
         }}
-        
+
         public ClassPropTools.MC getParentMatlabClassPropagationInfo(){{
-            try{{
+            if (parentClassPropInfo == null) try{{
                 //try to access the explicit tree method for the parent
                 parentClassPropInfo = (ClassPropTools.MC)
                     getClass().getMethod("getMatlabClassPropInfoOf{parentJavaName}").invoke(this);
-            }} catch (Exception e) {{ //on error, the parent does not provide the class prop info
-                    parentClassPropInfo = new ClassPropTools.MCNone();
+            }} catch (Exception e) {{
+                //the parent class does not implment the class prop defined interface - assign 'none'
+                parentClassPropInfo = new ClassPropTools.MCNone();
             }}
             return parentClassPropInfo;
         }}
