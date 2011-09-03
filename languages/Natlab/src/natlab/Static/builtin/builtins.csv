@@ -19,9 +19,14 @@
 #     ArityDefined. args, args() will add the interface for abstract
 #     builtins, args(n) sets a fixed arity, args(m,n) a variadic
 #     range, 'inf' is infinity (i.e. args(2,inf) means 2 or more args)
-#
-
-
+# - Class(<expr>)
+#     Defines what the Matlab classes of outputs are, given the classes of the
+#     input arguments. The language is defined in ClassTagLanguage.txt. Examples:
+#        Class((double|single)&(double|single)>double)
+#        Class(coerce(char|logical>double, numeric>0))
+#        Class(char&char>char, numeric&(0|double)>0,  (double|1)&numeric>1)
+#        Class(none>double)
+#        Class(parent&opt(any))
 #
 # TODO
 # - class is not impure
@@ -35,6 +40,9 @@
 # - group explicit indexing
 # - should I name <type>Result<..>?
 # - decide between 'elemental' and 'elementwise', matrix, matrixwise? array... matrix... ?
+# - change script to allow lines to start with "- x", to mark continuations
+# - change tag processing to annotate 'args' if classes are defined
+# - new tag "outs"?
 
 
 #pure functions have no side effects and always return the same value
@@ -62,18 +70,16 @@ unaryAnyMatrixFunction; strictAnyMatrixFunction
 
 # elemental unary function operating on a general matrix
 elementalUnaryAnyMatrixFunction; unaryAnyMatrixFunction
-#TODO - the following class propagations are tests:
-test;; Class(parent)
 
 # matrix-wise unary function operating on a general matrix
 matrixUnaryAnyMatrixFunction; unaryAnyMatrixFunction;; Class(double>double)
-transpose;;  Class((double|single)&1>(double&logical))
-ctranspose;; Class(parent&opt(double))
+transpose;; Class(double,int)
+ctranspose
 
 
 # TODO take optional 2nd parameter k:
-tril;; Class(coerce(logical|char>double,double>double))
-triu;; Class(numeric|(double))
+tril
+triu
 
 
 

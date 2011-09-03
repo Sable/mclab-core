@@ -69,7 +69,7 @@ public abstract class Builtin {
     //static initializer fills in builtinMap
     static {
         builtinMap.put("pi",Pi.getInstance());
-        builtinMap.put("test",Test.getInstance());
+        builtinMap.put("elementalUnaryAnyMatrixFunction",ElementalUnaryAnyMatrixFunction.getInstance());
         builtinMap.put("transpose",Transpose.getInstance());
         builtinMap.put("ctranspose",Ctranspose.getInstance());
         builtinMap.put("tril",Tril.getInstance());
@@ -305,52 +305,22 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractElementalUnaryAnyMatrixFunction(this,arg);
-        }
-        
-    }
-    public static class Test extends AbstractElementalUnaryAnyMatrixFunction implements ClassPropagationDefined {
+    public static class ElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
         //returns the singleton instance of this class
-        private static Test singleton = null;
-        public static Test getInstance(){
-            if (singleton == null) singleton = new Test();
+        private static ElementalUnaryAnyMatrixFunction singleton = null;
+        public static ElementalUnaryAnyMatrixFunction getInstance(){
+            if (singleton == null) singleton = new ElementalUnaryAnyMatrixFunction();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseTest(this,arg);
+            return visitor.caseElementalUnaryAnyMatrixFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "test";
+            return "elementalUnaryAnyMatrixFunction";
         }
         
-        //class prop info stuff:
-        private final ClassPropTools.MC classPropInfo = getParentMatlabClassPropagationInfo();
-        private ClassPropTools.MC parentClassPropInfo;
-
-        //method that explicitly returns tree for this class - used by get parent class info
-        public final ClassPropTools.MC getMatlabClassPropInfoOfTest(){
-            return this.classPropInfo;
-        }
-
-        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if (parentClassPropInfo == null) try{
-                //try to access the explicit tree method for the parent
-                parentClassPropInfo = (ClassPropTools.MC)
-                    getClass().getMethod("getMatlabClassPropInfoOfAbstractElementalUnaryAnyMatrixFunction").invoke(this);
-            } catch (Exception e) {
-                //the parent class does not implment the class prop defined interface - assign 'none'
-                parentClassPropInfo = new ClassPropTools.MCNone();
-            }
-            return parentClassPropInfo;
-        }
-        
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
-
     }
     public static abstract class AbstractMatrixUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction implements ClassPropagationDefined {
         //visit visitor
@@ -399,7 +369,7 @@ public abstract class Builtin {
         }
         
         //class prop info stuff:
-        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCNum(1)),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")));
+        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))));
         private ClassPropTools.MC parentClassPropInfo;
 
         //method that explicitly returns tree for this class - used by get parent class info
@@ -422,7 +392,7 @@ public abstract class Builtin {
         public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
 
     }
-    public static class Ctranspose extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
+    public static class Ctranspose extends AbstractMatrixUnaryAnyMatrixFunction  {
         //returns the singleton instance of this class
         private static Ctranspose singleton = null;
         public static Ctranspose getInstance(){
@@ -438,31 +408,8 @@ public abstract class Builtin {
             return "ctranspose";
         }
         
-        //class prop info stuff:
-        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCChain(getParentMatlabClassPropagationInfo(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNone()));
-        private ClassPropTools.MC parentClassPropInfo;
-
-        //method that explicitly returns tree for this class - used by get parent class info
-        public final ClassPropTools.MC getMatlabClassPropInfoOfCtranspose(){
-            return this.classPropInfo;
-        }
-
-        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if (parentClassPropInfo == null) try{
-                //try to access the explicit tree method for the parent
-                parentClassPropInfo = (ClassPropTools.MC)
-                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
-            } catch (Exception e) {
-                //the parent class does not implment the class prop defined interface - assign 'none'
-                parentClassPropInfo = new ClassPropTools.MCNone();
-            }
-            return parentClassPropInfo;
-        }
-        
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
-
     }
-    public static class Tril extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
+    public static class Tril extends AbstractMatrixUnaryAnyMatrixFunction  {
         //returns the singleton instance of this class
         private static Tril singleton = null;
         public static Tril getInstance(){
@@ -478,31 +425,8 @@ public abstract class Builtin {
             return "tril";
         }
         
-        //class prop info stuff:
-        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")));
-        private ClassPropTools.MC parentClassPropInfo;
-
-        //method that explicitly returns tree for this class - used by get parent class info
-        public final ClassPropTools.MC getMatlabClassPropInfoOfTril(){
-            return this.classPropInfo;
-        }
-
-        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if (parentClassPropInfo == null) try{
-                //try to access the explicit tree method for the parent
-                parentClassPropInfo = (ClassPropTools.MC)
-                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
-            } catch (Exception e) {
-                //the parent class does not implment the class prop defined interface - assign 'none'
-                parentClassPropInfo = new ClassPropTools.MCNone();
-            }
-            return parentClassPropInfo;
-        }
-        
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
-
     }
-    public static class Triu extends AbstractMatrixUnaryAnyMatrixFunction implements ClassPropagationDefined {
+    public static class Triu extends AbstractMatrixUnaryAnyMatrixFunction  {
         //returns the singleton instance of this class
         private static Triu singleton = null;
         public static Triu getInstance(){
@@ -518,29 +442,6 @@ public abstract class Builtin {
             return "triu";
         }
         
-        //class prop info stuff:
-        private final ClassPropTools.MC classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")))),new ClassPropTools.MCBuiltin("double"));
-        private ClassPropTools.MC parentClassPropInfo;
-
-        //method that explicitly returns tree for this class - used by get parent class info
-        public final ClassPropTools.MC getMatlabClassPropInfoOfTriu(){
-            return this.classPropInfo;
-        }
-
-        public ClassPropTools.MC getParentMatlabClassPropagationInfo(){
-            if (parentClassPropInfo == null) try{
-                //try to access the explicit tree method for the parent
-                parentClassPropInfo = (ClassPropTools.MC)
-                    getClass().getMethod("getMatlabClassPropInfoOfAbstractMatrixUnaryAnyMatrixFunction").invoke(this);
-            } catch (Exception e) {
-                //the parent class does not implment the class prop defined interface - assign 'none'
-                parentClassPropInfo = new ClassPropTools.MCNone();
-            }
-            return parentClassPropInfo;
-        }
-        
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){ return classPropInfo; }
-
     }
     public static abstract class AbstractFlexibleAnyMatrixFunction extends AbstractAnyMatrixFunction  {
         //visit visitor

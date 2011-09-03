@@ -1,0 +1,215 @@
+
+===== 1 Intro =====
+In the following we define the tiny language used to define how
+classes propagate through builtins. This is used in the builtins.csv
+to specify class propagation, using the "Class" tag. To specify the
+class propagation for a builtin, or a abstract builtin, it is
+specified as
+  Class(<expr>)
+
+or
+  Class(<expr_1>,<expr_2>,<expr_3>,..,<expr_n>)
+
+Where the expressions follow the syntax of the language. The language
+itself is vaguely similar to regular expressions in that it matches
+incoming types. But rather than having a match as a result, the
+expression language allows to explicitly state what the result is.
+
+
+
+===== 2 Class Specification =====
+
+=== 2.1 Basics ===
+Every expression is interpreted either in LHS or RHS mode. In LHS mode
+it matches the classes of arguments to the expression, in RHS it emits the
+expression as output classes. For example 
+  double>char
+
+will attempt to match a double argument, and if one is found, it will
+emit a char result. Iff for the overall expression, all input arguments
+have been consumed by matching, it will result in an overall match,
+and the emitted results wil be returned.
+
+At any point there will be a partial match, which consists of the next
+input argument index to be read, and the result classes emitted. For
+example after the above expression, if one attempts to match the input
+arguments [double, double], the partial result will refer to the 2nd
+argument, and will have 'char' as an output.
+
+
+
+=== 2.2 Language features ===
+The language supports the following syntax, with LHS and RHS semantics showing:
+
+2.2.1 Operators
+expr1 > expr2
+  LHS,RHS: will attempt to match expr1 as a LHS, and if it is a match,
+  will run expr2 as a RHS expression and emit the results
+
+expr1 & expr2
+  LHS: will attempt to match expr1 as a LHS, and if it is a match,
+  will attempt to match expr2
+  RHS: will run expr1 as a RHS, then will run expr2 as a RHS expression
+
+expr1 | expr2
+  LHS: will attempt to match expr1 and expr2 indenpendently, then will
+  return whichever succesful match consumed the most arguments.
+  RHS: will emit the union of the emitted results of expr1 and expr,
+  run as RHS expressions. Both expr1 and expr2 must have the same
+  number of emitted result. If not, it will throw a runtime error.
+
+Just like in other langauges, & precedes | precedes >.
+
+
+
+2.2.2 Non-parametric Expressions
+2.2.2.1 Builtins
+The class propagation language supports the following builtins
+double
+float
+uint8
+uint16
+uint32
+uint64
+int8
+int16
+int32
+int64
+char
+logical
+function_handle
+  LHS: will attempt to match the builtin class
+  RHS: will emit the builtin class
+
+2.2.2.2 Groups of Builtins
+Certain builtins are grouped together using union
+float     is the same as 'single|double'
+uint      is the same as 'uint8|uint16|uint32|uint64'
+sint      is the same as 'int8|int16|int32|int64'
+int       is the same as 'uint|sint'
+numeric   is the same as 'float|int'
+matrix    is the same as 'numeric|char|logical'
+
+2.2.2.3 Non-parametric language features
+none
+  LHS,RHS: will result in a succesful match, without consuming inputs
+  or emitting results
+begin
+  LHS,RHS: will match if the next argument is the first argument (no
+  arguments have been matched)
+end
+  LHS,RHS: will match if all arguments have been matched
+any
+  LHS: will match the next argument, no matter what it is, if there
+  is an argument left to match
+  RHS: error
+parent
+  will substitute the expression that is defined for the abstract
+  parent builtin. If the parent builtin does not define class
+  propagation information, will substitute 'none'.
+
+
+2.2.3 Functions
+coerce(replaceExpr, expr)
+  will take every single argument, and execute replaceExpr on it
+  individually and independently. The replace Expr has to be either
+  not a match, or a match and emit a single result. If it does, this
+  result gets replaced as a the new argument. 
+  It will the take the new set of arguments, and execute the second
+  argument 'expr' with it, either as LHS or RHS depending on whether
+  the coerce itself was exected as LHS or RHS, and return the result
+  of that.
+  This allows operand coercion. For example a function may convert all
+  incoming char or logical arguments to doubles, which would be done
+  using
+    coerce(char|logical>double, expr)
+
+opt(expr)
+  is the same as 'none|expr'
+  LHS: will attempt to match the expression. If it fails, still
+  returns a succesful match, but it does so by matching 'none'.
+  RHS: This will likely cause an error, because the union of two match
+  results must both result in the same number of emited outputs.
+
+
+2.2.4 Number
+<number>
+  Same as the argument with the same index as the given number. So 0
+  will match (LHS) or emit (RHS) the class of the first argument.
+  Negative numbers will match from the back, so -1 is the clas of the
+  last argument.
+
+===== 3. Extra Notes on Semantics =====
+
+
+
+=== 3.1 RHS can have LHS sub-expressions, and vice versa ===
+An expression may emit results even if it is run as a LHS
+expression, and an expression run as RHS may match more elements. For
+example for
+  double > (char > logical & int16)
+
+the 'char' expression will get matched, due to the second '>'
+operation. Similarly,
+  (double & char > logical) > int16
+
+An equivalent expression, will emit the logical because of the second '>'.
+
+
+
+=== 3.2 Overall execution of Class tag ===
+Overall, expressions are evaluated as LHS expressions, so
+  Class(double)
+
+will attempt to match a incoming double argument, and have no returns.
+
+Multiple arguments to the Class tag get transformed internally to
+their union, so
+  Class(expr_1,expr_2,..,expr_n)
+is equivalent to
+  Class(expr_1 | expr_2 | .. | expr_n)
+This only applies for arguments to the class tag, comma is not an
+operator equivalent to | in general.
+
+
+
+=== 3.3 Greedy matching ===
+While the language looks similar to regular expressions, it is in fact
+different: all matching is done greedily.
+So the expression
+  (double | none) & (double)
+When run on a single double input, will not match. This is because the
+union will greedily match the longest expression, which will consume
+the input argument.
+
+
+
+===== 4 Examples =====
+Class((double|single)&(double|single)>double) 
+  will match two floats, and result in a double
+
+Class(coerce(char|logical>double, numeric>0))
+  will convert any char and logical arguments to double, then will
+  match any single numeric argument, and emit the type of that argument
+
+Class(char&char>char, numeric&(0|double)>0,  (double|1)&numeric>1)
+  Either two chars will result in a char, or, if two arguments are
+  numeric, they should either have the same class or at least one
+  argument has to be a double, in which case it will return the class
+  of the other argument.
+
+Class(none>double)
+  If there are no inputs, will result in a double (i.e. this models a
+  double constant).
+
+Class(parent&opt(any))
+  Matches whatever the parent builtin matches, but will allow for one
+  extra argument of any type.
+
+
+===== 5 Source Code ======
+Where to find the definition:
+- processTags.py (did it move?) shows the python definition
+- ClassPropTools.java has the java implementation of the expr nodes
+
+
