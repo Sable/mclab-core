@@ -73,7 +73,7 @@ public abstract class GenericFile implements Serializable {
      * If this generic file is not a directory, null is returned.
      * @return
      */
-    abstract public Collection<GenericFile> listChildren();
+    abstract public Collection<? extends GenericFile> listChildren();
     
     
     /**
@@ -109,6 +109,21 @@ public abstract class GenericFile implements Serializable {
         if (pos == -1) return "";
         return name.substring(pos+1);
    }
+
+    
+    /**
+     * returns the file extension of this file.
+     * Returns an empty String if there is no file extension.
+     * Doesn't remove "." in the extension.
+     * @return
+     */
+    public String getExtensionComplete() {
+        String name = getName();
+        if (name == null) return "";
+        int pos = name.lastIndexOf('.');
+        if (pos == -1) return "";
+        return name.substring(pos);
+   }
     
     /**
      * returns the whole path of the file
@@ -139,10 +154,6 @@ public abstract class GenericFile implements Serializable {
     public static GenericFile create(URL url){
         return null;
     }
-    
-    
-    @Override
-    abstract public int hashCode();
     @Override
     abstract public boolean equals(Object obj);
 }

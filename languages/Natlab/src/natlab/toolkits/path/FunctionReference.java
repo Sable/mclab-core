@@ -17,6 +17,8 @@
 // =========================================================================== //
 
 package natlab.toolkits.path;
+import ast.ASTNode;
+import ast.Program;
 import natlab.toolkits.filehandling.genericFile.*;
 
 
@@ -36,20 +38,23 @@ import natlab.toolkits.filehandling.genericFile.*;
 
 
 public class FunctionReference {
-    GenericFile path;
-    String name;
-    boolean isBuiltin;
-    boolean isPrivate; //TODO - denote whether private, sibling, nested etc.
-    
+    public final GenericFile path;
+    public final String name;
+    public final ReferenceType referenceType;
+    public final boolean isBuiltin;
     /**
      * creates a Function Reference referring to a function inside a matlab file
      * @param name the name of the function
      * @param path the path of the function (as an absolute File)
      */
+
     public FunctionReference(String name, GenericFile path){
         this.path = path;
         this.name = name;
-        this.isBuiltin = false;
+	if (path instanceof BuiltinFile)
+	    this.isBuiltin = true;
+	else this.isBuiltin = false;
+	referenceType = ReferenceType.UNKNOWN;
     }
     
     /**
@@ -59,12 +64,29 @@ public class FunctionReference {
      */
     public FunctionReference(GenericFile path){
         this.path = path;
-        //TODO this should be done nicer - what if there is no extension?
-        this.name = path.getName().substring(0,path.getName().length()-path.getExtension().length()-1);
-        this.isBuiltin = false;
+        this.name = natlab.toolkits.path.FolderHandler.getFileName(path);
+	if (path instanceof BuiltinFile)
+	    this.isBuiltin = true;
+	else this.isBuiltin = false;
+	referenceType = ReferenceType.UNKNOWN;
     }
-    
-    
+
+    public FunctionReference(GenericFile path, ReferenceType t){
+        this.path = path;
+        this.name = natlab.toolkits.path.FolderHandler.getFileName(path);
+	if (path instanceof BuiltinFile)
+	    this.isBuiltin = true;
+	else this.isBuiltin = false;
+	referenceType=t;
+    }
+
+    public FunctionReference(GenericFile path, ast.Function f, ReferenceType t){
+		this.path = path;
+		this.name = f.getName();
+		this.isBuiltin = false;
+		this.referenceType=t;
+    }
+
     /**
      * returns the name of the function
      */
@@ -88,8 +110,10 @@ public class FunctionReference {
     public FunctionReference(String name){
     	this.name = name;
     	this.isBuiltin = true;
+    	this.path = null;
+    	this.referenceType=ReferenceType.UNKNOWN;
     }
-    
+
     /**
      * returns whether this function refers to a builtin
      */
@@ -116,6 +140,16 @@ public class FunctionReference {
     @Override
     public int hashCode() {
     	return name.hashCode()+(isBuiltin?0:path.hashCode());
+    }
+
+    public enum ReferenceType{
+	UNKNOWN, /* path/name.m. It can be a script, functionlist or class */ 
+        PACKAGE, /* +name */ 
+        CLASS_CONSTRUCTOR, /* @type/type.m */
+        OVERLOADED,  /* @type/name */
+        PRIVATE, /* private/name.m */	 
+        NESTED, /* Nested function */
+        SUBFUNCTION, /* When Multiple functions are in the same file. NOT the first/main  function */
     }
 }
 

@@ -25,15 +25,36 @@ aspect NameResolutionAdditions
     protected String CompilationUnits.name="";
     public String CompilationUnits.getName(){return name;}
     public void CompilationUnits.setName(String name){this.name=name;}
+    
+    protected GenericFile CompilationUnits.rootFolder=null;
+    public GenericFile CompilationUnits.getRootFolder(){
+	return rootFolder;
+    }   	      
+    public void CompilationUnits.setRootFolder(GenericFile root){
+	rootFolder = root;
+    }   	    
+
     protected String Program.fullpath="";
     protected String Program.name="";  
+    protected GenericFile Program.file=null;  
     public void Program.setName(String name){this.name=name;}
-    //public void FunctionList.setName(String name){this.name=name;}
     
-    public void Program.setFullPath(String file){this.fullpath=file;}   
+    public void Program.setFullPath(String file){
+
+    }   
     public String Program.getName(){return name;}
-	public String Program.getFullPath(){return this.fullpath;}
-      
+    public String Program.getFullPath(){return this.fullpath;}
+
+    public void Program.setFile(GenericFile f){
+        this.fullpath=f.getPath();
+        String extension = f.getExtensionComplete();
+        this.name=f.getName().substring(0, f.getName().length()-extension.length());
+        this.file=f;
+    }
+
+    public GenericFile Program.getFile(){
+        return file;
+    }
 
     public boolean Program.canDoDeclRewrites = true;
 
