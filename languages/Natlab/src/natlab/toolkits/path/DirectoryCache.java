@@ -146,11 +146,21 @@ public class DirectoryCache extends PersistentlyCachedObject{
         return s+">";
     }
     
+    public static void printCache(){
+        System.out.println(cache);
+    }
+    
     /**
      * returns a string representation of the cache
      */
     public static String getString(){
         return cache.toString();
+    }
+    
+    public static void touchAll(){
+        for (CachedDirectory d : cache.directories.values()){
+            d.update();
+        }
     }
 }
 

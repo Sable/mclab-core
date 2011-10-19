@@ -68,6 +68,8 @@ public class FilePathEnvironment extends AbstractPathEnvironment {
 		pwd = main.getParent();
         natlabPath = MatlabPath.getNatlabPath();
 		matlabPath = MatlabPath.getMatlabPath();
+		//DirectoryCache.touchAll();
+		//DirectoryCache.printCache();
 	}
 
 	/**

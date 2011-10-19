@@ -108,7 +108,7 @@ public class CachedDirectory extends GenericFile implements Externalizable {
                     childDirs = null;
                 } else {
                     exists = true;                    
-                    Collection<GenericFile> children = directory.listChildren();
+                    Collection<? extends GenericFile> children = directory.listChildren();
                     for (GenericFile f : children){
                         if (f.isDir()){
                             childDirs.add(f.getName());
