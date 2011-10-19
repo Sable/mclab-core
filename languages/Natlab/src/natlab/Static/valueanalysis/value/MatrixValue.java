@@ -31,7 +31,7 @@ import natlab.toolkits.analysis.Mergable;
  * Use SimpleMatrixValue for an implementation that is non-abstract, and 
  * which adds a constant.
  * 
- * Any actual implementation of this class has to be generic itself.
+ * Any actual implementation of this class has to be generic in itself.
  * Implementations have to provide a MatrixValueFactory. The convention
  * is that every implementation of MatrixValue provides a factory as a public
  * static final variable FACTORY (see SimpleMatrixValue).
@@ -39,7 +39,7 @@ import natlab.toolkits.analysis.Mergable;
  * @author adubra
  */
 public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> {
-    PrimitiveClassReference classRef;
+    protected PrimitiveClassReference classRef;
     
     @Override
     public PrimitiveClassReference getMatlabClass() {
@@ -59,8 +59,13 @@ public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> 
     abstract public D merge(Value<D> other);
     
     
-    //TODO - should this be part of Value?
-    public abstract boolean isConstant();
+    /**
+     * returns true if there is a constant associated with this value
+     * @return
+     */
+    public boolean isConstant(){
+        return getConstant() != null;
+    }
     
     /**
      * returns the constant associated with this value, or null if it's not a constant
@@ -77,7 +82,7 @@ public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> 
      * returns a Matrix Value representing the index i
      * in the loop header
      * for i = <this>:<inc>:<upper>
-     * inc is optional, and may be null
+     * inc is optional, and may be null, in which case inc=1
      */
     abstract public D forRange(D upper, D inc);
     

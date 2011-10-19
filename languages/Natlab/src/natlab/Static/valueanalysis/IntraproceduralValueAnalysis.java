@@ -16,7 +16,7 @@ import natlab.toolkits.path.FunctionReference;
 /**
  * This analysis attempts to find the class of every variable.
  * It also propagates some constant information. This analysis
- * store a flow set for every statement, which is a map of
+ * stores a flow set for every statement, which is a map of
  * variablename->classname->abstract value
  * 
  * This class operates on the static IR.
@@ -25,12 +25,14 @@ import natlab.toolkits.path.FunctionReference;
 public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<D>>{
     StaticFunction function;
     MatrixValueFactory<D> factory;
+    ValuePropagator<D> valuePropagator;
     
     public IntraproceduralValueAnalysis(StaticFunction function, MatrixValueFactory<D> factory) {
         super(function.getAst());
         this.function = function;
         DEBUG = true;
         this.factory = factory;
+        this.valuePropagator = factory.getValuePropagator();
     }
     
     //TODO - a second constructor which also takes an Args<D> object
@@ -44,9 +46,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
 
     @Override
     public void merge(ValueFlowMap<D> in1, ValueFlowMap<D> in2, ValueFlowMap<D> out) {
-        ValueFlowMap<D> map = in1.merge(in2);
-        out.clear(); //TODO - use correct valueflow map method union (in1,dest)
-        out.putAll(map);
+        in1.union(in2, out);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         ValueFlowMap<D> flow = getCurrentInSet().copy();
         ValueSet<D> result = ValueSet.newInstance();
         //set the loop var
+        //TODO - do we have to check whether colon is overloaded?
         if (node.hasIncr()){ //there's an inc value
             for (LinkedList<Value<D>> list : cross(flow,
                     node.getLowerName(),node.getIncName(),node.getUpperName())){
@@ -102,7 +103,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
         ValueFlowMap<D> flow = getCurrentInSet(); //note copied!
         ValueSet<D> array = flow.get(node.getArrayName().getID());
-        ValueFlowMap<D> result = ValueFlowMap.newInstance();
+        ValueFlowMap<D> result = null;
         //go through all possible array values
         for (Value<D> arrayValue : array){
             if (arrayValue instanceof MatrixValue<?>){
@@ -110,13 +111,15 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
                 //TODO - deal with overloading etc.
                 //TODO - errors on assign - use is assign to var??
                 for (List<Value<D>> indizes : cross(flow,node.getIndizes())){
-                    result.merge(doAssign(flow,node.getTargets(),
+                    result = unionOrSet(result,doAssign(flow,node.getTargets(),
                             Collections.singleton(ValueSet.newInstance(arrayValue.subsref(indizes)))));
+                    
                 }
             } else if (arrayValue instanceof FunctionHandleValue<?>){
                 //go through all function handles this may represent and get the result
                 for (FunctionReference ref :((FunctionHandleValue<D>)arrayValue).getFunctions()){
-                  result.merge(doFunctionCall(ref, flow, node.getIndizes(), node.getTargets()));
+                  result = unionOrSet(result,doFunctionCall(
+                          ref, flow, node.getIndizes(), node.getTargets()));
                 }
             } else {
                 //TODO more possible values here
@@ -225,9 +228,20 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     private ValueFlowMap<D> doFunctionCall(
             FunctionReference function,ValueFlowMap<D> flow,
             IRCommaSeparatedList args,IRCommaSeparatedList targets){
-        
-        
-        return null;
+        ValueFlowMap<D> result = null;
+        //TODO - do overloading, deal with dominant args etc.
+        if (function.isBuiltin()){
+            for (LinkedList<Value<D>> argumentList : cross(flow,args)){
+                Args<D> argsObj = Args.newInstance(argumentList);
+                Res<D> res = valuePropagator.call(function.getname(), argsObj);
+                result = unionOrSet(result,doAssign(flow, targets, res));
+                System.out.println(result);
+            }
+        } else {
+            //TODO - deal with this
+            return null;
+        }
+        return result;
     }
     
     
@@ -236,7 +250,7 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
      * by the comma separated list. Returns a new flowmap which is a copy
      * of old one, except for the newly assigned valeus.
      * 
-     * TODO - should this be part of ValueFlowMap?
+     * TODO - should this be part of ValueFlowMap? Or maybe a helper
      */
     private ValueFlowMap<D> doAssign(ValueFlowMap<D> flow, 
             IRCommaSeparatedList targets, Collection<ValueSet<D>> values){
@@ -254,6 +268,17 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     }
     
     
+    
+    /**
+     * merges flow map  b into flow map a and returns a, unless a or b is null 
+     * - in which case the other argument gets returned.
+     */
+    private ValueFlowMap<D> unionOrSet(ValueFlowMap<D> a, ValueFlowMap<D> b){
+        if (a == null) return b;
+        if (b == null) return a;
+        a.union(b);
+        return a;
+    }
 }
 
 

@@ -9,7 +9,7 @@ import natlab.toolkits.analysis.*;
 /**
  * represents a flow map for the value analysis.
  * This is a map from variable name (String) to ValueSet.
- * Note that this is one of the view classes in this package representing mutable objects.
+ * Note that this is one of the few classes in this package representing mutable objects.
  * 
  * @author ant6n
  */
@@ -145,4 +145,19 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
         }
         return false;   
     }
+    
+    /**
+     * fast merge does the same as merge, except it destroys the arguments or this.
+     * It's faster by returning a modified version of the argument - usually
+     * whichever ValueFlowMap had more elements in it
+     * TODO - remove this, probably
+    public ValueFlowMap<D> fastMerge(ValueFlowMap<D> other){
+        if (this.map.size() > other.map.size()){
+            this.union(other);
+            return this;
+        } else {
+            other.union(this);
+            return other;
+        }
+    }*/
 }

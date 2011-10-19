@@ -31,7 +31,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
         return new ValueSet<D>();
     }
     
-    private ValueSet(Map<ClassReference, Value<D>> aMap){
+    private ValueSet(Map<ClassReference, D> aMap){
         if (aMap.size() == 0) return;            
         if (aMap.size() == 1){
             size = 1;
@@ -42,7 +42,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
             size = aMap.size();
         }
     }
-    public static <D extends MatrixValue<D>> ValueSet<D> newInstance(Map<ClassReference, Value<D>> aMap){
+    public static <D extends MatrixValue<D>> ValueSet<D> newInstance(Map<ClassReference, D> aMap){
         return new ValueSet<D>(aMap);
     }
     

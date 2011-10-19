@@ -12,6 +12,9 @@ import natlab.Static.valueanalysis.constant.*;
  * This class also provides a Factory for non-extended PrimitiveData
  * (i.e. an implementation of PrimitiveValueFactory<PrimitiveData>)
  * 
+ * This class also has to provide a BuiltinVisitor that propagates values
+ * through builtins.
+ * 
  * @author ant6n
  *
  * @param <D>
@@ -23,6 +26,12 @@ public abstract class MatrixValueFactory<D extends MatrixValue<D>> {
      * @param constant
      */
     abstract public D newMatrixValue(Constant constant);
+    
+    
+    /**
+     * returns a ValuePropagator
+     */
+    abstract public ValuePropagator<D> getValuePropagator();
     
     
     /**

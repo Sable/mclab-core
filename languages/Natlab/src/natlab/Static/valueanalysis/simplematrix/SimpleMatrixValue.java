@@ -1,9 +1,12 @@
-package natlab.Static.valueanalysis.value;
+package natlab.Static.valueanalysis.simplematrix;
 
 import java.util.List;
 
 import natlab.Static.classes.reference.*;
 import natlab.Static.valueanalysis.constant.Constant;
+import natlab.Static.valueanalysis.value.MatrixValue;
+import natlab.Static.valueanalysis.value.Shape;
+import natlab.Static.valueanalysis.value.Value;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -87,16 +90,18 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
         //TODO
     }
     
-    
-    
-    //*** factory *************************************************************
-    public static class SimpleMatrixValueFactory extends MatrixValueFactory<SimpleMatrixValue>{
-        @Override
-        public SimpleMatrixValue newMatrixValue(Constant constant) {
-            return new SimpleMatrixValue(constant);
-        }
-    }
+
     public static final SimpleMatrixValueFactory FACTORY = new SimpleMatrixValueFactory();
+
+
+    @Override
+    public Shape<SimpleMatrixValue> getShape() {
+        return null;
+    }
+    @Override
+    public boolean hasShape() {
+        return false;
+    }
 }
 
 

@@ -2,9 +2,10 @@ package natlab.Static.builtin;
 
 import java.util.*;
 
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.classes.reference.PrimitiveClassReference;
-import natlab.Static.valueanalysis.value.Value;
+import natlab.Static.classes.reference.*;
+import natlab.Static.valueanalysis.constant.*;
+import natlab.Static.valueanalysis.simplematrix.SimpleMatrixValueFactory;
+import natlab.Static.valueanalysis.value.*;
 
 /**
  * tools for building class propagation information for builtins.
@@ -23,7 +24,7 @@ public class ClassPropTools {
      * returns null if the combination of argument classes is illegal.
      */
     public static LinkedList<HashSet<ClassReference>> matchByValues(MC tree,
-            List<Value<?>> argValues){
+            List<? extends Value<?>> argValues){
         ArrayList<ClassReference> argClasses = new ArrayList<ClassReference>(argValues.size());
         for (Value<?> v : argValues){
             argClasses.add(v.getMatlabClass());
@@ -48,10 +49,10 @@ public class ClassPropTools {
      */
 
     public static LinkedList<HashSet<ClassReference>> match(MC tree,
-            List<ClassReference> argClasses,List<Value<?>> argValues){
+            List<ClassReference> argClasses,List<? extends Value<?>> argValues){
         MatchResult match = tree.match(true, new MatchResult(), argClasses, argValues);
         //System.out.println(match.getAllResults());
-        if (match == null || match.numMatched != argClasses.size()) return null;
+        if (match == null || match.isError || match.numMatched != argClasses.size()) return null;
         return match.getAllResults();
     }
     
@@ -66,26 +67,29 @@ public class ClassPropTools {
         MatchResult p1,p2; //parents
         ClassReference emittedClass;
         int numEmittedResults; //number of emmited results
+        boolean isError = false; //if any MatchResult is an error, then overall we'll have an error
         /**
          * default constructor
          */
         MatchResult(){}
         /**
-         * constructor referring to parent, copying numMatched/numEmmited
+         * constructor referring to parent, copying numMatched/numEmmited, error
          */
         MatchResult(MatchResult parent){
             this.numMatched = parent.numMatched;
             this.p1 = parent;
             this.numEmittedResults = parent.numEmittedResults;
+            this.isError = parent.isError;
         }
         /**
-         * constructor referring to parent, copying numMatched and adding extra result
+         * constructor referring to parent, copying numMatched,error and adding extra result
          */
         MatchResult(MatchResult parent,ClassReference emittedClass){
             this.numMatched = parent.numMatched;
             this.p1 = parent;
             this.emittedClass = emittedClass;
             this.numEmittedResults = parent.numEmittedResults+1;
+            this.isError = parent.isError;
         }
         
         
@@ -97,6 +101,7 @@ public class ClassPropTools {
             if (numMatched == other.numMatched && numEmittedResults == other.numEmittedResults){
                 MatchResult result = new MatchResult(this);
                 result.p2 = other;
+                result.isError = this.isError || other.isError;
                 return result;
             } else {
                 throw new UnsupportedOperationException(
@@ -118,11 +123,24 @@ public class ClassPropTools {
         MatchResult emit(ClassReference classRef){
             return new MatchResult(this,classRef);
         }
+
+        /**
+         * returns a match result which adds an error to the given result,
+         * and refers back tho this
+         */
+        MatchResult error(){
+           MatchResult m = new MatchResult(this); 
+           m.isError = true;
+           return m;
+        }
         
         /**
          * returns all results as a linked list of sets of matlab classes
+         * returns null if the match result is erroneous
          */
         LinkedList<HashSet<ClassReference>> getAllResults(){
+            //check if matchresult is error
+            if (isError) return null;
             LinkedList<HashSet<ClassReference>> results = new LinkedList<HashSet<ClassReference>>();
             Deque<MatchResult> deque = new LinkedList<MatchResult>();
             deque.add(this);
@@ -170,7 +188,7 @@ public class ClassPropTools {
          * This method returns null if the match failed.
          */
         abstract public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues);
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues);
     }
     
     //<builtin class>
@@ -182,7 +200,7 @@ public class ClassPropTools {
         }
         public String toString() {return classRef.getName();}
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues){
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
             if (isLeft){ //isleft - try to match
                 if (previousMatchResult.numMatched < inputClasses.size() &&
                     inputClasses.get(previousMatchResult.numMatched).equals(classRef))
@@ -202,7 +220,7 @@ public class ClassPropTools {
         }
         public String toString() {return class1+"|"+class2;} 
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues){
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
             if (isLeft){ //isleft - try left and right, then return the longer succesfull match
                 MatchResult match1 = class1.match(isLeft, previousMatchResult, inputClasses, inputValues);
                 MatchResult match2 = class2.match(isLeft, previousMatchResult, inputClasses, inputValues);
@@ -228,7 +246,7 @@ public class ClassPropTools {
         }
         public String toString() {return "("+class1+")&("+class2+")";}        
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues){
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
             if (isLeft){ //isleft - try to match first, then try to match second using the result
                 MatchResult match = class1.match(isLeft, previousMatchResult, inputClasses, inputValues);
                 if (match == null) return null;
@@ -247,7 +265,7 @@ public class ClassPropTools {
         }
         public String toString() {return "("+class1+">"+class2+")";}        
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues){
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
             //isleft/isright - try to match first, then try to match second using the result
             MatchResult match = class1.match(true, previousMatchResult, inputClasses, inputValues);
             if (match == null){
@@ -257,21 +275,22 @@ public class ClassPropTools {
             return class2.match(false, match, inputClasses, inputValues);
         }
     }
-    //<n> - matches or emits argument n
+    //<n> - matches or emits argument n, negative numbers match from the back
     public static class MCNum extends MC{
         int num;
         public MCNum(int num){this.num = num;}
         public String toString() { return num+""; }
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues){
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
+            int index = num<0?(inputClasses.size()+num):num; //negative index?
             if (isLeft){ //isleft
-                if (num < inputClasses.size() &&
+                if (index < inputClasses.size() && index >= 0 &&
                     inputClasses.get(previousMatchResult.numEmittedResults).
                         equals(inputClasses.get(num))) return previousMatchResult.next();
                 return null;
             } else { //isright
                 //TODO should catch the index out of bounds exception?
-                return previousMatchResult.emit(inputClasses.get(num));
+                return previousMatchResult.emit(inputClasses.get(index));
             }
         }
     }
@@ -280,7 +299,7 @@ public class ClassPropTools {
         public String toString() { return "none"; }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
             return previousMatchResult;
         }
         
@@ -290,7 +309,7 @@ public class ClassPropTools {
         public String toString() { return "begin"; }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
             return (previousMatchResult.numMatched == 0)?previousMatchResult:null;
         }
     }
@@ -299,7 +318,7 @@ public class ClassPropTools {
         public String toString() { return "end"; }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
             return (previousMatchResult.numMatched == inputClasses.size())?previousMatchResult:null;
         }
     }
@@ -308,11 +327,52 @@ public class ClassPropTools {
         public String toString() { return "any"; }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
             if (!isLeft) throw new UnsupportedOperationException("class propagation error: 'any' can not be used on the right hand side");
-            return previousMatchResult.next();
+            return (previousMatchResult.numMatched < inputClasses.size())?
+                    previousMatchResult.next():
+                    null;
         }
     }
+    //If there is another argument to consume, matches if it is
+    //scalar, or if it's shape is unknown, without consuming the argument.
+    //Can be used to check if the next argument is scalar.
+    public static class MCScalar extends MC{
+        public String toString() { return "scalar"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
+            if (!isLeft) throw new UnsupportedOperationException("class propagation error: 'any' can not be used on the right hand side");
+            int i = previousMatchResult.numMatched; 
+            if (i >= inputClasses.size())
+                return null; //no more elements to match
+            if (inputValues == null || inputValues.get(i) == null) return previousMatchResult;
+            //find if the value is scalar nor not 
+            Value<?> value = inputValues.get(i);
+            if (value instanceof MatrixValue<?>){
+                MatrixValue<?> matrix = (MatrixValue<?>)value;
+                if (matrix.isConstant()){
+                    return matrix.getConstant().isScalar()?previousMatchResult:null;
+                }
+            }
+            if (value.hasShape() && !value.getShape().maybeScalar()){
+                return null;
+            }   
+            //we couldn't find anyting out
+            return previousMatchResult;        
+        }
+    }    
+    //error - emits an error result - any MatchResult that includes an error object will result in an error overall
+    public static class MCError extends MC{
+        public String toString() { return "error"; }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses,
+                List<? extends Value<?>> inputValues) {
+            return previousMatchResult.error();
+        }
+    }
+    
     
     
     
@@ -340,7 +400,7 @@ public class ClassPropTools {
         }
         public MatchResult match(boolean isLeft,
                 MatchResult previousMatchResult,
-                List<ClassReference> inputClasses, List<Value<?>> inputValues) {
+                List<ClassReference> inputClasses, List<? extends Value<?>> inputValues) {
             //try to match every arg, replacing if necessary
             ArrayList<ClassReference> newInputClasses = 
                 new ArrayList<ClassReference>(inputClasses);
@@ -366,6 +426,65 @@ public class ClassPropTools {
         
     }
     
+    
+    // if next is a string, consumes it (otherwise no match)
+    // if the value of the string is known, check whether it's among the types emmitted by the
+    // argument expression (which should emit 1 result). If it is, emite that type.
+    // if it isn't, emit an error
+    public static class MCTypeString extends MC{
+        MC tree;
+        HashSet<String> allowedTypes = new HashSet<String>();
+        Map<String,ClassReference> types = new HashMap<String,ClassReference>();
+        public MCTypeString(MC tree){
+            this.tree = tree;
+            //get all allowed types from tree
+            LinkedList<HashSet<ClassReference>> treeResult = tree.match(
+                    false, new MatchResult(), new LinkedList<ClassReference>(), new LinkedList<Value<?>>()).getAllResults();
+            if (treeResult.size() != 1) throw new UnsupportedOperationException(
+                    "typeString arguments neeed emit one result, got "+treeResult+" for "+this);
+            for (ClassReference c : treeResult.get(0)){
+                if (!(c instanceof PrimitiveClassReference)) throw new UnsupportedOperationException(
+                    "typeString arguments neeed emit primitive types, got "+c+" for "+this);
+                allowedTypes.add(c.toString());
+                types.put(c.toString(), c);
+            }
+        }
+        public String toString() {
+            return "typeString("+tree+")";
+        }
+        public MatchResult match(boolean isLeft,
+                MatchResult previousMatchResult,
+                List<ClassReference> inputClasses,
+                List<? extends Value<?>> inputValues) {
+            int i = previousMatchResult.numMatched;
+            if (previousMatchResult.numMatched < inputClasses.size() &&
+                    inputClasses.get(i).equals(PrimitiveClassReference.CHAR)){
+                //consume element
+                MatchResult next = previousMatchResult.next();
+                //if the next value is not known, just return whatever 
+                if ((inputValues == null) || inputValues.get(i) == null
+                        || !(inputValues.get(i) instanceof MatrixValue<?>) 
+                        || !((MatrixValue<?>)(inputValues.get(i))).isConstant() ){
+                    return tree.match(false, next, new LinkedList<ClassReference>(), new LinkedList<Value<?>>());
+                }
+                //else we have a value
+                Constant constant = ((MatrixValue<?>)(inputValues.get(i))).getConstant();
+                if (!(constant instanceof CharConstant)){
+                    return next.error();
+                }
+                //check whether the value is in the list of results
+                String value = ((CharConstant)(constant)).getValue();
+                if (allowedTypes.contains(value)) {
+                    return next.emit(types.get(value));
+                } else {
+                    return next.error();
+                }
+            } else {
+                //next arg not a string
+                return null;
+            }
+        }
+    }
     
     
     /**
@@ -454,8 +573,22 @@ public class ClassPropTools {
         System.out.println("(coerce([logical,char],double,double>double): "+Builtin.Tril.getInstance().getMatlabClassPropagationInfo());
         System.out.println("parent&opt(double)-(double>double): "+Builtin.Ctranspose.getInstance().getMatlabClassPropagationInfo());
         System.out.println("(double>double): "+Builtin.Ctranspose.getInstance().getParentMatlabClassPropagationInfo());
-        System.out.println("none:"+Builtin.Test.getInstance().getMatlabClassPropagationInfo());
-        System.out.println("none:"+Builtin.Test.getInstance().getParentMatlabClassPropagationInfo());
+        
+        MC f5 = new MCTypeString(new MCUnion(new MCBuiltin("double"),new MCBuiltin("logical")));
+        System.out.println();
+        System.out.println(f5);
+        printMatch(f5,PrimitiveClassReference.DOUBLE);
+        printMatch(f5,PrimitiveClassReference.CHAR);
+        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue("double"));
+        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue("int16"));
+        
+        
+        MC f6 = new MCMap(new MCChain(new MCScalar(),new MCBuiltin("char")),new MCBuiltin("logical"));
+        System.out.println();
+        System.out.println(f6);
+        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("aaaa"));
+        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("a"));
+        
     }
     /**
      * for testing
@@ -463,6 +596,15 @@ public class ClassPropTools {
     static void printMatch(MC tree,ClassReference ... args){
         System.out.print(Arrays.asList(args)+"->");
         System.out.println(match(tree,Arrays.<ClassReference>asList(args)));
+    }
+    static void printMatchByValue(MC tree,Value<?>... values){
+        System.out.print(Arrays.asList(values)+"->");
+        //create values
+        LinkedList<ClassReference> types = new LinkedList<ClassReference>();
+        for (Value<?> v: values){
+            types.add(v.getMatlabClass());
+        }
+        System.out.println(match(tree,types,Arrays.asList(values)));
     }
 }
 

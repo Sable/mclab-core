@@ -56,6 +56,7 @@ public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>
         return Constant.get(Math.PI);
     }
    
+    /* TODO
     @Override
     public Constant caseTrue(Builtin builtin, List<Constant> arg) {
         //TODO - deal with args
@@ -64,7 +65,7 @@ public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>
     @Override
     public Constant caseFalse(Builtin builtin, List<Constant> arg) {
         return Constant.get(false);
-    }
+    }*/
 }
 
 

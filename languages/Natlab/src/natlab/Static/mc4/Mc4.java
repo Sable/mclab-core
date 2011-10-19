@@ -30,7 +30,12 @@ import natlab.Static.builtin.*;
 import natlab.Static.callgraph.*;
 import natlab.Static.interproceduralAnalysis.InterproceduralAnalysis;
 import natlab.Static.interproceduralAnalysis.examples.CallStringAnalysis;
+import natlab.Static.valueanalysis.IntraproceduralValueAnalysis;
+import natlab.Static.valueanalysis.ValueSet;
+import natlab.Static.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.Static.valueanalysis.value.MatrixValueFactory;
 import natlab.options.Options;
+import natlab.toolkits.analysis.functionhandle.FunctionReference;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.*;
 
@@ -90,6 +95,7 @@ public class Mc4 {
 		/* */
 		
 		
+		
 		//try to do all benchmarks
 		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks";
 		File bFolder = new File(bFolderString);
@@ -106,9 +112,10 @@ public class Mc4 {
 		    options = new Options();
 	        options.parse(args);
 	        main(options);
+	        System.exit(0);//only do first
 		}
 		System.exit(0);
-		  
+		/* */
 		
 		
 		
@@ -133,20 +140,28 @@ public class Mc4 {
 	 */
 	public static void main(Options options){
         //object that resolves function names to files      
+	    long t = System.currentTimeMillis();
         functionFinder = new FilePathEnvironment(options, Builtin.getBuiltinQuery());
+        //System.out.println("time "+(System.currentTimeMillis() - t));
+        //System.exit(0);
         
 	    //collect all need matlab files
 	    FunctionCollection functions = new FunctionCollection(functionFinder);
+	    
+	    /** test code for interproc
 	    InterproceduralAnalysis<?,?,?> analysis = 
 	        InterproceduralAnalysis.create(new CallStringAnalysis.Factory(), functions, null);
 	    System.out.println(analysis.getMainNode().getResult());
 	    System.exit(0);
 	    //inline all
 	    //functions.inlineAll();
+	    */
 	    
 	    //print result for now
 	    //System.out.println(functions.getAsInlinedFunction().getPrettyPrinted());
 	   
+	    /**
+	    // just write out file
 	    if (true){
 	        FileWriter fstream = null;
 	        try{
@@ -154,6 +169,7 @@ public class Mc4 {
 	            System.out.println("get inilined function success");
 	            if (!(new File(outDir).exists())){ (new File(outDir)).mkdir(); }
 	            File file = new File(outDir+"/"+function.getName()+".m");
+	            System.out.println("writing file "+file.getAbsolutePath());
 	            fstream = new FileWriter(file);
 	            fstream.write(function.getPrettyPrinted());
                 fstream.close();	            
@@ -164,6 +180,18 @@ public class Mc4 {
 	            e.printStackTrace();
 	        }
 	    }
+        */
+	    
+	    StaticFunction aFunction = functions.getAsInlinedStaticFunction();
+	    
+	    System.out.println(aFunction);
+	    
+	    //test intraprocedural class analysis
+	    IntraproceduralValueAnalysis<SimpleMatrixValue> classAnalysis =
+	        new IntraproceduralValueAnalysis<SimpleMatrixValue>(
+	            aFunction,SimpleMatrixValue.FACTORY);
+	    FlowAnalysisTestTool test = new FlowAnalysisTestTool(classAnalysis);
+	    System.out.println(test.run(true,true));
 	}
 }
 

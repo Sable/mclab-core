@@ -79,4 +79,12 @@ public class FunctionHandleValue<D extends MatrixValue<D>> implements Value<D> {
         throw new UnsupportedOperationException("function handles do not support indexint");
         //TODO - or should they support it - this is the same as calling a function
     }
+    @Override
+    public Shape<D> getShape() {
+        return Shape.<D>scalar();
+    }
+    @Override
+    public boolean hasShape() {
+        return true;
+    }
 }

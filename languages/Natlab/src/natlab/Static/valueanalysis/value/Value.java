@@ -30,6 +30,18 @@ public interface Value<D extends MatrixValue<D>> extends Mergable<Value<D>>{
      */
     public Value<D> subsref(List<Value<D>> indizes);
     
+    /**
+     * returns true if this value has a shape associated with it
+     * @return
+     */
+    public boolean hasShape();
+    
+    /**
+     * returns the shape associated with this value, or null if it doesn't have a shape
+     * @return
+     */
+    public Shape<D> getShape();
+    
 }
 
 
