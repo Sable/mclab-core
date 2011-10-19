@@ -107,6 +107,31 @@ parent
   will substitute the expression that is defined for the abstract
   parent builtin. If the parent builtin does not define class
   propagation information, will substitute 'none'.
+error
+  same as none, except that the result is flagged as erroneous. During
+  the matching this is ignored, but if a result is erroneous overall,
+  it will result in not a match overall
+natlab
+  LHS,RHS: Besides the 'Class' tag for builtins, one can define an
+  alternative tag 'MatlabClass' which more closely resembles Matlab
+  semantics, including some of the irregularities of the language. When
+  defining such a MatlabClass tag, the keyword 'natlab' will refer to
+  the expression defined by the 'Class' tag. Note that one cannote
+  define a 'MatlabClass' without defining a 'Class' tag, so this
+  should always be defined.
+matlab
+  equivalent to 'natlab', but this can be used inside 'Class' tags to
+  refer to whatever is defined for the 'MatlabClass' tag. The
+  existence of the 'MatlabClass' tag is not checked, and may result in
+  obscure errors if not used properly.
+scalar
+  LHS: If there is another argument to consume, matches if it is
+  scalar, or if it's shape is unknown, without consuming the argument.
+  Can be used to check if the next argument is scalar. This should
+  only be used if the scalar requirement is directly related to
+  types. If shapes and types are independent, they should be specified
+  independently
+  RHS: error
 
 
 2.2.3 Functions
@@ -131,6 +156,19 @@ opt(expr)
   RHS: This will likely cause an error, because the union of two match
   results must both result in the same number of emited outputs.
 
+star(expr)
+  is the same as opt(x)&opt(x)&opt(x)&...
+
+typeString(expr)
+  LHS,RHS: if the next element is a char, will consume it. If the 
+  value is known, will check whether the value of the string is a
+  type, defined among 'expr'. if the char has a different value,
+  will return an error, otherwise will return the type denoted by
+  the string. If the value is not known, will return all results
+  produced by 'expr'. 'expr' should produce one (union) result.
+  This can be used to match a last optional argument denoting a
+  type, for example as used by the functions ones, zeros, ...
+
 
 2.2.4 Number
 <number>
@@ -139,9 +177,8 @@ opt(expr)
   Negative numbers will match from the back, so -1 is the clas of the
   last argument.
 
+
 ===== 3. Extra Notes on Semantics =====
-
-
 
 === 3.1 RHS can have LHS sub-expressions, and vice versa ===
 An expression may emit results even if it is run as a LHS
@@ -205,6 +242,20 @@ Class(none>double)
 Class(parent&opt(any))
   Matches whatever the parent builtin matches, but will allow for one
   extra argument of any type.
+
+MatlabClass((char|logical)&1>error | natlab)
+  This will define separate semantics for Matlab, compared to natlab.
+  This will reject any input that is either two chars or two logicals,
+  but use the original natlab definition other than that.
+
+Class(star(numeric)&(typeString(numeric)|(none>double)))
+  Will match any number of numeric arguments. If the last argument
+  is a char, will attempt to interpret it as a string denoting a
+  numeric type. if it is, return that numeric type. if it is a string
+  of unknown value, return all numeric. if it's another string, return
+  an error. if the last argument is not a string, return a double.
+  This can be used for function calls like
+       ones(3,3), ones(2,2,4,4,'double')
 
 
 ===== 5 Source Code ======

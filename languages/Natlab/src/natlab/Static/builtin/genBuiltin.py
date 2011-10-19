@@ -18,7 +18,8 @@
 
 import csv;
 import processTags;
-
+import collections;
+import itertools;
 
 
 # caps first letter
@@ -33,8 +34,8 @@ def getChildren(name,children,parents) :
 
 
 # function which constructs the Builtin.java file
-def printBuiltinJava(file,children,parents,abstract,comments):
-    N = len(children);
+def printBuiltinJava(file,builtins):
+    N = len(builtins);
     file.write("""
 package natlab.Static.builtin;
 
@@ -107,37 +108,34 @@ public abstract class Builtin {
     static {
 """);
     # print the placing of classes into the builtinMap
-    for i in range(0,N):
-        if (not abstract[i]):
-            file.write('        builtinMap.put("%s",%s.getInstance());\n' % (children[i],firstCaps(children[i])))
+    for b in builtins:
+        if (not b.isAbstract):
+            file.write('        builtinMap.put("%s",%s.getInstance());\n' % (b.name,b.javaName))
     file.write( """    }    
     
     //the actual Builtin Classes:
     """)
     # print the classes
-    for i in range(0,N):
-        printClass(file,parents[i],children[i],abstract[i],tags[i])
+    for b in builtins:
+        printClass(file,b)
     file.write( "\n}" )
 
 
-# used by printClass for tagMatching
-import re
-matchWord = re.compile('^\w*');
 
 # prints the static classes inside the Builtin class, for a given builtin operation
 # note that operations can either be asbtract or non abstract
-def printClass(file,parent,child,isAbstract,tags):
+def printClass(file,b):
     # first define code for either abstract or non-abstract class
     # note that we reinsert %s, so that we can insert the 'implements' clause later
     iset = set();
-    if (isAbstract):
+    if (b.isAbstract):
         code =  """
     public static abstract class %s extends %s %s {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.case%s(this,arg);
         }
-        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child));
+        """ % (b.javaName,b.parentJavaName,"%s",b.javaName);
     else:
         code = """
     public static class %s extends %s %s {
@@ -155,9 +153,9 @@ def printClass(file,parent,child,isAbstract,tags):
         public String getName(){
             return "%s";
         }
-        """ % (firstCaps(child),firstCaps(parent),"%s",firstCaps(child),firstCaps(child),firstCaps(child),firstCaps(child),child);
+        """ % (b.javaName,b.parentJavaName,"%s",b.javaName,b.javaName,b.javaName,b.javaName,b.name);
     # fill in code due to tags
-    code += processTags.processTags(child,firstCaps(child),firstCaps(parent),isAbstract,iset,tags)    
+    code += processTags.processTags(b,iset)    
     
     # other code that needs to be added to a class can be added here
     
@@ -170,49 +168,51 @@ def printClass(file,parent,child,isAbstract,tags):
 
 
 # prints the visitor class walking up the class hierarchy as a default case
-def printBuiltinVisitorJava(file,children,parents,abstract,comments):
-   N = len(children);
+def printBuiltinVisitorJava(file,builtin):
    file.write("""package natlab.Static.builtin;
 
 public abstract class BuiltinVisitor<Arg,Ret> {
    public abstract Ret caseBuiltin(Builtin builtin,Arg arg);""")
-   for i in range(0,N):
-      if (abstract[i]) : file.write('\n')
-      if (len(comments[i]) > 0) : file.write('    \n    //%s' % comments[i])
+   for b in builtin:
+      if (b.isAbstract) : file.write('\n')
+      if (len(b.comments) > 0) : file.write('    \n    //%s' % b.comments)
       file.write("""
-    public Ret case%s(Builtin builtin,Arg arg){ return case%s(builtin,arg); }""" % (firstCaps(children[i]),firstCaps(parents[i])))
+    public Ret case%s(Builtin builtin,Arg arg){ return case%s(builtin,arg); }""" % (b.javaName,b.parentJavaName))
    file.write("""
 }""")
     
-
+# prints subtrees below the following nodes separately
+printSeparateList = ['MatrixFn'];
 # prints the the tree as a dot file
-def printTreeDot(file,children,parents,abstract,comments):
-   N = len(children);
+def printTreeDot(file,builtin):
    file.write("""digraph builtins{
        //size="10.25,7.75";
        rankdir=LR;
-       graph [ranksep=0];
-       edge[ weight = 1.2 ];
+       graph [ranksep=.2,concentrate=true, nodesep=.3];
+       //edge[ weight = 1.2 ];
        Builtin;
 
 """);
    list = [];
-   for i in range(0,N):
-      if (abstract[i]) :
+   for b in builtin:
+      if (b.isAbstract) :
          file.write('\n')
-         shortName = children[i][8:] #removes the 'abstract'
-         if (len(comments[i]) > 0) : file.write('    \n    //%s' % comments[i])
+         shortName = b.shortName
+         sepPrefix = 'sep' if shortName in printSeparateList else '' # sepPrefix is non-empty if subtre is separated
+         if (len(b.comments) > 0) : file.write('    \n       //%s' % b.comments)
          file.write("""
-       %s[shape=plaintext,color=none,label="%s"];""" % (children[i],shortName));
+       %s[shape=plaintext,color=none,label="%s"];""" % (sepPrefix+b.name,shortName));
+         if (len(sepPrefix) > 0): file.write("""
+       %s[shape=plaintext,color=none,label="%s"];""" % (b.name,shortName)); # print second node if tree is separated
          file.write("""
-       %s -> %s;""" % (parents[i],children[i]));
+       %s -> %s;""" % (b.parentName,sepPrefix+b.name));
          # find the non abstract children - and insert new node for them
-         cs =  [children[j] for j in range(0,N) if parents[j] == children[i] and not abstract[j]]
+         cs =  [child.name for child in b.children if not child.isAbstract]
          if len(cs) >= 1 : 
            file.write("""
        %s[shape=box,label="%s",rank="max"];""" % (cs[0],"\\n".join(cs)));
            file.write("""
-       %s -> %s;""" % (children[i],cs[0]));
+       %s -> %s;""" % (b.name,cs[0]));
            list.append(cs[0])
 
    file.write("""
@@ -220,87 +220,197 @@ def printTreeDot(file,children,parents,abstract,comments):
 }""" % " ".join(list))
     
 
+# used by printClass for tagMatching
+import re
+matchWord = re.compile('^\w*');
+
+# given a list of strings which are tags, verbatim from the csv, returns the dictionary of tags->args
+def getTagDict(taglist):
+   taglist = ([s.strip() for s in taglist if s.strip() != '']) # read tags - remove empties and strip
+   t = {}
+   for tag in taglist:
+      # find first word
+      i = matchWord.match(tag).span();
+      tagName = tag[i[0]:i[1]];
+      tagArgs = tag[i[1]:].strip();
+      t[tagName] = tagArgs;
+   return t;
 
 
 
 
 
-# the script that reads the csv and prints the stuff
-reader = csv.reader(open("builtins.csv"), delimiter=';');
-list = []
-tree = {}
-currentParent = ''; # if no parent is defined, use the most recent child - no need to specify parents of leafs
-currentComment = ''; # comments are collected and output in the visitor class
+# definition for data
+# use for Builtins: 'name javaName isAbstract parentName childNames parent children tags comment index'
+class Builtin(object):
+   def __init__(self,name,originalName,isAbstract,parentName,parent,childNames,children,tags,comments,index):
+      self.__dict__.update(locals()); #this updates self as well - bad?
+      self.javaName = firstCaps(name); 
+      # define java name, parent java name, and short name
+      self.parentJavaName = firstCaps(parentName);
+      self.parent = None; self.children = None;
+      shortName = self.name[8:] if self.isAbstract else self.name #removes the 'abstract'
+      shortName = shortName[0:-8]+'Fn' if shortName[-8:] == 'Function' else shortName; # replace 'Function'-end
+      self.shortName = shortName
+   def __str__(self):
+      return 'Builtin-{0.name}'.format(self);
+   def __repr__(self):
+      return str(self)
+   #iterator
+   def __iter__(self):
+      return itertools.chain((self,),*self.children)
+   # returns 
+   def getByName(self,name):
+      for builtin in self:
+         if builtin.name == name:
+            return builtin
+   def getByOriginalName(self,name):
+      for builtin in self:
+         if builtin.originalName == name:
+            return builtin
+   # returns a list of all leafs
+   def getLeafs(self):
+      result = []
+      for builtin in self:
+         if not builtin.isAbstract:
+            print '--',builtin
+            result.append(builtin)
+      return result
+   # returns all defined tags, including tags defined for parents, as a dictionary tagName->builtin
+   # where builtin is the the most recent ancestor for which the tag is defined
+   def getAllTags(self):
+      if self.parent:
+         result = self.parent.getAllTags()
+      else:
+         result = {};
+      result.update(dict((tagName,self) for tagName in self.tags.keys()))
+      return result
 
-children = []
-parents = []
-comments = []
-tags = [] # list of map of tags for every builtin - starts after 2nd entry (tagName -> tagArgs)
-
-# read through all rows, filling in tree
-for row in reader:
-    if (len(row) == 0):
-        3;
-    elif (row[0][0] == '#'): #catch comment
-        currentComment = row[0][1:].strip()
-    else:
-        children.append(row[0])
-        # use most recent child (currentParent) if no parent i defined
-        if ((len(row) < 2 or (len(row[1].strip()) ==  0))):
-            parents.append(currentParent)
-        else:
-            parents.append(row[1].strip());
-            currentParent = children[-1];
-        taglist = ([s.strip() for s in row[2:] if s.strip() != '']) # read tags - remove empties and strip
-        t = {}
-        for tag in taglist:
-           # find first word
-           i = matchWord.match(tag).span();
-           tagName = tag[i[0]:i[1]];
-           tagArgs = tag[i[1]:].strip();
-           t[tagName] = tagArgs;
-        tags.append(t);
-        print children[-1], t
-        comments.append(currentComment);
-        currentComment = '';
-
-
-# rename all prents that are occuring, finding/setting the abstract classes
-abstract = [True if child in parents else False for child in children]
-children = ['abstract'+firstCaps(child)  if child in parents else child for child in children]
-parents  = ['abstract'+firstCaps(parent) for parent in parents]
-
-
-
-
-
-#  overall parent is Builtin, treat it specially
-parents = ['Builtin' if parent == 'abstractBuiltin' else parent for parent in parents]
-
-
-# write Builtin.java
-print 'generating Builtin.java...'
-file = open('Builtin.java','w');
-printBuiltinJava(file,children,parents,abstract,comments)
-file.close();
+   # TODO 
+   # - tags from all parents
+   # etc. etc.
+   # - has/get parent
+   # - has/get child
+  
 
 
-# write BuiltinVisitor.java
-print 'generating BuiltinVisitor.java...'
-file = open('BuiltinVisitor.java','w');
-printBuiltinVisitorJava(file,children,parents,abstract,comments)
-file.close();
+# converts csv data to Builtin definition
+def createBuiltinDefs(csvData):
+   dict = {}
+   result = []
+   # create objects
+   for i in range(0,len(csvData.names)):
+      builtin = Builtin(   name=csvData.names[i],
+                           originalName=csvData.originalNames[i],
+                           isAbstract=csvData.isAbstracts[i],
+                           parentName=csvData.parents[i],
+                           parent=None,
+                           childNames=[csvData.names[j] for j in range(0,len(csvData.names)) if csvData.parents[j] == csvData.names[i]],
+                           children=[],
+                           tags=csvData.tags[i],
+                           comments=csvData.comments[i],
+                           index=i);
+
+      dict[builtin.name] = builtin
+      result.append(builtin)
+   # fill in parents, children
+   for i in range(0,len(csvData.names)):
+      result[i].children = [dict[name] for name in result[i].childNames]
+      try: result[i].parent = dict[result[i].parentName];
+      except:
+         pass
+   return result;
 
 
-# write the tree.dot
-print 'creating dot of tree'
-file = open('tree.dot','w');
-printTreeDot(file,children,parents,abstract,comments)
-file.close();
+# reads the csv file description, and returns it as a Builtin tree
+def readCSVData(fileName):
+   # the script that reads the csv and prints the stuff
+   reader = csv.reader(open(fileName), delimiter=';');
+   list = []
+   tree = {}
+   currentParent = ''; # if no parent is defined, use the most recent child - no need to specify parents of leafs
+   currentComment = ''; # comments are collected and output in the visitor class
 
-print 'genereated code for %d builtins (including abstract builtins)' % (len(children))
+   children = []
+   parents = []
+   comments = []
+   tags = [] # list of map of tags for every builtin - starts after 2nd entry (tagName -> tagArgs)
 
-#for i in range(0,len(children)):
-#   if not abstract[i]: print children[i]
 
-print 'number of Builtins generated: %d' % (len(children))
+   # read through all rows, filling in tree
+   for row in reader:
+      if (len(row) == 0): # empty row - skip
+         3;
+      elif (row[0][0] == '#'): # catch comment
+         currentComment = row[0][1:].strip()
+      elif (row[0].strip()[0] == '-'): # catch continuation
+         row[0] = row[0].strip()[1:]; # remove the '-' and white space from first cell
+         tags[-1].update(getTagDict(row)) # get the defined tags and update the most recent tag dict
+      else:
+         children.append(row[0].strip())
+         # use most recent child (currentParent) if no parent i defined
+         if ((len(row) < 2 or (len(row[1].strip()) ==  0))):
+             parents.append(currentParent)
+         else:
+             parents.append(row[1].strip());
+             currentParent = children[-1];
+
+         tags.append(getTagDict(row[2:]));
+         #print children[-1], tags[-1]
+         comments.append(currentComment);
+         currentComment = '';
+
+
+   # rename all prents that are occuring, finding/setting the abstract classes
+   abstract = [True if child in parents else False for child in children]
+   originalNames = children
+   children = ['abstract'+firstCaps(child)  if child in parents else child for child in children]
+   parents  = ['abstract'+firstCaps(parent) for parent in parents]
+
+   #  overall parent is Builtin, treat it specially
+   parents = ['Builtin' if parent == 'abstractBuiltin' else parent for parent in parents]
+
+
+   return  createBuiltinDefs(collections.namedtuple('CSVData','names originalNames parents isAbstracts tags comments')
+                             (children,originalNames,parents,abstract,tags,comments));
+
+
+# overall 'script' that actually generates all the code
+def generate():
+   # actually read the data
+   builtins = readCSVData("builtins.csv");
+
+
+   # write Builtin.java
+   print 'generating Builtin.java...'
+   file = open('Builtin.java','w');
+   printBuiltinJava(file,builtins)
+   file.close();
+
+
+   # write BuiltinVisitor.java
+   print 'generating BuiltinVisitor.java...'
+   file = open('BuiltinVisitor.java','w');
+   printBuiltinVisitorJava(file,builtins)
+   file.close();
+
+
+   # write the tree.dot
+   print 'creating dot of tree'
+   file = open('tree.dot','w');
+   printTreeDot(file,builtins)
+   file.close();
+
+   print 'genereated code for \n - %d builtins (including abstract builtins)' % sum([1 for b in builtins])
+   print ' - %d non-abstract builtins' % sum([1 for b in builtins if not b.isAbstract])
+
+   #for i in range(0,len(children)):
+   #   if not abstract[i]: print children[i]
+
+
+if __name__ == "__main__":
+   generate()
+
+
+
+

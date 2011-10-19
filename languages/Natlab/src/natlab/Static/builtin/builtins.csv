@@ -1,17 +1,24 @@
 # specifies builtins, in a tree structure, with annotated information
 # this list is used to generate the java code for the builtins (via 'genBuiltin.py') 
 # Syntax:
-# <name>; <parent>; <tag1>; <tag2>; ... ; <tagn>
+# <name>; <parent>; <tag_1>; <tag_2>; ... ; <tag_n>
+# [  - <tag_n+1>; <tag_n+2>; ... ; <tag_n+m>]
+# [  - <tag_n+m+1>; ... ]
+# [  ...]
+#
 # - if no parent is specified then the most recent name is assumed
 # - the most recent comment gets preserved and annotated to the java code
-# - all parent classes will be renamed as Abstract<Name>, except the root
+# - all parent classes will be renamed as Abstract<Name>, except the root, "builtin"
 # - all classes will have their first letter capitalized
 # - the overall parent class 'Builtin' - is treated specially, so doesn't need to
-#   specifically listed
+#   specifically listed - we nevertheless use an explitic root
 # - Tags are optional -- they specify extra properties that the builtins have.
 #   Both internal nodes (abstract builtins) and leafs (actual
 #   builtins) can have tags. a tag will force some extra code to be
 #   inserted into the buitin, and/or force it to implement some extra interface.
+# - if a line gets too long, tags can be continued on the next lines, all starting
+#   with '-'. It is assumed that a line starting with whitespace+'-' continues the
+#   tag definitions of the previous builtin
 #
 # tags:
 # - args, args(), args(n), args(m,n)
@@ -27,150 +34,228 @@
 #        Class(char&char>char, numeric&(0|double)>0,  (double|1)&numeric>1)
 #        Class(none>double)
 #        Class(parent&opt(any))
+# - matlabClass(<expr>)
+#     Allows alternative definition of class propagation that more exacty follows
+#     Matlab semantics. This can only be defined for builtins for which 'Class' is defined.
 #
+# Categories of functions
+# - pure/impure: pure functions have no side effects, change no state, always return the same result
+# - matrix:      args/operands/results are of class numerical, char, logical
+# - cell:        operates on cells
+# - struct:      operates on structs
+# - object:      operates on objects
+# - versatile:   operates on multiple kinds of classes - or subgroup of functions operates on multiple kinds of classes
+# - anyMatrix:   operates on any matrix class
+# - numeric:     operates on numerical classes - char/logical may get coerced to double
+# - float:       operates on floats
+# - proper/improper: proper functions have strict arity, and the arguments are operands, rather than options
+# - unary, binary: function takes in exactly one, two operatnds, respectively
+# - elemnwise:   operates on matrizes (or expanded scalars) elemental, and the result has the same shape as the arg
+# - array:       operates on a whole matrix
+# - dimensionSensitive: function is of the form f(M,[dim]), i.e. there is a second optional parameter specifying along which dimension to operate
+# - dimensionCollapsing: function that collapses a dimension (optional second arg tells which)
+
 # TODO
 # - class is not impure
 # - mfilename is matlab system
 # - better categorize matlab system stuff
 # - better categorize operator vs matrix operator, and the binary vs
-#     unary, and elementwise vs matrix
-#     also group by type (numerical, float, etc.)
-# - an operator is something that takes the same number of args,
-#     always ?
 # - group explicit indexing
-# - should I name <type>Result<..>?
-# - decide between 'elemental' and 'elementwise', matrix, matrixwise? array... matrix... ?
-# - change script to allow lines to start with "- x", to mark continuations
+# - should it be named <type>Result<..>?
 # - change tag processing to annotate 'args' if classes are defined
 # - new tag "outs"?
+# - need a category for function_handle functions?
+# - append multiple comments together -> should they become javadoc?
+# - create a new class like MatlabClass - if defined, the actual matlab behavior is different, this also needs
+#    - a way to refer to the 'simlified' declaration, maybe? - like the 'parent' node
+#    - an output called 'error' - if any output is 'error', the result is error
+# - create categories relating to complex vs real
+# - conversion vs query, what's the same, what's different?? define properly
+# - investigate whether query, constructor etc. functions need the proper/improper categories
 
 
-#pure functions have no side effects and always return the same value
-pureFunction; builtin
+root; builtin
 
-# function operates on matrizes
+# pure functions have no side effects and always return the same value, depending only on arguments
+pureFunction; root
+
+
+# function operates on matrizes (numerical,char,logical)
 matrixFunction; pureFunction
+
+# **************************************************************************************
+# constant function - there are few of these, most 'constants' take optional shape args
+constant; matrixFunction
+
+doubleConstant; constant; Class(none>double)
+pi
+i
+j
 
 
 # ****************************************************************************************
 # general function - operates on any matrix, sometimes with restrictions
 anyMatrixFunction; matrixFunction
 
-# constant function
-constant; anyMatrixFunction
-pi
-
 
 # any matrix functions with fixed arity, where all arguments are numeric operands
-strictAnyMatrixFunction; anyMatrixFunction
+properAnyMatrixFunction; anyMatrixFunction
 
 # unary function operating on a general matrix
-unaryAnyMatrixFunction; strictAnyMatrixFunction
+unaryAnyMatrixFunction; properAnyMatrixFunction
 
 
 # elemental unary function operating on a general matrix
 elementalUnaryAnyMatrixFunction; unaryAnyMatrixFunction
 
 # matrix-wise unary function operating on a general matrix
-matrixUnaryAnyMatrixFunction; unaryAnyMatrixFunction;; Class(double>double)
-transpose;; Class(double,int)
-ctranspose
+arrayUnaryAnyMatrixFunction; unaryAnyMatrixFunction
+
+# binary function operating on a general matrix
+binaryAnyMatrixFunction; properAnyMatrixFunction
 
 
-# TODO take optional 2nd parameter k:
+# elemental binary function operating on a general matrix
+elementalBinaryAnyMatrixFunction; BinaryAnyMatrixFunction
+
+# matrix-wise unary function operating on a general matrix
+arrayBinaryAnyMatrixFunction; BinaryAnyMatrixFunction
+
+
+
+# improper numerical matrix functions don't have a fixed arity, and take (optional) extra
+# arguments that either options or different possible operands.
+improperAnyMatrixFunction; anyMatrixFunction
+
+
+
+diagonalSensitive; improperAnyMatrixFunction
+-Class(matrix&opt(matrix)>0)
 tril
 triu
+diag
 
 
+# functions of the form f(matrix,[dimension]), where matrix is any matrix
+dimensionSensitiveAnyMatrixFunction; improperAnyMatrixFunction
 
-# non-strict numerical matrix functions don't have a fixed arity, and take (optional) extra
-# arguments that either options or different possible operands.
-flexibleAnyMatrixFunction; anyMatrixFunction
-
-# numeric function that collapses a dimension (optional second arg tells which)
-dimensionCollapsingAnyMatrixFunction; flexibleAnyMatrixFunction
-
+# functions that collapse the specified dimension
+dimensionCollapsingAnyMatrixFunction; dimensionSensitiveAnyMatrixFunction
 
 
 
 # ***************************************************************************************
-# numeric function - operatoes on any numeric matrix, chars and logicals are coerced to double
-# with the restriction that integer or single argument types need to agree
-# - some Matlab functions don't actually coerce logicals and or chars!
-numericMatrixFunction; matrixFunction
+# numeric function - operates on any numeric matrix, chars and logicals are coerced to double
+# with the restriction that int or single argument types need to agree
+# - some actual Matlab functions don't actually coerce logicals and or chars!
+numericFunction; matrixFunction
 
 
 # numeric matrix functions with fixed arity, where all arguments are numeric operands
 # should this be called something related to operator?
-strictNumericMatrixFunction; numericMatrixFunction
+properNumericFunction; numericFunction
 
-# unary numeric matrix function
-unaryNumericMatrixFunction; strictNumericMatrixFunction
+# unary numeric function
+unaryNumericFunction; properNumericFunction
+-Class(numeric>0, char|logical>double)
 
-# elemental unary numeric matrix function
-elementalUnaryNumericMatrixFunction; unaryNumericMatrixFunction
+elementalUnaryNumericFunction; unaryNumericFunction
 
-RoundingOperation; elementalUnaryNumericMatrixFunction
-# fix takes logicals, the others don't
-fix
+elementalUnaryArithmetic; elementalUnaryNumericFunction
+uplus
+uminus
+real
+imag
+abs
+conj;; MatlabClass(logical>error)
+
+RoundingOperation; elementalUnaryNumericFunction
+-MatlabClass(logical>error)
+fix;; MatlabClass(logical>double)
 round
 floor
 ceil
 
-# matrix-wise unary numeric matrix function
-matrixUnaryNumericMatrixFunction; unaryNumericMatrixFunction
+arrayUnaryNumericFunction; unaryNumericFunction
 
-# binary numeric matrix function
-binaryNumericMatrixFunction; strictNumericMatrixFunction; Class(coerce(logical|char>double,(numeric&(double|0)>0)|((double|1)&numeric>1)))
+arrayUnaryArithmetic; arrayUnaryNumericFunction
+
+
+# binary numeric function - doesn't mix integers
+binaryNumericFunction; properNumericFunction
+-Class(coerce(logical|char>double, (numeric&(double|0)>0) | ((double|1)&numeric>1)))
+-MatlabClass((logical|char)&0>error, (int&logical)|(logical&int)>error, natlab)
 
 # elemental binary numeric matrix function
-elementalBinaryNumericMatrixFunction; binaryNumericMatrixFunction
+elementalBinaryNumericFunction; binaryNumericFunction
+complex
+-MatlabClass((char|logical)&any>error, any&(char|logical)>error, natlab)
 
-# binary elemental arithmetic - doesn't mix integer types
-elemnetalBinaryArithmeticFunction; elementalBinaryNumericMatrixFunction
+
+# elemewise binary arithmetic
+elementalBinaryArithmetic; elementalBinaryNumericFunction
+-MatlabClass(logical&logical>double, parent)
 plus
 minus
 times
-# the following do not allow both args to be double
+# integers can only be combined with scalar doubles
+power
+
+dividingElementalArithmetic; elementalBinaryArithmetic
+-MatlabClass(logical&logical>error, parent)
+# the following do not allow both args to be double under certain circumstances (...)
 ldivide
 rdivide
 mod
 rem
 
-# matrix wise binary numeric matrix function
-matrixBinaryNumericMatrixFunction; binaryNumericMatrixFunction
+# array wise binary numeric matrix function
+arrayBinaryNumericFunction; binaryNumericFunction
+dot
+-MatlabClass(logical&any>error, natlab)
+cross
+
 
 # binary matrix arithmetic - doesn't mix integer types
-matrixBinaryArithmeticFunction; matrixBinaryNumericMatrixFunction
-mtimes
-# the following do not allow both args to be double
+arrayBinaryArithmetic; arrayBinaryNumericFunction
+mtimes;; MatlabClass(logical&logical>double, parent)
+# integers can only be comibned with scalar doubles -- or not?
+mpower
+dividingArrayArithmetic; arrayBinaryArithmetic
 mldivide
 mrdivide
 
 
-# non-strict numerical matrix functions don't have a fixed arity, and take (optional) extra
+# improper numerical matrix functions don't have a fixed arity, and take (optional) extra
 # arguments that either options or different possible operands.
-flexibleNumericMatrixFunction; numericMatrixFunction
+improperNumericFunction; numericFunction
 
-# numeric function that collapses a dimension (optional second arg tells which)
-dimensionCollapsingNumericMatrixFunction; flexibleNumericMatrixFunction
+# functions of the form f(matrix,[dimension]), where matrix is any matrix
+dimensionSensitiveNumericFunction; improperNumericFunction
+
+# functions that collapse the specified dimension
+dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
 min
 max
+# median does not support logical matrizes
+median
+
 
 
 
 # ***************************************************************************************
 # operatoes on floating point matrizes
-floatMatrixFunction; matrixFunction
+floatFunction; matrixFunction
 
-# strict float functions have a fixed arity, and all operands are floats
-strictFloatMatrixFunction; floatMatrixFunction
+# proper float functions have a fixed arity, and all operands are floats
+properFloatFunction; floatFunction
 
 # unary functions operating on floating point matrizes
-unaryFloatMatrixFunction; strictFloatMatrixFunction
+unaryFloatFunction; properFloatFunction
+-Class(float>0)
 
 # elemental unary functions operating on floating point matrizes
-elementalUnaryFloatMatrixFunction; unaryFloatMatrixFunction
+elementalUnaryFloatFunction; unaryFloatFunction
 sqrt
 realsqrt
 erf
@@ -186,8 +271,8 @@ log
 log2
 log10
 
-forwardTrigonometricFunction; elementalUnaryFloatMatrixFunction
-trigonometricFunction; forwardTrigonometricFunction
+forwardTrigonometricFunction; elementalUnaryFloatFunction
+radianTrigonometricFunction; forwardTrigonometricFunction
 sin
 cos
 tan
@@ -195,7 +280,7 @@ cot
 sec
 csc
 
-decimalTrigonometricFunction; forwardTrigonometricFunction
+degreeTrigonometricFunction; forwardTrigonometricFunction
 sind
 cosd
 tand
@@ -211,8 +296,8 @@ coth
 sech
 csch
 
-inverseTrigonmetricFunction; elementalUnaryFloatMatrixFunction
-standardInverseTrigonmetricFunction; inverseTrigonmetricFunction
+inverseTrigonmetricFunction; elementalUnaryFloatFunction
+radianInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asin
 acos
 atan
@@ -221,7 +306,7 @@ acot
 asec
 acsc
 
-decimalInverseTrigonmetricFunction; inverseTrigonmetricFunction
+degreeInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asind
 acosd
 atand
@@ -241,44 +326,61 @@ acsch
 
 
 # matrix-wise unary function operating on floating point matrizes
-matrixUnaryFloatMatrixFunction; unaryFloatMatrixFunction
+arrayUnaryFloatFunction; unaryFloatFunction
 
 # unary function operating on square floating point matrix
-squareMatrixUnaryFloatMatrixFunction; matrixUnaryFloatMatrixFunction
+squareArrayUnaryFloatFunction; arrayUnaryFloatFunction
 logm
 sqrtm
 expm
+inv
+
 
 # binary matrix function operaitng on float matrices
-binaryFloatMatrixFunction; strictFloatMatrixFunction
+binaryFloatFunction; properFloatFunction
 
 # matrix-wise binary funciton operating on float matrices
-matrixBinaryFloatMatrixFunction; binaryFloatMatrixFunction
+arrayBinaryFloatFunction; binaryFloatFunction
+-Class(single&float>0,float&single>1)
 hypot
 
-# flexible float matrix functions do not have a fixed arity, and extra arguments are either
+# improper float matrix functions do not have a fixed arity, and extra arguments are either
 # options or different possible operands.
-flexibleFloatMatrixFunction; floatMatrixFunction
+improperFloatFunction; floatFunction
 
 
-# numeric function that collapses a dimension (optional second arg tells which)
-dimensionCollapsingFloaMatrixFunction; flexibleFloatMatrixFunction
+
+# functions of the form f(matrix,[dimension])
+dimensionSensitiveFloatFunction; improperFloatFunction
 # cumsum coerces logicals to double
 cumsum
+cumprod
 
+# numeric function that collapses a dimension (optional second arg tells which)
+dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
+mode
+prod
 
 # standard matrix math functions with optional arguments
-matrixLibaryFunction; flexibleFloatMatrixFunction
+matrixLibaryFunction; improperFloatFunction
 eig
 norm
+# query?
+rank
+
+# optional 2 args
 cond
-rcond
+# square float -> salar double - should probably be proper
 det
+rcond
 # has 2 operands
 linsolve
 
+# TODO
+# cros
+
 # factorization functions
-facotorizationFunction; flexibleFloatMatrixFunction
+facotorizationFunction; improperFloatFunction
 schur
 # ordschur is not a factorization per se, it massages schur result
 ordschur
@@ -291,35 +393,69 @@ qr
 
 # ***************************************************************************************
 # bit functions - usually operates on ints or logicals, some exceptions
-bitMatrixFunction; matrixFunction
-# pure bit functions - bitand, bitor, bitxor
-# impure bit functions - bitcmp (with one arg is pure), bitset
+bitFunction; matrixFunction
+properBitFunction; bitFunction
+bitand
+bitor
+bitxor
+
+improperBitFunciton; bitFunction
+bitcmp
+bitset
+bitget
+bitshift
 
 
-# ***************************************************************************************
-# char functions operate on strings - is this necessary or desired?
-charMatrixFunction; matrixFunction
 
 
 
 
 # **************************************************************************************
-# functions that convert values to different classes
-conversionFunction; matrixFunction
+# functions that return doubles or logicals about given values
+# TODO - some support only matrizes, others anything
+# TODO impure/pure unary for scalar?
+matrixQuery; matrixFunction
+
+
+# return doubles
+toDoubleMatrixQuery; matrixQuery
+
+
+toScalarDoubleMatrixQuery; toDoubleMatrixQuery
+nnz
 
 
 
-# functions that convert values to logicals
-conversionToLogicalFunction; conversionFunction
+
+# return logicals
+toLogicalMatrixQuery; matrixQuery
+
+# unary return logicals
+unaryToLogicalMatrixQuery; toLogicalMatrixQuery
+-Class(matrix>logical)
 
 
-binaryConversionToLogicalFunction; conversionToLogicalFunction
+scalarUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
+not
+any
+all
+isreal
 
-# elemental binary functions resulting in logicals
-elementalBinaryConversionToLogicalFunction; binaryConversionToLogicalFunction
+
+elementalUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
+isinf
+isfinite
+isnan
+
+
+# binary return logicals
+binaryToLogicalMatrixQuery; toLogicalMatrixQuery
+-Class(matrix&matrix>logical)
+
+elementalBinaryToLogicalMatrixQuery; binaryToLogicalMatrixQuery
 
 # relational operators
-relationalOperator; elementalBinaryConversionToLogicalFunction
+relationalOperator; elementalBinaryToLogicalMatrixQuery
 eq
 ne
 lt
@@ -328,7 +464,7 @@ le
 ge
 
 # logical operators
-logicalOperator; elementalBinaryConversionToLogicalFunction
+logicalOperator; elementalBinaryToLogicalMatrixQuery
 and
 or
 xor
@@ -336,33 +472,50 @@ xor
 
 
 
+# **************************************************************************************
+# functions that create matrix arrays from vectors or values describing the matrizes
+matrixCreation; matrixFunction
+colon
+-Class(coerce(logical>double,matlab))
+-MatlabClass(logical&logical&opt(logical)>error, (logical|double) & (double|logical) & opt(double|logical) > double, (double|-1) & (double|-1) & opt(numeric) > -1, (double|1) & numeric & (double|1) > 1, char & ((char|double)&char | char) > char)
 
-# constructors
-constructor; conversionFunction
 
+
+
+# construct arrays via their dimensions; and possibly a type
+byShapeAndTypeMatrixCreation; matrixCreation
+
+numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
+ones
+zeros
+# eye takes at most 2 dims
+eye
+
+floatByShapeAndTypeMatrixCreation; numericalByShapeAndTypeMatrixCreation;
+inf
+nan
+
+# there is no optional type argument
+logicalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
+true
+false
 
 
 # **************************************************************************************
-# functions that return scalar or vector values describing matrizes
-arrayQuery; matrixFunction
-
-
-# return numericals
-doubleResultArrayQuery; arrayQuery
-
-# scalar numerical 
-ScalarDoubleResultArrayQuery; doubleResultArrayQuery
-nnz
-
-# return logicals
-logicalResultArrayQuery; arrayQuery
-
-# return scalar doubles
-scalarLogicalResultArrayQuery; logicalResultArrayQuery
-not
-any
-all
-
+# matrix constructors
+matrixConstructor; matrixFunction
+double
+single
+char
+logical
+int8
+int16
+int32
+int64
+uint8
+uint16
+uint32
+uint64
 
 
 # ***************************************************************************************
@@ -372,195 +525,162 @@ cellFunction; pureFunction
 # ***************************************************************************************
 # function operates on structures
 structFunction; pureFunction
+isfield
 
 # ***************************************************************************************
 # function operates on objects
 objectFunction; pureFunction
+# TODO - should there be the whole pure/impure spiel?
+
 
 # ***************************************************************************************
 # function operates on a mixtures of matrizes, cell arrays, structures and/or objects
 versatileFunction; pureFunction
 
 # takes in a matrix or cells of strings
-matrixOrCellOfStringsFunction; versatileFunction
+matrixOrCellOfCharFunction; versatileFunction
+sort
+unique
+
+# ***************************************************************************************
+# char functions operate on strings, or cells of strings
+# TODO should it be called string function?
+charFunction; matrixOrCellOfCharFunction
+properCharFunction; charFunction;
+unaryProperCharFunction; properCharFunction;
+upper
+lower
+deblank
+# strip
+strtrim
+
+improperCharFunction; charFunction
+strfind
+findstr
+strrep
+
+# str[n]cmp[i]
+stringCompare; improperCharFunction
+strcmp
+strcmpi
+strncmpi
+strncmp
+
+# regular expression functions
+regexpFunction; improperCharFunction
+regexptranslate
+regexp
+regexpi
+regexprep
 
 
-# *** constants **************************************************
-#constant; pureFunction;
-#
-#numericalConstant; constant; args(0)
-#i
-#j
+
+# query functions that operate not just on matrizes (c.f. matrixQueryFunction)
+versatileQuery; versatileFunction
+
+# return numericals
+doubleResultVersatileQuery; versatileQuery
+
+# scalar numerical 
+scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
+length
+ndims
+numel
+
+# return logicals
+logicalResultVersatileQuery; versatileQuery
+
+# return scalar doubles
+scalarLogicalResultVersatileQuery; logicalResultVersatileQuery
+classQuery; scalarLogicalResultVersatileQuery
+isempty
+isobject
+isfloat
+isinteger
+islogical
+isstruct
+ischar
+iscell
+isnumeric
+
+# impure?
+isa
+
+
+scalarLogicalShapeQuery; scalarLogicalResultVersatileQuery
+isemtpy
+isvector
+isscalar
+
+
+binaryToScalarLogicalVersatileQuery; versatileQuery
+# same as isequal; but nan == nan
+isequalwithequalnans
+# recursive equal all
+isequal
+
+
+versatileConversion; versatileFunction
+
+# TODO improper?
+# functions that change the shape
+shapeTransformation; versatileConversion
+reshape
+permute
+squeeze
+transpose
+ctranspose
 
 
 
-# #matlab operators
-# operator; pureFunction
+
+# all these take multiple args
+Concatenation; versatileFunction
+horzcat
+vertcat
+# generalization of horz/vert cat
+cat
+
+indexing; versatileFunction
+subsasgn
+subsref
+
+
+mapOperator; versatileFunction
+structfun
+arrayfun
+cellfun
+
+
 
 # # special operators ... not sure what to do with them
-# colon
-# horzcat
-# vertcat
-# cat
-# nargin
+# nargin - impure?
 # nargout
 # mfilename
-# end
+# end - this could be a query
 
 
-# # other operators
-# isequalwithequalnans
-# # same as isequal; but nan == nan
-# isequal
-# # recursive equal all
-# subsasgn
-# # explicit indexingops
-# subsref
+
 
 # histc
 
 
-# mapOperator; operator;
-# structfun
-# arrayfun
-# cellfun
-
-
-# # *** binary ops *************************************************
-# binaryOperator; operator
 
 
 
-
-
-# #numerical binary oprators
-# numericalBinaryOperator; binaryOperator
-# #matrix operators
-# matrixBinaryOperator; numericalBinaryOperator
-# #array operators
-# elementwiseBinaryOperator; numericalBinaryOperator
-# power
+# elementalBinaryOperator; numericalBinaryOperator
 # pow2
 # #scalbn; ldexp
-# # only works with single; double
-# hypot
 
-# # *** unary operators ***************************************************
-# unaryOperator; operator
 
-# numericalUnaryOperator; unaryOperator
-# elementwiseUnaryOperator; numericalUnaryOperator
-# uplus
-# uminus
-# conj
-# real
-# imag
-# abs
 
-# matrixUnaryOperator; numericalUnaryOperator
-# transpose
-# ctranspose
-# # analytical matrix operators
+# eps - float function? but improper - query?
 
 
 
 
 
-# logicalUnaryOperator; unaryOperator
-# not
 
-
-# # *** matrix operations ************************************************
-# matrixOperation; pureFunction
-# elementwiseMatrixOperation; matrixOperation
-
-
-
-
-# # matrix computation algorithms
-# matrixComputation; matrixOperation
-# inv
-# eig
-# norm
-# rank
-# det
-# dot
-# cross
-# # factorization
-# linsolve
-# # linear solve
-# # n dimensional discrete fourier transform
-# rcond
-# # condition number estimate
-# tril
-# triu
-# eps
-
-# fourierFunction; matrixComputation
-# ifftn
-# fftn
-# fft
-
-
-# factorization; matrixComputation
-# schur
-# #factorization
-# ordschur
-# lu
-# chol
-# qr
-# svd
-
-
-
-# # bit operators
-# bitOperation; pureFunction
-# bitand
-# bitor
-# bitxor
-# bitcmp
-# bitget
-# bitshift
-# bitset
-
-
-# # *** string operations **************************************************
-# stringOperation; pureFunction
-# strncmpi
-# strcmp
-# strcmpi
-# strtrim
-# strfind
-# findstr
-# strrep
-# upper
-# lower
-# deblank
-
-
-# # regulat expressions
-# regexpOperation; stringOperation
-# regexptranslate
-# regexp
-# regexpi
-# tegexprep
-
-
-# # *** Constructors *****************************************************
-# constructor; pureFunction
-# primitiveConstructor; constructor
-# double
-# single
-# char
-# logical
-# int8
-# int16
-# int32
-# int64
-# uint8
-# uint16
-# uint32
-# uint64
 
 
 # compoundConstructor; constructor
@@ -571,48 +691,26 @@ matrixOrCellOfStringsFunction; versatileFunction
 # conversionFunction; constructor
 # cell2struct
 # struct2cell
-# typecast
+# typecast # change datatype without changing underlying data - is this a bit function?
 # cast
 
 
-# # *** struct operations ************************************************
-# structOperation; pureFunction
-# isfield
+
+# other stuff
+# complex
 
 
-# # *** class operations **************************************************
 # classOperation; pureFunction
 # class
 
-# classQueryOperation; classOperation
-# methodnames
-# fieldnames
-
-# logicalClassQueryOperation; classQueryOperation
-# isempty
-# isobject
-# isfloat
-# isinteger
-# islogical
-# isstruct
-# ischar
-# iscell
-# isa
 
 
-# # *** Array operations **************************************************
-# arrayOperation; pureFunction
-# sort
-# unique
-# find
+
+
+
 
 # arrayConstructor; arrayOperation
-# diag
-# # changing arrays
-# reshape
-# permute
-# squeeze
-# complex
+
 
 # dimensionCollapsingOperation; arrayOperation
 # prod - only floats?
@@ -620,56 +718,24 @@ matrixOrCellOfStringsFunction; versatileFunction
 # mean
 # min
 # max
-# cumprod
-# cumsum
-# median
+# cumprod - not collapsing
+# cumsum - not collapsing
 
-# ShapeArrayConstructor; arrayConstructor
-# # construct arrays via their dimensions; and possibly a type
-# NumericalShapeAndTypeArrayConstructor; ShapeArrayConstructor
-# ones
-# zeros
-# # eye takes at most 2 dims
-# eye
-# FloatShapeAndTypeArrayConstructor; NumericalShapeAndTypeArrayConstructor
-# inf
-# nan
-# LogicalShapeArrayConstructor; ShapeArrayConstructor
-# true
-# false
+
 
 
 
 # arrayQuery; arrayOperation
 # size
-# nonzeros
-# sign
+# sign - numerical function?
 
 
-# scalarResultArrayQuery; arrayQuery
-# numericalScalarResultArrayQuery; scalarResultArrayQuery
-# length
-# ndims
-# numel
-# nnz
-
-# logicalScalarResultArrayQuery; scalarResultArrayQuery
-# any
-# all
-# isemtpy
-# isnan
-# isinf
-# isfinite
-# isvector
-# isscalar
-# isreal
-# isnumeric
 
 
 
 
 # *** opposite of pure functions *****************************************
-impureFunction; builtin
+impureFunction; root
 
 # dunnno what to do with these
 superiorto
@@ -678,7 +744,7 @@ exit
 quit
 # only really need one of quit/exit
 builtin
-# calls builtin - strict
+# calls builtin - proper
 
 timeFunction; impureFunction
 clock
@@ -712,6 +778,10 @@ which
 version
 clear
 
+# methods, fieldnames takes obj or string, allows extra arg '-full'
+methods
+fieldnames
+
 
 reportFunction; impureFunction
 # errors should be seprated from warnings and displaying stuff?
@@ -721,7 +791,7 @@ clc
 error
 warning
 echo
-# should this be here? - this could be a strict lib function?
+# should this be here? - this could be a proper lib function?
 diary
 # something logging related
 lastwarn
@@ -769,6 +839,8 @@ fwrite
 fgetl
 fgets
 fclose
+
+
 
 
 # *** library funcitons that are not builtins!! TODO **********************

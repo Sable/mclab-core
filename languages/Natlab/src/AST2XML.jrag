@@ -96,7 +96,7 @@ aspect ASTtoXML {
 			
 			Element e = doc.createElement("CompilationUnits");
 			e.setAttribute("id", Long.toString(id));
-			e.setAttribute("name", name);
+			e.setAttribute("name", "name"); //TODO - was 'name);' - fix this!
 			for(Program p : getPrograms()){
 		    	p.getXML(doc, e);
 			}
