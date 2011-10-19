@@ -5,8 +5,6 @@ import java.io.*;
 import java.lang.reflect.*;
 import ast.*;
 import analysis.*;
-import nodecases.*;
-import natlab.toolkits.analysis.*;
 import natlab.CompilationProblem;
 import natlab.options.Options;
 
@@ -102,9 +100,18 @@ public class FlowAnalysisTestTool
      */
     public String run()
     {
+        return run(false,false);
+    }
+    /**
+     * same as run(), but with two optional parameters
+     * @param compact - if true, prints out only the out sets after a node, more compactly
+     * @param hideComments - if true hides comments
+     * @return
+     */
+    public String run(boolean compact,boolean hideComments){
         if( !analysis.isAnalyzed() )
             analysis.analyze();
-        return ast.getAnalysisPrettyPrinted( analysis );
+        return ast.getAnalysisPrettyPrinted(analysis, compact, hideComments);
     }
 
     /**

@@ -20,25 +20,40 @@
 // =========================================================================== //
 
 aspect AnalysisPrettyPrint {
+    syn String ASTNode.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis)
+    {
+        return getAnalysisPrettyPrinted(analysis,false);
+    }
 
-    syn String ASTNode.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis )
+    syn String ASTNode.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis, boolean compact)
+    {
+        return getAnalysisPrettyPrinted(analysis,false,false);
+    }
+
+    /**
+     * prints the ast node, together with the flowset(s) that is associated with the nodes, by the
+     * given analysis. The second optional parameter results in a more compact print
+     */
+    syn String ASTNode.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments )
     {
         StringBuffer buf = new StringBuffer();
-        for(beaver.Symbol comment : getComments()) {
-            buf.append(comment.value);
-            buf.append("\n");
+        if (!hideComments){
+            for(beaver.Symbol comment : getComments()) {
+                buf.append(comment.value);
+                buf.append("\n");
+            }   
         }
-        buf.append( getAnalysisPrettyPrintedLessComments( analysis ) );
+        buf.append( getAnalysisPrettyPrintedLessComments( analysis, compact, hideComments) );
         return buf.toString();
     }
 
-    syn String ASTNode.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
+    syn String ASTNode.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments)
     {
-        //throw new UnsupportedOperationException( getClass().getName() + ".getAnalysisPrettyPrintedLessComments( analysis )");
+        //throw new UnsupportedOperationException( getClass().getName() + ".getAnalysisPrettyPrintedLessComments( analysis, compact, hideComments)");
         return getPrettyPrintedLessComments();
     }
 
-    eq CompilationUnits.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
+    eq CompilationUnits.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments)
     {
         StringBuffer buf = new StringBuffer();
 
@@ -49,46 +64,46 @@ aspect AnalysisPrettyPrint {
             else
                 buf.append("\n\n");
             
-            buf.append( p.getAnalysisPrettyPrinted( analysis ) );
+            buf.append( p.getAnalysisPrettyPrinted(analysis, compact, hideComments) );
         }
         return buf.toString();
     }
 
     //program
-    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         return "";
     }
       
     // Variable Declaration
-    eq VariableDecl.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) = "%Declare " + getID();
+    eq VariableDecl.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) = "%Declare " + getID();
     
     
     // Script    
-    eq Script.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq Script.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getAnalysisPrettyPrinted( analysis ));
+            buf.append(comment.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         return buf.toString();
     }
     
-    eq FunctionList.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq FunctionList.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         for(Function func : getFunctions()) {
-            buf.append(func.getAnalysisPrettyPrinted( analysis ));
+            buf.append(func.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             buf.append('\n');
         }
         return buf.toString();
     }
     
-    eq FunctionList.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis ) {
+    eq FunctionList.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments ) {
         StringBuffer buf = new StringBuffer();
-        buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
+        buf.append(getAnalysisPrettyPrintedLessComments( analysis, compact, hideComments));
         for(beaver.Symbol comment : getComments()) {
             buf.append(comment.value);
             buf.append("\n");
@@ -96,9 +111,9 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq FunctionDecl.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis ) {
+    eq FunctionDecl.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments ) {
         StringBuffer buf = new StringBuffer();
-        buf.append(getAnalysisPrettyPrintedLessComments( analysis ));
+        buf.append(getAnalysisPrettyPrintedLessComments( analysis, compact, hideComments));
                 
         //collect all comments     
         StringBuffer cbuf = new StringBuffer();
@@ -115,7 +130,7 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
     
-    eq Function.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq Function.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "function ");
@@ -125,7 +140,7 @@ aspect AnalysisPrettyPrint {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getAnalysisPrettyPrinted( analysis ));
+            buf.append(param.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             first = false;
         }
         buf.append("] = ");
@@ -136,21 +151,21 @@ aspect AnalysisPrettyPrint {
             if(!first) {
                 buf.append(", ");
             }
-            buf.append(param.getAnalysisPrettyPrinted( analysis ));
+            buf.append(param.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             first = false;
         }
         buf.append(")");
         buf.append('\n');
         for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getAnalysisPrettyPrinted( analysis ));
+            buf.append(comment.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             buf.append('\n');
         }
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         for(Function func : getNestedFunctions()) {
-            buf.append(func.getAnalysisPrettyPrinted( analysis ));
+            buf.append(func.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             buf.append('\n');
         }
         buf.append(indent + "end");
@@ -159,115 +174,64 @@ aspect AnalysisPrettyPrint {
        
     //help comments
     
-    eq HelpComment.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) = getText();
+    eq HelpComment.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) = getText();
 
     //Stmts
 
-    eq Stmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
+    eq Stmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments)
     {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append( getPrettyPrintedLessComments() );
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            //buf.append( indent + "% \n" );
-        }
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments); //last '\n' was originally not printed
         return buf.toString();
     }
-    eq EmptyStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis )
+    eq EmptyStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments)
     {
         return getPrettyPrintedLessComments();
     }
-    eq ForStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq ForStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "for ");
-        String assignStmt = getAssignStmt().getAnalysisPrettyPrinted( analysis );
+        String assignStmt = getAssignStmt().getAnalysisPrettyPrinted(analysis, compact, hideComments);
         buf.append( assignStmt.trim() );   // remove all initial tabs
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         buf.append(indent + "end");
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            buf.append( "\n" );
-        }        
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments);
         return buf.toString();
     }
 
-    eq WhileStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq WhileStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "while ");
-        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append(getExpr().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         buf.append(indent + "end");
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " +this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            buf.append( "\n" );
-        }
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments);
         return buf.toString();
     }
 
     // if-elseif-else
-    eq IfStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq IfStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         boolean first = true;
@@ -275,131 +239,97 @@ aspect AnalysisPrettyPrint {
             if(!first) {
                 buf.append( indent + "else" );
             }
-            buf.append(block.getAnalysisPrettyPrinted( analysis ));
+            buf.append(block.getAnalysisPrettyPrinted(analysis, compact, hideComments));
             first = false;
         }
         if(hasElseBlock()) {
-            buf.append(getElseBlock().getAnalysisPrettyPrinted( analysis ));
+            buf.append(getElseBlock().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         }
         buf.append(indent + "end");
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            buf.append( "\n" );
-        }
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments);
         return buf.toString();
     }
 
-    eq IfBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq IfBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "if ");
-        buf.append(getCondition().getAnalysisPrettyPrinted( analysis ));
+        buf.append(getCondition().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         return buf.toString();
     }
 
-    eq ElseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq ElseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "else ");
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         return buf.toString();
     }
 /////////////////////////////////////////////
     // switch-case
-    eq SwitchStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq SwitchStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "switch ");
-        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append(getExpr().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         buf.append('\n');
         for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
-            buf.append(scase.getAnalysisPrettyPrinted( analysis ));
+            buf.append(scase.getAnalysisPrettyPrinted(analysis, compact, hideComments));
         }
         if(hasDefaultCaseBlock()) {
-            buf.append(getDefaultCaseBlock().getAnalysisPrettyPrinted( analysis ));
+            buf.append(getDefaultCaseBlock().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         }
         buf.append( indent + "end");
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            buf.append( "\n" );
-        }
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments);
         return buf.toString();
     }
-    eq SwitchCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq SwitchCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "case ");
-        buf.append(getExpr().getAnalysisPrettyPrinted( analysis ));
+        buf.append(getExpr().getAnalysisPrettyPrinted(analysis, compact, hideComments));
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         return buf.toString();
     }
-    eq DefaultCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq DefaultCaseBlock.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append(indent + "otherwise ");
         buf.append('\n');
         for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         return buf.toString();
     }
 
     // try-catch
-    eq TryStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis ) {
+    eq TryStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
         buf.append( indent + "try ");
         buf.append('\n');
         for(Stmt stmt : getTryStmts()) {
-            String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+            String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
         }
         List<Stmt> catchList = getCatchStmts();
@@ -407,32 +337,51 @@ aspect AnalysisPrettyPrint {
             buf.append( indent + "catch ");
             buf.append('\n');        
             for(Stmt stmt : catchList) {
-                String stmtStr = stmt.getAnalysisPrettyPrinted( analysis );         
+                String stmtStr = stmt.getAnalysisPrettyPrinted(analysis, compact, hideComments);         
             	buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
             }
         }
         buf.append( indent + "end" );
         Object in, out;
-        in = (Object)analysis.getInFlowSets().get( this );
-        out = (Object)analysis.getOutFlowSets().get( this );
-        if( in != null && out != null ){
-            buf.append( "\n" + indent + "% Data flow of " + this.getClass() + "\n" + indent + "%\n" );
-            if( in != null ){
-                buf.append( indent + "% In set\n" );
-                Scanner inScanner = new Scanner( in.toString() );
-                while( inScanner.hasNextLine() )
-                    buf.append( indent + "% " + inScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            if( out != null ){
-                buf.append( indent + "% Out set\n" );
-                Scanner outScanner = new Scanner( out.toString() );
-                while( outScanner.hasNextLine() )
-                    buf.append( indent + "% " + outScanner.nextLine() + "\n" );
-                buf.append( indent + "% \n" );
-            }
-            buf.append( "\n" );
-        }
+        in = analysis.getInFlowSets().get( this );
+        out = analysis.getOutFlowSets().get( this );
+        printFlowData(this,in,out,buf,compact, hideComments);
         return buf.toString();
     }
+    
+    
+    /**
+     * prints the flow data information, and puts it int he supplied Stringbuffer.
+     * If the last flag is set, will print only the outset without any extra info
+     */
+    static protected void ASTNode.printFlowData(ASTNode node,Object in,Object out,StringBuffer buf,boolean compact, boolean hideComments){
+        if( in != null || out != null ){
+            String indent = node.getIndent();
+            if (!compact){
+                buf.append( "\n" + indent + "% Data flow of " + node.getClass() + "\n" + indent + "%\n" );
+                if( in != null ){
+                    buf.append( indent + "% In set\n" );
+                    Scanner inScanner = new Scanner( in.toString() );
+                    while( inScanner.hasNextLine() )
+                        buf.append( indent + "% " + inScanner.nextLine() + "\n" );
+                    buf.append( indent + "% \n" );
+                }
+                if( out != null ){
+                    buf.append( indent + "% Out set\n" );
+                    Scanner outScanner = new Scanner( out.toString() );
+                    while( outScanner.hasNextLine() )
+                        buf.append( indent + "% " + outScanner.nextLine() + "\n" );
+                    buf.append( indent + "% \n" );
+                }
+                buf.append( "\n" );
+            } else { //compact printing
+                if( out != null ){
+                    Scanner outScanner = new Scanner( out.toString() );
+                    while( outScanner.hasNextLine() )
+                        buf.append( "\n" + indent + "% " + outScanner.nextLine());
+                }
+            }
+        }        
+    }
+
 }
