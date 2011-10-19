@@ -282,7 +282,9 @@ java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
 	<target name="eclipse.build" depends="annotations.eclipse.build, matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations and matlab), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
+	<target name="Natlab.gen" depends="gen" description="Just generates the Natlab related code" />
 
+	
 	<!-- Special target for building MATLAB2Fortran Code-Gen -->
 	<target name="build_codegen" depends="annotations.build, codegen, compile2" description="CodeGen: generate and build all files (including annotations)" />
  </project>
