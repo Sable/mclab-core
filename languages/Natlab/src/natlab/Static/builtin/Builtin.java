@@ -73,7 +73,6 @@ public abstract class Builtin {
         builtinMap.put("j",J.getInstance());
         builtinMap.put("elementalUnaryAnyMatrixFunction",ElementalUnaryAnyMatrixFunction.getInstance());
         builtinMap.put("arrayUnaryAnyMatrixFunction",ArrayUnaryAnyMatrixFunction.getInstance());
-        builtinMap.put("binaryAnyMatrixFunction",BinaryAnyMatrixFunction.getInstance());
         builtinMap.put("elementalBinaryAnyMatrixFunction",ElementalBinaryAnyMatrixFunction.getInstance());
         builtinMap.put("arrayBinaryAnyMatrixFunction",ArrayBinaryAnyMatrixFunction.getInstance());
         builtinMap.put("tril",Tril.getInstance());
@@ -500,20 +499,10 @@ public abstract class Builtin {
         }
         
     }
-    public static class BinaryAnyMatrixFunction extends AbstractProperAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static BinaryAnyMatrixFunction singleton = null;
-        public static BinaryAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new BinaryAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class AbstractBinaryAnyMatrixFunction extends AbstractProperAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBinaryAnyMatrixFunction(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "binaryAnyMatrixFunction";
+            return visitor.caseAbstractBinaryAnyMatrixFunction(this,arg);
         }
         
     }

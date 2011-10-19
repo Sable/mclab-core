@@ -31,9 +31,10 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //elemental unary function operating on a general matrix
     public Ret caseElementalUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }    
     //matrix-wise unary function operating on a general matrix
-    public Ret caseArrayUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }    
+    public Ret caseArrayUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }
+    
     //binary function operating on a general matrix
-    public Ret caseBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }    
+    public Ret caseAbstractBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }    
     //elemental binary function operating on a general matrix
     public Ret caseElementalBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryAnyMatrixFunction(builtin,arg); }    
     //matrix-wise unary function operating on a general matrix

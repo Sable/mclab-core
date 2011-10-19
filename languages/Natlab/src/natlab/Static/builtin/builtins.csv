@@ -116,10 +116,10 @@ binaryAnyMatrixFunction; properAnyMatrixFunction
 
 
 # elemental binary function operating on a general matrix
-elementalBinaryAnyMatrixFunction; BinaryAnyMatrixFunction
+elementalBinaryAnyMatrixFunction; binaryAnyMatrixFunction
 
 # matrix-wise unary function operating on a general matrix
-arrayBinaryAnyMatrixFunction; BinaryAnyMatrixFunction
+arrayBinaryAnyMatrixFunction; binaryAnyMatrixFunction
 
 
 

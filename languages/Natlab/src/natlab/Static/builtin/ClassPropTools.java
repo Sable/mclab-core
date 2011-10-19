@@ -571,8 +571,6 @@ public class ClassPropTools {
         
         
         System.out.println("(coerce([logical,char],double,double>double): "+Builtin.Tril.getInstance().getMatlabClassPropagationInfo());
-        System.out.println("parent&opt(double)-(double>double): "+Builtin.Ctranspose.getInstance().getMatlabClassPropagationInfo());
-        System.out.println("(double>double): "+Builtin.Ctranspose.getInstance().getParentMatlabClassPropagationInfo());
         
         MC f5 = new MCTypeString(new MCUnion(new MCBuiltin("double"),new MCBuiltin("logical")));
         System.out.println();
