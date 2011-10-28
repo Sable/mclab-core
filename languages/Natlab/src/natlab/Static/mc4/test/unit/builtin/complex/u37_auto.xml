@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<result>
-   <success>true</success>
-   <result>
-      <class>uint64</class>
-      <size>2,2</size>
-      <value>0,0,1+i*1,1+i*1</value>
-   </result>
-</result>

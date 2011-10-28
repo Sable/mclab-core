@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<result>
-   <success>true</success>
-   <result>
-      <class>double</class>
-      <size>2,2</size>
-      <value>0.462942241540772+i*0.420434027272075,0.473702289025588-i*0.370321270093927,0.525588689399292-i*0.410883957106727,0.53780481216354+i*0.361909500627825</value>
-   </result>
-</result>

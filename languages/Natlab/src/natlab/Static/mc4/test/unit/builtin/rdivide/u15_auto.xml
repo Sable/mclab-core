@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<result>
-   <success>true</success>
-   <result>
-      <class>double</class>
-      <size>1,3</size>
-      <value>1,1,1</value>
-   </result>
-</result>

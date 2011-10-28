@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<result>
-   <success>true</success>
-   <result>
-      <class>double</class>
-      <size>2,2</size>
-      <value>0.999997250257874,0.999911151775641,0.999890622417177,0.999990090780036</value>
-   </result>
-</result>
