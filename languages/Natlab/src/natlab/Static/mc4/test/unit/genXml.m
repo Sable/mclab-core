@@ -1,6 +1,7 @@
 % runs all the unit tests
-function tryUnits
+function genXml(exitOnFinish)
   addpath(pwd) % make the xml functions accessible from other dirs
+  warning off
   for d1 = getSubDirs()
     d1 = d1{1};
     cd(d1)
@@ -25,6 +26,13 @@ function tryUnits
     cd('..')
   end
 
+
+  % exit on finish
+  if (nargin > 0)
+    if exitOnFinish
+      exit
+    end
+  end
 end
 
 
