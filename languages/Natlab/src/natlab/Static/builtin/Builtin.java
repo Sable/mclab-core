@@ -71,14 +71,9 @@ public abstract class Builtin {
         builtinMap.put("pi",Pi.getInstance());
         builtinMap.put("i",I.getInstance());
         builtinMap.put("j",J.getInstance());
-        builtinMap.put("elementalUnaryAnyMatrixFunction",ElementalUnaryAnyMatrixFunction.getInstance());
-        builtinMap.put("arrayUnaryAnyMatrixFunction",ArrayUnaryAnyMatrixFunction.getInstance());
-        builtinMap.put("elementalBinaryAnyMatrixFunction",ElementalBinaryAnyMatrixFunction.getInstance());
-        builtinMap.put("arrayBinaryAnyMatrixFunction",ArrayBinaryAnyMatrixFunction.getInstance());
         builtinMap.put("tril",Tril.getInstance());
         builtinMap.put("triu",Triu.getInstance());
         builtinMap.put("diag",Diag.getInstance());
-        builtinMap.put("dimensionCollapsingAnyMatrixFunction",DimensionCollapsingAnyMatrixFunction.getInstance());
         builtinMap.put("uplus",Uplus.getInstance());
         builtinMap.put("uminus",Uminus.getInstance());
         builtinMap.put("real",Real.getInstance());
@@ -89,7 +84,6 @@ public abstract class Builtin {
         builtinMap.put("round",Round.getInstance());
         builtinMap.put("floor",Floor.getInstance());
         builtinMap.put("ceil",Ceil.getInstance());
-        builtinMap.put("arrayUnaryArithmetic",ArrayUnaryArithmetic.getInstance());
         builtinMap.put("complex",Complex.getInstance());
         builtinMap.put("plus",Plus.getInstance());
         builtinMap.put("minus",Minus.getInstance());
@@ -301,6 +295,8 @@ public abstract class Builtin {
         builtinMap.put("which",Which.getInstance());
         builtinMap.put("version",Version.getInstance());
         builtinMap.put("clear",Clear.getInstance());
+        builtinMap.put("nargin",Nargin.getInstance());
+        builtinMap.put("nargout",Nargout.getInstance());
         builtinMap.put("methods",Methods.getInstance());
         builtinMap.put("fieldnames",Fieldnames.getInstance());
         builtinMap.put("disp",Disp.getInstance());
@@ -465,37 +461,17 @@ public abstract class Builtin {
         }
         
     }
-    public static class ElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static ElementalUnaryAnyMatrixFunction singleton = null;
-        public static ElementalUnaryAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new ElementalUnaryAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class ElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseElementalUnaryAnyMatrixFunction(this,arg);
         }
-        //return name of builtin
-        public String getName(){
-            return "elementalUnaryAnyMatrixFunction";
-        }
         
     }
-    public static class ArrayUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static ArrayUnaryAnyMatrixFunction singleton = null;
-        public static ArrayUnaryAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new ArrayUnaryAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class ArrayUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseArrayUnaryAnyMatrixFunction(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "arrayUnaryAnyMatrixFunction";
         }
         
     }
@@ -506,37 +482,17 @@ public abstract class Builtin {
         }
         
     }
-    public static class ElementalBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static ElementalBinaryAnyMatrixFunction singleton = null;
-        public static ElementalBinaryAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new ElementalBinaryAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class ElementalBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseElementalBinaryAnyMatrixFunction(this,arg);
         }
-        //return name of builtin
-        public String getName(){
-            return "elementalBinaryAnyMatrixFunction";
-        }
         
     }
-    public static class ArrayBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static ArrayBinaryAnyMatrixFunction singleton = null;
-        public static ArrayBinaryAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new ArrayBinaryAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class ArrayBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseArrayBinaryAnyMatrixFunction(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "arrayBinaryAnyMatrixFunction";
         }
         
     }
@@ -626,20 +582,10 @@ public abstract class Builtin {
         }
         
     }
-    public static class DimensionCollapsingAnyMatrixFunction extends AbstractDimensionSensitiveAnyMatrixFunction  {
-        //returns the singleton instance of this class
-        private static DimensionCollapsingAnyMatrixFunction singleton = null;
-        public static DimensionCollapsingAnyMatrixFunction getInstance(){
-            if (singleton == null) singleton = new DimensionCollapsingAnyMatrixFunction();
-            return singleton;
-        }
+    public static abstract class DimensionCollapsingAnyMatrixFunction extends AbstractDimensionSensitiveAnyMatrixFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseDimensionCollapsingAnyMatrixFunction(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "dimensionCollapsingAnyMatrixFunction";
         }
         
     }
@@ -906,20 +852,10 @@ public abstract class Builtin {
         }
         
     }
-    public static class ArrayUnaryArithmetic extends AbstractArrayUnaryNumericFunction  {
-        //returns the singleton instance of this class
-        private static ArrayUnaryArithmetic singleton = null;
-        public static ArrayUnaryArithmetic getInstance(){
-            if (singleton == null) singleton = new ArrayUnaryArithmetic();
-            return singleton;
-        }
+    public static abstract class ArrayUnaryArithmetic extends AbstractArrayUnaryNumericFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseArrayUnaryArithmetic(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "arrayUnaryArithmetic";
         }
         
     }
@@ -5206,6 +5142,40 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "clear";
+        }
+        
+    }
+    public static class Nargin extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Nargin singleton = null;
+        public static Nargin getInstance(){
+            if (singleton == null) singleton = new Nargin();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargin(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargin";
+        }
+        
+    }
+    public static class Nargout extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Nargout singleton = null;
+        public static Nargout getInstance(){
+            if (singleton == null) singleton = new Nargout();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargout(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargout";
         }
         
     }

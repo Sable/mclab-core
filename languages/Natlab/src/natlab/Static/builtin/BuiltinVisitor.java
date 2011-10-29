@@ -27,16 +27,20 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractProperAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractAnyMatrixFunction(builtin,arg); }
     
     //unary function operating on a general matrix
-    public Ret caseAbstractUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }    
+    public Ret caseAbstractUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }
+    
     //elemental unary function operating on a general matrix
-    public Ret caseElementalUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }    
+    public Ret caseElementalUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }
+    
     //matrix-wise unary function operating on a general matrix
     public Ret caseArrayUnaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryAnyMatrixFunction(builtin,arg); }
     
     //binary function operating on a general matrix
-    public Ret caseAbstractBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }    
+    public Ret caseAbstractBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractProperAnyMatrixFunction(builtin,arg); }
+    
     //elemental binary function operating on a general matrix
-    public Ret caseElementalBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryAnyMatrixFunction(builtin,arg); }    
+    public Ret caseElementalBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryAnyMatrixFunction(builtin,arg); }
+    
     //matrix-wise unary function operating on a general matrix
     public Ret caseArrayBinaryAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryAnyMatrixFunction(builtin,arg); }
     
@@ -49,7 +53,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseDiag(Builtin builtin,Arg arg){ return caseAbstractDiagonalSensitive(builtin,arg); }
     
     //functions of the form f(matrix,[dimension]), where matrix is any matrix
-    public Ret caseAbstractDimensionSensitiveAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractImproperAnyMatrixFunction(builtin,arg); }    
+    public Ret caseAbstractDimensionSensitiveAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractImproperAnyMatrixFunction(builtin,arg); }
+    
     //functions that collapse the specified dimension
     public Ret caseDimensionCollapsingAnyMatrixFunction(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveAnyMatrixFunction(builtin,arg); }
     
@@ -79,6 +84,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseCeil(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }
 
     public Ret caseAbstractArrayUnaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryNumericFunction(builtin,arg); }
+
     public Ret caseArrayUnaryArithmetic(Builtin builtin,Arg arg){ return caseAbstractArrayUnaryNumericFunction(builtin,arg); }
     
     //binary numeric function - doesn't mix integers
@@ -517,7 +523,9 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseWhos(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
     public Ret caseWhich(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
     public Ret caseVersion(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
-    public Ret caseClear(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }    
+    public Ret caseClear(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
+    public Ret caseNargin(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
+    public Ret caseNargout(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }    
     //methods, fieldnames takes obj or string, allows extra arg '-full'
     public Ret caseMethods(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }
     public Ret caseFieldnames(Builtin builtin,Arg arg){ return caseAbstractMatlabEnvironmentFunction(builtin,arg); }

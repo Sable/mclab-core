@@ -68,3 +68,7 @@ def Class(builtin, tagArgs, iset):
 # actually defined in its own file
 def MatlabClass(builtin, tagArgs, iset):
     return classProp.MatlabClass(builtin, tagArgs, iset);
+# abstract should be taken care of by genbuiltins
+def abstract(builtin, tagArgs, iset):
+    return ""
+

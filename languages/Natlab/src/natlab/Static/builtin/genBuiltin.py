@@ -300,17 +300,16 @@ def createBuiltinDefs(csvData):
    result = []
    # create objects
    for i in range(0,len(csvData.names)):
-      builtin = Builtin(   name=csvData.names[i],
-                           originalName=csvData.originalNames[i],
-                           isAbstract=csvData.isAbstracts[i],
-                           parentName=csvData.parents[i],
-                           parent=None,
-                           childNames=[csvData.names[j] for j in range(0,len(csvData.names)) if csvData.parents[j] == csvData.names[i]],
-                           children=[],
-                           tags=csvData.tags[i],
-                           comments=csvData.comments[i],
-                           index=i);
-
+      builtin = Builtin(name=csvData.names[i],
+                        originalName=csvData.originalNames[i],
+                        isAbstract=csvData.isAbstracts[i],
+                        parentName=csvData.parents[i],
+                        parent=None,
+                        childNames=[csvData.names[j] for j in range(0,len(csvData.names)) if csvData.parents[j] == csvData.names[i]],
+                        children=[],
+                        tags=csvData.tags[i],
+                        comments=csvData.comments[i],
+                        index=i);
       dict[builtin.name] = builtin
       result.append(builtin)
    # fill in parents, children
@@ -362,7 +361,7 @@ def readCSVData(fileName):
 
 
    # rename all prents that are occuring, finding/setting the abstract classes
-   abstract = [True if child in parents else False for child in children]
+   abstract = [children[i] in parents or tags[i].has_key('abstract') for i in range(0,len(children))]
    originalNames = children
    children = ['abstract'+firstCaps(child)  if child in parents else child for child in children]
    parents  = ['abstract'+firstCaps(parent) for parent in parents]

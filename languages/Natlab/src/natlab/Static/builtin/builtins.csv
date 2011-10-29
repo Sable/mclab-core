@@ -37,6 +37,8 @@
 # - matlabClass(<expr>)
 #     Allows alternative definition of class propagation that more exacty follows
 #     Matlab semantics. This can only be defined for builtins for which 'Class' is defined.
+# -abstract
+#     makes this builtin abstract. By default, all non-terminal node in the builtin tree are abstract
 #
 # Categories of functions
 # - pure/impure: pure functions have no side effects, change no state, always return the same result
@@ -106,20 +108,20 @@ unaryAnyMatrixFunction; properAnyMatrixFunction
 
 
 # elemental unary function operating on a general matrix
-elementalUnaryAnyMatrixFunction; unaryAnyMatrixFunction
+elementalUnaryAnyMatrixFunction; unaryAnyMatrixFunction; abstract
 
 # matrix-wise unary function operating on a general matrix
-arrayUnaryAnyMatrixFunction; unaryAnyMatrixFunction
+arrayUnaryAnyMatrixFunction; unaryAnyMatrixFunction; abstract
 
 # binary function operating on a general matrix
 binaryAnyMatrixFunction; properAnyMatrixFunction
 
 
 # elemental binary function operating on a general matrix
-elementalBinaryAnyMatrixFunction; binaryAnyMatrixFunction
+elementalBinaryAnyMatrixFunction; binaryAnyMatrixFunction; abstract
 
 # matrix-wise unary function operating on a general matrix
-arrayBinaryAnyMatrixFunction; binaryAnyMatrixFunction
+arrayBinaryAnyMatrixFunction; binaryAnyMatrixFunction; abstract
 
 
 
@@ -140,7 +142,7 @@ diag
 dimensionSensitiveAnyMatrixFunction; improperAnyMatrixFunction
 
 # functions that collapse the specified dimension
-dimensionCollapsingAnyMatrixFunction; dimensionSensitiveAnyMatrixFunction
+dimensionCollapsingAnyMatrixFunction; dimensionSensitiveAnyMatrixFunction; abstract
 
 
 
@@ -159,7 +161,7 @@ properNumericFunction; numericFunction
 unaryNumericFunction; properNumericFunction
 -Class(numeric>0, char|logical>double)
 
-elementalUnaryNumericFunction; unaryNumericFunction
+elementalUnaryNumericFunction; unaryNumericFunction; abstract
 
 elementalUnaryArithmetic; elementalUnaryNumericFunction
 uplus
@@ -178,7 +180,7 @@ ceil
 
 arrayUnaryNumericFunction; unaryNumericFunction
 
-arrayUnaryArithmetic; arrayUnaryNumericFunction
+arrayUnaryArithmetic; arrayUnaryNumericFunction; abstract
 
 
 # binary numeric function - doesn't mix integers
@@ -777,6 +779,9 @@ whos
 which
 version
 clear
+nargin
+nargout
+
 
 # methods, fieldnames takes obj or string, allows extra arg '-full'
 methods
