@@ -42,7 +42,7 @@ public class CachedDirectory extends GenericFile implements Externalizable {
     HashSet<String> childDirs = new HashSet<String>();
     private boolean exists = false;
     transient boolean directoryChangedSinceCreation = false;
-    transient boolean persistent = false; //should we cache this dir across sessions?
+    //transient boolean persistent = false; //should we cache this dir across sessions?
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -82,13 +82,13 @@ public class CachedDirectory extends GenericFile implements Externalizable {
      * type has to be supplied (which cannot be created elsewhere).
      * Construct a Cached Directory via the directory cache.
      */
-    protected CachedDirectory(DirectoryCache cache, GenericFile directory, boolean persistent){
+    protected CachedDirectory(DirectoryCache cache, GenericFile directory){
         if (cache == null) 
             throw new UnsupportedOperationException("a CachedDirectory can only be created by the DirectoryCache");
         this.directory = directory;
         this.lastModifiedDate = 0;
         this.lastTouchedDate = 0;
-        this.persistent = persistent;
+        //this.persistent = persistent;
     }
     
     /**
@@ -149,9 +149,9 @@ public class CachedDirectory extends GenericFile implements Externalizable {
     /**
      * returns true if this directory is to be stored in the directory cache
      */
-    public boolean isPersistent(){
-        return persistent;
-    }
+    //public boolean isPersistent(){
+    //    return persistent;
+    //}
     
     /**
      * gets the last time this directory was updated

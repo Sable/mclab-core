@@ -18,7 +18,9 @@
 
 package natlab.toolkits.path;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
 import java.util.*;
 
 import natlab.toolkits.filehandling.genericFile.*;
@@ -52,12 +54,22 @@ public class DirectoryCache extends PersistentlyCachedObject{
      */
     public static final long DIRECTORY_EXPIRATION_TIME_MS = 8*MS_PER_WEEK;
     private static final String key = "";
+    // the persistent directories
     private HashMap<GenericFile,CachedDirectory> directories = new HashMap<GenericFile,CachedDirectory>();
+    // the transient directories
+    transient private HashMap<GenericFile,SoftReference<CachedDirectory>> transientDirectories = 
+        new HashMap<GenericFile,SoftReference<CachedDirectory>>();
     private transient static DirectoryCache cache = getCache();
     
     //private constructor
     private DirectoryCache() {
         super(key);
+    }
+    
+    private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        transientDirectories = new HashMap<GenericFile,SoftReference<CachedDirectory>>();
     }
     
     /**
@@ -72,11 +84,21 @@ public class DirectoryCache extends PersistentlyCachedObject{
         //if the cache cannot be found, create a new one
         if (cache == null){
             cache = new DirectoryCache();
-        } else {
-            cache.setChanged(false); //if the cache already exists, set it to be unchanged
         }
         return cache;
     }
+    
+    
+    /**
+     * returns true if the given directory is in this cache, or if the given
+     * file is a cached diretory
+     */
+    public static boolean contains(GenericFile dir){
+        return (dir instanceof CachedDirectory) 
+            || cache.directories.containsKey(dir)
+            || cache.transientDirectories.containsKey(dir);
+    }
+    
     
     
     /**
@@ -84,11 +106,21 @@ public class DirectoryCache extends PersistentlyCachedObject{
      * if the argument is already a CachedDirectory, the query gets ignored.
      * If new directory gets created, it will use the given persistent value
      */
-    public static void put(GenericFile dir, boolean persistent){
-        if (dir instanceof CachedDirectory) return;
-        if (!cache.directories.containsKey(dir)){
-            cache.directories.put(dir, new CachedDirectory(cache,dir,persistent));
-            if (persistent) cache.setChanged(true);
+    public static CachedDirectory put(GenericFile dir, boolean persistent){
+        if (dir instanceof CachedDirectory) return (CachedDirectory)dir;
+        if (!cache.directories.containsKey(dir) && !cache.transientDirectories.containsKey(dir)){
+            CachedDirectory result = new CachedDirectory(cache,dir);
+            if (persistent){
+                cache.directories.put(dir, result);
+                cache.setChanged(true);
+                return result;
+            } else {
+                cache.transientDirectories.put(dir, 
+                        new SoftReference<CachedDirectory>(result));
+                return result;
+            }
+        } else {
+            return get(dir);
         }
     }
 
@@ -99,7 +131,15 @@ public class DirectoryCache extends PersistentlyCachedObject{
     public static void put(GenericFile dir){
         put(dir,DEFAULT_PERSISTENT_VALUE);
     }
-    
+
+    /**
+     * same as put(GenericFile,false), i.e. puts the directory in the cache in a
+     * non persistent way
+     */
+    public static CachedDirectory putTransient(GenericFile dir){
+        return put(dir,false);
+    }
+
     /**
      * Returns the directory object for the given file.
      * If this directory does not exist in this cache yet, it will get added to it
@@ -108,6 +148,15 @@ public class DirectoryCache extends PersistentlyCachedObject{
      */
     public static CachedDirectory get(GenericFile dir){
         if (dir instanceof CachedDirectory) return (CachedDirectory)dir;
+        if (cache.transientDirectories.containsKey(dir)){
+            CachedDirectory adir = cache.transientDirectories.get(dir).get();
+            if (adir == null){
+                adir = new CachedDirectory(cache,dir);                
+                cache.transientDirectories.put(dir, new SoftReference<CachedDirectory>(adir));
+                return adir;
+            }
+            return adir;
+        }
         if (!cache.directories.containsKey(dir)){
             put(dir,DEFAULT_PERSISTENT_VALUE);
         }
@@ -121,11 +170,9 @@ public class DirectoryCache extends PersistentlyCachedObject{
         LinkedList<GenericFile> toRemove = new LinkedList<GenericFile>();
         for (GenericFile k : directories.keySet()){
             CachedDirectory d = directories.get(k);
-            //remove all old/nonpersistent dirs - but don't force resaving due to expiration
-            if (!d.isPersistent() || d.getLastTouchedTime() + DIRECTORY_EXPIRATION_TIME_MS < t){
+            //remove all old dirs - but don't force resaving due to expiration
+            if (d.getLastTouchedTime() + DIRECTORY_EXPIRATION_TIME_MS < t){
                 toRemove.add(k);
-            } else {
-                setChanged(d.hasChangedSinceCreation());
             }
         }
         //actually remove directories, but only if we actually have a changed
@@ -141,6 +188,9 @@ public class DirectoryCache extends PersistentlyCachedObject{
     public String toString() {
         String s = "directory cache:<";
         for (GenericFile dir : directories.keySet()){
+            s += "\n"+dir;
+        }
+        for (GenericFile dir : transientDirectories.keySet()){
             s += "\n"+dir;
         }
         return s+">";
@@ -161,6 +211,12 @@ public class DirectoryCache extends PersistentlyCachedObject{
         for (CachedDirectory d : cache.directories.values()){
             d.update();
         }
+    }
+    
+    public static void main(String[] args) {
+        DirectoryCache.putTransient(GenericFile.create("."));
+        DirectoryCache.printCache();
+        System.out.println(DirectoryCache.get(GenericFile.create(".")));        
     }
 }
 
