@@ -241,6 +241,7 @@ public abstract class Builtin {
         builtinMap.put("regexp",Regexp.getInstance());
         builtinMap.put("regexpi",Regexpi.getInstance());
         builtinMap.put("regexprep",Regexprep.getInstance());
+        builtinMap.put("size",Size.getInstance());
         builtinMap.put("length",Length.getInstance());
         builtinMap.put("ndims",Ndims.getInstance());
         builtinMap.put("numel",Numel.getInstance());
@@ -4107,6 +4108,23 @@ public abstract class Builtin {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDoubleResultVersatileQuery(this,arg);
+        }
+        
+    }
+    public static class Size extends AbstractDoubleResultVersatileQuery  {
+        //returns the singleton instance of this class
+        private static Size singleton = null;
+        public static Size getInstance(){
+            if (singleton == null) singleton = new Size();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSize(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "size";
         }
         
     }

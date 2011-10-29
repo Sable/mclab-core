@@ -586,12 +586,15 @@ versatileQuery; versatileFunction
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
+size
 
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
 length
 ndims
 numel
+
+
 
 # return logicals
 logicalResultVersatileQuery; versatileQuery
@@ -716,16 +719,6 @@ cellfun
 
 
 # arrayConstructor; arrayOperation
-
-
-
-
-
-
-
-# arrayQuery; arrayOperation
-# size
-# sign - numerical function?
 
 
 
