@@ -166,20 +166,15 @@ public class DirectoryCache extends PersistentlyCachedObject{
     @Override
     protected void onExit() {
         long t = System.currentTimeMillis();
-        //go through and remove any 'old' directories, find whether changed is true
-        LinkedList<GenericFile> toRemove = new LinkedList<GenericFile>();
-        for (GenericFile k : directories.keySet()){
-            CachedDirectory d = directories.get(k);
-            //remove all old dirs - but don't force resaving due to expiration
-            if (d.getLastTouchedTime() + DIRECTORY_EXPIRATION_TIME_MS < t){
-                toRemove.add(k);
-            }
-        }
-        //actually remove directories, but only if we actually have a changed
-        //otherwise the data won't be saved to the cache, anyway
+        //go through and remove any 'old' directories, 
+        //but only when changed is true
         if (getChanged()){
-            for (GenericFile r : toRemove){
-                directories.remove(r);
+            for (GenericFile k : directories.keySet()){
+                CachedDirectory d = directories.get(k);
+                //remove all old dirs - but don't force resaving due to expiration
+                if (d.getLastTouchedTime() + DIRECTORY_EXPIRATION_TIME_MS < t){
+                    cache.directories.remove(k);
+                }
             }
         }
     }
