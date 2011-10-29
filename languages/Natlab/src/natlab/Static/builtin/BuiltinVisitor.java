@@ -246,6 +246,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractDimensionCollapsingFloatFunction(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
     public Ret caseMode(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
     public Ret caseProd(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
+    public Ret caseSum(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
+    public Ret caseMean(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
     
     //standard matrix math functions with optional arguments
     public Ret caseAbstractMatrixLibaryFunction(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }

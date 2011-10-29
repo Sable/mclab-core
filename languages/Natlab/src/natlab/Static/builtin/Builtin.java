@@ -162,6 +162,8 @@ public abstract class Builtin {
         builtinMap.put("cumprod",Cumprod.getInstance());
         builtinMap.put("mode",Mode.getInstance());
         builtinMap.put("prod",Prod.getInstance());
+        builtinMap.put("sum",Sum.getInstance());
+        builtinMap.put("mean",Mean.getInstance());
         builtinMap.put("eig",Eig.getInstance());
         builtinMap.put("norm",Norm.getInstance());
         builtinMap.put("rank",Rank.getInstance());
@@ -2483,6 +2485,40 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "prod";
+        }
+        
+    }
+    public static class Sum extends AbstractDimensionCollapsingFloatFunction  {
+        //returns the singleton instance of this class
+        private static Sum singleton = null;
+        public static Sum getInstance(){
+            if (singleton == null) singleton = new Sum();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSum(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sum";
+        }
+        
+    }
+    public static class Mean extends AbstractDimensionCollapsingFloatFunction  {
+        //returns the singleton instance of this class
+        private static Mean singleton = null;
+        public static Mean getInstance(){
+            if (singleton == null) singleton = new Mean();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMean(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "mean";
         }
         
     }
