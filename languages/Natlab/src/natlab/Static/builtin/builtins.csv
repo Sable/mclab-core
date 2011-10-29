@@ -362,6 +362,10 @@ cumprod
 dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
 mode
 prod
+sum
+mean
+
+
 
 # standard matrix math functions with optional arguments
 matrixLibaryFunction; improperFloatFunction
@@ -714,14 +718,6 @@ cellfun
 # arrayConstructor; arrayOperation
 
 
-# dimensionCollapsingOperation; arrayOperation
-# prod - only floats?
-# sum
-# mean
-# min
-# max
-# cumprod - not collapsing
-# cumsum - not collapsing
 
 
 
