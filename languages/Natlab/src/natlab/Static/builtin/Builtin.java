@@ -274,6 +274,7 @@ public abstract class Builtin {
         builtinMap.put("arrayfun",Arrayfun.getInstance());
         builtinMap.put("cellfun",Cellfun.getInstance());
         builtinMap.put("superiorto",Superiorto.getInstance());
+        builtinMap.put("superiorfloat",Superiorfloat.getInstance());
         builtinMap.put("exit",Exit.getInstance());
         builtinMap.put("quit",Quit.getInstance());
         builtinMap.put("clock",Clock.getInstance());
@@ -4753,6 +4754,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "superiorto";
+        }
+        
+    }
+    public static class Superiorfloat extends AbstractImpureFunction  {
+        //returns the singleton instance of this class
+        private static Superiorfloat singleton = null;
+        public static Superiorfloat getInstance(){
+            if (singleton == null) singleton = new Superiorfloat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSuperiorfloat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "superiorfloat";
         }
         
     }

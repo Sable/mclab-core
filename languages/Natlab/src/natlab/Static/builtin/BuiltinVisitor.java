@@ -489,7 +489,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //*** opposite of pure functions *****************************************
     public Ret caseAbstractImpureFunction(Builtin builtin,Arg arg){ return caseAbstractRoot(builtin,arg); }    
     //dunnno what to do with these
-    public Ret caseSuperiorto(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }    
+    public Ret caseSuperiorto(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
+    public Ret caseSuperiorfloat(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }    
     //set superior to relationship in oldclass constructor
     public Ret caseExit(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
     public Ret caseQuit(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }

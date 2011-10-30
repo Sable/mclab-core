@@ -730,6 +730,7 @@ impureFunction; root
 
 # dunnno what to do with these
 superiorto
+superiorfloat
 #set superior to relationship in oldclass constructor
 exit
 quit
