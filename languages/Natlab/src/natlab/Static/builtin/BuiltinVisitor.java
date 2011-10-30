@@ -589,9 +589,10 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseFwrite(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }
     public Ret caseFgetl(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }
     public Ret caseFgets(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }
-    public Ret caseFclose(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }    
+    public Ret caseFclose(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }
+    
     //*** library funcitons that are not builtins!! TODO **********************
-    public Ret caseNotABuiltin, root(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }    
+    public Ret caseAbstractNotABuiltin(Builtin builtin,Arg arg){ return caseAbstractRoot(builtin,arg); }    
     //linspace
-    public Ret caseImwrite(Builtin builtin,Arg arg){ return caseAbstractPosixIoFunction(builtin,arg); }
+    public Ret caseImwrite(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
 }

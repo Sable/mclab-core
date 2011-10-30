@@ -344,7 +344,6 @@ public abstract class Builtin {
         builtinMap.put("fgetl",Fgetl.getInstance());
         builtinMap.put("fgets",Fgets.getInstance());
         builtinMap.put("fclose",Fclose.getInstance());
-        builtinMap.put("notABuiltin, root",NotABuiltin, root.getInstance());
         builtinMap.put("imwrite",Imwrite.getInstance());
     }    
     
@@ -6030,24 +6029,14 @@ public abstract class Builtin {
         }
         
     }
-    public static class NotABuiltin, root extends AbstractPosixIoFunction  {
-        //returns the singleton instance of this class
-        private static NotABuiltin, root singleton = null;
-        public static NotABuiltin, root getInstance(){
-            if (singleton == null) singleton = new NotABuiltin, root();
-            return singleton;
-        }
+    public static abstract class AbstractNotABuiltin extends AbstractRoot  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseNotABuiltin, root(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "notABuiltin, root";
+            return visitor.caseAbstractNotABuiltin(this,arg);
         }
         
     }
-    public static class Imwrite extends AbstractPosixIoFunction  {
+    public static class Imwrite extends AbstractNotABuiltin  {
         //returns the singleton instance of this class
         private static Imwrite singleton = null;
         public static Imwrite getInstance(){
