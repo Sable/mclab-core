@@ -790,6 +790,7 @@ echo
 # should this be here? - this could be a proper lib function?
 diary
 # something logging related
+message
 lastwarn
 lasterror
 format

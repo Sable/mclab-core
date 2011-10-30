@@ -310,6 +310,7 @@ public abstract class Builtin {
         builtinMap.put("clc",Clc.getInstance());
         builtinMap.put("error",Error.getInstance());
         builtinMap.put("warning",Warning.getInstance());
+        builtinMap.put("message",Message.getInstance());
         builtinMap.put("echo",Echo.getInstance());
         builtinMap.put("diary",Diary.getInstance());
         builtinMap.put("lastwarn",Lastwarn.getInstance());
@@ -5410,6 +5411,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "warning";
+        }
+        
+    }
+    public static class Message extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Message singleton = null;
+        public static Message getInstance(){
+            if (singleton == null) singleton = new Message();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMessage(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "message";
         }
         
     }
