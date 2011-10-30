@@ -841,12 +841,12 @@ fclose
 
 
 # *** library funcitons that are not builtins!! TODO **********************
-#notABuiltin, builtin
+notABuiltin, root
 #conv
 #toeplitz
 #dyaddown
 #flipud
 #linspace
-#imwrite
+imwrite
 
 
