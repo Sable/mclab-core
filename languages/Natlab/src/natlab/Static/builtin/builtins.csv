@@ -349,7 +349,7 @@ hypot
 # improper float matrix functions do not have a fixed arity, and extra arguments are either
 # options or different possible operands.
 improperFloatFunction; floatFunction
-
+eps
 
 
 # functions of the form f(matrix,[dimension])
