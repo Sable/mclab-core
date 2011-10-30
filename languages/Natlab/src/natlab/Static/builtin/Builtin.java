@@ -245,6 +245,7 @@ public abstract class Builtin {
         builtinMap.put("length",Length.getInstance());
         builtinMap.put("ndims",Ndims.getInstance());
         builtinMap.put("numel",Numel.getInstance());
+        builtinMap.put("end",End.getInstance());
         builtinMap.put("isempty",Isempty.getInstance());
         builtinMap.put("isobject",Isobject.getInstance());
         builtinMap.put("isfloat",Isfloat.getInstance());
@@ -4184,6 +4185,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "numel";
+        }
+        
+    }
+    public static class End extends AbstractScalarDoubleResultVersatileQuery  {
+        //returns the singleton instance of this class
+        private static End singleton = null;
+        public static End getInstance(){
+            if (singleton == null) singleton = new End();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEnd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "end";
         }
         
     }
