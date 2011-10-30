@@ -158,6 +158,7 @@ public abstract class Builtin {
         builtinMap.put("expm",Expm.getInstance());
         builtinMap.put("inv",Inv.getInstance());
         builtinMap.put("hypot",Hypot.getInstance());
+        builtinMap.put("eps",Eps.getInstance());
         builtinMap.put("cumsum",Cumsum.getInstance());
         builtinMap.put("cumprod",Cumprod.getInstance());
         builtinMap.put("mode",Mode.getInstance());
@@ -310,9 +311,9 @@ public abstract class Builtin {
         builtinMap.put("clc",Clc.getInstance());
         builtinMap.put("error",Error.getInstance());
         builtinMap.put("warning",Warning.getInstance());
-        builtinMap.put("message",Message.getInstance());
         builtinMap.put("echo",Echo.getInstance());
         builtinMap.put("diary",Diary.getInstance());
+        builtinMap.put("message",Message.getInstance());
         builtinMap.put("lastwarn",Lastwarn.getInstance());
         builtinMap.put("lasterror",Lasterror.getInstance());
         builtinMap.put("format",Format.getInstance());
@@ -2408,6 +2409,23 @@ public abstract class Builtin {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractImproperFloatFunction(this,arg);
+        }
+        
+    }
+    public static class Eps extends AbstractImproperFloatFunction  {
+        //returns the singleton instance of this class
+        private static Eps singleton = null;
+        public static Eps getInstance(){
+            if (singleton == null) singleton = new Eps();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEps(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "eps";
         }
         
     }
@@ -5414,23 +5432,6 @@ public abstract class Builtin {
         }
         
     }
-    public static class Message extends AbstractReportFunction  {
-        //returns the singleton instance of this class
-        private static Message singleton = null;
-        public static Message getInstance(){
-            if (singleton == null) singleton = new Message();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseMessage(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "message";
-        }
-        
-    }
     public static class Echo extends AbstractReportFunction  {
         //returns the singleton instance of this class
         private static Echo singleton = null;
@@ -5462,6 +5463,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "diary";
+        }
+        
+    }
+    public static class Message extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Message singleton = null;
+        public static Message getInstance(){
+            if (singleton == null) singleton = new Message();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMessage(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "message";
         }
         
     }
