@@ -419,6 +419,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     
     //query functions that operate not just on matrizes (c.f. matrixQueryFunction)
     public Ret caseAbstractVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileFunction(builtin,arg); }
+    public Ret caseClass(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
     
     //return numericals
     public Ret caseAbstractDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
@@ -434,7 +435,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //return logicals
     public Ret caseAbstractLogicalResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
     
-    //return scalar doubles
+    //return scalar logicals
     public Ret caseAbstractScalarLogicalResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractLogicalResultVersatileQuery(builtin,arg); }
 
     public Ret caseAbstractClassQuery(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalResultVersatileQuery(builtin,arg); }

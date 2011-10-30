@@ -583,6 +583,7 @@ regexprep
 
 # query functions that operate not just on matrizes (c.f. matrixQueryFunction)
 versatileQuery; versatileFunction
+class
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
@@ -599,7 +600,7 @@ end
 # return logicals
 logicalResultVersatileQuery; versatileQuery
 
-# return scalar doubles
+# return scalar logicals
 scalarLogicalResultVersatileQuery; logicalResultVersatileQuery
 classQuery; scalarLogicalResultVersatileQuery
 isempty

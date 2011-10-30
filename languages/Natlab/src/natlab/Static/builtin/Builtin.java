@@ -241,6 +241,7 @@ public abstract class Builtin {
         builtinMap.put("regexp",Regexp.getInstance());
         builtinMap.put("regexpi",Regexpi.getInstance());
         builtinMap.put("regexprep",Regexprep.getInstance());
+        builtinMap.put("class",Class.getInstance());
         builtinMap.put("size",Size.getInstance());
         builtinMap.put("length",Length.getInstance());
         builtinMap.put("ndims",Ndims.getInstance());
@@ -4103,6 +4104,23 @@ public abstract class Builtin {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractVersatileQuery(this,arg);
+        }
+        
+    }
+    public static class Class extends AbstractVersatileQuery  {
+        //returns the singleton instance of this class
+        private static Class singleton = null;
+        public static Class getInstance(){
+            if (singleton == null) singleton = new Class();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClass(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "class";
         }
         
     }
