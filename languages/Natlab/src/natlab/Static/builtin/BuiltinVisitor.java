@@ -596,4 +596,5 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractNotABuiltin(Builtin builtin,Arg arg){ return caseAbstractRoot(builtin,arg); }    
     //linspace
     public Ret caseImwrite(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseSparse(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
 }

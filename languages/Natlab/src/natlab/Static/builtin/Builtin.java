@@ -346,6 +346,7 @@ public abstract class Builtin {
         builtinMap.put("fgets",Fgets.getInstance());
         builtinMap.put("fclose",Fclose.getInstance());
         builtinMap.put("imwrite",Imwrite.getInstance());
+        builtinMap.put("sparse",Sparse.getInstance());
     }    
     
     //the actual Builtin Classes:
@@ -6078,6 +6079,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "imwrite";
+        }
+        
+    }
+    public static class Sparse extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Sparse singleton = null;
+        public static Sparse getInstance(){
+            if (singleton == null) singleton = new Sparse();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSparse(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sparse";
         }
         
     }
