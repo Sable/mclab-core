@@ -68,14 +68,15 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractUnaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractProperNumericFunction(builtin,arg); }
 
     public Ret caseAbstractElementalUnaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractUnaryNumericFunction(builtin,arg); }
+    public Ret caseReal(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
+    public Ret caseImag(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
+    public Ret caseAbs(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
+    public Ret caseConj(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
+    public Ret caseSign(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
 
     public Ret caseAbstractElementalUnaryArithmetic(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
     public Ret caseUplus(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
     public Ret caseUminus(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
-    public Ret caseReal(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
-    public Ret caseImag(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
-    public Ret caseAbs(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
-    public Ret caseConj(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryArithmetic(builtin,arg); }
 
     public Ret caseAbstractRoundingOperation(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryNumericFunction(builtin,arg); }
     public Ret caseFix(Builtin builtin,Arg arg){ return caseAbstractRoundingOperation(builtin,arg); }

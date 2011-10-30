@@ -162,18 +162,20 @@ unaryNumericFunction; properNumericFunction
 -Class(numeric>0, char|logical>double)
 
 elementalUnaryNumericFunction; unaryNumericFunction; abstract
-
-elementalUnaryArithmetic; elementalUnaryNumericFunction
-uplus
-uminus
 real
 imag
 abs
 conj;; MatlabClass(logical>error)
+sign;; MatlabClass(logical>error)
+
+
+elementalUnaryArithmetic; elementalUnaryNumericFunction
+uplus
+uminus
 
 RoundingOperation; elementalUnaryNumericFunction
--MatlabClass(logical>error)
-fix;; MatlabClass(logical>double)
+-MatlabClass(logical>error,natlab)
+fix;; MatlabClass(logical>double,natlab)
 round
 floor
 ceil

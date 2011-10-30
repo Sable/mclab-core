@@ -74,12 +74,13 @@ public abstract class Builtin {
         builtinMap.put("tril",Tril.getInstance());
         builtinMap.put("triu",Triu.getInstance());
         builtinMap.put("diag",Diag.getInstance());
-        builtinMap.put("uplus",Uplus.getInstance());
-        builtinMap.put("uminus",Uminus.getInstance());
         builtinMap.put("real",Real.getInstance());
         builtinMap.put("imag",Imag.getInstance());
         builtinMap.put("abs",Abs.getInstance());
         builtinMap.put("conj",Conj.getInstance());
+        builtinMap.put("sign",Sign.getInstance());
+        builtinMap.put("uplus",Uplus.getInstance());
+        builtinMap.put("uminus",Uminus.getInstance());
         builtinMap.put("fix",Fix.getInstance());
         builtinMap.put("round",Round.getInstance());
         builtinMap.put("floor",Floor.getInstance());
@@ -640,6 +641,111 @@ public abstract class Builtin {
         }
         
     }
+    public static class Real extends AbstractElementalUnaryNumericFunction  {
+        //returns the singleton instance of this class
+        private static Real singleton = null;
+        public static Real getInstance(){
+            if (singleton == null) singleton = new Real();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseReal(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "real";
+        }
+        
+    }
+    public static class Imag extends AbstractElementalUnaryNumericFunction  {
+        //returns the singleton instance of this class
+        private static Imag singleton = null;
+        public static Imag getInstance(){
+            if (singleton == null) singleton = new Imag();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImag(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "imag";
+        }
+        
+    }
+    public static class Abs extends AbstractElementalUnaryNumericFunction  {
+        //returns the singleton instance of this class
+        private static Abs singleton = null;
+        public static Abs getInstance(){
+            if (singleton == null) singleton = new Abs();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbs(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "abs";
+        }
+        
+    }
+    public static class Conj extends AbstractElementalUnaryNumericFunction  {
+        //returns the singleton instance of this class
+        private static Conj singleton = null;
+        public static Conj getInstance(){
+            if (singleton == null) singleton = new Conj();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseConj(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "conj";
+        }
+        
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (matlabClassPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+            }
+            return matlabClassPropInfo;
+        }
+
+    }
+    public static class Sign extends AbstractElementalUnaryNumericFunction  {
+        //returns the singleton instance of this class
+        private static Sign singleton = null;
+        public static Sign getInstance(){
+            if (singleton == null) singleton = new Sign();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSign(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sign";
+        }
+        
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (matlabClassPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+            }
+            return matlabClassPropInfo;
+        }
+
+    }
     public static abstract class AbstractElementalUnaryArithmetic extends AbstractElementalUnaryNumericFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -681,96 +787,18 @@ public abstract class Builtin {
         }
         
     }
-    public static class Real extends AbstractElementalUnaryArithmetic  {
-        //returns the singleton instance of this class
-        private static Real singleton = null;
-        public static Real getInstance(){
-            if (singleton == null) singleton = new Real();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseReal(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "real";
-        }
-        
-    }
-    public static class Imag extends AbstractElementalUnaryArithmetic  {
-        //returns the singleton instance of this class
-        private static Imag singleton = null;
-        public static Imag getInstance(){
-            if (singleton == null) singleton = new Imag();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseImag(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "imag";
-        }
-        
-    }
-    public static class Abs extends AbstractElementalUnaryArithmetic  {
-        //returns the singleton instance of this class
-        private static Abs singleton = null;
-        public static Abs getInstance(){
-            if (singleton == null) singleton = new Abs();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbs(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "abs";
-        }
-        
-    }
-    public static class Conj extends AbstractElementalUnaryArithmetic  {
-        //returns the singleton instance of this class
-        private static Conj singleton = null;
-        public static Conj getInstance(){
-            if (singleton == null) singleton = new Conj();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseConj(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "conj";
-        }
-        
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
-            //set classPropInfo if not defined
-            if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
-            }
-            return matlabClassPropInfo;
-        }
-
-    }
     public static abstract class AbstractRoundingOperation extends AbstractElementalUnaryNumericFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractRoundingOperation(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo()),getClassPropagationInfo());
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo());
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),getClassPropagationInfo()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -792,12 +820,12 @@ public abstract class Builtin {
             return "fix";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"));
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getClassPropagationInfo());
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"));
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
