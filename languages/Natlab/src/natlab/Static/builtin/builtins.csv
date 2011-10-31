@@ -590,6 +590,7 @@ class
 # return numericals
 doubleResultVersatileQuery; versatileQuery
 size
+find
 
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery

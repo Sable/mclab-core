@@ -426,6 +426,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //return numericals
     public Ret caseAbstractDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
     public Ret caseSize(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
+    public Ret caseFind(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
     
     //scalar numerical
     public Ret caseAbstractScalarDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
