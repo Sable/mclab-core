@@ -350,6 +350,7 @@ public abstract class Builtin {
         builtinMap.put("sparse",Sparse.getInstance());
         builtinMap.put("var",Var.getInstance());
         builtinMap.put("std",Std.getInstance());
+        builtinMap.put("realmax",Realmax.getInstance());
         builtinMap.put("histc",Histc.getInstance());
     }    
     
@@ -6151,6 +6152,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "std";
+        }
+        
+    }
+    public static class Realmax extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Realmax singleton = null;
+        public static Realmax getInstance(){
+            if (singleton == null) singleton = new Realmax();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRealmax(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "realmax";
         }
         
     }
