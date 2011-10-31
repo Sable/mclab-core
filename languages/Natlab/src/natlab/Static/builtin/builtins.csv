@@ -852,4 +852,5 @@ notABuiltin; root
 #linspace
 imwrite
 sparse
-
+var
+std

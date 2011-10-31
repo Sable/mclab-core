@@ -348,6 +348,8 @@ public abstract class Builtin {
         builtinMap.put("fclose",Fclose.getInstance());
         builtinMap.put("imwrite",Imwrite.getInstance());
         builtinMap.put("sparse",Sparse.getInstance());
+        builtinMap.put("var",Var.getInstance());
+        builtinMap.put("std",Std.getInstance());
     }    
     
     //the actual Builtin Classes:
@@ -6114,6 +6116,40 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "sparse";
+        }
+        
+    }
+    public static class Var extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Var singleton = null;
+        public static Var getInstance(){
+            if (singleton == null) singleton = new Var();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVar(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "var";
+        }
+        
+    }
+    public static class Std extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Std singleton = null;
+        public static Std getInstance(){
+            if (singleton == null) singleton = new Std();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "std";
         }
         
     }
