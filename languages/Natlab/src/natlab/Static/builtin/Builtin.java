@@ -186,6 +186,7 @@ public abstract class Builtin {
         builtinMap.put("bitset",Bitset.getInstance());
         builtinMap.put("bitget",Bitget.getInstance());
         builtinMap.put("bitshift",Bitshift.getInstance());
+        builtinMap.put("find",Find.getInstance());
         builtinMap.put("nnz",Nnz.getInstance());
         builtinMap.put("not",Not.getInstance());
         builtinMap.put("any",Any.getInstance());
@@ -245,7 +246,6 @@ public abstract class Builtin {
         builtinMap.put("regexprep",Regexprep.getInstance());
         builtinMap.put("class",Class.getInstance());
         builtinMap.put("size",Size.getInstance());
-        builtinMap.put("find",Find.getInstance());
         builtinMap.put("length",Length.getInstance());
         builtinMap.put("ndims",Ndims.getInstance());
         builtinMap.put("numel",Numel.getInstance());
@@ -2965,6 +2965,23 @@ public abstract class Builtin {
         }
         
     }
+    public static class Find extends AbstractToDoubleMatrixQuery  {
+        //returns the singleton instance of this class
+        private static Find singleton = null;
+        public static Find getInstance(){
+            if (singleton == null) singleton = new Find();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFind(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "find";
+        }
+        
+    }
     public static abstract class AbstractToScalarDoubleMatrixQuery extends AbstractToDoubleMatrixQuery  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
@@ -4195,23 +4212,6 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "size";
-        }
-        
-    }
-    public static class Find extends AbstractDoubleResultVersatileQuery  {
-        //returns the singleton instance of this class
-        private static Find singleton = null;
-        public static Find getInstance(){
-            if (singleton == null) singleton = new Find();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseFind(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "find";
         }
         
     }

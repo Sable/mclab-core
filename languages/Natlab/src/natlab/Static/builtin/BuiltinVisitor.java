@@ -294,6 +294,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     
     //return doubles
     public Ret caseAbstractToDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractMatrixQuery(builtin,arg); }
+    public Ret caseFind(Builtin builtin,Arg arg){ return caseAbstractToDoubleMatrixQuery(builtin,arg); }
 
     public Ret caseAbstractToScalarDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractToDoubleMatrixQuery(builtin,arg); }
     public Ret caseNnz(Builtin builtin,Arg arg){ return caseAbstractToScalarDoubleMatrixQuery(builtin,arg); }
@@ -426,7 +427,6 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //return numericals
     public Ret caseAbstractDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
     public Ret caseSize(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
-    public Ret caseFind(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
     
     //scalar numerical
     public Ret caseAbstractScalarDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
