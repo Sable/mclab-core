@@ -350,6 +350,7 @@ public abstract class Builtin {
         builtinMap.put("sparse",Sparse.getInstance());
         builtinMap.put("var",Var.getInstance());
         builtinMap.put("std",Std.getInstance());
+        builtinMap.put("histc",Histc.getInstance());
     }    
     
     //the actual Builtin Classes:
@@ -6150,6 +6151,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "std";
+        }
+        
+    }
+    public static class Histc extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Histc singleton = null;
+        public static Histc getInstance(){
+            if (singleton == null) singleton = new Histc();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHistc(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "histc";
         }
         
     }

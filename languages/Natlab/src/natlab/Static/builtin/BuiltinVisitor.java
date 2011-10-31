@@ -600,4 +600,5 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseSparse(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseVar(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseStd(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseHistc(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
 }

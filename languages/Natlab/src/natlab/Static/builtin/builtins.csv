@@ -675,9 +675,6 @@ cellfun
 
 
 
-# histc
-
-
 
 
 
@@ -854,3 +851,4 @@ imwrite
 sparse
 var
 std
+histc
