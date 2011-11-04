@@ -512,18 +512,18 @@ false
 # **************************************************************************************
 # matrix constructors
 matrixConstructor; matrixFunction
-double
-single
-char
-logical
-int8
-int16
-int32
-int64
-uint8
-uint16
-uint32
-uint64
+double ;;Class(any>double)
+single ;;Class(any>single)
+char   ;;Class(any>char)
+logical;;Class(any>logical)
+int8   ;;Class(any>int8)
+int16  ;;Class(any>int16)
+int32  ;;Class(any>int32)
+int64  ;;Class(any>int64)
+uint8  ;;Class(any>uint8)
+uint16 ;;Class(any>uint16)
+uint32 ;;Class(any>uint32)
+uint64 ;;Class(any>uint64)
 
 
 # ***************************************************************************************

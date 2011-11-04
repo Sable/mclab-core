@@ -3564,7 +3564,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Double extends AbstractMatrixConstructor  {
+    public static class Double extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Double singleton = null;
         public static Double getInstance(){
@@ -3580,8 +3580,22 @@ public abstract class Builtin {
             return "double";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Single extends AbstractMatrixConstructor  {
+    public static class Single extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Single singleton = null;
         public static Single getInstance(){
@@ -3597,8 +3611,22 @@ public abstract class Builtin {
             return "single";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("single"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("single"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Char extends AbstractMatrixConstructor  {
+    public static class Char extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Char singleton = null;
         public static Char getInstance(){
@@ -3614,8 +3642,22 @@ public abstract class Builtin {
             return "char";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Logical extends AbstractMatrixConstructor  {
+    public static class Logical extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Logical singleton = null;
         public static Logical getInstance(){
@@ -3631,8 +3673,22 @@ public abstract class Builtin {
             return "logical";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Int8 extends AbstractMatrixConstructor  {
+    public static class Int8 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Int8 singleton = null;
         public static Int8 getInstance(){
@@ -3648,8 +3704,22 @@ public abstract class Builtin {
             return "int8";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Int16 extends AbstractMatrixConstructor  {
+    public static class Int16 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Int16 singleton = null;
         public static Int16 getInstance(){
@@ -3665,8 +3735,22 @@ public abstract class Builtin {
             return "int16";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Int32 extends AbstractMatrixConstructor  {
+    public static class Int32 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Int32 singleton = null;
         public static Int32 getInstance(){
@@ -3682,8 +3766,22 @@ public abstract class Builtin {
             return "int32";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Int64 extends AbstractMatrixConstructor  {
+    public static class Int64 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Int64 singleton = null;
         public static Int64 getInstance(){
@@ -3699,8 +3797,22 @@ public abstract class Builtin {
             return "int64";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Uint8 extends AbstractMatrixConstructor  {
+    public static class Uint8 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Uint8 singleton = null;
         public static Uint8 getInstance(){
@@ -3716,8 +3828,22 @@ public abstract class Builtin {
             return "uint8";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Uint16 extends AbstractMatrixConstructor  {
+    public static class Uint16 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Uint16 singleton = null;
         public static Uint16 getInstance(){
@@ -3733,8 +3859,22 @@ public abstract class Builtin {
             return "uint16";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Uint32 extends AbstractMatrixConstructor  {
+    public static class Uint32 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Uint32 singleton = null;
         public static Uint32 getInstance(){
@@ -3750,8 +3890,22 @@ public abstract class Builtin {
             return "uint32";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
+            }
+            return classPropInfo;
+        }
+
     }
-    public static class Uint64 extends AbstractMatrixConstructor  {
+    public static class Uint64 extends AbstractMatrixConstructor implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Uint64 singleton = null;
         public static Uint64 getInstance(){
@@ -3767,6 +3921,20 @@ public abstract class Builtin {
             return "uint64";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class CellFunction extends AbstractPureFunction  {
         //returns the singleton instance of this class
