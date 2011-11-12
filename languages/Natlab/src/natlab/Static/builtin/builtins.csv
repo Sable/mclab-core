@@ -188,7 +188,7 @@ arrayUnaryArithmetic; arrayUnaryNumericFunction; abstract
 # binary numeric function - doesn't mix integers
 binaryNumericFunction; properNumericFunction
 -Class(coerce(logical|char>double, (numeric&(double|0)>0) | ((double|1)&numeric>1)))
--MatlabClass((logical|char)&0>error, (int&logical)|(logical&int)>error, natlab)
+-MatlabClass((int&logical)|(logical&int)>error, natlab)
 
 # elemental binary numeric matrix function
 elementalBinaryNumericFunction; binaryNumericFunction
@@ -198,15 +198,15 @@ complex
 
 # elemewise binary arithmetic
 elementalBinaryArithmetic; elementalBinaryNumericFunction
--MatlabClass(logical&logical>double, parent)
 plus
 minus
 times
 # integers can only be combined with scalar doubles
 power
+-MatlabClass(logical&0>error, parent)
 
 dividingElementalArithmetic; elementalBinaryArithmetic
--MatlabClass(logical&logical>error, parent)
+-MatlabClass(logical&0>error, parent)
 # the following do not allow both args to be double under certain circumstances (...)
 ldivide
 rdivide
@@ -222,7 +222,7 @@ cross
 
 # binary matrix arithmetic - doesn't mix integer types
 arrayBinaryArithmetic; arrayBinaryNumericFunction
-mtimes;; MatlabClass(logical&logical>double, parent)
+mtimes;; MatlabClass(logical&0>double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower
 dividingArrayArithmetic; arrayBinaryArithmetic
@@ -345,7 +345,7 @@ binaryFloatFunction; properFloatFunction
 
 # matrix-wise binary funciton operating on float matrices
 arrayBinaryFloatFunction; binaryFloatFunction
--Class((single&float|float&single)>single,double&double>double)
+-Class(float&(double|0)>0,(double|1)&float>1)
 hypot
 
 # improper float matrix functions do not have a fixed arity, and extra arguments are either

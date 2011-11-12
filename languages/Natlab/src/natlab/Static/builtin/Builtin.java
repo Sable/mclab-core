@@ -908,12 +908,12 @@ public abstract class Builtin {
             return visitor.caseAbstractBinaryNumericFunction(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))))),new ClassPropTools.MCError()),getClassPropagationInfo()));
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))))),new ClassPropTools.MCError()),getClassPropagationInfo());
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))))),new ClassPropTools.MCError()),getClassPropagationInfo()));
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))))),new ClassPropTools.MCError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -969,16 +969,6 @@ public abstract class Builtin {
             return visitor.caseAbstractElementalBinaryArithmetic(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
-            //set classPropInfo if not defined
-            if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-            }
-            return matlabClassPropInfo;
-        }
-
     }
     public static class Plus extends AbstractElementalBinaryArithmetic  {
         //returns the singleton instance of this class
@@ -1047,6 +1037,16 @@ public abstract class Builtin {
             return "power";
         }
         
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (matlabClassPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+            }
+            return matlabClassPropInfo;
+        }
+
     }
     public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic  {
         //visit visitor
@@ -1054,12 +1054,12 @@ public abstract class Builtin {
             return visitor.caseAbstractDividingElementalArithmetic(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),parentClassPropInfo);
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),parentClassPropInfo);
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -1207,12 +1207,12 @@ public abstract class Builtin {
             return "mtimes";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -2412,12 +2412,12 @@ public abstract class Builtin {
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1)));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
+                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1)));
             }
             return classPropInfo;
         }
