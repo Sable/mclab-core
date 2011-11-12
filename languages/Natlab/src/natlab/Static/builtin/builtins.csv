@@ -215,7 +215,9 @@ rem
 
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
+# TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
 dot
+-Class(coerce(logical|char>double,((single&float)|(float&single)>single) | (numeric&(double|0)>double) | ((double|1)&numeric>double)))
 -MatlabClass(logical&any>error, natlab)
 cross
 

@@ -111,7 +111,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseRem(Builtin builtin,Arg arg){ return caseAbstractDividingElementalArithmetic(builtin,arg); }
     
     //array wise binary numeric matrix function
-    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }
+    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }    
+    //TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
     public Ret caseDot(Builtin builtin,Arg arg){ return caseAbstractArrayBinaryNumericFunction(builtin,arg); }
     public Ret caseCross(Builtin builtin,Arg arg){ return caseAbstractArrayBinaryNumericFunction(builtin,arg); }
     
