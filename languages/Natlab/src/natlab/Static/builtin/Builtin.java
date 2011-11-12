@@ -714,12 +714,12 @@ public abstract class Builtin {
             return "conj";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError());
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError());
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -741,12 +741,12 @@ public abstract class Builtin {
             return "sign";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError());
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError());
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -2412,12 +2412,12 @@ public abstract class Builtin {
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCNum(1)));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCNum(1)));
+                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
             }
             return classPropInfo;
         }

@@ -165,8 +165,8 @@ elementalUnaryNumericFunction; unaryNumericFunction; abstract
 real
 imag
 abs
-conj;; MatlabClass(logical>error)
-sign;; MatlabClass(logical>error)
+conj;; MatlabClass(logical>error,natlab)
+sign;; MatlabClass(logical>error,natlab)
 
 
 elementalUnaryArithmetic; elementalUnaryNumericFunction
@@ -345,7 +345,7 @@ binaryFloatFunction; properFloatFunction
 
 # matrix-wise binary funciton operating on float matrices
 arrayBinaryFloatFunction; binaryFloatFunction
--Class(single&float>0,float&single>1)
+-Class((single&float|float&single)>single,double&double>double)
 hypot
 
 # improper float matrix functions do not have a fixed arity, and extra arguments are either
