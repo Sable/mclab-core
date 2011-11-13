@@ -1200,6 +1200,16 @@ public abstract class Builtin {
             return visitor.caseAbstractArrayBinaryArithmetic(this,arg);
         }
         
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (matlabClassPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+            }
+            return matlabClassPropInfo;
+        }
+
     }
     public static class Mtimes extends AbstractArrayBinaryArithmetic  {
         //returns the singleton instance of this class

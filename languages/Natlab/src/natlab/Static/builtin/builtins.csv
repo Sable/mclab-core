@@ -224,6 +224,7 @@ cross
 
 # binary matrix arithmetic - doesn't mix integer types
 arrayBinaryArithmetic; arrayBinaryNumericFunction
+-MatlabClass(logical&0>error, parent)
 mtimes;; MatlabClass(logical&0>double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower
