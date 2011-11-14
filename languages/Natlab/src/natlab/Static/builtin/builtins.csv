@@ -594,6 +594,9 @@ regexprep
 # query functions that operate not just on matrizes (c.f. matrixQueryFunction)
 versatileQuery; versatileFunction
 class
+# overloaded for struct for within constructors - struct,char,char..
+-Class(any>char)
+
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery

@@ -4443,7 +4443,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Class extends AbstractVersatileQuery  {
+    public static class Class extends AbstractVersatileQuery implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Class singleton = null;
         public static Class getInstance(){
@@ -4459,6 +4459,20 @@ public abstract class Builtin {
             return "class";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+            }
+            return classPropInfo;
+        }
+
     }
     public static abstract class AbstractDoubleResultVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
         //visit visitor
