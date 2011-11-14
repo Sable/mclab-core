@@ -65,8 +65,8 @@ class MCFunction(MC):
 # 2) set up keywords of the language in a dictionary
 # basic types:
 lang = dict(double=MCBuiltin('double'),single=MCBuiltin('single'),char=MCBuiltin('char'),logical=MCBuiltin('logical'),
-            uint8=MCBuiltin('int8'),uint16=MCBuiltin('uint16'),uint32=MCBuiltin('uint32'),uint64=MCBuiltin('uint64'),
-            int8=MCBuiltin('int8'),int16=MCBuiltin('uint16'),int32=MCBuiltin('uint32'),int64=MCBuiltin('uint64'),
+            uint8=MCBuiltin('uint8'),uint16=MCBuiltin('uint16'),uint32=MCBuiltin('uint32'),uint64=MCBuiltin('uint64'),
+            int8=MCBuiltin('int8'),int16=MCBuiltin('int16'),int32=MCBuiltin('int32'),int64=MCBuiltin('int64'),
             function_handle=MCBuiltin('function_handle'))
 # union types
 lang.update(dict(float=lang['single']|lang['double'], uint=(lang['uint8']|lang['uint16']|lang['uint32']|lang['uint64']), 

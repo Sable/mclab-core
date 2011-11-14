@@ -499,14 +499,14 @@ colon
 byShapeAndTypeMatrixCreation; matrixCreation
 
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
--Class(star(numeric|logical)&(typeString(numeric)|none>double))
+-Class(star(numeric|logical)&(typeString(numeric)|(none>double)))
 ones
 zeros
 # eye takes at most 2 dims
 eye
 
 floatByShapeAndTypeMatrixCreation; numericalByShapeAndTypeMatrixCreation;
--Class(star(numeric|logical)&(typeString(float)|none>double))
+-Class(star(numeric|logical)&(typeString(float)|(none>double)))
 inf
 nan
 
