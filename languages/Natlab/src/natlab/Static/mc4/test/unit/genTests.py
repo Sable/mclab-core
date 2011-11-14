@@ -23,14 +23,47 @@ binaryFloat = bUnits.builtins.getByOriginalName('binaryFloatFunction')
 unaryFloat =  bUnits.builtins.getByOriginalName('unaryFloatFunction')
 
 
-# create unit tests
-bUnits.genBuiltinTests([binaryNumeric,binaryFloat],2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])
-bUnits.genBuiltinTests([binaryNumeric,binaryFloat],2,bUnits.someMatrix,[(2,2)])
 
-bUnits.genBuiltinTests([unaryNumeric,unaryAnyMatrix,unaryFloat],1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])
-bUnits.genBuiltinTests([unaryNumeric,unaryAnyMatrix,unaryFloat],1,bUnits.someMatrix,[(2,2)])
+# binaries
+bUnits.genTests([binaryNumeric,binaryFloat],
+                bUnits.genArgs(2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(3,bUnits.double,[(1,1)])+
+                bUnits.genArgs(1,bUnits.double,[(1,1)]))
 
-bUnits.genBuiltinTests([bUnits.builtins.getByOriginalName('colon')],2,bUnits.someMatrix,[(1,1)])
-bUnits.genBuiltinTests([bUnits.builtins.getByOriginalName('colon')],3,bUnits.someMatrix,[(1,1)])
+# unaries
+bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],
+                bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(2,bUnits.double,[(1,1)])+
+                bUnits.genArgs(3,bUnits.double,[(1,1)]))
+
+#byShapeAndTypeMatrixCreation
+typeNames = [["'uint8'"],["'int32'"],["'double'"],["'single'"],["'logical'"],["'char'"],[]]
+bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation')],
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(3,bUnits.double,[(1,1)]),
+                typeNames)
+
+#queries
+matrixQuery = bUnits.builtins.getByOriginalName('matrixQuery')
+versatileQuery = bUnits.builtins.getByOriginalName('versatileQuery')
+
+bUnits.genTests([matrixQuery,versatileQuery],
+                bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
+                bUnits.genArgs(2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(3,bUnits.double,[(1,1)]))
 
 
+
+# specific functions ***********************************************************
+bUnits.genTests([bUnits.builtins.getByOriginalName('colon')],
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]));

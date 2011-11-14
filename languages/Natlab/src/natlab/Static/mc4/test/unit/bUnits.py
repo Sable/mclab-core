@@ -31,7 +31,7 @@ someMatrix = someNumerical+char+logical
 def cross(*args):
     ans = [[]]
     for arg in args:
-        ans = [x+[y] for x in ans for y in arg]
+        ans = [x+y for x in ans for y in arg]
     return ans
 
 # copy n times
@@ -54,15 +54,16 @@ def genMatrix(argType, argShape, seed=0):
     r = argType.format(r);
     return r;
 
-# generates a list of Matlab expressions for the given argTypes x argShapes lists
-def genArgs(argTypes, argShapes):
-    result = []
-    seed = 0
+# generates a list of all combinations of argNum Matlab expressions with the given argTypes, argShapes lists
+def genArgs(argNum, argTypes, argShapes):
+    argList = [];
+    seed = 0;
     for t in argTypes:
         for s in argShapes:
-            result.append(genMatrix(t,s,seed))
-            seed = seed+1
-    return result
+            argList.append([genMatrix(t,s,seed)]);
+            seed = seed+1;
+    crossedArgs = cross(*copyNTimes(argList,argNum));
+    return crossedArgs;
 
 
 def genUnitFunction(testName, builtinName, args):
@@ -84,23 +85,37 @@ def pathNameOfBuiltin(builtin):
     n = len(list)
     return (path,'u'+str(n)+'_auto')
 
-# generates tests for the given list of builtins, arg types and shapes
-def genBuiltinTests(builtins, argNum, argTypes, argShapes):
-    argList = genArgs(argTypes,argShapes);
-    crossedArgs = cross(*copyNTimes(argList,argNum))
-    
+
+
+def genBuiltinTest(b,args):
+    # generate unit case path/name/code
+    path,name = pathNameOfBuiltin(b)
+    fn = genUnitFunction(name,b.name,args)                
+    # write to file
+    print path+'/'+name+'.m';
+    file = open(path+'/'+name+'.m','w')
+    file.write(fn)
+    file.close();
+
+
+# generates tests for the given list of builtins, and list of arguments
+# argsList is a set of arguments, where every entry is list of lists
+# example
+# genTests(builtin, [['3','6'],['2']]) - will create two tests
+# gen args generates tests
+def genTests(builtins, *argsList):
+    crossedArgs = cross(*argsList)
     for btree in builtins:
         for b in btree:
             if not b.isAbstract:
                 for args in crossedArgs:
-                    # generate unit case path/name/code
-                    path,name = pathNameOfBuiltin(b)
-                    fn = genUnitFunction(name,b.name,args)                
-                    # write to file
-                    print path+'/'+name+'.m';
-                    file = open(path+'/'+name+'.m','w')
-                    file.write(fn)
-                    file.close();
+                    genBuiltinTest(b,args);
+
+
+# generates tests for the given list of builtins, arg types and shapes
+def genTestsByTypeAndShape(builtins, argNum, argTypes, argShapes):
+    crossedArgs = genArgs(argNum, argTypes, argShapes);
+    genTests(builtins,crossedArgs)
 
 
 # deletes previous builtin tests
@@ -119,6 +134,7 @@ def delBuiltinTests():
 
 
 builtinPath=os.path.realpath('../../builtin');
+builtinPath=os.path.realpath('../../../builtin');
 sys.path.append(builtinPath) # path where the builtins are defined
 import genBuiltin
 builtins=genBuiltin.readCSVData(builtinPath+'/builtins.csv')[0];
