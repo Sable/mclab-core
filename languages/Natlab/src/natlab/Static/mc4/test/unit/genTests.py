@@ -44,7 +44,8 @@ bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],
 typeNames = [["'uint8'"],["'int32'"],["'double'"],["'single'"],["'logical'"],["'char'"],[]]
 bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation')],
                 bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
-                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,3),(3,1)])+
+                bUnits.genArgs(2,bUnits.someNumerical,[(1,1)])+
                 bUnits.genArgs(3,bUnits.double,[(1,1)]),
                 typeNames)
 

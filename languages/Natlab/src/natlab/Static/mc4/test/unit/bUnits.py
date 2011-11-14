@@ -5,6 +5,7 @@ import random
 import os.path
 import fnmatch
 
+ignoreBuiltinSet = ['end']
 int8 =  ['int8({0})']
 int16 = ['int16({0})']
 int32 = ['int32({0})']
@@ -25,6 +26,7 @@ char = ['char(32+80*{0})']
 logical = ['({0} > .5)']
 matrix = numerical+char+logical
 someMatrix = someNumerical+char+logical
+
 
 
 # cross lists
@@ -107,7 +109,7 @@ def genTests(builtins, *argsList):
     crossedArgs = cross(*argsList)
     for btree in builtins:
         for b in btree:
-            if not b.isAbstract:
+            if (not b.isAbstract) and (not b.name in ignoreBuiltinSet):
                 for args in crossedArgs:
                     genBuiltinTest(b,args);
 
