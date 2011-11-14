@@ -82,9 +82,5 @@ bUnits.genTests([bUnits.builtins.getByOriginalName('colon')],
                 bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]));
 
 
-print   '\n'.join([repr(s) for s in  (   bUnits.genArgs(2,bUnits.double,[(1,1),(2,1),(1,2),(2,2)])+
-                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
-                bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]))])
-
 
 
