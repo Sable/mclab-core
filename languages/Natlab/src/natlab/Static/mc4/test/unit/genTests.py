@@ -36,7 +36,7 @@ bUnits.genTests([binaryNumeric,binaryFloat],
 bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],
                 bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
-                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(1,bUnits.matrix,[(1,1)])+
                 bUnits.genArgs(2,bUnits.double,[(1,1)])+
                 bUnits.genArgs(3,bUnits.double,[(1,1)]))
 
@@ -58,7 +58,7 @@ versatileQuery = bUnits.builtins.getByOriginalName('versatileQuery')
 bUnits.genTests([matrixQuery,versatileQuery],
                 bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
-                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(1,bUnits.matrix,[(1,1)])+
                 bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
                 bUnits.genArgs(2,bUnits.double,[(1,1)])+
                 bUnits.genArgs(2,bUnits.double,[(2,2)])+
