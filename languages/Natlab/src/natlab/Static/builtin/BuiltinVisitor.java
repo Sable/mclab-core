@@ -297,7 +297,9 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractToDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractMatrixQuery(builtin,arg); }
     public Ret caseFind(Builtin builtin,Arg arg){ return caseAbstractToDoubleMatrixQuery(builtin,arg); }
 
-    public Ret caseAbstractToScalarDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractToDoubleMatrixQuery(builtin,arg); }
+    public Ret caseAbstractUnaryToScalarDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractToDoubleMatrixQuery(builtin,arg); }
+
+    public Ret caseAbstractToScalarDoubleMatrixQuery(Builtin builtin,Arg arg){ return caseAbstractUnaryToScalarDoubleMatrixQuery(builtin,arg); }
     public Ret caseNnz(Builtin builtin,Arg arg){ return caseAbstractToScalarDoubleMatrixQuery(builtin,arg); }
     
     //return logicals
@@ -452,7 +454,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseIschar(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
     public Ret caseIscell(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
     public Ret caseIsnumeric(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }    
-    //impure?
+    //TODO impure?
     public Ret caseIsa(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
 
     public Ret caseAbstractScalarLogicalShapeQuery(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalResultVersatileQuery(builtin,arg); }
@@ -472,9 +474,11 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractShapeTransformation(Builtin builtin,Arg arg){ return caseAbstractVersatileConversion(builtin,arg); }
     public Ret caseReshape(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
     public Ret casePermute(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
-    public Ret caseSqueeze(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
-    public Ret caseTranspose(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
-    public Ret caseCtranspose(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
+
+    public Ret caseAbstractUnaryShapeTransformation(Builtin builtin,Arg arg){ return caseAbstractShapeTransformation(builtin,arg); }
+    public Ret caseSqueeze(Builtin builtin,Arg arg){ return caseAbstractUnaryShapeTransformation(builtin,arg); }
+    public Ret caseTranspose(Builtin builtin,Arg arg){ return caseAbstractUnaryShapeTransformation(builtin,arg); }
+    public Ret caseCtranspose(Builtin builtin,Arg arg){ return caseAbstractUnaryShapeTransformation(builtin,arg); }
     
     //all these take multiple args
     public Ret caseAbstractConcatenation(Builtin builtin,Arg arg){ return caseAbstractVersatileFunction(builtin,arg); }

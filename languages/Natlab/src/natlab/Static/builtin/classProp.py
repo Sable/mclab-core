@@ -57,8 +57,8 @@ class MCNonParametric(MC):
 # function of the form name(<expr>,<expr>,...) - the expresions, and string, java are given by the constructor
 class MCFunction(MC):
   def __init__(self,str,java,*exprs): self.exprs = exprs; self.java = java; self.str = str;
-  def __str__(self):          return self.str+"("+','.join(exprs)+")"
-  def __str__(self):          return self.java+"("+','.join([e.toJava() for e in self.exprs])+")"
+  def __str__(self):          return self.str+"("+','.join([str(e) for e in self.exprs])+")"
+  def toJava (self):          return self.java+"("+','.join([e.toJava() for e in self.exprs])+")"
 
 
 

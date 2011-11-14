@@ -431,10 +431,13 @@ matrixQuery; matrixFunction
 # return doubles
 toDoubleMatrixQuery; matrixQuery
 find
+-Class(matrix&opt(matrix&opt(char))>double&double&double)
 
-toScalarDoubleMatrixQuery; toDoubleMatrixQuery
+unaryToScalarDoubleMatrixQuery; toDoubleMatrixQuery
+-Class(matrix>double)
+
+toScalarDoubleMatrixQuery; unaryToScalarDoubleMatrixQuery;
 nnz
-
 
 
 
@@ -492,22 +495,24 @@ colon
 
 
 
-
 # construct arrays via their dimensions; and possibly a type
 byShapeAndTypeMatrixCreation; matrixCreation
 
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
+-Class(star(numeric|logical)&(typeString(numeric)|none>double))
 ones
 zeros
 # eye takes at most 2 dims
 eye
 
 floatByShapeAndTypeMatrixCreation; numericalByShapeAndTypeMatrixCreation;
+-Class(star(numeric|logical)&(typeString(float)|none>double))
 inf
 nan
 
 # there is no optional type argument
 logicalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
+-Class(star(numeric|logical)>double)
 true
 false
 
@@ -592,6 +597,7 @@ class
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
+-Class(any>double)
 size
 
 
@@ -605,6 +611,9 @@ end
 
 # return logicals
 logicalResultVersatileQuery; versatileQuery
+-Class(any>logical)
+
+
 
 # return scalar logicals
 scalarLogicalResultVersatileQuery; logicalResultVersatileQuery
@@ -619,8 +628,9 @@ ischar
 iscell
 isnumeric
 
-# impure?
+# TODO impure?
 isa
+-Class(any&char>logical)
 
 
 scalarLogicalShapeQuery; scalarLogicalResultVersatileQuery
@@ -630,19 +640,26 @@ isscalar
 
 
 binaryToScalarLogicalVersatileQuery; versatileQuery
+-Class(any&any>logical)
 # same as isequal; but nan == nan
 isequalwithequalnans
 # recursive equal all
 isequal
 
 
-versatileConversion; versatileFunction
 
+
+versatileConversion; versatileFunction
 # TODO improper?
 # functions that change the shape
 shapeTransformation; versatileConversion
 reshape
+-Class(any&matrix&star(matrix)>0)
 permute
+-Class(any&double>0)
+
+unaryShapeTransformation; shapeTransformation
+-Class(any>0)
 squeeze
 transpose
 ctranspose
@@ -735,6 +752,7 @@ impureFunction; root
 # dunnno what to do with these
 superiorto
 superiorfloat
+-Class(star(float)>char)
 #set superior to relationship in oldclass constructor
 exit
 quit
