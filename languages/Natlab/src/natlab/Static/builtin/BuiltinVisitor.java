@@ -92,7 +92,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractProperNumericFunction(builtin,arg); }
     
     //elemental binary numeric matrix function
-    public Ret caseAbstractElementalBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }
+    public Ret caseAbstractElementalBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }    
+    //imporoper? - supports 1 arg
     public Ret caseComplex(Builtin builtin,Arg arg){ return caseAbstractElementalBinaryNumericFunction(builtin,arg); }
     
     //elemewise binary arithmetic
@@ -157,8 +158,6 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseErfc(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
     public Ret caseErfcinv(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
     public Ret caseGamma(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
-    public Ret caseGammainc(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
-    public Ret caseBetainc(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
     public Ret caseGammaln(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
     public Ret caseExp(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }
     public Ret caseLog(Builtin builtin,Arg arg){ return caseAbstractElementalUnaryFloatFunction(builtin,arg); }

@@ -110,8 +110,6 @@ public abstract class Builtin {
         builtinMap.put("erfc",Erfc.getInstance());
         builtinMap.put("erfcinv",Erfcinv.getInstance());
         builtinMap.put("gamma",Gamma.getInstance());
-        builtinMap.put("gammainc",Gammainc.getInstance());
-        builtinMap.put("betainc",Betainc.getInstance());
         builtinMap.put("gammaln",Gammaln.getInstance());
         builtinMap.put("exp",Exp.getInstance());
         builtinMap.put("log",Log.getInstance());
@@ -935,7 +933,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Complex extends AbstractElementalBinaryNumericFunction  {
+    public static class Complex extends AbstractElementalBinaryNumericFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Complex singleton = null;
         public static Complex getInstance(){
@@ -951,14 +949,24 @@ public abstract class Builtin {
             return "complex";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo()));
+        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo())));
         public ClassPropTools.MC getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo()));
+                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo())));
             }
             return matlabClassPropInfo;
+        }
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(parentClassPropInfo,new ClassPropTools.MCNum(0))));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(parentClassPropInfo,new ClassPropTools.MCNum(0))));
+            }
+            return classPropInfo;
         }
 
     }
@@ -1525,40 +1533,6 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "gamma";
-        }
-        
-    }
-    public static class Gammainc extends AbstractElementalUnaryFloatFunction  {
-        //returns the singleton instance of this class
-        private static Gammainc singleton = null;
-        public static Gammainc getInstance(){
-            if (singleton == null) singleton = new Gammainc();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseGammainc(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "gammainc";
-        }
-        
-    }
-    public static class Betainc extends AbstractElementalUnaryFloatFunction  {
-        //returns the singleton instance of this class
-        private static Betainc singleton = null;
-        public static Betainc getInstance(){
-            if (singleton == null) singleton = new Betainc();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseBetainc(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "betainc";
         }
         
     }

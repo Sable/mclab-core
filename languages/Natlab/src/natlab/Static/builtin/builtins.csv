@@ -192,8 +192,10 @@ binaryNumericFunction; properNumericFunction
 
 # elemental binary numeric matrix function
 elementalBinaryNumericFunction; binaryNumericFunction
+#imporoper? - supports 1 arg
 complex
--MatlabClass((char|logical)&any>error, any&(char|logical)>error, natlab)
+-Class(coerce(logical|char>double, numeric>0 | parent))
+-MatlabClass((char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
 
 
 # elemewise binary arithmetic
@@ -270,8 +272,6 @@ erfinv
 erfc
 erfcinv
 gamma
-gammainc
-betainc
 gammaln
 exp
 log
