@@ -609,6 +609,7 @@ scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
 length
 ndims
 numel
+-Class(any*star(matrix)>double)
 end
 
 
