@@ -445,7 +445,6 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractScalarLogicalResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractLogicalResultVersatileQuery(builtin,arg); }
 
     public Ret caseAbstractClassQuery(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalResultVersatileQuery(builtin,arg); }
-    public Ret caseIsempty(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
     public Ret caseIsobject(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
     public Ret caseIsfloat(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
     public Ret caseIsinteger(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
@@ -458,7 +457,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseIsa(Builtin builtin,Arg arg){ return caseAbstractClassQuery(builtin,arg); }
 
     public Ret caseAbstractScalarLogicalShapeQuery(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalResultVersatileQuery(builtin,arg); }
-    public Ret caseIsemtpy(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
+    public Ret caseIsempty(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
     public Ret caseIsvector(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
     public Ret caseIsscalar(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
 

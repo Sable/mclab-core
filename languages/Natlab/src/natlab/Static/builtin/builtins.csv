@@ -512,7 +512,7 @@ nan
 
 # there is no optional type argument
 logicalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
--Class(star(numeric|logical)>double)
+-Class(star(numeric|logical)>logical)
 true
 false
 
@@ -617,11 +617,9 @@ logicalResultVersatileQuery; versatileQuery
 -Class(any>logical)
 
 
-
 # return scalar logicals
 scalarLogicalResultVersatileQuery; logicalResultVersatileQuery
 classQuery; scalarLogicalResultVersatileQuery
-isempty
 isobject
 isfloat
 isinteger
@@ -637,7 +635,7 @@ isa
 
 
 scalarLogicalShapeQuery; scalarLogicalResultVersatileQuery
-isemtpy
+isempty
 isvector
 isscalar
 
