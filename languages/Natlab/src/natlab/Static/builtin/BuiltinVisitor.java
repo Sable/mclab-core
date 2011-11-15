@@ -461,11 +461,11 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseIsvector(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
     public Ret caseIsscalar(Builtin builtin,Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
 
-    public Ret caseAbstractBinaryToScalarLogicalVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }    
+    public Ret caseAbstractMultiaryToScalarLogicalVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }    
     //same as isequal
-    public Ret caseIsequalwithequalnans(Builtin builtin,Arg arg){ return caseAbstractBinaryToScalarLogicalVersatileQuery(builtin,arg); }    
+    public Ret caseIsequalwithequalnans(Builtin builtin,Arg arg){ return caseAbstractMultiaryToScalarLogicalVersatileQuery(builtin,arg); }    
     //recursive equal all
-    public Ret caseIsequal(Builtin builtin,Arg arg){ return caseAbstractBinaryToScalarLogicalVersatileQuery(builtin,arg); }
+    public Ret caseIsequal(Builtin builtin,Arg arg){ return caseAbstractMultiaryToScalarLogicalVersatileQuery(builtin,arg); }
 
     public Ret caseAbstractVersatileConversion(Builtin builtin,Arg arg){ return caseAbstractVersatileFunction(builtin,arg); }
     

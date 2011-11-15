@@ -640,8 +640,8 @@ isvector
 isscalar
 
 
-binaryToScalarLogicalVersatileQuery; versatileQuery
--Class(any&any>logical)
+multiaryToScalarLogicalVersatileQuery; versatileQuery
+-Class(star(any)>logical)
 # same as isequal; but nan == nan
 isequalwithequalnans
 # recursive equal all

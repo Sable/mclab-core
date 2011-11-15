@@ -4846,28 +4846,28 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractBinaryToScalarLogicalVersatileQuery(this,arg);
+            return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg);
         }
         
         public ClassPropTools.MC getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCBuiltin("logical"));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCBuiltin("logical"));
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Isequalwithequalnans extends AbstractBinaryToScalarLogicalVersatileQuery  {
+    public static class Isequalwithequalnans extends AbstractMultiaryToScalarLogicalVersatileQuery  {
         //returns the singleton instance of this class
         private static Isequalwithequalnans singleton = null;
         public static Isequalwithequalnans getInstance(){
@@ -4884,7 +4884,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Isequal extends AbstractBinaryToScalarLogicalVersatileQuery  {
+    public static class Isequal extends AbstractMultiaryToScalarLogicalVersatileQuery  {
         //returns the singleton instance of this class
         private static Isequal singleton = null;
         public static Isequal getInstance(){
