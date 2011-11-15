@@ -196,7 +196,6 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAsin(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAcos(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAtan(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
-    public Ret caseAtan2(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAcot(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAsec(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
     public Ret caseAcsc(Builtin builtin,Arg arg){ return caseAbstractRadianInverseTrigonmetricFunction(builtin,arg); }
@@ -229,6 +228,10 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     
     //binary matrix function operaitng on float matrices
     public Ret caseAbstractBinaryFloatFunction(Builtin builtin,Arg arg){ return caseAbstractProperFloatFunction(builtin,arg); }
+    
+    //elemental binary functino operating on floats matrizes
+    public Ret caseAbstractElementalBinaryFloatFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryFloatFunction(builtin,arg); }
+    public Ret caseAtan2(Builtin builtin,Arg arg){ return caseAbstractElementalBinaryFloatFunction(builtin,arg); }
     
     //matrix-wise binary funciton operating on float matrices
     public Ret caseAbstractArrayBinaryFloatFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryFloatFunction(builtin,arg); }

@@ -136,7 +136,6 @@ public abstract class Builtin {
         builtinMap.put("asin",Asin.getInstance());
         builtinMap.put("acos",Acos.getInstance());
         builtinMap.put("atan",Atan.getInstance());
-        builtinMap.put("atan2",Atan2.getInstance());
         builtinMap.put("acot",Acot.getInstance());
         builtinMap.put("asec",Asec.getInstance());
         builtinMap.put("acsc",Acsc.getInstance());
@@ -156,6 +155,7 @@ public abstract class Builtin {
         builtinMap.put("sqrtm",Sqrtm.getInstance());
         builtinMap.put("expm",Expm.getInstance());
         builtinMap.put("inv",Inv.getInstance());
+        builtinMap.put("atan2",Atan2.getInstance());
         builtinMap.put("hypot",Hypot.getInstance());
         builtinMap.put("eps",Eps.getInstance());
         builtinMap.put("cumsum",Cumsum.getInstance());
@@ -2020,23 +2020,6 @@ public abstract class Builtin {
         }
         
     }
-    public static class Atan2 extends AbstractRadianInverseTrigonmetricFunction  {
-        //returns the singleton instance of this class
-        private static Atan2 singleton = null;
-        public static Atan2 getInstance(){
-            if (singleton == null) singleton = new Atan2();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAtan2(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "atan2";
-        }
-        
-    }
     public static class Acot extends AbstractRadianInverseTrigonmetricFunction  {
         //returns the singleton instance of this class
         private static Acot singleton = null;
@@ -2388,17 +2371,10 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction  {
+    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements ClassPropagationDefined {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryFloatFunction(this,arg);
-        }
-        
-    }
-    public static abstract class AbstractArrayBinaryFloatFunction extends AbstractBinaryFloatFunction implements ClassPropagationDefined {
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseAbstractArrayBinaryFloatFunction(this,arg);
         }
         
         public ClassPropTools.MC getMatlabClassPropagationInfo(){{
@@ -2415,6 +2391,37 @@ public abstract class Builtin {
             return classPropInfo;
         }
 
+    }
+    public static abstract class AbstractElementalBinaryFloatFunction extends AbstractBinaryFloatFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryFloatFunction(this,arg);
+        }
+        
+    }
+    public static class Atan2 extends AbstractElementalBinaryFloatFunction  {
+        //returns the singleton instance of this class
+        private static Atan2 singleton = null;
+        public static Atan2 getInstance(){
+            if (singleton == null) singleton = new Atan2();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAtan2(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "atan2";
+        }
+        
+    }
+    public static abstract class AbstractArrayBinaryFloatFunction extends AbstractBinaryFloatFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayBinaryFloatFunction(this,arg);
+        }
+        
     }
     public static class Hypot extends AbstractArrayBinaryFloatFunction  {
         //returns the singleton instance of this class
@@ -4844,12 +4851,12 @@ public abstract class Builtin {
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("logical"));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("logical"));
             }
             return classPropInfo;
         }

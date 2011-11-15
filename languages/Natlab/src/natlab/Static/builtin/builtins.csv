@@ -308,7 +308,6 @@ radianInverseTrigonmetricFunction; inverseTrigonmetricFunction
 asin
 acos
 atan
-atan2
 acot
 asec
 acsc
@@ -345,11 +344,16 @@ inv
 
 # binary matrix function operaitng on float matrices
 binaryFloatFunction; properFloatFunction
+-Class(float&(double|0)>0,(double|1)&float>1)
+
+# elemental binary functino operating on floats matrizes
+elementalBinaryFloatFunction; binaryFloatFunction
+atan2
 
 # matrix-wise binary funciton operating on float matrices
 arrayBinaryFloatFunction; binaryFloatFunction
--Class(float&(double|0)>0,(double|1)&float>1)
 hypot
+
 
 # improper float matrix functions do not have a fixed arity, and extra arguments are either
 # options or different possible operands.
@@ -642,7 +646,7 @@ isscalar
 
 
 multiaryToScalarLogicalVersatileQuery; versatileQuery
--Class(star(any)>logical)
+-Class(any&any&star(any)>logical)
 # same as isequal; but nan == nan
 isequalwithequalnans
 # recursive equal all
