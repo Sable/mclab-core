@@ -4552,3 +4552,2035 @@ public abstract class Builtin {
         }
         
     }
+    public static class Numel extends AbstractScalarDoubleResultVersatileQuery implements ClassPropagationDefined {
+        //returns the singleton instance of this class
+        private static Numel singleton = null;
+        public static Numel getInstance(){
+            if (singleton == null) singleton = new Numel();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNumel(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "numel";
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static class End extends AbstractScalarDoubleResultVersatileQuery  {
+        //returns the singleton instance of this class
+        private static End singleton = null;
+        public static End getInstance(){
+            if (singleton == null) singleton = new End();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEnd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "end";
+        }
+        
+    }
+    public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractLogicalResultVersatileQuery(this,arg);
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static abstract class AbstractScalarLogicalResultVersatileQuery extends AbstractLogicalResultVersatileQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarLogicalResultVersatileQuery(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractClassQuery extends AbstractScalarLogicalResultVersatileQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractClassQuery(this,arg);
+        }
+        
+    }
+    public static class Isobject extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Isobject singleton = null;
+        public static Isobject getInstance(){
+            if (singleton == null) singleton = new Isobject();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsobject(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isobject";
+        }
+        
+    }
+    public static class Isfloat extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Isfloat singleton = null;
+        public static Isfloat getInstance(){
+            if (singleton == null) singleton = new Isfloat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsfloat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isfloat";
+        }
+        
+    }
+    public static class Isinteger extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Isinteger singleton = null;
+        public static Isinteger getInstance(){
+            if (singleton == null) singleton = new Isinteger();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsinteger(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isinteger";
+        }
+        
+    }
+    public static class Islogical extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Islogical singleton = null;
+        public static Islogical getInstance(){
+            if (singleton == null) singleton = new Islogical();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIslogical(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "islogical";
+        }
+        
+    }
+    public static class Isstruct extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Isstruct singleton = null;
+        public static Isstruct getInstance(){
+            if (singleton == null) singleton = new Isstruct();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsstruct(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isstruct";
+        }
+        
+    }
+    public static class Ischar extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Ischar singleton = null;
+        public static Ischar getInstance(){
+            if (singleton == null) singleton = new Ischar();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIschar(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ischar";
+        }
+        
+    }
+    public static class Iscell extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Iscell singleton = null;
+        public static Iscell getInstance(){
+            if (singleton == null) singleton = new Iscell();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIscell(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "iscell";
+        }
+        
+    }
+    public static class Isnumeric extends AbstractClassQuery  {
+        //returns the singleton instance of this class
+        private static Isnumeric singleton = null;
+        public static Isnumeric getInstance(){
+            if (singleton == null) singleton = new Isnumeric();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsnumeric(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isnumeric";
+        }
+        
+    }
+    public static class Isa extends AbstractClassQuery implements ClassPropagationDefined {
+        //returns the singleton instance of this class
+        private static Isa singleton = null;
+        public static Isa getInstance(){
+            if (singleton == null) singleton = new Isa();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsa(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isa";
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static abstract class AbstractScalarLogicalShapeQuery extends AbstractScalarLogicalResultVersatileQuery  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarLogicalShapeQuery(this,arg);
+        }
+        
+    }
+    public static class Isempty extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Isempty singleton = null;
+        public static Isempty getInstance(){
+            if (singleton == null) singleton = new Isempty();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsempty(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isempty";
+        }
+        
+    }
+    public static class Isvector extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Isvector singleton = null;
+        public static Isvector getInstance(){
+            if (singleton == null) singleton = new Isvector();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsvector(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isvector";
+        }
+        
+    }
+    public static class Isscalar extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Isscalar singleton = null;
+        public static Isscalar getInstance(){
+            if (singleton == null) singleton = new Isscalar();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsscalar(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isscalar";
+        }
+        
+    }
+    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg);
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static class Isequalwithequalnans extends AbstractMultiaryToScalarLogicalVersatileQuery  {
+        //returns the singleton instance of this class
+        private static Isequalwithequalnans singleton = null;
+        public static Isequalwithequalnans getInstance(){
+            if (singleton == null) singleton = new Isequalwithequalnans();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsequalwithequalnans(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isequalwithequalnans";
+        }
+        
+    }
+    public static class Isequal extends AbstractMultiaryToScalarLogicalVersatileQuery  {
+        //returns the singleton instance of this class
+        private static Isequal singleton = null;
+        public static Isequal getInstance(){
+            if (singleton == null) singleton = new Isequal();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsequal(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isequal";
+        }
+        
+    }
+    public static abstract class AbstractVersatileConversion extends AbstractVersatileFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractVersatileConversion(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractShapeTransformation extends AbstractVersatileConversion  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractShapeTransformation(this,arg);
+        }
+        
+    }
+    public static class Reshape extends AbstractShapeTransformation implements ClassPropagationDefined {
+        //returns the singleton instance of this class
+        private static Reshape singleton = null;
+        public static Reshape getInstance(){
+            if (singleton == null) singleton = new Reshape();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseReshape(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "reshape";
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCNum(0));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCNum(0));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static class Permute extends AbstractShapeTransformation implements ClassPropagationDefined {
+        //returns the singleton instance of this class
+        private static Permute singleton = null;
+        public static Permute getInstance(){
+            if (singleton == null) singleton = new Permute();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePermute(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "permute";
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static abstract class AbstractUnaryShapeTransformation extends AbstractShapeTransformation implements ClassPropagationDefined {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryShapeTransformation(this,arg);
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static class Squeeze extends AbstractUnaryShapeTransformation  {
+        //returns the singleton instance of this class
+        private static Squeeze singleton = null;
+        public static Squeeze getInstance(){
+            if (singleton == null) singleton = new Squeeze();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSqueeze(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "squeeze";
+        }
+        
+    }
+    public static class Transpose extends AbstractUnaryShapeTransformation  {
+        //returns the singleton instance of this class
+        private static Transpose singleton = null;
+        public static Transpose getInstance(){
+            if (singleton == null) singleton = new Transpose();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTranspose(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "transpose";
+        }
+        
+    }
+    public static class Ctranspose extends AbstractUnaryShapeTransformation  {
+        //returns the singleton instance of this class
+        private static Ctranspose singleton = null;
+        public static Ctranspose getInstance(){
+            if (singleton == null) singleton = new Ctranspose();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCtranspose(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ctranspose";
+        }
+        
+    }
+    public static abstract class AbstractConcatenation extends AbstractVersatileFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractConcatenation(this,arg);
+        }
+        
+    }
+    public static class Horzcat extends AbstractConcatenation  {
+        //returns the singleton instance of this class
+        private static Horzcat singleton = null;
+        public static Horzcat getInstance(){
+            if (singleton == null) singleton = new Horzcat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHorzcat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "horzcat";
+        }
+        
+    }
+    public static class Vertcat extends AbstractConcatenation  {
+        //returns the singleton instance of this class
+        private static Vertcat singleton = null;
+        public static Vertcat getInstance(){
+            if (singleton == null) singleton = new Vertcat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVertcat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "vertcat";
+        }
+        
+    }
+    public static class Cat extends AbstractConcatenation  {
+        //returns the singleton instance of this class
+        private static Cat singleton = null;
+        public static Cat getInstance(){
+            if (singleton == null) singleton = new Cat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cat";
+        }
+        
+    }
+    public static abstract class AbstractIndexing extends AbstractVersatileFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractIndexing(this,arg);
+        }
+        
+    }
+    public static class Subsasgn extends AbstractIndexing  {
+        //returns the singleton instance of this class
+        private static Subsasgn singleton = null;
+        public static Subsasgn getInstance(){
+            if (singleton == null) singleton = new Subsasgn();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSubsasgn(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "subsasgn";
+        }
+        
+    }
+    public static class Subsref extends AbstractIndexing  {
+        //returns the singleton instance of this class
+        private static Subsref singleton = null;
+        public static Subsref getInstance(){
+            if (singleton == null) singleton = new Subsref();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSubsref(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "subsref";
+        }
+        
+    }
+    public static abstract class AbstractMapOperator extends AbstractVersatileFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMapOperator(this,arg);
+        }
+        
+    }
+    public static class Structfun extends AbstractMapOperator  {
+        //returns the singleton instance of this class
+        private static Structfun singleton = null;
+        public static Structfun getInstance(){
+            if (singleton == null) singleton = new Structfun();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStructfun(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "structfun";
+        }
+        
+    }
+    public static class Arrayfun extends AbstractMapOperator  {
+        //returns the singleton instance of this class
+        private static Arrayfun singleton = null;
+        public static Arrayfun getInstance(){
+            if (singleton == null) singleton = new Arrayfun();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseArrayfun(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "arrayfun";
+        }
+        
+    }
+    public static class Cellfun extends AbstractMapOperator  {
+        //returns the singleton instance of this class
+        private static Cellfun singleton = null;
+        public static Cellfun getInstance(){
+            if (singleton == null) singleton = new Cellfun();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCellfun(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cellfun";
+        }
+        
+    }
+    public static abstract class AbstractImpureFunction extends AbstractRoot  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImpureFunction(this,arg);
+        }
+        
+    }
+    public static class Superiorto extends AbstractImpureFunction  {
+        //returns the singleton instance of this class
+        private static Superiorto singleton = null;
+        public static Superiorto getInstance(){
+            if (singleton == null) singleton = new Superiorto();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSuperiorto(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "superiorto";
+        }
+        
+    }
+    public static class Superiorfloat extends AbstractImpureFunction implements ClassPropagationDefined {
+        //returns the singleton instance of this class
+        private static Superiorfloat singleton = null;
+        public static Superiorfloat getInstance(){
+            if (singleton == null) singleton = new Superiorfloat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSuperiorfloat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "superiorfloat";
+        }
+        
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("char"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("char"));
+            }
+            return classPropInfo;
+        }
+
+    }
+    public static class Exit extends AbstractImpureFunction  {
+        //returns the singleton instance of this class
+        private static Exit singleton = null;
+        public static Exit getInstance(){
+            if (singleton == null) singleton = new Exit();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExit(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "exit";
+        }
+        
+    }
+    public static class Quit extends AbstractImpureFunction  {
+        //returns the singleton instance of this class
+        private static Quit singleton = null;
+        public static Quit getInstance(){
+            if (singleton == null) singleton = new Quit();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseQuit(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "quit";
+        }
+        
+    }
+    public static abstract class AbstractBuiltin extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBuiltin(this,arg);
+        }
+        
+    }
+    public static abstract class AbstractTimeFunction extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractTimeFunction(this,arg);
+        }
+        
+    }
+    public static class Clock extends AbstractTimeFunction  {
+        //returns the singleton instance of this class
+        private static Clock singleton = null;
+        public static Clock getInstance(){
+            if (singleton == null) singleton = new Clock();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClock(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "clock";
+        }
+        
+    }
+    public static class Tic extends AbstractTimeFunction  {
+        //returns the singleton instance of this class
+        private static Tic singleton = null;
+        public static Tic getInstance(){
+            if (singleton == null) singleton = new Tic();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTic(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "tic";
+        }
+        
+    }
+    public static class Toc extends AbstractTimeFunction  {
+        //returns the singleton instance of this class
+        private static Toc singleton = null;
+        public static Toc getInstance(){
+            if (singleton == null) singleton = new Toc();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseToc(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "toc";
+        }
+        
+    }
+    public static class Cputime extends AbstractTimeFunction  {
+        //returns the singleton instance of this class
+        private static Cputime singleton = null;
+        public static Cputime getInstance(){
+            if (singleton == null) singleton = new Cputime();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCputime(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cputime";
+        }
+        
+    }
+    public static abstract class AbstractMatlabSystemFunction extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatlabSystemFunction(this,arg);
+        }
+        
+    }
+    public static class Assert extends AbstractMatlabSystemFunction  {
+        //returns the singleton instance of this class
+        private static Assert singleton = null;
+        public static Assert getInstance(){
+            if (singleton == null) singleton = new Assert();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAssert(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "assert";
+        }
+        
+    }
+    public static class Nargoutchk extends AbstractMatlabSystemFunction  {
+        //returns the singleton instance of this class
+        private static Nargoutchk singleton = null;
+        public static Nargoutchk getInstance(){
+            if (singleton == null) singleton = new Nargoutchk();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargoutchk(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargoutchk";
+        }
+        
+    }
+    public static class Nargchk extends AbstractMatlabSystemFunction  {
+        //returns the singleton instance of this class
+        private static Nargchk singleton = null;
+        public static Nargchk getInstance(){
+            if (singleton == null) singleton = new Nargchk();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargchk(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargchk";
+        }
+        
+    }
+    public static class Str2func extends AbstractMatlabSystemFunction  {
+        //returns the singleton instance of this class
+        private static Str2func singleton = null;
+        public static Str2func getInstance(){
+            if (singleton == null) singleton = new Str2func();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStr2func(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "str2func";
+        }
+        
+    }
+    public static class Pause extends AbstractMatlabSystemFunction  {
+        //returns the singleton instance of this class
+        private static Pause singleton = null;
+        public static Pause getInstance(){
+            if (singleton == null) singleton = new Pause();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePause(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "pause";
+        }
+        
+    }
+    public static abstract class AbstractDynamicMatlabFunction extends AbstractMatlabSystemFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDynamicMatlabFunction(this,arg);
+        }
+        
+    }
+    public static class Eval extends AbstractDynamicMatlabFunction  {
+        //returns the singleton instance of this class
+        private static Eval singleton = null;
+        public static Eval getInstance(){
+            if (singleton == null) singleton = new Eval();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEval(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "eval";
+        }
+        
+    }
+    public static class Evalin extends AbstractDynamicMatlabFunction  {
+        //returns the singleton instance of this class
+        private static Evalin singleton = null;
+        public static Evalin getInstance(){
+            if (singleton == null) singleton = new Evalin();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEvalin(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "evalin";
+        }
+        
+    }
+    public static class Feval extends AbstractDynamicMatlabFunction  {
+        //returns the singleton instance of this class
+        private static Feval singleton = null;
+        public static Feval getInstance(){
+            if (singleton == null) singleton = new Feval();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFeval(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "feval";
+        }
+        
+    }
+    public static class Assignin extends AbstractDynamicMatlabFunction  {
+        //returns the singleton instance of this class
+        private static Assignin singleton = null;
+        public static Assignin getInstance(){
+            if (singleton == null) singleton = new Assignin();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAssignin(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "assignin";
+        }
+        
+    }
+    public static class Inputname extends AbstractDynamicMatlabFunction  {
+        //returns the singleton instance of this class
+        private static Inputname singleton = null;
+        public static Inputname getInstance(){
+            if (singleton == null) singleton = new Inputname();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInputname(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "inputname";
+        }
+        
+    }
+    public static abstract class AbstractMatlabEnvironmentFunction extends AbstractMatlabSystemFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatlabEnvironmentFunction(this,arg);
+        }
+        
+    }
+    public static class Import extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Import singleton = null;
+        public static Import getInstance(){
+            if (singleton == null) singleton = new Import();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImport(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "import";
+        }
+        
+    }
+    public static class Cd extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Cd singleton = null;
+        public static Cd getInstance(){
+            if (singleton == null) singleton = new Cd();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cd";
+        }
+        
+    }
+    public static class Exist extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Exist singleton = null;
+        public static Exist getInstance(){
+            if (singleton == null) singleton = new Exist();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExist(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "exist";
+        }
+        
+    }
+    public static class Matlabroot extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Matlabroot singleton = null;
+        public static Matlabroot getInstance(){
+            if (singleton == null) singleton = new Matlabroot();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMatlabroot(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "matlabroot";
+        }
+        
+    }
+    public static class Whos extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Whos singleton = null;
+        public static Whos getInstance(){
+            if (singleton == null) singleton = new Whos();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWhos(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "whos";
+        }
+        
+    }
+    public static class Which extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Which singleton = null;
+        public static Which getInstance(){
+            if (singleton == null) singleton = new Which();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWhich(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "which";
+        }
+        
+    }
+    public static class Version extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Version singleton = null;
+        public static Version getInstance(){
+            if (singleton == null) singleton = new Version();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVersion(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "version";
+        }
+        
+    }
+    public static class Clear extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Clear singleton = null;
+        public static Clear getInstance(){
+            if (singleton == null) singleton = new Clear();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClear(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "clear";
+        }
+        
+    }
+    public static class Nargin extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Nargin singleton = null;
+        public static Nargin getInstance(){
+            if (singleton == null) singleton = new Nargin();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargin(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargin";
+        }
+        
+    }
+    public static class Nargout extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Nargout singleton = null;
+        public static Nargout getInstance(){
+            if (singleton == null) singleton = new Nargout();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargout(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "nargout";
+        }
+        
+    }
+    public static class Methods extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Methods singleton = null;
+        public static Methods getInstance(){
+            if (singleton == null) singleton = new Methods();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMethods(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "methods";
+        }
+        
+    }
+    public static class Fieldnames extends AbstractMatlabEnvironmentFunction  {
+        //returns the singleton instance of this class
+        private static Fieldnames singleton = null;
+        public static Fieldnames getInstance(){
+            if (singleton == null) singleton = new Fieldnames();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFieldnames(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fieldnames";
+        }
+        
+    }
+    public static abstract class AbstractReportFunction extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractReportFunction(this,arg);
+        }
+        
+    }
+    public static class Disp extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Disp singleton = null;
+        public static Disp getInstance(){
+            if (singleton == null) singleton = new Disp();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDisp(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "disp";
+        }
+        
+    }
+    public static class Display extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Display singleton = null;
+        public static Display getInstance(){
+            if (singleton == null) singleton = new Display();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDisplay(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "display";
+        }
+        
+    }
+    public static class Clc extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Clc singleton = null;
+        public static Clc getInstance(){
+            if (singleton == null) singleton = new Clc();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClc(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "clc";
+        }
+        
+    }
+    public static class Error extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Error singleton = null;
+        public static Error getInstance(){
+            if (singleton == null) singleton = new Error();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseError(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "error";
+        }
+        
+    }
+    public static class Warning extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Warning singleton = null;
+        public static Warning getInstance(){
+            if (singleton == null) singleton = new Warning();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWarning(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "warning";
+        }
+        
+    }
+    public static class Echo extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Echo singleton = null;
+        public static Echo getInstance(){
+            if (singleton == null) singleton = new Echo();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEcho(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "echo";
+        }
+        
+    }
+    public static class Diary extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Diary singleton = null;
+        public static Diary getInstance(){
+            if (singleton == null) singleton = new Diary();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDiary(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "diary";
+        }
+        
+    }
+    public static class Message extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Message singleton = null;
+        public static Message getInstance(){
+            if (singleton == null) singleton = new Message();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMessage(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "message";
+        }
+        
+    }
+    public static class Lastwarn extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Lastwarn singleton = null;
+        public static Lastwarn getInstance(){
+            if (singleton == null) singleton = new Lastwarn();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLastwarn(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "lastwarn";
+        }
+        
+    }
+    public static class Lasterror extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Lasterror singleton = null;
+        public static Lasterror getInstance(){
+            if (singleton == null) singleton = new Lasterror();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLasterror(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "lasterror";
+        }
+        
+    }
+    public static class Format extends AbstractReportFunction  {
+        //returns the singleton instance of this class
+        private static Format singleton = null;
+        public static Format getInstance(){
+            if (singleton == null) singleton = new Format();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFormat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "format";
+        }
+        
+    }
+    public static abstract class AbstractRandomFunction extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRandomFunction(this,arg);
+        }
+        
+    }
+    public static class Rand extends AbstractRandomFunction  {
+        //returns the singleton instance of this class
+        private static Rand singleton = null;
+        public static Rand getInstance(){
+            if (singleton == null) singleton = new Rand();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRand(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "rand";
+        }
+        
+    }
+    public static class Randi extends AbstractRandomFunction  {
+        //returns the singleton instance of this class
+        private static Randi singleton = null;
+        public static Randi getInstance(){
+            if (singleton == null) singleton = new Randi();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRandi(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "randi";
+        }
+        
+    }
+    public static class Randn extends AbstractRandomFunction  {
+        //returns the singleton instance of this class
+        private static Randn singleton = null;
+        public static Randn getInstance(){
+            if (singleton == null) singleton = new Randn();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRandn(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "randn";
+        }
+        
+    }
+    public static abstract class AbstractSystemFunction extends AbstractImpureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractSystemFunction(this,arg);
+        }
+        
+    }
+    public static class Computer extends AbstractSystemFunction  {
+        //returns the singleton instance of this class
+        private static Computer singleton = null;
+        public static Computer getInstance(){
+            if (singleton == null) singleton = new Computer();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseComputer(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "computer";
+        }
+        
+    }
+    public static class Beep extends AbstractSystemFunction  {
+        //returns the singleton instance of this class
+        private static Beep singleton = null;
+        public static Beep getInstance(){
+            if (singleton == null) singleton = new Beep();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBeep(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "beep";
+        }
+        
+    }
+    public static class Dir extends AbstractSystemFunction  {
+        //returns the singleton instance of this class
+        private static Dir singleton = null;
+        public static Dir getInstance(){
+            if (singleton == null) singleton = new Dir();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDir(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "dir";
+        }
+        
+    }
+    public static abstract class AbstractOperatingSystemCallFunction extends AbstractSystemFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractOperatingSystemCallFunction(this,arg);
+        }
+        
+    }
+    public static class Unix extends AbstractOperatingSystemCallFunction  {
+        //returns the singleton instance of this class
+        private static Unix singleton = null;
+        public static Unix getInstance(){
+            if (singleton == null) singleton = new Unix();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUnix(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "unix";
+        }
+        
+    }
+    public static class Dos extends AbstractOperatingSystemCallFunction  {
+        //returns the singleton instance of this class
+        private static Dos singleton = null;
+        public static Dos getInstance(){
+            if (singleton == null) singleton = new Dos();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDos(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "dos";
+        }
+        
+    }
+    public static class System extends AbstractOperatingSystemCallFunction  {
+        //returns the singleton instance of this class
+        private static System singleton = null;
+        public static System getInstance(){
+            if (singleton == null) singleton = new System();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSystem(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "system";
+        }
+        
+    }
+    public static abstract class AbstractIoFunction extends AbstractSystemFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractIoFunction(this,arg);
+        }
+        
+    }
+    public static class Load extends AbstractIoFunction  {
+        //returns the singleton instance of this class
+        private static Load singleton = null;
+        public static Load getInstance(){
+            if (singleton == null) singleton = new Load();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLoad(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "load";
+        }
+        
+    }
+    public static class Save extends AbstractIoFunction  {
+        //returns the singleton instance of this class
+        private static Save singleton = null;
+        public static Save getInstance(){
+            if (singleton == null) singleton = new Save();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSave(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "save";
+        }
+        
+    }
+    public static class Input extends AbstractIoFunction  {
+        //returns the singleton instance of this class
+        private static Input singleton = null;
+        public static Input getInstance(){
+            if (singleton == null) singleton = new Input();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInput(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "input";
+        }
+        
+    }
+    public static class Textscan extends AbstractIoFunction  {
+        //returns the singleton instance of this class
+        private static Textscan singleton = null;
+        public static Textscan getInstance(){
+            if (singleton == null) singleton = new Textscan();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTextscan(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "textscan";
+        }
+        
+    }
+    public static abstract class AbstractPosixIoFunction extends AbstractIoFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractPosixIoFunction(this,arg);
+        }
+        
+    }
+    public static class Sprintf extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Sprintf singleton = null;
+        public static Sprintf getInstance(){
+            if (singleton == null) singleton = new Sprintf();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSprintf(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sprintf";
+        }
+        
+    }
+    public static class Sscanf extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Sscanf singleton = null;
+        public static Sscanf getInstance(){
+            if (singleton == null) singleton = new Sscanf();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSscanf(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sscanf";
+        }
+        
+    }
+    public static class Fprintf extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fprintf singleton = null;
+        public static Fprintf getInstance(){
+            if (singleton == null) singleton = new Fprintf();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFprintf(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fprintf";
+        }
+        
+    }
+    public static class Ftell extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Ftell singleton = null;
+        public static Ftell getInstance(){
+            if (singleton == null) singleton = new Ftell();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFtell(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ftell";
+        }
+        
+    }
+    public static class Ferror extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Ferror singleton = null;
+        public static Ferror getInstance(){
+            if (singleton == null) singleton = new Ferror();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFerror(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ferror";
+        }
+        
+    }
+    public static class Fopen extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fopen singleton = null;
+        public static Fopen getInstance(){
+            if (singleton == null) singleton = new Fopen();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFopen(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fopen";
+        }
+        
+    }
+    public static class Fread extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fread singleton = null;
+        public static Fread getInstance(){
+            if (singleton == null) singleton = new Fread();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFread(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fread";
+        }
+        
+    }
+    public static class Frewind extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Frewind singleton = null;
+        public static Frewind getInstance(){
+            if (singleton == null) singleton = new Frewind();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFrewind(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "frewind";
+        }
+        
+    }
+    public static class Fscanf extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fscanf singleton = null;
+        public static Fscanf getInstance(){
+            if (singleton == null) singleton = new Fscanf();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFscanf(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fscanf";
+        }
+        
+    }
+    public static class Fseek extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fseek singleton = null;
+        public static Fseek getInstance(){
+            if (singleton == null) singleton = new Fseek();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFseek(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fseek";
+        }
+        
+    }
+    public static class Fwrite extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fwrite singleton = null;
+        public static Fwrite getInstance(){
+            if (singleton == null) singleton = new Fwrite();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFwrite(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fwrite";
+        }
+        
+    }
+    public static class Fgetl extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fgetl singleton = null;
+        public static Fgetl getInstance(){
+            if (singleton == null) singleton = new Fgetl();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFgetl(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fgetl";
+        }
+        
+    }
+    public static class Fgets extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fgets singleton = null;
+        public static Fgets getInstance(){
+            if (singleton == null) singleton = new Fgets();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFgets(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fgets";
+        }
+        
+    }
+    public static class Fclose extends AbstractPosixIoFunction  {
+        //returns the singleton instance of this class
+        private static Fclose singleton = null;
+        public static Fclose getInstance(){
+            if (singleton == null) singleton = new Fclose();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFclose(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "fclose";
+        }
+        
+    }
+    public static abstract class AbstractNotABuiltin extends AbstractRoot  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractNotABuiltin(this,arg);
+        }
+        
+    }
+    public static class Imwrite extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Imwrite singleton = null;
+        public static Imwrite getInstance(){
+            if (singleton == null) singleton = new Imwrite();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImwrite(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "imwrite";
+        }
+        
+    }
+    public static class Sparse extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Sparse singleton = null;
+        public static Sparse getInstance(){
+            if (singleton == null) singleton = new Sparse();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSparse(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "sparse";
+        }
+        
+    }
+    public static class Var extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Var singleton = null;
+        public static Var getInstance(){
+            if (singleton == null) singleton = new Var();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVar(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "var";
+        }
+        
+    }
+    public static class Std extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Std singleton = null;
+        public static Std getInstance(){
+            if (singleton == null) singleton = new Std();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStd(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "std";
+        }
+        
+    }
+    public static class Realmax extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Realmax singleton = null;
+        public static Realmax getInstance(){
+            if (singleton == null) singleton = new Realmax();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRealmax(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "realmax";
+        }
+        
+    }
+    public static class Histc extends AbstractNotABuiltin  {
+        //returns the singleton instance of this class
+        private static Histc singleton = null;
+        public static Histc getInstance(){
+            if (singleton == null) singleton = new Histc();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHistc(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "histc";
+        }
+        
+    }
+}
