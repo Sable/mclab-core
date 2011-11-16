@@ -135,10 +135,12 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     
     //functions that collapse the specified dimension
     public Ret caseAbstractDimensionCollapsingNumericFunction(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveNumericFunction(builtin,arg); }
-    public Ret caseMin(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingNumericFunction(builtin,arg); }
-    public Ret caseMax(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingNumericFunction(builtin,arg); }    
+
+    public Ret caseAbstractMinOrMax(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingNumericFunction(builtin,arg); }
+    public Ret caseMin(Builtin builtin,Arg arg){ return caseAbstractMinOrMax(builtin,arg); }
+    public Ret caseMax(Builtin builtin,Arg arg){ return caseAbstractMinOrMax(builtin,arg); }    
     //median does not support logical matrizes
-    public Ret caseMedian(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingNumericFunction(builtin,arg); }
+    public Ret caseMedian(Builtin builtin,Arg arg){ return caseAbstractMinOrMax(builtin,arg); }
     
     //operatoes on floating point matrizes
     public Ret caseAbstractFloatFunction(Builtin builtin,Arg arg){ return caseAbstractMatrixFunction(builtin,arg); }
@@ -242,7 +244,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseEps(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }
     
     //functions of the form f(matrix,[dimension])
-    public Ret caseAbstractDimensionSensitiveFloatFunction(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }    
+    public Ret caseAbstractDimensionSensitiveFloatFunction(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }
+    public Ret caseClass(float&opt(numeric|logical)>0)(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }    
     //cumsum coerces logicals to double
     public Ret caseCumsum(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
     public Ret caseCumprod(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
@@ -563,8 +566,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
 
     public Ret caseAbstractRandomFunction(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }
     public Ret caseRand(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
-    public Ret caseRandi(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
     public Ret caseRandn(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
+    public Ret caseRandi(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
 
     public Ret caseAbstractSystemFunction(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }    
     //should there be a separated operating system category?
@@ -604,8 +607,9 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //linspace
     public Ret caseImwrite(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseSparse(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseRealmax(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseHistc(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }    
+    //at least variance should be a builtin, std = sqrt(var)
     public Ret caseVar(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseStd(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
-    public Ret caseRealmax(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
-    public Ret caseHistc(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
 }

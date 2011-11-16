@@ -378,33 +378,109 @@ def readCSVData(fileName):
 def generate():
    # actually read the data
    builtins = readCSVData("builtins.csv");
-
-
+   
+   
    # write Builtin.java
    print 'generating Builtin.java...'
    file = open('Builtin.java','w');
    printBuiltinJava(file,builtins)
    file.close();
-
-
+   
+   
    # write BuiltinVisitor.java
    print 'generating BuiltinVisitor.java...'
    file = open('BuiltinVisitor.java','w');
    printBuiltinVisitorJava(file,builtins)
    file.close();
-
-
+   
+   
    # write the tree.dot
    print 'creating dot of tree'
    file = open('tree.dot','w');
    printTreeDot(file,builtins)
    file.close();
-
+   
+   # output which builtins have class prop
+   for b in builtins:      
+      if not b.isAbstract and not b.getAllTags().has_key("Class") and b.name in list:
+         print b.name
+   
+   
    print 'genereated code for \n - %d builtins (including abstract builtins)' % sum([1 for b in builtins])
    print ' - %d non-abstract builtins' % sum([1 for b in builtins if not b.isAbstract])
 
    #for i in range(0,len(children)):
    #   if not abstract[i]: print children[i]
+
+
+list = ['vertcat',
+'cos',
+'nargout',
+'ge',
+'round',
+'mrdivide',
+'dot',
+'diag',
+'abs',
+'isinf',
+'false',
+'horzcat',
+'power',
+'rand',
+'superiorfloat',
+'mpower',
+'eye',
+'plus',
+'minus',
+'nargin',
+'std',
+'mod',
+'imag',
+'double',
+'size',
+'and',
+'not',
+'eps',
+'exp',
+'uminus',
+'le',
+'floor',
+'realmax',
+'zeros',
+'rdivide',
+'gt',
+'numel',
+'disp',
+'ctranspose',
+'pi',
+'fprintf',
+'mtimes',
+'sort',
+'transpose',
+'ceil',
+'sum',
+'colon',
+'lt',
+'reshape',
+'cumsum',
+'times',
+'fix',
+'mean',
+'find',
+'end',
+'min',
+'xor',
+'max',
+'clock',
+'sqrt',
+'true',
+'ones',
+'histc',
+'i',
+'sin',
+'ne',
+'imwrite',
+'eq']
 
 
 if __name__ == "__main__":

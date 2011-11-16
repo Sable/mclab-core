@@ -87,7 +87,7 @@ lang['scalar'] = MCNonParametric('scalar','new ClassPropTools.MCScalar()');
 # other bits of the language
 lang['coerce'] = lambda replaceExpr, expr: MCCoerce(replaceExpr,expr)
 lang['opt'] = lambda expr: (expr|lang['none']) #note: op(x), being (x|none), will cause an error on the rhs
-lang['not'] =   lambda typesExpr: MCFunction('not','new ClassPropTools.MCNot',typesExpr)
+lang['not'] = lambda typesExpr: MCFunction('not','new ClassPropTools.MCNot',typesExpr)
 # todo - so far opt only allows up to 10 repititions
 opt = lang['opt']
 lang['star']= lambda expr: opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)&opt(expr)

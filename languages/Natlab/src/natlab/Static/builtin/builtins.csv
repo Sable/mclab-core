@@ -244,8 +244,13 @@ dimensionSensitiveNumericFunction; improperNumericFunction
 
 # functions that collapse the specified dimension
 dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
+
+minOrMax; dimensionCollapsingNumericFunction
+-Class(matrix&any&(numeric|logical)>0, logical&logical>logical, coerce(logical|char>double, (numeric&opt(double|0)>0) | ((double|1)&numeric>1)), matrix>0)
+-MatlabClass(logical&logical>logical, (char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
 min
 max
+
 # median does not support logical matrizes
 median
 
@@ -359,20 +364,22 @@ hypot
 # options or different possible operands.
 improperFloatFunction; floatFunction
 eps
+-Class(float>0,typeString(float))
 
 
 # functions of the form f(matrix,[dimension])
 dimensionSensitiveFloatFunction; improperFloatFunction
+Class(float&opt(numeric|logical)>0)
 # cumsum coerces logicals to double
-cumsum
+cumsum;;Class(coerce(logical>double,parent))
 cumprod
 
 # numeric function that collapses a dimension (optional second arg tells which)
 dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
 mode
 prod
-sum
-mean
+sum;;Class(coerce(int|char|logical>double,parent))
+mean;;Class(coerce(int|char|logical>double,parent))
 
 
 
@@ -559,6 +566,7 @@ versatileFunction; pureFunction
 
 # takes in a matrix or cells of strings
 matrixOrCellOfCharFunction; versatileFunction
+-Class(any>0)
 sort
 unique
 
@@ -767,7 +775,7 @@ builtin
 # calls builtin - proper
 
 timeFunction; impureFunction
-clock
+clock;; Class(none>double)
 tic
 toc
 cputime
@@ -797,8 +805,9 @@ whos
 which
 version
 clear
-nargin
-nargout
+
+nargin;; Class(none|char|function_handle>double)
+nargout;;Class(none|char|function_handle>double)
 
 
 # methods, fieldnames takes obj or string, allows extra arg '-full'
@@ -808,7 +817,7 @@ fieldnames
 
 reportFunction; impureFunction
 # errors should be seprated from warnings and displaying stuff?
-disp
+disp;; Class(any>none)
 display
 clc
 error
@@ -824,9 +833,10 @@ format
 
 
 randomFunction; impureFunction
+-Class(star(numeric|logical)&(typeString(float)|(none>double)))
 rand
-randi
 randn
+randi;;Class((numeric|logical)&star(numeric|logical)&(typeString(numeric)|(none>double)))
 
 
 systemFunction; impureFunction
@@ -851,7 +861,7 @@ textscan
 posixIoFunction; ioFunction
 sprintf
 sscanf
-fprintf
+fprintf;;Class(opt(double),char,star(any) > double)
 ftell
 ferror
 fopen
@@ -874,9 +884,11 @@ notABuiltin; root
 #dyaddown
 #flipud
 #linspace
-imwrite
+imwrite;;Class(numeric,opt(numeric),char,star(matrix))
 sparse
-var
-std
-realmax
-histc
+realmax;;Class(typeString(float)|none>double)
+histc;;Class(numeric&numeric&opt(numeric)>double&double)
+
+# at least variance should be a builtin, std = sqrt(var)
+var;;Class(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))
+std;;Class(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))
