@@ -25,7 +25,7 @@ unaryFloat =  bUnits.builtins.getByOriginalName('unaryFloatFunction')
 
 
 # binaries
-bUnits.genTests([binaryNumeric,binaryFloat],
+bUnits.genTests([binaryNumeric,binaryFloat],[[]]+
                 bUnits.genArgs(2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
                 bUnits.genArgs(2,bUnits.someMatrix,[(2,2)])+
@@ -33,7 +33,7 @@ bUnits.genTests([binaryNumeric,binaryFloat],
                 bUnits.genArgs(1,bUnits.double,[(1,1)]))
 
 # unaries
-bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],
+bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],[[]]+
                 bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
                 bUnits.genArgs(1,bUnits.matrix,[(1,1)])+
@@ -42,7 +42,7 @@ bUnits.genTests([unaryNumeric,unaryAnyMatrix,unaryFloat],
 
 #byShapeAndTypeMatrixCreation
 typeNames = [["'uint8'"],["'int32'"],["'double'"],["'single'"],["'logical'"],["'char'"],[]]
-bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation')],
+bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation')],[[]]+
                 bUnits.genArgs(1,bUnits.someMatrix,[(1,1)]),
                 typeNames)
 bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation')],
@@ -55,7 +55,7 @@ bUnits.genTests([bUnits.builtins.getByOriginalName('byShapeAndTypeMatrixCreation
 #queries
 matrixQuery = bUnits.builtins.getByOriginalName('matrixQuery')
 versatileQuery = bUnits.builtins.getByOriginalName('versatileQuery')
-bUnits.genTests([matrixQuery,versatileQuery],
+bUnits.genTests([matrixQuery,versatileQuery],[[]]+
                 bUnits.genArgs(1,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(2,bUnits.double,[(1,1),(3,3),(3,1),(1,3)])+
                 bUnits.genArgs(1,bUnits.matrix,[(1,1)])+
@@ -68,19 +68,34 @@ bUnits.genTests([matrixQuery,versatileQuery],
 binaryMatrixQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
 binaryMatrixQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
 binaryVersatileQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
-bUnits.genTests(binaryMatrixQuery+binaryVersatileQuery,
+bUnits.genTests(binaryMatrixQuery+binaryVersatileQuery,[[]]+
                 bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
                 bUnits.genArgs(2,bUnits.someMatrix,[(2,2)]))
 
 
 
+bUnits.genTests([bUnits.builtins.getByOriginalName('dimensionSensitiveFloatFunction')],[[]]+
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(1,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(2,2)])+
+                bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]));
+
 
 # specific functions ***********************************************************
-bUnits.genTests([bUnits.builtins.getByOriginalName('colon')],
+bUnits.genTests([bUnits.builtins.getByOriginalName('colon')],[[]]+
                 bUnits.genArgs(2,bUnits.double,[(1,1),(2,1),(1,2),(2,2)])+
                 bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
                 bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]));
 
+bUnits.genTests([bUnits.builtins.getByOriginalName('minOrMax')],[[]]+
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1),(2,2)])+
+                bUnits.genArgs(2,bUnits.double,[(1,1),(2,1),(1,2),(2,2)])+
+                bUnits.genArgs(2,bUnits.someMatrix,[(1,1),(2,2)])+
+                bUnits.genArgs(3,bUnits.someMatrix,[(1,1)]));
+
+bUnits.genTests([bUnits.builtins.getByOriginalName('realmax')],
+                typeNames);
 
 
 
