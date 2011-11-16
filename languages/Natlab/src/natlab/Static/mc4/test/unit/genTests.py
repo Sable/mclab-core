@@ -97,5 +97,8 @@ bUnits.genTests([bUnits.builtins.getByOriginalName('minOrMax')],[[]]+
 bUnits.genTests([bUnits.builtins.getByOriginalName('realmax')],
                 typeNames);
 
+bUnits.genTests([bUnits.builtins.getByOriginalName('var')],
+                bUnits.genArgs(1,bUnits.someMatrix,[(1,1),(2,2)]));
+
 
 
