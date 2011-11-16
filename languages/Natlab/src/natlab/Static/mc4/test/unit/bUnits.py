@@ -72,7 +72,7 @@ def genUnitFunction(testName, builtinName, args):
     s = 'function [result] = {0}(n)\n'.format(testName)
     for i in range(0,len(args)):
         s += '  x{0} = {1};\n'.format(i,args[i]);
-    s += '  result = {0}(x{1});\n'.format(builtinName,',x'.join(map(str,range(0,len(args)))));
+    s += '  result = {0}({1});\n'.format(builtinName,','.join(['x'+s for s in map(str,range(0,len(args)))]));
     s += 'end\n';
     return s
 
