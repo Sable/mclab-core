@@ -369,7 +369,7 @@ eps
 
 # functions of the form f(matrix,[dimension])
 dimensionSensitiveFloatFunction; improperFloatFunction
-Class(float&opt(numeric|logical)>0)
+-Class(float&opt(numeric|logical)>0)
 # cumsum coerces logicals to double
 cumsum;;Class(coerce(logical>double,parent))
 cumprod

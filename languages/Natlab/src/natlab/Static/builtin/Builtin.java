@@ -158,7 +158,6 @@ public abstract class Builtin {
         builtinMap.put("atan2",Atan2.getInstance());
         builtinMap.put("hypot",Hypot.getInstance());
         builtinMap.put("eps",Eps.getInstance());
-        builtinMap.put("Class(float&opt(numeric|logical)>0)",Class(float&opt(numeric|logical)>0).getInstance());
         builtinMap.put("cumsum",Cumsum.getInstance());
         builtinMap.put("cumprod",Cumprod.getInstance());
         builtinMap.put("mode",Mode.getInstance());
@@ -2506,29 +2505,26 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction  {
+    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements ClassPropagationDefined {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDimensionSensitiveFloatFunction(this,arg);
         }
         
-    }
-    public static class Class(float&opt(numeric|logical)>0) extends AbstractDimensionSensitiveFloatFunction  {
-        //returns the singleton instance of this class
-        private static Class(float&opt(numeric|logical)>0) singleton = null;
-        public static Class(float&opt(numeric|logical)>0) getInstance(){
-            if (singleton == null) singleton = new Class(float&opt(numeric|logical)>0)();
-            return singleton;
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+            }
+            return classPropInfo;
         }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseClass(float&opt(numeric|logical)>0)(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "Class(float&opt(numeric|logical)>0)";
-        }
-        
+
     }
     public static class Cumsum extends AbstractDimensionSensitiveFloatFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
@@ -2554,7 +2550,7 @@ public abstract class Builtin {
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
                 classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;
@@ -2643,7 +2639,7 @@ public abstract class Builtin {
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
                 classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;
@@ -2674,7 +2670,7 @@ public abstract class Builtin {
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
                 classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;

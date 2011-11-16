@@ -244,8 +244,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseEps(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }
     
     //functions of the form f(matrix,[dimension])
-    public Ret caseAbstractDimensionSensitiveFloatFunction(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }
-    public Ret caseClass(float&opt(numeric|logical)>0)(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }    
+    public Ret caseAbstractDimensionSensitiveFloatFunction(Builtin builtin,Arg arg){ return caseAbstractImproperFloatFunction(builtin,arg); }    
     //cumsum coerces logicals to double
     public Ret caseCumsum(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
     public Ret caseCumprod(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
