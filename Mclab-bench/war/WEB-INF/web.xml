@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>Upload</servlet-name>
+		<servlet-class>mclab.UploadHandler</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+        <welcome-file>guestbook.jsp</welcome-file>
+    </welcome-file-list>
+	<servlet>
+		<servlet-class>mclab.ProjectsTable</servlet-class><servlet-name>Table</servlet-name>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Table</servlet-name>
+		<url-pattern>/Table</url-pattern></servlet-mapping>
+	<servlet>
+		<servlet-class>mclab.DetailedProject</servlet-class>
+		<servlet-name>Detail</servlet-name>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Detail</servlet-name>
+		<url-pattern>/Detail</url-pattern></servlet-mapping>
+	<servlet>
+		<servlet-class>mclab.Finder</servlet-class>
+		<servlet-name>Find</servlet-name></servlet>
+	<servlet-mapping>
+		<servlet-name>Find</servlet-name>
+		<url-pattern>/find</url-pattern>
+	</servlet-mapping>
+    <servlet>
+        <servlet-class>mclab.UploadWorker</servlet-class>
+        <servlet-name>Worker</servlet-name></servlet>
+    <servlet-mapping>
+        <servlet-name>Worker</servlet-name>
+        <url-pattern>/worker</url-pattern>
+    </servlet-mapping>	
+    <servlet>
+        <servlet-class>mclab.SaveQuery</servlet-class>
+        <servlet-name>SaveQuery</servlet-name>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SaveQuery</servlet-name>
+        <url-pattern>/Save</url-pattern>
+    </servlet-mapping>  
+</web-app>

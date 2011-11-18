@@ -1,0 +1,13 @@
+application: mclab-bench
+version: py
+runtime: python
+api_version: 1
+
+handlers:
+- url: /datastore_admin
+  script: $PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
+- url: .*
+  script: bench.py
+
+builtins:
+- datastore_admin: on
