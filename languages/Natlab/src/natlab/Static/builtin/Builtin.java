@@ -4575,12 +4575,12 @@ public abstract class Builtin {
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
             }
             return classPropInfo;
         }

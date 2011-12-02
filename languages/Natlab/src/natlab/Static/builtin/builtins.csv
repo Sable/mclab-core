@@ -612,7 +612,7 @@ class
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
--Class(any>double)
+-Class(any&opt(numeric|logical)>double)
 size
 
 
