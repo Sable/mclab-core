@@ -4196,7 +4196,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Sort extends AbstractMatrixOrCellOfCharFunction  {
+    public static class Sort extends AbstractMatrixOrCellOfCharFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Sort singleton = null;
         public static Sort getInstance(){
@@ -4212,6 +4212,20 @@ public abstract class Builtin {
             return "sort";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class Unique extends AbstractMatrixOrCellOfCharFunction  {
         //returns the singleton instance of this class

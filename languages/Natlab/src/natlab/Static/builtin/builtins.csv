@@ -569,7 +569,7 @@ versatileFunction; pureFunction
 # takes in a matrix or cells of strings
 matrixOrCellOfCharFunction; versatileFunction
 -Class(any>0)
-sort
+sort;;Class(any&opt(numeric)&opt(char) > 0&double)
 unique
 
 # ***************************************************************************************
