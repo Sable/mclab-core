@@ -247,8 +247,8 @@ dot
 dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
 
 minOrMax; dimensionCollapsingNumericFunction
--Class(matrix&any&(numeric|logical)>0, logical&logical>logical, coerce(logical|char>double, (numeric&opt(double|0)>0) | ((double|1)&numeric>1)), matrix>0)
--MatlabClass(logical&logical>logical, (char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
+-Class( matrix&any&(numeric|logical)>0&double, logical&logical>logical&double, coerce(logical|char>double&double, (numeric&opt(double|0)>0&double) | ((double|1)&numeric>1&double)), matrix>0&double)
+-MatlabClass(logical&logical>logical&double, (char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
 min
 max
 
