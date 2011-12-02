@@ -217,10 +217,6 @@ rem
 
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
-# TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
-dot
--Class(coerce(logical|char>double,((single&float)|(float&single)>single) | (numeric&(double|0)>double) | ((double|1)&numeric>double)))
--MatlabClass(logical&any>error, natlab)
 cross
 
 
@@ -239,8 +235,13 @@ mrdivide
 # arguments that either options or different possible operands.
 improperNumericFunction; numericFunction
 
-# functions of the form f(matrix,[dimension]), where matrix is any matrix
+# functions of the form f(matrix1,matrix2,...,matrixk,[dimension]), where matrix is any matrix
 dimensionSensitiveNumericFunction; improperNumericFunction
+# TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
+dot
+-Class(coerce(logical|char>double,((single&(float|single))|(float&single)>single) | (numeric&(double|0)>double) | ((double|1)&numeric>double))&opt(numeric|logical))
+-MatlabClass(logical&any>error, natlab)
+
 
 # functions that collapse the specified dimension
 dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
@@ -378,6 +379,7 @@ cumprod
 dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
 mode
 prod
+#TODO - sum takes a possible string parameter
 sum;;Class(coerce(int|char|logical>double,parent))
 mean;;Class(coerce(int|char|logical>double,parent))
 

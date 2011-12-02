@@ -112,9 +112,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseRem(Builtin builtin,Arg arg){ return caseAbstractDividingElementalArithmetic(builtin,arg); }
     
     //array wise binary numeric matrix function
-    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }    
-    //TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
-    public Ret caseDot(Builtin builtin,Arg arg){ return caseAbstractArrayBinaryNumericFunction(builtin,arg); }
+    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }
     public Ret caseCross(Builtin builtin,Arg arg){ return caseAbstractArrayBinaryNumericFunction(builtin,arg); }
     
     //binary matrix arithmetic - doesn't mix integer types
@@ -130,8 +128,10 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //arguments that either options or different possible operands.
     public Ret caseAbstractImproperNumericFunction(Builtin builtin,Arg arg){ return caseAbstractNumericFunction(builtin,arg); }
     
-    //functions of the form f(matrix,[dimension]), where matrix is any matrix
-    public Ret caseAbstractDimensionSensitiveNumericFunction(Builtin builtin,Arg arg){ return caseAbstractImproperNumericFunction(builtin,arg); }
+    //functions of the form f(matrix1,matrix2,...,matrixk,[dimension]), where matrix is any matrix
+    public Ret caseAbstractDimensionSensitiveNumericFunction(Builtin builtin,Arg arg){ return caseAbstractImproperNumericFunction(builtin,arg); }    
+    //TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
+    public Ret caseDot(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveNumericFunction(builtin,arg); }
     
     //functions that collapse the specified dimension
     public Ret caseAbstractDimensionCollapsingNumericFunction(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveNumericFunction(builtin,arg); }
@@ -252,7 +252,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //numeric function that collapses a dimension (optional second arg tells which)
     public Ret caseAbstractDimensionCollapsingFloatFunction(Builtin builtin,Arg arg){ return caseAbstractDimensionSensitiveFloatFunction(builtin,arg); }
     public Ret caseMode(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
-    public Ret caseProd(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
+    public Ret caseProd(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }    
+    //TODO - sum takes a possible string parameter
     public Ret caseSum(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
     public Ret caseMean(Builtin builtin,Arg arg){ return caseAbstractDimensionCollapsingFloatFunction(builtin,arg); }
     
