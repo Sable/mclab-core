@@ -364,7 +364,7 @@ hypot
 # options or different possible operands.
 improperFloatFunction; floatFunction
 eps
--Class(float>0,typeString(float))
+-Class(none>double,float>0,typeString(float))
 
 
 # functions of the form f(matrix,[dimension])

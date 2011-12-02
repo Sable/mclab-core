@@ -2494,12 +2494,12 @@ public abstract class Builtin {
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))));
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")))));
         public ClassPropTools.MC getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))));
+                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")))));
             }
             return classPropInfo;
         }
