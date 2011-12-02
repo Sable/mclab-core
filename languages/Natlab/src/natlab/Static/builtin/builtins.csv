@@ -622,9 +622,8 @@ size
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
 length
 ndims
-numel
--Class(any&star(matrix)>double)
-end
+numel;;Class(any&star(matrix)>double)
+end;;Class(any&numeric&numeric>double)
 
 
 # return logicals
