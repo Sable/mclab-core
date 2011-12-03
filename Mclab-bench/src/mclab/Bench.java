@@ -37,14 +37,13 @@ public class Bench {
 	Boolean parsed = false;
 	Blob xmlBlob;
 	@Id	String name;
+	Text xml;
+
 	Date date;
 	String link;
 	String Tags;
-	@Embedded ArrayList<File> files;
 	private User uploader;
-	public void addFile(String name, String content){
-		files.add(new File(name, content));
-	}
+
 	public String downloadURL(){
 		return "http://www.mathworks.com/matlabcentral/fileexchange/"+name+"?controller=file_infos&download=true";
 	}
@@ -52,15 +51,11 @@ public class Bench {
 		return uploader;
 	}
 	public Bench() {
-		files = new ArrayList<File>();
 		UserService userService = UserServiceFactory.getUserService();
 		uploader = userService.getCurrentUser();
 	}
 	public String toString(){
-		String result = "";
-		for (File f: files){
-			result= result + " " +f.getName();
-		}
+		String result = name;
 		return result;
 	}
 	public String projectNumber(){

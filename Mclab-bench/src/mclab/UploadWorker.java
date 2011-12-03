@@ -59,7 +59,7 @@ public class UploadWorker extends HttpServlet{
     	ZipEntry entry;
     	Bench bench = new Bench();
     	ArrayList<String> files = new ArrayList<String>();
-    	int BUFLIMIT = 1024*1000;
+    	int BUFLIMIT = 1024*10;
     	int total = 0 , succeeded = 0; 
     	while ((entry=zio.getNextEntry()) != null){
     		byte[] buf = new byte[BUFLIMIT];
@@ -99,7 +99,7 @@ public class UploadWorker extends HttpServlet{
 						.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
 			XPath xpe = xpf.newXPath();
 			StringBuffer xml = new StringBuffer();
-			int BUFFER=104096;
+			int BUFFER=10409;
 			
 			char[] data= new char[BUFFER];
 			int count=0;

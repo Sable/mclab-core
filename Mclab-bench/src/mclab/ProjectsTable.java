@@ -24,6 +24,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.InputSource;
 
 
+import com.google.appengine.api.datastore.QueryResultIterable;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.taskqueue.*;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.users.*;
@@ -171,22 +173,23 @@ public class ProjectsTable extends HttpServlet{
 		}
 		writer.printf("</tr></thead><tbody>");
 
-		Query<Bench> iterator = ofy.query(Bench.class).filter("parsed =", true);
 //		QueryImpl<Bench> a;
 		if(all){
-			ArrayList<Bench> results = new ArrayList<Bench>(4000); 
-			int chunk = 500;
-			for (int i=0;i<(4000/chunk)+1;i++){
-				iterator = ofy.query(Bench.class).filter("parsed =", true);		
-				iterator.limit(chunk);
-				iterator.offset(i*chunk);
-				
-				for (Bench b: iterator.fetch()){
-					handle(b, writer, query_cache, keyset, total, q);
+			Query<Bench> iterator = ofy.query(Bench.class).filter("parsed =", true);
+			QueryResultIterator<Bench> a= iterator.iterator();
+			int iter=0;
+			while (a.hasNext()){
+				handle(a.next(), writer, query_cache, keyset, total, q);
+				iter ++;
+				if ((iter % 300) ==0){
+					iterator = ofy.query(Bench.class).filter("parsed =", true);
+					iterator.startCursor(a.getCursor());
+					a = iterator.iterator();
 				}
 			}
 		}
 		else{
+			Query<Bench> iterator = ofy.query(Bench.class).filter("parsed =", true);
 			iterator.limit(60);
 			for (Bench b: iterator.fetch()){
 				handle(b, writer, query_cache, keyset, total, q);
