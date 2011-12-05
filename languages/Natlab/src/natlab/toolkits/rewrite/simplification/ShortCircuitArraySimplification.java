@@ -183,11 +183,11 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
       [E1 | E2, t1]
       ==========
       [E1, t2]
-      if ~t2
+      if t2
+        t1 = t2;
+      else
         [E2, t3]
         t1 = t2 | t3;
-      else
-        t1 = t2;
       end
     */
     protected LinkedList<Stmt> handleOr( OrExpr cond, TempFactory condFact )
@@ -198,15 +198,23 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
     /*
       [E1 op E2, t1]
       ==========
+      ---if op is &
       [E1, t2]
-      if [~]t2
+      if t2
         [E2,t3]
         t1 = t2 op t3;
       else
         t1 = t2;
       end
-
-      the ~ will be used if op is |
+      ----------
+      ---if op is |
+      [E1, t2]
+      if t2
+        t1 = t2;
+      else
+        [E2,t3]
+        t1 = t2 op t3;
+      end
     */
     protected LinkedList<Stmt> handleAndOr( boolean isAnd, BinaryExpr cond, TempFactory condFact )
     {
@@ -239,17 +247,20 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
                                      lhsTFact.genNameExpr() );
         elseAssign.setOutputSuppressed( true );
 
-        //[~]t2
         Expr newCondExpr;
-        if( isAnd )
-            newCondExpr = lhsTFact.genNameExpr();
-        else
-            newCondExpr = new NotExpr( lhsTFact.genNameExpr() );
+        newCondExpr = lhsTFact.genNameExpr();
 
         //new if
-        E1List.add( ASTHelpers.newIfStmt( newCondExpr,
-                                          ASTHelpers.listToList( E2List ),
-                                          new ast.List().add( elseAssign ) ) );
+        if( isAnd ){
+            E1List.add( ASTHelpers.newIfStmt( newCondExpr,
+                                              ASTHelpers.listToList( E2List ),
+                                              new ast.List().add( elseAssign ) ) );
+        } else {
+            E1List.add( ASTHelpers.newIfStmt( newCondExpr,
+                                              new ast.List().add( elseAssign ),
+                                              ASTHelpers.listToList( E2List ) ) );
+        }
+            
         return E1List;
 
     }

@@ -64,10 +64,10 @@ public class ForSimplification extends AbstractSimplification
       end
       ========== if E not var
       t1=E;
-      t2=size(t1);
-      t3=prod(t2(2:end));
+      [t2,t3]=size(t1);
+      i=[];
       for t4=1:t3
-        i = t1(t4);
+        i=t1(:,t4);
         ...
       end
      */
@@ -84,33 +84,33 @@ public class ForSimplification extends AbstractSimplification
             LinkedList<Stmt> newStmts = new LinkedList();
 
             //build new temp assignments
-            TempFactory sizeF, stopF, tlvarF;
-            Expr domainVal1, domainVal2; //two uses of loop domain value
+            TempFactory t2F, t3F, t4F;
 
             //setup variables for two uses of the loop domain
-            NameExpr[] domUses = new NameExpr[2];
-            prepDomain( domUses, rhs, newStmts );
+            NameExpr[] t1Uses = new NameExpr[2];
+            prepDomain( t1Uses, rhs, newStmts );
 
-            sizeF = TempFactory.genFreshTempFactory();
-            stopF = TempFactory.genFreshTempFactory();
-            tlvarF = TempFactory.genFreshTempFactory();
+            t2F = TempFactory.genFreshTempFactory();
+            t3F = TempFactory.genFreshTempFactory();
+            t4F = TempFactory.genFreshTempFactory();
+            
 
-            AssignStmt sizeAssign = new AssignStmt( sizeF.genNameExpr(), newSize(domUses[0]) );
-            AssignStmt stopAssign = new AssignStmt( stopF.genNameExpr(), 
-                                                    newProd( newParam( sizeF.genNameExpr(),
-                                                                       new2ToEnd() ) ) );
-            sizeAssign.setOutputSuppressed( true );
-            stopAssign.setOutputSuppressed( true );
+            AssignStmt t2t3Assign = ASTHelpers.buildMultiAssign( newSize(t1Uses[0]), true, 
+                                                                 t2F.genNameExpr(),
+                                                                 t3F.genNameExpr());
+            newStmts.add( t2t3Assign );
 
-            newStmts.add( sizeAssign );
-            newStmts.add( stopAssign );
+            //build lvar assignments
+            AssignStmt lvarDefaultAssign = new AssignStmt( (Expr)lhs.copy(), new MatrixExpr() );
+            lvarDefaultAssign.setOutputSuppressed( true );
+            newStmts.add( lvarDefaultAssign );
 
-            //build lvar assignment
-            AssignStmt lvarAssign = new AssignStmt( lhs, newParamFirstColon( domUses[1], tlvarF.genNameExpr() ) );
+            AssignStmt lvarAssign = new AssignStmt( lhs, newParamFirstColon( t1Uses[1], t4F.genNameExpr() ) );
             lvarAssign.setOutputSuppressed( true );
 
             //build new for
-            AssignStmt newLoopVar = new AssignStmt( tlvarF.genNameExpr(), new1ToExpr( stopF.genNameExpr() ) );
+            AssignStmt newLoopVar = new AssignStmt( t4F.genNameExpr(), new1ToExpr( t3F.genNameExpr() ) );
+            newLoopVar.setOutputSuppressed( false );
 
             rewrite( body );
             body.insertChild( lvarAssign, 0 );

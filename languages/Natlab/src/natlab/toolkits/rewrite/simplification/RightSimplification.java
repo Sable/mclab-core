@@ -113,7 +113,23 @@ public class RightSimplification extends AbstractSimplification
     {
         inAssignStmt = true;
 
-        caseStmt( node );
+        /*LinkedList<Stmt> backNewStmts = newStmts;
+        newStmts = new LinkedList<Stmt>();
+        rewrite( node.getRHS() );
+        if( !newStmts.isEmpty() ){
+            newStmts.add( node );
+            newNode = new TransformedNode( newStmts );
+        }
+        newStmts = backNewStmts;*/
+
+        //Because of the Simple Assignment Simplification, we only
+        //need simplify assignment statements that are name
+        //expressions or matrix expressions on the right hand
+        //side. All other assignments are guaranteed to be simple on
+        //the right.
+        if( node.getLHS() instanceof NameExpr ||
+            node.getLHS() instanceof MatrixExpr )
+            caseStmt( node ); 
 
         inAssignStmt = false;
     }
@@ -121,7 +137,10 @@ public class RightSimplification extends AbstractSimplification
 
     
     public void caseForStmt(ForStmt node) {
-        //rewrite statements
+        LinkedList<Stmt> backNewStmts = newStmts;
+        newStmts = new LinkedList<Stmt>();
+
+        //rewrite body
         rewrite(node.getStmts());
         
         //get stuff out of the assignment statement
@@ -130,16 +149,19 @@ public class RightSimplification extends AbstractSimplification
             AssignStmt assign = (AssignStmt)newNode.remove(newNode.size()-1);
             newNode.add(new ForStmt(assign, node.getStmts()));
         }
+        newStmts = backNewStmts;
     }
     
     public void caseStmt( Stmt node )
     {
-        newStmts = new LinkedList();
+        LinkedList<Stmt> backNewStmts = newStmts;
+        newStmts = new LinkedList<Stmt>();
         rewriteChildren( node );
         if( !newStmts.isEmpty() ){
             newStmts.add( node );
             newNode = new TransformedNode( newStmts );
         }
+        newStmts = backNewStmts;
     }
 
     String deep = "";
@@ -151,8 +173,11 @@ public class RightSimplification extends AbstractSimplification
         Expr newExpr = (Expr)ec.transform();
 
         LinkedList<Stmt> backNewStmts = newStmts;
-        LinkedList<Stmt> exprsNewStmts = new LinkedList();
+        newStmts = new LinkedList<Stmt>();
+        LinkedList<Stmt> exprsNewStmts = new LinkedList<Stmt>();
 
+        TempFactory backSCTempFact = currentSCTempFact;
+        currentSCTempFact = null;
         //loop through all the new assignment stmts and rewrites them
         while( !ec.getNewAssignments().isEmpty() ){
             
@@ -177,6 +202,7 @@ public class RightSimplification extends AbstractSimplification
             if( !inSCStmt )
                 newNode = new TransformedNode( newExpr );
         }
+        currentSCTempFact = backSCTempFact;
         if( currentSCTempFact!=null ){
             AssignStmt newAssign = new AssignStmt( currentSCTempFact.genNameExpr(),
                                                    newExpr );
@@ -266,8 +292,9 @@ public class RightSimplification extends AbstractSimplification
             caseShortCircuitAndExpr( new ShortCircuitAndExpr( new NotExpr( e1 ),
                                                               new NotExpr( e2 )));
         }
-        else
+        else{
             caseExpr(node);
+        }
     }
 
     protected void simplifySCIfPat( Expr e1, Expr e2, boolean elseVal )
@@ -327,6 +354,7 @@ public class RightSimplification extends AbstractSimplification
         }
         else{
             rewrite(e);
+            
             e = currentSCTempFact.genNameExpr();
             AssignStmt boolAssign = new AssignStmt(currentSCTempFact.genNameExpr(), 
                                                    ASTHelpers.buildBoolLit(elseVal) );
@@ -335,5 +363,20 @@ public class RightSimplification extends AbstractSimplification
             newStmts.add( ASTHelpers.newIfStmt( e, thenPart, new ast.List<Stmt>().add(boolAssign) ) );
         }
 
+    }
+
+    private void printNewStmts()
+    {
+        System.out.print("[");
+        boolean start = true;
+        for( Stmt s : newStmts ){
+            if(start)
+                start = false;
+            else{
+                System.out.print(",\n ");
+            }
+            System.out.print(s.getPrettyPrinted());
+        }
+        System.out.println("]");
     }
 }

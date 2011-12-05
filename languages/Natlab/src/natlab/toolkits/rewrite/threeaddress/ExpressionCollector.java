@@ -44,7 +44,6 @@ import natlab.toolkits.analysis.varorfun.*;
  */
 public class ExpressionCollector extends AbstractLocalRewrite
 {
-    private boolean isSub = false;
     private LinkedList<AssignStmt> newAssignments;
     private VFFlowset resolvedNames;
     private VFPreorderAnalysis kindAnalysis;
@@ -55,20 +54,6 @@ public class ExpressionCollector extends AbstractLocalRewrite
 
     protected HashMap< Expr, HashSet<EndCallExpr>> targetAndEndMap;
     
-
-    public ASTNode transform()
-    {
-        targetAndEndMap = new HashMap();
-        ASTNode returnNode = super.transform();
-        for( Expr t : targetAndEndMap.keySet() )
-            for( EndCallExpr e : targetAndEndMap.get(t) ){
-                Expr tCopy = (Expr)t.copy();
-                kindAnalysis.getFlowSets().put(tCopy, kindAnalysis.getFlowSets().get(t) );
-                e.setArray( tCopy );
-            }
-        return returnNode;
-    }
-
     public ExpressionCollector( ASTNode tree, 
                                 VFFlowset resolvedNames )
     {
@@ -103,400 +88,201 @@ public class ExpressionCollector extends AbstractLocalRewrite
         return newAssignments;
     }
 
-    /**
-     * Determines if a given ParameterizedExpr can have an END bound
-     * to it.
-     */
-    public boolean canEndBind( ParameterizedExpr node )
-    {
-        return !(node.getTarget() instanceof NameExpr) || !isFun((NameExpr)node.getTarget() );
-    }
+    public void caseExpr( Expr node )
+    { return; }
 
-    /**
-     * Deals with cell or range expression. Will perform different
-     * action depending on if it is a sub expression or not.
-     */
-    public void possibleSubExprHandler(Expr node, Expr target, List<Expr> args, boolean isCell )
-    {
-        if( isSub ){
-            subExprHandler(node, target, args, isCell );
-        }
-        else{
-            if( isLHS || isCell || canEndBind( (ParameterizedExpr)node ) ){
-                targetAndEndMap.put( target, new HashSet() );
-                lastTarget = target;
-            }
-            /*isSub = true;
-            rewritingEnds = false;
-            rewriteArgs(args);
-            lastTarget = null;
-
-
-            isSub = false;
-            rewrite(target);
-            isSub = false;*/
-            Expr oldLastTarget = lastTarget;
-            lastTarget = null;
-            rewrite(target);
-
-            lastTarget = oldLastTarget;
-            isSub = true;
-            rewritingEnds = false;
-            rewriteArgs(args);
-            isSub = false;
-            lastTarget = null;
-        }
-        //System.out.println("&& done: " + node.getPrettyPrinted() );
-    }
-    
-    protected void rewriteEnds( Expr node )
-    {
-        
-        caseASTNode( node );
-    }
-
-    /*
-      Note: we assume that no args are removed or added in this
-      rewrite, so we can be assured that if newNode is set, then it
-      will be a single node.
-     */
-    protected void rewriteArgs(List<Expr> args )
-    {
-        if( lastTarget != null && !rewritingEnds ){
-            boolean change = false;
-            lastDims = args.getNumChild();
-            for( int i =0; i< lastDims; i++ ){
-                lastIndex = i+1;
-                rewrite( args.getChild(i) );
-                if( newNode != null ){
-                    change = true;
-                    args.setChild( (Expr)newNode.getSingleNode(), i );
-                }
-            }
-            newNode = null;
-        }
-        else
-            rewrite( args );
-    }
-
-    /**
-     * Simple helper method to wrap subExprHandler(Expr,boolean) call.
-     */
-    public void subExprHandler(Expr node )
-    {
-        subExprHandler(node, false);
-    }
-
-    /**
-     * Rewrites sub expressions. If the collector is in end finding
-     * mode, then it simply continues looking for ends and nothing
-     * else. If there was something that an end could bind to, then it
-     * will rewrite the ends. It will then replace the expression with
-     * a temp variable, and add an assignment for the given expression
-     * to the temp variable.
-     */
-    public void subExprHandler(Expr node, boolean canExpand)
-    {
-        if( rewritingEnds )
-            rewriteEnds( node );
-        else{
-            if( lastTarget != null ){
-                rewritingEnds = true; 
-                rewriteEnds( node );
-                rewritingEnds = false;
-            }
-            rewriteSubExpr( node, canExpand );
-        }
-    }
-
-    /**
-     * Deals with Cell indexing and parameterized expressions when
-     * they are sub expressions.
-     */
-    public void subExprHandler(Expr node, Expr target, List<Expr> args, boolean isCell)
-    {
-        if( !isCell && !canEndBind( (ParameterizedExpr)node ) ){
-            //can't bind an end
-            if( rewritingEnds ){
-                rewriteArgs( args );
-            }
-            else{
-                fixEndsAndRewrite( node, args, isCell );
-            }
-        }
-        else{
-            //all contained ends will be bound to this expr, so just
-            //rewrite it, don't care about the ends
-            rewriteSubExpr( node, isCell );
-        }
-    }
-
-    /**
-     * Rewrite a sub expression containing ends to rewrite. In
-     * particular, deals with parameterized and cell indexing expressions.
-     */
-    protected void fixEndsAndRewrite(Expr node, List<Expr> args, boolean canExpand ){
-        rewritingEnds = true;
-        boolean oldSub = isSub; //TODO is this correct??!?! preserve isSub
-        isSub = true;
-        rewriteArgs( args );
-        rewritingEnds = false;
-        //isSub = false;
-        isSub = oldSub; 
-        /**
-         * this was changed because it seemed that sometimes, expressions wouldn't 
-         * get properly expanded. Example
-         * zeros(lengh(a),(b+1))
-         * would be turned into
-         * t = length(a)
-         * zeros(t, (b+1))
-         * presumably this is because after dealing with 'length', it would come
-         * out as not in sub anymore, due to this assignment
-         */
-        
-        rewriteSubExpr( node, canExpand );
-        //Expr oldLastTarget = lastTarget;
-        //lastTarget = null;
-        //subExprHandler( node );
-        //lastTarget = oldLastTarget;
-    }
-
-    /**
-     * Creates the new assignment to a temporary from a given
-     * expression and replaces the expression with the temporary. It
-     * adds the new assignment to the newAssignments list.
-     */
-    protected void rewriteSubExpr( Expr node, boolean canExpand )
-    {
-        TempFactory tmp = TempFactory.genFreshTempFactory();
-        AssignStmt newAssign;
-        if( canExpand ){
-            MatrixExpr newMat = new MatrixExpr(
-                                               new ast.List().add(
-                                                                  new Row(
-                                                                          new ast.List().add(tmp.genCSLExpr())
-                                                                          )
-                                                                  )
-                                               );
-            newAssign = new AssignStmt( newMat, node );
-        }
-        else
-            newAssign = new AssignStmt( tmp.genNameExpr(), node );
-        newAssign.setOutputSuppressed(true);
-        newAssignments.add( newAssign );
-        if( canExpand )
-            newNode = new TransformedNode( tmp.genCSLExpr() );
-        else
-            newNode = new TransformedNode( tmp.genNameExpr() );
-    }
-
-
-    /**
-     * Extracts out the target if not in the LHS of an assignment.
-     */
-    public void caseDotExpr( DotExpr node )
-    {
-        if( isSub )
-            subExprHandler( node, true );
-        else if( !isLHS ){
-            isSub = true;
-            rewrite( node.getTarget() );
-            if( newNode != null ){
-                node.setTarget( (Expr)newNode.getSingleNode() );
-                newNode = new TransformedNode( node );
-            }
-            isSub = false;
-        }
-    }
-                
+    public void caseLambdaExpr( LambdaExpr node )
+    { return; }
 
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
-        possibleSubExprHandler( node, node.getTarget(), node.getArgs(), false );
+        Expr paramTarget = node.getTarget();
+        if( paramTarget instanceof DotExpr ){
+            DotExpr dotParamTarget = (DotExpr)paramTarget;
+            
+            if( !isLHS && !(dotParamTarget.getTarget() instanceof NameExpr) ){
+                dotParamTarget.setTarget( makeTempAssign(dotParamTarget.getTarget() ));
+            }
+        }
+        replaceEnds( node );
+        removeArgs( node );
+        fixEnds( node );
     }
+
     public void caseCellIndexExpr( CellIndexExpr node )
     {
-        possibleSubExprHandler( node, node.getTarget(), node.getArgs(), true );
+        Expr indexTarget = node.getTarget();
+        if( !isLHS && !(indexTarget instanceof NameExpr))
+            node.setTarget( makeTempAssign( indexTarget ));
+        replaceEnds( node );
+        removeArgs( node );
+        fixEnds( node );
     }
 
-    public void caseRangeExpr( RangeExpr node )
+    public void caseDotExpr( DotExpr node )
     {
-        if( isSub ){
-            subExprHandler( node );
-        }
-        else{
-            Expr newLower = node.getLower();
-            Opt newIncr = node.getIncrOpt();
-            Expr newUpper = node.getUpper();
-            boolean changed = false;
-
-            isSub = true;
-            rewrite( node.getLower() );
-            if( newNode!=null ){
-                newLower = (Expr)newNode.getSingleNode();
-                changed = true;
+        if( isLHS ){
+            removeArgs( node );
+        }else{
+            if( !(node.getTarget() instanceof NameExpr) ){
+                node.setTarget( makeTempAssign(node.getTarget() ));
             }
-            if( node.hasIncr() ){
-                rewrite( node.getIncr() );
-                if( newNode!=null ){
-                    newIncr = new Opt((Expr)newNode.getSingleNode());
-                    changed = true;
+        }
+    }
+
+    public void caseMatrixExpr( MatrixExpr node )
+    {
+        if( collectFromRows( node.getRows() ))
+            newNode = new TransformedNode( node );
+    }
+    public void caseCellArrayExpr( CellArrayExpr node )
+    {
+        if( collectFromRows( node.getRows() ))
+            newNode = new TransformedNode( node );
+    }
+
+    private boolean collectFromRows( List<Row> rows ){
+        if( !areAllVarsOrLiteralsInRows( rows )){
+            boolean changed = false;
+            for( Row r : rows ){
+                for( int i=0; i< r.getNumElement(); i++ ){
+                    if( !isLiteral(r.getElement(i)) ){
+                        r.setElement( makeTempAssign(r.getElement(i)), i);
+                        changed = true;
+                    }
                 }
             }
-            rewrite( node.getUpper() );
-            if( newNode != null ){
-                newUpper = (Expr)newNode.getSingleNode();
-                changed = true;
-            }
-            isSub = false;
-
-            if( changed ){
-                RangeExpr newRange = new RangeExpr(newLower,newIncr,newUpper);
-                newNode = new TransformedNode(newRange);
-            }
+            return changed;
         }
-        
+        return false;
     }
+    public void caseRangeExpr( RangeExpr node ){
+        if( isVarOrLiteral(node.getLower()) &&
+            isVarOrLiteral(node.getUpper()) && 
+            ( !node.hasIncr() || 
+              isVarOrLiteral(node.getIncr()) )){
+            return;
+        }else{
+            boolean changed = false;
+            if( !(node.getLower() instanceof LiteralExpr) ){
+                changed = true;
+                node.setLower( makeTempAssign( node.getLower() ));
+            }
+            if( node.hasIncr() && !(node.getIncr() instanceof LiteralExpr) ){
+                changed = true;
+                node.setIncr( makeTempAssign( node.getIncr() ));
+            }
+            if( !(node.getUpper() instanceof LiteralExpr) ){
+                changed = true;
+                node.setUpper( makeTempAssign( node.getUpper() ));
+            }
+            if( changed )
+                newNode = new TransformedNode( node );
+        }
+    }
+
     public void caseBinaryExpr( BinaryExpr node )
     {
-        if( isSub )
-            subExprHandler( node );
-        else{
-            Expr lhs = node.getLHS();
-            Expr rhs = node.getRHS();
-            
-            Expr newLhs = lhs;
-            Expr newRhs = rhs;
+        if( !areAllVarsOrLiterals( node.getLHS(),
+                                   node.getRHS() ) ){
             boolean changed = false;
-            
-            isSub = true;
-            rewrite( lhs );
-            if( newNode != null ){
-                newLhs = (Expr)newNode.getSingleNode();
+            if( !isLiteral(node.getLHS()) ){
                 changed = true;
+                node.setLHS( makeTempAssign( node.getLHS() ));
             }
-            rewrite( rhs );
-            if( newNode != null ){
-                newRhs = (Expr)newNode.getSingleNode();
+            if( !isLiteral(node.getRHS()) ){
                 changed = true;
+                node.setRHS( makeTempAssign( node.getRHS() ));
             }
-            if( changed ){
-                node.setLHS(newLhs);
-                node.setRHS(newRhs);
-                newNode = new TransformedNode(node);
-            }
+            if( changed )
+                newNode = new TransformedNode( node );
         }
     }
+
     public void caseUnaryExpr( UnaryExpr node )
     {
-        if( isSub )
-            subExprHandler( node );
-        else{
-            Expr operand = node.getOperand();
-            
-            Expr newOperand = operand;
-            boolean changed = false;
-            
-            isSub = true;
-            rewrite( operand );
-            if( newNode != null ){
-                newOperand = (Expr)newNode.getSingleNode();
-                changed = true;
-            }
-            if( changed ){
-                node.setOperand(newOperand);
-                newNode = new TransformedNode(node);
-            }
+        if( !isVarOrLiteral( node.getOperand() )){
+            node.setOperand( makeTempAssign( node.getOperand() ));
+            newNode = new TransformedNode( node );
         }
     }
 
     /**
-     * this is just a copy of BinaryExpression case, but with multiple args
+     * Takes the given expression, creates an assignment from the
+     * expression to a fresh temp, adds it to the list of new
+     * assignments, and returns the fresh temp.
      */
-    @Override
-    public void caseMatrixExpr(MatrixExpr node) {
-        if (!isLHS){
-            if (isSub){
-                subExprHandler( node );
-            } else if (!isLHS){
-                List<ASTNode> newChildren = genericExprCase(node);
-                if (newChildren != null){
-                    newNode = new TransformedNode(new MatrixExpr((List)newChildren));
-                }
-            }
-        }
-    }
-    
-    
-    @Override
-    public void caseCellArrayExpr(CellArrayExpr node) {
-        if (isSub){
-            subExprHandler( node );
-        } else {
-            List<ASTNode> newChildren = genericExprCase(node);
-            if (newChildren != null){
-                newNode = new TransformedNode(new CellArrayExpr((List)newChildren));
-            }
-        }
-    }
-    
-    /**
-     * lambda expression
-     * do nothing to the expr, except pull it out if it's a subexpr
-     */
-    public void caseLambdaExpr(LambdaExpr node) {
-        if (isSub){
-            TempFactory tmp = TempFactory.genFreshTempFactory();
-            AssignStmt newAssign = new AssignStmt( tmp.genNameExpr(), node );
-            newAssign.setOutputSuppressed(true);
-            newAssignments.add(newAssign);
-            newNode = new TransformedNode( tmp.genNameExpr() );
-        }
-    }
-    
-    
-    /**
-     * does basically what happens in any case, for example Plus
-     * Returns the newNodes as a list, or null if it's unchanged
-     * @param children
-     */
-    public List<ASTNode> genericExprCase(ASTNode node){
-        List<ASTNode> children = new List<ASTNode>();
-        for (int i = 0; i < node.getNumChild(); i ++){
-            children.add(node.getChild(i));
-        }
-        List<ASTNode> newChildren = new List<ASTNode>();
-        for (ASTNode n : children){
-            newChildren.add(n);
-        }
-
-        boolean changed = false;
-
-        isSub = true;
-        for (int i = 0; i < children.getNumChild(); i++){
-            rewrite(newChildren.getChild(i));
-            if ( newNode != null){
-                newChildren.setChild(newNode.getSingleNode(),i);
-                changed = true;
-            }
-        }
-        if( changed ){
-            return newChildren;
-        } else {
-            return null;
-        }
-    }
-
-    
-    
-    
-    public void caseNameExpr( NameExpr node )
+    protected NameExpr makeTempAssign( Expr node )
     {
-        if( isSub ){
-            if( !isVar( node ) ){
-                subExprHandler( node );
-            }
+        return makeTempAssign( node, false );
+    }
+    protected NameExpr makeTempAssign( Expr node, boolean useCSLtmps )
+    {
+        TempFactory tmp = TempFactory.genFreshTempFactory();
+        NameExpr temp1, temp2;
+        if( useCSLtmps ){
+            temp1 = tmp.genCSLExpr();
+            temp2 = tmp.genCSLExpr();
+        } else{
+            temp1 = tmp.genNameExpr();
+            temp2 = tmp.genNameExpr();
         }
+        AssignStmt newAssign = new AssignStmt(temp1, node);
+        newAssign.setOutputSuppressed(true);
+        newAssignments.add(newAssign);
+        return temp2;
+    }
+    protected boolean isVarOrLiteral( ASTNode node ){
+        return (node instanceof LiteralExpr) || isVar(node);
+    }
+    protected boolean areAllVarsOrLiterals( List<Expr> nodes ){
+        for( ASTNode n : nodes )
+            if( !isVarOrLiteral( n ) )
+                return false;
+        return true;
+    }
+
+    protected boolean areAllVarsOrLiterals( Expr... nodes ){
+        for( ASTNode n : nodes )
+            if( !isVarOrLiteral( n ) )
+                return false;
+        return true;
+    }
+
+    protected boolean areAllVarsOrLiteralsInRows( List<Row> rows )
+    {
+        for( Row r : rows )
+            if( !areAllVarsOrLiterals( r.getElements() ) )
+                return false;
+        return true;
+    }
+
+    protected boolean areAllLiterals( Expr... nodes )
+    {
+        for( Expr n : nodes )
+            if( !isLiteral( n ) )
+                return false;
+        return true;
+    }
+
+    protected boolean areAllLiterals( List<Expr> nodes )
+    {
+        for( Expr n : nodes )
+            if( !isLiteral( n ))
+                return false;
+        return true;
+    }
+
+    protected boolean isLiteral( ASTNode node ){
+        return node instanceof LiteralExpr;
+    }
+
+    protected boolean isVar( ASTNode node )
+    {
+        if( node instanceof NameExpr )
+            return isVar((NameExpr)node);
+        else
+            return false;
     }
 
     protected boolean isVar( NameExpr nameExpr )
@@ -517,6 +303,13 @@ public class ExpressionCollector extends AbstractLocalRewrite
             return (kind!=null) && kind.isVariable();
         }
     }
+    protected boolean isFun( ASTNode node )
+    {
+        if( node instanceof NameExpr )
+            return isFun((NameExpr)node);
+        else
+            return false;
+    }
     protected boolean isFun( NameExpr nameExpr )
     {
         if( nameExpr.tmpVar )
@@ -526,7 +319,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
             if( resolvedNames == null ){
                 if (!kindAnalysis.getFlowSets().containsKey(nameExpr.getName())){
                     kindAnalysis.analyze();
-                    //TODO - not efficient, but probably better than making assumptiions!1
+                    //TODO - not efficient, but probably better than making assumptiions!
                 }
                 
                 kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).contains(nameExpr.getName().getID());
@@ -537,31 +330,192 @@ public class ExpressionCollector extends AbstractLocalRewrite
             return (kind!=null) && kind.isFunction();
         }
     }
-    public void caseExpr( Expr node )
+
+    private boolean canCSLExpand( Expr node )
     {
-        //System.out.println("^^^ ce " + isSub + " " + node + " " + node.getPrettyPrinted());
-        if( isSub )
-            subExprHandler( node );
-        else
-            rewriteChildren( node );
-    }
-    public void caseLiteralExpr( LiteralExpr node )
-    {
-        return;
-    }
-    public void caseColonExpr( ColonExpr node )
-    {
-        return;
+        if( node instanceof CellIndexExpr ){
+            return !areAllLiterals( ((CellIndexExpr)node).getArgs() );
+        } else if( node instanceof DotExpr ){
+            DotExpr dot = (DotExpr)node;
+            if( dot.getTarget() instanceof ParameterizedExpr ){
+                ParameterizedExpr paramExpr = (ParameterizedExpr) dot.getTarget();
+                return !areAllLiterals( paramExpr.getArgs() );
+            }else
+                return true;
+        }
+        return false;
     }
 
-    public void caseEndExpr( EndExpr node )
+    /**
+     * Determines if a given ParameterizedExpr can have an END bound
+     * to it.
+     */
+    public boolean canEndBind( ParameterizedExpr node )
     {
-        EndCallExpr newEnd = new EndCallExpr( new NameExpr( new Name("BLARG")), lastDims, lastIndex );
-        targetAndEndMap.get(lastTarget).add( newEnd );
-        if( !rewritingEnds )
-            caseExpr( newEnd );
-        else 
-            newNode = new TransformedNode( newEnd );
+        return !(node.getTarget() instanceof NameExpr) || !isFun((NameExpr)node.getTarget() );
     }
+
+    /**
+     * Removes the args from all parameterized expressions in node and
+     * replaces them with temps. Add appropriate assignment statements
+     * to newAssignments.
+     */
+    private void removeArgs( ASTNode node )
+    {
+        ArgRemover argRemover = new ArgRemover( node );
+        ASTNode cleanedNode = argRemover.transform();
+        if( cleanedNode != null )
+            newNode = new TransformedNode( cleanedNode );
+    }
+
+    private void replaceEnds( ASTNode node )
+    {
+        targetAndEndMap = new HashMap<Expr, HashSet<EndCallExpr>>();
+        EndReplacer endReplacer = new EndReplacer( node );
+        ASTNode cleanedNode = endReplacer.transform();
+        if( cleanedNode != null )
+            newNode = new TransformedNode( cleanedNode );
+    }
+
+    private void fixEnds( ASTNode node )
+    {
+        for( Expr t : targetAndEndMap.keySet() ){
+            for( EndCallExpr e : targetAndEndMap.get(t) ){
+                Expr tCopy = (Expr)t.copy();
+                kindAnalysis.getFlowSets().put(tCopy, kindAnalysis.getFlowSets().get(t) );
+                e.setArray( tCopy );
+            }
+        }
+    }
+    /**
+     * A rewrite that replaces all end expressions with end call
+     * expressions with the correct index bindings. It also associates
+     * the end call expression with the expression it binds to. It
+     * records this association in the targetAndEndMap. 
+     *
+     * This transformation does not extract the ends, which should be
+     * done by the ArgRemover. This transformation also leaves the end
+     * call expressions in an incorrect state, namely, they are not
+     * bound correctly. 
+     */
+    private class EndReplacer extends AbstractLocalRewrite
+    {
+        private Expr target = null;
+        private int totalIndices;
+        private int currentIndex;
+        public EndReplacer(ASTNode tree)
+        {
+            super( tree );
+        }
         
+        @Override
+        public void caseParameterizedExpr( ParameterizedExpr node )
+        {
+            if( target == null ){
+                if( canEndBind( node ) )
+                    replaceEndsInArgs( node.getArgs(), node );
+            } else{
+                if( !canEndBind( node ) ){
+                    rewrite( node.getArgs() );
+                    System.out.println("JESSE130 " + node.getPrettyPrinted());
+                }
+            }
+            rewrite( node.getTarget() );
+        }
+
+        @Override
+        public void caseCellIndexExpr( CellIndexExpr node )
+        {
+            if( target == null )
+                replaceEndsInArgs( node.getArgs(), node );
+            rewrite( node.getTarget() );
+        }
+
+        @Override
+        public void caseEndExpr( EndExpr node )
+        {
+            EndCallExpr endCallExpr = new EndCallExpr( new NameExpr( new Name("THISSHOULDNOTBESEENINOUTPUT_LOVE_JESSE")),
+                                                       totalIndices, 
+                                                       currentIndex );
+            addToMap( endCallExpr );
+            newNode = new TransformedNode(endCallExpr);
+            System.out.println("JESSE106 "+totalIndices+" "+currentIndex+" "+target.getPrettyPrinted());
+        }
+
+        private void addToMap( EndCallExpr endCall )
+        {
+            if( targetAndEndMap.containsKey( target ) ){
+                HashSet<EndCallExpr> set = targetAndEndMap.get(target);
+                if( set == null ){
+                    set = new HashSet<EndCallExpr>();
+                    targetAndEndMap.put(target, set);
+                }
+                set.add( endCall );
+            }else{
+                HashSet<EndCallExpr> set = new HashSet<EndCallExpr>();
+                set.add( endCall );
+                targetAndEndMap.put(target,set);
+            }
+        }
+        /**
+         * Deep replaces all the end expressions in a list of
+         * expressions, binding them to the given target. It is
+         * intended for the arguments of a parameterized or cell
+         * indexing expression. It also keeps track of current index,
+         * and total indices.
+         *
+         * Post Condition: target = null;
+         */
+        private void replaceEndsInArgs( List<Expr> nodes, Expr target )
+        {
+            this.target = target;
+            totalIndices = nodes.getNumChild();
+            for( int i = 0; i<totalIndices; i++ ){
+                currentIndex = i+1;
+                rewrite( nodes.getChild(i) );
+                if( newNode != null )
+                    nodes.setChild((Expr)newNode.getSingleNode(),i);
+            }
+            this.target = null;
+        }
+    }
+    private class ArgRemover extends AbstractLocalRewrite
+    {
+        public ArgRemover(ASTNode tree)
+        {
+            super( tree );
+        }
+        
+        @Override
+        public void caseParameterizedExpr( ParameterizedExpr node )
+        {
+            rewrite(node.getTarget());
+            if( rewriteArgList( node.getArgs() ))
+                newNode = new TransformedNode( node );
+        }
+
+        @Override
+        public void caseCellIndexExpr( CellIndexExpr node )
+        {
+            rewrite(node.getTarget());
+            if( rewriteArgList( node.getArgs() )){
+                newNode = new TransformedNode( node );
+            }
+        }
+
+        public boolean rewriteArgList( List<Expr> args )
+        {
+            boolean change = false;
+            if( !areAllVarsOrLiterals( args ) ){
+                for(int i=0; i<args.getNumChild(); i++){
+                    Expr arg = args.getChild(i);
+                    if( !isLiteral(arg) ){
+                        change = true;
+                        args.setChild( makeTempAssign(arg, canCSLExpand(arg)), i);
+                    }
+                }
+            }
+            return change;
+        }
+    }
 }

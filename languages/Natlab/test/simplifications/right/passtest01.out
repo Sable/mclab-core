@@ -8,5 +8,5 @@ function x = test(a,b)
     else
         t1 = true;
     end
+    t1;
 end
-

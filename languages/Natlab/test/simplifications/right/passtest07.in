@@ -1,0 +1,7 @@
+function  [x] = drv_aatest(n)
+  while (n == n)
+    for l = (1 : (-1) : 1)
+    end
+  end
+end
+

@@ -98,6 +98,10 @@ public class ASTHelpers
         return newAssign;
     }
 
+    public static AssignStmt buildMultiAssign( Expr rhs, boolean outputSuppressed, Expr... lvalues )
+    {
+        return buildMultiAssign(Arrays.asList(lvalues), rhs, outputSuppressed);
+    }
 
     /**
      * Tests if a given expression is a scalar short-circuit
