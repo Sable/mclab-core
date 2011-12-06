@@ -48,9 +48,9 @@ public class ExpressionCollector extends AbstractLocalRewrite
     private VFFlowset resolvedNames;
     private VFPreorderAnalysis kindAnalysis;
     protected boolean isLHS = false;
-    protected boolean rewritingEnds = false;
-    protected Expr lastTarget = null;
-    protected int lastIndex, lastDims;
+    //protected boolean rewritingEnds = false;
+    //protected Expr lastTarget = null;
+    //protected int lastIndex, lastDims;
 
     protected HashMap< Expr, HashSet<EndCallExpr>> targetAndEndMap;
     
@@ -414,7 +414,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
         {
             if( target == null ){
                 if( canEndBind( node ) )
-                    replaceEndsInArgs( node.getArgs(), node );
+                    replaceEndsInArgs( node.getArgs(), node.getTarget() );
             } else{
                 if( !canEndBind( node ) ){
                     rewrite( node.getArgs() );
@@ -428,7 +428,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
         public void caseCellIndexExpr( CellIndexExpr node )
         {
             if( target == null )
-                replaceEndsInArgs( node.getArgs(), node );
+                replaceEndsInArgs( node.getArgs(), node.getTarget() );
             rewrite( node.getTarget() );
         }
 
@@ -480,6 +480,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
             this.target = null;
         }
     }
+
     private class ArgRemover extends AbstractLocalRewrite
     {
         public ArgRemover(ASTNode tree)
