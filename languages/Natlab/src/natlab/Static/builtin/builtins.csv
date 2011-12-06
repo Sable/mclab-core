@@ -861,9 +861,9 @@ textscan
 
 
 posixIoFunction; ioFunction
-sprintf
+sprintf;;Class(char&star(any)>char)
 sscanf
-fprintf;;Class(opt(double),char,star(any) > double)
+fprintf;;Class(opt(double)&char&star(any) > double)
 ftell
 ferror
 fopen
