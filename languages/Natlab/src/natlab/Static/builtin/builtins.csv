@@ -419,6 +419,7 @@ qr
 # bit functions - usually operates on ints or logicals, some exceptions
 bitFunction; matrixFunction
 properBitFunction; bitFunction
+-Class(uint&(double|0)>0, (double|1)&uint>1, logical&logical>logical, (double|logical)&(double|logical)>double)
 bitand
 bitor
 bitxor

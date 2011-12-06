@@ -2919,12 +2919,26 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractProperBitFunction extends AbstractBitFunction  {
+    public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements ClassPropagationDefined {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractProperBitFunction(this,arg);
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double")))));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double")))));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class Bitand extends AbstractProperBitFunction  {
         //returns the singleton instance of this class
