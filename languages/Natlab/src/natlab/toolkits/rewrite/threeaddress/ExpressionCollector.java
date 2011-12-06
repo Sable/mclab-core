@@ -164,15 +164,15 @@ public class ExpressionCollector extends AbstractLocalRewrite
             return;
         }else{
             boolean changed = false;
-            if( !(node.getLower() instanceof LiteralExpr) ){
+            if( !(isLiteral(node.getLower()))){
                 changed = true;
                 node.setLower( makeTempAssign( node.getLower() ));
             }
-            if( node.hasIncr() && !(node.getIncr() instanceof LiteralExpr) ){
+            if( node.hasIncr() && !(isLiteral(node.getIncr())) ){
                 changed = true;
                 node.setIncr( makeTempAssign( node.getIncr() ));
             }
-            if( !(node.getUpper() instanceof LiteralExpr) ){
+            if( !(isLiteral(node.getUpper())) ){
                 changed = true;
                 node.setUpper( makeTempAssign( node.getUpper() ));
             }
@@ -233,7 +233,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
         return temp2;
     }
     protected boolean isVarOrLiteral( ASTNode node ){
-        return (node instanceof LiteralExpr) || isVar(node);
+        return (isLiteral(node)) || isVar(node);
     }
     protected boolean areAllVarsOrLiterals( List<Expr> nodes ){
         for( ASTNode n : nodes )
@@ -274,7 +274,8 @@ public class ExpressionCollector extends AbstractLocalRewrite
     }
 
     protected boolean isLiteral( ASTNode node ){
-        return node instanceof LiteralExpr;
+        //TODO - does this make sense? - this expands colons, so we make colon expr's literals as well
+        return node instanceof LiteralExpr || node instanceof ColonExpr;
     }
 
     protected boolean isVar( ASTNode node )
