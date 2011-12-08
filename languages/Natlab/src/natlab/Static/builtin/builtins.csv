@@ -615,8 +615,9 @@ class
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
--Class(any&opt(numeric|logical)>double)
-size
+-Class(any>double)
+# TODO fix this output?!
+size;;Class(any&opt(numeric|logical)>double&double&double&double&double&double)
 
 
 # scalar numerical 

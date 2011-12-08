@@ -433,7 +433,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseClass(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
     
     //return numericals
-    public Ret caseAbstractDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }
+    public Ret caseAbstractDoubleResultVersatileQuery(Builtin builtin,Arg arg){ return caseAbstractVersatileQuery(builtin,arg); }    
+    //TODO fix this output?!
     public Ret caseSize(Builtin builtin,Arg arg){ return caseAbstractDoubleResultVersatileQuery(builtin,arg); }
     
     //scalar numerical
