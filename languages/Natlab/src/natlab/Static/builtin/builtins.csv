@@ -390,7 +390,7 @@ matrixLibaryFunction; improperFloatFunction
 eig
 norm
 # query?
-rank
+rank;;Class(float&matrix>double)
 
 # optional 2 args
 cond

@@ -2718,7 +2718,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Rank extends AbstractMatrixLibaryFunction  {
+    public static class Rank extends AbstractMatrixLibaryFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Rank singleton = null;
         public static Rank getInstance(){
@@ -2734,6 +2734,20 @@ public abstract class Builtin {
             return "rank";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double"));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double"));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class Cond extends AbstractMatrixLibaryFunction  {
         //returns the singleton instance of this class
