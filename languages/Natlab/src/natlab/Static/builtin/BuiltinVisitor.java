@@ -562,7 +562,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseEcho(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }    
     //should this be here? - this could be a proper lib function?
     public Ret caseDiary(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }    
-    //something logging related
+    //TODO review this:
     public Ret caseMessage(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
     public Ret caseLastwarn(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
     public Ret caseLasterror(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
