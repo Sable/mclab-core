@@ -6034,7 +6034,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Error extends AbstractReportFunction  {
+    public static class Error extends AbstractReportFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Error singleton = null;
         public static Error getInstance(){
@@ -6050,6 +6050,20 @@ public abstract class Builtin {
             return "error";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCNone()));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCNone()));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class Warning extends AbstractReportFunction  {
         //returns the singleton instance of this class

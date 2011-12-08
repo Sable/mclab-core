@@ -822,7 +822,7 @@ reportFunction; impureFunction
 disp;; Class(any>none)
 display
 clc
-error
+error;;Class(opt(char)&opt(char)&opt(star(any)))
 warning
 echo
 # should this be here? - this could be a proper lib function?
