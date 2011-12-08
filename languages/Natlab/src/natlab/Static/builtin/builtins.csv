@@ -551,6 +551,8 @@ uint64 ;;Class(any>uint64)
 # ***************************************************************************************
 # function operates on cell arrays
 cellFunction; pureFunction
+cellhorzcat
+cellvertcat
 
 # ***************************************************************************************
 # function operates on structures

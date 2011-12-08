@@ -379,9 +379,12 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseUint8(Builtin builtin,Arg arg){ return caseAbstractMatrixConstructor(builtin,arg); }
     public Ret caseUint16(Builtin builtin,Arg arg){ return caseAbstractMatrixConstructor(builtin,arg); }
     public Ret caseUint32(Builtin builtin,Arg arg){ return caseAbstractMatrixConstructor(builtin,arg); }
-    public Ret caseUint64(Builtin builtin,Arg arg){ return caseAbstractMatrixConstructor(builtin,arg); }    
+    public Ret caseUint64(Builtin builtin,Arg arg){ return caseAbstractMatrixConstructor(builtin,arg); }
+    
     //function operates on cell arrays
-    public Ret caseCellFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
+    public Ret caseAbstractCellFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
+    public Ret caseCellhorzcat(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
+    public Ret caseCellvertcat(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
     
     //function operates on structures
     public Ret caseAbstractStructFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }

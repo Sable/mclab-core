@@ -222,7 +222,8 @@ public abstract class Builtin {
         builtinMap.put("uint16",Uint16.getInstance());
         builtinMap.put("uint32",Uint32.getInstance());
         builtinMap.put("uint64",Uint64.getInstance());
-        builtinMap.put("cellFunction",CellFunction.getInstance());
+        builtinMap.put("cellhorzcat",Cellhorzcat.getInstance());
+        builtinMap.put("cellvertcat",Cellvertcat.getInstance());
         builtinMap.put("isfield",Isfield.getInstance());
         builtinMap.put("objectFunction",ObjectFunction.getInstance());
         builtinMap.put("sort",Sort.getInstance());
@@ -4138,20 +4139,44 @@ public abstract class Builtin {
         }
 
     }
-    public static class CellFunction extends AbstractPureFunction  {
+    public static abstract class AbstractCellFunction extends AbstractPureFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractCellFunction(this,arg);
+        }
+        
+    }
+    public static class Cellhorzcat extends AbstractCellFunction  {
         //returns the singleton instance of this class
-        private static CellFunction singleton = null;
-        public static CellFunction getInstance(){
-            if (singleton == null) singleton = new CellFunction();
+        private static Cellhorzcat singleton = null;
+        public static Cellhorzcat getInstance(){
+            if (singleton == null) singleton = new Cellhorzcat();
             return singleton;
         }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseCellFunction(this,arg);
+            return visitor.caseCellhorzcat(this,arg);
         }
         //return name of builtin
         public String getName(){
-            return "cellFunction";
+            return "cellhorzcat";
+        }
+        
+    }
+    public static class Cellvertcat extends AbstractCellFunction  {
+        //returns the singleton instance of this class
+        private static Cellvertcat singleton = null;
+        public static Cellvertcat getInstance(){
+            if (singleton == null) singleton = new Cellvertcat();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCellvertcat(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cellvertcat";
         }
         
     }
