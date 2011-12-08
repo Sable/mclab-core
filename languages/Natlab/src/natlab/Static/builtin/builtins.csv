@@ -826,7 +826,7 @@ disp;; Class(any>none)
 display
 clc
 error;;Class(opt(char)&opt(char)&opt(star(any)))
-warning
+warning;;Class(any&star(opt(any))>char)
 echo
 # should this be here? - this could be a proper lib function?
 diary
