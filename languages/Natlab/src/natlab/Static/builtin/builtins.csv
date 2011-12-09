@@ -74,6 +74,7 @@
 # - create categories relating to complex vs real
 # - conversion vs query, what's the same, what's different?? define properly
 # - investigate whether query, constructor etc. functions need the proper/improper categories
+# - create a way of just returning the dominant arg, where a list of dominant args is given
 
 
 root; builtin
@@ -896,6 +897,7 @@ imwrite;;Class(numeric,opt(numeric),char,star(matrix))
 sparse;;Class((double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)>0)
 realmax;;Class(typeString(float)|none>double)
 histc;;Class(numeric&numeric&opt(numeric)>double&double)
+blkdiag;;Class(star(numeric)>double)
 
 # at least variance should be a builtin, std = sqrt(var)
 var;;Class(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))

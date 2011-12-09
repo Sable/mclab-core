@@ -3,7 +3,7 @@ package natlab.Static.builtin;
 public abstract class BuiltinVisitor<Arg,Ret> {
    public abstract Ret caseBuiltin(Builtin builtin,Arg arg);
     
-    //- investigate whether query, constructor etc. functions need the proper/improper categories
+    //- create a way of just returning the dominant arg, where a list of dominant args is given
     public Ret caseAbstractRoot(Builtin builtin,Arg arg){ return caseBuiltin(builtin,arg); }
     
     //pure functions have no side effects and always return the same value, depending only on arguments
@@ -616,7 +616,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseImwrite(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseSparse(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseRealmax(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
-    public Ret caseHistc(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }    
+    public Ret caseHistc(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public Ret caseBlkdiag(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }    
     //at least variance should be a builtin, std = sqrt(var)
     public Ret caseVar(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseStd(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
