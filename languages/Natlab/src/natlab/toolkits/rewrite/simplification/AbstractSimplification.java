@@ -58,12 +58,13 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
                 return true;
             else{
                 Name name = nameExpr.getName();
-                if (kindAnalysis.getFlowSets().containsKey(name)){
+                if (!kindAnalysis.getFlowSets().containsKey(name)){
                     /*if we don't find the node in the kindAnalasys, re-analyze
                       TODO -- is this correct?
                       this was added because a simplification added calls to 'false'
                       which couldn't be found in the flow sets
                     */
+                    //System.err.println("abstract simplification attempted to access kind of uknown name expr "+expr.getPrettyPrinted());
                     kindAnalysis.analyze();
                 }
                 VFDatum kind = kindAnalysis.getFlowSets().get(name).contains(nameExpr.getName().getID());

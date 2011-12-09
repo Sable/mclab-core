@@ -126,9 +126,10 @@ public class Simplifier
     {
         ASTNode currentTree = tree;
         for( AbstractSimplification simp : simplifications ){
-            if (DEBUG) System.out.println( simp ); 
+            if (DEBUG) System.out.println( simp +":"); 
             simp.setTree( currentTree );
             currentTree = simp.transform();
+            if (DEBUG) System.out.println(currentTree.getPrettyPrinted());
         }
         return currentTree;
     }
