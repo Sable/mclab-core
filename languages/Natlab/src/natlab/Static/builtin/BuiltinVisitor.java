@@ -383,12 +383,16 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     
     //function operates on cell arrays
     public Ret caseAbstractCellFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
-    public Ret caseCellhorzcat(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
-    public Ret caseCellvertcat(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
+    public Ret caseCell(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
+
+    public Ret caseAbstractCellCat(Builtin builtin,Arg arg){ return caseAbstractCellFunction(builtin,arg); }
+    public Ret caseCellhorzcat(Builtin builtin,Arg arg){ return caseAbstractCellCat(builtin,arg); }
+    public Ret caseCellvertcat(Builtin builtin,Arg arg){ return caseAbstractCellCat(builtin,arg); }
     
     //function operates on structures
     public Ret caseAbstractStructFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
-    public Ret caseIsfield(Builtin builtin,Arg arg){ return caseAbstractStructFunction(builtin,arg); }    
+    public Ret caseIsfield(Builtin builtin,Arg arg){ return caseAbstractStructFunction(builtin,arg); }
+    public Ret caseStruct(Builtin builtin,Arg arg){ return caseAbstractStructFunction(builtin,arg); }    
     //function operates on objects
     public Ret caseObjectFunction(Builtin builtin,Arg arg){ return caseAbstractPureFunction(builtin,arg); }
     

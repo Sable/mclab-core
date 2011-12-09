@@ -551,13 +551,18 @@ uint64 ;;Class(any>uint64)
 # ***************************************************************************************
 # function operates on cell arrays
 cellFunction; pureFunction
+cell
+
+cellCat; cellFunction
 cellhorzcat
 cellvertcat
+
 
 # ***************************************************************************************
 # function operates on structures
 structFunction; pureFunction
 isfield
+struct
 
 # ***************************************************************************************
 # function operates on objects
@@ -732,9 +737,6 @@ cellfun
 
 
 
-# compoundConstructor; constructor
-# cell
-# struct
 
 
 # conversionFunction; constructor

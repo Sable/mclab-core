@@ -222,9 +222,11 @@ public abstract class Builtin {
         builtinMap.put("uint16",Uint16.getInstance());
         builtinMap.put("uint32",Uint32.getInstance());
         builtinMap.put("uint64",Uint64.getInstance());
+        builtinMap.put("cell",Cell.getInstance());
         builtinMap.put("cellhorzcat",Cellhorzcat.getInstance());
         builtinMap.put("cellvertcat",Cellvertcat.getInstance());
         builtinMap.put("isfield",Isfield.getInstance());
+        builtinMap.put("struct",Struct.getInstance());
         builtinMap.put("objectFunction",ObjectFunction.getInstance());
         builtinMap.put("sort",Sort.getInstance());
         builtinMap.put("unique",Unique.getInstance());
@@ -4146,7 +4148,31 @@ public abstract class Builtin {
         }
         
     }
-    public static class Cellhorzcat extends AbstractCellFunction  {
+    public static class Cell extends AbstractCellFunction  {
+        //returns the singleton instance of this class
+        private static Cell singleton = null;
+        public static Cell getInstance(){
+            if (singleton == null) singleton = new Cell();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCell(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "cell";
+        }
+        
+    }
+    public static abstract class AbstractCellCat extends AbstractCellFunction  {
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractCellCat(this,arg);
+        }
+        
+    }
+    public static class Cellhorzcat extends AbstractCellCat  {
         //returns the singleton instance of this class
         private static Cellhorzcat singleton = null;
         public static Cellhorzcat getInstance(){
@@ -4163,7 +4189,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Cellvertcat extends AbstractCellFunction  {
+    public static class Cellvertcat extends AbstractCellCat  {
         //returns the singleton instance of this class
         private static Cellvertcat singleton = null;
         public static Cellvertcat getInstance(){
@@ -4201,6 +4227,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "isfield";
+        }
+        
+    }
+    public static class Struct extends AbstractStructFunction  {
+        //returns the singleton instance of this class
+        private static Struct singleton = null;
+        public static Struct getInstance(){
+            if (singleton == null) singleton = new Struct();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStruct(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "struct";
         }
         
     }
