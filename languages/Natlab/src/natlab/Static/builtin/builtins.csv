@@ -898,6 +898,7 @@ sparse;;Class((double|char|logical)&opt(double|char|logical)&opt(double|char|log
 realmax;;Class(typeString(float)|none>double)
 histc;;Class(numeric&numeric&opt(numeric)>double&double)
 blkdiag;;Class(star(numeric)>double)
+toeplitz;;Class((single)&opt(single|double)>0,(single|double)>0,double&(single|double)>1)
 
 # at least variance should be a builtin, std = sqrt(var)
 var;;Class(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))
