@@ -893,7 +893,7 @@ notABuiltin; root
 #flipud
 #linspace
 imwrite;;Class(numeric,opt(numeric),char,star(matrix))
-sparse
+sparse;;Class((double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)&(double|char|logical)>0)
 realmax;;Class(typeString(float)|none>double)
 histc;;Class(numeric&numeric&opt(numeric)>double&double)
 
