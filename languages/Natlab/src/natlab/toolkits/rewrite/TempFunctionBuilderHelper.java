@@ -28,7 +28,7 @@ public class TempFunctionBuilderHelper {
         //find fresh name by 
         int i = 1;
         while (true){
-            String name = startsWith+i;
+            String name = startsWith+(i++);
             if (       !usedNames.contains(name)
                     && !avoidNames.contains(name)
                     && !query.isFunctionOrScript(name) 
@@ -37,8 +37,5 @@ public class TempFunctionBuilderHelper {
                 
             }
         }
-        
     }
-    
-    
 }

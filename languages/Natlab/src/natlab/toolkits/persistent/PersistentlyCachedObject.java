@@ -57,7 +57,7 @@ public abstract class PersistentlyCachedObject implements Serializable {
         try {
             String[] keys = prefs.keys();
             for (String k : keys){
-                System.out.println(k);
+                //System.out.println(k);
                 if (!(new File(prefs.get(k, "")).exists())){
                     prefs.remove(k);
                 }
@@ -103,7 +103,7 @@ public abstract class PersistentlyCachedObject implements Serializable {
         final PersistentlyCachedObject aThis = this;
         Runtime.getRuntime().addShutdownHook(new Thread(){
             public void run() {
-                System.err.println("on persistently cached object exit, write "+tempFile);
+                //System.err.println("on persistently cached object exit, write "+tempFile);
                 onExit();
                 if (storeOnExit){
                     if (changed){
@@ -113,13 +113,13 @@ public abstract class PersistentlyCachedObject implements Serializable {
                             oStream.writeObject(aThis);
                             fStream.close();
                             prefs.put(key, tempFile.getAbsolutePath());
-                            System.err.println("write succesful");
+                            //System.err.println("write succesful");
                         } catch (IOException e) {
                             prefs.remove(key);
-                            System.err.println("write error "+e);
+                            //System.err.println("write error "+e);
                         }
                     } else {
-                        System.err.println("object unchagend");
+                        //System.err.println("object unchagend");
                     }
                 } else {
                     prefs.remove(key);
@@ -201,8 +201,8 @@ public abstract class PersistentlyCachedObject implements Serializable {
             return object;
         } catch (Exception e) {
             //something bad happened - unregister key and delete temporary file
-            System.err.println("read exception "+e);
-            e.printStackTrace();
+            //System.err.println("read exception "+e);
+            //e.printStackTrace();
             removeTmp = true;
             prefs.remove(key);
         } finally {

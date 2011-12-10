@@ -169,11 +169,12 @@ public class DirectoryCache extends PersistentlyCachedObject{
         //go through and remove any 'old' directories, 
         //but only when changed is true
         if (getChanged()){
-            for (GenericFile k : directories.keySet()){
-                CachedDirectory d = directories.get(k);
+            Iterator<GenericFile> i = directories.keySet().iterator();
+            while(i.hasNext()){
+                CachedDirectory d = directories.get(i.next());
                 //remove all old dirs - but don't force resaving due to expiration
                 if (d.getLastTouchedTime() + DIRECTORY_EXPIRATION_TIME_MS < t){
-                    cache.directories.remove(k);
+                    i.remove(); 
                 }
             }
         }

@@ -149,7 +149,7 @@ public abstract class GenericFile implements Serializable {
         return new FileFile(filename); //TODO
     }
     public static GenericFile create(File file){
-        return null;
+        return new FileFile(file);
     }
     public static GenericFile create(URL url){
         return null;

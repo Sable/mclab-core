@@ -73,6 +73,21 @@ public class FilePathEnvironment extends AbstractPathEnvironment {
 	}
 
 	/**
+     * creates file path environment from just a file
+     * pwd is assumed to be the directory where the first file is.
+     * 
+     */
+    public FilePathEnvironment(GenericFile file,BuiltinQuery builtin){
+        super(builtin);
+        this.options = new Options();
+        main = file;
+        pwd = main.getParent();
+        natlabPath = MatlabPath.getNatlabPath();
+        matlabPath = MatlabPath.getMatlabPath();
+    }
+
+	
+	/**
 	 * returns true if the given matlab function name matches the provided file
 	 * (i.e. if the function name and .m file have the same name)
 	 * TODO: should this be case sensitive?

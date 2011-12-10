@@ -41,13 +41,15 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     private boolean endExpr=false;
     private ASTNode outerParameterizedExpr=null;
     private boolean boundEndExprToID=false;
+    
+    
+    
     /**
      * initializes the VFPreorderAnalysis using LookupFile.getFunctionOrScriptQueryObject().
      * This is deprecated, because using this lookupFile should be made explicit.
      * With this function, an environment is assumed that may not be intended by the user.
      * @param tree
      */
-    
     public VFPreorderAnalysis( ASTNode tree )
     {
         this(tree,LookupFile.getFunctionOrScriptQueryObject());
@@ -107,7 +109,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         inFunction=true;
         currentFunction=node;
         currentSet = newInitialFlow();
-        if (node.getParent().getParent() instanceof Function){
+        if (node.getParent() != null && node.getParent().getParent() != null && node.getParent().getParent() instanceof Function){
             for( ValueDatumPair<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).toList() ){
                 if( pair.getDatum()==VFDatum.VAR  || pair.getDatum()==VFDatum.BOT)
                     currentSet.add( pair.copy() );
@@ -364,4 +366,12 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 	public VFDatum getResult(Name n) {
 		return flowSets.get(n).contains(n.getID());
 	}
+    
+    
+    /**
+     * returns the function/script query object used internally
+     */
+    public FunctionOrScriptQuery getQuery(){
+        return lookupQuery;
+    }
 }
