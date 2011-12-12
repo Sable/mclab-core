@@ -2706,7 +2706,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Norm extends AbstractMatrixLibaryFunction  {
+    public static class Norm extends AbstractMatrixLibaryFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class
         private static Norm singleton = null;
         public static Norm getInstance(){
@@ -2722,6 +2722,20 @@ public abstract class Builtin {
             return "norm";
         }
         
+        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+        public ClassPropTools.MC getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
+                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+            }
+            return classPropInfo;
+        }
+
     }
     public static class Rank extends AbstractMatrixLibaryFunction implements ClassPropagationDefined {
         //returns the singleton instance of this class

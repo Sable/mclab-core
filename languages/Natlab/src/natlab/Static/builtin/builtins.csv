@@ -389,7 +389,7 @@ mean;;Class(coerce(int|char|logical>double,parent))
 # standard matrix math functions with optional arguments
 matrixLibaryFunction; improperFloatFunction
 eig
-norm
+norm;;Class(float&opt(float|logical|char)>0)
 # query?
 rank;;Class(float&opt(matrix)>double)
 
