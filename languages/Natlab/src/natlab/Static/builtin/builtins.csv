@@ -412,7 +412,7 @@ ordschur
 lu
 chol
 svd
-qr
+qr;;Class(float&opt(float|logical)>0&0&0)
 
 
 
