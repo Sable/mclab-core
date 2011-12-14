@@ -373,6 +373,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
                 System.out.println(" whilestmt: previousOut and newOut: ");
                 System.out.println(previousOut);
                 System.out.println(newOut);
+                System.err.println(" whilestmt: previousOut and newOut: ");
             }
         }while( !previousOut.equals( newOut ) );
 
