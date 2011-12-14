@@ -370,8 +370,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
     
     function /{Filler} { startFunction(); blockStack.push(BlockType.FUNCTION); yybegin(YYINITIAL); }
     
-    ( case
-    | for
+    ( for
     | if
     | parfor
     | switch
@@ -505,8 +504,7 @@ KeywordPrefix= {StmtTerminator} {Filler}*
     
     {KeywordPrefix} function /{Filler}  { startFunction(); blockStack.push(BlockType.FUNCTION); }
     
-    {KeywordPrefix} ( case
-                    | for
+    {KeywordPrefix} ( for
                     | if
                     | parfor
                     | switch
