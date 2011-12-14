@@ -50,6 +50,7 @@ public class ClassPropTools {
 
     public static LinkedList<HashSet<ClassReference>> match(MC tree,
             List<ClassReference> argClasses,List<? extends Value<?>> argValues){
+        if (DEBUG) System.out.println("match "+tree+" with "+argValues);
         MatchResult match = tree.match(true, new MatchResult(), argClasses, argValues);
         //System.out.println(match.getAllResults());
         if (match == null || match.isError || match.numMatched != argClasses.size()) return null;
@@ -142,12 +143,16 @@ public class ClassPropTools {
             //check if matchresult is error
             if (isError) return null;
             LinkedList<HashSet<ClassReference>> results = new LinkedList<HashSet<ClassReference>>();
-            Deque<MatchResult> deque = new LinkedList<MatchResult>();
-            deque.add(this);
+            PriorityQueue<MatchResult> pq = new PriorityQueue<MatchResult>(10,new Comparator<MatchResult>() {
+                public int compare(MatchResult o1, MatchResult o2) {
+                    return o2.numEmittedResults - o1.numEmittedResults;
+                }
+            });
+            pq.add(this);
             int currentIndex = numEmittedResults;
             HashSet<ClassReference> currentSet = new HashSet<ClassReference>();
-            while(deque.size() > 0){
-                MatchResult current = deque.removeFirst();
+            while(pq.size() > 0){
+                MatchResult current = pq.poll();
                 //start a new set
                 if (currentIndex != current.numEmittedResults){
                     results.addFirst(currentSet);
@@ -156,15 +161,15 @@ public class ClassPropTools {
                 }
                 //put info from this in set and deque
                 if (current.emittedClass != null) currentSet.add(current.emittedClass);
-                if (current.p1 != null) deque.addLast(current.p1);
-                if (current.p2 != null) deque.addLast(current.p2);
+                if (current.p1 != null) pq.offer(current.p1);
+                if (current.p2 != null) pq.offer(current.p2);
             }
             return results;
         }
         
         @Override
         public String toString() {
-            return "machresult-"+numMatched+"-"+getAllResults().toString();
+            return "machresult-"+numMatched+"-"+getAllResults();
         }
     }
         
@@ -195,8 +200,11 @@ public class ClassPropTools {
     public static class MCBuiltin extends MC{
         ClassReference classRef;
         public MCBuiltin(String name){
-            //TODO - check in more than just primitive classes?
-            this.classRef = PrimitiveClassReference.valueOf(name.toUpperCase());
+            if (name.equalsIgnoreCase("function_handle")){//TODO - remove this(?!)
+                this.classRef = FunctionHandleClassReference.getInstance();
+            } else {
+                this.classRef = PrimitiveClassReference.valueOf(name.toUpperCase());
+            }
         }
         public String toString() {return classRef.getName();}
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
@@ -282,11 +290,12 @@ public class ClassPropTools {
         public String toString() { return num+""; }
         public MatchResult match(boolean isLeft,MatchResult previousMatchResult,
                 List<ClassReference> inputClasses, List<? extends Value<?>> inputValues){
-            int index = num<0?(inputClasses.size()+num):num; //negative index?
+            int index = num<0?(inputClasses.size()+num):num; //deal with negative index
             if (isLeft){ //isleft
                 if (index < inputClasses.size() && index >= 0 &&
-                    inputClasses.get(previousMatchResult.numEmittedResults).
-                        equals(inputClasses.get(num))) return previousMatchResult.next();
+                    previousMatchResult.numMatched < inputClasses.size() &&
+                    inputClasses.get(previousMatchResult.numMatched).
+                        equals(inputClasses.get(index))) return previousMatchResult.next();
                 return null;
             } else { //isright
                 //TODO should catch the index out of bounds exception?
@@ -349,17 +358,19 @@ public class ClassPropTools {
             if (inputValues == null || inputValues.get(i) == null) return previousMatchResult;
             //find if the value is scalar nor not 
             Value<?> value = inputValues.get(i);
+            //check if scalar constant
             if (value instanceof MatrixValue<?>){
                 MatrixValue<?> matrix = (MatrixValue<?>)value;
                 if (matrix.isConstant()){
                     return matrix.getConstant().isScalar()?previousMatchResult:null;
                 }
             }
+            //check if scalar
             if (value.hasShape() && !value.getShape().maybeScalar()){
                 return null;
-            }   
-            //we couldn't find anyting out
-            return previousMatchResult;        
+            }
+            //match!
+            return previousMatchResult;
         }
     }    
     //error - emits an error result - any MatchResult that includes an error object will result in an error overall
@@ -404,7 +415,6 @@ public class ClassPropTools {
             //try to match every arg, replacing if necessary
             ArrayList<ClassReference> newInputClasses = 
                 new ArrayList<ClassReference>(inputClasses);
-            System.out.println(newInputClasses);
             for(int i = 0; i < inputClasses.size(); i++){
                 //do match for arg i
                 MatchResult match = 
@@ -419,7 +429,6 @@ public class ClassPropTools {
                     //override argument class with the singleton match result
                     newInputClasses.set(i, match.emittedClass);                    
                 }
-                System.out.println(newInputClasses);
             }
             return tree.match(isLeft, previousMatchResult, newInputClasses, inputValues);
         }
@@ -569,9 +578,7 @@ public class ClassPropTools {
         printMatch(f4,PrimitiveClassReference.CHAR,PrimitiveClassReference.INT16);
         printMatch(f4,PrimitiveClassReference.INT16,PrimitiveClassReference.CHAR);
         
-        
-        System.out.println("(coerce([logical,char],double,double>double): "+Builtin.Tril.getInstance().getMatlabClassPropagationInfo());
-        
+                
         MC f5 = new MCTypeString(new MCUnion(new MCBuiltin("double"),new MCBuiltin("logical")));
         System.out.println();
         System.out.println(f5);
@@ -586,6 +593,40 @@ public class ClassPropTools {
         System.out.println(f6);
         printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("aaaa"));
         printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("a"));
+        
+        MC f7 = new MCMap(new MCBuiltin("logical"),new MCError());
+        System.out.println();
+        System.out.println(f7);
+        printMatch(f7,PrimitiveClassReference.LOGICAL);
+        printMatch(f7,PrimitiveClassReference.DOUBLE);
+        
+        
+        System.out.println();
+        System.out.println("more tests:");
+        System.out.println(Builtin.Colon.getInstance().getMatlabClassPropagationInfo());
+        printMatch(Builtin.Colon.getInstance().getMatlabClassPropagationInfo(),
+                PrimitiveClassReference.SINGLE,PrimitiveClassReference.DOUBLE);
+        
+        System.out.println();
+        System.out.println(Builtin.Conj.getInstance().getMatlabClassPropagationInfo());
+        printMatch(Builtin.Colon.getInstance().getMatlabClassPropagationInfo(),
+                PrimitiveClassReference.DOUBLE);
+        
+        System.out.println();
+        System.out.println(Builtin.Colon.getInstance().getMatlabClassPropagationInfo());
+        printMatch(Builtin.Colon.getInstance().getMatlabClassPropagationInfo(),
+                PrimitiveClassReference.SINGLE,PrimitiveClassReference.DOUBLE);
+        
+        
+        System.out.println();
+        System.out.println(Builtin.Ones.getInstance().getMatlabClassPropagationInfo());
+        printMatchByValue(Builtin.Ones.getInstance().getMatlabClassPropagationInfo(),
+                new SimpleMatrixValueFactory().newMatrixValue("double"));
+
+        System.out.println();
+        System.out.println(Builtin.Complex.getInstance().getMatlabClassPropagationInfo());
+        printMatch(Builtin.Complex.getInstance().getMatlabClassPropagationInfo(),
+                PrimitiveClassReference.SINGLE,PrimitiveClassReference.DOUBLE);
         
     }
     /**
