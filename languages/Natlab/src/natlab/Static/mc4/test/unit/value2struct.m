@@ -3,14 +3,21 @@
 function [s] = value2struct(mat)
   s.class = class(mat);
   s.size = size(mat);
-  if (isnumeric(mat) || islogical(mat) || ischar(mat))
-     s.value = mat;
+  if isnumeric(mat)
+     s.matrix = real(mat);
+     if (~isreal(mat))
+        s.imagMatrix = imag(mat);
+     end     
+  elseif islogical(mat)
+     s.logical = mat;
+  elseif ischar(mat)
+     s.char = mat;
   elseif (iscell(mat))
      elements = cell(1,numel(mat));
      for i = 1:numel(mat)
         elements{i} = value2struct(mat{i});
      end
-     s.value = elements;
+     s.cell = elements;
   elseif (isstruct(mat) || isobject(mat))
      if (isobject(mat))
         warning off MATLAB:structOnObject
@@ -23,20 +30,20 @@ function [s] = value2struct(mat)
            field = fields{j};
            newStruct.(field) = value2struct(mat(i).(field));
         end
-        s.value{i} = newStruct;
+        s.struct{i} = newStruct;
      end
   elseif (isa(mat,'function_handle'))
-     s.value = (functions(mat));
+     s.handle = (functions(mat));
      % store the workspace for anoymous functions
-     if isfield(s.value,'workspace')
-        workspace = s.value.workspace{1};
+     if isfield(s.handle,'workspace')
+        workspace = s.handle.workspace{1};
         fields = fieldnames(workspace);
         space = struct();
         for i = 1:numel(fields)
            field = fields{1};
            space.(field) = value2struct(workspace.(field));
         end
-        s.value.workspace = space;
+        s.handle.workspace = space;
      end
   else
      error(['value2struct cannot convert ' class(mat)])

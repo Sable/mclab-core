@@ -136,8 +136,9 @@ def delBuiltinTests():
 
 
 builtinPath=os.path.realpath('../../builtin');
+sys.path.append(builtinPath)
 builtinPath=os.path.realpath('../../../builtin');
-sys.path.append(builtinPath) # path where the builtins are defined
+sys.path.append(builtinPath)
 import genBuiltin
 builtins=genBuiltin.readCSVData(builtinPath+'/builtins.csv')[0];
 

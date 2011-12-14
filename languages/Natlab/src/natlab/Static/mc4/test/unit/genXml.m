@@ -5,22 +5,11 @@ function genXml(exitOnFinish)
   for d1 = getSubDirs()
     d1 = d1{1};
     cd(d1)
+    doDirectory(d1);
     for d2 = getSubDirs()
       d2 = d2{1};
       cd(d2)
-      % get all unit tests
-      files = dir();
-      for i = 1:numel(files)
-        file = files(i);
-        if (~file.isdir && (file.name(1) ~= upper(file.name(1))))
-          fprintf('.')
-          name = file.name(1:end-2);
-          % run test and get result as struct
-          s = runTest(name,d2);
-          % store xml
-          xmlwrite([name '.xml'], struct2xml(s,'result'))
-        end
-      end      
+      doDirectory(d2);
       cd('..')
     end
     cd('..')
@@ -35,6 +24,23 @@ function genXml(exitOnFinish)
   end
 end
 
+% runs tets in current directory
+function doDirectory(d)
+      % get all unit tests
+      files = dir();
+      fprintf('\n%s\n',d);
+      for i = 1:numel(files)
+        file = files(i);
+        if (~file.isdir && (file.name(1) ~= upper(file.name(1))) && strcmp(file.name(end-1:end),'.m'))
+          fprintf('.')
+          name = file.name(1:end-2);
+          % run test and get result as struct
+          s = runTest(name,d);
+          % store xml
+          xmlwrite([name '.xml'], struct2xml(s,'result'))
+        end
+      end
+end
 
 function s = runTest(name,dir)
   try
