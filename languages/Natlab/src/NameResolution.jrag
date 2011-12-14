@@ -116,7 +116,7 @@ aspect NameResolution{
 
     syn lazy Map<String,Function> Function.getSiblings() = (Map<String,Function>)getSiblingsInh();
 
-    inh LocalFunctionLookupInterface Function.getParentFunction();
+    inh LocalFunctionLookupInterface Function.getParentFunction(); //TODO - fix this, it errors on functions without parents
     eq FunctionList.getFunction(int i).getParentFunction() = this;
     eq Function.getNestedFunction(int i).getParentFunction() = this;
     eq ClassDef.getMethod(int i).getParentFunction() = null; //TODO-JD: fix this
@@ -126,7 +126,7 @@ aspect NameResolution{
         Function f = getNested().get(name);
         if( f != null )
             return f;
-        if (getParentFunction() == null) return null;
+        if (getParent() == null || getParentFunction() == null) return null;
         return getParentFunction().lookupFunction( name );
     }
     syn Function FunctionList.lookupFunction( String name )

@@ -181,5 +181,23 @@ aspect LValue
         }
         return names;
     }
-
+    
+    
+    /**
+     * returns all children that are names
+     */
+    syn java.util.Set<NameExpr> ASTNode.getAllNameExpressions()
+    {
+        java.util.Set<NameExpr> names = new java.util.LinkedHashSet<NameExpr>();
+        for( int i = 0; i<getNumChild(); i++ )
+            names.addAll( getChild(i).getAllNameExpressions() );
+        return names;
+    }
+    eq NameExpr.getAllNameExpressions()
+    {   
+        java.util.LinkedHashSet<NameExpr> names = new java.util.LinkedHashSet<NameExpr>();
+        names.add( this );
+        return names;
+    }
 }
+
