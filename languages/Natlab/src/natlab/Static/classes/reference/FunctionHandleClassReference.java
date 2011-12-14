@@ -20,6 +20,11 @@ package natlab.Static.classes.reference;
 
 public class FunctionHandleClassReference implements BuiltinClassReference {
     public static FunctionHandleClassReference singleton = new FunctionHandleClassReference();
+
+    public boolean isInt(){ return false; }
+    public boolean isFloat(){ return false; }
+    public boolean isNumeric(){ return false; }
+    public boolean isMatrix(){ return false; }
     
     private FunctionHandleClassReference(){        
     }

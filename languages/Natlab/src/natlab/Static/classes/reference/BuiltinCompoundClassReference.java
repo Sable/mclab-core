@@ -21,7 +21,12 @@ package natlab.Static.classes.reference;
 public enum BuiltinCompoundClassReference implements BuiltinClassReference {
     STRUCT,
     CELL;
-
+    
+    public boolean isInt(){ return false; }
+    public boolean isFloat(){ return false; }
+    public boolean isNumeric(){ return false; }
+    public boolean isMatrix(){ return false; }
+    
     private String name = this.name().toLowerCase();
     
     @Override

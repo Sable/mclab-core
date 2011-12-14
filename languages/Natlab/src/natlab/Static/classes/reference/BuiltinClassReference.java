@@ -19,5 +19,8 @@
 package natlab.Static.classes.reference;
 
 public interface BuiltinClassReference extends ClassReference{
-
+    public boolean isInt();
+    public boolean isFloat();
+    public boolean isNumeric();
+    public boolean isMatrix();
 }
