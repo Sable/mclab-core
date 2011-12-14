@@ -17,14 +17,13 @@ import natlab.toolkits.analysis.Mergable;
  * Note about implementation: this will only actually use a map if there is more
  * than element stored by this set. If there is one, a singleton value is used.
  * This should be ok since this class is immutable.
- * TODO - should the singleton be implemented by making the map a general map,
- *        and using Collecitons.singletonMap?
  */
 public class ValueSet<D extends MatrixValue<D>> implements 
   Iterable<Value<D>>, Mergable<ValueSet<D>>{
     LinkedHashMap<ClassReference, Value<D>> map = null;
     Value<D> singleton = null; //used if this value set only stores one value
     int size = 0; //number of elements in this
+    public static boolean DEBUG = false;
     
     private ValueSet(){}
     public  static <D extends MatrixValue<D>> ValueSet<D> newInstance(){
@@ -69,16 +68,23 @@ public class ValueSet<D extends MatrixValue<D>> implements
     }
    
     
+    /**
+     * factory method for collections - the given values need not to have distinct
+     * matlab classes. Values with equal matlab classes will get merged together.
+     */
+    public static <D extends MatrixValue<D>> ValueSet<D> newInstance(Collection<Value<D>> values){
+        return new ValueSet<D>(values.iterator());
+    }
     
     /**
-     * constructor from a set of distinct Values (i.e. they are assumed to have
+     * constructor from a set of not necessairly distinct Values (i.e. they may have
      * different types)
      */
     private ValueSet(Collection<Value<D>> values){
-        
+        this(values.iterator());
     }
     /**
-     * constructor form an iterator of distinct values (i.e. they are assumed to
+     * constructor form an iterator of not necessarily distinct values (i.e. they may
      * have different types)
      */
     private ValueSet(Iterator<Value<D>> iterator){
@@ -91,10 +97,22 @@ public class ValueSet<D extends MatrixValue<D>> implements
             map.put(singleton.getMatlabClass(), singleton);
             while (iterator.hasNext()){
                 Value<D> next = iterator.next();
-                map.put(next.getMatlabClass(),next);
+                //merge if necessary
+                if (map.containsKey(next.getMatlabClass())){
+                    map.put(next.getMatlabClass(), 
+                            map.get(next.getMatlabClass()).merge(next));
+                } else {
+                    map.put(next.getMatlabClass(),next);
+                }
             }
             singleton = null;
             size = map.size();
+            //check if we actually ended up having a singleton
+            if (size == 1){
+                singleton = map.values().iterator().next();
+                map = null;
+            }
+            
         }
     }
     
@@ -184,7 +202,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
     
     @Override
     public ValueSet<D> merge(ValueSet<D> other) {
-        System.out.println(this+" "+other);
+        if (DEBUG) System.out.println("merge: "+this+", "+other);
         ValueSet<D> result;
         //clone the bigger set
         if (size() > other.size()){
@@ -194,7 +212,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
             other = this;
         }
         if (other.size == 0) return result;
-        System.out.println(result+" "+other);
+        //System.out.println(result+" "+other);
         //merge elements from the smaller set
         if (result.size == 1){
             if (other.size == 1){
@@ -214,7 +232,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
                 Value<D> v = other.singleton;
                 ClassReference key = v.getMatlabClass();
                 if (result.hasMatlabClass(key)){ //exist in both sets - merge
-                    result.map.put(key,other.map.get(key).merge(v));
+                    result.map.put(key,result.map.get(key).merge(v));
                 } else { //put new element
                     result.map.put(key, v);
                 }
@@ -228,7 +246,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
                     }
                 }
             }
-            result.size = map.size();
+            result.size = result.map.size();
         }
         return result;
     }
@@ -258,12 +276,16 @@ public class ValueSet<D extends MatrixValue<D>> implements
     @SuppressWarnings("unchecked")
     public static <D extends MatrixValue<D>> List<LinkedList<Value<D>>> cross(
             Iterator<ValueSet<D>> i){
-        if (!i.hasNext()) return null;
+        if (!i.hasNext()){
+            LinkedList<LinkedList<Value<D>>> result = new LinkedList<LinkedList<Value<D>>>();
+            result.add(new LinkedList<Value<D>>());
+            return result;
+        }
         //get set, (others)
         ValueSet<D> set = i.next();
         List<LinkedList<Value<D>>> rec = cross(i);
         //compute set x others
-        if (rec == null){
+        if (rec.size() == 1 && rec.get(0).size() == 0){
             //base case just return the set of elements
             LinkedList<LinkedList<Value<D>>> result = new LinkedList<LinkedList<Value<D>>>();
             for (Value v : set){
@@ -272,6 +294,7 @@ public class ValueSet<D extends MatrixValue<D>> implements
             }
             return result;
         } else {
+            //TODO add case for there being only one value - no copy needed
             LinkedList<LinkedList<Value<D>>> result = new LinkedList<LinkedList<Value<D>>>();            
             //recursive case 
             for (LinkedList<Value<D>> currentList : rec){
@@ -302,4 +325,47 @@ public class ValueSet<D extends MatrixValue<D>> implements
         if (size == 1) return singleton.equals(other.singleton);
         return map.equals(other.map);
     }
+    
+    @Override
+    public int hashCode() {
+        if (size == 0) return 0;
+        if (size == 1) return singleton.hashCode();
+        return map.hashCode();
+    }
+    
+    public boolean contains(ClassReference aClass){
+        if (size == 0) return false;
+        if (size == 1){
+            ClassReference classRef = singleton.getMatlabClass();
+            return (classRef == null)?(classRef == aClass):classRef.equals(aClass);
+        }
+        return map.containsKey(aClass);
+    }
+    public boolean contains(String aClassName){
+        if (size == 0) return false;
+        if (size == 1) return singleton.getMatlabClass().getName().equals(aClassName);
+        for (ClassReference k : map.keySet()){
+            if (k.getName().equals(aClassName)) return true;
+        }
+        return false;
+    }
+    
+    /**
+     * returns a new value set, calling toFunctionArgument on all values
+     */
+    public ValueSet<D> toFunctionArgument(boolean recursive){
+        if (size() == 0) return this;
+        ValueSet<D> result = new ValueSet<D>(this);
+        if (result.size == 1){
+            result.singleton = result.singleton.toFunctionArgument(recursive);
+        } else {
+            for (ClassReference aClass : result.map.keySet()){
+                result.map.put(aClass,result.map.get(aClass).toFunctionArgument(recursive));
+            }
+        }
+        return result;
+    }
+
 }
+
+

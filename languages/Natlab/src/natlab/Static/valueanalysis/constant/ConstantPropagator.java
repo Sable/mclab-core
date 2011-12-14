@@ -31,13 +31,12 @@ import natlab.Static.builtin.BuiltinVisitor;
  * 
  * TODO: how to deal with error cases?
  * 
- * 
  * @author adubra
  */
 
 public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>{
     static ConstantPropagator instance = null;
-    static ConstantPropagator getInstance(){
+    static public ConstantPropagator getInstance(){
         if (instance == null) instance = new ConstantPropagator();
         return instance;
     }
@@ -55,17 +54,43 @@ public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>
     public Constant casePi(Builtin builtin, List<Constant> arg) {
         return Constant.get(Math.PI);
     }
-   
-    /* TODO
+    
     @Override
-    public Constant caseTrue(Builtin builtin, List<Constant> arg) {
-        //TODO - deal with args
-        return Constant.get(true);
+    public Constant caseIsequal(Builtin builtin, List<Constant> arg) {
+        if (arg.size() == 2){
+            Constant a = arg.get(0);
+            Constant b = arg.get(1);
+            if (a.getClass().equals(b.getClass())){
+                return Constant.get(a.equals(b));
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
+    
+    
     @Override
-    public Constant caseFalse(Builtin builtin, List<Constant> arg) {
-        return Constant.get(false);
-    }*/
+    public Constant caseEq(Builtin builtin, List<Constant> arg) {
+        return caseIsequal(builtin, arg);
+    }
+    
+    @Override
+    public Constant caseAny(Builtin builtin, List<Constant> arg) {
+        if (arg.size() == 1){
+            Constant a = arg.get(0);
+            if (a instanceof DoubleConstant){
+                return Constant.get(((DoubleConstant)a).getValue() != 0);
+            } else if (a instanceof LogicalConstant){
+                return Constant.get(((LogicalConstant)a).getValue());
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
 }
 
 

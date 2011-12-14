@@ -11,21 +11,37 @@ import natlab.toolkits.analysis.*;
  * This is a map from variable name (String) to ValueSet.
  * Note that this is one of the few classes in this package representing mutable objects.
  * 
+ * A Flow set may be non viable if
+ * - all control flow paths to the associated node result in an error
+ * - as a first approximation for a recursive call - i.e. 'no knowledge'
+ * 
+ * A non-viable flowset can be erroneous or just have no knowledge. Either way, merging
+ * a viable and a non-viable flowset will result in just viable the flowset (plus, possibly,
+ * some annotations for errors). a non viable flowset is empty.
+ * 
+ * 
  * @author ant6n
  */
-public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<String, ValueSet<D>> 
-       implements Mergable<ValueFlowMap<D>>{  
+public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<String, ValueSet<D>> 
+       implements Mergable<ValueFlowMap<D>>,FlowData{  
     LinkedHashMap<String,ValueSet<D>> map = new LinkedHashMap<String,ValueSet<D>>();
-    public ValueFlowMap(){
-        super(null);
-    }
+    private boolean isViable = true;
     
+    public ValueFlowMap(){
+       // super(null);
+    }
     public static <D extends MatrixValue<D>> ValueFlowMap<D> newInstance(){
         return new ValueFlowMap<D>();
     }
-    
+    public ValueFlowMap(boolean isViable){
+       // super(null);
+        this.isViable = isViable;
+    }
+    public static <D extends MatrixValue<D>> ValueFlowMap<D> newInstance(boolean isViable){
+        return new ValueFlowMap<D>(isViable);
+    }    
     public ValueFlowMap(Map<String, ValueSet<D>> aMap){
-        super(null);
+       // super(null);
         this.putAll(aMap);
     }
     
@@ -35,54 +51,59 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
      * @param aMap
      */
     public ValueFlowMap(ValueFlowMap<D> aMap){
-        super(null);
+       // super(null);
         map.putAll(aMap.map);
+        isViable = aMap.isViable;
     }
     
-    @Override
+    //@Override
     public boolean containsKey(Object key) {
-        return containsKey(key);
+        return map.containsKey(key);
     }
 
-    @Override
+    //@Override
     public ValueSet<D> get(Object K) {
         return map.get(K);
     }
 
-    @Override
+    //@Override
     public Set<String> keySet() {
         return map.keySet();
     }
 
-    @Override
+    //@Override
     public ValueSet<D> put(String key, ValueSet<D> values) {
+        if (!isViable) return null;
         return map.put(key,values);
     }
     
     public void putAll(Map<String,ValueSet<D>> map) {
-        map.putAll(map);
+        if (!isViable) return;
+        this.map.putAll(map);
     }
     
     public void putAll(ValueFlowMap<D> other){
-        map.putAll(other.map);
+        if (!isViable) return;
+        this.map.putAll(other.map);
     }
 
-    @Override
+    //@Override
     public ValueSet<D> remove(Object key) {
+        if (!isViable) return null;
         return map.remove(key);
     }
 
-    @Override
+    //@Override
     public int size() {
         return map.size();
     }
 
-    @Override
+    //@Override
     public ValueFlowMap<D> emptyMap() {
         return new ValueFlowMap<D>();
     }
     
-    @Override
+    //@Override
     public ValueFlowMap<D> copy() {
         return new ValueFlowMap<D>(this);
     }
@@ -92,6 +113,9 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
      */
     @Override
     public ValueFlowMap<D> merge(ValueFlowMap<D> o) {
+        if (!isViable() || !o.isViable()){
+            return isViable?new ValueFlowMap<D>(this):new ValueFlowMap<D>(o);            
+        }
         ValueFlowMap<D> result, smaller;
         //clone the bigger set
         if (this.size() > o.size()){
@@ -108,6 +132,25 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
         return result;
     }
     
+    public void mergePut(String key,ValueSet<D> value){
+        if (!isViable) return;
+        if (!map.containsKey(key)){
+            map.put(key,value);
+        } else {
+            map.put(key,map.get(key).merge(value));
+        }
+    }
+    
+    
+    /**
+     * makes this value flow map a copy of the other
+     * overwrites whatever is in the current flowset
+     */
+    public void copyOtherIntoThis(ValueFlowMap<D> other){
+        this.isViable = other.isViable;
+        this.map = new LinkedHashMap<String,ValueSet<D>>(other.map);
+    }
+    
     
     /**
      * we'll make the print method go across multiple lines if the list is long
@@ -115,6 +158,7 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
     public static final int PRINT_COLUMNS_TO_NEWLINE = 100;
     @Override
     public String toString() {
+        if (!isViable) return "{not viable}";
         StringBuffer buf = new StringBuffer();
         int indexOflastBreak = 0;
         buf.append('{');
@@ -141,9 +185,20 @@ public class ValueFlowMap<D extends MatrixValue<D>> extends AbstractFlowMap<Stri
         if (obj == null) return false;
         if (obj instanceof ValueFlowMap<?>){
             ValueFlowMap<D> flowMap = (ValueFlowMap<D>)obj;
-            return flowMap.map.equals(map);
+            return flowMap.isViable==isViable && flowMap.map.equals(map);
         }
         return false;   
+    }
+    
+    
+    @Override
+    public int hashCode() {
+        return isViable?43:19 + this.map.hashCode();
+    }
+    
+    
+    public boolean isViable(){
+        return isViable;
     }
     
     /**

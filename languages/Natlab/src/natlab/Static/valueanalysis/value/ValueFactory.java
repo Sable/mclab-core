@@ -1,7 +1,11 @@
 package natlab.Static.valueanalysis.value;
 
+import java.util.Arrays;
+
 import natlab.Static.valueanalysis.ValueSet;
 import natlab.Static.valueanalysis.constant.*;
+import natlab.Static.valueanalysis.value.composite.*;
+import natlab.toolkits.path.FunctionReference;
 
 /**
  * Since PrimitiveValues are generic in the data they store, we need a 
@@ -17,10 +21,10 @@ import natlab.Static.valueanalysis.constant.*;
  * 
  * @author ant6n
  *
- * @param <D>
+ * TODO - should some of the methods be in different internal factories?
  */
 
-public abstract class MatrixValueFactory<D extends MatrixValue<D>> {
+public abstract class ValueFactory<D extends MatrixValue<D>> {
     /**
      * constructs a new Primitive Value from a constant
      * @param constant
@@ -53,7 +57,20 @@ public abstract class MatrixValueFactory<D extends MatrixValue<D>> {
         return newMatrixValue(Constant.get(value));
     }
 
-
+    /**
+     * creates a function handle value
+     */
+    public FunctionHandleValue<D> newFunctionHandleValue(FunctionReference f){
+        return new FunctionHandleValue<D>(this, f);
+    }
+    
+    /**
+     * creates a function handle value, but already supplies some arguments (partial application)
+     */
+    public FunctionHandleValue<D> newFunctionHandlevalue(FunctionReference f,java.util.List<ValueSet<D>> partialValues){
+        return new FunctionHandleValue<D>(this,f,partialValues);
+    }
+    
     /**
      * creates a value set with one constant primitive value
      */
@@ -79,5 +96,50 @@ public abstract class MatrixValueFactory<D extends MatrixValue<D>> {
         return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
     }
     
+    /**
+     * creates a scalar shape
+     */
+    public Shape<D> newScalarShape(){
+        return Shape.scalar(this);
+    }
     
+    /**
+     * creates a 0x0 shape
+     */
+    public Shape<D> newEmptyShape(){
+        return Shape.empty(this);
+    }
+    
+    /**
+     * creates a shape from the given collection of constants
+     */
+    public Shape<D> newShape(Constant... constants){
+        return Shape.newInstance(this,Arrays.asList(constants));
+    }
+    
+    /**
+     * returns a shape which would be the result when accessing an array with the given
+     * indizes (i.e., the shape [max(a1),max(a2),max(a3),...,max(an)])
+     */
+    public Shape<D> newShapeFromIndizes(Args<D> indizes){
+        return Shape.fromIndizes(this, indizes);
+    }
+    
+    public ColonValue<D> newColonValue(){
+        return new ColonValue<D>();
+    }
+    
+    /**
+     * creates an empty struct
+     */
+    public StructValue<D> newStruct(){
+        return new StructValue<D>(this);
+    }
+    
+    /**
+     * creates an empty cell array
+     */
+    public CellValue<D> newCell(){
+        return new CellValue<D>(this);
+    }
 }

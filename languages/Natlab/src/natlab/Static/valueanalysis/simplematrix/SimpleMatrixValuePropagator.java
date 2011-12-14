@@ -4,11 +4,16 @@ import java.util.*;
 import natlab.Static.builtin.*;
 import natlab.Static.classes.reference.*;
 import natlab.Static.valueanalysis.*;
+import natlab.Static.valueanalysis.constant.*;
 import natlab.Static.valueanalysis.value.*;
+import natlab.Static.valueanalysis.value.composite.CellValue;
 
 public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixValue>{
+    public static boolean DEBUG = false;
+    ConstantPropagator constantProp = ConstantPropagator.getInstance();
+    
     public SimpleMatrixValuePropagator() {
-        super(SimpleMatrixValue.FACTORY);
+        super(new SimpleMatrixValueFactory());
     }
 
     /**
@@ -17,14 +22,28 @@ public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixVal
     @Override
     public Res<SimpleMatrixValue> caseBuiltin(Builtin builtin,
             Args<SimpleMatrixValue> arg) {
-        //TODO - deal with constants
+        //ceal with constants
+        if (arg.isAllConstant()){
+            ArrayList<Constant> args = new ArrayList<Constant>();
+            for (Value<SimpleMatrixValue> a : arg){
+                args.add(a.getConstant());
+            }
+            Constant cResult = builtin.visit(constantProp, args);
+            if (cResult != null){
+                return Res.newInstance(new SimpleMatrixValue(cResult));
+            }
+        }
+        
         
         //if it's not constant check whether the Builtin implements class propagation
         if (builtin instanceof ClassPropagationDefined){
+            if (DEBUG) System.out.println("case builtin: "+builtin
+                    +" prop: "+((ClassPropagationDefined)builtin).getMatlabClassPropagationInfo()
+                    +" args: "+arg);
             LinkedList<HashSet<ClassReference>> matchResult = 
                 ClassPropTools.matchByValues(((ClassPropagationDefined)builtin).getMatlabClassPropagationInfo(),arg);
             if (matchResult == null){
-                throw new UnsupportedOperationException("error"); //TODO give better error
+                return Res.newErrorResult(builtin.getName()+" is not defined for arguments "+arg);
             }
             return matchResultToRes(matchResult);
         }
@@ -37,6 +56,9 @@ public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixVal
         Res<SimpleMatrixValue> result = Res.newInstance();
         for (HashSet<ClassReference> values: matchResult){
             HashMap<ClassReference,SimpleMatrixValue> map = new HashMap<ClassReference,SimpleMatrixValue>();
+            if (values.size() == 0){
+                throw new UnsupportedOperationException("encountered match result with 0 values");
+            }
             for (ClassReference classRef : values){
                 map.put(classRef,new SimpleMatrixValue((PrimitiveClassReference)classRef));
             }
@@ -44,6 +66,40 @@ public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixVal
         }
         return result;
     }
-
     
+    
+    
+    @Override
+    public Res<SimpleMatrixValue> caseAbstractConcatenation(Builtin builtin,
+            Args<SimpleMatrixValue> arg) {
+        return Res.newInstance(
+                new SimpleMatrixValue(
+                        (PrimitiveClassReference)getDominantCatArgClass(arg)));
+    }
+    
+    
+    //TODO - move to cell prop
+    @Override
+    public Res<SimpleMatrixValue> caseCellhorzcat(Builtin builtin,
+            Args<SimpleMatrixValue> elements) {
+        ValueSet<SimpleMatrixValue> values = ValueSet.newInstance(elements);
+        Shape<SimpleMatrixValue> shape = Shape.fromIndizes(this.factory, 
+                Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
+        return Res.newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
+    }
+    @Override
+    public Res<SimpleMatrixValue> caseCellvertcat(Builtin builtin,
+            Args<SimpleMatrixValue> elements) {
+        ValueSet<SimpleMatrixValue> values = ValueSet.newInstance(elements);
+        Shape<SimpleMatrixValue> shape = Shape.fromIndizes(this.factory, 
+                Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
+        return Res.newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
+    }
+    
+    @Override
+    public Res<SimpleMatrixValue> caseCell(Builtin builtin,
+            Args<SimpleMatrixValue> arg) {
+        return Res.newInstance(new CellValue<SimpleMatrixValue>(
+                this.factory, this.factory.newShapeFromIndizes(arg),ValueSet.<SimpleMatrixValue>newInstance()));
+    }
 }

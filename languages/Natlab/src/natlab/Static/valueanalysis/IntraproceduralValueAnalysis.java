@@ -4,13 +4,15 @@ import java.util.*;
 import java.util.List;
 
 import ast.*;
+import natlab.Static.builtin.Builtin;
 import natlab.Static.callgraph.StaticFunction;
-import natlab.Static.classes.reference.PrimitiveClassReference;
+import natlab.Static.interproceduralAnalysis.FunctionAnalysis;
+import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.Static.ir.*;
 import natlab.Static.ir.analysis.*;
 import natlab.Static.valueanalysis.constant.*;
 import natlab.Static.valueanalysis.value.*;
-import natlab.toolkits.analysis.FlowMap;
+import natlab.Static.valueanalysis.value.composite.FunctionHandleValue;
 import natlab.toolkits.path.FunctionReference;
 
 /**
@@ -22,31 +24,66 @@ import natlab.toolkits.path.FunctionReference;
  * This class operates on the static IR.
  * @author ant6n
  */
-public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<D>>{
+public class IntraproceduralValueAnalysis<D extends MatrixValue<D>>
+extends IRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<D>>
+implements FunctionAnalysis<Args<D>, Res<D>>{
     StaticFunction function;
-    MatrixValueFactory<D> factory;
+    ValueFactory<D> factory;
     ValuePropagator<D> valuePropagator;
+    ValueFlowMap<D> argMap;
+    static boolean Debug = false;//true;
+    InterproceduralAnalysisNode<IntraproceduralValueAnalysis<D>, Args<D>, Res<D>> node;
     
-    public IntraproceduralValueAnalysis(StaticFunction function, MatrixValueFactory<D> factory) {
+    public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<D>, Args<D>, Res<D>> node,
+            StaticFunction function, ValueFactory<D> factory) {
         super(function.getAst());
+        this.node = node;
         this.function = function;
-        DEBUG = true;
         this.factory = factory;
         this.valuePropagator = factory.getValuePropagator();
     }
     
-    //TODO - a second constructor which also takes an Args<D> object
+    /**
+     * constructor that allows specifying values of the arguments
+     */
+    public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<D>, Args<D>, Res<D>> node,
+            StaticFunction function, ValueFactory<D> factory, Args<D> args) {
+        this(node,function,factory);
+        argMap = new ValueFlowMap<D>();
+        //TODO check whether given args <= declared args
+        for (int i = 0; i < args.size(); i++){
+            argMap.put(
+                    function.getAst().getInputParam(i).getID(),
+                    ValueSet.newInstance(args.get(i)));
+        }
+        if (Debug) System.out.println("intraprocedural value analysis on "+function.getName()+" with args "+argMap);
+    }
+    
+    
+    /**
+     * returns the result of the analysis. Runs the analysis if isAnalyzed is false
+     */
+    public Res<D> getResult(){
+        if (! isAnalyzed()) this.analyze();
+        Res<D> result = Res.newInstance();
+        ValueFlowMap<D> flowResult = getOutFlowSets().get(function.getAst());
+        //TODO - make sure there's the right number of outputs
+        for (Name out : function.getAst().getOutputParamList()){
+            result.add(flowResult.get(out.getID()));
+        }
+        return result;
+    }
+    
 
     /*********** inherited stuff **************************************/
     @Override
     public void copy(ValueFlowMap<D> source, ValueFlowMap<D> dest) {
-        dest.clear();
-        dest.putAll(source);
+        dest.copyOtherIntoThis(source);
     }
 
     @Override
     public void merge(ValueFlowMap<D> in1, ValueFlowMap<D> in2, ValueFlowMap<D> out) {
-        in1.union(in2, out);
+        out.copyOtherIntoThis(in1.merge(in2));
     }
 
     @Override
@@ -57,69 +94,105 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     /*********** Function case - setting up args *************************/
     @Override
     public void caseFunction(Function node) {
-        // TODO Auto-generated method stub
-        super.caseFunction(node);
+        currentInSet = argMap.copy();
+        caseASTNode(node);
+        associateInAndOut(node);
     }
 
     /*********** statement cases *****************************************/
     @Override
     public void caseIRCallStmt(IRCallStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
         //find function
         FunctionReference ref = function.getCalledFunctions().get(node.getFunctionName().getID());
         //do call
-        setCurrentOutSet(
-                doFunctionCall(ref, getCurrentInSet(), node.getArguments(), node.getTargets()));
+        setCurrentOutSet(assign(getCurrentInSet(),node.getTargets(),
+                call(ref, getCurrentInSet(), node.getArguments(), node.getTargets(), node, null)));
         //associate flowsets
         associateInAndOut(node);
     }
     
+    public void caseIRCommentStmt(IRCommentStmt node) {}
     
     @SuppressWarnings("unchecked")
     @Override
     public void caseLoopVar(AssignStmt assign) {
+        if (checkNonViable(assign)) return;
         IRForStmt node = (IRForStmt)assign.getParent();
-        ValueFlowMap<D> flow = getCurrentInSet().copy();
-        ValueSet<D> result = ValueSet.newInstance();
+        ValueFlowMap<D> flow = getCurrentInSet();
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
         //set the loop var
         //TODO - do we have to check whether colon is overloaded?
         if (node.hasIncr()){ //there's an inc value
             for (LinkedList<Value<D>> list : cross(flow,
                     node.getLowerName(),node.getIncName(),node.getUpperName())){
-                result = result.add(((D)list.getFirst()).forRange((D)list.getLast(),(D)list.get(1)));
+                results.add(Res.newInstance(((D)list.getFirst()).forRange((D)list.getLast(),(D)list.get(1))));
             }
         } else { //there's no inc value
             for (LinkedList<Value<D>> list : cross(flow,
                     node.getLowerName(),node.getUpperName())){
-                result = result.add(((D)list.getFirst()).forRange((D)list.getLast(),null));
+                results.add(Res.newInstance(((D)list.getFirst()).forRange((D)list.getLast(),null)));
             }
         }
         //put results
-        flow.put(node.getLoopVarName().getID(), result);
-        setCurrentOutSet(flow);
+        setCurrentOutSet(assign(flow,node.getLoopVarName().getID(), Res.newInstance(results)));
         associateInAndOut(node);
+    }
+    
+    
+    @Override
+    public void caseIfCondition(Expr condExpr) {
+        if (checkNonViable(condExpr)) return;
+        ValueFlowMap<D> current = getCurrentInSet();
+        ValueSet<D> values = current.get(((NameExpr)condExpr).getName().getID());
+        for (Value<D> value : values){
+            value.isConstant();
+            Constant aConst = value.getConstant();
+            Constant any = (Builtin.Any.getInstance().visit(ConstantPropagator.getInstance(),
+                    Collections.singletonList(aConst)));
+            if (any != null && any instanceof LogicalConstant){
+                if (((LogicalConstant)any).equals(Constant.get(true))){
+                    //result is true - false set is not viable
+                    setTrueFalseOutSet(current, ValueFlowMap.<D>newInstance(false));
+                } else {
+                    //result is false - true set is not viable
+                    setTrueFalseOutSet(ValueFlowMap.<D>newInstance(false), current);
+                }
+                return;
+            }
+        }
+        setTrueFalseOutSet(current, current);
     }
     
     @Override
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case array get: "+node.getPrettyPrinted());
         ValueFlowMap<D> flow = getCurrentInSet(); //note copied!
+        //if (Debug) System.out.println(flow);
         ValueSet<D> array = flow.get(node.getArrayName().getID());
-        ValueFlowMap<D> result = null;
+        if (array == null) throw new UnsupportedOperationException("attempting to access unknown array "+node.getArrayName().getID()+" in\n"+node.getPrettyPrinted()+"\n with flow "+flow);
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
         //go through all possible array values
         for (Value<D> arrayValue : array){
             if (arrayValue instanceof MatrixValue<?>){
-                //go through all possible index sets
-                //TODO - deal with overloading etc.
-                //TODO - errors on assign - use is assign to var??
-                for (List<Value<D>> indizes : cross(flow,node.getIndizes())){
-                    result = unionOrSet(result,doAssign(flow,node.getTargets(),
-                            Collections.singleton(ValueSet.newInstance(arrayValue.subsref(indizes)))));
-                    
+                if (node.getIndizes().size() == 0){
+                    results.add(Res.newInstance(ValueSet.newInstance(arrayValue)));
+                } else {
+                    //go through all possible index setss
+                    //TODO - deal with overloading etc.
+                    //TODO - errors on assign - use is assign to var??
+                    for (List<Value<D>> indizes : cross(flow,node.getIndizes())){
+                        results.add(Res.newInstance(arrayValue.arraySubsref(Args.newInstance(indizes))));
+                    }
                 }
             } else if (arrayValue instanceof FunctionHandleValue<?>){
                 //go through all function handles this may represent and get the result
-                for (FunctionReference ref :((FunctionHandleValue<D>)arrayValue).getFunctions()){
-                  result = unionOrSet(result,doFunctionCall(
-                          ref, flow, node.getIndizes(), node.getTargets()));
+                //TODO - make this independent of the specific function handle value implementation
+                for (FunctionHandleValue.FunctionHandle<D> handle :((FunctionHandleValue<D>)arrayValue).getFunctionHandles()){
+                    results.add(call(
+                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), node, handle.getPartialValues()));
                 }
             } else {
                 //TODO more possible values here
@@ -128,28 +201,33 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         }
         
         //put result assign/set flowsets
-        setCurrentOutSet(result);
+        setCurrentOutSet(assign(flow, node.getTargets(), Res.newInstance(results)));
         associateInAndOut(node);
     }
     
     //TODO make it deal with overloading properly
     @Override
-    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
+    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case assign f_handle: "+node.getPrettyPrinted());
         //find var and remove
         String targetName = node.getTargetName().getID();
-        ValueFlowMap<D> flow = getCurrentInSet().copy();
-        flow.remove(targetName);
+        ValueFlowMap<D> flow = getCurrentInSet();
         
         //find the function handle
-        System.err.println(function.getCalledFunctions());
         FunctionReference f = 
-            function.getCalledFunctions().get(node.getFunction().getID());
+            function.getCalledFunctions().get(node.getFunctionName().getID());
         
-        //assign
-        flow.put(targetName, ValueSet.newInstance(new FunctionHandleValue<D>(f)));
+        //get enclosed workspace - the set of values already assigned
+        List<Name> enclosedNames = node.getEnclosedVars();
+        LinkedList<ValueSet<D>> enclosedValues = new LinkedList<ValueSet<D>>();
+        for (Name var : enclosedNames){
+            enclosedValues.add(flow.get(var.getID()));
+        }
         
         //assign result
-        setCurrentOutSet(flow);
+        setCurrentOutSet(assign(flow, targetName, 
+                Res.newInstance(factory.newFunctionHandlevalue(f, enclosedValues))));
         
         //set in/out set
         associateInAndOut(node);
@@ -157,18 +235,131 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     
     
     @Override
+    public void caseIRArraySetStmt(IRArraySetStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case array set: "+node.getPrettyPrinted());
+        //find vars
+        ValueFlowMap<D> flow = getCurrentInSet();
+        String targetName = node.getArrayName().getID();
+        ValueSet<D> targets = flow.get(targetName);
+        ValueSet<D> values = flow.get(node.getValueName().getID());
+        List<LinkedList<Value<D>>> indizesList = cross(flow,node.getIndizes());
+        
+        //if target is undefined yet, define it
+        if (targets == null){
+            //for now just use the value... FIXME
+            targets = values;
+        }
+        if (values == null){
+            throw new UnsupportedOperationException("bad array set "+node.getPrettyPrinted()+"\n"+targetName+","+targets+","+values+"\n"+flow+"\n"+function);
+        }
+        
+        //assign all combinations
+        LinkedList<Value<D>> results = new LinkedList<Value<D>>();
+        for (Value<D> value : values){
+            for (LinkedList<Value<D>> indizes : indizesList){
+                Args<D> is = Args.newInstance(indizes);
+                for (Value<D> target : targets){
+                    results.add(target.arraySubsasgn(is, value));
+                }
+            }
+        }
+        
+        //assign result
+        setCurrentOutSet(assign(flow, targetName, Res.newInstance(ValueSet.newInstance(results))));
+        
+        //set in/out set
+        associateInAndOut(node);
+    }
+    
+    @Override
     public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case assign literal: "+node.getPrettyPrinted());
         //get literal and make constant
         Constant constant = Constant.get(node.getRHS());
 
         //put in flow map
-        ValueFlowMap<D> flow = getCurrentInSet().copy();
+        ValueFlowMap<D> flow = getCurrentInSet();
         String targetName = node.getTargetName().getID();
-        flow.remove(targetName);
-        flow.put(targetName, factory.newValueSet(constant));
         
         //assign result
-        setCurrentOutSet(flow);
+        setCurrentOutSet(assign(flow,targetName, 
+                Res.newInstance(factory.newValueSet(constant))));
+
+        //set in/out set
+        associateInAndOut(node);
+    }
+    
+    @Override
+    public void caseIRCopyStmt(IRCopyStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case copy: "+node.getPrettyPrinted());
+
+        ValueFlowMap<D> flow = getCurrentInSet();
+        String targetName = node.getTargetName().getID();
+        ValueSet<D> valueSet = flow.get(node.getSourceName().getID());
+        
+        //assign result
+        setCurrentOutSet(assign(flow, targetName, Res.newInstance(valueSet)));
+        
+        //set in/out set
+        associateInAndOut(node);
+        if (Debug) System.out.println("after copy: "+flow);
+    }
+    
+    
+    @Override
+    public void caseIRDotGetStmt(IRDotGetStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case dot get: "+node.getPrettyPrinted());
+
+        //get variable, field, flow
+        ValueFlowMap<D> flow = getCurrentInSet();
+        String objName = node.getDotName().getID();
+        String field = node.getFieldName().getID();
+        
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
+        
+        //TODO check if var exists
+        //loop through all possible values
+        for (Value<D> v : flow.get(objName)){
+            results.add(Res.newInstance(v.dotSubsref(field)));
+        }
+        //assign result
+        setCurrentOutSet(assign(flow, node.getTargets(),Res.newInstance(results)));
+
+        //set in/out set
+        associateInAndOut(node);
+    }
+    
+    @Override
+    public void caseIRDotSetStmt(IRDotSetStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case dot set: "+node.getPrettyPrinted());
+
+        //get variable, field, flow
+        ValueFlowMap<D> flow = getCurrentInSet();
+        String objName = node.getDotName().getID();
+        String field = node.getFieldName().getID();
+        String rhs = node.getValueName().getID();
+        
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
+        //loop through all possible rhs
+        for (Value<D> v : flow.get(rhs)){
+            //check if var exists - TODO this might change
+            if (isVarAssigned(flow, objName)){
+                //go through all possible objects
+                for (Value<D> obj : flow.get(objName)){
+                    results.add(Res.newInstance(obj.dotSubsasgn(field, v)));                    
+                }
+            } else {
+                results.add(Res.newInstance(factory.newStruct().dotSubsasgn(field, v)));
+            }
+        }
+
+        //assign result
+        setCurrentOutSet(assign(flow, objName, Res.newInstance(results)));
 
         //set in/out set
         associateInAndOut(node);
@@ -176,8 +367,71 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     
     
     @Override
+    public void caseIRCellArrayGetStmt(IRCellArrayGetStmt node) {
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case cell array get: "+node.getPrettyPrinted());
+        ValueFlowMap<D> flow = getCurrentInSet();
+        //if (Debug) System.out.println(flow);
+        ValueSet<D> array = flow.get(node.getCellArrayName().getID());
+        if (array == null) throw new UnsupportedOperationException("attempting to access unknown cell array "+node.getCellArrayName().getID()+" in\n"+node.getPrettyPrinted()+"\n with flow "+flow);
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
+        //go through all possible array values
+        for (Value<D> arrayValue : array){
+            //go through all possible index setss
+            //TODO - deal with overloading etc.
+            //TODO - errors on assign - use is assign to var??
+            for (List<Value<D>> indizes : cross(flow,node.getArguments())){
+                results.add(arrayValue.cellSubsref(Args.newInstance(indizes)));
+            }
+        }
+        
+        //put result assign/set flowsets
+        setCurrentOutSet(assign(flow, node.getTargets(), Res.newInstance(results)));
+        associateInAndOut(node);
+    }
+    
+    @Override
+    public void caseIRCellArraySetStmt(IRCellArraySetStmt node) {     
+        if (checkNonViable(node)) return;
+        if (Debug) System.out.println("case cell array set: "+node.getPrettyPrinted());
+        //find vars
+        ValueFlowMap<D> flow = getCurrentInSet();
+        String targetName = node.getCellArrayName().getID();
+        ValueSet<D> targets = flow.get(targetName);
+        ValueSet<D> values = flow.get(node.getValueName().getID());
+        List<LinkedList<Value<D>>> indizesList = cross(flow,node.getIndizes());
+        
+        //if target is undefined yet, define it
+        if (targets == null){
+            //TODO - call builtin cell instead
+            targets = ValueSet.newInstance(factory.newCell());
+        }
+        if (values == null){
+            //TODO return error value
+            throw new UnsupportedOperationException("bad array set "+node.getPrettyPrinted()+"\n"+targetName+","+targets+","+values+"\n"+flow);
+        }
+        
+        //assign all combinations
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
+        for (Value<D> value : values){
+            for (LinkedList<Value<D>> indizes : indizesList){
+                Args<D> is = Args.newInstance(indizes);
+                for (Value<D> target : targets){
+                    results.add(Res.newInstance(target.cellSubsasgn(is,Args.newInstance(value))));
+                }
+            }
+        }
+        
+        //assign result
+        setCurrentOutSet(assign(flow, node.getCellArrayName().getID(), Res.newInstance(results)));
+        associateInAndOut(node);
+    }
+    
+    @Override
     public void caseStmt(Stmt node) {
-        System.out.println(node+" "+currentInSet);
+        if (checkNonViable(node)) return;
+        //if (Debug)
+        System.out.println("Stmt "+node+"-"+node.getPrettyPrinted());
         //set in/out set
         associateInAndOut(node);
     }
@@ -189,24 +443,47 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
         associateInSet(node, getCurrentInSet());
         associateOutSet(node, getCurrentOutSet());
     }
-    
-    
+
+
     /**
      * given an IRCommaSeparated list and a flow set, returns all possible combinations
      * of values as a list of lists
      */
     private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,IRCommaSeparatedList args){
-         if (!args.isAllNameExpressions()){
-             //TODO deal with this
-             throw new UnsupportedOperationException("received bad input values on comma separated list");
-         } else {
-             //get list of value sets from the names
-             ArrayList<ValueSet<D>> values = new ArrayList<ValueSet<D>>(args.size());
-             for (Name name : args.asNameList()){
-                 values.add(flow.get(name.getID()));
-             }
-             return ValueSet.cross(values);
-         }
+        return cross(flow,args,null);
+    }
+    
+    /**
+     * given an IRCommaSeparated list and a flow set, returns all possible combinations
+     * of values as a list of lists
+     * partial values will be prepended
+     */
+    private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,IRCommaSeparatedList args,List<ValueSet<D>> partialValues){
+        if (Debug)System.out.println("cross - flow: "+flow+" args: "+args);
+        //get list of value sets from the names        
+        ArrayList<ValueSet<D>> values;
+        if (partialValues == null){
+            values = new ArrayList<ValueSet<D>>(args.size());
+        } else {
+            values = new ArrayList<ValueSet<D>>(args.size()+partialValues.size());
+            values.addAll(partialValues);
+        }
+        for (Expr expr : args){
+            if (expr instanceof NameExpr){
+                String name = ((NameExpr)expr).getName().getID();
+                ValueSet<D> vs = flow.get(name);
+                if (vs == null){
+                    System.out.println(function.toString());
+                    throw new UnsupportedOperationException("name "+name+" not found in "+flow);
+                }
+                values.add(vs);
+            } else if (expr instanceof ColonExpr){
+                values.add(ValueSet.newInstance(factory.newColonValue()));
+            } else {
+                throw new UnsupportedOperationException("received bad arg set "+args);
+            }
+        }
+        return ValueSet.cross(values);
     }
     
     /**
@@ -223,38 +500,82 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     
     /**
      * implements the flow equations for calling functions
-     * Returns a new value flow map which represents the outset of a call
+     * Returns a Result, doesn't modify anything
      */
-    private ValueFlowMap<D> doFunctionCall(
+    private Res<D> call(
             FunctionReference function,ValueFlowMap<D> flow,
-            IRCommaSeparatedList args,IRCommaSeparatedList targets){
-        ValueFlowMap<D> result = null;
-        //TODO - do overloading, deal with dominant args etc.
-        if (function.isBuiltin()){
-            for (LinkedList<Value<D>> argumentList : cross(flow,args)){
+            IRCommaSeparatedList args,IRCommaSeparatedList targets,
+            ASTNode<?> callsite, List<ValueSet<D>> partialArgs){
+        LinkedList<Res<D>> results = new LinkedList<Res<D>>();
+        if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
+        for (LinkedList<Value<D>> argumentList : cross(flow,args,partialArgs)){
+            //TODO - do overloading, deal with dominant args etc.
+            //actually call
+            //System.out.println("doFunctionCall result "+res);
+            if (function.isBuiltin()){
                 Args<D> argsObj = Args.newInstance(argumentList);
-                Res<D> res = valuePropagator.call(function.getname(), argsObj);
-                result = unionOrSet(result,doAssign(flow, targets, res));
-                System.out.println(result);
+                //spcial cases for some known functions
+                if (function.getname().equals("nargin") && argsObj.size() == 0){
+                    results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
+                } else {
+                    results.add(valuePropagator.call(function.getname(), argsObj));
+                }
+            }else{
+                //simplify args
+                ArrayList<Value<D>> newArgumentList = new ArrayList<Value<D>>(argumentList);
+                for (int i = 0; i < newArgumentList.size(); i++){
+                    newArgumentList.set(i, newArgumentList.get(i).toFunctionArgument(false));
+                }
+                Args<D> argsObj = Args.newInstance(newArgumentList);
+                //simplify again if its recursive
+                //TODO - rethink this - if a call is recursive, force it to be even if the arg ist different?
+                if (node.getCallString().contains(function, argsObj)){
+                    newArgumentList = new ArrayList<Value<D>>(argumentList);
+                    for (int i = 0; i < newArgumentList.size(); i++){
+                        newArgumentList.set(i, newArgumentList.get(i).toFunctionArgument(true));
+                    }
+                    argsObj = Args.newInstance(newArgumentList);
+                }
+                //perform analysis for call
+                results.add(node.analyze(function, argsObj, callsite));
             }
-        } else {
-            //TODO - deal with this
-            return null;
-        }
-        return result;
+        }        
+        if (Debug) System.out.println("called "+function+", received "+Res.newInstance(results));
+        //FIXME
+        return Res.newInstance(results);
     }
     
+
+    /**
+     * assigns the given collection of values, to the targets represented
+     * by the comma separated list. Returns a new flowmap which is a copy
+     * of old one, except for the newly assigned valeus.
+     * 
+     * all assignments should go through assign calls
+     * TODO - should the third argument be a ValueSet?
+     */
+    private ValueFlowMap<D> assign(ValueFlowMap<D> flow, 
+            String target, Res<D> values){
+        return assign(flow,new IRCommaSeparatedList(new NameExpr(new Name(target))),values);
+    }
     
     /**
      * assigns the given collection of values, to the targets represented
      * by the comma separated list. Returns a new flowmap which is a copy
      * of old one, except for the newly assigned valeus.
      * 
+     * all assignments should go through assign calls
+     * 
      * TODO - should this be part of ValueFlowMap? Or maybe a helper
+     * TODO - should we just assign Res<D>?
      */
-    private ValueFlowMap<D> doAssign(ValueFlowMap<D> flow, 
-            IRCommaSeparatedList targets, Collection<ValueSet<D>> values){
+    private ValueFlowMap<D> assign(ValueFlowMap<D> flow, 
+            IRCommaSeparatedList targets, Res<D> values){
+       if (Debug) System.out.println("assign: "+targets+" = "+values);
        ValueFlowMap<D> result = flow.copy();
+       if (!values.isViable()){
+           return ValueFlowMap.newInstance(false);
+       }
        if (targets.isAllNameExpressions()){
            Iterator<ValueSet<D>> iValues = values.iterator();
            Iterator<Name> iNames = targets.asNameList().iterator();
@@ -268,16 +589,41 @@ public class IntraproceduralValueAnalysis<D extends MatrixValue<D>> extends  IRA
     }
     
     
+    @Override
+    public Res<D> getDefaultResult() {
+        return Res.newInstance(false);
+    }
+    
+    
+    @Override
+    public IRFunction getTree() {
+        return (IRFunction)this.function.getAst();
+    }
+    
     
     /**
-     * merges flow map  b into flow map a and returns a, unless a or b is null 
-     * - in which case the other argument gets returned.
+     * returns true if the given variable name is assigned in the given flow set
      */
-    private ValueFlowMap<D> unionOrSet(ValueFlowMap<D> a, ValueFlowMap<D> b){
-        if (a == null) return b;
-        if (b == null) return a;
-        a.union(b);
-        return a;
+    private boolean isVarAssigned(ValueFlowMap<D> flow,String varName){
+        return (flow.containsKey(varName) && (flow.get(varName).size > 0));
+    }    
+    
+    
+    /**
+     * checks whether the current flow set is not viable. If it isn't, associate
+     * nonviable in/out sets, and return true. Thus, every statemetn case should
+     * start with
+     *  if (checkNonViable(node)) return;
+     */
+    private boolean checkNonViable(ASTNode<?> node){
+        if (Debug){
+            System.out.println("==== analyzing "+node+": "+node.getPrettyPrinted());
+            System.out.println("flowset "+getCurrentInSet());
+        }
+        if (getCurrentInSet().isViable()) return false;
+        setCurrentOutSet(getCurrentInSet().copy());
+        associateInAndOut(node);
+        return true;
     }
 }
 

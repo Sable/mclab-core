@@ -2,11 +2,11 @@ package natlab.Static.valueanalysis.simplematrix;
 
 import java.util.List;
 
+import natlab.Static.builtin.Builtin.Subsasgn;
 import natlab.Static.classes.reference.*;
+import natlab.Static.valueanalysis.ValueSet;
 import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.MatrixValue;
-import natlab.Static.valueanalysis.value.Shape;
-import natlab.Static.valueanalysis.value.Value;
+import natlab.Static.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -14,6 +14,7 @@ import natlab.toolkits.analysis.Mergable;
  * on top of the matlab class
  */
 public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
+    static SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
     Constant constant;
     
     
@@ -83,13 +84,7 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
         //call COLON
         return new SimpleMatrixValue(this.classRef);
     }
-    
-    @Override
-    public SimpleMatrixValue subsref(List<Value<SimpleMatrixValue>> indizes) {
-        return new SimpleMatrixValue(this.getMatlabClass());
-        //TODO
-    }
-    
+        
 
     public static final SimpleMatrixValueFactory FACTORY = new SimpleMatrixValueFactory();
 
@@ -101,6 +96,42 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
     @Override
     public boolean hasShape() {
         return false;
+    }
+    @Override
+    public ValueSet<SimpleMatrixValue> arraySubsref(Args<SimpleMatrixValue> indizes) {
+        return ValueSet.newInstance(new SimpleMatrixValue(this.getMatlabClass()));
+    }
+    
+    @Override
+    public ValueSet<SimpleMatrixValue> dotSubsref(String field) {
+        throw new UnsupportedOperationException("cannot dot-access a matrix");
+        //return ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
+    }
+    
+    @Override
+    public Res<SimpleMatrixValue> cellSubsref(Args<SimpleMatrixValue> indizes) {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public Value<SimpleMatrixValue> cellSubsasgn(Args<SimpleMatrixValue> indizes, Args<SimpleMatrixValue> values) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public Value<SimpleMatrixValue> arraySubsasgn(
+            Args<SimpleMatrixValue> indizes,Value<SimpleMatrixValue> value) {
+        //TODO - check whether conversion is allowed
+        return new SimpleMatrixValue(this.getMatlabClass());
+    }
+    
+    @Override
+    public Value<SimpleMatrixValue> toFunctionArgument(boolean recursive) {
+        return isConstant()?new SimpleMatrixValue(this.classRef):this;
+    }
+    @Override
+    public Value<SimpleMatrixValue> dotSubsasgn(String field,
+            Value<SimpleMatrixValue> value) {
+        throw new UnsupportedOperationException("cannot dot-assign a matrix");
     }
 }
 

@@ -21,8 +21,7 @@ package natlab.Static.valueanalysis.value;
 import java.util.List;
 
 import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.constant.*;
-import natlab.toolkits.analysis.Mergable;
+import natlab.Static.valueanalysis.ValueSet;
 
 /**
  * represents a primitive value, i.e. a value that has a primitive type.
@@ -59,23 +58,13 @@ public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> 
     abstract public D merge(Value<D> other);
     
     
-    /**
-     * returns true if there is a constant associated with this value
-     * @return
-     */
     public boolean isConstant(){
         return getConstant() != null;
     }
-    
-    /**
-     * returns the constant associated with this value, or null if it's not a constant
-     * @return
-     */
-    abstract public Constant getConstant();
-    
+        
     
     @Override
-    abstract public D subsref(List<Value<D>> indizes);  
+    abstract public ValueSet<D> arraySubsref(Args<D> indizes);  
     
     
     /**
