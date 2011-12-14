@@ -20,8 +20,9 @@ package natlab.Static.callgraph;
 
 import java.util.*;
 
-import natlab.Static.ir.transform.ThreeAddressToIR;
+import natlab.Static.ir.IRFunction;
 import natlab.Static.mc4.Mc4;
+import natlab.Static.simplification.ThreeAddressToIR;
 import natlab.toolkits.BiMap;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.path.FunctionReference;
@@ -48,12 +49,14 @@ public class StaticFunction implements Cloneable {
     String name;
     HashSet<String> siblings; //TODO - make these a hashmap<string,StaticFunction>
 
-    //references to functions being called
-    //this represents only non-class specific (overloaded) functions
-    //a FunctionReference of null signifies that the function could not be found
-    //(the kind is bottom)
-    //- either because it doesn't exist, or because it is only overloaded,
-    //  or is a variable coming from a script
+    /**
+     * references to functions being called
+     * this represents only non-class specific (overloaded) functions
+     * a FunctionReference of null signifies that the function could not be found
+     * (the kind is bottom)
+     *- either because it doesn't exist, or because it is only overloaded,
+     *  or is a variable coming from a script
+     */
     BiMap<String,FunctionReference> calledFunctions; 
     
 
@@ -99,8 +102,8 @@ public class StaticFunction implements Cloneable {
     //creates and puts first order approximation of the symbol table - variable or function
     private void findAndResolveFunctions(){
         //perform variable or function analysis on function and get result
-        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,
-                Mc4.functionFinder.getFunctionOrScriptQuery(reference.getFile()));
+        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function);
+            //TODO - use proper context, Mc4.functionFinder.getFunctionOrScriptQuery(reference.getFile()));
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
@@ -128,7 +131,7 @@ public class StaticFunction implements Cloneable {
     //apply simplification on the thing
     public void applySimplification(Class<? extends AbstractSimplification> simplification){
         FunctionList fList = new FunctionList();
-        fList.addFunction(function);        
+        fList.addFunction(function);
         function = Simplifier.simplify(fList,simplification).getFunction(0);
     }
     
@@ -136,17 +139,24 @@ public class StaticFunction implements Cloneable {
     //transforms the underlying AST to 3 address code
     private void transformToIR(){
         try{
-          applySimplification(CommentSimplification.class);
-          applySimplification(ThreeAddressToIR.class);
+            if (this.function instanceof IRFunction){
+                VFPreorderAnalysis anal = new VFPreorderAnalysis(function);
+                function = (Function)new CommentSimplification(function, anal).transform();
+                anal = new VFPreorderAnalysis(function);
+                function = (Function)new ThreeAddressToIR(function,anal).transform();
+            } else {
+                applySimplification(CommentSimplification.class);
+                applySimplification(ThreeAddressToIR.class);
+            }
         }catch (RuntimeException e){
-            System.out.println(function.getPrettyPrinted());
+            System.out.println("error transforming to IR:\n"+function.getName());
             throw e;
         }
     }
     
     
     //getter methods
-    public HashMap<String,FunctionReference> getCalledFunctions(){ return calledFunctions; }
+    public BiMap<String,FunctionReference> getCalledFunctions(){ return calledFunctions; }
     public String getName(){ return name; }
     public Function getAst(){ return function; }
     public FunctionReference getReference(){ return reference; }
@@ -180,19 +190,31 @@ public class StaticFunction implements Cloneable {
     	    if (calledFunctions.containsValue(ref)){ //we need to inline ref
     	        //ref is in the map and is called from this - we need to inline it
     	        StaticFunction otherFunction = map.get(ref);
-
+    	        
     	        //create a copy of the function
     	        otherFunction = otherFunction.clone();
-
+    	        
     	        //merge symbol tables
     	        String oName = otherFunction.name;
     	        mergeSymbols(otherFunction, oName.substring(0,Math.min(4,oName.length()))+"_");
-
+    	        
     	        //for any name that maps to ref, we need to inline it
-    	        for (String name : calledFunctions.getKeys(ref)){
-    	            //put it in the inline list
-    	            inlinerMap.put(name, otherFunction.function);
+    	        for (String name : calledFunctions.keySet()){
+    	            if (calledFunctions.get(name).equals(ref)){
+    	                inlinerMap.put(name, otherFunction.function);
+    	            }
     	        }
+    	        
+    	        //update called functions table to remove all references to the other function
+    	        for (String name : inlinerMap.keySet()){
+    	            calledFunctions.remove(name);
+    	        }
+    	        
+    	        
+    	        //for (String name : calledFunctions.getKeys(ref)){
+    	        //    //put it in the inline list
+    	        //    inlinerMap.put(name, otherFunction.function);
+    	        //}
     		}
     	}
 
@@ -207,6 +229,7 @@ public class StaticFunction implements Cloneable {
 
     	    //the inline creates non IR nodes, turn back into IR
     	    transformToIR();
+    	    
 
     	    System.out.println("finished transforming to IR");
     	} else {
@@ -245,10 +268,10 @@ public class StaticFunction implements Cloneable {
         //the rename maps for both functions
         HashMap<String,String> renameOther = new HashMap<String,String>();
         HashMap<String,String> renameThis = new HashMap<String,String>();
-        
+
         Set<String> symbols = function.getSymbols();
         Set<String> otherSymbols = otherFunction.function.getSymbols();
-                
+        
         //build rename maps - find name conflicts
         for (String name : otherSymbols){
             if (symbols.contains(name)){ //name conflict
@@ -262,6 +285,10 @@ public class StaticFunction implements Cloneable {
                 
                 if (otherFunction.calledFunctions.containsKey(name)
                         && calledFunctions.containsKey(name)){
+                    if(name.equals("sign")){
+                    System.out.println("merging sign among "+otherFunction.name+" "+this.name);
+                    }
+                    
                     //case: name is fun in both and they refer to the same - don't rename 
                     if(calledFunctions.get(name).equals(otherFunction.calledFunctions.get(name))){
                         continue; // don't rename

@@ -21,9 +21,13 @@ import java.io.File;
 import java.util.*;
 import ast.*;
 import natlab.CompilationProblem;
+import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.Static.simplification.LambdaSimplification;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.AbstractPathEnvironment;
 import natlab.toolkits.path.FunctionReference;
+import natlab.toolkits.rewrite.Simplifier;
 
 /**
  * A FunctionCollection is a collection of static functions.
@@ -42,9 +46,11 @@ import natlab.toolkits.path.FunctionReference;
  */
 
 public class FunctionCollection extends HashMap<FunctionReference,StaticFunction>{
+    private static final long serialVersionUID = 1L;
     private HashSet<GenericFile> loadedFiles = new HashSet<GenericFile>(); //files that were loaded so far
     private FunctionReference main = null; //denotes which function is the entry point
     private AbstractPathEnvironment path;
+    private static boolean DEBUG = false;
     
     /**
      * The function collection gets created via a path environment object
@@ -89,7 +95,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
      * @return returns true on success
      */
     public boolean collect(FunctionReference file,ArrayList<CompilationProblem> errList){
-        System.out.println("collecting "+file);
+        if (DEBUG) System.out.println("collecting "+file);
         //was the filename already loaded?
         if (loadedFiles.contains(file)) return true;
         
@@ -114,6 +120,11 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
                     program.getClass()+".");
         }
         
+        //We reduce lambda expressions at this point, because they create extra functions
+        program = (Program)Simplifier.simplify(program, 
+                new VFPreorderAnalysis(program, path.getFunctionOrScriptQuery(file.path)), 
+                LambdaSimplification.class); //TODO hook up with proper path environment
+        //System.out.println(program.getPrettyPrinted());
         
         loadedFiles.add(file.getFile());
         boolean success = true;
@@ -211,7 +222,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
     	for (FunctionReference ref : get(function).getCalledFunctions().values()){
 			if (!ref.isBuiltin()){
 				//inline recursively
-			    System.out.println("inlining "+ref);
+			    System.out.println("go inline "+ref);
 				inlineAll(context,ref);
 			}
     	}
@@ -240,7 +251,47 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
         c.inlineAll();
         return c.get(c.getMain());
     }
+    
+    
+    /**
+     * returns all function references that are either in this function collection or that
+     * are being referred to by and function in this collection
+     */
+    public HashSet<FunctionReference> getAllFunctionReferences(){
+        HashSet<FunctionReference> result = new HashSet<FunctionReference>();
+        for (FunctionReference ref : this.keySet()){
+            result.add(ref);
+            result.addAll(this.get(ref).getCalledFunctions().values());
+        }
+        return result;
+    }
+
+
+    /**
+     * returns all function references to builtins among the whole call graph
+     */
+    public HashSet<FunctionReference> getAllFunctionBuiltinReferences(){
+        HashSet<FunctionReference> result = new HashSet<FunctionReference>();
+        for (FunctionReference ref : this.keySet()){
+            for (FunctionReference ref2 : this.get(ref).getCalledFunctions().values()){
+                if (ref2.isBuiltin()) result.add(ref2);
+            }
+        }
+        return result;
+    }
+    
+
+
+    public String getPrettyPrinted(){
+        String s = "";
+        for (FunctionReference f : this.keySet()){
+            s += ("\n"+this.get(f));            
+        }
+        return s;
+    }
+
 }
+
 
 
 
