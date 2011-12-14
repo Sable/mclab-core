@@ -23,6 +23,7 @@ import java.util.*;
 import natlab.Static.ir.analysis.IRNodeCaseHandler;
 import ast.Expr;
 import ast.List;
+import ast.LiteralExpr;
 import ast.Name;
 import ast.NameExpr;
 
@@ -51,10 +52,18 @@ public class IRCommaSeparatedList extends List<Expr> implements IRNode {
             add(e);
         }
     }
+
+    public IRCommaSeparatedList(List<Expr> exprs){
+        this();
+        for (Expr e : exprs){
+            add(e);
+        }
+    }
+
     
     @Override
     public List<Expr> add(Expr node) {
-        // TODO Auto-generated method stub
+        if (node instanceof LiteralExpr) throw new UnsupportedOperationException();
         return super.add(node);
     }
     
@@ -125,4 +134,15 @@ public class IRCommaSeparatedList extends List<Expr> implements IRNode {
         return getNumChild();
     }
     
+    
+    @Override
+    public String toString() {
+        String s = "[";
+        Iterator<Expr> i = this.iterator();
+        while(i.hasNext()){
+            s += i.next().getPrettyPrinted();
+            if (i.hasNext()) s += ",";
+        }
+        return s+"]";
+    }
 }

@@ -41,7 +41,8 @@ public interface IRNodeCaseHandler {
     public void caseIRAbstractAssignToVarStmt(IRAbstractAssignToVarStmt node);
     public void caseIRArrayGetStmt(IRArrayGetStmt node);
     public void caseIRArraySetStmt(IRArraySetStmt node);
-    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node);
+    public void caseIRCopyStmt(IRCopyStmt node);
+    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node);
     public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node);
     public void caseIRCallStmt(IRCallStmt node);
     public void caseIRCellArrayGetStmt(IRCellArrayGetStmt node);

@@ -30,8 +30,6 @@ import ast.*;
  * but analyses should be aware of this.
  * 
  * 
- * TODO
- * - we should specialize on the case where the target is only one name
  */
 
 public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
@@ -43,8 +41,9 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
         List<Row> rows = new List<Row>();
         rows.add(new Row(targets));
         setLHS(new MatrixExpr(rows));
+        getTargets();
     }
-
+    
     
     /**
      * special constructor if there is only one value on the right
@@ -74,8 +73,8 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
             super.setLHS(node);
         } else {
             List<Row> rows = new List<Row>();
-            rows.add(new Row((new List<Expr>()).add(node)));
-            setLHS(new MatrixExpr(rows));            
+            rows.add(new Row(new IRCommaSeparatedList(node)));
+            setLHS(new MatrixExpr(rows));
         }
     }
     
@@ -117,10 +116,11 @@ public abstract class IRAbstractAssignToListStmt extends IRAbstractAssignStmt {
             return super.getPrettyPrintedLessComments();
         } else {
             return this.getIndent()
-                  +getTargets().getChild(0).getPrettyPrintedLessComments()
-                  +" = "
+                  //+getTargets().getChild(0).getPrettyPrintedLessComments()
+                  //+" = "
                   +this.getRHS().getPrettyPrintedLessComments()
-                  +(isOutputSuppressed()?";":"");
+                  +(isOutputSuppressed()?";":"")
+                  +" % [] = ...";
         }
     }
     

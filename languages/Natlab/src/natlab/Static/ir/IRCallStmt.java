@@ -51,6 +51,9 @@ public class IRCallStmt extends IRAbstractAssignToListStmt {
                 new IRCommaSeparatedList(target),new IRCommaSeparatedList(args));
     }
     
+    public IRCallStmt(Name function,IRCommaSeparatedList targets,IRCommaSeparatedList args) {
+        this(new NameExpr(function),targets,args);
+    }
     
     public IRCallStmt(NameExpr function,IRCommaSeparatedList targets,IRCommaSeparatedList args) {
         //set lhs

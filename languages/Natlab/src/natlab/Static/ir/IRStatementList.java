@@ -41,7 +41,7 @@ public class IRStatementList extends List<Stmt> implements IRNode {
     public List<Stmt> add(Stmt node) {
         if (!(node instanceof IRStmt)){
             throw new UnsupportedOperationException("attempting to put non IR stmt "
-                    +(node.getClass().getName())+" in a IRStatementList");
+                    +(node.getClass().getName())+":\n"+node.getPrettyPrinted()+" in a IRStatementList");
         }
         return super.add(node);
     }

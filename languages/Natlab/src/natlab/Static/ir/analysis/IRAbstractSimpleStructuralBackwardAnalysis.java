@@ -69,12 +69,16 @@ public abstract class IRAbstractSimpleStructuralBackwardAnalysis<F> extends
         parentForwarder.caseIRArraySetStmt(node);
     }
     @Override
-    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
-        parentForwarder.caseIRAssignFunctionHandleStmt(node);
+    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node) {
+        parentForwarder.caseIRCreateFunctionHandleStmt(node);
     }
     @Override
     public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node) {
         parentForwarder.caseIRAssignLiteralStmt(node);
+    }
+    @Override
+    public void caseIRCopyStmt(IRCopyStmt node) {
+        parentForwarder.caseIRCopyStmt(node);
     }
     @Override
     public void caseIRCallStmt(IRCallStmt node) {

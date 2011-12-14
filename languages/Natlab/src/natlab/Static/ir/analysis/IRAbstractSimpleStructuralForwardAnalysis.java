@@ -84,8 +84,8 @@ abstract public class IRAbstractSimpleStructuralForwardAnalysis<F> extends
         parentForwarder.caseIRArraySetStmt(node);
     }
     @Override
-    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
-        parentForwarder.caseIRAssignFunctionHandleStmt(node);
+    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node) {
+        parentForwarder.caseIRCreateFunctionHandleStmt(node);
     }
     @Override
     public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node) {
@@ -102,6 +102,10 @@ abstract public class IRAbstractSimpleStructuralForwardAnalysis<F> extends
     @Override
     public void caseIRCellArraySetStmt(IRCellArraySetStmt node) {
         parentForwarder.caseIRCellArraySetStmt(node);
+    }
+    @Override
+    public void caseIRCopyStmt(IRCopyStmt node) {
+        parentForwarder.caseIRCopyStmt(node);
     }
     @Override
     public void caseIRCommaSeparatedList(IRCommaSeparatedList node) {
@@ -133,7 +137,7 @@ abstract public class IRAbstractSimpleStructuralForwardAnalysis<F> extends
     }
     @Override
     public void caseIRWhileStmt(IRWhileStmt node) {
-        parentForwarder.caseIRStmt(node);
+        parentForwarder.caseIRWhileStmt(node);
     }
 
     @Override

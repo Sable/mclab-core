@@ -50,12 +50,11 @@ public class IRCellArrayGetStmt extends IRAbstractAssignToListStmt {
     public Name getCellArrayName(){
         return ((NameExpr)(((CellIndexExpr)getRHS()).getTarget())).getName();
     }
-        
+    
     //get arguments
     public IRCommaSeparatedList getArguments(){
          return (IRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
     }    
-    
     
     
     @Override

@@ -88,7 +88,12 @@ public class IRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler
     }
 
     @Override
-    public void caseIRAssignFunctionHandleStmt(IRAssignFunctionHandleStmt node) {
+    public void caseIRCopyStmt(IRCopyStmt node) {
+        irCallback.caseIRAbstractAssignToVarStmt(node);
+    }
+    
+    @Override
+    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node) {
         irCallback.caseIRAbstractAssignToVarStmt(node);
     }
 

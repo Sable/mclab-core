@@ -44,6 +44,14 @@ public class IRArraySetStmt extends IRAbstractAssignStmt {
         return ((NameExpr)((ParameterizedExpr)getLHS()).getTarget()).getName();
     }
         
+    public Name getValueName(){
+        return ((NameExpr)getRHS()).getName();
+    }
+    
+    public IRCommaSeparatedList getIndizes(){
+        return (IRCommaSeparatedList)(((ParameterizedExpr)getLHS()).getArgList());
+    }
+    
     
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {

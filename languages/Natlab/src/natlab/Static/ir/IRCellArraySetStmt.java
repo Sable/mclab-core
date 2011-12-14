@@ -43,6 +43,14 @@ public class IRCellArraySetStmt extends IRAbstractAssignStmt {
         return ((NameExpr)((CellIndexExpr)getLHS()).getTarget()).getName();
     }
         
+    public Name getValueName(){
+        return ((NameExpr)getRHS()).getName();
+    }
+    
+    public IRCommaSeparatedList getIndizes(){
+        return (IRCommaSeparatedList)(((CellIndexExpr)getLHS()).getArgList());
+    }
+    
     @Override
     public void irAnalyize(IRNodeCaseHandler irHandler) {
         irHandler.caseIRCellArraySetStmt(this);
