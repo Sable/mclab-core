@@ -24,7 +24,6 @@ package natlab.Static.interproceduralAnalysis;
  * - stores function, functionanalysis, callstring, argument, result
  * - takes care of a map of <callsite,interproc analysis node>
  * 
- * TODO - flag something as recursive
  * @param <F> the FunctionAnalysis type used to analyse each function/argument pair
  * @param <A>  the argument set that is given to the function to run the analysis
  * @param <R> the result set that the analysis returns for that function
@@ -32,9 +31,11 @@ package natlab.Static.interproceduralAnalysis;
 
 
 import java.util.*;
+
+import analysis.StructuralAnalysis;
+import ast.ASTNode;
 import natlab.Static.callgraph.*;
 import natlab.toolkits.path.FunctionReference;
-import annotations.ast.ASTNode;
 
 public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {
     private StaticFunction function;
@@ -45,7 +46,10 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
     private Arg argument;
     private FunctionCollection callgraph;
     private HashMap<ASTNode<?>,InterproceduralAnalysisNode<FAnalysis, Arg, Res>> callsites = 
-        new HashMap<ASTNode<?>, InterproceduralAnalysisNode<FAnalysis,Arg,Res>>();
+        new HashMap<ASTNode<?>,InterproceduralAnalysisNode<FAnalysis,Arg,Res>>();
+    static final boolean DEBUG = false;
+    private boolean isRecursive = false; //this may change during analysis
+    private Res currentRecursiveResult = null;
     
     /**
      * constructs an InterproceduralAnalysisNode,
@@ -64,7 +68,7 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
             FunctionReference ref,
             CallString<Arg> callString,
             Arg argument){
-        System.err.println("new node "+ref);
+        if (DEBUG) System.out.println("new intra proc anal node  "+ref+"("+argument+") - "+callString);
         
         //initialize/assign data
         this.function = callgraph.get(ref);
@@ -82,6 +86,20 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         
         //run analysis
         functionAnalysis.analyze();
+        
+        //if it was found that this is a recursive call, do fixed point iteration
+        if (isRecursive){
+            if (DEBUG) System.out.println("fixed point itreation on "+this+"\n first result"+functionAnalysis.getResult());
+
+            //fixed point is reached when the current result equals the new result
+            while (!currentRecursiveResult.equals(functionAnalysis.getResult())){
+                currentRecursiveResult = functionAnalysis.getResult();
+                functionAnalysis = analysisFactory.newFunctionAnalysis(function, argument, this);
+                functionAnalysis.analyze();
+                if (DEBUG) System.out.println(" newer result "+currentRecursiveResult);
+            }
+            if (DEBUG) System.out.println(" finished iteration, got "+currentRecursiveResult);
+        }
     }
     
     
@@ -110,26 +128,33 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         
         //check whether this is a recursive call
         if (callString.contains(function, arg)){
-            //TODO
-            //find the recursive result - there has to be one already
-            //TODO could there be a result already computed?
-            // -- there should be, with what temporary results
-            //tag the previous ref/arg node as recursive, to trigger fixed point compute
-            throw new UnsupportedOperationException("encountered unsupported recusrive call");
+            node =  interprocAnalysis.getNode(function, arg);
+            if (DEBUG) System.out.println("found recursive call "+callString+" -- "+node);
+            if (node.currentRecursiveResult == null){
+                node.currentRecursiveResult = node.getAnalysis().getDefaultResult();
+                if (DEBUG) System.out.println("created default result "+node.currentRecursiveResult);
+            }
+            //set the node to be recursive
+            node.isRecursive = true;
+            return node.currentRecursiveResult;
         } else {
             //not a recursive call - try to find the result in the interprocedural analysis
+            if (DEBUG) System.out.println("try to find node "+function.name+"("+arg+")");
             node =  interprocAnalysis.getNode(function, arg);
             if (node == null){
-                //create new interpocedural analysis node and return the result
+                if (DEBUG) System.out.println("creating new node "+function.name+"("+arg+")");
+                //create new interpocedural analysis
                 node = new InterproceduralAnalysisNode<FAnalysis, Arg, Res>(
                         interprocAnalysis, callgraph, factory, function,
                         callString.add(function, arg, callsite), arg);
+            } else {
+                if (DEBUG) System.out.println("found existing node "+node.function.getName()+"("+node.argument+")");
             }
-            //TODO - make sure this makes sense
             result = node.getResult();
         }
         
         //register call site - will overwrite old, invalidated value
+        //TODO
         setNodeForCallsite(callsite, node);
         return result;
     }
@@ -158,8 +183,19 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         return functionAnalysis.getResult();
     }
     
+    @Override
+    public String toString() {
+        return "AnalysisNode: "+function.getName()+"("+argument+")  --> "+getResult();
+    }
     
-    
+    /**
+     * prints the complete analysis node with code and flowsets 
+     */
+    public String getPrettyPrinted(){
+        return "AnalysisNode: "+function.getName()+"("+argument+"):\n"
+            + function.getAst().getAnalysisPrettyPrinted((StructuralAnalysis<?>)functionAnalysis, true, true)
+            + "\nresult: "+getResult();
+    }
 }
 
 

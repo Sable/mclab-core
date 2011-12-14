@@ -1,8 +1,7 @@
 package natlab.Static.interproceduralAnalysis;
 
-import natlab.Static.interproceduralAnalysis.CallString.Element;
 import natlab.toolkits.path.FunctionReference;
-import annotations.ast.ASTNode;
+import ast.ASTNode;
 
 /**
  * A Call String that is not generic in any argument Object.

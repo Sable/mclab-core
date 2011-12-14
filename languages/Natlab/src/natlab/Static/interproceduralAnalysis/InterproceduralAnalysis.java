@@ -18,8 +18,7 @@
 
 package natlab.Static.interproceduralAnalysis;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import annotations.ast.ASTNode;
 import natlab.Static.callgraph.*;
@@ -32,6 +31,8 @@ import natlab.toolkits.path.FunctionReference;
  * 
  * Mostly just a cache of analyses
  * 
+ * TODO - add support for multiple entry points
+ * 
  * @author ant6n
  *
  * @param <F> the FunctionAnalysis type used to analyse each function/argument pair
@@ -43,6 +44,12 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     private FunctionCollection callgraph;
     private InterproceduralAnalysisFactory<F, A, R> factory;
     private A mainArgs;
+    // TODO - should this be weak or something?
+    // should it be a hashmap of hashmaps?? -- or clear after analyze?
+    //see 'Key' below - TODO turn into Call<A>
+    LinkedHashMap<Key,InterproceduralAnalysisNode<F, A, R>> nodes =
+        new LinkedHashMap<Key, InterproceduralAnalysisNode<F,A,R>>();
+    
     
     public InterproceduralAnalysis(
             InterproceduralAnalysisFactory<F, A, R> factory,
@@ -53,6 +60,7 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
         this.mainArgs = mainArgs;
         analyze();
     }
+    
     
     /**
      * factory method
@@ -77,16 +85,13 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     
     /**
      * returns the node for the main
+     * TODO - this should be entry points
      */
     public InterproceduralAnalysisNode<F, A, R> getMainNode(){
         return getNode(callgraph.getMain(),mainArgs);
     }
     
     
-    // TODO - should this be weak or something?
-    // should it be a hashmap of hashmaps??
-    HashMap<Key,InterproceduralAnalysisNode<F, A, R>> nodes =
-        new HashMap<Key, InterproceduralAnalysisNode<F,A,R>>();
     /**
      * returns the node associated with the given function reference/argument pair.
      * If there is none, returns null.
@@ -112,18 +117,44 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
             this.arg = arg;
         }
         public int hashCode() {
-            return ref.hashCode() + 4783973*(arg == null?0:arg.hashCode());
+            return 0;
+            //System.out.println((ref.hashCode() + 4783973*(arg == null?0:arg.hashCode()))+" - "+getPrettyPrinted());
+            //return ref.hashCode() + 4783973*(arg == null?0:arg.hashCode());
         }
         @SuppressWarnings("unchecked")
         public boolean equals(Object obj) {
             if (obj instanceof InterproceduralAnalysis.Key) {
                 InterproceduralAnalysis.Key key = (InterproceduralAnalysis.Key) obj;
-                return key.ref.equals(ref)
-                && (arg==null || key.arg==null)?(arg==key.arg):key.arg.equals(arg);
+                return key.ref.equals(ref) &&
+                ((arg==null || key.arg==null)?(arg==key.arg):key.arg.equals(arg));
             }
             return false;
         }
+        
+        @Override
+        public String toString() {
+            return ref.getname()+"("+arg+")";
+        }
     }
+    
+    
+    public String getPrettyPrinted(){
+        String s = "";
+        for (InterproceduralAnalysisNode<F, A, R> node : nodes.values()){
+            s += node.getPrettyPrinted()+"\n\n";
+        }
+        return s;
+    }
+    
+    @Override
+    public String toString() {
+        String s = "InterproceduralAnalysis:"+getMainNode().getFunction().getName();
+        for (InterproceduralAnalysisNode<?,?,?> node : nodes.values()){
+            s += "\n  "+node;
+        }
+        return s;
+    }
+
 }
 
 
