@@ -11,6 +11,7 @@ import ast.*;
  */
 
 public class TempFunctionBuilderHelper {
+    static HashSet<String> allNames = new HashSet<String>();
     
     public static String getFreshFunctionName(ASTNode<?> node, FunctionOrScriptQuery query, String startsWith){
         return getFreshFunctionName(node,query,startsWith,new HashSet<String>());
@@ -31,8 +32,10 @@ public class TempFunctionBuilderHelper {
             String name = startsWith+(i++);
             if (       !usedNames.contains(name)
                     && !avoidNames.contains(name)
+                    && !allNames.contains(name)
                     && !query.isFunctionOrScript(name) 
                     && !query.isPackage(name)){
+                allNames.add(name);
                 return name;
                 
             }
