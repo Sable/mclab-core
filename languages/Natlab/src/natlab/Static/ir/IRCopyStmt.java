@@ -8,6 +8,7 @@ import natlab.Static.ir.analysis.IRNodeCaseHandler;
  * u = t
  */
 public class IRCopyStmt extends IRAbstractAssignToVarStmt {
+    private static final long serialVersionUID = 1L;
 
     public IRCopyStmt(Name lhs, Name rhs) {
         super(lhs);

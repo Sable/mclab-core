@@ -76,6 +76,10 @@ abstract public class IRAbstractSimpleStructuralForwardAnalysis<F> extends
         parentForwarder.caseIRAbstractAssignToVarStmt(node);
     }
     @Override
+    public void caseIRAbstractAssignFromVarStmt(IRAbstractAssignFromVarStmt node){
+        parentForwarder.caseIRAbstractAssignFromVarStmt(node);
+    }
+    @Override
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
         parentForwarder.caseIRArrayGetStmt(node);
     }

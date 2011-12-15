@@ -39,6 +39,7 @@ public interface IRNodeCaseHandler {
     public void caseIRAbstractAssignStmt(IRAbstractAssignStmt node);
     public void caseIRAbstractAssignToListStmt(IRAbstractAssignToListStmt node);
     public void caseIRAbstractAssignToVarStmt(IRAbstractAssignToVarStmt node);
+    public void caseIRAbstractAssignFromVarStmt(IRAbstractAssignFromVarStmt node);
     public void caseIRArrayGetStmt(IRArrayGetStmt node);
     public void caseIRArraySetStmt(IRArraySetStmt node);
     public void caseIRCopyStmt(IRCopyStmt node);

@@ -78,13 +78,18 @@ public class IRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler
     }
 
     @Override
+    public void caseIRAbstractAssignFromVarStmt(IRAbstractAssignFromVarStmt node){
+        irCallback.caseIRAbstractAssignFromVarStmt(node);
+    }
+    
+    @Override
     public void caseIRArrayGetStmt(IRArrayGetStmt node) {
         irCallback.caseIRAbstractAssignToListStmt(node);
     }
 
     @Override
     public void caseIRArraySetStmt(IRArraySetStmt node) {
-        irCallback.caseIRAbstractAssignStmt(node);
+        irCallback.caseIRAbstractAssignFromVarStmt(node);
     }
 
     @Override
@@ -119,7 +124,7 @@ public class IRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler
 
     @Override
     public void caseIRCellArraySetStmt(IRCellArraySetStmt node) {
-        irCallback.caseIRAbstractAssignStmt(node);
+        irCallback.caseIRAbstractAssignFromVarStmt(node);
     }
 
     @Override
@@ -179,7 +184,7 @@ public class IRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler
 
     @Override
     public void caseIRDotSetStmt(IRDotSetStmt node) {
-        irCallback.caseIRAbstractAssignStmt(node);
+        irCallback.caseIRAbstractAssignFromVarStmt(node);
     }
 
     @Override

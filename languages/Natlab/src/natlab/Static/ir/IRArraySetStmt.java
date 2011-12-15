@@ -31,13 +31,12 @@ import ast.*;
  */
 
 
-public class IRArraySetStmt extends IRAbstractAssignStmt {
+public class IRArraySetStmt extends IRAbstractAssignFromVarStmt {
     private static final long serialVersionUID = 1L;
 
     public IRArraySetStmt(Name array, IRCommaSeparatedList indizes,Name rhs){
-        super();
+        super(rhs);
         setLHS(new ParameterizedExpr(new NameExpr(array),indizes));
-        setRHS(new NameExpr(rhs));
     }
     
     public Name getArrayName(){

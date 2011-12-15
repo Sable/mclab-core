@@ -30,23 +30,18 @@ import ast.*;
  */
 
 
-public class IRCellArraySetStmt extends IRAbstractAssignStmt {
+public class IRCellArraySetStmt extends IRAbstractAssignFromVarStmt {
     private static final long serialVersionUID = 1L;
     
     public IRCellArraySetStmt(Name array, IRCommaSeparatedList indizes,Name rhs){
-        super();
+        super(rhs);
         setLHS(new CellIndexExpr(new NameExpr(array),indizes));
-        setRHS(new NameExpr(rhs));
     }
     
     public Name getCellArrayName(){
         return ((NameExpr)((CellIndexExpr)getLHS()).getTarget()).getName();
     }
-        
-    public Name getValueName(){
-        return ((NameExpr)getRHS()).getName();
-    }
-    
+            
     public IRCommaSeparatedList getIndizes(){
         return (IRCommaSeparatedList)(((CellIndexExpr)getLHS()).getArgList());
     }
