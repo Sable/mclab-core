@@ -20,18 +20,23 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
     }
 
     public void caseFunction( Function node ){
-
         HashSetFlowSet<String> mySet = newInitialFlow();
-
         for( Name n: node.getInputParams() )
             mySet.add( n.getID() );
         currentOutSet = newInitialFlow();
         copy(mySet, currentOutSet);
         caseASTNode( node );
-        
-        
+        outFlowSets.put(node, currentOutSet);
     }
 
+    public void caseScript( Script node ){
+        HashSetFlowSet<String> mySet = newInitialFlow();
+        currentOutSet = newInitialFlow();
+        copy(mySet, currentOutSet);
+        caseASTNode( node );   
+        outFlowSets.put(node, currentOutSet);
+    }
+    
     public void caseAssignStmt( AssignStmt node )
     {
         inFlowSets.put(node, currentInSet.copy() );
@@ -53,10 +58,12 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
         caseASTNode( node );
         outFlowSets.put( node, currentInSet );
     }
+    
     public void copy( HashSetFlowSet<String> source, HashSetFlowSet<String> dest )
     {
         source.copy(dest);
     }
+    
     public void merge( HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out )
     {
         in1.intersection( in2, out );

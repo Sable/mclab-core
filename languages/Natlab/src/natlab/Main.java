@@ -32,6 +32,7 @@ import natlab.toolkits.DependenceAnalysis.Profiler;
 import natlab.toolkits.analysis.ForVisitor;
 
 import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
 import natlab.toolkits.analysis.example.*;
 import natlab.toolkits.analysis.test.*;
 import natlab.toolkits.analysis.handlepropagation.*;
@@ -39,9 +40,13 @@ import natlab.toolkits.analysis.callgraph.*;
 import natlab.example.*;
 import natlab.toolkits.rewrite.multireturn.*;
 import natlab.toolkits.rewrite.threeaddress.*;
+import natlab.toolkits.scalar.AbstractFlowAnalysis;
 import natlab.toolkits.analysis.isscalar.*;
+import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.refactoring.*;
 
 import natlab.toolkits.rewrite.Validator;
+
 
 import natlab.toolkits.filehandling.*;
 
@@ -50,6 +55,7 @@ import matlab.TranslationProblem;
 import matlab.OffsetTracker;
 import matlab.TextPosition;*/
 import matlab.*;
+import matlab.MatlabParser.program_return;
 
 
 import java.io.*;
@@ -352,9 +358,9 @@ public class Main
                         System.err.println( "server shutdown" );
                 }
                 // FOR JESSE PLAY
-                //else if( options.play() ){
-                    //Play.run();
-                //}
+                else if( options.play() ){
+
+                }
                 else if( options.getFiles().size() == 0 ){
                     System.err.println("No files provided, must have at least one file.");
                 }
@@ -364,7 +370,7 @@ public class Main
                     //parse each file and put them in a list of Programs
                     ArrayList<Program> programs = new ArrayList<Program>( options.getFiles().size() );
                     ArrayList<String> fileNames = new ArrayList<String>( options.getFiles().size() );
-                    
+                    TreeMap<String, Program> programMap=new TreeMap<String, Program>();
                     for( Object o : options.getFiles() ){
                         //When processing files there are currently two options.
                         //Either the matlab flag is set or it isn't.
@@ -437,10 +443,15 @@ public class Main
                         //    System.err.println("\nWeeding Failed, Skipping: " + file);
                         //    break;
                         //}
+                        String[] parts=file.split(File.separator);
+                        String filename= parts[parts.length-1];
+                        prog.setName(filename.substring(0,filename.length()-2)); //#FIXME Soroush: find the extension? 
                         
+                        prog.setFullPath(file);
+
+                        programMap.put(prog.getName(), prog);
                         programs.add(prog);
                     }
-                    
                     //Take all resulting Program nodes and place them in a
                     //CompilationUnits instance
                     CompilationUnits cu = new CompilationUnits();
@@ -489,10 +500,31 @@ public class Main
                             System.out.println(cu.getPrettyPrinted());
                     }
                     else if( options.vfpreorder() ){
-                        VFPreorderAnalysis a = new VFPreorderAnalysis( cu );
+
+                    	DefinitelyAssignedAnalysis a = new DefinitelyAssignedAnalysis( cu );
                         a.analyze();
-                        System.out.println(cu.getPrettyPrinted());
-                        System.out.println( a.getCurrentSet().toString() );
+			/*
+                        MScriptInliner inliner = new MScriptInliner(cu, programMap);
+                        for (Program p: programMap.values()){
+                    		if (p instanceof FunctionList){                    		
+                    			FunctionList f = (FunctionList)p;
+                    			inliner.inlineAllFunctions((Function)f.getChild(0).getChild(0));
+                    		}
+                        }
+			*/
+                    	//VFFlowSensitiveAnalysis a = new VFFlowSensitiveAnalysis( cu );
+                        
+                        //a.analyze();
+                        //System.out.println(cu.getPrettyPrinted());
+//                        System.out.println("Sensitive"+ a.getCurrentOutSet().toString() );
+                        
+			cu.setRootFolder(new natlab.toolkits.filehandling.genericFile.FileFile("/home/soroush/Examples/PathEx/"));
+//                        CDAnalysis c = new CDAnalysis( cu );
+						FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, ReachingDefs.class);
+						System.out.println(testTool.run());
+
+			
+
 
 			/*
 

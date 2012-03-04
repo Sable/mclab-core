@@ -45,7 +45,8 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
     {
         A copiedOutSet = newInitialFlow();
         copy( currentInSet, copiedOutSet );
-        loopStack.peek().addBreakSet( copiedOutSet );
+        if ( !loopStack.isEmpty() )
+            loopStack.peek().addBreakSet( copiedOutSet );
     }
 
     /**
@@ -56,7 +57,8 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
     {
         A copiedOutSet = newInitialFlow();
         copy( currentInSet, copiedOutSet );
-        loopStack.peek().addContinueSet( copiedOutSet );
+        if ( !loopStack.isEmpty() )
+            loopStack.peek().addContinueSet( copiedOutSet );
     }
 
 

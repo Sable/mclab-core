@@ -81,8 +81,7 @@ public class FileFile extends GenericFile {
         }
         return list;
     }
-
-    
+   
     @Override
     public int hashCode() {
         return file.hashCode();

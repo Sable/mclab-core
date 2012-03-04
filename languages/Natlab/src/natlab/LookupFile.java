@@ -23,12 +23,12 @@ import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import ast.*;
 
 public class LookupFile{ 
-    private static HashMap<String, String> builtinClasses = initialize();
-    private static HashMap<String, String> builtinFunctions;
-    private static HashMap<String, String> builtinPackages;
+	public  static HashMap<String, String> builtinClasses = initialize();
+    public  static HashMap<String, String> builtinFunctions;
+    public  static HashMap<String, String> builtinPackages;
     private static HashMap<String, String> outputInfo;
     private static HashMap<String, Function> currentFile;
-    private static HashMap<String, ASTNode> lib; 
+    public static HashMap<String, ASTNode> lib; 
     private static HashMap<String, String> initialize(){
         try{
             InputStream fin=LookupFile.class.getResourceAsStream("builtin.ser");

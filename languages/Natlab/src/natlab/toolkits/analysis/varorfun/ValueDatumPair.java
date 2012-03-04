@@ -7,8 +7,8 @@ package natlab.toolkits.analysis.varorfun;
 
 public class ValueDatumPair< V, D >
 {
-    protected V value;
-    protected D datum;
+    protected final V value;
+    protected final D datum;
 
     public ValueDatumPair( V v, D d )
     {
@@ -26,20 +26,12 @@ public class ValueDatumPair< V, D >
     }
     public boolean equals( Object o )
     {
-        try{
-            return value.equals( ((ValueDatumPair)o).getValue() );
-        }catch( Exception e){
-            return false;
-        }
+        return value.equals( ((ValueDatumPair)o).getValue() );
     }
+
     public int hashCode()
     {
         return value.hashCode();
-    }
-
-    public D setDatum( D d )
-    {
-        return datum = d;
     }
     /**
      * Shallow copies the Pair.

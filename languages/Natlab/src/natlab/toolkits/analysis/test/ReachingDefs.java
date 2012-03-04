@@ -20,7 +20,10 @@ package natlab.toolkits.analysis.test;
 
 import analysis.*;
 import natlab.toolkits.analysis.*;
+import natlab.toolkits.utils.NodeFinder;
 import ast.*;
+
+import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -32,7 +35,11 @@ import java.util.HashSet;
 public class ReachingDefs 
     extends AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String,Set<AssignStmt>>>
 {
-    private Merger merger = new Merger<Set<ASTNode>>(){
+	public static final AssignStmt UNDEF = new AssignStmt();
+	public static final AssignStmt PARAM = new AssignStmt();
+	public static final AssignStmt GLOBAL = new AssignStmt();
+
+	private Merger merger = new Merger<Set<ASTNode>>(){
         public Set<ASTNode> merge( Set<ASTNode> s1, Set<ASTNode> s2 )
         {
             Set<ASTNode> ms = new HashSet<ASTNode>( s1 );
@@ -47,6 +54,7 @@ public class ReachingDefs
     public ReachingDefs( ASTNode tree )
     {
         super(tree);
+//        DEBUG=true;
         startMap = new HashMapFlowMap<String,Set<AssignStmt>>(merger);
         nameCollector= new NameCollector(tree);
         nameCollector.analyze();
@@ -66,7 +74,14 @@ public class ReachingDefs
                        HashMapFlowMap<String,Set<AssignStmt>> in2,
                        HashMapFlowMap<String,Set<AssignStmt>> out )
     {
-        in1.union( merger, in2, out );
+    	Set<String> keys = new HashSet<String>(in1.keySet());
+        keys.addAll(in2.keySet());
+        for (String s: keys){
+        	Set<AssignStmt> res = new HashSet<AssignStmt>();
+    		res.addAll(in1.get(s));
+    		res.addAll(in2.get(s));
+        	out.put(s, res);
+        }
     }
 
     /** 
@@ -92,6 +107,40 @@ public class ReachingDefs
         copy(in, out);
         return out;
     }
+    
+    public void caseFunction(Function f)
+    {
+    	currentOutSet = newInitialFlow();
+    	currentInSet = currentOutSet;
+        for (Name n: NodeFinder.find(f, Name.class)){
+        	Set<AssignStmt> s = new HashSet<AssignStmt>();
+        	s.add(UNDEF);
+        	currentOutSet.put(n.getID(), s);
+        }
+        for (Name inputArg: f.getInputParamList()){
+        	Set<AssignStmt> s = new HashSet<AssignStmt>();
+        	s.add(PARAM);
+        	currentOutSet.put(inputArg.getID(), s);
+        }
+        caseASTNode(f.getStmts());
+        outFlowSets.put(f, currentOutSet);
+    }
+
+
+    public void caseScript(Script f)
+    {
+    	currentOutSet = newInitialFlow();
+    	currentInSet = currentOutSet;
+        for (Name n: NodeFinder.find(f, Name.class)){
+        	Set<AssignStmt> s = new HashSet<AssignStmt>();
+        	s.add(UNDEF);
+        	currentOutSet.put(n.getID(), s);
+        }
+        caseASTNode(f.getStmts());
+        outFlowSets.put(f, currentOutSet);
+    }
+
+    
     
     public HashMapFlowMap<String,Set<AssignStmt>> newInitialFlow()
     {

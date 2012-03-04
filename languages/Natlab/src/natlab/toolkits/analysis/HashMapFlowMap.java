@@ -130,6 +130,7 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
     {
         return map.containsKey(key);
     }
+    
     /**
      * Returns a set view of the keys in the map.
      */
@@ -138,9 +139,27 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
     {
         return map.keySet();
     }
+    
     @Override
     public HashMapFlowMap<K,V> emptyMap()
     {
         return new HashMapFlowMap();
+    }
+
+    @Override
+    public boolean equals(Object o){
+    	if (o!=null && (o instanceof HashMapFlowMap))
+    		return ((HashMapFlowMap)o).map.equals(map);
+    	return false;
+    }
+    
+    
+    public Map<K, V> toMap(){
+    	return new HashMap<K, V>(map);
+    }
+    
+    @Override
+    public String toString(){
+    	return map.toString();
     }
 }

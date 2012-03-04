@@ -1,9 +1,7 @@
 package natlab.toolkits.analysis.varorfun;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Set;
+
+import java.util.*;
 
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -29,10 +27,10 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     private Function currentFunction = null;
     private Script currentScript = null;
     private FunctionOrScriptQuery lookupQuery = null;
-    private boolean endExpr=false;
-    private boolean boundEndExprToID=false;
-    private ASTNode outerParameterizedExpr=null;
+    private LValueExpr outerParameterizedExpr=null;
     private boolean inFunction=false;
+    private java.util.List<NameExpr> endCandidates = null;
+
 	@Override
 	public void caseCondition(Expr condExpr) {
 		if (condExpr instanceof NameExpr)
@@ -73,12 +71,11 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         outFlowSets.put( node, currentOutSet.copy() );
     }
     
-    public void caseEndExpr( EndExpr node ){
-        endExpr=true;
-    }
-    
     @Override
     public void caseCellIndexExpr(CellIndexExpr node){
+        NameExpr n = new ArrayList<NameExpr>(((CellIndexExpr) node).getTarget().getNameExpressions()).get(0);
+        currentOutSet.add( new ValueDatumPair( n.getName().getID(), VFDatum.VAR ) );
+        annotateNode(n.getName());
     	caseMyLValue(node);
     }
         
@@ -90,9 +87,9 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         currentInSet = newInitialFlow();
         currentOutSet = currentInSet;
         if (node.getParent().getParent() instanceof Function){
-            for( ValueDatumPair<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).toList() ){
-                if( pair.getDatum()==VFDatum.VAR  || pair.getDatum()==VFDatum.BOT)
-                    currentInSet.add( pair.copy() );
+            for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).toList() ){
+                if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
+                    currentInSet.add( pair );
             }        	
         }
         if(DEBUG){
@@ -213,108 +210,162 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         annotateNode(node.getName());
     }
     
-    public void caseLambdaExpr(LambdaExpr node){}
+    public void caseLambdaExpr(LambdaExpr node){/*
+    	VFFlowset backup = currentOutSet.copy();
+    	Set<String> inputSet=new TreeSet<String>();
+    	for (Name inputParam: node.getInputParams()){
+    		currentOutSet.add(new ValueDatumPair<String,VFDatum>(inputParam.getID(),VFDatum.VAR));
+    		inputSet.add(inputParam.getID());
+    	}
+    	caseASTNode(node);
+    	for (Map.Entry<String, VFDatum> p:currentOutSet.getMap().entrySet()){
+    		if (! inputSet.contains(p.getKey()))
+    			backup.add(new ValueDatumPair<String, VFDatum>(p.getKey(),p.getValue()));
+    	}
+    	currentOutSet=backup;*/
+    }
+    
+
+
+
+    private ASTNode getTarget(LValueExpr node){
+    	ASTNode target = null;
+    	if (node instanceof CellIndexExpr)
+            target = ((CellIndexExpr) node).getTarget();
+    	else if (node instanceof ParameterizedExpr)
+            target = ((ParameterizedExpr) node).getTarget();
+    	else
+            System.err.println("in LValue without any target");
+        return target;
+    }
+    
+    private ASTNode getArgs(LValueExpr node){
+        ASTNode args = null;
+        if (node instanceof CellIndexExpr)
+            args = ((CellIndexExpr) node).getArgs();
+        if (node instanceof ParameterizedExpr)
+            args = ((ParameterizedExpr) node).getArgs();
+        return args;
+    }
+
+    public void caseMyLValue(LValueExpr node) {
+    	ASTNode target = getTarget(node);
+        ASTNode args = getArgs(node);
+    	NameExpr res = new ArrayList<NameExpr>(target.getNameExpressions()).get(0);
+        String targetName=res.getName().getID();
+        
+        List<NameExpr> candidates_backup;
+        if (endCandidates!=null)
+            candidates_backup = new ArrayList<NameExpr>(endCandidates);
+        else
+            candidates_backup = new ArrayList<NameExpr>();
+
+        if (outerParameterizedExpr==null){
+            endCandidates = new ArrayList<NameExpr>();
+            outerParameterizedExpr=node;
+        }
+
+        target.analyze( this );
+
+        
+        VFDatum d =  currentOutSet.contains( targetName ); 
+        if ( d == null || d == VFDatum.BOT || VFDatum.LDVAR == d || d == VFDatum.WAR || d == VFDatum.TOP ) { 
+            endCandidates.add(res);
+        }
+        if (d == VFDatum.VAR){
+            endCandidates = new ArrayList<NameExpr>();
+            endCandidates.add(res);
+        }
+        
+        args.analyze( this );
+        
+        
+        endCandidates = candidates_backup;
+        if (outerParameterizedExpr==node){ //Reached the outermost expression 
+            endCandidates=null;
+            outerParameterizedExpr=null;
+        }
+    }
+
+    
+    
+    private void handleLoad(ParameterizedExpr node){
+        if (! (node.getTarget() instanceof NameExpr)) return ;
+        NameExpr target = (NameExpr)node.getTarget();
+        if (target.getName().getID().equals( "load" ) ){
+            ASTNode args = node.getChild(1);
+            for (int i=1;i< args.getNumChild();i++)
+                if( args.getChild( i ) instanceof StringLiteralExpr )  {
+                    String param = ( (StringLiteralExpr) args.getChild( i ) ).getValue();
+                    if (param.charAt(0)!='-'){
+                        currentOutSet.add( new ValueDatumPair( param  , VFDatum.VAR ) );
+                        annotateNode(target.getName());
+                    }
+                }
+        }
+    }
+    @Override public void caseParameterizedExpr( ParameterizedExpr node ) {
+        handleLoad(node);
+        caseMyLValue(node);
+    }
     
     @Override
-    public void caseParameterizedExpr( ParameterizedExpr node )
-    {
-    	caseMyLValue(node);
+    public void caseEndExpr(EndExpr e) {
+        if (endCandidates == null || endCandidates.size() == 0 ){
+            if (outerParameterizedExpr==null)
+                System.err.println("Cannot bind end to anything");
+            else {
+                NameExpr res = new ArrayList<NameExpr>(getTarget(outerParameterizedExpr).getNameExpressions()).get(0);
+                System.err.println("No candidates, making " +res.getName().getID() + " a TOP" );
+                bindError(res, e);
+            }
+            return;
+        }
+
+        if ( endCandidates.size() == 1 ){
+            bindWarn(endCandidates.get(0), e);
+        }
+
+        if (inFunction && endCandidates.size() > 1 ){
+            bindError(endCandidates.get(0), e);
+            System.err.println("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
+            return;
+        }
+        
+        if ( (!inFunction) && endCandidates.size() > 1){
+            NameExpr toBind = null;
+            
+            for (NameExpr n: endCandidates){
+                if (!scriptOrFunctionExists(n.getName().getID())){
+                    if ( toBind==null )
+                        toBind=n;
+                    else{
+                        System.err.println("More than one candidate, making " + n.getName().getID() + " a TOP" );
+                        bindError(n, e);
+                    }
+                }
+            }            
+            if (toBind == null){ // all cands exist in the lib{
+                System.err.println("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
+                bindError(endCandidates.get(0), e);
+            }
+            else
+                bindWarn(toBind, e);
+        }
     }
 
-    public void caseMyLValue(LValueExpr node){
-    	VFFlowset currentSet= currentOutSet;
-    	ASTNode target = null;
-    	boolean endExprBackup=endExpr;
-    	endExpr=false;
-    	if (node instanceof CellIndexExpr)
-    		target = ((CellIndexExpr) node).getTarget();
-    	else if (node instanceof ParameterizedExpr)
-    		target = ((ParameterizedExpr) node).getTarget();
-    	else
-    		System.err.println("in LValue without any target");
-    	
-        //getNameExpressions must return a set containing only
-        //NameExpr
-        @SuppressWarnings("unchecked")
-            Set<NameExpr> names = (Set<NameExpr>)target.getNameExpressions();
-    	NameExpr res = new ArrayList<NameExpr>(names).get(0);
-//    	System.out.println(res.getName().getID()+" EndExpr: "+endExpr+ " boundToID: " + boundEndExprToID + " backup: "+endExprBackup);
-//    	System.out.println(res.getName().getID()+" before: "+ currentSet);
-	    String targetName=res.getName().getID();
-	    if (outerParameterizedExpr==null){
-	    	outerParameterizedExpr=node;
-	    	endExpr=false;
-	    	endExprBackup=false;
-	    	boundEndExprToID=false;
-	    }
-
-    	ASTNode args = null;
-    	if (node instanceof CellIndexExpr)
-    		args = ((CellIndexExpr) node).getArgs();
-    	if (node instanceof ParameterizedExpr)
-    		args = ((ParameterizedExpr) node).getArgs();
-
-	    args.analyze( this );
-	    if (node instanceof ParameterizedExpr && target instanceof NameExpr && targetName.equals( "load" ) ) 
-	    {
-	    	for (int i=1;i<node.getChild(1).getNumChild();i++){
-	    		if( node.getChild( 1 ).getChild( i ) instanceof StringLiteralExpr ) 
-	    		{		
-	    			String param = ( (StringLiteralExpr) node.getChild( 1 ).getChild( i ) ).getValue();
-	    			if (param.charAt(0)!='-'){
-	    				currentSet.add( new ValueDatumPair<String,VFDatum>( param  , VFDatum.VAR ) );
-	    				annotateNode(res.getName());
-	    			}
-	    		}
-	    	}
-	    }
-	    target.analyze( this );	
-
-	    /* END Expression */
-	    if (boundEndExprToID){
-	    	VFDatum d =  currentSet.contains( targetName );
-	    	if (d==VFDatum.VAR || d==VFDatum.BOT||d==null )
-	        {
-	            endExpr = false;
-	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP) );
-	            annotateNode(res.getName());
-	        }
-	    	boundEndExprToID=false;
-	    }
-//	    System.out.println(res.getName().getID()+"EndExpr: "+endExpr+ " boundToID: " + boundEndExprToID + " backup: "+endExprBackup);
-	    if (endExpr){
-	        VFDatum d =  currentSet.contains( targetName );
-	        if (d == null || VFDatum.BOT.equals(d)||(d==VFDatum.LDVAR && inFunction))
-	        {
-	            endExpr = false;
-	            if (inFunction)
-	            boundEndExprToID=true;
-	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.WAR) );
-	            annotateNode(res.getName());
-	        }
-	        else if (VFDatum.VAR.equals(d)||VFDatum.WAR==d||(d==VFDatum.LDVAR && !inFunction))
-	        {
-	            endExpr = false;
-	            currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.VAR) );
-	            annotateNode(res.getName());
-	        }
-	    }
-	    
-		
-		endExpr|=endExprBackup;
-	    if (outerParameterizedExpr==node){
-	    	if (endExpr){
-	    		currentSet.add( new ValueDatumPair<String,VFDatum>( targetName, VFDatum.TOP ) );
-	    		annotateNode(res.getName());
-	    		endExpr=false;
-	    		boundEndExprToID=false;
-	    	}
-	    	outerParameterizedExpr=null;
-	    }
-//	    System.out.println(res.getName().getID()+" after: "+ currentSet);
-//	    System.out.println(res.getName().getID()+"EndExpr: "+endExpr+ " boundToID: " + boundEndExprToID + " backup: "+endExprBackup);
+    private void bindError(NameExpr n, EndExpr e){
+        currentOutSet.add(n.getName().getID(), VFDatum.TOP);
+        annotateNode(n.getName());
     }
 
+
+    private void bindWarn(NameExpr n, EndExpr e){
+        VFDatum d = currentOutSet.contains(n.getName().getID());
+        if (d != VFDatum.VAR)
+            currentOutSet.add(n.getName().getID(), VFDatum.WAR);
+        annotateNode(n.getName());
+    }
     
     private void annotateNode(Name n){
     	outFlowSets.put(n, currentOutSet);

@@ -78,7 +78,7 @@ public class Parse {
      * @return The Program node for the given file being parsed if no
      * errors. If an error occurs then null is returned. 
      */
-    public static Program parseFile(String fName, Reader file, ArrayList<CompilationProblem> errList )
+    public static Program parseFile(String fName, Reader file, List<CompilationProblem> errList )
     {
         parsePreamble();
         
@@ -146,7 +146,7 @@ public class Parse {
      * @return The Program node for the given file being parsed if no
      * errors. If an error occurs then null is returned. 
      */
-    public static Program parseFile(String fName, ArrayList<CompilationProblem> errList ){
+    public static Program parseFile(String fName, List<CompilationProblem> errList ){
     	try {
     		FileReader reader = new FileReader(fName);
     		Program program = parseFile(fName,reader,errList);    	
@@ -170,14 +170,14 @@ public class Parse {
      * @return The Program node for the given file being parsed if no
      * errors. If an error occurs then null is returned. 
      */
-    public static Program parseMatlabFile(String fName, ArrayList<CompilationProblem> errList ){
+    public static Program parseMatlabFile(String fName, List<CompilationProblem> errList ){
     	Reader source = Parse.translateFile( fName, errList );
         if( source == null ) return null;
         Program program = Parse.parseFile( fName, source, errList );
         return program;
     }
 
-    public static CompilationUnits parseFiles(List<String> fileList,   ArrayList<CompilationProblem> errList ){
+    public static CompilationUnits parseFiles(List<String> fileList,   List<CompilationProblem> errList ){
     CompilationUnits cu = new CompilationUnits();
     for (String fName: fileList){
         Reader natlabFile = Parse.translateFile(fName, errList);
@@ -200,7 +200,7 @@ public class Parse {
      * @return The Program node for the given file being parsed if no
      * errors. If an error occurs then null is returned. 
      */
-    public static Program parseMatlabFile(String fName, Reader file, ArrayList<CompilationProblem> errList ){
+    public static Program parseMatlabFile(String fName, Reader file, List<CompilationProblem> errList ){
     	//TODO - something should be done about the mapping file
     	//translate into natlab
     	Reader natlabFile = Parse.translateFile(fName, file, errList);
@@ -217,7 +217,7 @@ public class Parse {
      * @return A reader object giving access to the translated
      * source.
      */
-    public static Reader translateFile(String fName, ArrayList<CompilationProblem> errList)
+    public static Reader translateFile(String fName, List<CompilationProblem> errList)
     {
         BufferedReader in = null;
         PositionMap prePosMap = null;
@@ -270,7 +270,7 @@ public class Parse {
      * @return A reader object giving access to the translated
      * source.
      */
-    public static Reader translateFile(String fName, String source, ArrayList<CompilationProblem> errList)
+    public static Reader translateFile(String fName, String source, List<CompilationProblem> errList)
     {
         BufferedReader in = null;
         PositionMap prePosMap = null;
@@ -320,7 +320,7 @@ public class Parse {
      * @return A reader object giving access to the translated
      * source.
      */
-    public static Reader translateFile(String fName, Reader source, ArrayList<CompilationProblem> errList)
+    public static Reader translateFile(String fName, Reader source, List<CompilationProblem> errList)
     {
     	//we'll just build a String out of the source and call the method that takes a String
     	//TODO - this should be done directly from the reader
@@ -356,7 +356,7 @@ public class Parse {
      * source.
      */
     static Reader finishTranslateFile(String fName, BufferedReader in, 
-                                              PositionMap prePosMap, ArrayList errList)
+                                              PositionMap prePosMap, List errList)
     {
         try{
             OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));

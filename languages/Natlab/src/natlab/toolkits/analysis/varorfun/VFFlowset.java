@@ -35,15 +35,15 @@ import natlab.toolkits.analysis.*;
  */
 
 //TODO-JD make some operations unsupported 
-public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
+public class VFFlowset extends AbstractFlowSet<Map.Entry<String, VFDatum>>
 {
 
     public static boolean DEBUG = false;
     public void copy(VFFlowset dest) {
     	if (this == dest) return;
         dest.clear();
-        for (ValueDatumPair<String,VFDatum> element : toList()){
-            dest.add(element.copy());
+        for (Map.Entry<String,VFDatum> element : toList()){
+            dest.add(element);
         }
     }
     protected HashMap<String, VFDatum> set;
@@ -69,6 +69,11 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
         return new VFFlowset( newSet );
     }
     
+    //    public boolean equals(Object o) {
+        
+    //  return ((VFFlowset)o).set.equals(this.set);
+    //}
+
     public VFFlowset emptySet()
     {
         return new VFFlowset();
@@ -87,20 +92,28 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
     {
         return set.size();
     }
-    public void add(ValueDatumPair<String, VFDatum> pair)
+    public void add(ValueDatumPair<String, VFDatum> p){
+        add(p.getValue() , p.getDatum());
+    }
+
+
+    public void add(Map.Entry<String, VFDatum> p){
+        add(p.getKey() , p.getValue());
+    }
+
+    public void add(String name, VFDatum value)
     {
         if( DEBUG )
-            System.out.println("adding " + pair);
-        VFDatum d = set.get( pair.getValue() );
+            System.out.println("adding " + name + "->" + value);
+        VFDatum d = set.get(name );
         if( d != null ){
-            //TODO-JD Is this safe?
-            d = (d.merge( pair.getDatum() ));
+            d = (d.merge( value ));
             if( DEBUG )
                 System.out.println("merged datum is " + d);
-            set.put( pair.getValue(), d );
+            set.put( name, d );
         }
         else{
-            set.put( pair.getValue(), pair.getDatum() );
+            set.put( name, value );
         }
     }
 
@@ -115,15 +128,19 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
     }
     public VFDatum contains( String value )
     {
-        return set.get(value);
+    	return set.get(value);
+    	
     }
-    public List< ValueDatumPair<String, VFDatum> > toList()
+    
+    public VFDatum getKind(String n){
+    	if (set.containsKey(n))
+    		return set.get(n);
+    	return VFDatum.UNDEF;
+    }
+    
+    public List< Map.Entry<String, VFDatum> > toList()
     {
-        List< ValueDatumPair<String, VFDatum> > list = new ArrayList<ValueDatumPair<String, VFDatum>>( set.size() );
-        for( Map.Entry<String ,VFDatum> entry : set.entrySet() ){
-            list.add( new ValueDatumPair<String,VFDatum>( entry.getKey(), entry.getValue() ) );
-        }
-        return list;
+        return new ArrayList<Map.Entry<String, VFDatum>>( set.entrySet() );
     }
 
     public String toString()
@@ -139,7 +156,7 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
             else
                 s.append(", \n");
             
-            s.append( ValueDatumPair.toString(entry.getKey(), entry.getValue() ) );
+            s.append( entry.toString() );
             //"< " + entry.getKey().toString() + ", " entry.getValue().toString() + " >");
         }
         if( !first )
@@ -148,20 +165,22 @@ public class VFFlowset extends AbstractFlowSet<ValueDatumPair<String, VFDatum>>
 
         return s.toString();
     }
+
+    @Deprecated
     public HashMap<String,VFDatum> getMap(){return set;}
 
-    public Iterator<ValueDatumPair<String,VFDatum>> iterator()
+    public Iterator<Map.Entry<String,VFDatum>> iterator()
     {
-        return new Iterator<ValueDatumPair<String,VFDatum>>(){
+        return new Iterator<Map.Entry<String,VFDatum>>(){
             Iterator<Map.Entry<String,VFDatum>> mapIterator = set.entrySet().iterator();
             public boolean hasNext()
             {
                 return mapIterator.hasNext();
             }
-            public ValueDatumPair<String,VFDatum> next()
+            public Map.Entry<String,VFDatum> next()
             {
                 Map.Entry<String,VFDatum> entry = mapIterator.next();
-                return new ValueDatumPair(entry.getKey(), entry.getValue() );
+                return entry;
             }
             public void remove()
             {

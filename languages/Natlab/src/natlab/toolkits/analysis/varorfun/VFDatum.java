@@ -1,11 +1,11 @@
 /*
-Copyright 2011 Jesse Doherty, Soroush Radpour and McGill University.
+  Copyright 2011 Jesse Doherty, Soroush Radpour and McGill University.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,8 +21,9 @@ package natlab.toolkits.analysis.varorfun;
  */
 
 public enum VFDatum
-{
-    TOP, VAR, PREFIX, FUN, LDVAR, BOT, WAR;
+{    
+    UNDEF, VAR, PREFIX, FUN, LDVAR, BOT, WAR, TOP, IVAR, IFUN;
+ 
     public VFDatum merge(VFDatum ov){
         if( this == ov )
             return this;
@@ -30,20 +31,33 @@ public enum VFDatum
         if( BOT == this ) 
             return ov;
 
-	if (BOT == ov)
+        if (BOT == ov)
             return this;
 
-	if (LDVAR == this) 
-	    return ov;
+        if (LDVAR == this) 
+            return ov;
 
-	if (LDVAR == ov)
-	    return this;
-	if (this==WAR || ov == WAR )
-		return WAR;
+        if (LDVAR == ov)
+            return this;
 
-	return TOP;
+        if (this == IVAR)
+            return ov;
+        
+        if (ov == IVAR)
+            return this;
+
+        if (this == IFUN)
+            return ov;
+        
+        if (ov == IFUN)
+            return this;
+
+        if (this==WAR || ov == WAR )
+            return WAR;
+
+        return TOP;
     }
-    public boolean isFunction(){return this==FUN;}
-    public boolean isVariable(){return this==VAR;}
-    public boolean isID(){return this==BOT || this==LDVAR;}
+    public boolean isFunction(){return this==FUN || this==IFUN;}
+    public boolean isVariable(){return this==VAR || this==IVAR;}
+    public boolean isID(){return this==BOT || this==LDVAR || this==WAR || this==TOP;}
 }
