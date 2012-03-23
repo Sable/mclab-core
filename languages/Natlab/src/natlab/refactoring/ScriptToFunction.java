@@ -2,7 +2,6 @@ package natlab.refactoring;
 
 import java.util.*;
 
-import natlab.Static.builtin.Builtin.Find;
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.refactoring.Exceptions.RenameRequired;

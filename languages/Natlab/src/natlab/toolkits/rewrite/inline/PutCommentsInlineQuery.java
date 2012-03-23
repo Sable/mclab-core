@@ -18,7 +18,7 @@
 
 package natlab.toolkits.rewrite.inline;
 
-import natlab.Static.ir.IRCommentStmt;
+import natlab.tame.ir.IRCommentStmt;
 import ast.*;
 
 /**
