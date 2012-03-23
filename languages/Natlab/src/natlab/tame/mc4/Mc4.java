@@ -22,12 +22,9 @@
 package natlab.tame.mc4;
 
 import java.io.*;
-import java.net.URL;
 import java.util.HashSet;
 
 
-import natlab.FlowAnalysisTestTool;
-import natlab.Static.builtin.*;
 import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.*;
@@ -36,7 +33,6 @@ import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.tame.valueanalysis.value.*;
-import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.*;
 
 
