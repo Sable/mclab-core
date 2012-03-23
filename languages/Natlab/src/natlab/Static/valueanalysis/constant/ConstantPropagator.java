@@ -16,12 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.constant;
+package natlab.tame.valueanalysis.constant;
 
 import java.util.List;
 
-import natlab.Static.builtin.Builtin;
-import natlab.Static.builtin.BuiltinVisitor;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.BuiltinVisitor;
 
 /**
  * propagates constants.

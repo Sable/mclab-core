@@ -72,3 +72,44 @@ def MatlabClass(builtin, tagArgs, iset):
 def abstract(builtin, tagArgs, iset):
     return ""
 
+def Class2(builtin, tagArgs, iset):
+    iset.add("HasClassPropagationInfo"); # add the interface
+    treeString = tagArgs.strip()[1:-1];  # building string to parse - remove parentheses
+    
+    # java expr for parent info - find if tag 'Class' is defined for a parent
+    if (builtin.parent and builtin.parent.getAllTags().has_key('Class')):
+      parentInfo = 'super.getClassPropagationInfo2()'
+    else:
+      parentInfo = 'new CPNone()'
+    
+    # deal with the matlabClass info - check if there is a matlabClass tag defined - if not, emit the default
+    if (not builtin.getAllTags().has_key('MatlabClass')):
+        matlabClassMethod = """
+        public CP getMatlabClassPropagationInfo2(){{
+            return getClassPropagationInfo();
+        }}
+"""; # there's no explicit tag for matlab - just return the class info
+    else:
+        matlabClassMethod = ''; # emit nothing - the matlabClass tag will deal with it
+
+    # produce code
+    return matlabClassMethod+"""
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){{
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){{
+                classPropInfo2 = ClassPropTool.parse("{treeString}");
+                classPropInfo2.setVar("parent",{parentInfo});
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }}
+            return classPropInfo2;
+        }}
+""".format(treeString=treeString, javaName=builtin.javaName, parentInfo=parentInfo);
+
+
+
+
+def MatlabClass2(builtin, tagArgs, iset):
+    return ""
+
+

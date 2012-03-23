@@ -16,13 +16,13 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.callgraph;
+package natlab.tame.callgraph;
 import java.io.File;
 import java.util.*;
 import ast.*;
 import natlab.CompilationProblem;
-import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisNode;
-import natlab.Static.simplification.LambdaSimplification;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.AbstractPathEnvironment;

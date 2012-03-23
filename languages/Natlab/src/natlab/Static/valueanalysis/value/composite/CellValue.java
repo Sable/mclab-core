@@ -1,4 +1,4 @@
-package natlab.Static.valueanalysis.value.composite;
+package natlab.tame.valueanalysis.value.composite;
 
 import java.util.*;
 
@@ -9,11 +9,11 @@ import java.util.*;
  * TODO - do proper implementation when usesMap is true
  */
 
-import natlab.Static.classes.reference.BuiltinCompoundClassReference;
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.classes.reference.BuiltinCompoundClassReference;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.value.*;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     private Shape<D> shape;

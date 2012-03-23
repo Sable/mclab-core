@@ -1,11 +1,11 @@
-package natlab.Static.valueanalysis.value.composite;
+package natlab.tame.valueanalysis.value.composite;
 
 import java.util.HashMap;
 
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.*;
-import natlab.Static.valueanalysis.constant.*;
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.value.*;
 
 /**
  * implements a value for structs.

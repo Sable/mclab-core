@@ -16,15 +16,15 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.constant;
+package natlab.tame.valueanalysis.constant;
 
 import ast.FPLiteralExpr;
 import ast.IntLiteralExpr;
 import ast.LiteralExpr;
 import ast.StringLiteralExpr;
-import natlab.Static.classes.*;
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.classes.reference.PrimitiveClassReference;
+import natlab.tame.classes.*;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 
 /**
  * represents an actual specific Matlab value.

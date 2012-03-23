@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.mc4.symbolTable;
+package natlab.tame.mc4.symbolTable;
 
 /**
  * An entry of the symbol table.

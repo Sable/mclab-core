@@ -1,8 +1,8 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.Constant;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.Constant;
 import natlab.toolkits.analysis.Mergable;
 
 

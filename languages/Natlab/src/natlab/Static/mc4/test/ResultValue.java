@@ -1,4 +1,4 @@
-package natlab.Static.mc4.test;
+package natlab.tame.mc4.test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

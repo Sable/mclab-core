@@ -1,7 +1,7 @@
-package natlab.Static.ir;
+package natlab.tame.ir;
 
 import ast.*;
-import natlab.Static.ir.analysis.IRNodeCaseHandler;
+import natlab.tame.ir.analysis.IRNodeCaseHandler;
 
 //TODO give cell/array/det set a single parent '... = t' (assign from var?)
 // - alternative: remove altogether, and have one complex assign (?)

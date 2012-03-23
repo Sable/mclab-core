@@ -1,12 +1,12 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
-import natlab.Static.builtin.Builtin;
-import natlab.Static.builtin.BuiltinVisitor;
-import natlab.Static.classes.reference.BuiltinClassReference;
-import natlab.Static.classes.reference.BuiltinCompoundClassReference;
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.classes.reference.FunctionHandleClassReference;
-import natlab.Static.classes.reference.PrimitiveClassReference;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.BuiltinVisitor;
+import natlab.tame.classes.reference.BuiltinClassReference;
+import natlab.tame.classes.reference.BuiltinCompoundClassReference;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.FunctionHandleClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 
 /**
  * Propagate values for builtin functions.

@@ -1,4 +1,4 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import natlab.Static.classes.reference.ClassReference;
+import natlab.tame.classes.reference.ClassReference;
 
 /**
  * A way to combine multiple argument abstract values together to make an

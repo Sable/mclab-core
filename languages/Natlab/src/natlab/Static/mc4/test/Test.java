@@ -1,20 +1,20 @@
-package natlab.Static.mc4.test;
+package natlab.tame.mc4.test;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
 
 import natlab.FlowAnalysisTestTool;
-import natlab.Static.builtin.Builtin;
-import natlab.Static.builtin.ClassPropTools;
-import natlab.Static.callgraph.FunctionCollection;
-import natlab.Static.callgraph.StaticFunction;
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.classes.reference.PrimitiveClassReference;
-import natlab.Static.valueanalysis.IntraproceduralValueAnalysis;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.classprop.ClassPropTool;
+import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FilePathEnvironment;
 

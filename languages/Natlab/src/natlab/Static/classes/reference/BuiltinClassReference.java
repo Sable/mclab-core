@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.classes.reference;
+package natlab.tame.classes.reference;
 
 public interface BuiltinClassReference extends ClassReference{
     public boolean isInt();

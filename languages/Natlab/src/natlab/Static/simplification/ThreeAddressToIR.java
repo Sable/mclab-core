@@ -16,12 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.simplification;
+package natlab.tame.simplification;
 
 import java.util.*;
 
 import natlab.DecIntNumericLiteralValue;
-import natlab.Static.ir.*;
+import natlab.tame.ir.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.simplification.*;

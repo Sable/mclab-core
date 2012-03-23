@@ -1,10 +1,10 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import natlab.Static.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.ValueSet;
 import natlab.toolkits.analysis.Mergable;
 
 /**

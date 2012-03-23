@@ -1,13 +1,9 @@
-package natlab.Static.valueanalysis.simplematrix;
+package natlab.tame.valueanalysis.simplematrix;
 
-import java.util.List;
-
-import natlab.Static.builtin.Builtin.Subsasgn;
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.*;
-import natlab.toolkits.analysis.Mergable;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.value.*;
 
 /**
  * represents a MatrixValue that is instantiable. It stores a constant,

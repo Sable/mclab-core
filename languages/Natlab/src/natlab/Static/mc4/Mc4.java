@@ -19,7 +19,7 @@
 /**
  * 
  */
-package natlab.Static.mc4;
+package natlab.tame.mc4;
 
 import java.io.*;
 import java.net.URL;
@@ -28,13 +28,14 @@ import java.util.HashSet;
 
 import natlab.FlowAnalysisTestTool;
 import natlab.Static.builtin.*;
-import natlab.Static.callgraph.*;
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.*;
-import natlab.Static.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.Static.valueanalysis.simplematrix.SimpleMatrixValueFactory;
-import natlab.Static.valueanalysis.value.*;
 import natlab.options.Options;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.callgraph.*;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
+import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.filehandling.genericFile.*;
 import natlab.toolkits.path.*;
 
@@ -59,19 +60,7 @@ public class Mc4 {
     }
     
     
-    //TODO get rid of this
-    public static void fiddle() throws Exception{
-        URL location = Mc4.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println(location);
-        System.out.println(location.getFile());
-        
-        System.out.println(natlab.Main.class.getResource("Main.class"));
-        
-        System.out.println(
-                new ZippedFile("C:\\classes\\COMP 621.ZIP","ass2/ass2.pdf"));                
-    }
     
-
 	/**
 	 * @param args
 	 */
@@ -95,6 +84,7 @@ public class Mc4 {
 		
 		//try to do all benchmarks
 		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\";
+		bFolderString = "../Benchmarks/matlabBenchmarks/";
 		String[] subfolders = new String[]{
 		    "aaatest",
 		    "adpt",
@@ -129,6 +119,7 @@ public class Mc4 {
 		    };
 		for (String subfolder : subfolders){
 		    File dir = new File(bFolderString+subfolder);
+		    System.out.println(dir.getAbsolutePath());
 		    File[] list = dir.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.matches(".*drv_.*m");
@@ -141,7 +132,7 @@ public class Mc4 {
 		    options = new Options();
 	        options.parse(args);
 	        main(options);
-	        System.exit(0);//only do first
+	        //System.exit(0);//only do first
 		}
 		System.out.println("\n---done---\n builtins: "+allRefs.size()+"\n\n");
 		//for (FunctionReference ref : allRefs) System.out.println(ref);
@@ -163,7 +154,7 @@ public class Mc4 {
 		} 
 		main(options);
 	}
-
+	
 	static HashSet<FunctionReference> allRefs = new HashSet<FunctionReference>();
 	
 	/**

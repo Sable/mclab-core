@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.classes.reference;
+package natlab.tame.classes.reference;
 
 public enum PrimitiveClassReference implements BuiltinClassReference {
     LOGICAL{ public boolean isNumeric(){ return false; }},

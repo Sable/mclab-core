@@ -16,8 +16,8 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.ir;
-import natlab.Static.ir.analysis.IRNodeCaseHandler;
+package natlab.tame.ir;
+import natlab.tame.ir.analysis.IRNodeCaseHandler;
 import ast.*;
 
 /**

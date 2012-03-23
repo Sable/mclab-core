@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.interproceduralAnalysis;
+package natlab.tame.interproceduralAnalysis;
 
 import ast.*;
 import natlab.toolkits.path.FunctionReference;

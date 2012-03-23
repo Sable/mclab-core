@@ -1,9 +1,9 @@
-package natlab.Static.valueanalysis;
+package natlab.tame.valueanalysis;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.*;
 
 /**

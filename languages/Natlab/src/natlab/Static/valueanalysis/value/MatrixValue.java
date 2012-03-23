@@ -16,12 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.List;
 
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.ValueSet;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.ValueSet;
 
 /**
  * represents a primitive value, i.e. a value that has a primitive type.

@@ -1,18 +1,18 @@
-package natlab.Static.valueanalysis;
+package natlab.tame.valueanalysis;
 
 import java.util.*;
 import java.util.List;
 
 import ast.*;
-import natlab.Static.builtin.Builtin;
-import natlab.Static.callgraph.StaticFunction;
-import natlab.Static.interproceduralAnalysis.FunctionAnalysis;
-import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisNode;
-import natlab.Static.ir.*;
-import natlab.Static.ir.analysis.*;
-import natlab.Static.valueanalysis.constant.*;
-import natlab.Static.valueanalysis.value.*;
-import natlab.Static.valueanalysis.value.composite.FunctionHandleValue;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.ir.*;
+import natlab.tame.ir.analysis.*;
+import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.composite.FunctionHandleValue;
 import natlab.toolkits.path.FunctionReference;
 
 /**

@@ -1,12 +1,14 @@
-package natlab.Static.valueanalysis.simplematrix;
+package natlab.tame.valueanalysis.simplematrix;
 
 import java.util.*;
-import natlab.Static.builtin.*;
-import natlab.Static.classes.reference.*;
-import natlab.Static.valueanalysis.*;
-import natlab.Static.valueanalysis.constant.*;
-import natlab.Static.valueanalysis.value.*;
-import natlab.Static.valueanalysis.value.composite.CellValue;
+import natlab.tame.builtin.*;
+import natlab.tame.builtin.classprop.ClassPropTool;
+import natlab.tame.builtin.classprop.HasClassPropagationInfo;
+import natlab.tame.classes.reference.*;
+import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.composite.CellValue;
 
 public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixValue>{
     public static boolean DEBUG = false;
@@ -36,12 +38,12 @@ public class SimpleMatrixValuePropagator extends ValuePropagator<SimpleMatrixVal
         
         
         //if it's not constant check whether the Builtin implements class propagation
-        if (builtin instanceof ClassPropagationDefined){
+        if (builtin instanceof HasClassPropagationInfo){
             if (DEBUG) System.out.println("case builtin: "+builtin
-                    +" prop: "+((ClassPropagationDefined)builtin).getMatlabClassPropagationInfo()
+                    +" prop: "+((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo()
                     +" args: "+arg);
             LinkedList<HashSet<ClassReference>> matchResult = 
-                ClassPropTools.matchByValues(((ClassPropagationDefined)builtin).getMatlabClassPropagationInfo(),arg);
+                ClassPropTool.matchByValues(((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo(),arg);
             if (matchResult == null){
                 return Res.newErrorResult(builtin.getName()+" is not defined for arguments "+arg);
             }

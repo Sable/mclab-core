@@ -16,10 +16,10 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.ir.analysis;
+package natlab.tame.ir.analysis;
 
 import ast.ASTNode;
-import natlab.Static.ir.*;
+import natlab.tame.ir.*;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import nodecases.NodeCaseHandler;
 

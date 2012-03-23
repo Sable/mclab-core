@@ -1,11 +1,11 @@
-package natlab.Static.valueanalysis;
+package natlab.tame.valueanalysis;
 
-import natlab.Static.callgraph.FunctionCollection;
-import natlab.Static.callgraph.StaticFunction;
-import natlab.Static.interproceduralAnalysis.InterproceduralAnalysis;
-import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisFactory;
-import natlab.Static.interproceduralAnalysis.InterproceduralAnalysisNode;
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.valueanalysis.value.*;
 
 public class ValueAnalysis<D extends MatrixValue<D>>
 extends InterproceduralAnalysis<IntraproceduralValueAnalysis<D>,Args<D>,Res<D>>{

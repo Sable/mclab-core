@@ -16,14 +16,14 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.interproceduralAnalysis.examples;
+package natlab.tame.interproceduralAnalysis.examples;
 
 import java.util.LinkedHashSet;
 
 import ast.*;
-import natlab.Static.callgraph.StaticFunction;
-import natlab.Static.interproceduralAnalysis.*;
 import analysis.*;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.interproceduralAnalysis.*;
 import natlab.toolkits.analysis.*;
 import natlab.toolkits.path.FunctionReference;
 

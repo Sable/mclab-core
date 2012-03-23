@@ -1,10 +1,10 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.List;
 
-import natlab.Static.builtin.Builtin;
-import natlab.Static.builtin.BuiltinVisitor;
-import natlab.Static.classes.reference.*;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.BuiltinVisitor;
+import natlab.tame.classes.reference.*;
 
 public class ClassPropagator extends BuiltinVisitor<List<ClassReference>,ClassReference>{
 

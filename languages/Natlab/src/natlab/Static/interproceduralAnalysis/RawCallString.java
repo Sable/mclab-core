@@ -1,4 +1,4 @@
-package natlab.Static.interproceduralAnalysis;
+package natlab.tame.interproceduralAnalysis;
 
 import natlab.toolkits.path.FunctionReference;
 import ast.ASTNode;

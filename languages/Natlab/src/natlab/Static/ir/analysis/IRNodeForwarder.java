@@ -16,12 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.ir.analysis;
+package natlab.tame.ir.analysis;
 
 
-import natlab.Static.ir.*;
 import analysis.*;
 import nodecases.*;
+import natlab.tame.ir.*;
 import natlab.toolkits.analysis.*;
 import ast.*;
 

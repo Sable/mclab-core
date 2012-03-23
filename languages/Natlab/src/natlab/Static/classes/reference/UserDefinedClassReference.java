@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.classes.reference;
+package natlab.tame.classes.reference;
 
 public abstract class UserDefinedClassReference implements ClassReference {
     

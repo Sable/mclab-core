@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.value.composite;
+package natlab.tame.valueanalysis.value.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,15 +24,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import natlab.Static.classes.reference.FunctionHandleClassReference;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.Args;
-import natlab.Static.valueanalysis.value.MatrixValue;
-import natlab.Static.valueanalysis.value.ValueFactory;
-import natlab.Static.valueanalysis.value.Res;
-import natlab.Static.valueanalysis.value.Shape;
-import natlab.Static.valueanalysis.value.Value;
+import natlab.tame.classes.reference.FunctionHandleClassReference;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.MatrixValue;
+import natlab.tame.valueanalysis.value.Res;
+import natlab.tame.valueanalysis.value.Shape;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.path.FunctionReference;
 
 /**

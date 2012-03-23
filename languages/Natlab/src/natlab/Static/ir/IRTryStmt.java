@@ -1,4 +1,4 @@
-package natlab.Static.ir;
+package natlab.tame.ir;
 
 import ast.TryStmt;
 

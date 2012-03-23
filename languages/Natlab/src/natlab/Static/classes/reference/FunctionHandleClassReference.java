@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.classes.reference;
+package natlab.tame.classes.reference;
 
 public class FunctionHandleClassReference implements BuiltinClassReference {
     public static FunctionHandleClassReference singleton = new FunctionHandleClassReference();

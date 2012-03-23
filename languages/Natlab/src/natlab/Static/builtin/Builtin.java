@@ -1,8 +1,11 @@
 
-package natlab.Static.builtin;
+package natlab.tame.builtin;
 
-import java.util.HashMap;
+//decloare the required imports:
+import java.util.*;
 import natlab.toolkits.path.BuiltinQuery;
+import natlab.tame.builtin.classprop.*;
+import natlab.tame.builtin.classprop.ast.*;
 
 
 public abstract class Builtin {
@@ -35,6 +38,13 @@ public abstract class Builtin {
             public boolean isBuiltin(String functionname) 
               { return builtinMap.containsKey(functionname); }
         };
+    }
+
+    /**
+     * returns the names of all defined Builtins as an unmodifiable set
+     */
+    public static Set<String> getAllBuiltinNames(){
+      return Collections.unmodifiableSet(builtinMap.keySet());
     }
 
     
@@ -386,22 +396,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDoubleConstant extends AbstractConstant implements ClassPropagationDefined {
+    public static abstract class AbstractDoubleConstant extends AbstractConstant implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDoubleConstant(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("none -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPNone(),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPNone(),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -521,22 +546,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements ClassPropagationDefined {
+    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDiagonalSensitive(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix matrix? -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
             }
             return classPropInfo;
         }
@@ -621,22 +661,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements ClassPropagationDefined {
+    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryNumericFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("numeric -> 0, char|logical -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNum(0)),new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNum(0)),new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
@@ -716,12 +771,12 @@ public abstract class Builtin {
             return "conj";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -743,12 +798,12 @@ public abstract class Builtin {
             return "sign";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -801,12 +856,12 @@ public abstract class Builtin {
             return visitor.caseAbstractRoundingOperation(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCError()),getClassPropagationInfo());
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPBuiltin("logical"),new CPError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -828,12 +883,12 @@ public abstract class Builtin {
             return "fix";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getClassPropagationInfo());
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
@@ -904,28 +959,39 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryNumericFunction extends AbstractProperNumericFunction implements ClassPropagationDefined {
+    public static abstract class AbstractBinaryNumericFunction extends AbstractProperNumericFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryNumericFunction(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCError()),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPUnion(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPError()),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCError()),getClassPropagationInfo());
+                CP parentClassPropInfo = new CPNone();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPUnion(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCNum(1))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(logical|char->double, (numeric double|0->0) | (double|1 numeric->1))");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPNum(1))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCNum(1))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPNum(1))));
             }
             return classPropInfo;
         }
@@ -938,7 +1004,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Complex extends AbstractElementalBinaryNumericFunction implements ClassPropagationDefined {
+    public static class Complex extends AbstractElementalBinaryNumericFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Complex singleton = null;
         public static Complex getInstance(){
@@ -954,22 +1020,33 @@ public abstract class Builtin {
             return "complex";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo())));
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPError()),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPAny()),new CPError()),new CPUnion(new CPMap(new CPChain(new CPAny(),new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical"))),new CPError()),getClassPropagationInfo())));
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo())));
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPError()),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPAny()),new CPError()),new CPUnion(new CPMap(new CPChain(new CPAny(),new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical"))),new CPError()),getClassPropagationInfo())));
             }
             return matlabClassPropInfo;
         }
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCNum(1))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(logical|char->double, (numeric (double|0)? ->0) | (double|1 numeric->1))");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPNum(1))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCNum(1))));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPNum(1))));
             }
             return classPropInfo;
         }
@@ -1049,12 +1126,12 @@ public abstract class Builtin {
             return "power";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -1066,12 +1143,12 @@ public abstract class Builtin {
             return visitor.caseAbstractDividingElementalArithmetic(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -1175,12 +1252,12 @@ public abstract class Builtin {
             return visitor.caseAbstractArrayBinaryArithmetic(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCError()),parentClassPropInfo);
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPError()),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -1202,12 +1279,12 @@ public abstract class Builtin {
             return "mtimes";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPBuiltin("double")),parentClassPropInfo);
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getMatlabClassPropagationInfo();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+                CP parentClassPropInfo = super.getMatlabClassPropagationInfo();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPNum(0)),new CPBuiltin("double")),parentClassPropInfo);
             }
             return matlabClassPropInfo;
         }
@@ -1285,7 +1362,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Dot extends AbstractDimensionSensitiveNumericFunction implements ClassPropagationDefined {
+    public static class Dot extends AbstractDimensionSensitiveNumericFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Dot singleton = null;
         public static Dot getInstance(){
@@ -1301,22 +1378,33 @@ public abstract class Builtin {
             return "dot";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),getClassPropagationInfo());
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPAny()),new CPError()),getClassPropagationInfo());
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),getClassPropagationInfo());
+                CP parentClassPropInfo = new CPNone();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPAny()),new CPError()),getClassPropagationInfo());
             }
             return matlabClassPropInfo;
         }
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCBuiltin("double")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(logical|char->double,(single float)|(float single)->single || numeric double|0->double || double|1 numeric->double) (numeric|logical)?");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        private CP classPropInfo = null; //new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPMap(new CPUnion(new CPChain(new CPBuiltin("single"),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("single"))),new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("single"))),new CPBuiltin("single")),new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPBuiltin("double"))),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPBuiltin("double")))),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("single"))),new ClassPropTools.MCBuiltin("single")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCBuiltin("double")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPMap(new CPUnion(new CPChain(new CPBuiltin("single"),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("single"))),new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("single"))),new CPBuiltin("single")),new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPBuiltin("double"))),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPBuiltin("double")))),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()));
             }
             return classPropInfo;
         }
@@ -1329,28 +1417,39 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractMinOrMax extends AbstractDimensionCollapsingNumericFunction implements ClassPropagationDefined {
+    public static abstract class AbstractMinOrMax extends AbstractDimensionCollapsingNumericFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractMinOrMax(this,arg);
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo()))));
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPBuiltin("double"))),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPError()),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPAny()),new CPError()),new CPUnion(new CPMap(new CPChain(new CPAny(),new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical"))),new CPError()),getClassPropagationInfo()))));
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCError()),getClassPropagationInfo()))));
+                CP parentClassPropInfo = new CPNone();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPBuiltin("double"))),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPError()),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPAny()),new CPError()),new CPUnion(new CPMap(new CPChain(new CPAny(),new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical"))),new CPError()),getClassPropagationInfo()))));
             }
             return matlabClassPropInfo;
         }
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1))))),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix any (numeric|logical)->0 double, logical logical->logical double, coerce(logical|char->double, numeric (double|0)?->0 double || double|1 numeric->1 double), matrix->0 double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPAny()),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical"))),new CPChain(new CPNum(0),new CPBuiltin("double"))),new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPBuiltin("double"))),new CPUnion(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPChain(new CPNum(0),new CPBuiltin("double"))),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPChain(new CPNum(1),new CPBuiltin("double"))))),new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPChain(new CPNum(0),new CPBuiltin("double"))))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCAny()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1))))),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPAny()),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical"))),new CPChain(new CPNum(0),new CPBuiltin("double"))),new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPChain(new CPBuiltin("logical"),new CPBuiltin("double"))),new CPUnion(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("char")),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPChain(new CPNum(0),new CPBuiltin("double"))),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPChain(new CPNum(1),new CPBuiltin("double"))))),new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPChain(new CPNum(0),new CPBuiltin("double"))))));
             }
             return classPropInfo;
         }
@@ -1421,22 +1520,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements ClassPropagationDefined {
+    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryFloatFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float->0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0));
             }
             return classPropInfo;
         }
@@ -2403,22 +2517,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements ClassPropagationDefined {
+    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryFloatFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1)));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float double|0 -> 0, double|1 float -> 1");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPNum(1)));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1)));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPNum(1)));
             }
             return classPropInfo;
         }
@@ -2479,7 +2608,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Eps extends AbstractImproperFloatFunction implements ClassPropagationDefined {
+    public static class Eps extends AbstractImproperFloatFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Eps singleton = null;
         public static Eps getInstance(){
@@ -2495,43 +2624,73 @@ public abstract class Builtin {
             return "eps";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("none->double, float->0, typeString(float)");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPNone(),new CPBuiltin("double")),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0)),new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPNone(),new CPBuiltin("double")),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0)),new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")))));
             }
             return classPropInfo;
         }
 
     }
-    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements ClassPropagationDefined {
+    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDimensionSensitiveFloatFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float (numeric|logical)? -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static class Cumsum extends AbstractDimensionSensitiveFloatFunction implements ClassPropagationDefined {
+    public static class Cumsum extends AbstractDimensionSensitiveFloatFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Cumsum singleton = null;
         public static Cumsum getInstance(){
@@ -2547,16 +2706,31 @@ public abstract class Builtin {
             return "cumsum";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(logical->double, parent)");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),parentClassPropInfo);
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPCoerce(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;
         }
@@ -2620,7 +2794,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements ClassPropagationDefined {
+    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sum singleton = null;
         public static Sum getInstance(){
@@ -2636,22 +2810,37 @@ public abstract class Builtin {
             return "sum";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(int|char|logical->double,parent)");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double")),parentClassPropInfo);
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPCoerce(new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;
         }
 
     }
-    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements ClassPropagationDefined {
+    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Mean singleton = null;
         public static Mean getInstance(){
@@ -2667,16 +2856,31 @@ public abstract class Builtin {
             return "mean";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(int|char|logical->double,parent)");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double")),parentClassPropInfo);
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),parentClassPropInfo);
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPCoerce(new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double")),parentClassPropInfo);
             }
             return classPropInfo;
         }
@@ -2706,7 +2910,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Norm extends AbstractMatrixLibaryFunction implements ClassPropagationDefined {
+    public static class Norm extends AbstractMatrixLibaryFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Norm singleton = null;
         public static Norm getInstance(){
@@ -2722,22 +2926,37 @@ public abstract class Builtin {
             return "norm";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float (float|logical|char)?->0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("logical")),new CPBuiltin("char")),new CPNone())),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("logical")),new CPBuiltin("char")),new CPNone())),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static class Rank extends AbstractMatrixLibaryFunction implements ClassPropagationDefined {
+    public static class Rank extends AbstractMatrixLibaryFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Rank singleton = null;
         public static Rank getInstance(){
@@ -2753,16 +2972,31 @@ public abstract class Builtin {
             return "rank";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float matrix?->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -2928,7 +3162,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Qr extends AbstractFacotorizationFunction implements ClassPropagationDefined {
+    public static class Qr extends AbstractFacotorizationFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Qr singleton = null;
         public static Qr getInstance(){
@@ -2944,16 +3178,31 @@ public abstract class Builtin {
             return "qr";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCNum(0),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNum(0)));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float (float|logical)?->0 0 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("logical")),new CPNone())),new CPChain(new CPChain(new CPNum(0),new CPNum(0)),new CPNum(0)));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCNum(0),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNum(0)));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPBuiltin("logical")),new CPNone())),new CPChain(new CPChain(new CPNum(0),new CPNum(0)),new CPNum(0)));
             }
             return classPropInfo;
         }
@@ -2966,22 +3215,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements ClassPropagationDefined {
+    public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractProperBitFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double")))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("uint double|0->0, double|1 uint->1, logical logical->logical, double|logical double|logical->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64"))),new CPNum(1)),new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPBuiltin("logical")),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical"))),new CPBuiltin("double")))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64"))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("double")))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPNum(0)),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64"))),new CPNum(1)),new CPUnion(new CPMap(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPBuiltin("logical")),new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical"))),new CPBuiltin("double")))));
             }
             return classPropInfo;
         }
@@ -3127,7 +3391,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Find extends AbstractToDoubleMatrixQuery implements ClassPropagationDefined {
+    public static class Find extends AbstractToDoubleMatrixQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Find singleton = null;
         public static Find getInstance(){
@@ -3143,37 +3407,67 @@ public abstract class Builtin {
             return "find";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix (matrix char?)?->double double double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPNone())),new CPChain(new CPChain(new CPBuiltin("double"),new CPBuiltin("double")),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPNone())),new CPChain(new CPChain(new CPBuiltin("double"),new CPBuiltin("double")),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
 
     }
-    public static abstract class AbstractUnaryToScalarDoubleMatrixQuery extends AbstractToDoubleMatrixQuery implements ClassPropagationDefined {
+    public static abstract class AbstractUnaryToScalarDoubleMatrixQuery extends AbstractToDoubleMatrixQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryToScalarDoubleMatrixQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -3210,22 +3504,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements ClassPropagationDefined {
+    public static abstract class AbstractUnaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryToLogicalMatrixQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix->logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -3364,22 +3673,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements ClassPropagationDefined {
+    public static abstract class AbstractBinaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryToLogicalMatrixQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("matrix matrix -> logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical"))),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical"))),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -3566,7 +3890,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Colon extends AbstractMatrixCreation implements ClassPropagationDefined {
+    public static class Colon extends AbstractMatrixCreation implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Colon singleton = null;
         public static Colon getInstance(){
@@ -3582,22 +3906,33 @@ public abstract class Builtin {
             return "colon";
         }
         
-        private ClassPropTools.MC matlabClassPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNone())),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))))),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("char"))),new ClassPropTools.MCBuiltin("char")))))));
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){
+        private CP matlabClassPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("logical"),new CPNone())),new CPError()),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("double")),new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical"))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPNum(0)),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(-1)),new CPUnion(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(-1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))))),new CPNum(-1)),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPBuiltin("double"),new CPNum(1))),new CPNum(1)),new CPMap(new CPChain(new CPBuiltin("char"),new CPUnion(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("double")),new CPBuiltin("char")),new CPBuiltin("char"))),new CPBuiltin("char")))))));
+        public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
             if (matlabClassPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                matlabClassPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCNone())),new ClassPropTools.MCError()),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))))),new ClassPropTools.MCNum(-1)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1)),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(1))),new ClassPropTools.MCNum(1)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("char"))),new ClassPropTools.MCBuiltin("char")))))));
+                CP parentClassPropInfo = new CPNone();
+                matlabClassPropInfo = new CPUnion(new CPMap(new CPChain(new CPChain(new CPBuiltin("logical"),new CPBuiltin("logical")),new CPUnion(new CPBuiltin("logical"),new CPNone())),new CPError()),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("logical"),new CPBuiltin("double")),new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical"))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("double")),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPBuiltin("double"),new CPNum(0))),new CPUnion(new CPUnion(new CPBuiltin("double"),new CPNum(0)),new CPNone())),new CPNum(0)),new CPUnion(new CPMap(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(-1)),new CPUnion(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(-1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))))),new CPNum(-1)),new CPUnion(new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNum(1)),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPBuiltin("double"),new CPNum(1))),new CPNum(1)),new CPMap(new CPChain(new CPBuiltin("char"),new CPUnion(new CPChain(new CPUnion(new CPBuiltin("char"),new CPBuiltin("double")),new CPBuiltin("char")),new CPBuiltin("char"))),new CPBuiltin("char")))))));
             }
             return matlabClassPropInfo;
         }
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getMatlabClassPropagationInfo());
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(logical -> double, matlab)");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        private CP classPropInfo = null; //new CPCoerce(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),getMatlabClassPropagationInfo());
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCBuiltin("logical"),new ClassPropTools.MCBuiltin("double")),getMatlabClassPropagationInfo());
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPCoerce(new CPMap(new CPBuiltin("logical"),new CPBuiltin("double")),getMatlabClassPropagationInfo());
             }
             return classPropInfo;
         }
@@ -3610,22 +3945,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements ClassPropagationDefined {
+    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("(numeric|logical)* typeString(numeric)|(none->double)");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPMap(new CPNone(),new CPBuiltin("double"))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPMap(new CPNone(),new CPBuiltin("double"))));
             }
             return classPropInfo;
         }
@@ -3682,22 +4032,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractFloatByShapeAndTypeMatrixCreation extends AbstractNumericalByShapeAndTypeMatrixCreation implements ClassPropagationDefined {
+    public static abstract class AbstractFloatByShapeAndTypeMatrixCreation extends AbstractNumericalByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractFloatByShapeAndTypeMatrixCreation(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("(numeric|logical)* typeString(float)|(none->double)");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double"))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double"))));
             }
             return classPropInfo;
         }
@@ -3737,22 +4102,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractLogicalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements ClassPropagationDefined {
+    public static abstract class AbstractLogicalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractLogicalByShapeAndTypeMatrixCreation(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("(numeric|logical)*->logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -3799,7 +4179,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Double extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Double extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Double singleton = null;
         public static Double getInstance(){
@@ -3815,22 +4195,37 @@ public abstract class Builtin {
             return "double";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Single extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Single extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Single singleton = null;
         public static Single getInstance(){
@@ -3846,22 +4241,37 @@ public abstract class Builtin {
             return "single";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("single"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->single");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("single"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("single"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("single"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Char extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Char extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Char singleton = null;
         public static Char getInstance(){
@@ -3877,22 +4287,37 @@ public abstract class Builtin {
             return "char";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Logical extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Logical extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Logical singleton = null;
         public static Logical getInstance(){
@@ -3908,22 +4333,37 @@ public abstract class Builtin {
             return "logical";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Int8 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Int8 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Int8 singleton = null;
         public static Int8 getInstance(){
@@ -3939,22 +4379,37 @@ public abstract class Builtin {
             return "int8";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->int8");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("int8"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int8"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("int8"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Int16 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Int16 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Int16 singleton = null;
         public static Int16 getInstance(){
@@ -3970,22 +4425,37 @@ public abstract class Builtin {
             return "int16";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int16"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->int16");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("int16"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int16"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("int16"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Int32 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Int32 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Int32 singleton = null;
         public static Int32 getInstance(){
@@ -4001,22 +4471,37 @@ public abstract class Builtin {
             return "int32";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int32"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->int32");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("int32"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int32"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("int32"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Int64 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Int64 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Int64 singleton = null;
         public static Int64 getInstance(){
@@ -4032,22 +4517,37 @@ public abstract class Builtin {
             return "int64";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int64"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->int64");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("int64"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("int64"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("int64"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Uint8 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Uint8 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Uint8 singleton = null;
         public static Uint8 getInstance(){
@@ -4063,22 +4563,37 @@ public abstract class Builtin {
             return "uint8";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint8"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->uint8");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("uint8"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint8"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("uint8"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Uint16 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Uint16 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Uint16 singleton = null;
         public static Uint16 getInstance(){
@@ -4094,22 +4609,37 @@ public abstract class Builtin {
             return "uint16";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->uint16");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("uint16"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint16"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("uint16"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Uint32 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Uint32 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Uint32 singleton = null;
         public static Uint32 getInstance(){
@@ -4125,22 +4655,37 @@ public abstract class Builtin {
             return "uint32";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->uint32");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("uint32"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint32"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("uint32"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Uint64 extends AbstractMatrixConstructor implements ClassPropagationDefined {
+    public static class Uint64 extends AbstractMatrixConstructor implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Uint64 singleton = null;
         public static Uint64 getInstance(){
@@ -4156,16 +4701,31 @@ public abstract class Builtin {
             return "uint64";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->uint64");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("uint64"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("uint64"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("uint64"));
             }
             return classPropInfo;
         }
@@ -4301,28 +4861,43 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractMatrixOrCellOfCharFunction extends AbstractVersatileFunction implements ClassPropagationDefined {
+    public static abstract class AbstractMatrixOrCellOfCharFunction extends AbstractVersatileFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractMatrixOrCellOfCharFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any->0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static class Sort extends AbstractMatrixOrCellOfCharFunction implements ClassPropagationDefined {
+    public static class Sort extends AbstractMatrixOrCellOfCharFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sort singleton = null;
         public static Sort getInstance(){
@@ -4338,16 +4913,31 @@ public abstract class Builtin {
             return "sort";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any numeric? char? -> 0 double");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPChain(new CPNum(0),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNum(0)));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPChain(new CPNum(0),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
@@ -4674,7 +5264,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Class extends AbstractVersatileQuery implements ClassPropagationDefined {
+    public static class Class extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Class singleton = null;
         public static Class getInstance(){
@@ -4690,43 +5280,73 @@ public abstract class Builtin {
             return "class";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any -> char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
 
     }
-    public static abstract class AbstractDoubleResultVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+    public static abstract class AbstractDoubleResultVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDoubleResultVersatileQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Size extends AbstractDoubleResultVersatileQuery implements ClassPropagationDefined {
+    public static class Size extends AbstractDoubleResultVersatileQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Size singleton = null;
         public static Size getInstance(){
@@ -4742,16 +5362,31 @@ public abstract class Builtin {
             return "size";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any (numeric|logical)? -> double double double double double double double double double double double double double double double");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPBuiltin("double"),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCBuiltin("double")));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPMap(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPBuiltin("double"),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
@@ -4798,7 +5433,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Numel extends AbstractScalarDoubleResultVersatileQuery implements ClassPropagationDefined {
+    public static class Numel extends AbstractScalarDoubleResultVersatileQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Numel singleton = null;
         public static Numel getInstance(){
@@ -4814,22 +5449,37 @@ public abstract class Builtin {
             return "numel";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any matrix* -> double");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPAny(),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()))),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPMap(new CPChain(new CPAny(),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()))),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static class End extends AbstractScalarDoubleResultVersatileQuery implements ClassPropagationDefined {
+    public static class End extends AbstractScalarDoubleResultVersatileQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static End singleton = null;
         public static End getInstance(){
@@ -4845,37 +5495,67 @@ public abstract class Builtin {
             return "end";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any numeric numeric -> double");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+    public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractLogicalResultVersatileQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any -> logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -5031,7 +5711,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Isa extends AbstractClassQuery implements ClassPropagationDefined {
+    public static class Isa extends AbstractClassQuery implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Isa singleton = null;
         public static Isa getInstance(){
@@ -5047,16 +5727,31 @@ public abstract class Builtin {
             return "isa";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any char -> logical");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPAny(),new CPBuiltin("char")),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPMap(new CPChain(new CPAny(),new CPBuiltin("char")),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -5120,22 +5815,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements ClassPropagationDefined {
+    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("logical"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any any any*->logical");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPAny(),new CPAny()),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("logical"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCAny()),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("logical"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPAny(),new CPAny()),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("logical"));
             }
             return classPropInfo;
         }
@@ -5189,7 +5899,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Reshape extends AbstractShapeTransformation implements ClassPropagationDefined {
+    public static class Reshape extends AbstractShapeTransformation implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Reshape singleton = null;
         public static Reshape getInstance(){
@@ -5205,22 +5915,37 @@ public abstract class Builtin {
             return "reshape";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any matrix matrix* -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical"))),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()))),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical"))),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPAny(),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical"))),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()))),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static class Permute extends AbstractShapeTransformation implements ClassPropagationDefined {
+    public static class Permute extends AbstractShapeTransformation implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Permute singleton = null;
         public static Permute getInstance(){
@@ -5236,37 +5961,67 @@ public abstract class Builtin {
             return "permute";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any double -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPAny(),new CPBuiltin("double")),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPAny(),new CPBuiltin("double")),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static abstract class AbstractUnaryShapeTransformation extends AbstractShapeTransformation implements ClassPropagationDefined {
+    public static abstract class AbstractUnaryShapeTransformation extends AbstractShapeTransformation implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryShapeTransformation(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPNum(0));
             }
             return classPropInfo;
         }
@@ -5504,7 +6259,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Superiorfloat extends AbstractImpureFunction implements ClassPropagationDefined {
+    public static class Superiorfloat extends AbstractImpureFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Superiorfloat singleton = null;
         public static Superiorfloat getInstance(){
@@ -5520,16 +6275,31 @@ public abstract class Builtin {
             return "superiorfloat";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("float* -> char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone()),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone()),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
@@ -5583,7 +6353,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Clock extends AbstractTimeFunction implements ClassPropagationDefined {
+    public static class Clock extends AbstractTimeFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Clock singleton = null;
         public static Clock getInstance(){
@@ -5599,16 +6369,31 @@ public abstract class Builtin {
             return "clock";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("none -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPNone(),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPNone(),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -5992,7 +6777,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Nargin extends AbstractMatlabEnvironmentFunction implements ClassPropagationDefined {
+    public static class Nargin extends AbstractMatlabEnvironmentFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Nargin singleton = null;
         public static Nargin getInstance(){
@@ -6008,22 +6793,37 @@ public abstract class Builtin {
             return "nargin";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("function_handle")),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("none|char|function_handle->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPUnion(new CPUnion(new CPNone(),new CPBuiltin("char")),new CPBuiltin("function_handle")),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("function_handle")),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPUnion(new CPUnion(new CPNone(),new CPBuiltin("char")),new CPBuiltin("function_handle")),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Nargout extends AbstractMatlabEnvironmentFunction implements ClassPropagationDefined {
+    public static class Nargout extends AbstractMatlabEnvironmentFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Nargout singleton = null;
         public static Nargout getInstance(){
@@ -6039,16 +6839,31 @@ public abstract class Builtin {
             return "nargout";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("function_handle")),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("none|char|function_handle->double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPUnion(new CPUnion(new CPNone(),new CPBuiltin("char")),new CPBuiltin("function_handle")),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("function_handle")),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPUnion(new CPUnion(new CPNone(),new CPBuiltin("char")),new CPBuiltin("function_handle")),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -6095,7 +6910,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Disp extends AbstractReportFunction implements ClassPropagationDefined {
+    public static class Disp extends AbstractReportFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Disp singleton = null;
         public static Disp getInstance(){
@@ -6111,16 +6926,31 @@ public abstract class Builtin {
             return "disp";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNone());
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any -> none");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPAny(),new CPNone());
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCAny(),new ClassPropTools.MCNone());
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPAny(),new CPNone());
             }
             return classPropInfo;
         }
@@ -6160,7 +6990,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Error extends AbstractReportFunction implements ClassPropagationDefined {
+    public static class Error extends AbstractReportFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Error singleton = null;
         public static Error getInstance(){
@@ -6176,22 +7006,37 @@ public abstract class Builtin {
             return "error";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCNone())),new ClassPropTools.MCError());
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("char? char? any*->error");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("char"),new CPNone()),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPUnion(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPNone())),new CPError());
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCNone())),new ClassPropTools.MCError());
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("char"),new CPNone()),new CPUnion(new CPBuiltin("char"),new CPNone())),new CPUnion(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPNone())),new CPError());
             }
             return classPropInfo;
         }
 
     }
-    public static class Warning extends AbstractReportFunction implements ClassPropagationDefined {
+    public static class Warning extends AbstractReportFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Warning singleton = null;
         public static Warning getInstance(){
@@ -6207,16 +7052,31 @@ public abstract class Builtin {
             return "warning";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("any any* -> char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPAny(),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()))),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCAny(),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPAny(),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()))),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
@@ -6256,7 +7116,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Message extends AbstractReportFunction implements ClassPropagationDefined {
+    public static class Message extends AbstractReportFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Message singleton = null;
         public static Message getInstance(){
@@ -6272,16 +7132,31 @@ public abstract class Builtin {
             return "message";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("char any* -> char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPBuiltin("char"),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()))),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPBuiltin("char"),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone())),new CPUnion(new CPUnion(new CPAny(),new CPNone()),new CPNone()))),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
@@ -6338,22 +7213,37 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractRandomFunction extends AbstractImpureFunction implements ClassPropagationDefined {
+    public static abstract class AbstractRandomFunction extends AbstractImpureFunction implements HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractRandomFunction(this,arg);
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("(numeric|logical)* typeString(float)|(none->double)");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double"))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double"))));
             }
             return classPropInfo;
         }
@@ -6393,7 +7283,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Randi extends AbstractRandomFunction implements ClassPropagationDefined {
+    public static class Randi extends AbstractRandomFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Randi singleton = null;
         public static Randi getInstance(){
@@ -6409,16 +7299,31 @@ public abstract class Builtin {
             return "randi";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("numeric|logical (numeric|logical)* typeString(numeric)|(none->double)");
+                classPropInfo2.setVar("parent",super.getClassPropagationInfo2());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()))),new CPUnion(new CPTypeString(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPMap(new CPNone(),new CPBuiltin("double"))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = super.getClassPropagationInfo();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()))),new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCMap(new ClassPropTools.MCNone(),new ClassPropTools.MCBuiltin("double"))));
+                CP parentClassPropInfo = super.getClassPropagationInfo();
+                classPropInfo = new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("logical")),new CPNone()))),new CPUnion(new CPTypeString(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPMap(new CPNone(),new CPBuiltin("double"))));
             }
             return classPropInfo;
         }
@@ -6622,7 +7527,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Sprintf extends AbstractPosixIoFunction implements ClassPropagationDefined {
+    public static class Sprintf extends AbstractPosixIoFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sprintf singleton = null;
         public static Sprintf getInstance(){
@@ -6638,16 +7543,31 @@ public abstract class Builtin {
             return "sprintf";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("char any* -> char");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPBuiltin("char"),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("char"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("char"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPBuiltin("char"),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("char"));
             }
             return classPropInfo;
         }
@@ -6670,7 +7590,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Fprintf extends AbstractPosixIoFunction implements ClassPropagationDefined {
+    public static class Fprintf extends AbstractPosixIoFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Fprintf singleton = null;
         public static Fprintf getInstance(){
@@ -6686,16 +7606,31 @@ public abstract class Builtin {
             return "fprintf";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNone()),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("double? char any* -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNone()),new CPBuiltin("char")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCNone()),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCAny(),new ClassPropTools.MCNone()))),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPUnion(new CPBuiltin("double"),new CPNone()),new CPBuiltin("char")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPAny(),new CPNone()),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone())),new CPUnion(new CPAny(),new CPNone()))),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
@@ -6895,7 +7830,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Imwrite extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Imwrite extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Imwrite singleton = null;
         public static Imwrite getInstance(){
@@ -6911,22 +7846,37 @@ public abstract class Builtin {
             return "imwrite";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("numeric numeric? char matrix*");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPBuiltin("char")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPBuiltin("char")),new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())));
             }
             return classPropInfo;
         }
 
     }
-    public static class Sparse extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Sparse extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sparse singleton = null;
         public static Sparse getInstance(){
@@ -6942,22 +7892,37 @@ public abstract class Builtin {
             return "sparse";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("(double|char|logical) (double|char|logical)* -> 0");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("char")),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("double"),new CPBuiltin("char")),new CPBuiltin("logical")),new CPNone())),new CPNum(0));
             }
             return classPropInfo;
         }
 
     }
-    public static class Realmax extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Realmax extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Realmax singleton = null;
         public static Realmax getInstance(){
@@ -6973,22 +7938,37 @@ public abstract class Builtin {
             return "realmax";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNone()),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("typeString(float)|(none->double)");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCTypeString(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNone()),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPTypeString(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPMap(new CPNone(),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
 
     }
-    public static class Histc extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Histc extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Histc singleton = null;
         public static Histc getInstance(){
@@ -7004,22 +7984,37 @@ public abstract class Builtin {
             return "histc";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("numeric numeric numeric? -> double double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPChain(new CPBuiltin("double"),new CPBuiltin("double")));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64"))))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCBuiltin("double")));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64"))))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPChain(new CPBuiltin("double"),new CPBuiltin("double")));
             }
             return classPropInfo;
         }
 
     }
-    public static class Blkdiag extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Blkdiag extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Blkdiag singleton = null;
         public static Blkdiag getInstance(){
@@ -7035,22 +8030,37 @@ public abstract class Builtin {
             return "blkdiag";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("numeric* -> double");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPBuiltin("double"));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCBuiltin("double"));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPMap(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPChain(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPBuiltin("double"));
             }
             return classPropInfo;
         }
 
     }
-    public static class Toeplitz extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Toeplitz extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Toeplitz singleton = null;
         public static Toeplitz getInstance(){
@@ -7066,22 +8076,37 @@ public abstract class Builtin {
             return "toeplitz";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1))));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPUnion(new CPMap(new CPChain(new CPBuiltin("single"),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPNum(0)),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0)),new CPMap(new CPChain(new CPBuiltin("double"),new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPNum(1))));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNone())),new ClassPropTools.MCNum(0)),new ClassPropTools.MCUnion(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0)),new ClassPropTools.MCMap(new ClassPropTools.MCChain(new ClassPropTools.MCBuiltin("double"),new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double"))),new ClassPropTools.MCNum(1))));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPUnion(new CPMap(new CPChain(new CPBuiltin("single"),new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNone())),new CPNum(0)),new CPUnion(new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0)),new CPMap(new CPChain(new CPBuiltin("double"),new CPUnion(new CPBuiltin("single"),new CPBuiltin("double"))),new CPNum(1))));
             }
             return classPropInfo;
         }
 
     }
-    public static class Var extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Var extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Var singleton = null;
         public static Var getInstance(){
@@ -7097,22 +8122,37 @@ public abstract class Builtin {
             return "var";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(char|logical -> double, float ->0) numeric? numeric?");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")),new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")),new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()));
             }
             return classPropInfo;
         }
 
     }
-    public static class Std extends AbstractNotABuiltin implements ClassPropagationDefined {
+    public static class Std extends AbstractNotABuiltin implements HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Std singleton = null;
         public static Std getInstance(){
@@ -7128,16 +8168,31 @@ public abstract class Builtin {
             return "std";
         }
         
-        public ClassPropTools.MC getMatlabClassPropagationInfo(){{
+        public CP getMatlabClassPropagationInfo2(){{
             return getClassPropagationInfo();
         }}
 
-        private ClassPropTools.MC classPropInfo = null; //new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()));
-        public ClassPropTools.MC getClassPropagationInfo(){
+        private CP classPropInfo2 = null;
+        public CP getClassPropagationInfo2(){
+            //set classPropInfo if not defined
+            if (classPropInfo2 == null){
+                classPropInfo2 = ClassPropTool.parse("coerce(char|logical -> double, float ->0) numeric? numeric?");
+                classPropInfo2.setVar("parent",new CPNone());
+                classPropInfo2.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo2;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null; //new CPChain(new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")),new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()));
+        public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                ClassPropTools.MC parentClassPropInfo = new ClassPropTools.MCNone();
-                classPropInfo = new ClassPropTools.MCChain(new ClassPropTools.MCChain(new ClassPropTools.MCCoerce(new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("char"),new ClassPropTools.MCBuiltin("logical")),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCMap(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCNum(0))),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone())),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("single"),new ClassPropTools.MCBuiltin("double")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("uint8"),new ClassPropTools.MCBuiltin("uint16")),new ClassPropTools.MCBuiltin("uint32")),new ClassPropTools.MCBuiltin("uint64")),new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCUnion(new ClassPropTools.MCBuiltin("int8"),new ClassPropTools.MCBuiltin("int16")),new ClassPropTools.MCBuiltin("int32")),new ClassPropTools.MCBuiltin("int64")))),new ClassPropTools.MCNone()));
+                CP parentClassPropInfo = new CPNone();
+                classPropInfo = new CPChain(new CPChain(new CPCoerce(new CPMap(new CPUnion(new CPBuiltin("char"),new CPBuiltin("logical")),new CPBuiltin("double")),new CPMap(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPNum(0))),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone())),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("single"),new CPBuiltin("double")),new CPUnion(new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("uint8"),new CPBuiltin("uint16")),new CPBuiltin("uint32")),new CPBuiltin("uint64")),new CPUnion(new CPUnion(new CPUnion(new CPBuiltin("int8"),new CPBuiltin("int16")),new CPBuiltin("int32")),new CPBuiltin("int64")))),new CPNone()));
             }
             return classPropInfo;
         }

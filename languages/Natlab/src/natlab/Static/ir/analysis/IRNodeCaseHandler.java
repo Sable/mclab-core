@@ -16,8 +16,8 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.ir.analysis;
-import natlab.Static.ir.*;
+package natlab.tame.ir.analysis;
+import natlab.tame.ir.*;
 
 /**
  * extension of the node case handler to handle IRNode cases.

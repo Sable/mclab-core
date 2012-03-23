@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.mc4.symbolTable;
+package natlab.tame.mc4.symbolTable;
 
 public interface SymbolFilter {
     public boolean accept(Symbol symbolType);

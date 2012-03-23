@@ -16,9 +16,9 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.constant;
+package natlab.tame.valueanalysis.constant;
 
-import natlab.Static.classes.reference.*;
+import natlab.tame.classes.reference.*;
 
 /**
  * This is a char constant (String). This can only store char arrays which are strings,

@@ -1,9 +1,9 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.*;
 
-import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.*;
+import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
 /**

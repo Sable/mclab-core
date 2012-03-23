@@ -16,12 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.interproceduralAnalysis;
+package natlab.tame.interproceduralAnalysis;
 
 import java.util.*;
 
 import annotations.ast.ASTNode;
-import natlab.Static.callgraph.*;
+import natlab.tame.callgraph.*;
 import natlab.toolkits.path.FunctionReference;
 
 /**

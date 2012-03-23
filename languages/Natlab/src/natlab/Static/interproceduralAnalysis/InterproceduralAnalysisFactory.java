@@ -16,9 +16,9 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.interproceduralAnalysis;
+package natlab.tame.interproceduralAnalysis;
 
-import natlab.Static.callgraph.StaticFunction;
+import natlab.tame.callgraph.StaticFunction;
 
 /**
 * @param <F> the FunctionAnalysis type used to analyse each function/argument pair

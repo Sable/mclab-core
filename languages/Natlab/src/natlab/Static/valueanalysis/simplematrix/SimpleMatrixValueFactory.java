@@ -1,11 +1,11 @@
 /**
  * 
  */
-package natlab.Static.valueanalysis.simplematrix;
+package natlab.tame.valueanalysis.simplematrix;
 
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.valueanalysis.constant.Constant;
-import natlab.Static.valueanalysis.value.ValueFactory;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.value.ValueFactory;
 
 public class SimpleMatrixValueFactory extends ValueFactory<SimpleMatrixValue>{
     @Override

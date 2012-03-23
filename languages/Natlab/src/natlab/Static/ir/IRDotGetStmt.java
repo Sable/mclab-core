@@ -1,7 +1,7 @@
-package natlab.Static.ir;
+package natlab.tame.ir;
 
 import ast.*;
-import natlab.Static.ir.analysis.IRNodeCaseHandler;
+import natlab.tame.ir.analysis.IRNodeCaseHandler;
 
 public class IRDotGetStmt extends IRAbstractAssignToListStmt {
     private static final long serialVersionUID = 1L;

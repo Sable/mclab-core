@@ -1,4 +1,4 @@
-package natlab.Static.simplification;
+package natlab.tame.simplification;
 
 import java.util.*;
 

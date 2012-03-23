@@ -16,9 +16,9 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.mc4.symbolTable;
+package natlab.tame.mc4.symbolTable;
 
-import natlab.Static.mc4.*;
+import natlab.tame.mc4.*;
 import natlab.toolkits.path.FunctionReference;
 
 /**

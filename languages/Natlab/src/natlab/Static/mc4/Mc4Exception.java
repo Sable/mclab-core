@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.mc4;
+package natlab.tame.mc4;
 
 /**
  * This is runtime except that gets thrown by the mc4 compiler.

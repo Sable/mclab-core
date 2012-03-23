@@ -16,11 +16,11 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.ir;
+package natlab.tame.ir;
 
 import java.util.*;
 
-import natlab.Static.ir.analysis.IRNodeCaseHandler;
+import natlab.tame.ir.analysis.IRNodeCaseHandler;
 import ast.Expr;
 import ast.List;
 import ast.LiteralExpr;

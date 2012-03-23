@@ -16,6 +16,16 @@
 #                                                                             #
 # =========================================================================== #
 
+
+# This python script generates the the Builtin.java and BuiltinVisitor.java
+# given the builtin.csv file.
+# It can also be used as a module, in which case the the module provides
+# a way to look a the information contained in the csv file(s) using some
+# objects. The testing code in the tame package uses that to generate unit
+# tests.
+# 
+# TODO - eventually move this from python back to java.
+
 import csv;
 import processTags;
 import collections;
@@ -37,10 +47,13 @@ def getChildren(name,children,parents) :
 def printBuiltinJava(file,builtins):
     N = len(builtins);
     file.write("""
-package natlab.Static.builtin;
+package natlab.tame.builtin;
 
-import java.util.HashMap;
+//decloare the required imports:
+import java.util.*;
 import natlab.toolkits.path.BuiltinQuery;
+import natlab.tame.builtin.classprop.*;
+import natlab.tame.builtin.classprop.ast.*;
 
 
 public abstract class Builtin {
@@ -73,6 +86,13 @@ public abstract class Builtin {
             public boolean isBuiltin(String functionname) 
               { return builtinMap.containsKey(functionname); }
         };
+    }
+
+    /**
+     * returns the names of all defined Builtins as an unmodifiable set
+     */
+    public static Set<String> getAllBuiltinNames(){
+      return Collections.unmodifiableSet(builtinMap.keySet());
     }
 
     
@@ -169,7 +189,7 @@ def printClass(file,b):
 
 # prints the visitor class walking up the class hierarchy as a default case
 def printBuiltinVisitorJava(file,builtin):
-   file.write("""package natlab.Static.builtin;
+   file.write("""package natlab.tame.builtin;
 
 public abstract class BuiltinVisitor<Arg,Ret> {
    public abstract Ret caseBuiltin(Builtin builtin,Arg arg);""")
@@ -382,14 +402,14 @@ def generate():
    
    # write Builtin.java
    print 'generating Builtin.java...'
-   file = open('Builtin.java','w');
+   file = open('../Builtin.java','w');
    printBuiltinJava(file,builtins)
    file.close();
    
    
    # write BuiltinVisitor.java
    print 'generating BuiltinVisitor.java...'
-   file = open('BuiltinVisitor.java','w');
+   file = open('../BuiltinVisitor.java','w');
    printBuiltinVisitorJava(file,builtins)
    file.close();
    

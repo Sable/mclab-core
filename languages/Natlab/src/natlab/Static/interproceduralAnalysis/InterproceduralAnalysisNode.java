@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.interproceduralAnalysis;
+package natlab.tame.interproceduralAnalysis;
 
 /**
  * TODO 
@@ -34,7 +34,7 @@ import java.util.*;
 
 import analysis.StructuralAnalysis;
 import ast.ASTNode;
-import natlab.Static.callgraph.*;
+import natlab.tame.callgraph.*;
 import natlab.toolkits.path.FunctionReference;
 
 public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {

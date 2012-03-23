@@ -1,10 +1,10 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.List;
 
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.Constant;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.Constant;
 
 /**
  * this is a special value that represents the colon ':' used in indexing operations.

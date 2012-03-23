@@ -1,10 +1,10 @@
-package natlab.Static.valueanalysis.value;
+package natlab.tame.valueanalysis.value;
 
 import java.util.Arrays;
 
-import natlab.Static.valueanalysis.ValueSet;
-import natlab.Static.valueanalysis.constant.*;
-import natlab.Static.valueanalysis.value.composite.*;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.value.composite.*;
 import natlab.toolkits.path.FunctionReference;
 
 /**

@@ -16,13 +16,13 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.callgraph;
+package natlab.tame.callgraph;
 
 import java.util.*;
 
-import natlab.Static.ir.IRFunction;
-import natlab.Static.mc4.Mc4;
-import natlab.Static.simplification.ThreeAddressToIR;
+import natlab.tame.ir.IRFunction;
+import natlab.tame.mc4.Mc4;
+import natlab.tame.simplification.ThreeAddressToIR;
 import natlab.toolkits.BiMap;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.path.FunctionReference;

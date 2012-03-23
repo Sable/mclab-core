@@ -1,4 +1,4 @@
-package natlab.Static.builtin;
+package natlab.tame.builtin;
 
 public abstract class BuiltinVisitor<Arg,Ret> {
    public abstract Ret caseBuiltin(Builtin builtin,Arg arg);
@@ -560,7 +560,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //errors should be seprated from warnings and displaying stuff?
     public Ret caseDisp(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
     public Ret caseDisplay(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
-    public Ret caseClc(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
+    public Ret caseClc(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }    
+    //TODO rething error
     public Ret caseError(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
     public Ret caseWarning(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }
     public Ret caseEcho(Builtin builtin,Arg arg){ return caseAbstractReportFunction(builtin,arg); }    

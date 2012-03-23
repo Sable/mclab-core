@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.classes.reference;
+package natlab.tame.classes.reference;
 /**
  * A reference to a class.
  * Objects of this type are immutable.

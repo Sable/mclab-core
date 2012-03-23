@@ -1,6 +1,6 @@
-package natlab.Static.ir;
+package natlab.tame.ir;
 
-import natlab.Static.ir.analysis.IRNodeCaseHandler;
+import natlab.tame.ir.analysis.IRNodeCaseHandler;
 import ast.BreakStmt;
 
 public class IRBreakStmt extends BreakStmt implements IRStmt {

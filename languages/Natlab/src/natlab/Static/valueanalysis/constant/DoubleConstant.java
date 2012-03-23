@@ -16,10 +16,10 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.Static.valueanalysis.constant;
+package natlab.tame.valueanalysis.constant;
 
-import natlab.Static.classes.reference.ClassReference;
-import natlab.Static.classes.reference.PrimitiveClassReference;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 
 /**
  * currently a scalar double only.
