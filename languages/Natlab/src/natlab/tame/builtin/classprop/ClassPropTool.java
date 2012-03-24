@@ -95,6 +95,7 @@ public class ClassPropTool {
      * main for testing
      */
     public static void main(String[] args) {
+    	
         CPBuiltin dbl = new CPBuiltin("double");
         CPBuiltin chr = new CPBuiltin("char");
         CPBuiltin itg = new CPBuiltin("int16");
@@ -265,7 +266,7 @@ public class ClassPropTool {
         		
         		int N = (classes.size()+1);
         		boolean same = true;
-        		for (int i = 0;i<N*N*N*N*N*N;i++){
+        		for (int i = 0;i<N*N*N*N*N;i++){
         			int n = i;
         			ArrayList<ClassReference> arglist = new ArrayList<ClassReference>();
         			while(n > 0){
@@ -288,7 +289,7 @@ public class ClassPropTool {
         		if (same) System.out.print(".");        		
         	}
         }
-        System.out.println("test end");
+        System.out.println("\ntest end");
     }
     /**
      * for testing

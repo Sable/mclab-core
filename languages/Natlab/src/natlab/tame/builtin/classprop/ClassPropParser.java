@@ -18,36 +18,36 @@ public class ClassPropParser extends Parser {
 		static public final short TYPESTRING = 3;
 		static public final short NUMBER = 4;
 		static public final short ID = 5;
-		static public final short OROR = 6;
-		static public final short QUESTION = 7;
-		static public final short MULT = 8;
-		static public final short RPAREN = 9;
-		static public final short OR = 10;
+		static public final short ARROW = 6;
+		static public final short OROR = 7;
+		static public final short RPAREN = 8;
+		static public final short QUESTION = 9;
+		static public final short MULT = 10;
 		static public final short COMMA = 11;
-		static public final short ARROW = 12;
+		static public final short OR = 12;
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9ojaKjB0q4GX6kowoGnPZNH#DRauCMB5o#2YA0N4GKFdXH4K10l$WR$iU#tiQtPwSssdZF" +
-		"mTLVNPdkxCm1kC84fp2F3k0Zg64K3OwYXMlfq2h$qF19CeY9tnXkEYfqNDNUPHvZ314rEuD" +
-		"5YvJ6Tnrd6LETBiKpQw30kO0PpM893XLrITW0tgh53x5BwpO5llJXHotZ3KKNdlxcSB5GsU" +
-		"ftFSqVFBHsZo$UjSwFUBVBJ8M734z8Ddl0mhP16gFLt1sILd1flZPoP#egiatEoGIxKloPR" +
-		"v5Bh7VDEPlIkVl#Bz2bJywnAziYnyVOBRRn3pKV$$4sZjpNtOf97qfTxnXz##rC#gDxbJLx" +
-		"pfo$oZS6HPyrFv84YtdJ6Eueu$kiLGqAS4dIubPHlEPBmbXpQlr4rJnC=");
+		"U9ojaKbFmp0GXP#J409je0NAKfPUk20XBXmGN00X3gX2B4Sk8F57#CdiBUlmnfcK#G6rzSN" +
+		"FpoyPsm5mZnRciO8PpA90YbLCOLe4JUUFMscTH1wH8O$COLshKZT7tZ8MOsw3pmao6HC5sg" +
+		"H3bj1WBya2kbX3GC9qncmPQsWQ$Dw$FsvLsgboxaqfk1UjchEgzwgSFXLDrBgYwe6zu8vx3" +
+		"uYjGVG4UwHbNeSS2flEpJiWNT9tNe$icxubc#IOR94Jy#$83hcn#QvxVzlfEdzguuLRkoHN" +
+		"vDfvPxMsUT$6S#$p24ENENBxrjLdyaj#v5k#v5C#g8SoaFUu#ePHarSRNyWJXVwFm5jDZS2" +
+		"RJHnflEaArJd9#5OWATf$8996o0==");
 
 	private final Action[] actions;
 
 	public ClassPropParser() {
 		super(PARSING_TABLES);
 		actions = new Action[] {
-			new Action() {	// [0] eqn = list.l
+			new Action() {	// [0] cases = list.l
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final CPList l = (CPList) _symbol_l.value;
 					 return l.asUnion();
 				}
 			},
-			new Action() {	// [1] lexpr = expr.a ARROW expr.b
+			new Action() {	// [1] expr = expr.a ARROW expr.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -56,7 +56,7 @@ public class ClassPropParser extends Parser {
 					 return new CPMap   (a, b);
 				}
 			},
-			new Action() {	// [2] lexpr = lexpr.a OROR lexpr.b
+			new Action() {	// [2] expr = expr.a OROR expr.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -65,22 +65,22 @@ public class ClassPropParser extends Parser {
 					 return new CPUnion (a, b);
 				}
 			},
-			Action.RETURN,	// [3] lexpr = pexpr
-			new Action() {	// [4] expr = expr.a QUESTION
+			Action.RETURN,	// [3] expr = clause
+			new Action() {	// [4] clause = clause.a QUESTION
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
 					 return Functions.get("?",new CPList(a,null));
 				}
 			},
-			new Action() {	// [5] expr = expr.a MULT
+			new Action() {	// [5] clause = clause.a MULT
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
 					 return Functions.get("*",new CPList(a,null));
 				}
 			},
-			new Action() {	// [6] expr = expr.a expr.b
+			new Action() {	// [6] clause = clause.a clause.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -89,7 +89,7 @@ public class ClassPropParser extends Parser {
 					 return new CPChain(a,b);
 				}
 			},
-			new Action() {	// [7] expr = expr.a OR expr.b
+			new Action() {	// [7] clause = clause.a OR clause.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -98,28 +98,28 @@ public class ClassPropParser extends Parser {
 					 return new CPUnion (a, b);
 				}
 			},
-			new Action() {	// [8] expr = NUMBER.n
+			new Action() {	// [8] clause = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final Number n = (Number) _symbol_n.value;
 					 return new CPNum(n.intValue());
 				}
 			},
-			new Action() {	// [9] expr = ID.s
+			new Action() {	// [9] clause = ID.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
 					 return Functions.get(s);
 				}
 			},
-			new Action() {	// [10] expr = LPAREN lexpr.e RPAREN
+			new Action() {	// [10] clause = LPAREN expr.e RPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final CP e = (CP) _symbol_e.value;
 					 return e;
 				}
 			},
-			new Action() {	// [11] expr = COERCE LPAREN lexpr.a COMMA lexpr.b RPAREN
+			new Action() {	// [11] clause = COERCE LPAREN expr.a COMMA expr.b RPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 3];
 					final CP a = (CP) _symbol_a.value;
@@ -128,21 +128,21 @@ public class ClassPropParser extends Parser {
 					 return new CPCoerce(a,b);
 				}
 			},
-			new Action() {	// [12] expr = TYPESTRING LPAREN list.l RPAREN
+			new Action() {	// [12] clause = TYPESTRING LPAREN list.l RPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 3];
 					final CPList l = (CPList) _symbol_l.value;
 					 return Functions.get("typeString",l);
 				}
 			},
-			new Action() {	// [13] list = lexpr.e
+			new Action() {	// [13] list = expr.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final CP e = (CP) _symbol_e.value;
 					 return new CPList(e,null);
 				}
 			},
-			new Action() {	// [14] list = lexpr.a COMMA list.l
+			new Action() {	// [14] list = expr.a COMMA list.l
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -150,8 +150,7 @@ public class ClassPropParser extends Parser {
 					final CPList l = (CPList) _symbol_l.value;
 					 return new CPList(a,l);
 				}
-			},
-			Action.RETURN	// [15] pexpr = expr
+			}
 		};
 	}
 

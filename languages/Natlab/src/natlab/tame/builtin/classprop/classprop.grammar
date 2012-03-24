@@ -19,40 +19,36 @@
 
 %typeof NUMBER = "Number";
 %typeof ID = "String";
-%typeof expr, pexpr, lexpr, eqn = "CP";
+%typeof clause, expr, cases = "CP";
 %typeof list = "CPList";
 
-%goal eqn;
+%goal cases;
 
-eqn
+cases
     = list.l                            {: return l.asUnion(); :}
     ;
     
-lexpr 
-	= expr.a ARROW expr.b             {: return new CPMap   (a, b); :}
-	| lexpr.a OROR lexpr.b            {: return new CPUnion (a, b); :}
-	| pexpr
+expr 
+	= clause.a ARROW clause.b           {: return new CPMap   (a, b); :}
+	| expr.a   OROR expr.b              {: return new CPUnion (a, b); :}
+	| clause
 	;
 
-expr
-	= expr.a QUESTION                  {: return Functions.get("?",new CPList(a,null)); :}
-	| expr.a MULT                      {: return Functions.get("*",new CPList(a,null)); :}	
-	| expr.a expr.b @ CHAIN            {: return new CPChain(a,b);   :}
-	| expr.a OR expr.b                 {: return new CPUnion (a, b); :}
-    | NUMBER.n                         {: return new CPNum(n.intValue()); :}
-	| ID.s                             {: return Functions.get(s);   :}
-	| LPAREN lexpr.e RPAREN            {: return e;                  :}
-	| COERCE LPAREN lexpr.a COMMA lexpr.b RPAREN  @CALL     {: return new CPCoerce(a,b); :}
-	| TYPESTRING LPAREN list.l RPAREN  @CALL {: return Functions.get("typeString",l); :}
+clause
+	= clause.a QUESTION                 {: return Functions.get("?",new CPList(a,null)); :}
+	| clause.a MULT                     {: return Functions.get("*",new CPList(a,null)); :}	
+	| clause.a clause.b @ CHAIN         {: return new CPChain(a,b);   :}
+	| clause.a OR clause.b              {: return new CPUnion (a, b); :}
+    | NUMBER.n                          {: return new CPNum(n.intValue()); :}
+	| ID.s                              {: return Functions.get(s);   :}
+	| LPAREN expr.e RPAREN              {: return e;                  :}
+	| COERCE LPAREN expr.a COMMA expr.b RPAREN  @CALL {: return new CPCoerce(a,b); :}
+	| TYPESTRING LPAREN list.l RPAREN  @CALL          {: return Functions.get("typeString",l); :}
 	;
 
 list
-    = lexpr.e                           {: return new CPList(e,null); :}
-    | lexpr.a COMMA list.l              {: return new CPList(a,l);    :}
-    ;
-
-pexpr
-	= expr
+    = expr.e                           {: return new CPList(e,null); :}
+    | expr.a COMMA list.l              {: return new CPList(a,l);    :}
     ;
 
 
