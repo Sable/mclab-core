@@ -1,3 +1,5 @@
+# DEPRECATED - THERE IS A PARSER FOR THE CLASS LANGUAGE IN JAVA NOW
+# TODO -delete
 
 # processing Class tag - class propagation language
 import processTags

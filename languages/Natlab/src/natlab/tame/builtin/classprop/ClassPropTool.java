@@ -246,16 +246,16 @@ public class ClassPropTool {
         for (String s : Builtin.getAllBuiltinNames()){
         	Builtin builtin = Builtin.getInstance(s);
         	if (builtin instanceof HasClassPropagationInfo){
-        		CP cp = ((HasClassPropagationInfo)builtin).getClassPropagationInfo();
+        		CP cp = ((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo();
         		//System.out.println(cp);
         		if (!parse(cp.toString()).toString().equals(cp.toString())){
         			System.out.println("not indemptotent:\n"+cp+"\n"+parse(cp.toString()));        			
         		}
         		
-        		
+        		        		
+        		/*
             	//get new builtin spec
-        		CP cp2 = ((HasClassPropagationInfo)builtin).getClassPropagationInfo2();
-        		
+        		CP cp2 = ((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo();
         		//compare results
         		//System.out.println(builtin.getName());
         		ArrayList<ClassReference> classes = new ArrayList<ClassReference>();
@@ -287,6 +287,7 @@ public class ClassPropTool {
         			}
         		}
         		if (same) System.out.print(".");        		
+        		*/
         	}
         }
         System.out.println("\ntest end");

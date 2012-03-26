@@ -19,7 +19,4 @@ public interface HasClassPropagationInfo {
      * By default (i.e. usually), this returns the same as ClassPropagationInfo()
      */
     public CP getMatlabClassPropagationInfo();
-
-    
-    public CP getClassPropagationInfo2();
 }
