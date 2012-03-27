@@ -4942,7 +4942,7 @@ public abstract class Builtin {
         public CP getClassPropagationInfo(){
             //set classPropInfo if not defined
             if (classPropInfo == null){
-                classPropInfo = ClassPropTool.parse("any -> logical");
+                classPropInfo = ClassPropTool.parse("any->logical");
                 classPropInfo.setVar("parent",new CPNone());
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }

@@ -8,8 +8,8 @@ import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
-import natlab.tame.ir.*;
-import natlab.tame.ir.analysis.*;
+import natlab.tame.tir.*;
+import natlab.tame.tir.analysis.*;
 import natlab.tame.valueanalysis.constant.*;
 import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.value.composite.FunctionHandleValue;
@@ -25,7 +25,7 @@ import natlab.toolkits.path.FunctionReference;
  * @author ant6n
  */
 public class IntraproceduralValueAnalysis<D extends MatrixValue<D>>
-extends IRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<D>>
+extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<D>>
 implements FunctionAnalysis<Args<D>, Res<D>>{
     StaticFunction function;
     ValueFactory<D> factory;
@@ -101,7 +101,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
 
     /*********** statement cases *****************************************/
     @Override
-    public void caseIRCallStmt(IRCallStmt node) {
+    public void caseTIRCallStmt(TIRCallStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
         //find function
@@ -113,13 +113,13 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
         associateInAndOut(node);
     }
     
-    public void caseIRCommentStmt(IRCommentStmt node) {}
+    public void caseIRCommentStmt(TIRCommentStmt node) {}
     
     @SuppressWarnings("unchecked")
     @Override
     public void caseLoopVar(AssignStmt assign) {
         if (checkNonViable(assign)) return;
-        IRForStmt node = (IRForStmt)assign.getParent();
+        TIRForStmt node = (TIRForStmt)assign.getParent();
         ValueFlowMap<D> flow = getCurrentInSet();
         LinkedList<Res<D>> results = new LinkedList<Res<D>>();
         //set the loop var
@@ -166,7 +166,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     }
     
     @Override
-    public void caseIRArrayGetStmt(IRArrayGetStmt node) {
+    public void caseTIRArrayGetStmt(TIRArrayGetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case array get: "+node.getPrettyPrinted());
         ValueFlowMap<D> flow = getCurrentInSet(); //note copied!
@@ -207,7 +207,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     
     //TODO make it deal with overloading properly
     @Override
-    public void caseIRCreateFunctionHandleStmt(IRCreateFunctionHandleStmt node) {
+    public void caseTIRAbstractCreateFunctionHandleStmt(TIRAbstractCreateFunctionHandleStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case assign f_handle: "+node.getPrettyPrinted());
         //find var and remove
@@ -219,7 +219,10 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
             function.getCalledFunctions().get(node.getFunctionName().getID());
         
         //get enclosed workspace - the set of values already assigned
-        List<Name> enclosedNames = node.getEnclosedVars();
+        List<Name> enclosedNames = new ArrayList<Name>();
+        if (node instanceof TIRCreateLambdaStmt){
+        	enclosedNames = ((TIRCreateLambdaStmt)node).getEnclosedVars();
+        }
         LinkedList<ValueSet<D>> enclosedValues = new LinkedList<ValueSet<D>>();
         for (Name var : enclosedNames){
             enclosedValues.add(flow.get(var.getID()));
@@ -235,7 +238,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     
     
     @Override
-    public void caseIRArraySetStmt(IRArraySetStmt node) {
+    public void caseTIRArraySetStmt(TIRArraySetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case array set: "+node.getPrettyPrinted());
         //find vars
@@ -273,7 +276,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     }
     
     @Override
-    public void caseIRAssignLiteralStmt(IRAssignLiteralStmt node) {
+    public void caseTIRAssignLiteralStmt(TIRAssignLiteralStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case assign literal: "+node.getPrettyPrinted());
         //get literal and make constant
@@ -292,7 +295,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     }
     
     @Override
-    public void caseIRCopyStmt(IRCopyStmt node) {
+    public void caseTIRCopyStmt(TIRCopyStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case copy: "+node.getPrettyPrinted());
 
@@ -310,7 +313,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     
     
     @Override
-    public void caseIRDotGetStmt(IRDotGetStmt node) {
+    public void caseTIRDotGetStmt(TIRDotGetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case dot get: "+node.getPrettyPrinted());
 
@@ -334,7 +337,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     }
     
     @Override
-    public void caseIRDotSetStmt(IRDotSetStmt node) {
+    public void caseTIRDotSetStmt(TIRDotSetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case dot set: "+node.getPrettyPrinted());
 
@@ -367,7 +370,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     
     
     @Override
-    public void caseIRCellArrayGetStmt(IRCellArrayGetStmt node) {
+    public void caseTIRCellArrayGetStmt(TIRCellArrayGetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case cell array get: "+node.getPrettyPrinted());
         ValueFlowMap<D> flow = getCurrentInSet();
@@ -391,7 +394,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     }
     
     @Override
-    public void caseIRCellArraySetStmt(IRCellArraySetStmt node) {     
+    public void caseTIRCellArraySetStmt(TIRCellArraySetStmt node) {     
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case cell array set: "+node.getPrettyPrinted());
         //find vars
@@ -449,7 +452,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
      * given an IRCommaSeparated list and a flow set, returns all possible combinations
      * of values as a list of lists
      */
-    private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,IRCommaSeparatedList args){
+    private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,TIRCommaSeparatedList args){
         return cross(flow,args,null);
     }
     
@@ -458,7 +461,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
      * of values as a list of lists
      * partial values will be prepended
      */
-    private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,IRCommaSeparatedList args,List<ValueSet<D>> partialValues){
+    private List<LinkedList<Value<D>>> cross(ValueFlowMap<D> flow,TIRCommaSeparatedList args,List<ValueSet<D>> partialValues){
         if (Debug)System.out.println("cross - flow: "+flow+" args: "+args);
         //get list of value sets from the names        
         ArrayList<ValueSet<D>> values;
@@ -504,7 +507,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
      */
     private Res<D> call(
             FunctionReference function,ValueFlowMap<D> flow,
-            IRCommaSeparatedList args,IRCommaSeparatedList targets,
+            TIRCommaSeparatedList args,TIRCommaSeparatedList targets,
             ASTNode<?> callsite, List<ValueSet<D>> partialArgs){
         LinkedList<Res<D>> results = new LinkedList<Res<D>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
@@ -556,7 +559,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
      */
     private ValueFlowMap<D> assign(ValueFlowMap<D> flow, 
             String target, Res<D> values){
-        return assign(flow,new IRCommaSeparatedList(new NameExpr(new Name(target))),values);
+        return assign(flow,new TIRCommaSeparatedList(new NameExpr(new Name(target))),values);
     }
     
     /**
@@ -570,7 +573,7 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
      * TODO - should we just assign Res<D>?
      */
     private ValueFlowMap<D> assign(ValueFlowMap<D> flow, 
-            IRCommaSeparatedList targets, Res<D> values){
+            TIRCommaSeparatedList targets, Res<D> values){
        if (Debug) System.out.println("assign: "+targets+" = "+values);
        ValueFlowMap<D> result = flow.copy();
        if (!values.isViable()){
@@ -596,8 +599,8 @@ implements FunctionAnalysis<Args<D>, Res<D>>{
     
     
     @Override
-    public IRFunction getTree() {
-        return (IRFunction)this.function.getAst();
+    public TIRFunction getTree() {
+        return (TIRFunction)this.function.getAst();
     }
     
     

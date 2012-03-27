@@ -21,7 +21,7 @@ package natlab.tame.simplification;
 import java.util.*;
 
 import natlab.DecIntNumericLiteralValue;
-import natlab.tame.ir.*;
+import natlab.tame.tir.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.rewrite.*;
 import natlab.toolkits.rewrite.simplification.*;
@@ -40,6 +40,7 @@ import ast.List;
  * 
  * This requires that LambdaSimplification has been performed on the IR,
  * Since the LambdaSimplification creates new functions, and works on functionLists,
+ * Also requires swtich simplification.
  * 
  */
 public class ThreeAddressToIR extends AbstractSimplification {
@@ -68,14 +69,14 @@ public class ThreeAddressToIR extends AbstractSimplification {
         
         rewriteChildren(node);
         //collect nested functions
-        List<IRFunction> nesteds = new List<IRFunction>();
+        List<TIRFunction> nesteds = new List<TIRFunction>();
         for (Function f : node.getNestedFunctions()){
-            nesteds.add((IRFunction)f);
+            nesteds.add((TIRFunction)f);
         }
-        //create IRFunction
+        //create TIRFunction
         newNode = new TransformedNode(
-                new IRFunction(node.getOutputParamList(),node.getName(),node.getInputParamList(),
-                        node.getHelpCommentList(),new IRStatementList(node.getStmtList()),nesteds));
+                new TIRFunction(node.getOutputParamList(),node.getName(),node.getInputParamList(),
+                        node.getHelpCommentList(),new TIRStatementList(node.getStmtList()),nesteds));
     }
         
     
@@ -93,7 +94,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
      */
     @Override
     public void caseEmptyStmt(EmptyStmt node) {
-        newNode = new TransformedNode(new IRCommentStmt(node.getComments()));
+        newNode = new TransformedNode(new TIRCommentStmt(node.getComments()));
     }
     
     @Override
@@ -101,7 +102,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
         //recursively rewrite children
         rewriteChildren(node);
 
-        if (node instanceof IRStmt) return; //don't redo conversion
+        if (node instanceof TIRStmt) return; //don't redo conversion
         
         //pull out expression
         LinkedList<AssignStmt> stmts = new LinkedList<AssignStmt>();
@@ -115,9 +116,9 @@ public class ThreeAddressToIR extends AbstractSimplification {
         //we will assume that there is only one if block (via if simplification)
         newNode = new TransformedNode(stmts);
         newNode.add(
-                new IRIfStmt(condition.getName(),
-                        new IRStatementList(node.getIfBlock(0).getStmtList()),
-                        new IRStatementList(elseStmts)));
+                new TIRIfStmt(condition.getName(),
+                        new TIRStatementList(node.getIfBlock(0).getStmtList()),
+                        new TIRStatementList(elseStmts)));
     }
 
 
@@ -125,7 +126,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
         //rewrite body
         rewrite(node.getStmtList());
 
-        if (node instanceof IRStmt) return; //don't redo conversion        
+        if (node instanceof TIRStmt) return; //don't redo conversion        
         
         //find range variables
         RangeExpr range = (RangeExpr)node.getAssignStmt().getRHS();
@@ -137,16 +138,16 @@ public class ThreeAddressToIR extends AbstractSimplification {
         
         //build transformed node
         newNode = new TransformedNode(assigns);
-        newNode.add(new IRForStmt(((NameExpr)(node.getAssignStmt().getLHS())).getName(),
+        newNode.add(new TIRForStmt(((NameExpr)(node.getAssignStmt().getLHS())).getName(),
                 l.getName(), i!=null?i.getName():null, u.getName(), 
-                        new IRStatementList(node.getStmtList())));
+                        new TIRStatementList(node.getStmtList())));
         
     }
     
     public void caseWhileStmt(WhileStmt node) {
         rewriteChildren(node);
         
-        if (node instanceof IRStmt) return; //don't redo conversion        
+        if (node instanceof TIRStmt) return; //don't redo conversion        
         
         //pull out expr
         LinkedList<AssignStmt> assign = new LinkedList<AssignStmt>();
@@ -159,46 +160,46 @@ public class ThreeAddressToIR extends AbstractSimplification {
         
         //construct transformed node
         newNode = new TransformedNode(assign);
-        newNode.add(new IRWhileStmt(condition.getName(), new IRStatementList(node.getStmtList())));
+        newNode.add(new TIRWhileStmt(condition.getName(), new TIRStatementList(node.getStmtList())));
     }
     
     
     public void caseReturnStmt(ReturnStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion        
-        newNode = new TransformedNode(new IRReturnStmt());
+        if (node instanceof TIRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new TIRReturnStmt());
     }
     
     public void caseBreakStmt(BreakStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion        
-        newNode = new TransformedNode(new IRBreakStmt());
+        if (node instanceof TIRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new TIRBreakStmt());
     }
     
     @Override
     public void caseContinueStmt(ContinueStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion        
-        newNode = new TransformedNode(new IRContinueStmt());
+        if (node instanceof TIRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new TIRContinueStmt());
     }
     
     @Override
     public void casePersistentStmt(PersistentStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion        
-        newNode = new TransformedNode(new IRPersistentSmt(node.getNameList()));
+        if (node instanceof TIRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new TIRPersistentSmt(node.getNameList()));
     }
     
     @Override
     public void caseGlobalStmt(GlobalStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion        
-        newNode = new TransformedNode(new IRGlobalStmt(node.getNameList()));
+        if (node instanceof TIRStmt) return; //don't redo conversion        
+        newNode = new TransformedNode(new TIRGlobalStmt(node.getNameList()));
     }
     
     @Override
     public void caseTryStmt(TryStmt node) {
         rewriteChildren(node);
-        if (node instanceof IRStmt) return; //don't redo conversion        
+        if (node instanceof TIRStmt) return; //don't redo conversion        
         
-        newNode = new TransformedNode(new IRTryStmt(
-                        new IRStatementList(node.getTryStmtList()),
-                        new IRStatementList(node.getCatchStmtList())));
+        newNode = new TransformedNode(new TIRTryStmt(
+                        new TIRStatementList(node.getTryStmtList()),
+                        new TIRStatementList(node.getCatchStmtList())));
     }
     
     @Override
@@ -214,11 +215,11 @@ public class ThreeAddressToIR extends AbstractSimplification {
         Expr expr = expandExpr(node.getExpr(), assignments);
         //check if last assign is a call - remove target
         if (assignments.size() > 0){
-            if (assignments.getLast() instanceof IRCallStmt){
-                IRCallStmt call = (IRCallStmt)assignments.getLast();
+            if (assignments.getLast() instanceof TIRCallStmt){
+                TIRCallStmt call = (TIRCallStmt)assignments.getLast();
                 assignments.set(assignments.size()-1, 
-                        new IRCallStmt(call.getFunctionName(), 
-                                new IRCommaSeparatedList(), 
+                        new TIRCallStmt(call.getFunctionName(), 
+                                new TIRCommaSeparatedList(), 
                                 call.getArguments()));
             }
         }
@@ -237,7 +238,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     Random rnd = new Random();
     public void caseAssignStmt(AssignStmt node) {
-        if (node instanceof IRStmt) return; //don't redo conversion
+        if (node instanceof TIRStmt) return; //don't redo conversion
         
         //we need to pull out the assignments to literals etc.
         LinkedList<AssignStmt> assignments = new LinkedList<AssignStmt>();
@@ -256,8 +257,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
      * takes an expression and interprets it as an LValue, returning it as a
      * comma separated list - it should not include parameterized expressions
      */
-    private IRCommaSeparatedList exprToCommaSeparatedList(Expr expr){
-        IRCommaSeparatedList list = new IRCommaSeparatedList();
+    private TIRCommaSeparatedList exprToCommaSeparatedList(Expr expr){
+        TIRCommaSeparatedList list = new TIRCommaSeparatedList();
         if (expr instanceof NameExpr){
             list.add(expr);
         } else if (expr instanceof MatrixExpr) {
@@ -277,19 +278,19 @@ public class ThreeAddressToIR extends AbstractSimplification {
         if (isParameterizedVar(node.getLHS())){
             ParameterizedExpr param = (ParameterizedExpr)(node.getLHS());
             node.setRHS(expandExpr(node.getRHS(),assignments));
-            node = new IRArraySetStmt(((NameExpr)(param.getTarget())).getName(), 
+            node = new TIRArraySetStmt(((NameExpr)(param.getTarget())).getName(), 
                     listToCommaSeparatedList(param.getArgList(), assignments, true), ((NameExpr)node.getRHS()).getName());
         //CellArraySet
         } else if (node.getLHS() instanceof CellIndexExpr) {
             CellIndexExpr cell = (CellIndexExpr)(node.getLHS());
             node.setRHS(expandExpr(node.getRHS(), assignments));
-            node = new IRCellArraySetStmt(((NameExpr)(cell.getTarget())).getName(), 
+            node = new TIRCellArraySetStmt(((NameExpr)(cell.getTarget())).getName(), 
                     listToCommaSeparatedList(cell.getArgList(), assignments, true), ((NameExpr)node.getRHS()).getName());
         //DotArraySet
         } else if (node.getLHS() instanceof DotExpr) {
             DotExpr dot = (DotExpr)(node.getLHS());
             node.setRHS(expandExpr(node.getRHS(), assignments));
-            node = new IRDotSetStmt(
+            node = new TIRDotSetStmt(
                     ((NameExpr)dot.getTarget()).getName(),dot.getField(),
                     ((NameExpr)node.getRHS()).getName());
             
@@ -298,36 +299,36 @@ public class ThreeAddressToIR extends AbstractSimplification {
             //ArrayGet - rhs is a parametrized var
             if (isParameterizedVar(node.getRHS())){
                 ParameterizedExpr param = (ParameterizedExpr)node.getRHS();
-                node = new IRArrayGetStmt(((NameExpr)node.getLHS()).getName(),((NameExpr)param.getTarget()).getName(),
+                node = new TIRArrayGetStmt(((NameExpr)node.getLHS()).getName(),((NameExpr)param.getTarget()).getName(),
                         listToCommaSeparatedList(param.getArgList(),assignments,true));
             
             //copy - rhs is a name expression
             } else if (node.getRHS() instanceof NameExpr && isVar((NameExpr)(node.getRHS()))){
-                node = new IRCopyStmt(
+                node = new TIRCopyStmt(
                         ((NameExpr)node.getLHS()).getName(),
                         ((NameExpr)node.getRHS()).getName());
             
             //DotGet
             } else if (node.getRHS() instanceof DotExpr && isVar(((DotExpr)node.getRHS()).getTarget())){
                     DotExpr dot = (DotExpr)node.getRHS();
-                    node = new IRDotGetStmt(new IRCommaSeparatedList(node.getLHS()),
+                    node = new TIRDotGetStmt(new TIRCommaSeparatedList(node.getLHS()),
                             ((NameExpr)dot.getTarget()).getName(),dot.getField());
             
             //rhs is a cell index expr
             } else if (node.getRHS() instanceof CellIndexExpr){
                 CellIndexExpr cell = (CellIndexExpr)(node.getRHS());
-                node = new IRCellArrayGetStmt((NameExpr)cell.getTarget(), 
+                node = new TIRCellArrayGetStmt((NameExpr)cell.getTarget(), 
                         exprToCommaSeparatedList(node.getLHS()),
                         listToCommaSeparatedList(cell.getArgs(), assignments, true));
             
             //rhs is a call
             } else if (isCall(node.getRHS())){
                 NameExpr function;
-                IRCommaSeparatedList args;
+                TIRCommaSeparatedList args;
                 //get args and function
                 if (node.getRHS() instanceof NameExpr){
                     function = (NameExpr)(node.getRHS());
-                    args = new IRCommaSeparatedList();
+                    args = new TIRCommaSeparatedList();
                 } else if (node.getRHS() instanceof ParameterizedExpr){
                     ParameterizedExpr param = (ParameterizedExpr)(node.getRHS());
                     function = (NameExpr)(param.getTarget());
@@ -338,32 +339,32 @@ public class ThreeAddressToIR extends AbstractSimplification {
                 }
                 
                 
-                node = new IRCallStmt(function, 
+                node = new TIRCallStmt(function, 
                         exprToCommaSeparatedList(node.getLHS()),args);
                                 
             //assigning a literal
             } else if (node.getRHS() instanceof LiteralExpr){
-                node = new IRAssignLiteralStmt(((NameExpr)(node.getLHS())).getName(),
+                node = new TIRAssignLiteralStmt(((NameExpr)(node.getLHS())).getName(),
                         (LiteralExpr)(node.getRHS()));
                 
             //rhs is a  binary operation            
             } else if (node.getRHS() instanceof BinaryExpr){
                 BinaryExpr bin = (BinaryExpr)(node.getRHS());
-                IRCommaSeparatedList target = new IRCommaSeparatedList();
+                TIRCommaSeparatedList target = new TIRCommaSeparatedList();
                 target.add(node.getLHS());
-                IRCommaSeparatedList args = new IRCommaSeparatedList();
+                TIRCommaSeparatedList args = new TIRCommaSeparatedList();
                 args.add(expandExpr(bin.getLHS(), assignments));
                 args.add(expandExpr(bin.getRHS(), assignments));
-                node = new IRCallStmt(new NameExpr(new Name(bin.getOperatorName())), target, args);
+                node = new TIRCallStmt(new NameExpr(new Name(bin.getOperatorName())), target, args);
                 
             //rhs is a unary operation
             } else if (node.getRHS() instanceof UnaryExpr){
                 UnaryExpr un = (UnaryExpr)(node.getRHS());
-                IRCommaSeparatedList target = new IRCommaSeparatedList();
+                TIRCommaSeparatedList target = new TIRCommaSeparatedList();
                 target.add(node.getLHS());
-                IRCommaSeparatedList args = new IRCommaSeparatedList();
+                TIRCommaSeparatedList args = new TIRCommaSeparatedList();
                 args.add(expandExpr(un.getOperand(), assignments));
-                node = new IRCallStmt(new NameExpr(new Name(un.getOperatorName())), target, args);
+                node = new TIRCallStmt(new NameExpr(new Name(un.getOperatorName())), target, args);
 
             //matrix expresssion
             } else if (node.getRHS() instanceof MatrixExpr){
@@ -377,7 +378,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             } else if(node.getRHS() instanceof LambdaExpr){
                 //previous transformations should've turned this into just a call
                 LambdaExpr lambda = (LambdaExpr)(node.getRHS());
-                node = new IRCreateFunctionHandleStmt(
+                node = new TIRCreateLambdaStmt(
                         ((NameExpr)(node.getLHS())).getName(), 
                         ((NameExpr)((ParameterizedExpr)lambda.getBody()).getTarget()).getName(),
                         lambda.getInputParamList(),
@@ -386,7 +387,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             
             //function handle creation
             } else if(node.getRHS() instanceof FunctionHandleExpr){
-                node = new IRCreateFunctionHandleStmt(
+                node = new TIRCreateFunctionReferenceStmt(
                         ((NameExpr)(node.getLHS())).getName(), 
                         ((FunctionHandleExpr)(node.getRHS())).getName());
                     
@@ -397,14 +398,14 @@ public class ThreeAddressToIR extends AbstractSimplification {
                 Expr hi = expandExpr(re.getUpper(), assignments);
                 
                 node = re.hasIncr()?
-                        new IRCallStmt(new Name("colon"), node.getLHS(), 
+                        new TIRCallStmt(new Name("colon"), node.getLHS(), 
                                 lo, expandExpr(re.getIncr(), assignments), hi):
-                        new IRCallStmt(new Name("colon"), node.getLHS(), lo, hi);
+                        new TIRCallStmt(new Name("colon"), node.getLHS(), lo, hi);
                         
             //end call expression
             } else if (node.getRHS() instanceof EndCallExpr){
                 EndCallExpr end = (EndCallExpr)node.getRHS();
-                node = new IRCallStmt(new Name("end"), node.getLHS(),
+                node = new TIRCallStmt(new Name("end"), node.getLHS(),
                         expandExpr(end.getArray(), assignments),
                         expandExpr(new IntLiteralExpr(new DecIntNumericLiteralValue(""+end.getNumDim(),false)), assignments),
                         expandExpr(new IntLiteralExpr(new DecIntNumericLiteralValue(""+end.getWhatDim(),false)), assignments)
@@ -424,14 +425,14 @@ public class ThreeAddressToIR extends AbstractSimplification {
     /**
      * expands a matrix expression into temporary assignments and a valid ir assign
      */
-    private IRAbstractAssignStmt expandMatrix(MatrixExpr matrix,NameExpr target,LinkedList<AssignStmt> assignList){
+    private TIRAbstractAssignStmt expandMatrix(MatrixExpr matrix,NameExpr target,LinkedList<AssignStmt> assignList){
         return expandRows(matrix.getRowList(),target,assignList,"vertcat","horzcat");
     }
     
     /**
      * expands a cell array expression into temporary assignments and a valid ir assign
      */
-    private IRAbstractAssignStmt expandCellArray(CellArrayExpr cellArray,NameExpr target,LinkedList<AssignStmt> assignList){
+    private TIRAbstractAssignStmt expandCellArray(CellArrayExpr cellArray,NameExpr target,LinkedList<AssignStmt> assignList){
         //TODO
         return expandRows(cellArray.getRowList(),target,assignList,"cellvertcat","cellhorzcat");
     }
@@ -440,17 +441,17 @@ public class ThreeAddressToIR extends AbstractSimplification {
      * takes in a list of rows and expands it into a bunch of assignments into temporaries,
      * which get added to assignList.
      * vertcat and horzcat are the names of functions for horizontal and vertical concatenation
-     * Returns the last assignment as an IRCallStmt (this one does not get added to assignList).
+     * Returns the last assignment as an TIRCallStmt (this one does not get added to assignList).
      */
-    private IRAbstractAssignStmt expandRows(List<Row> rows,NameExpr target,LinkedList<AssignStmt> assignList,
+    private TIRAbstractAssignStmt expandRows(List<Row> rows,NameExpr target,LinkedList<AssignStmt> assignList,
             String vertcat, String horzcat){
         //collect rows
-        IRCommaSeparatedList rowTemps = new IRCommaSeparatedList();
+        TIRCommaSeparatedList rowTemps = new TIRCommaSeparatedList();
         
         //case 0x0 matrix - just say 'target = vertcat()'
         if (rows.getNumChild() == 0){
-            return new IRCallStmt(new NameExpr(new Name(vertcat)),
-                   new IRCommaSeparatedList(target),new IRCommaSeparatedList());
+            return new TIRCallStmt(new NameExpr(new Name(vertcat)),
+                   new TIRCommaSeparatedList(target),new TIRCommaSeparatedList());
         }
         
         //case 1x1 matrix
@@ -458,8 +459,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
             Row row = rows.getChild(0);
             if (row.getNumElement() == 1){
                 rowTemps.add(expandExpr(row.getElement(0), assignList));
-                return new IRCallStmt(new NameExpr(new Name(vertcat)),
-                        new IRCommaSeparatedList(target),rowTemps);
+                return new TIRCallStmt(new NameExpr(new Name(vertcat)),
+                        new TIRCommaSeparatedList(target),rowTemps);
             }
         }
         
@@ -471,8 +472,8 @@ public class ThreeAddressToIR extends AbstractSimplification {
                 //collect the row in tmp
                 TempFactory tmp = TempFactory.genFreshTempFactory();
                 assignList.add(
-                        new IRCallStmt(new NameExpr(new Name(horzcat)),
-                                new IRCommaSeparatedList(tmp.genNameExpr()),
+                        new TIRCallStmt(new NameExpr(new Name(horzcat)),
+                                new TIRCommaSeparatedList(tmp.genNameExpr()),
                                 listToCommaSeparatedList(row.getElementList(),assignList,true)));
                 rowTemps.add(tmp.genNameExpr());
             }
@@ -482,12 +483,12 @@ public class ThreeAddressToIR extends AbstractSimplification {
         if (rows.getNumChild() == 1){
             //only one row - we pull out the assignment of that row, and get the right target
             //in front of it
-            IRAbstractAssignStmt assign = (IRAbstractAssignStmt)assignList.removeLast();
+            TIRAbstractAssignStmt assign = (TIRAbstractAssignStmt)assignList.removeLast();
             assign.setLHS(target);
             return assign;
         } else {
-            return new IRCallStmt(new NameExpr(new Name(vertcat)),
-                    new IRCommaSeparatedList(target),
+            return new TIRCallStmt(new NameExpr(new Name(vertcat)),
+                    new TIRCommaSeparatedList(target),
                     rowTemps);
         }
     }
@@ -497,9 +498,9 @@ public class ThreeAddressToIR extends AbstractSimplification {
      * takes in a expression list, and returns the same list as a comma separated list
      * - pulls out all literals along the way if the flag is set
      */
-    private IRCommaSeparatedList listToCommaSeparatedList
+    private TIRCommaSeparatedList listToCommaSeparatedList
         (ast.List<Expr> list,LinkedList<AssignStmt> literalAssignments,boolean pullOutLiterals){
-        IRCommaSeparatedList newList =  new IRCommaSeparatedList();
+        TIRCommaSeparatedList newList =  new TIRCommaSeparatedList();
         for (Expr e : list){
             if (pullOutLiterals){
                 newList.add(expandExpr(e,literalAssignments));
@@ -528,7 +529,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
             return (NameExpr)exp;
         } else if (exp instanceof LiteralExpr){
             TempFactory tmp = TempFactory.genFreshTempFactory();
-            assignments.add(new IRAssignLiteralStmt(tmp.genName(), (LiteralExpr)exp));
+            assignments.add(new TIRAssignLiteralStmt(tmp.genName(), (LiteralExpr)exp));
             return tmp.genNameExpr();
         } else if (exp instanceof ColonExpr){
             return exp;

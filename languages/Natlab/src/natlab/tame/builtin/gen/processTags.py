@@ -138,9 +138,9 @@ def MatlabClass(builtin, tagArgs, iset):
 
 
 # former class tags - delete these when the delete/delete2 tags are deleted of the builtin.csv
-def delete(builtin, tagArgs, iset):
-    return ""
-def delete2(builtin, tagArgs, iset):
-    return ""
+#def delete(builtin, tagArgs, iset):
+#    return ""
+#def delete2(builtin, tagArgs, iset):
+#    return ""
 
 

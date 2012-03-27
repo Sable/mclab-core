@@ -20,9 +20,9 @@ package natlab.tame.callgraph;
 
 import java.util.*;
 
-import natlab.tame.ir.IRFunction;
 import natlab.tame.mc4.Mc4;
 import natlab.tame.simplification.ThreeAddressToIR;
+import natlab.tame.tir.TIRFunction;
 import natlab.toolkits.BiMap;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.path.FunctionReference;
@@ -139,7 +139,7 @@ public class StaticFunction implements Cloneable {
     //transforms the underlying AST to 3 address code
     private void transformToIR(){
         try{
-            if (this.function instanceof IRFunction){
+            if (this.function instanceof TIRFunction){
                 VFPreorderAnalysis anal = new VFPreorderAnalysis(function);
                 function = (Function)new CommentSimplification(function, anal).transform();
                 anal = new VFPreorderAnalysis(function);

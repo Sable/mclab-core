@@ -29,12 +29,12 @@
 # - Class(<expr>)
 #     Defines what the Matlab classes of outputs are, given the classes of the
 #     input arguments. The language is defined in ClassTagLanguage.txt. Examples:
-#        Class((double|single)&(double|single)>double)
-#        Class(coerce(char|logical>double, numeric>0))
-#        Class(char&char>char, numeric&(0|double)>0,  (double|1)&numeric>1)
-#        delete(none>double)
-#        delete(parent&opt(any))
-# - matlabdelete(<expr>)
+#        Class(double|single double|single->double)
+#        Class(coerce(char|logical->double, numeric->0))
+#        Class(char char->char, numeric 0|double ->0,  double|1 numeric->1)
+#        Class(none ->double)
+#        Class(parent any*)
+# - Matlabclass(<expr>)
 #     Allows alternative definition of class propagation that more exacty follows
 #     Matlab semantics. This can only be defined for builtins for which 'Class' is defined.
 # -abstract
@@ -90,7 +90,7 @@ matrixFunction; pureFunction
 # constant function - there are few of these, most 'constants' take optional shape args
 constant; matrixFunction
 
-doubleConstant; constant; delete(none>double)
+doubleConstant; constant; 
 -Class(none -> double)
 pi
 i
@@ -134,7 +134,6 @@ improperAnyMatrixFunction; anyMatrixFunction
 
 
 diagonalSensitive; improperAnyMatrixFunction
--delete(matrix&opt(matrix)>0)
 -Class(matrix matrix? -> 0)
 tril
 triu
@@ -162,27 +161,22 @@ properNumericFunction; numericFunction
 
 # unary numeric function
 unaryNumericFunction; properNumericFunction
--delete(numeric>0, char|logical>double)
 -Class(numeric -> 0, char|logical -> double)
 
 elementalUnaryNumericFunction; unaryNumericFunction; abstract
 real
 imag
 abs
-conj;; delete2(logical>error,natlab)
--MatlabClass(logical->error, natlab)
-sign;; delete2(logical>error,natlab)
--MatlabClass(logical -> error, natlab)
+conj;; MatlabClass(logical->error, natlab)
+sign;; MatlabClass(logical -> error, natlab)
 
 elementalUnaryArithmetic; elementalUnaryNumericFunction
 uplus
 uminus
 
 RoundingOperation; elementalUnaryNumericFunction
--delete2(logical>error,natlab)
 -MatlabClass(logical -> error, natlab)
-fix;; delete2(logical>double,natlab)
--MatlabClass(logical->double, natlab)
+fix;; MatlabClass(logical->double, natlab)
 round
 floor
 ceil
@@ -194,18 +188,14 @@ arrayUnaryArithmetic; arrayUnaryNumericFunction; abstract
 
 # binary numeric function - doesn't mix integers
 binaryNumericFunction; properNumericFunction
--delete(coerce(logical|char>double, (numeric&(double|0)>0) | ((double|1)&numeric>1)))
 -Class(coerce(logical|char->double, (numeric double|0->0) | (double|1 numeric->1)))
--delete2((int&logical)|(logical&int)>error, natlab)
 -MatlabClass((int logical)|(logical int)->error, natlab)
 
 # elemental binary numeric matrix function
 elementalBinaryNumericFunction; binaryNumericFunction
 #imporoper? - supports 1 arg
 complex
--delete(coerce(logical|char>double, (numeric&opt(double|0)>0) | ((double|1)&numeric>1)))
 -Class(coerce(logical|char->double, (numeric (double|0)? ->0) | (double|1 numeric->1)))
--delete2((char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
 -MatlabClass(char|logical -> error, char|logical any->error, any char|logical->error, natlab)
 
 
@@ -215,12 +205,9 @@ plus
 minus
 times
 # integers can only be combined with scalar doubles
-power
--delete2(logical&0>error, parent)
--MatlabClass(logical 0->error, parent)
+power;; MatlabClass(logical 0->error, parent)
 
 dividingElementalArithmetic; elementalBinaryArithmetic
--delete2(logical&0>error, parent)
 -MatlabClass(logical 0->error, parent)
 # the following do not allow both args to be double under certain circumstances (...)
 ldivide
@@ -235,12 +222,9 @@ cross
 
 # binary matrix arithmetic - doesn't mix integer types
 arrayBinaryArithmetic; arrayBinaryNumericFunction
--delete2(logical&0>error, parent)
 -MatlabClass(logical 0->error, parent)
 
-mtimes;; delete2(logical&0>double, parent)
--MatlabClass(logical 0->double, parent)
--delete2(logical&0>double, parent)
+mtimes;; MatlabClass(logical 0->double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower
 dividingArrayArithmetic; arrayBinaryArithmetic
@@ -256,9 +240,7 @@ improperNumericFunction; numericFunction
 dimensionSensitiveNumericFunction; improperNumericFunction
 # TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
 dot
--delete(coerce(logical|char>double,((single&(float|single))|(float&single)>single) | (numeric&(double|0)>double) | ((double|1)&numeric>double))&opt(numeric|logical))
 -Class(coerce(logical|char->double,(single float)|(float single)->single || numeric double|0->double || double|1 numeric->double) (numeric|logical)?)
--delete2(logical&any>error, natlab)
 -MatlabClass(logical any->error, natlab)
 
 
@@ -266,9 +248,7 @@ dot
 dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
 
 minOrMax; dimensionCollapsingNumericFunction
--delete(matrix&any&(numeric|logical)>0&double, logical&logical>logical&double, coerce(logical|char>double, (numeric&opt(double|0)>0&double) | ((double|1)&numeric>1&double)), matrix>0&double)
 -Class(matrix any (numeric|logical)->0 double, logical logical->logical double, coerce(logical|char->double, numeric (double|0)?->0 double || double|1 numeric->1 double), matrix->0 double)
--delete2(logical&logical>logical&double, (char|logical)> error, (char|logical)&any>error, any&(char|logical)>error, natlab)
 -MatlabClass(logical logical->logical double, char|logical -> error, char|logical any->error, any char|logical->error, natlab)
 min
 max
@@ -288,7 +268,6 @@ properFloatFunction; floatFunction
 
 # unary functions operating on floating point matrizes
 unaryFloatFunction; properFloatFunction
--delete(float>0)
 -Class(float->0)
 
 # elemental unary functions operating on floating point matrizes
@@ -372,7 +351,6 @@ inv
 
 # binary matrix function operaitng on float matrices
 binaryFloatFunction; properFloatFunction
--delete(float&(double|0)>0,(double|1)&float>1)
 -Class(float double|0 -> 0, double|1 float -> 1)
 
 # elemental binary functino operating on floats matrizes
@@ -387,17 +365,13 @@ hypot
 # improper float matrix functions do not have a fixed arity, and extra arguments are either
 # options or different possible operands.
 improperFloatFunction; floatFunction
-eps
--delete(none>double,float>0,typeString(float))
--Class(none->double, float->0, typeString(float))
+eps;; Class(none->double, float->0, typeString(float))
 
 # functions of the form f(matrix,[dimension])
 dimensionSensitiveFloatFunction; improperFloatFunction
--delete(float&opt(numeric|logical)>0)
 -Class(float (numeric|logical)? -> 0)
 # cumsum coerces logicals to double
-cumsum;;delete(coerce(logical>double,parent))
--Class(coerce(logical->double, parent))
+cumsum;; Class(coerce(logical->double, parent))
 cumprod
 
 # numeric function that collapses a dimension (optional second arg tells which)
@@ -405,21 +379,16 @@ dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
 mode
 prod
 #TODO - sum takes a possible string parameter
-sum;;delete(coerce(int|char|logical>double,parent))
--Class(coerce(int|char|logical->double,parent))
-mean;;delete(coerce(int|char|logical>double,parent))
--Class(coerce(int|char|logical->double,parent))
-
+sum;; Class(coerce(int|char|logical->double,parent))
+mean;; Class(coerce(int|char|logical->double,parent))
 
 
 # standard matrix math functions with optional arguments
 matrixLibaryFunction; improperFloatFunction
 eig
-norm;;delete(float&opt(float|logical|char)>0)
--Class(float (float|logical|char)?->0)
+norm;; Class(float (float|logical|char)?->0)
 # query?
-rank;;delete(float&opt(matrix)>double)
--Class(float matrix?->double)
+rank;; Class(float matrix?->double)
 
 # optional 2 args
 cond
@@ -440,8 +409,7 @@ ordschur
 lu
 chol
 svd
-qr;;delete(float&opt(float|logical)>arg(0)&0&0)
--Class(float (float|logical)?->0 0 0)
+qr;; Class(float (float|logical)?->0 0 0)
 
 
 
@@ -449,7 +417,6 @@ qr;;delete(float&opt(float|logical)>arg(0)&0&0)
 # bit functions - usually operates on ints or logicals, some exceptions
 bitFunction; matrixFunction
 properBitFunction; bitFunction
--delete(uint&(double|0)>0, (double|1)&uint>1, logical&logical>logical, (double|logical)&(double|logical)>double)
 -Class(uint double|0->0, double|1 uint->1, logical logical->logical, double|logical double|logical->double)
 bitand
 bitor
@@ -476,11 +443,9 @@ matrixQuery; matrixFunction
 # return doubles
 toDoubleMatrixQuery; matrixQuery
 find
--delete(matrix&opt(matrix&opt(char))>double&double&double)
 -Class(matrix (matrix char?)?->double double double)
 
 unaryToScalarDoubleMatrixQuery; toDoubleMatrixQuery
--delete(matrix>double)
 -Class(matrix->double)
 
 toScalarDoubleMatrixQuery; unaryToScalarDoubleMatrixQuery;
@@ -493,7 +458,6 @@ toLogicalMatrixQuery; matrixQuery
 
 # unary return logicals
 unaryToLogicalMatrixQuery; toLogicalMatrixQuery
--delete(matrix>logical)
 -Class(matrix->logical)
 
 scalarUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
@@ -511,7 +475,6 @@ isnan
 
 # binary return logicals
 binaryToLogicalMatrixQuery; toLogicalMatrixQuery
--delete(matrix&matrix>logical)
 -Class(matrix matrix -> logical)
 
 elementalBinaryToLogicalMatrixQuery; binaryToLogicalMatrixQuery
@@ -538,9 +501,7 @@ xor
 # functions that create matrix arrays from vectors or values describing the matrizes
 matrixCreation; matrixFunction
 colon
--delete(coerce(logical>double,matlab))
 -Class(coerce(logical -> double, matlab))
--delete2(logical&logical&opt(logical)>error, (logical|double) & (double|logical) & opt(double|logical) > double, (numeric & (double|0) & opt(double|0)) > 0, ((double|-1) & ((double|-1)&numeric | numeric)) > -1, (double|1) & numeric & (double|1) > 1, char & ((char|double)&char | char) > char)
 -MatlabClass(logical logical logical?->error, logical|double double|logical  (double|logical)? -> double, numeric double|0  (double|0)? -> 0, double|-1 (double|-1 numeric) | numeric -> -1, double|1 numeric double|1 -> 1, char (char|double char)|char -> char)
 
 
@@ -549,7 +510,6 @@ colon
 byShapeAndTypeMatrixCreation; matrixCreation
 
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
--delete(star(numeric|logical)&(typeString(numeric)|(none>double)))
 -Class((numeric|logical)* typeString(numeric)|(none->double))
 ones
 zeros
@@ -557,7 +517,6 @@ zeros
 eye
 
 floatByShapeAndTypeMatrixCreation; numericalByShapeAndTypeMatrixCreation;
--delete(star(numeric|logical)&(typeString(float)|(none>double)))
 -Class((numeric|logical)* typeString(float)|(none->double))
 inf
 nan
@@ -566,7 +525,6 @@ nan
 
 # there is no optional type argument
 logicalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
--delete(star(numeric|logical)>logical)
 -Class((numeric|logical)*->logical)
 true
 false
@@ -575,18 +533,18 @@ false
 # **************************************************************************************
 # matrix constructors
 matrixConstructor; matrixFunction
-double ;;delete(any>double);Class(any->double)
-single ;;delete(any>single);Class(any->single)
-char   ;;delete(any>char);Class(any->char)
-logical;;delete(any>logical);Class(any->logical)
-int8   ;;delete(any>int8);Class(any->int8)
-int16  ;;delete(any>int16);Class(any->int16)
-int32  ;;delete(any>int32);Class(any->int32)
-int64  ;;delete(any>int64);Class(any->int64)
-uint8  ;;delete(any>uint8);Class(any->uint8)
-uint16 ;;delete(any>uint16);Class(any->uint16)
-uint32 ;;delete(any>uint32);Class(any->uint32)
-uint64 ;;delete(any>uint64);Class(any->uint64)
+double ;;Class(any->double)
+single ;;Class(any->single)
+char   ;;Class(any->char)
+logical;;Class(any->logical)
+int8   ;;Class(any->int8)
+int16  ;;Class(any->int16)
+int32  ;;Class(any->int32)
+int64  ;;Class(any->int64)
+uint8  ;;Class(any->uint8)
+uint16 ;;Class(any->uint16)
+uint32 ;;Class(any->uint32)
+uint64 ;;Class(any->uint64)
 
 
 # ***************************************************************************************
@@ -617,10 +575,8 @@ versatileFunction; pureFunction
 
 # takes in a matrix or cells of strings
 matrixOrCellOfCharFunction; versatileFunction
--delete(any>0)
 -Class(any->0)
-sort;;delete(any&opt(numeric)&opt(char) > 0&double)
--Class(any numeric? char? -> 0 double)
+sort;;Class(any numeric? char? -> 0 double)
 unique
 
 # ***************************************************************************************
@@ -660,30 +616,24 @@ regexprep
 versatileQuery; versatileFunction
 class
 # overloaded for struct for within constructors - struct,char,char..
--delete(any>char)
 -Class(any -> char)
 
 # return numericals
 doubleResultVersatileQuery; versatileQuery
--delete(any>double)
 -Class(any -> double)
 # TODO fix this output?!
-size;;delete(any&opt(numeric|logical)>double&double&double&double&double&double&double&double&double&double&double&double&double&double&double)
--Class(any (numeric|logical)? -> double double double double double double double double double double double double double double double)
+size;; Class(any (numeric|logical)? -> double double double double double double double double double double double double double double double)
 
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
 length
 ndims
-numel;;delete(any&star(matrix)>double)
--Class(any matrix* -> double)
-end;;delete(any&numeric&numeric>double)
--Class(any numeric numeric -> double)
+numel;; Class(any matrix* -> double)
+end;; Class(any numeric numeric -> double)
 
 # return logicals
 logicalResultVersatileQuery; versatileQuery
--delete(any>logical)
--Class(any -> logical)
+-Class(any->logical)
 
 
 # return scalar logicals
@@ -699,9 +649,7 @@ iscell
 isnumeric
 
 # TODO impure?
-isa
--delete(any&char>logical)
--Class(any char -> logical)
+isa;; Class(any char -> logical)
 
 scalarLogicalShapeQuery; scalarLogicalResultVersatileQuery
 isempty
@@ -710,7 +658,6 @@ isscalar
 
 
 multiaryToScalarLogicalVersatileQuery; versatileQuery
--delete(any&any&star(any)>logical)
 -Class(any any any*->logical)
 # same as isequal; but nan == nan
 isequalwithequalnans
@@ -724,15 +671,10 @@ versatileConversion; versatileFunction
 # TODO improper?
 # functions that change the shape
 shapeTransformation; versatileConversion
-reshape
--delete(any&matrix&star(matrix)>0)
--Class(any matrix matrix* -> 0)
-permute
--delete(any&double>0)
--Class(any double -> 0)
+reshape;; Class(any matrix matrix* -> 0)
+permute;; Class(any double -> 0)
 
 unaryShapeTransformation; shapeTransformation
--delete(any>0)
 -Class(any -> 0)
 squeeze
 transpose
@@ -822,9 +764,7 @@ impureFunction; root
 
 # dunnno what to do with these
 superiorto
-superiorfloat
--delete(star(float)>char)
--Class(float* -> char)
+superiorfloat;; Class(float* -> char)
 #set superior to relationship in oldclass constructor
 exit
 quit
@@ -833,8 +773,7 @@ builtin
 # calls builtin - proper
 
 timeFunction; impureFunction
-clock;; delete(none>double)
--Class(none -> double)
+clock;; Class(none -> double)
 tic
 toc
 cputime
@@ -865,10 +804,8 @@ which
 version
 clear
 
-nargin;; delete(none|char|function_handle>double)
--Class(none|char|function_handle->double)
-nargout;;delete(none|char|function_handle>double)
--Class(none|char|function_handle->double)
+nargin;; Class(none|char|function_handle->double)
+nargout;;Class(none|char|function_handle->double)
 
 
 # methods, fieldnames takes obj or string, allows extra arg '-full'
@@ -878,33 +815,28 @@ fieldnames
 
 reportFunction; impureFunction
 # errors should be seprated from warnings and displaying stuff?
-disp;; delete(any>none);; Class(any -> none)
+disp;; Class(any -> none)
 display
 clc
 #TODO rething error
-error;;delete(opt(char)&opt(char)&opt(star(any))>error)
--Class(char? char? any*->error)
-warning;;delete(any&star(opt(any))>char)
--Class(any any* -> char)
+error;;  Class(char? char? any*->error)
+warning;;Class(any any* -> char)
 echo
 # should this be here? - this could be a proper lib function?
 diary
 # something logging related
 # TODO review this:
-message;;delete(char&star(opt(any))>char)
--Class(char any* -> char)
+message;;Class(char any* -> char)
 lastwarn
 lasterror
 format
 
 
 randomFunction; impureFunction
--delete(star(numeric|logical)&(typeString(float)|(none>double)))
 -Class((numeric|logical)* typeString(float)|(none->double))
 rand
 randn
-randi;;delete((numeric|logical)&star(numeric|logical)&(typeString(numeric)|(none>double)))
--Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))
+randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))
 
 
 systemFunction; impureFunction
@@ -927,9 +859,9 @@ textscan
 
 
 posixIoFunction; ioFunction
-sprintf;;delete(char&star(any)>char);; Class(char any* -> char)
+sprintf;; Class(char any* -> char)
 sscanf
-fprintf;;delete(opt(double)&char&star(any) > double); Class(double? char any* -> double)
+fprintf;; Class(double? char any* -> double)
 ftell
 ferror
 fopen
@@ -952,21 +884,17 @@ notABuiltin; root
 #dyaddown
 #flipud
 #linspace
-imwrite;;delete(numeric&opt(numeric)&char&star(matrix))
--Class(numeric numeric? char matrix*)
-sparse;;delete((double|char|logical)&opt(double|char|logical)&opt(double|char|logical)&opt(double|char|logical)&opt(double|char|logical)&opt(double|char|logical)>0)
--Class((double|char|logical) (double|char|logical)* -> 0)
-realmax;;delete(typeString(float)|(none>double))
--Class(typeString(float)|(none->double))
-histc;;delete(numeric&numeric&opt(numeric)>double&double)
--Class(numeric numeric numeric? -> double double)
-blkdiag;;delete(star(numeric)>double)
--Class(numeric* -> double)
-toeplitz;;delete((single)&opt(single|double)>0,(single|double)>0,double&(single|double)>1)
--Class(single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1)
+imwrite;; Class(numeric numeric? char matrix*)
+sparse;;  Class((double|char|logical) (double|char|logical)* -> 0)
+realmax;; Class(typeString(float)|(none->double))
+histc;;   Class(numeric numeric numeric? -> double double)
+blkdiag;; Class(numeric* -> double)
+toeplitz;;Class(single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1)
 
 # at least variance should be a builtin, std = sqrt(var)
-var;;delete(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))
--Class(coerce(char|logical -> double, float ->0) numeric? numeric?)
-std;;delete(coerce(char|logical>double,float>0)&opt(numeric)&opt(numeric))
--Class(coerce(char|logical -> double, float ->0) numeric? numeric?)
+var;; Class(coerce(char|logical -> double, float ->0) numeric? numeric?)
+std;; Class(coerce(char|logical -> double, float ->0) numeric? numeric?)
+
+
+
+
