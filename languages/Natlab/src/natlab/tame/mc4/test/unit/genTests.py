@@ -15,12 +15,12 @@ bUnits.delBuiltinTests()
 
 # define some groups of functions
 binaryNumeric = bUnits.builtins.getByOriginalName('binaryNumericFunction')
-unaryNumeric =  bUnits.builtins.getByOriginalName('unaryNumericFunction')
+unaryNumeric  = bUnits.builtins.getByOriginalName('unaryNumericFunction')
 
 unaryAnyMatrix = bUnits.builtins.getByOriginalName('unaryAnyMatrixFunction')
 
 binaryFloat = bUnits.builtins.getByOriginalName('binaryFloatFunction')
-unaryFloat =  bUnits.builtins.getByOriginalName('unaryFloatFunction')
+unaryFloat  = bUnits.builtins.getByOriginalName('unaryFloatFunction')
 
 
 
@@ -65,10 +65,9 @@ bUnits.genTests([matrixQuery,versatileQuery],[[]]+
                 bUnits.genArgs(3,bUnits.double,[(1,1)]))
 
 
-binaryMatrixQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
-binaryMatrixQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
-binaryVersatileQuery = [bUnits.builtins.getByOriginalName('binaryToScalarLogicalVersatileQuery')]
-bUnits.genTests(binaryMatrixQuery+binaryVersatileQuery,[[]]+
+binaryMatrixQuery = [bUnits.builtins.getByOriginalName('binaryToLogicalMatrixQuery')]
+multiaryVersatileQuery = [bUnits.builtins.getByOriginalName('multiaryToScalarLogicalVersatileQuery')]
+bUnits.genTests(binaryMatrixQuery+multiaryVersatileQuery,[[]]+
                 bUnits.genArgs(2,bUnits.someMatrix,[(1,1)])+
                 bUnits.genArgs(2,bUnits.someMatrix,[(2,2)]))
 

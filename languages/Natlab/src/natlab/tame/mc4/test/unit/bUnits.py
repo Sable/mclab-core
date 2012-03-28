@@ -107,6 +107,7 @@ def genBuiltinTest(b,args):
 # gen args generates tests
 def genTests(builtins, *argsList):
     crossedArgs = cross(*argsList)
+    print builtins
     for btree in builtins:
         for b in btree:
             if (not b.isAbstract) and (not b.name in ignoreBuiltinSet):
@@ -135,10 +136,10 @@ def delBuiltinTests():
 
 
 
-builtinPath=os.path.realpath('../../builtin');
+builtinPath=os.path.realpath('../../../builtin/gen');
 sys.path.append(builtinPath)
-builtinPath=os.path.realpath('../../../builtin');
-sys.path.append(builtinPath)
+#builtinPath=os.path.realpath('../../builtin/gen');
+#sys.path.append(builtinPath)
 import genBuiltin
 builtins=genBuiltin.readCSVData(builtinPath+'/builtins.csv')[0];
 
