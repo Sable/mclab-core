@@ -43,7 +43,7 @@ clause
 	| ID.s                              {: return Functions.get(s);   :}
 	| LPAREN expr.e RPAREN              {: return e;                  :}
 	| COERCE LPAREN expr.a COMMA expr.b RPAREN  @CALL {: return new CPCoerce(a,b); :}
-	| TYPESTRING LPAREN list.l RPAREN  @CALL          {: return Functions.get("typeString",l); :}
+	| TYPESTRING LPAREN expr.a RPAREN  @CALL          {: return new CPTypeString(a); :}
 	;
 
 list

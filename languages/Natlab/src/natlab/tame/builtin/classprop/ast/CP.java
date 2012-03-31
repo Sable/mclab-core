@@ -40,7 +40,9 @@ public abstract class CP extends Symbol{
     
     
     /**
-     * returns the string of the other. Places parentheses 
+     * returns the string of the other. Places parentheses if the other node
+     * has higher precedence than this node -- this is used by the pretty printer
+     * to only put parenthesis when necessary.
      */
     String print(CP other){
     	if (PrecedenceInfo.getPrecedence(other.getClass()) < PrecedenceInfo.getPrecedence(this.getClass())){

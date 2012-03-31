@@ -18,22 +18,22 @@ public class ClassPropParser extends Parser {
 		static public final short TYPESTRING = 3;
 		static public final short NUMBER = 4;
 		static public final short ID = 5;
-		static public final short ARROW = 6;
-		static public final short OROR = 7;
-		static public final short RPAREN = 8;
-		static public final short QUESTION = 9;
-		static public final short MULT = 10;
+		static public final short OROR = 6;
+		static public final short QUESTION = 7;
+		static public final short MULT = 8;
+		static public final short RPAREN = 9;
+		static public final short OR = 10;
 		static public final short COMMA = 11;
-		static public final short OR = 12;
+		static public final short ARROW = 12;
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9ojaKbFmp0GXP#J409je0NAKfPUk20XBXmGN00X3gX2B4Sk8F57#CdiBUlmnfcK#G6rzSN" +
-		"FpoyPsm5mZnRciO8PpA90YbLCOLe4JUUFMscTH1wH8O$COLshKZT7tZ8MOsw3pmao6HC5sg" +
-		"H3bj1WBya2kbX3GC9qncmPQsWQ$Dw$FsvLsgboxaqfk1UjchEgzwgSFXLDrBgYwe6zu8vx3" +
-		"uYjGVG4UwHbNeSS2flEpJiWNT9tNe$icxubc#IOR94Jy#$83hcn#QvxVzlfEdzguuLRkoHN" +
-		"vDfvPxMsUT$6S#$p24ENENBxrjLdyaj#v5k#v5C#g8SoaFUu#ePHarSRNyWJXVwFm5jDZS2" +
-		"RJHnflEaArJd9#5OWATf$8996o0==");
+		"U9ojaJjFmq0GXETiuoGOXuGtuP66XYOD4gAXe0aI4WWf1QAWGmZ#1J#PDmG8oznwapkeSzP" +
+		"tEpVhk$Ek0ToXXKMieubv4JGmYm9pgACMV3fZFtZJLZbI9F8WJtfNoRioFjxTnWgsg6Oqaw" +
+		"Ej$Z8MEA#gti0QOu4bRA8ZZt18k2$Z3h2EEa#hJWn#EV63DsrLMeNX6t8#fNMqK5LbckOt$" +
+		"cWV7QE37zrx3QmRMjSnwNXFE7oU57vjxnsH7N8MURjaOFgQz4YVx95Bys$80RcozI6vDRqV" +
+		"dTMtkx$8Y3ABSZNRTn5v9sDjwrEBv$$yGLo3nIucGqRopVc7ztxAaEf3tkLDCw$HMoyMdyt" +
+		"m$y6ngwdXsDia8jLULtZjUvznboCfshzhpKg5");
 
 	private final Action[] actions;
 
@@ -47,7 +47,7 @@ public class ClassPropParser extends Parser {
 					 return l.asUnion();
 				}
 			},
-			new Action() {	// [1] expr = expr.a ARROW expr.b
+			new Action() {	// [1] expr = clause.a ARROW clause.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final CP a = (CP) _symbol_a.value;
@@ -128,11 +128,11 @@ public class ClassPropParser extends Parser {
 					 return new CPCoerce(a,b);
 				}
 			},
-			new Action() {	// [12] clause = TYPESTRING LPAREN list.l RPAREN
+			new Action() {	// [12] clause = TYPESTRING LPAREN expr.a RPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_l = _symbols[offset + 3];
-					final CPList l = (CPList) _symbol_l.value;
-					 return Functions.get("typeString",l);
+					final Symbol _symbol_a = _symbols[offset + 3];
+					final CP a = (CP) _symbol_a.value;
+					 return new CPTypeString(a);
 				}
 			},
 			new Action() {	// [13] list = expr.e
