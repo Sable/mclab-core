@@ -51,6 +51,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
     //protected boolean rewritingEnds = false;
     //protected Expr lastTarget = null;
     //protected int lastIndex, lastDims;
+    private static boolean DEBUG = false;
 
     protected HashMap< Expr, HashSet<EndCallExpr>> targetAndEndMap;
     
@@ -418,7 +419,9 @@ public class ExpressionCollector extends AbstractLocalRewrite
             } else{
                 if( !canEndBind( node ) ){
                     rewrite( node.getArgs() );
-                    System.out.println("JESSE130 " + node.getPrettyPrinted());
+                    if (DEBUG){
+                        System.out.println("JESSE130 " + node.getPrettyPrinted());
+                    }
                 }
             }
             rewrite( node.getTarget() );
@@ -440,7 +443,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
                                                        currentIndex );
             addToMap( endCallExpr );
             newNode = new TransformedNode(endCallExpr);
-            System.out.println("JESSE106 "+totalIndices+" "+currentIndex+" "+target.getPrettyPrinted());
+            if (DEBUG) System.out.println("JESSE106 "+totalIndices+" "+currentIndex+" "+target.getPrettyPrinted());
         }
 
         private void addToMap( EndCallExpr endCall )
