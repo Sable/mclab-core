@@ -11,9 +11,9 @@ import natlab.tame.valueanalysis.constant.Constant;
  * This should only be used to pass colon into subsref. No operation should ever return
  * it.
  * @author ant6n
- * @param <D>
+ * @param <V>
  */
-public class ColonValue<D extends MatrixValue<D>> extends SpecialValue<D> {
+public class ColonValue<V extends Value<V>> extends SpecialValue<V> {
 
     @Override
     public Constant getConstant() {
@@ -26,7 +26,7 @@ public class ColonValue<D extends MatrixValue<D>> extends SpecialValue<D> {
     }
 
     @Override
-    public Shape<D> getShape() {
+    public Shape<?> getShape() {
         throw new UnsupportedOperationException();
     }
 
@@ -41,43 +41,43 @@ public class ColonValue<D extends MatrixValue<D>> extends SpecialValue<D> {
     }
 
     @Override
-    public ValueSet<D> arraySubsref(Args<D> indizes) {
+    public ValueSet<V> arraySubsref(Args<V> indizes) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public ValueSet<D> dotSubsref(String field) {
+    public ValueSet<V> dotSubsref(String field) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public Value<D> arraySubsasgn(Args<D> indizes,Value<D> value) {
+    public V arraySubsasgn(Args<V> indizes,V value) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public Value<D> dotSubsasgn(String field, Value<D> value) {
-        throw new UnsupportedOperationException();
-    }
-    
-    
-    @Override
-    public Res<D> cellSubsref(Args<D> indizes) {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public Value<D> cellSubsasgn(Args<D> indizes, Args<D> values) {
+    public V dotSubsasgn(String field, V value) {
         throw new UnsupportedOperationException();
     }
     
     
     @Override
-    public Value<D> merge(Value<D> o) {
+    public Res<V> cellSubsref(Args<V> indizes) {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public V cellSubsasgn(Args<V> indizes, Args<V> values) {
+        throw new UnsupportedOperationException();
+    }
+    
+    
+    @Override
+    public V merge(V o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Value<D> toFunctionArgument(boolean recursive) {
+    public V toFunctionArgument(boolean recursive) {
         throw new UnsupportedOperationException();
     }
 

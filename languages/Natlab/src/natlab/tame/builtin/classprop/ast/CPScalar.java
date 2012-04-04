@@ -4,7 +4,7 @@ import java.util.List;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.valueanalysis.value.MatrixValue;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.value.Value;
 
 //If there is another argument to consume, matches if it is

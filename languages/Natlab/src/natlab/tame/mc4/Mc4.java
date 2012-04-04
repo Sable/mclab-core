@@ -30,6 +30,7 @@ import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.tame.valueanalysis.value.*;
@@ -169,19 +170,20 @@ public class Mc4 {
 	    //collect all needed matlab files
 	    FunctionCollection functions = new FunctionCollection(functionFinder);
 	    allRefs.addAll(functions.getAllFunctionBuiltinReferences());
-	    
+	    System.out.println(functions);
 	    
 	    
 	    //test intraprocedural class analysis
 	    try{
-	    ValueAnalysis<SimpleMatrixValue> analysis = new ValueAnalysis<SimpleMatrixValue>(
+	    ValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = new ValueAnalysis<AggrValue<SimpleMatrixValue>>(
 	            functions,
-	            Args.newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)),
+	            Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)),
 	            new SimpleMatrixValueFactory());
         System.out.println(analysis);
-        System.out.println(analysis.getPrettyPrinted());
+        //System.out.println(analysis.getPrettyPrinted());
 	    } catch (StackOverflowError e){
 	        System.err.println("stackoverflow in "+functions.getMain().name);
+	        e.printStackTrace();
 	        System.exit(0);
 	    }
 	    System.out.println("=> finished "+functions.getMain().name);

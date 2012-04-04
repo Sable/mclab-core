@@ -3,6 +3,7 @@ package natlab.tame.valueanalysis;
 import java.util.*;
 import java.util.Map.Entry;
 
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.*;
 
@@ -22,25 +23,25 @@ import natlab.toolkits.analysis.*;
  * 
  * @author ant6n
  */
-public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<String, ValueSet<D>> 
-       implements Mergable<ValueFlowMap<D>>,FlowData{  
-    LinkedHashMap<String,ValueSet<D>> map = new LinkedHashMap<String,ValueSet<D>>();
+public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, ValueSet<V>> 
+       implements Mergable<ValueFlowMap<V>>,FlowData{  
+    LinkedHashMap<String,ValueSet<V>> map = new LinkedHashMap<String,ValueSet<V>>();
     private boolean isViable = true;
     
     public ValueFlowMap(){
        // super(null);
     }
-    public static <D extends MatrixValue<D>> ValueFlowMap<D> newInstance(){
-        return new ValueFlowMap<D>();
+    public static <V extends Value<V>> ValueFlowMap<V> newInstance(){
+        return new ValueFlowMap<V>();
     }
     public ValueFlowMap(boolean isViable){
        // super(null);
         this.isViable = isViable;
     }
-    public static <D extends MatrixValue<D>> ValueFlowMap<D> newInstance(boolean isViable){
-        return new ValueFlowMap<D>(isViable);
+    public static <V extends Value<V>> ValueFlowMap<V> newInstance(boolean isViable){
+        return new ValueFlowMap<V>(isViable);
     }    
-    public ValueFlowMap(Map<String, ValueSet<D>> aMap){
+    public ValueFlowMap(Map<String, ValueSet<V>> aMap){
        // super(null);
         this.putAll(aMap);
     }
@@ -50,7 +51,7 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
      * copy constructor
      * @param aMap
      */
-    public ValueFlowMap(ValueFlowMap<D> aMap){
+    public ValueFlowMap(ValueFlowMap<V> aMap){
        // super(null);
         map.putAll(aMap.map);
         isViable = aMap.isViable;
@@ -62,7 +63,7 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
     }
 
     //@Override
-    public ValueSet<D> get(Object K) {
+    public ValueSet<V> get(Object K) {
         return map.get(K);
     }
 
@@ -72,23 +73,23 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
     }
 
     //@Override
-    public ValueSet<D> put(String key, ValueSet<D> values) {
+    public ValueSet<V> put(String key, ValueSet<V> values) {
         if (!isViable) return null;
         return map.put(key,values);
     }
     
-    public void putAll(Map<String,ValueSet<D>> map) {
+    public void putAll(Map<String,ValueSet<V>> map) {
         if (!isViable) return;
         this.map.putAll(map);
     }
     
-    public void putAll(ValueFlowMap<D> other){
+    public void putAll(ValueFlowMap<V> other){
         if (!isViable) return;
         this.map.putAll(other.map);
     }
 
     //@Override
-    public ValueSet<D> remove(Object key) {
+    public ValueSet<V> remove(Object key) {
         if (!isViable) return null;
         return map.remove(key);
     }
@@ -99,40 +100,40 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
     }
 
     //@Override
-    public ValueFlowMap<D> emptyMap() {
-        return new ValueFlowMap<D>();
+    public ValueFlowMap<V> emptyMap() {
+        return new ValueFlowMap<V>();
     }
     
     //@Override
-    public ValueFlowMap<D> copy() {
-        return new ValueFlowMap<D>(this);
+    public ValueFlowMap<V> copy() {
+        return new ValueFlowMap<V>(this);
     }
     
     /**
      * Returns a new ValueFlowMap, which is a merge of the two maps
      */
     @Override
-    public ValueFlowMap<D> merge(ValueFlowMap<D> o) {
+    public ValueFlowMap<V> merge(ValueFlowMap<V> o) {
         if (!isViable() || !o.isViable()){
-            return isViable?new ValueFlowMap<D>(this):new ValueFlowMap<D>(o);            
+            return isViable?new ValueFlowMap<V>(this):new ValueFlowMap<V>(o);            
         }
-        ValueFlowMap<D> result, smaller;
+        ValueFlowMap<V> result, smaller;
         //clone the bigger set
         if (this.size() > o.size()){
-            result = new ValueFlowMap<D>(this);
+            result = new ValueFlowMap<V>(this);
             smaller = o;
         } else {
-            result = new ValueFlowMap<D>(o);
+            result = new ValueFlowMap<V>(o);
             smaller = this;
         }
         //merge in smaller set
-        for (Entry<String, ValueSet<D>> e : smaller.map.entrySet()){
+        for (Entry<String, ValueSet<V>> e : smaller.map.entrySet()){
             result.mergePut(e.getKey(), e.getValue());
         }
         return result;
     }
     
-    public void mergePut(String key,ValueSet<D> value){
+    public void mergePut(String key,ValueSet<V> value){
         if (!isViable) return;
         if (!map.containsKey(key)){
             map.put(key,value);
@@ -146,9 +147,9 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
      * makes this value flow map a copy of the other
      * overwrites whatever is in the current flowset
      */
-    public void copyOtherIntoThis(ValueFlowMap<D> other){
+    public void copyOtherIntoThis(ValueFlowMap<V> other){
         this.isViable = other.isViable;
-        this.map = new LinkedHashMap<String,ValueSet<D>>(other.map);
+        this.map = new LinkedHashMap<String,ValueSet<V>>(other.map);
     }
     
     
@@ -162,9 +163,9 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
         StringBuffer buf = new StringBuffer();
         int indexOflastBreak = 0;
         buf.append('{');
-        Iterator<Entry<String, ValueSet<D>>> i = map.entrySet().iterator();
+        Iterator<Entry<String, ValueSet<V>>> i = map.entrySet().iterator();
         while(i.hasNext()){
-            Entry<String, ValueSet<D>> entry = i.next();
+            Entry<String, ValueSet<V>> entry = i.next();
             String item = entry.getKey() + '=' + entry.getValue();
             if (buf.length()+item.length() > indexOflastBreak + PRINT_COLUMNS_TO_NEWLINE){
                 buf.append('\n');
@@ -184,7 +185,7 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (obj instanceof ValueFlowMap<?>){
-            ValueFlowMap<D> flowMap = (ValueFlowMap<D>)obj;
+            ValueFlowMap<V> flowMap = (ValueFlowMap<V>)obj;
             return flowMap.isViable==isViable && flowMap.map.equals(map);
         }
         return false;   
@@ -206,7 +207,7 @@ public class ValueFlowMap<D extends MatrixValue<D>> //extends AbstractFlowMap<St
      * It's faster by returning a modified version of the argument - usually
      * whichever ValueFlowMap had more elements in it
      * TODO - remove this, probably
-    public ValueFlowMap<D> fastMerge(ValueFlowMap<D> other){
+    public ValueFlowMap<V> fastMerge(ValueFlowMap<V> other){
         if (this.map.size() > other.map.size()){
             this.union(other);
             return this;

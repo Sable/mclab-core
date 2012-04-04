@@ -47,6 +47,7 @@ public class TIRCommentStmt extends EmptyStmt implements TIRStmt {
         //TODO - should be done via parsing the stmt "% "+comment  
     }
     
+    
     @Override
     public void irAnalyize(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRCommentStmt(this);

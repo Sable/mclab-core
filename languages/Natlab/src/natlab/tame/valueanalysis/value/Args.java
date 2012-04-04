@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 
 /**
  * A way to combine multiple argument abstract values together to make an
@@ -30,35 +31,35 @@ import natlab.tame.classes.reference.ClassReference;
  * - create a child class called Indizes?
  * @author ant6n
  */
-public class Args<D extends MatrixValue<D>> extends ArrayList<Value<D>>{
+public class Args<V extends Value<V>> extends ArrayList<V>{
     private static final long serialVersionUID = 1L;
     
-    private Args(Collection<Value<D>> list){
+    private Args(Collection<V> list){
         super(list);
     }
-    public static <D extends MatrixValue<D>> Args<D> newInstance(Collection<Value<D>> list){
-        return new Args<D>(list);
+    public static <V extends Value<V>> Args<V> newInstance(Collection<V> list){
+        return new Args<V>(list);
     }
-    public static <D extends MatrixValue<D>> Args<D> newInstance(Value<D> arg){
-        LinkedList<Value<D>> values = new LinkedList<Value<D>>();
+    public static <V extends Value<V>> Args<V> newInstance(V arg){
+        LinkedList<V> values = new LinkedList<V>();
         values.add(arg);
-        return new Args<D>(values);
+        return new Args<V>(values);
     }
-    public static <D extends MatrixValue<D>> Args<D> newInstance(Value<D> arg1,Value<D> arg2){
-        LinkedList<Value<D>> values = new LinkedList<Value<D>>();
+    public static <V extends Value<V>> Args<V> newInstance(V arg1,V arg2){
+        LinkedList<V> values = new LinkedList<V>();
         values.add(arg1);
         values.add(arg2);
-        return new Args<D>(values);
+        return new Args<V>(values);
     }
-    public static <D extends MatrixValue<D>> Args<D> newInstance(Value<D>... args){
-        return new Args<D>(Arrays.asList((Value<D>[])args));
+    public static <V extends Value<V>> Args<V> newInstance(V... args){
+        return new Args<V>(Arrays.asList((V[])args));
     }
     
     /**
      * returns true if all values are primitive
      */
     boolean isAllPrimitive(){
-        for (Value<?> v : this){
+        for (V v : this){
             if (!(v instanceof MatrixValue<?>)){
                 return false;
             }
@@ -69,10 +70,10 @@ public class Args<D extends MatrixValue<D>> extends ArrayList<Value<D>>{
     /**
      * returns as a list of all primitive values, if the values are all primitive
      */
-    public List<MatrixValue<D>> asAllPrimitive(){
-        ArrayList<MatrixValue<D>> list = new ArrayList<MatrixValue<D>>(size());
-        for (Value<D> v : this){
-            list.add((MatrixValue<D>)v);
+    public List<MatrixValue<?>> asAllPrimitive(){
+        ArrayList<MatrixValue<?>> list = new ArrayList<MatrixValue<?>>(size());
+        for (V v : this){
+            list.add((MatrixValue<?>)v);
         }
         return list;
     }
@@ -81,7 +82,7 @@ public class Args<D extends MatrixValue<D>> extends ArrayList<Value<D>>{
      * returns true if all values are constant
      */
     public boolean isAllConstant(){
-        for (Value<?> v : this){
+        for (V v : this){
             if (!v.isConstant()) return false;
         }
         return true;        
@@ -94,7 +95,7 @@ public class Args<D extends MatrixValue<D>> extends ArrayList<Value<D>>{
      */
     public List<ClassReference> getClassList(){
         List<ClassReference> list = new ArrayList<ClassReference>(this.size());
-        for (Value<?> v : this){
+        for (V v : this){
             list.add(v.getMatlabClass());
         }
         return list;

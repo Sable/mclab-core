@@ -2,6 +2,7 @@ package natlab.tame.valueanalysis.value;
 
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.constant.Constant;
 import natlab.toolkits.analysis.Mergable;
 
@@ -20,10 +21,16 @@ import natlab.toolkits.analysis.Mergable;
  * TODO: should this be iterned?
  * TODO: maybe we should have a special 'colon' value representing ':'
  * 
+ * A Value is an abstraction of Matlab values that only requires that it stores
+ * its Matlab class. In order for the method signatures to be precise, the
+ * value interce is generic in itself -- an actual value implementation V has to
+ * fill in itself, so that the method signatures use V instead of Value.
+ * 
+ * 
  * @author ant6n
  */
 
-public interface Value<D extends MatrixValue<D>> extends Mergable<Value<D>>{
+public interface Value<V extends Value<V>> extends Mergable<V>{
     public ClassReference getMatlabClass();
     
     /**
@@ -34,15 +41,15 @@ public interface Value<D extends MatrixValue<D>> extends Mergable<Value<D>>{
      * subsasgn should be complex right away, no?
      * the args should always be values
      */
-    public ValueSet<D> arraySubsref(Args<D> indizes);
-    public Res<D> cellSubsref(Args<D> indizes); //TODO specify nargout? - via args?
+    public ValueSet<V> arraySubsref(Args<V> indizes);
+    public Res<V> cellSubsref(Args<V> indizes); //TODO specify nargout? - via args?
     
     //TODO should the subsref be a matrix value? - what if the struct access unknown?
-    public ValueSet<D> dotSubsref(String field);
+    public ValueSet<V> dotSubsref(String field);
     
-    public Value<D> arraySubsasgn(Args<D> indizes,Value<D> value);
-    public Value<D> dotSubsasgn(String field,Value<D> value);
-    public Value<D> cellSubsasgn(Args<D> indizes,Args<D> values);
+    public V arraySubsasgn(Args<V> indizes,V value);
+    public V dotSubsasgn(String field,V value);
+    public V cellSubsasgn(Args<V> indizes,Args<V> values);
     
     /**
      * returns true if this value has a shape associated with it
@@ -53,8 +60,9 @@ public interface Value<D extends MatrixValue<D>> extends Mergable<Value<D>>{
     /**
      * returns the shape associated with this value, or null if it doesn't have a shape
      * @return
+     * TODO - put in HasShape
      */
-    public Shape<D> getShape();
+    public Shape<?> getShape();
     
     
     /**
@@ -77,7 +85,7 @@ public interface Value<D extends MatrixValue<D>> extends Mergable<Value<D>>{
      * program
      * TODO - how to specify preferred values?
      */
-    public Value<D> toFunctionArgument(boolean recursive);
+    public V toFunctionArgument(boolean recursive);
 }
 
 

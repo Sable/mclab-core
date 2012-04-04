@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -13,28 +14,28 @@ import natlab.toolkits.analysis.Mergable;
  * 
  */
 
-public class Res<D extends MatrixValue<D>> extends ArrayList<ValueSet<D>> 
-         implements Mergable<Res<D>> {
+public class Res<V extends Value<V>> extends ArrayList<ValueSet<V>> 
+         implements Mergable<Res<V>> {
     boolean isViable = true;
     
-    public static <D extends MatrixValue<D>> Res<D> newInstance(Value<D> aValue){
-        Res<D> result = new Res<D>();
+    public static <V extends Value<V>> Res<V> newInstance(V aValue){
+        Res<V> result = new Res<V>();
         result.add(ValueSet.newInstance(aValue));
         return result;
     }
 
-    public static <D extends MatrixValue<D>> Res<D> newInstance(ValueSet<D> aValueSet){
-        Res<D> result = new Res<D>();
+    public static <V extends Value<V>> Res<V> newInstance(ValueSet<V> aValueSet){
+        Res<V> result = new Res<V>();
         result.add(aValueSet);
         return result;
     }
 
-    public static <D extends MatrixValue<D>> Res<D> newInstance(){
-        return new Res<D>();
+    public static <V extends Value<V>> Res<V> newInstance(){
+        return new Res<V>();
     }
     
-    public static <D extends MatrixValue<D>> Res<D> newInstance(boolean isViable){
-        Res<D> result =  new Res<D>();
+    public static <V extends Value<V>> Res<V> newInstance(boolean isViable){
+        Res<V> result =  new Res<V>();
         result.isViable = isViable;
         return result;
     }
@@ -43,8 +44,8 @@ public class Res<D extends MatrixValue<D>> extends ArrayList<ValueSet<D>>
     /**
      * copy
      */
-    public static <D extends MatrixValue<D>> Res<D> newInstance(Res<D> other){
-        Res<D> result =  new Res<D>();
+    public static <V extends Value<V>> Res<V> newInstance(Res<V> other){
+        Res<V> result =  new Res<V>();
         result.isViable = other.isViable;
         result.addAll(other);
         return result;
@@ -54,8 +55,8 @@ public class Res<D extends MatrixValue<D>> extends ArrayList<ValueSet<D>>
     /**
      * returns a non-viable result set, that is, an error result
      */
-    public static <D extends MatrixValue<D>> Res<D> newErrorResult(String message){
-        Res<D> result =  new Res<D>();
+    public static <V extends Value<V>> Res<V> newErrorResult(String message){
+        Res<V> result =  new Res<V>();
         result.isViable = false;
         return result;
     }
@@ -73,19 +74,19 @@ public class Res<D extends MatrixValue<D>> extends ArrayList<ValueSet<D>>
      * returns a Res object, which is the result of merging all the given
      * res objects. If there is none, returns a nonViable result
      */
-    public static <D extends MatrixValue<D>> Res<D> newInstance(Collection<Res<D>> valueSets){
+    public static <V extends Value<V>> Res<V> newInstance(Collection<Res<V>> valueSets){
         if (valueSets.size() == 0){
             return newInstance(false);
         } else {
-            Iterator<Res<D>> i = valueSets.iterator();
-            Res<D> result = i.next();
+            Iterator<Res<V>> i = valueSets.iterator();
+            Res<V> result = i.next();
             while(i.hasNext()) result = result.merge(i.next());
             return result;
         }
     }
 
     @Override
-    public Res<D> merge(Res<D> o) {
+    public Res<V> merge(Res<V> o) {
         if (!isViable || o.isViable){
             //TODO merge errors
             return isViable?this:o;
@@ -93,7 +94,7 @@ public class Res<D extends MatrixValue<D>> extends ArrayList<ValueSet<D>>
         if (this.size() != o.size()){
             throw new UnsupportedOperationException("mreging results with different number of results");
         } else {
-            Res<D> result = new Res<D>(this.size());
+            Res<V> result = new Res<V>(this.size());
             for (int i = 0; i < this.size(); i++){
                 result.add(this.get(i).merge(o.get(i)));
             }

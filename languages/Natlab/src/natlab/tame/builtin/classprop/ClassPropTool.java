@@ -55,6 +55,8 @@ public class ClassPropTool {
         }
         return match(tree,argClasses,argValues);
     }
+
+    
     
     /**
      * given a Matlab Class Propagation description and a set of argument classes,
@@ -72,7 +74,7 @@ public class ClassPropTool {
      * returns null if the combination of argument classes is illegal.
      */
 
-    public static LinkedList<HashSet<ClassReference>> match(CP tree,
+    private static LinkedList<HashSet<ClassReference>> match(CP tree,
             List<ClassReference> argClasses,List<? extends Value<?>> argValues){
         if (DEBUG) System.out.println("match "+tree+" with "+argValues);
         ClassPropMatch match = tree.match(true, new ClassPropMatch(), argClasses, argValues);

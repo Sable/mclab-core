@@ -1,4 +1,4 @@
-package natlab.tame.valueanalysis.value.composite;
+package natlab.tame.valueanalysis.aggrvalue;
 
 import java.util.HashMap;
 
@@ -18,33 +18,34 @@ import natlab.tame.valueanalysis.value.*;
  */
 
 public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
-    HashMap<String,ValueSet<D>> structMap = new HashMap<String,ValueSet<D>>();
+    HashMap<String,ValueSet<AggrValue<D>>> structMap = 
+    		new HashMap<String,ValueSet<AggrValue<D>>>();
     
-    public StructValue(ValueFactory<D> factory) {
+    public StructValue(AggrValueFactory<D> factory) {
         super(factory);
     }
     
     
     @Override
-    public Value<D> arraySubsasgn(Args<D> indizes, Value<D> value) {
+    public AggrValue<D> arraySubsasgn(Args<AggrValue<D>> indizes, AggrValue<D> value) {
         return this; //TODO - error?
     }
 
     @Override
-    public StructValue<D> dotSubsasgn(String field, Value<D> value) {
+    public StructValue<D> dotSubsasgn(String field, AggrValue<D> value) {
         StructValue<D> result = new StructValue<D>(factory);
-        result.structMap = new HashMap<String,ValueSet<D>>(structMap);
+        result.structMap = new HashMap<String,ValueSet<AggrValue<D>>>(structMap);
         result.structMap.put(field, ValueSet.newInstance(value));
         return result;
     }
     
     @Override
-    public ValueSet<D> arraySubsref(Args<D> indizes) {
-        return ValueSet.newInstance(this); //TODO - error?
+    public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes) {
+        return ValueSet.<AggrValue<D>>newInstance(this); //TODO - error?
     }
     
     @Override
-    public ValueSet<D> dotSubsref(String field) {
+    public ValueSet<AggrValue<D>> dotSubsref(String field) {
         if (structMap.containsKey(field)){
             return structMap.get(field);
         } else {
@@ -54,11 +55,11 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     }
     
     @Override
-    public Res<D> cellSubsref(Args<D> indizes) {
+    public Res<AggrValue<D>> cellSubsref(Args<AggrValue<D>> indizes) {
         throw new UnsupportedOperationException();
     }
     @Override
-    public Value<D> cellSubsasgn(Args<D> indizes, Args<D> values) {
+    public AggrValue<D> cellSubsasgn(Args<AggrValue<D>> indizes, Args<AggrValue<D>> values) {
         throw new UnsupportedOperationException();
     }
     
@@ -98,7 +99,7 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     }
     
     @Override
-    public StructValue<D> merge(Value<D> o) {
+    public StructValue<D> merge(AggrValue<D> o) {
         if (!o.getMatlabClass().equals(this.getMatlabClass()))
             throw new UnsupportedOperationException("attempting to merge struct value with not a struct value");
         StructValue<D> aStruct = (StructValue<D>)o;
@@ -115,14 +116,13 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     
     @Override
     public String toString() {
-        return "struct"+new ValueFlowMap<D>(structMap);
+        return "struct"+new ValueFlowMap<AggrValue<D>>(structMap);
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StructValue<?>) {
-            return this.structMap.equals(((StructValue)obj).structMap);           
+            return this.structMap.equals(((StructValue<?>)obj).structMap);           
         } else {
             return false;
         }

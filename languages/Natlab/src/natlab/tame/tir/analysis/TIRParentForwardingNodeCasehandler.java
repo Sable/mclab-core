@@ -105,12 +105,12 @@ public class TIRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandle
     @Override
     public void caseTIRCreateFunctionReferenceStmt(
     		TIRCreateFunctionReferenceStmt node) {
-    	irCallback.caseTIRCreateFunctionReferenceStmt(node);
+    	irCallback.caseTIRAbstractCreateFunctionHandleStmt(node);
     }
     
     @Override
     public void caseTIRCreateLambdaStmt(TIRCreateLambdaStmt node) {
-    	irCallback.caseTIRCreateLambdaStmt(node);
+    	irCallback.caseTIRAbstractCreateFunctionHandleStmt(node);
     }
 
     @Override

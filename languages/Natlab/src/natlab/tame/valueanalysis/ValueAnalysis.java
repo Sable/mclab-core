@@ -5,13 +5,14 @@ import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysis;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.value.*;
 
-public class ValueAnalysis<D extends MatrixValue<D>>
-extends InterproceduralAnalysis<IntraproceduralValueAnalysis<D>,Args<D>,Res<D>>{
+public class ValueAnalysis<V extends Value<V>>
+extends InterproceduralAnalysis<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>>{
 
-    public ValueAnalysis(FunctionCollection callgraph, Args<D> mainArgs, ValueFactory<D> valueFactory) {
-        super(new Factory<D>(valueFactory), callgraph, mainArgs);
+    public ValueAnalysis(FunctionCollection callgraph, Args<V> mainArgs, ValueFactory<V> valueFactory) {
+        super(new Factory<V>(valueFactory), callgraph, mainArgs);
     }
     
 
@@ -19,17 +20,17 @@ extends InterproceduralAnalysis<IntraproceduralValueAnalysis<D>,Args<D>,Res<D>>{
     /**
      * the factory that generates the intraprocedural analysis nodes
      */
-    private static class Factory<D extends MatrixValue<D>> implements InterproceduralAnalysisFactory<IntraproceduralValueAnalysis<D>, Args<D>, Res<D>>{
-        ValueFactory<D> valueFactory;
-        public Factory(ValueFactory<D> valueFactory){
+    private static class Factory<V extends Value<V>> implements InterproceduralAnalysisFactory<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>>{
+        ValueFactory<V> valueFactory;
+        public Factory(ValueFactory<V> valueFactory){
             this.valueFactory = valueFactory;
         }
         
-        public IntraproceduralValueAnalysis<D> newFunctionAnalysis(
+        public IntraproceduralValueAnalysis<V> newFunctionAnalysis(
                 StaticFunction function,
-                Args<D> argumentSet,
-                InterproceduralAnalysisNode<IntraproceduralValueAnalysis<D>, Args<D>, Res<D>> node) {
-            return new IntraproceduralValueAnalysis<D>(node,function,valueFactory,argumentSet);
+                Args<V> argumentSet,
+                InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node) {
+            return new IntraproceduralValueAnalysis<V>(node,function,valueFactory,argumentSet);
         }
     }
 }

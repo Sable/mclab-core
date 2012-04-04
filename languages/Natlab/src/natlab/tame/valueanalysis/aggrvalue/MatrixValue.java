@@ -16,12 +16,14 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.value;
+package natlab.tame.valueanalysis.aggrvalue;
 
 import java.util.List;
 
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * represents a primitive value, i.e. a value that has a primitive type.
@@ -37,7 +39,7 @@ import natlab.tame.valueanalysis.ValueSet;
  * Note that any Value has to implement an equals method.
  * @author adubra
  */
-public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> {
+public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D> {
     protected PrimitiveClassReference classRef;
     
     @Override
@@ -55,7 +57,7 @@ public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> 
 
     
     @Override
-    abstract public D merge(Value<D> other);
+    abstract public AggrValue<D> merge(AggrValue<D> other);
     
     
     public boolean isConstant(){
@@ -64,17 +66,9 @@ public abstract class MatrixValue<D extends MatrixValue<D>> implements Value<D> 
         
     
     @Override
-    abstract public ValueSet<D> arraySubsref(Args<D> indizes);  
+    abstract public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes);  
     
-    
-    /**
-     * returns a Matrix Value representing the index i
-     * in the loop header
-     * for i = <this>:<inc>:<upper>
-     * inc is optional, and may be null, in which case inc=1
-     */
-    abstract public D forRange(D upper, D inc);
-    
+     
 }
 
 

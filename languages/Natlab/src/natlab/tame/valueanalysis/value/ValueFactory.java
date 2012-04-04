@@ -3,7 +3,13 @@ package natlab.tame.valueanalysis.value;
 import java.util.Arrays;
 
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.aggrvalue.CellValue;
+import natlab.tame.valueanalysis.aggrvalue.FunctionHandleValue;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+import natlab.tame.valueanalysis.aggrvalue.StructValue;
 import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.composite.*;
 import natlab.toolkits.path.FunctionReference;
 
@@ -24,122 +30,102 @@ import natlab.toolkits.path.FunctionReference;
  * TODO - should some of the methods be in different internal factories?
  */
 
-public abstract class ValueFactory<D extends MatrixValue<D>> {
-    /**
-     * constructs a new Primitive Value from a constant
-     * @param constant
-     */
-    abstract public D newMatrixValue(Constant constant);
-    
-    
+public abstract class ValueFactory<V extends Value<V>> {
     /**
      * returns a ValuePropagator
      */
-    abstract public ValuePropagator<D> getValuePropagator();
+    abstract public ValuePropagator<V> getValuePropagator();
     
+    
+	/**
+     * constructs a new Primitive Value from a constant
+     * @param constant
+     */
+    abstract public V newMatrixValue(Constant constant);
+        
     
     /**
      * Creates a primitive scalar constant value
      */
-    public MatrixValue<D> newMatrixValue(double value){
+    public V newMatrixValue(double value){
         return newMatrixValue(Constant.get(value));
     }
     /**
      * Creates a primitive scalar constant value
      */
-    public MatrixValue<D> newMatrixValue(boolean value){
+    public V newMatrixValue(boolean value){
         return newMatrixValue(Constant.get(value));
     }
     /**
      * Creates a primitive constant value
      */
-    public MatrixValue<D> newMatrixValue(String value){
+    public V newMatrixValue(String value){
         return newMatrixValue(Constant.get(value));
     }
 
     /**
      * creates a function handle value
      */
-    public FunctionHandleValue<D> newFunctionHandleValue(FunctionReference f){
-        return new FunctionHandleValue<D>(this, f);
-    }
+    abstract public V newFunctionHandleValue(FunctionReference f);
     
     /**
      * creates a function handle value, but already supplies some arguments (partial application)
      */
-    public FunctionHandleValue<D> newFunctionHandlevalue(FunctionReference f,java.util.List<ValueSet<D>> partialValues){
-        return new FunctionHandleValue<D>(this,f,partialValues);
-    }
+    abstract public V newFunctionHandlevalue(FunctionReference f,java.util.List<ValueSet<V>> partialValues);
+
     
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<D> newValueSet(Constant constant){
+    public ValueSet<V> newValueSet(Constant constant){
         return ValueSet.newInstance(newMatrixValue(constant));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<D> newValueSet(double value){
+    public ValueSet<V> newValueSet(double value){
         return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<D> newValueSet(boolean value){
+    public ValueSet<V> newValueSet(boolean value){
         return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<D> newValueSet(String value){
+    public ValueSet<V> newValueSet(String value){
         return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
     }
-    
-    /**
-     * creates a scalar shape
-     */
-    public Shape<D> newScalarShape(){
-        return Shape.scalar(this);
+        
+    public V newColonValue(){
+        return (V)new ColonValue<V>();
     }
-    
-    /**
-     * creates a 0x0 shape
-     */
-    public Shape<D> newEmptyShape(){
-        return Shape.empty(this);
-    }
-    
-    /**
-     * creates a shape from the given collection of constants
-     */
-    public Shape<D> newShape(Constant... constants){
-        return Shape.newInstance(this,Arrays.asList(constants));
-    }
-    
-    /**
-     * returns a shape which would be the result when accessing an array with the given
-     * indizes (i.e., the shape [max(a1),max(a2),max(a3),...,max(an)])
-     */
-    public Shape<D> newShapeFromIndizes(Args<D> indizes){
-        return Shape.fromIndizes(this, indizes);
-    }
-    
-    public ColonValue<D> newColonValue(){
-        return new ColonValue<D>();
-    }
+
     
     /**
      * creates an empty struct
      */
-    public StructValue<D> newStruct(){
-        return new StructValue<D>(this);
-    }
+    abstract public V newStruct();
     
     /**
      * creates an empty cell array
      */
-    public CellValue<D> newCell(){
-        return new CellValue<D>(this);
-    }
+    abstract public V newCell();
+
+    
+    /**
+     * returns a value representing the 
+     * lower:inc:upper used as the range expression in a for loop.
+     * inc is optional, and may be null.
+     * lower, upper, inc should be values with matrix mclasses.
+     * TODO - move this somewhere else.
+     */
+    abstract public V forRange(V lower,	V upper, V inc);
+
+    	
 }
+
+
+

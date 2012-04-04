@@ -5,9 +5,9 @@ import java.util.*;
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.constant.CharConstant;
 import natlab.tame.valueanalysis.constant.Constant;
-import natlab.tame.valueanalysis.value.MatrixValue;
 import natlab.tame.valueanalysis.value.Value;
 
 // if next is a string, consumes it (otherwise no match)

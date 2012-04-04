@@ -108,11 +108,9 @@ public class StaticFunction implements Cloneable {
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
         
-        
         //go through all symbols, and put them in the symbol table
-        for (Map.Entry<String, ? extends VFDatum> pair : flowset.toList()){
-            VFDatum vf = pair.getValue();
-            String name = pair.getKey();
+        for (String name : flowset.getMap().keySet()){
+            VFDatum vf = flowset.getMap().get(name);
             
             if (vf.isFunction()){
                 calledFunctions.put(name, null); 

@@ -1,4 +1,4 @@
-package natlab.tame.valueanalysis.value.composite;
+package natlab.tame.valueanalysis.aggrvalue;
 
 import java.util.*;
 
@@ -17,14 +17,14 @@ import natlab.tame.valueanalysis.value.*;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     private Shape<D> shape;
-    private HashMap<Integer,ValueSet<D>> cellMap = new HashMap<Integer, ValueSet<D>>();
+    private HashMap<Integer,ValueSet<AggrValue<D>>> cellMap = new HashMap<Integer, ValueSet<AggrValue<D>>>();
     private boolean usesMap = true; //uses the map, if false, just uses an overall ValueSet
-    private ValueSet<D> values = null;
+    private ValueSet<AggrValue<D>> values = null;
     
     /**
      * creates empty cell array
      */
-    public CellValue(ValueFactory<D> factory){
+    public CellValue(AggrValueFactory<D> factory){
         super(factory);
         shape = factory.newEmptyShape();
         
@@ -34,7 +34,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     /**
      * creates cell array with given shape and internal values
      */
-    public CellValue(ValueFactory<D> factory, Shape<D> shape, ValueSet<D> values){
+    public CellValue(AggrValueFactory<D> factory, Shape<D> shape, ValueSet<AggrValue<D>> values){
         super(factory);
         usesMap = false;
         this.values = values;
@@ -54,7 +54,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     
 
     @Override
-    public Value<D> arraySubsasgn(Args<D> indizes, Value<D> value) {
+    public AggrValue<D> arraySubsasgn(Args<AggrValue<D>> indizes, AggrValue<D> value) {
         if (value instanceof CellValue<?>){
             CellValue<D> cell = (CellValue<D>)value;
             CellValue<D> result = new CellValue<D>(this.factory);
@@ -68,22 +68,22 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
 
     @Override
-    public ValueSet<D> arraySubsref(Args<D> indizes) {
+    public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes) {
         throw new UnsupportedOperationException("array indexing of cell values not supported");
     }
 
     @Override
-    public Value<D> dotSubsasgn(String field, Value<D> value) {
+    public AggrValue<D> dotSubsasgn(String field, AggrValue<D> value) {
         throw new UnsupportedOperationException("dot indexing of cell values not supported");
     }
 
     @Override
-    public ValueSet<D> dotSubsref(String field) {
+    public ValueSet<AggrValue<D>> dotSubsref(String field) {
         throw new UnsupportedOperationException("dot indexing of cell values not supported");
     }
     
     @Override
-    public Res<D> cellSubsref(Args<D> indizes) {
+    public Res<AggrValue<D>> cellSubsref(Args<AggrValue<D>> indizes) {
         if (indizes.isAllConstant() && usesMap){
             throw new UnsupportedOperationException();
         } else {
@@ -93,7 +93,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         }
     }
     @Override
-    public CellValue<D> cellSubsasgn(Args<D> indizes, Args<D> values) {
+    public CellValue<D> cellSubsasgn(Args<AggrValue<D>> indizes, Args<AggrValue<D>> values) {
         if (indizes.isAllConstant() && shape.isConstant()){
             throw new UnsupportedOperationException();
         } else {
@@ -148,7 +148,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
 
     @Override
-    public Value<D> merge(Value<D> o) {
+    public AggrValue<D> merge(AggrValue<D> o) {
         if (!o.getMatlabClass().equals(this.getMatlabClass()))
             throw new UnsupportedOperationException("attempting to merge cell value with not a cell value");
         CellValue<D> other = (CellValue<D>)o;
@@ -181,7 +181,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         if (!usesMap) return this;
         CellValue<D> result = new CellValue<D>(factory);
         result.usesMap = false;
-        ValueSet<D> values = ValueSet.newInstance();
+        ValueSet<AggrValue<D>> values = ValueSet.newInstance();
         for (int i : cellMap.keySet()){
             values = values.merge(result.cellMap.get(i));
         }

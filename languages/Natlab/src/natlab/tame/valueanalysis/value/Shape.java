@@ -2,8 +2,8 @@ package natlab.tame.valueanalysis.value;
 
 import java.util.*;
 
-import natlab.tame.valueanalysis.constant.Constant;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.aggrvalue.*;
+import natlab.tame.valueanalysis.constant.*;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -13,14 +13,14 @@ import natlab.toolkits.analysis.Mergable;
 
 
 public class Shape<D extends MatrixValue<D>> implements Mergable<Shape<D>>{
-    ValueFactory<D> factory;
+	AggrValueFactory<D> factory;
     
-    private Shape(ValueFactory<D> factory) {
+    private Shape(AggrValueFactory<D> factory) {
         this.factory = factory;
     }
     
     
-    public static <D extends MatrixValue<D>> Shape<D> scalar(ValueFactory<D> factory){
+    public static <D extends MatrixValue<D>> Shape<D> scalar(AggrValueFactory<D> factory){
         return new Shape<D>(factory);
     }
     
@@ -29,7 +29,7 @@ public class Shape<D extends MatrixValue<D>> implements Mergable<Shape<D>>{
      * The given constants should be scalar.
      */
     public static <D extends MatrixValue<D>> Shape<D> newInstance(
-            ValueFactory<D> factory,Collection<Constant> dims){   
+            ValueFactory<AggrValue<D>> factory,Collection<Constant> dims){   
         throw new UnsupportedOperationException();//return new Shape<D>(factory);
     }
 
@@ -37,7 +37,7 @@ public class Shape<D extends MatrixValue<D>> implements Mergable<Shape<D>>{
     /**
      * returns a 0x0 shape
      */
-    public static <D extends MatrixValue<D>> Shape<D> empty(ValueFactory<D> factory){
+    public static <D extends MatrixValue<D>> Shape<D> empty(AggrValueFactory<D> factory){
         return new Shape<D>(factory);
     }
     
@@ -45,7 +45,7 @@ public class Shape<D extends MatrixValue<D>> implements Mergable<Shape<D>>{
      * returns a shape which would be the result when accessing an array with the given
      * indizes (i.e., the shape [max(a1),max(a2),max(a3),...,max(an)])
      */
-    public static <D extends MatrixValue<D>> Shape<D> fromIndizes(ValueFactory<D> factory, Args<D> indizes){
+    public static <D extends MatrixValue<D>> Shape<D> fromIndizes(AggrValueFactory<D> factory, Args<AggrValue<D>> indizes){
         return new Shape<D>(factory); //TODO
     }
     
@@ -61,7 +61,7 @@ public class Shape<D extends MatrixValue<D>> implements Mergable<Shape<D>>{
      * returns the single linear index that refers to the same element as
      * the given elements.
      */
-    public D getLinearIndex(Args<D> indizes){
+    public D getLinearIndex(Args<? extends AggrValue<D>> indizes){
         throw new UnsupportedOperationException();
     }
     

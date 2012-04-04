@@ -13,6 +13,7 @@ import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
@@ -65,17 +66,17 @@ public class Test {
         FilePathEnvironment functionFinder = new FilePathEnvironment(testFile, Builtin.getBuiltinQuery());
         FunctionCollection functions = new FunctionCollection(functionFinder);
         StaticFunction aFunction = functions.getAsInlinedStaticFunction();
-        IntraproceduralValueAnalysis<SimpleMatrixValue> classAnalysis =
-            new IntraproceduralValueAnalysis<SimpleMatrixValue>(null,
+        IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> classAnalysis =
+            new IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>(null,
                 aFunction,SimpleMatrixValue.FACTORY,
-                Args.newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)));
+                Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)));
         try{
             FlowAnalysisTestTool test = new FlowAnalysisTestTool(classAnalysis);
             String s = test.run(true,true);
             //System.out.println(s);
         } catch (UnsupportedOperationException e){
             System.err.println(e.getMessage());
-            return Res.<SimpleMatrixValue>newInstance();
+            return Res.<AggrValue<SimpleMatrixValue>>newInstance();
         }
         System.out.println("test result for "+testFile.getName()+": "+classAnalysis.getResult());
         return classAnalysis.getResult();

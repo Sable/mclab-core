@@ -1,5 +1,7 @@
 package natlab.tame.valueanalysis.value;
 
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+
 /**
  * Special Values are values that variables cannot actually take on.
  * Example
@@ -21,6 +23,6 @@ package natlab.tame.valueanalysis.value;
  * TODO also for errors?
  * TODO implement methods throwing unsupported exceptions ...
  */
-public abstract class SpecialValue<D extends MatrixValue<D>> implements Value<D> {
+public abstract class SpecialValue<V extends Value<V>> implements Value<V> {
 
 }

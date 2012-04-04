@@ -7,6 +7,7 @@ import natlab.tame.classes.reference.BuiltinCompoundClassReference;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.FunctionHandleClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 
 /**
  * Propagate values for builtin functions.
@@ -19,15 +20,15 @@ import natlab.tame.classes.reference.PrimitiveClassReference;
  * @author ant6n
  */
 
-public abstract class ValuePropagator<D extends MatrixValue<D>> 
-    extends BuiltinVisitor<Args<D>, Res<D>>{
+public abstract class ValuePropagator<V extends Value<V>> 
+    extends BuiltinVisitor<Args<V>, Res<V>>{
     
     /**
      * produces the abstract interpretation result of calling the given builtin
      * This is the public interface that users of this class should use
      * @return
      */
-    public Res<D> call(String builtin,Args<D> args){
+    public Res<V> call(String builtin,Args<V> args){
         Builtin b = Builtin.getInstance(builtin);
         if (b == null){
             throw new UnsupportedOperationException("builtin "+builtin+" not found");
@@ -35,12 +36,12 @@ public abstract class ValuePropagator<D extends MatrixValue<D>>
         return b.visit(this, args);        
     }
     
-    protected ValueFactory<D> factory;
+    protected ValueFactory<V> factory;
     /**
      * constructor takes in a MatrixValueFactory
      * TODO - do we need more args?
      */
-    public ValuePropagator(ValueFactory<D> factory){
+    public ValuePropagator(ValueFactory<V> factory){
         this.factory = factory;
     }
     
@@ -60,8 +61,9 @@ public abstract class ValuePropagator<D extends MatrixValue<D>>
      * 
      * Returns null if the combination of arguments is invalid
      *
+     * TODO - should this be in a separate tools/class?
      */
-    public ClassReference getDominantCatArgClass(Args<D> args){
+    public ClassReference getDominantCatArgClass(Args<V> args){
         if (args.size() == 0) return PrimitiveClassReference.DOUBLE;
         boolean hasChar = false, hasInt = false, hasSingle = false, hasDouble = false, 
             hasLogical = false, hasStruct = false, hasCell = false;
