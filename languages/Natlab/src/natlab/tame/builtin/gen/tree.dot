@@ -1,0 +1,578 @@
+digraph builtins{
+       //size="10.25,7.75";
+       rankdir=LR;
+       graph [ranksep=.2,concentrate=true, nodesep=.3];
+       //edge[ weight = 1.2 ];
+       Builtin;
+
+
+    
+       //- create a way of just returning the dominant arg, where a list of dominant args is given
+       abstractRoot[shape=plaintext,color=none,label="Root"];
+       Builtin -> abstractRoot;
+    
+       //pure functions have no side effects and always return the same value, depending only on arguments
+       abstractPureFunction[shape=plaintext,color=none,label="PureFn"];
+       abstractRoot -> abstractPureFunction;
+       objectFunction[shape=box,label="objectFunction",rank="max"];
+       abstractPureFunction -> objectFunction;
+    
+       //function operates on matrizes (numerical,char,logical)
+       sepabstractMatrixFunction[shape=plaintext,color=none,label="MatrixFn"];
+       abstractMatrixFunction[shape=plaintext,color=none,label="MatrixFn"];
+       abstractPureFunction -> sepabstractMatrixFunction;
+    
+       //constant function - there are few of these, most 'constants' take optional shape args
+       abstractConstant[shape=plaintext,color=none,label="Constant"];
+       abstractMatrixFunction -> abstractConstant;
+
+       abstractDoubleConstant[shape=plaintext,color=none,label="DoubleConstant"];
+       abstractConstant -> abstractDoubleConstant;
+       pi[shape=box,label="pi\ni\nj",rank="max"];
+       abstractDoubleConstant -> pi;
+    
+       //general function - operates on any matrix, sometimes with restrictions
+       abstractAnyMatrixFunction[shape=plaintext,color=none,label="AnyMatrixFn"];
+       abstractMatrixFunction -> abstractAnyMatrixFunction;
+    
+       //any matrix functions with fixed arity, where all arguments are numeric operands
+       abstractProperAnyMatrixFunction[shape=plaintext,color=none,label="ProperAnyMatrixFn"];
+       abstractAnyMatrixFunction -> abstractProperAnyMatrixFunction;
+    
+       //unary function operating on a general matrix
+       abstractUnaryAnyMatrixFunction[shape=plaintext,color=none,label="UnaryAnyMatrixFn"];
+       abstractProperAnyMatrixFunction -> abstractUnaryAnyMatrixFunction;
+    
+       //elemental unary function operating on a general matrix
+       elementalUnaryAnyMatrixFunction[shape=plaintext,color=none,label="lUnaryAnyMatrixFn"];
+       abstractUnaryAnyMatrixFunction -> elementalUnaryAnyMatrixFunction;
+    
+       //matrix-wise unary function operating on a general matrix
+       arrayUnaryAnyMatrixFunction[shape=plaintext,color=none,label="ryAnyMatrixFn"];
+       abstractUnaryAnyMatrixFunction -> arrayUnaryAnyMatrixFunction;
+    
+       //binary function operating on a general matrix
+       abstractBinaryAnyMatrixFunction[shape=plaintext,color=none,label="BinaryAnyMatrixFn"];
+       abstractProperAnyMatrixFunction -> abstractBinaryAnyMatrixFunction;
+    
+       //elemental binary function operating on a general matrix
+       elementalBinaryAnyMatrixFunction[shape=plaintext,color=none,label="lBinaryAnyMatrixFn"];
+       abstractBinaryAnyMatrixFunction -> elementalBinaryAnyMatrixFunction;
+    
+       //matrix-wise unary function operating on a general matrix
+       arrayBinaryAnyMatrixFunction[shape=plaintext,color=none,label="aryAnyMatrixFn"];
+       abstractBinaryAnyMatrixFunction -> arrayBinaryAnyMatrixFunction;
+    
+       //arguments that either options or different possible operands.
+       abstractImproperAnyMatrixFunction[shape=plaintext,color=none,label="ImproperAnyMatrixFn"];
+       abstractAnyMatrixFunction -> abstractImproperAnyMatrixFunction;
+
+       abstractDiagonalSensitive[shape=plaintext,color=none,label="DiagonalSensitive"];
+       abstractImproperAnyMatrixFunction -> abstractDiagonalSensitive;
+       tril[shape=box,label="tril\ntriu\ndiag",rank="max"];
+       abstractDiagonalSensitive -> tril;
+    
+       //functions of the form f(matrix,[dimension]), where matrix is any matrix
+       abstractDimensionSensitiveAnyMatrixFunction[shape=plaintext,color=none,label="DimensionSensitiveAnyMatrixFn"];
+       abstractImproperAnyMatrixFunction -> abstractDimensionSensitiveAnyMatrixFunction;
+    
+       //functions that collapse the specified dimension
+       dimensionCollapsingAnyMatrixFunction[shape=plaintext,color=none,label="nCollapsingAnyMatrixFn"];
+       abstractDimensionSensitiveAnyMatrixFunction -> dimensionCollapsingAnyMatrixFunction;
+    
+       //- some actual Matlab functions don't actually coerce logicals and or chars!
+       abstractNumericFunction[shape=plaintext,color=none,label="NumericFn"];
+       abstractMatrixFunction -> abstractNumericFunction;
+    
+       //should this be called something related to operator?
+       abstractProperNumericFunction[shape=plaintext,color=none,label="ProperNumericFn"];
+       abstractNumericFunction -> abstractProperNumericFunction;
+    
+       //unary numeric function
+       abstractUnaryNumericFunction[shape=plaintext,color=none,label="UnaryNumericFn"];
+       abstractProperNumericFunction -> abstractUnaryNumericFunction;
+
+       abstractElementalUnaryNumericFunction[shape=plaintext,color=none,label="ElementalUnaryNumericFn"];
+       abstractUnaryNumericFunction -> abstractElementalUnaryNumericFunction;
+       real[shape=box,label="real\nimag\nabs\nconj\nsign",rank="max"];
+       abstractElementalUnaryNumericFunction -> real;
+
+       abstractElementalUnaryArithmetic[shape=plaintext,color=none,label="ElementalUnaryArithmetic"];
+       abstractElementalUnaryNumericFunction -> abstractElementalUnaryArithmetic;
+       uplus[shape=box,label="uplus\numinus",rank="max"];
+       abstractElementalUnaryArithmetic -> uplus;
+
+       abstractRoundingOperation[shape=plaintext,color=none,label="RoundingOperation"];
+       abstractElementalUnaryNumericFunction -> abstractRoundingOperation;
+       fix[shape=box,label="fix\nround\nfloor\nceil",rank="max"];
+       abstractRoundingOperation -> fix;
+
+       abstractArrayUnaryNumericFunction[shape=plaintext,color=none,label="ArrayUnaryNumericFn"];
+       abstractUnaryNumericFunction -> abstractArrayUnaryNumericFunction;
+
+       arrayUnaryArithmetic[shape=plaintext,color=none,label="ryArithmetic"];
+       abstractArrayUnaryNumericFunction -> arrayUnaryArithmetic;
+    
+       //binary numeric function - doesn't mix integers
+       abstractBinaryNumericFunction[shape=plaintext,color=none,label="BinaryNumericFn"];
+       abstractProperNumericFunction -> abstractBinaryNumericFunction;
+    
+       //elemental binary numeric matrix function
+       abstractElementalBinaryNumericFunction[shape=plaintext,color=none,label="ElementalBinaryNumericFn"];
+       abstractBinaryNumericFunction -> abstractElementalBinaryNumericFunction;
+       complex[shape=box,label="complex",rank="max"];
+       abstractElementalBinaryNumericFunction -> complex;
+    
+       //elemewise binary arithmetic
+       abstractElementalBinaryArithmetic[shape=plaintext,color=none,label="ElementalBinaryArithmetic"];
+       abstractElementalBinaryNumericFunction -> abstractElementalBinaryArithmetic;
+       plus[shape=box,label="plus\nminus\ntimes\npower",rank="max"];
+       abstractElementalBinaryArithmetic -> plus;
+
+       abstractDividingElementalArithmetic[shape=plaintext,color=none,label="DividingElementalArithmetic"];
+       abstractElementalBinaryArithmetic -> abstractDividingElementalArithmetic;
+       ldivide[shape=box,label="ldivide\nrdivide\nmod\nrem",rank="max"];
+       abstractDividingElementalArithmetic -> ldivide;
+    
+       //array wise binary numeric matrix function
+       abstractArrayBinaryNumericFunction[shape=plaintext,color=none,label="ArrayBinaryNumericFn"];
+       abstractBinaryNumericFunction -> abstractArrayBinaryNumericFunction;
+       cross[shape=box,label="cross",rank="max"];
+       abstractArrayBinaryNumericFunction -> cross;
+    
+       //binary matrix arithmetic - doesn't mix integer types
+       abstractArrayBinaryArithmetic[shape=plaintext,color=none,label="ArrayBinaryArithmetic"];
+       abstractArrayBinaryNumericFunction -> abstractArrayBinaryArithmetic;
+       mtimes[shape=box,label="mtimes\nmpower",rank="max"];
+       abstractArrayBinaryArithmetic -> mtimes;
+
+       abstractDividingArrayArithmetic[shape=plaintext,color=none,label="DividingArrayArithmetic"];
+       abstractArrayBinaryArithmetic -> abstractDividingArrayArithmetic;
+       mldivide[shape=box,label="mldivide\nmrdivide",rank="max"];
+       abstractDividingArrayArithmetic -> mldivide;
+    
+       //arguments that either options or different possible operands.
+       abstractImproperNumericFunction[shape=plaintext,color=none,label="ImproperNumericFn"];
+       abstractNumericFunction -> abstractImproperNumericFunction;
+    
+       //functions of the form f(matrix1,matrix2,...,matrixk,[dimension]), where matrix is any matrix
+       abstractDimensionSensitiveNumericFunction[shape=plaintext,color=none,label="DimensionSensitiveNumericFn"];
+       abstractImproperNumericFunction -> abstractDimensionSensitiveNumericFunction;
+       dot[shape=box,label="dot",rank="max"];
+       abstractDimensionSensitiveNumericFunction -> dot;
+    
+       //functions that collapse the specified dimension
+       abstractDimensionCollapsingNumericFunction[shape=plaintext,color=none,label="DimensionCollapsingNumericFn"];
+       abstractDimensionSensitiveNumericFunction -> abstractDimensionCollapsingNumericFunction;
+
+       abstractMinOrMax[shape=plaintext,color=none,label="MinOrMax"];
+       abstractDimensionCollapsingNumericFunction -> abstractMinOrMax;
+       min[shape=box,label="min\nmax\nmedian",rank="max"];
+       abstractMinOrMax -> min;
+    
+       //operatoes on floating point matrizes
+       abstractFloatFunction[shape=plaintext,color=none,label="FloatFn"];
+       abstractMatrixFunction -> abstractFloatFunction;
+    
+       //proper float functions have a fixed arity, and all operands are floats
+       abstractProperFloatFunction[shape=plaintext,color=none,label="ProperFloatFn"];
+       abstractFloatFunction -> abstractProperFloatFunction;
+    
+       //unary functions operating on floating point matrizes
+       abstractUnaryFloatFunction[shape=plaintext,color=none,label="UnaryFloatFn"];
+       abstractProperFloatFunction -> abstractUnaryFloatFunction;
+    
+       //elemental unary functions operating on floating point matrizes
+       abstractElementalUnaryFloatFunction[shape=plaintext,color=none,label="ElementalUnaryFloatFn"];
+       abstractUnaryFloatFunction -> abstractElementalUnaryFloatFunction;
+       sqrt[shape=box,label="sqrt\nrealsqrt\nerf\nerfinv\nerfc\nerfcinv\ngamma\ngammaln\nexp\nlog\nlog2\nlog10",rank="max"];
+       abstractElementalUnaryFloatFunction -> sqrt;
+
+       abstractForwardTrigonometricFunction[shape=plaintext,color=none,label="ForwardTrigonometricFn"];
+       abstractElementalUnaryFloatFunction -> abstractForwardTrigonometricFunction;
+
+       abstractRadianTrigonometricFunction[shape=plaintext,color=none,label="RadianTrigonometricFn"];
+       abstractForwardTrigonometricFunction -> abstractRadianTrigonometricFunction;
+       sin[shape=box,label="sin\ncos\ntan\ncot\nsec\ncsc",rank="max"];
+       abstractRadianTrigonometricFunction -> sin;
+
+       abstractDegreeTrigonometricFunction[shape=plaintext,color=none,label="DegreeTrigonometricFn"];
+       abstractForwardTrigonometricFunction -> abstractDegreeTrigonometricFunction;
+       sind[shape=box,label="sind\ncosd\ntand\ncotd\nsecd\ncscd",rank="max"];
+       abstractDegreeTrigonometricFunction -> sind;
+
+       abstractHyperbolicTrigonometricFunction[shape=plaintext,color=none,label="HyperbolicTrigonometricFn"];
+       abstractForwardTrigonometricFunction -> abstractHyperbolicTrigonometricFunction;
+       sinh[shape=box,label="sinh\ncosh\ntanh\ncoth\nsech\ncsch",rank="max"];
+       abstractHyperbolicTrigonometricFunction -> sinh;
+
+       abstractInverseTrigonmetricFunction[shape=plaintext,color=none,label="InverseTrigonmetricFn"];
+       abstractElementalUnaryFloatFunction -> abstractInverseTrigonmetricFunction;
+
+       abstractRadianInverseTrigonmetricFunction[shape=plaintext,color=none,label="RadianInverseTrigonmetricFn"];
+       abstractInverseTrigonmetricFunction -> abstractRadianInverseTrigonmetricFunction;
+       asin[shape=box,label="asin\nacos\natan\nacot\nasec\nacsc",rank="max"];
+       abstractRadianInverseTrigonmetricFunction -> asin;
+
+       abstractDegreeInverseTrigonmetricFunction[shape=plaintext,color=none,label="DegreeInverseTrigonmetricFn"];
+       abstractInverseTrigonmetricFunction -> abstractDegreeInverseTrigonmetricFunction;
+       asind[shape=box,label="asind\nacosd\natand\nacotd\nasecd\nacscd",rank="max"];
+       abstractDegreeInverseTrigonmetricFunction -> asind;
+
+       abstractHyperbolicInverseTrigonmetricFunction[shape=plaintext,color=none,label="HyperbolicInverseTrigonmetricFn"];
+       abstractInverseTrigonmetricFunction -> abstractHyperbolicInverseTrigonmetricFunction;
+       asinh[shape=box,label="asinh\nacosh\natanh\nacoth\nasech\nacsch",rank="max"];
+       abstractHyperbolicInverseTrigonmetricFunction -> asinh;
+    
+       //matrix-wise unary function operating on floating point matrizes
+       abstractArrayUnaryFloatFunction[shape=plaintext,color=none,label="ArrayUnaryFloatFn"];
+       abstractUnaryFloatFunction -> abstractArrayUnaryFloatFunction;
+    
+       //unary function operating on square floating point matrix
+       abstractSquareArrayUnaryFloatFunction[shape=plaintext,color=none,label="SquareArrayUnaryFloatFn"];
+       abstractArrayUnaryFloatFunction -> abstractSquareArrayUnaryFloatFunction;
+       logm[shape=box,label="logm\nsqrtm\nexpm\ninv",rank="max"];
+       abstractSquareArrayUnaryFloatFunction -> logm;
+    
+       //binary matrix function operaitng on float matrices
+       abstractBinaryFloatFunction[shape=plaintext,color=none,label="BinaryFloatFn"];
+       abstractProperFloatFunction -> abstractBinaryFloatFunction;
+    
+       //elemental binary functino operating on floats matrizes
+       abstractElementalBinaryFloatFunction[shape=plaintext,color=none,label="ElementalBinaryFloatFn"];
+       abstractBinaryFloatFunction -> abstractElementalBinaryFloatFunction;
+       atan2[shape=box,label="atan2",rank="max"];
+       abstractElementalBinaryFloatFunction -> atan2;
+    
+       //matrix-wise binary funciton operating on float matrices
+       abstractArrayBinaryFloatFunction[shape=plaintext,color=none,label="ArrayBinaryFloatFn"];
+       abstractBinaryFloatFunction -> abstractArrayBinaryFloatFunction;
+       hypot[shape=box,label="hypot",rank="max"];
+       abstractArrayBinaryFloatFunction -> hypot;
+    
+       //options or different possible operands.
+       abstractImproperFloatFunction[shape=plaintext,color=none,label="ImproperFloatFn"];
+       abstractFloatFunction -> abstractImproperFloatFunction;
+       eps[shape=box,label="eps",rank="max"];
+       abstractImproperFloatFunction -> eps;
+    
+       //functions of the form f(matrix,[dimension])
+       abstractDimensionSensitiveFloatFunction[shape=plaintext,color=none,label="DimensionSensitiveFloatFn"];
+       abstractImproperFloatFunction -> abstractDimensionSensitiveFloatFunction;
+       cumsum[shape=box,label="cumsum\ncumprod",rank="max"];
+       abstractDimensionSensitiveFloatFunction -> cumsum;
+    
+       //numeric function that collapses a dimension (optional second arg tells which)
+       abstractDimensionCollapsingFloatFunction[shape=plaintext,color=none,label="DimensionCollapsingFloatFn"];
+       abstractDimensionSensitiveFloatFunction -> abstractDimensionCollapsingFloatFunction;
+       mode[shape=box,label="mode\nprod\nsum\nmean",rank="max"];
+       abstractDimensionCollapsingFloatFunction -> mode;
+    
+       //standard matrix math functions with optional arguments
+       abstractMatrixLibaryFunction[shape=plaintext,color=none,label="MatrixLibaryFn"];
+       abstractImproperFloatFunction -> abstractMatrixLibaryFunction;
+       eig[shape=box,label="eig\nnorm\nrank\ncond\ndet\nrcond\nlinsolve",rank="max"];
+       abstractMatrixLibaryFunction -> eig;
+    
+       //factorization functions
+       abstractFacotorizationFunction[shape=plaintext,color=none,label="FacotorizationFn"];
+       abstractImproperFloatFunction -> abstractFacotorizationFunction;
+       schur[shape=box,label="schur\nordschur\nlu\nchol\nsvd\nqr",rank="max"];
+       abstractFacotorizationFunction -> schur;
+    
+       //bit functions - usually operates on ints or logicals, some exceptions
+       abstractBitFunction[shape=plaintext,color=none,label="BitFn"];
+       abstractMatrixFunction -> abstractBitFunction;
+
+       abstractProperBitFunction[shape=plaintext,color=none,label="ProperBitFn"];
+       abstractBitFunction -> abstractProperBitFunction;
+       bitand[shape=box,label="bitand\nbitor\nbitxor",rank="max"];
+       abstractProperBitFunction -> bitand;
+
+       abstractImproperBitFunciton[shape=plaintext,color=none,label="ImproperBitFunciton"];
+       abstractBitFunction -> abstractImproperBitFunciton;
+       bitcmp[shape=box,label="bitcmp\nbitset\nbitget\nbitshift",rank="max"];
+       abstractImproperBitFunciton -> bitcmp;
+    
+       //TODO impure/pure unary for scalar?
+       abstractMatrixQuery[shape=plaintext,color=none,label="MatrixQuery"];
+       abstractMatrixFunction -> abstractMatrixQuery;
+    
+       //return doubles
+       abstractToDoubleMatrixQuery[shape=plaintext,color=none,label="ToDoubleMatrixQuery"];
+       abstractMatrixQuery -> abstractToDoubleMatrixQuery;
+       find[shape=box,label="find",rank="max"];
+       abstractToDoubleMatrixQuery -> find;
+
+       abstractUnaryToScalarDoubleMatrixQuery[shape=plaintext,color=none,label="UnaryToScalarDoubleMatrixQuery"];
+       abstractToDoubleMatrixQuery -> abstractUnaryToScalarDoubleMatrixQuery;
+
+       abstractToScalarDoubleMatrixQuery[shape=plaintext,color=none,label="ToScalarDoubleMatrixQuery"];
+       abstractUnaryToScalarDoubleMatrixQuery -> abstractToScalarDoubleMatrixQuery;
+       nnz[shape=box,label="nnz",rank="max"];
+       abstractToScalarDoubleMatrixQuery -> nnz;
+    
+       //return logicals
+       abstractToLogicalMatrixQuery[shape=plaintext,color=none,label="ToLogicalMatrixQuery"];
+       abstractMatrixQuery -> abstractToLogicalMatrixQuery;
+    
+       //unary return logicals
+       abstractUnaryToLogicalMatrixQuery[shape=plaintext,color=none,label="UnaryToLogicalMatrixQuery"];
+       abstractToLogicalMatrixQuery -> abstractUnaryToLogicalMatrixQuery;
+
+       abstractScalarUnaryToLogicalMatrixQuery[shape=plaintext,color=none,label="ScalarUnaryToLogicalMatrixQuery"];
+       abstractUnaryToLogicalMatrixQuery -> abstractScalarUnaryToLogicalMatrixQuery;
+       not[shape=box,label="not\nany\nall\nisreal",rank="max"];
+       abstractScalarUnaryToLogicalMatrixQuery -> not;
+
+       abstractElementalUnaryToLogicalMatrixQuery[shape=plaintext,color=none,label="ElementalUnaryToLogicalMatrixQuery"];
+       abstractUnaryToLogicalMatrixQuery -> abstractElementalUnaryToLogicalMatrixQuery;
+       isinf[shape=box,label="isinf\nisfinite\nisnan",rank="max"];
+       abstractElementalUnaryToLogicalMatrixQuery -> isinf;
+    
+       //binary return logicals
+       abstractBinaryToLogicalMatrixQuery[shape=plaintext,color=none,label="BinaryToLogicalMatrixQuery"];
+       abstractToLogicalMatrixQuery -> abstractBinaryToLogicalMatrixQuery;
+
+       abstractElementalBinaryToLogicalMatrixQuery[shape=plaintext,color=none,label="ElementalBinaryToLogicalMatrixQuery"];
+       abstractBinaryToLogicalMatrixQuery -> abstractElementalBinaryToLogicalMatrixQuery;
+    
+       //relational operators
+       abstractRelationalOperator[shape=plaintext,color=none,label="RelationalOperator"];
+       abstractElementalBinaryToLogicalMatrixQuery -> abstractRelationalOperator;
+       eq[shape=box,label="eq\nne\nlt\ngt\nle\nge",rank="max"];
+       abstractRelationalOperator -> eq;
+    
+       //logical operators
+       abstractLogicalOperator[shape=plaintext,color=none,label="LogicalOperator"];
+       abstractElementalBinaryToLogicalMatrixQuery -> abstractLogicalOperator;
+       and[shape=box,label="and\nor\nxor",rank="max"];
+       abstractLogicalOperator -> and;
+    
+       //functions that create matrix arrays from vectors or values describing the matrizes
+       abstractMatrixCreation[shape=plaintext,color=none,label="MatrixCreation"];
+       abstractMatrixFunction -> abstractMatrixCreation;
+       colon[shape=box,label="colon",rank="max"];
+       abstractMatrixCreation -> colon;
+    
+       //construct arrays via their dimensions
+       abstractByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="ByShapeAndTypeMatrixCreation"];
+       abstractMatrixCreation -> abstractByShapeAndTypeMatrixCreation;
+
+       abstractNumericalByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="NumericalByShapeAndTypeMatrixCreation"];
+       abstractByShapeAndTypeMatrixCreation -> abstractNumericalByShapeAndTypeMatrixCreation;
+       ones[shape=box,label="ones\nzeros\neye",rank="max"];
+       abstractNumericalByShapeAndTypeMatrixCreation -> ones;
+
+       abstractFloatByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="FloatByShapeAndTypeMatrixCreation"];
+       abstractNumericalByShapeAndTypeMatrixCreation -> abstractFloatByShapeAndTypeMatrixCreation;
+       inf[shape=box,label="inf\nnan",rank="max"];
+       abstractFloatByShapeAndTypeMatrixCreation -> inf;
+    
+       //there is no optional type argument
+       abstractLogicalByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="LogicalByShapeAndTypeMatrixCreation"];
+       abstractByShapeAndTypeMatrixCreation -> abstractLogicalByShapeAndTypeMatrixCreation;
+       true[shape=box,label="true\nfalse",rank="max"];
+       abstractLogicalByShapeAndTypeMatrixCreation -> true;
+    
+       //matrix constructors
+       abstractMatrixConstructor[shape=plaintext,color=none,label="MatrixConstructor"];
+       abstractMatrixFunction -> abstractMatrixConstructor;
+       double[shape=box,label="double\nsingle\nchar\nlogical\nint8\nint16\nint32\nint64\nuint8\nuint16\nuint32\nuint64",rank="max"];
+       abstractMatrixConstructor -> double;
+    
+       //function operates on cell arrays
+       abstractCellFunction[shape=plaintext,color=none,label="CellFn"];
+       abstractPureFunction -> abstractCellFunction;
+       cell[shape=box,label="cell",rank="max"];
+       abstractCellFunction -> cell;
+
+       abstractCellCat[shape=plaintext,color=none,label="CellCat"];
+       abstractCellFunction -> abstractCellCat;
+       cellhorzcat[shape=box,label="cellhorzcat\ncellvertcat",rank="max"];
+       abstractCellCat -> cellhorzcat;
+    
+       //function operates on structures
+       abstractStructFunction[shape=plaintext,color=none,label="StructFn"];
+       abstractPureFunction -> abstractStructFunction;
+       isfield[shape=box,label="isfield\nstruct",rank="max"];
+       abstractStructFunction -> isfield;
+    
+       //function operates on a mixtures of matrizes, cell arrays, structures and/or objects
+       abstractVersatileFunction[shape=plaintext,color=none,label="VersatileFn"];
+       abstractPureFunction -> abstractVersatileFunction;
+    
+       //takes in a matrix or cells of strings
+       abstractMatrixOrCellOfCharFunction[shape=plaintext,color=none,label="MatrixOrCellOfCharFn"];
+       abstractVersatileFunction -> abstractMatrixOrCellOfCharFunction;
+       sort[shape=box,label="sort\nunique",rank="max"];
+       abstractMatrixOrCellOfCharFunction -> sort;
+    
+       //TODO should it be called string function?
+       abstractCharFunction[shape=plaintext,color=none,label="CharFn"];
+       abstractMatrixOrCellOfCharFunction -> abstractCharFunction;
+
+       abstractProperCharFunction[shape=plaintext,color=none,label="ProperCharFn"];
+       abstractCharFunction -> abstractProperCharFunction;
+
+       abstractUnaryProperCharFunction[shape=plaintext,color=none,label="UnaryProperCharFn"];
+       abstractProperCharFunction -> abstractUnaryProperCharFunction;
+       upper[shape=box,label="upper\nlower\ndeblank\nstrtrim",rank="max"];
+       abstractUnaryProperCharFunction -> upper;
+
+       abstractImproperCharFunction[shape=plaintext,color=none,label="ImproperCharFn"];
+       abstractCharFunction -> abstractImproperCharFunction;
+       strfind[shape=box,label="strfind\nfindstr\nstrrep",rank="max"];
+       abstractImproperCharFunction -> strfind;
+    
+       //str[n]cmp[i]
+       abstractStringCompare[shape=plaintext,color=none,label="StringCompare"];
+       abstractImproperCharFunction -> abstractStringCompare;
+       strcmp[shape=box,label="strcmp\nstrcmpi\nstrncmpi\nstrncmp",rank="max"];
+       abstractStringCompare -> strcmp;
+    
+       //regular expression functions
+       abstractRegexpFunction[shape=plaintext,color=none,label="RegexpFn"];
+       abstractImproperCharFunction -> abstractRegexpFunction;
+       regexptranslate[shape=box,label="regexptranslate\nregexp\nregexpi\nregexprep",rank="max"];
+       abstractRegexpFunction -> regexptranslate;
+    
+       //query functions that operate not just on matrizes (c.f. matrixQueryFunction)
+       abstractVersatileQuery[shape=plaintext,color=none,label="VersatileQuery"];
+       abstractVersatileFunction -> abstractVersatileQuery;
+       class[shape=box,label="class",rank="max"];
+       abstractVersatileQuery -> class;
+    
+       //return numericals
+       abstractDoubleResultVersatileQuery[shape=plaintext,color=none,label="DoubleResultVersatileQuery"];
+       abstractVersatileQuery -> abstractDoubleResultVersatileQuery;
+       size[shape=box,label="size",rank="max"];
+       abstractDoubleResultVersatileQuery -> size;
+    
+       //scalar numerical
+       abstractScalarDoubleResultVersatileQuery[shape=plaintext,color=none,label="ScalarDoubleResultVersatileQuery"];
+       abstractDoubleResultVersatileQuery -> abstractScalarDoubleResultVersatileQuery;
+       length[shape=box,label="length\nndims\nnumel\nend",rank="max"];
+       abstractScalarDoubleResultVersatileQuery -> length;
+    
+       //return logicals
+       abstractLogicalResultVersatileQuery[shape=plaintext,color=none,label="LogicalResultVersatileQuery"];
+       abstractVersatileQuery -> abstractLogicalResultVersatileQuery;
+    
+       //return scalar logicals
+       abstractScalarLogicalResultVersatileQuery[shape=plaintext,color=none,label="ScalarLogicalResultVersatileQuery"];
+       abstractLogicalResultVersatileQuery -> abstractScalarLogicalResultVersatileQuery;
+
+       abstractClassQuery[shape=plaintext,color=none,label="ClassQuery"];
+       abstractScalarLogicalResultVersatileQuery -> abstractClassQuery;
+       isobject[shape=box,label="isobject\nisfloat\nisinteger\nislogical\nisstruct\nischar\niscell\nisnumeric\nisa",rank="max"];
+       abstractClassQuery -> isobject;
+
+       abstractScalarLogicalShapeQuery[shape=plaintext,color=none,label="ScalarLogicalShapeQuery"];
+       abstractScalarLogicalResultVersatileQuery -> abstractScalarLogicalShapeQuery;
+       isempty[shape=box,label="isempty\nisvector\nisscalar",rank="max"];
+       abstractScalarLogicalShapeQuery -> isempty;
+
+       abstractMultiaryToScalarLogicalVersatileQuery[shape=plaintext,color=none,label="MultiaryToScalarLogicalVersatileQuery"];
+       abstractVersatileQuery -> abstractMultiaryToScalarLogicalVersatileQuery;
+       isequalwithequalnans[shape=box,label="isequalwithequalnans\nisequal",rank="max"];
+       abstractMultiaryToScalarLogicalVersatileQuery -> isequalwithequalnans;
+
+       abstractVersatileConversion[shape=plaintext,color=none,label="VersatileConversion"];
+       abstractVersatileFunction -> abstractVersatileConversion;
+    
+       //functions that change the shape
+       abstractShapeTransformation[shape=plaintext,color=none,label="ShapeTransformation"];
+       abstractVersatileConversion -> abstractShapeTransformation;
+       reshape[shape=box,label="reshape\npermute",rank="max"];
+       abstractShapeTransformation -> reshape;
+
+       abstractUnaryShapeTransformation[shape=plaintext,color=none,label="UnaryShapeTransformation"];
+       abstractShapeTransformation -> abstractUnaryShapeTransformation;
+       squeeze[shape=box,label="squeeze\ntranspose\nctranspose",rank="max"];
+       abstractUnaryShapeTransformation -> squeeze;
+    
+       //all these take multiple args
+       abstractConcatenation[shape=plaintext,color=none,label="Concatenation"];
+       abstractVersatileFunction -> abstractConcatenation;
+       horzcat[shape=box,label="horzcat\nvertcat\ncat",rank="max"];
+       abstractConcatenation -> horzcat;
+
+       abstractIndexing[shape=plaintext,color=none,label="Indexing"];
+       abstractVersatileFunction -> abstractIndexing;
+       subsasgn[shape=box,label="subsasgn\nsubsref",rank="max"];
+       abstractIndexing -> subsasgn;
+
+       abstractMapOperator[shape=plaintext,color=none,label="MapOperator"];
+       abstractVersatileFunction -> abstractMapOperator;
+       structfun[shape=box,label="structfun\narrayfun\ncellfun",rank="max"];
+       abstractMapOperator -> structfun;
+    
+       //*** opposite of pure functions *****************************************
+       abstractImpureFunction[shape=plaintext,color=none,label="ImpureFn"];
+       abstractRoot -> abstractImpureFunction;
+       superiorto[shape=box,label="superiorto\nsuperiorfloat\nexit\nquit",rank="max"];
+       abstractImpureFunction -> superiorto;
+    
+       //only really need one of quit/exit
+       abstractBuiltin[shape=plaintext,color=none,label="Builtin"];
+       abstractImpureFunction -> abstractBuiltin;
+    
+       //calls builtin - proper
+       abstractTimeFunction[shape=plaintext,color=none,label="TimeFn"];
+       abstractImpureFunction -> abstractTimeFunction;
+       clock[shape=box,label="clock\ntic\ntoc\ncputime",rank="max"];
+       abstractTimeFunction -> clock;
+
+       abstractMatlabSystemFunction[shape=plaintext,color=none,label="MatlabSystemFn"];
+       abstractImpureFunction -> abstractMatlabSystemFunction;
+       assert[shape=box,label="assert\nnargoutchk\nnargchk\nstr2func\npause",rank="max"];
+       abstractMatlabSystemFunction -> assert;
+
+       abstractDynamicMatlabFunction[shape=plaintext,color=none,label="DynamicMatlabFn"];
+       abstractMatlabSystemFunction -> abstractDynamicMatlabFunction;
+       eval[shape=box,label="eval\nevalin\nfeval\nassignin\ninputname",rank="max"];
+       abstractDynamicMatlabFunction -> eval;
+
+       abstractMatlabEnvironmentFunction[shape=plaintext,color=none,label="MatlabEnvironmentFn"];
+       abstractMatlabSystemFunction -> abstractMatlabEnvironmentFunction;
+       import[shape=box,label="import\ncd\nexist\nmatlabroot\nwhos\nwhich\nversion\nclear\nnargin\nnargout\nmethods\nfieldnames",rank="max"];
+       abstractMatlabEnvironmentFunction -> import;
+
+       abstractReportFunction[shape=plaintext,color=none,label="ReportFn"];
+       abstractImpureFunction -> abstractReportFunction;
+       disp[shape=box,label="disp\ndisplay\nclc\nerror\nwarning\necho\ndiary\nmessage\nlastwarn\nlasterror\nformat",rank="max"];
+       abstractReportFunction -> disp;
+
+       abstractRandomFunction[shape=plaintext,color=none,label="RandomFn"];
+       abstractImpureFunction -> abstractRandomFunction;
+       rand[shape=box,label="rand\nrandn\nrandi",rank="max"];
+       abstractRandomFunction -> rand;
+
+       abstractSystemFunction[shape=plaintext,color=none,label="SystemFn"];
+       abstractImpureFunction -> abstractSystemFunction;
+       computer[shape=box,label="computer\nbeep\ndir",rank="max"];
+       abstractSystemFunction -> computer;
+
+       abstractOperatingSystemCallFunction[shape=plaintext,color=none,label="OperatingSystemCallFn"];
+       abstractSystemFunction -> abstractOperatingSystemCallFunction;
+       unix[shape=box,label="unix\ndos\nsystem",rank="max"];
+       abstractOperatingSystemCallFunction -> unix;
+
+       abstractIoFunction[shape=plaintext,color=none,label="IoFn"];
+       abstractSystemFunction -> abstractIoFunction;
+       load[shape=box,label="load\nsave\ninput\ntextscan",rank="max"];
+       abstractIoFunction -> load;
+
+       abstractPosixIoFunction[shape=plaintext,color=none,label="PosixIoFn"];
+       abstractIoFunction -> abstractPosixIoFunction;
+       sprintf[shape=box,label="sprintf\nsscanf\nfprintf\nftell\nferror\nfopen\nfread\nfrewind\nfscanf\nfseek\nfwrite\nfgetl\nfgets\nfclose",rank="max"];
+       abstractPosixIoFunction -> sprintf;
+    
+       //*** library funcitons that are not builtins!! TODO **********************
+       abstractNotABuiltin[shape=plaintext,color=none,label="NotABuiltin"];
+       abstractRoot -> abstractNotABuiltin;
+       imwrite[shape=box,label="imwrite\nsparse\nrealmax\nhistc\nblkdiag\ntoeplitz\nvar\nstd",rank="max"];
+       abstractNotABuiltin -> imwrite;
+       //  {rank=same; objectFunction pi tril real uplus fix complex plus ldivide cross mtimes mldivide dot min sqrt sin sind sinh asin asind asinh logm atan2 hypot eps cumsum mode eig schur bitand bitcmp find nnz not isinf eq and colon ones inf true double cell cellhorzcat isfield sort upper strfind strcmp regexptranslate class size length isobject isempty isequalwithequalnans reshape squeeze horzcat subsasgn structfun superiorto clock assert eval import disp rand computer unix load sprintf imwrite }
+}

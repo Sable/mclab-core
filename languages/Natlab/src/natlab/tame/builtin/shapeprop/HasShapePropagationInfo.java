@@ -9,5 +9,5 @@ public interface HasShapePropagationInfo {
      * returns the shape propagation info for the Builtin.
      * FIXME - this should return a proper ast node, not an object
      */
-    public Object getComplexPropagationInfo();
+    public Object getShapePropagationInfo();
 }

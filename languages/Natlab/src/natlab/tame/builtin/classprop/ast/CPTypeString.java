@@ -5,9 +5,7 @@ import java.util.*;
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.constant.CharConstant;
-import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.value.Value;
 
 // if next is a string, consumes it (otherwise no match)
@@ -46,12 +44,12 @@ public class CPTypeString extends CP{
             ClassPropMatch next = previousMatchResult.next();
             //if the next value is not known, just return whatever 
             if ((inputValues == null) || inputValues.get(i) == null
-                    || !(inputValues.get(i) instanceof MatrixValue<?>) 
-                    || !((MatrixValue<?>)(inputValues.get(i))).isConstant() ){
+                    || !(inputValues.get(i) instanceof HasConstant) 
+                    || (((HasConstant)inputValues.get(i)).getConstant() == null)){
                 return tree.match(false, next, new LinkedList<ClassReference>(), new LinkedList<Value<?>>());
             }
             //else we have a value
-            Constant constant = ((MatrixValue<?>)(inputValues.get(i))).getConstant();
+            Constant constant = ((HasConstant)(inputValues.get(i))).getConstant();
             if (!(constant instanceof CharConstant)){
                 return next.error();
             }

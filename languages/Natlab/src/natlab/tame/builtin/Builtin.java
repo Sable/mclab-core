@@ -6,6 +6,8 @@ import java.util.*;
 import natlab.toolkits.path.BuiltinQuery;
 import natlab.tame.builtin.classprop.*;
 import natlab.tame.builtin.classprop.ast.*;
+import natlab.tame.builtin.shapeprop.*;
+//import natlab.tame.builtin.shapeprop.ast.*; //XU -- remove this!!!!!
 
 
 public abstract class Builtin {
@@ -396,12 +398,17 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDoubleConstant extends AbstractConstant implements HasClassPropagationInfo {
+    public static abstract class AbstractDoubleConstant extends AbstractConstant implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDoubleConstant(this,arg);
         }
         
+        public Object getShapePropagationInfo(){
+            return "[] -> $";
+        }
+
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}

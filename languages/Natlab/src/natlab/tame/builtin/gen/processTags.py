@@ -133,14 +133,40 @@ def MatlabClass(builtin, tagArgs, iset):
 
 
 
+def Shape(builtin, tagArgs, iset):
+    iset.add("HasShapePropagationInfo"); # add 'has shape' to the implemented interfaces of the builtin
+    shape = tagArgs.strip()[1:-1]; # get the shape info -- strip parentheses
+    return """
+        public Object getShapePropagationInfo(){{
+            return "{shape}"; //XU - FIX THIS -- CHECK CLASS PROP EXAMPLE!!
+        }}
+
+""".format(shape=shape); # return the java method
 
 
 
 
-# former class tags - delete these when the delete/delete2 tags are deleted of the builtin.csv
-#def delete(builtin, tagArgs, iset):
-#    return ""
-#def delete2(builtin, tagArgs, iset):
-#    return ""
 
 
+
+
+
+
+
+
+
+# Idea for Vineet:
+#s = tagArgs.strip()[1:-1]
+#cases = s.split('||')
+#for case in cases:
+#   clause = case.split('->')
+#   if (len(clause) < 2):
+#       # perform replacements
+#       tags = clause[0].split(',');
+#       for tag in tas.split(',');
+#         tag = tag.strip();
+#         
+#   else:
+#       # there's an actual arrow expression
+
+       

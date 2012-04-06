@@ -4,7 +4,8 @@ import java.util.List;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.value.Value;
 
 //If there is another argument to consume, matches if it is
@@ -23,14 +24,14 @@ public class CPScalar extends CP{
         //find if the value is scalar nor not 
         Value<?> value = inputValues.get(i);
         //check if scalar constant
-        if (value instanceof MatrixValue<?>){
-            MatrixValue<?> matrix = (MatrixValue<?>)value;
-            if (matrix.isConstant()){
-                return matrix.getConstant().isScalar()?previousMatchResult:null;
-            }
+        if (value instanceof HasConstant){
+            Constant constant = ((HasConstant)value).getConstant();
+            if (constant != null){
+                return constant.isScalar()?previousMatchResult:null;
+            } 
         }
         //check if scalar
-        if (value.hasShape() && !value.getShape().maybeScalar()){
+        if ((value instanceof HasShape) && !(((HasShape<?>)value).getShape().maybeScalar())){
             return null;
         }
         //match!
