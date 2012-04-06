@@ -19,7 +19,9 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.Name;
+import ast.NameExpr;
+import ast.WhileStmt;
 
 /**
  * while loop of the form

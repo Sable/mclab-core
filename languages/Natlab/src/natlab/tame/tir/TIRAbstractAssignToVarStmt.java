@@ -17,7 +17,8 @@
 // =========================================================================== //
 
 package natlab.tame.tir;
-import ast.*;
+import ast.Name;
+import ast.NameExpr;
 
 
 public abstract class TIRAbstractAssignToVarStmt extends TIRAbstractAssignStmt {

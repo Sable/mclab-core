@@ -1,7 +1,9 @@
 package natlab.tame.tir;
 
-import ast.*;
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
+import ast.DotExpr;
+import ast.Name;
+import ast.NameExpr;
 
 public class TIRDotGetStmt extends TIRAbstractAssignToListStmt {
     private static final long serialVersionUID = 1L;

@@ -1,8 +1,12 @@
 package natlab.tame.simplification;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
-import ast.*;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.rewrite.TempFactory;
@@ -10,6 +14,16 @@ import natlab.toolkits.rewrite.TempFunctionBuilderHelper;
 import natlab.toolkits.rewrite.TransformedNode;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
 import natlab.toolkits.utils.NodeFinder;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.Function;
+import ast.FunctionList;
+import ast.LambdaExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Stmt;
 
 /**
  * This seeks through functions, and finds lambda expressions.

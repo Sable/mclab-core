@@ -18,8 +18,8 @@
 
 package natlab.tame.interproceduralAnalysis;
 
-import ast.Function;
 import analysis.Analysis;
+import ast.Function;
 
 /**
  * This interface represents an intra-procedural analysis, as used by a 

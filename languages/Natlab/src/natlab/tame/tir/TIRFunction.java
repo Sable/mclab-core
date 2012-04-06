@@ -21,8 +21,10 @@ package natlab.tame.tir;
 import java.util.Map;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-
-import ast.*;
+import ast.Function;
+import ast.HelpComment;
+import ast.List;
+import ast.Name;
 
 public class TIRFunction extends Function implements TIRNode {
     private static final long serialVersionUID = 1L;

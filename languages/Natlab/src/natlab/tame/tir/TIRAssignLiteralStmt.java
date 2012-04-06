@@ -18,7 +18,8 @@
 
 package natlab.tame.tir;
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.LiteralExpr;
+import ast.Name;
 
 /**
  * assignments of the form

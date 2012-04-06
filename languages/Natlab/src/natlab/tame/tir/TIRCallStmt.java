@@ -18,7 +18,10 @@
 
 package natlab.tame.tir;
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.Expr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
 
 /**
  * a call is of the form

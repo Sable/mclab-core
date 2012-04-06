@@ -18,16 +18,26 @@
 
 package natlab.tame.callgraph;
 import java.io.File;
-import java.util.*;
-import ast.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+
 import natlab.CompilationProblem;
-import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.filehandling.genericFile.*;
+import natlab.toolkits.filehandling.genericFile.FileFile;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.AbstractPathEnvironment;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.Simplifier;
+import ast.ClassDef;
+import ast.EmptyProgram;
+import ast.Function;
+import ast.FunctionList;
+import ast.Program;
+import ast.Script;
 
 /**
  * A FunctionCollection is a collection of static functions.
@@ -189,7 +199,7 @@ public class FunctionCollection extends HashMap<FunctionReference,StaticFunction
             }
         }
         if (unfoundFunctions.size() != 0){
-            System.out.println(function.getAst().getPrettyPrinted());
+            //System.out.println(function.getAst().getPrettyPrinted());
             throw new UnsupportedOperationException("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
         }
         return success;

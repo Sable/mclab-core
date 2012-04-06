@@ -2,20 +2,13 @@ package natlab.tame.mc4.test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-
-import natlab.toolkits.filehandling.genericFile.FileFile;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 
 /**

@@ -17,11 +17,8 @@
 // =========================================================================== //
 
 package natlab.tame.tir;
-import java.util.Collections;
-import java.util.LinkedList;
-
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.Name;
 
 /**
  * assignments of the form

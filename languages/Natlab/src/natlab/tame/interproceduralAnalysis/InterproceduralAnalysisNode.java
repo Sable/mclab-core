@@ -30,12 +30,13 @@ package natlab.tame.interproceduralAnalysis;
  */
 
 
-import java.util.*;
+import java.util.HashMap;
 
+import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.toolkits.path.FunctionReference;
 import analysis.StructuralAnalysis;
 import ast.ASTNode;
-import natlab.tame.callgraph.*;
-import natlab.toolkits.path.FunctionReference;
 
 public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {
     private StaticFunction function;

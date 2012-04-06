@@ -17,7 +17,13 @@
 // =========================================================================== //
 
 package natlab.tame.tir;
-import ast.*;
+import ast.ASTNode;
+import ast.Expr;
+import ast.List;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.Row;
 
 /**
  * nodes of the form

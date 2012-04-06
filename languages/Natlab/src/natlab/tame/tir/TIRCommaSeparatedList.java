@@ -18,7 +18,8 @@
 
 package natlab.tame.tir;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
 import ast.Expr;

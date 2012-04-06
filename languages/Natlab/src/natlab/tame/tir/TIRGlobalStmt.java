@@ -1,8 +1,8 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
+import ast.GlobalStmt;
 import ast.Name;
-import ast.GlobalStmt;;
 /**
  * this exists mostly to have a complete IR.
  * In practice, symbol tables should provide this information

@@ -19,7 +19,13 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.ForStmt;
+import ast.Name;
+import ast.NameExpr;
+import ast.Opt;
+import ast.RangeExpr;
 
 /**
  * IR For statement is of the form

@@ -1,7 +1,9 @@
 package natlab.tame.tir;
 
-import ast.*;
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
+import ast.DotExpr;
+import ast.Name;
+import ast.NameExpr;
 
 //TODO give cell/array/det set a single parent '... = t' (assign from var?)
 // - alternative: remove altogether, and have one complex assign (?)

@@ -18,20 +18,26 @@
 
 package natlab.tame.callgraph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import natlab.tame.mc4.Mc4;
 import natlab.tame.simplification.ThreeAddressToIR;
 import natlab.tame.tir.TIRFunction;
 import natlab.toolkits.BiMap;
-import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.path.FunctionReference;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.rewrite.inline.*;
+import natlab.toolkits.rewrite.RenameSymbols;
+import natlab.toolkits.rewrite.Simplifier;
+import natlab.toolkits.rewrite.inline.Inliner;
+import natlab.toolkits.rewrite.inline.PutCommentsInlineQuery;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
 import natlab.toolkits.rewrite.simplification.CommentSimplification;
-
-import ast.*;
+import ast.Function;
+import ast.FunctionList;
 
 /**
  * 

@@ -20,7 +20,10 @@ package natlab.tame.tir;
 
 import java.util.ArrayList;
 
-import ast.*;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.List;
+import ast.NameExpr;
 
 public abstract class TIRAbstractAssignStmt extends AssignStmt implements TIRStmt {
     private static final long serialVersionUID = 1L;

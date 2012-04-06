@@ -21,20 +21,21 @@
  */
 package natlab.tame.mc4;
 
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.HashSet;
-
 
 import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
-import natlab.tame.callgraph.*;
-import natlab.tame.classes.reference.*;
-import natlab.tame.valueanalysis.*;
+import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
-import natlab.tame.valueanalysis.value.*;
-import natlab.toolkits.path.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.toolkits.path.FilePathEnvironment;
+import natlab.toolkits.path.FunctionReference;
 
 
 /**
@@ -80,12 +81,12 @@ public class Mc4 {
 		
 		
 		//try to do all benchmarks
-		String bFolderString = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\";
+		String bFolderString;// = "C:\\classes\\mclab\\Benchmarks\\matlabBenchmarks\\";
 		bFolderString = "../Benchmarks/matlabBenchmarks/";
 		String[] subfolders = new String[]{
 		    "aaatest",
 		    "adpt",
-		    "beul",
+		    //"beul", //handle
 		    "capr",
 		    "clos",
 		    "crni",
@@ -108,8 +109,8 @@ public class Mc4 {
 		    "nnet", //uses cell arrays
 		    "play", //recursive
 		    "rayt", //end-issue???
-		    "sch2", //error in toeplitz - nargin
-		    "schr", //uses lambda - toeplitz
+		    //"sch2", //handle error only? - error in toeplitz - nargin
+		    //"schr", //uses lambda - toeplitz
 		    //"sdku", //uses load
 		    "spga", //end-issue???
 		    "svd" //uses nargout - cannot be all inlined
@@ -170,7 +171,7 @@ public class Mc4 {
 	    //collect all needed matlab files
 	    FunctionCollection functions = new FunctionCollection(functionFinder);
 	    allRefs.addAll(functions.getAllFunctionBuiltinReferences());
-	    System.out.println(functions);
+	    //System.out.println(functions);
 	    
 	    
 	    //test intraprocedural class analysis

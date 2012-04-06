@@ -18,8 +18,8 @@
 
 package natlab.tame.interproceduralAnalysis;
 
-import ast.*;
 import natlab.toolkits.path.FunctionReference;
+import ast.ASTNode;
 
 /**
  * represents a call string

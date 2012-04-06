@@ -1,11 +1,23 @@
 package natlab.tame.simplification;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
 
-import ast.*;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.rewrite.*;
+import natlab.toolkits.rewrite.TempFactory;
+import natlab.toolkits.rewrite.TransformedNode;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.SwitchCaseBlock;
+import ast.SwitchStmt;
 
 /**
  * This simplification will simplify switch statements into if-then else statements

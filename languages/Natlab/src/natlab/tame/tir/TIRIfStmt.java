@@ -19,7 +19,12 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.ElseBlock;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
 
 
 /**

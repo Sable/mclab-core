@@ -19,8 +19,8 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import beaver.*;
-import ast.*;
+import ast.EmptyStmt;
+import beaver.Symbol;
 
 /**
  * An empty statement

@@ -19,7 +19,8 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.List;
+import ast.Stmt;
 
 public class TIRStatementList extends List<Stmt> implements TIRNode {
     private static final long serialVersionUID = 1L;

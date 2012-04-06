@@ -2,10 +2,7 @@ package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
 import ast.FunctionHandleExpr;
-import ast.LambdaExpr;
 import ast.Name;
-import ast.NameExpr;
-import ast.ParameterizedExpr;
 
 public class TIRCreateFunctionReferenceStmt extends
 		TIRAbstractCreateFunctionHandleStmt {

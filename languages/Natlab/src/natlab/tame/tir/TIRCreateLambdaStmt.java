@@ -1,13 +1,9 @@
 package natlab.tame.tir;
 
-import java.util.Collections;
 import java.util.LinkedList;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import nodecases.NodeCaseHandler;
-
 import ast.Expr;
-import ast.FunctionHandleExpr;
 import ast.LambdaExpr;
 import ast.List;
 import ast.Name;

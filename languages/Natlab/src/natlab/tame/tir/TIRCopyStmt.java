@@ -1,7 +1,8 @@
 package natlab.tame.tir;
 
-import ast.*;
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
+import ast.Name;
+import ast.NameExpr;
 
 /**
  * statements of the form

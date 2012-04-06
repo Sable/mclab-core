@@ -18,10 +18,9 @@
 
 package natlab.tame.interproceduralAnalysis;
 
-import java.util.*;
+import java.util.LinkedHashMap;
 
-import annotations.ast.ASTNode;
-import natlab.tame.callgraph.*;
+import natlab.tame.callgraph.FunctionCollection;
 import natlab.toolkits.path.FunctionReference;
 
 /**

@@ -19,7 +19,9 @@
 package natlab.tame.tir;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
-import ast.*;
+import ast.CellIndexExpr;
+import ast.Name;
+import ast.NameExpr;
 
 /**
  * statements of the form
