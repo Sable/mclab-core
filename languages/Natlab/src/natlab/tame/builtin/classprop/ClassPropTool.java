@@ -2,8 +2,6 @@ package natlab.tame.builtin.classprop;
 
 import java.util.*;
 
-import beaver.Symbol;
-
 import java.io.StringReader;
 import java.lang.System;
 import natlab.tame.builtin.Builtin;
@@ -29,7 +27,7 @@ public class ClassPropTool {
      * returns null if the parsing failes.
      */
     public static CP parse(String source){
-    	System.err.println("parsing: "+source);
+    	//System.err.println("parsing: "+source);
     	ClassPropParser parser = new ClassPropParser();
     	ClassPropScanner input = new ClassPropScanner(new StringReader(source));
     	try{
@@ -57,8 +55,6 @@ public class ClassPropTool {
         }
         return match(tree,argClasses,argValues);
     }
-
-    
     
     /**
      * given a Matlab Class Propagation description and a set of argument classes,
@@ -76,7 +72,7 @@ public class ClassPropTool {
      * returns null if the combination of argument classes is illegal.
      */
 
-    private static LinkedList<HashSet<ClassReference>> match(CP tree,
+    public static LinkedList<HashSet<ClassReference>> match(CP tree,
             List<ClassReference> argClasses,List<? extends Value<?>> argValues){
         if (DEBUG) System.out.println("match "+tree+" with "+argValues);
         ClassPropMatch match = tree.match(true, new ClassPropMatch(), argClasses, argValues);
@@ -99,12 +95,6 @@ public class ClassPropTool {
      * main for testing
      */
     public static void main(String[] args) {
-    	
-    	System.out.println(parse("double|char -> logical int16"));
-    	//System.out.println(parse("(double -> double) (int16 -> int16)"));
-    	//System.out.println(parse("int16|double double->char || double->double"));
-    	//System.exit(0);
-    	
         CPBuiltin dbl = new CPBuiltin("double");
         CPBuiltin chr = new CPBuiltin("char");
         CPBuiltin itg = new CPBuiltin("int16");
@@ -255,16 +245,16 @@ public class ClassPropTool {
         for (String s : Builtin.getAllBuiltinNames()){
         	Builtin builtin = Builtin.getInstance(s);
         	if (builtin instanceof HasClassPropagationInfo){
-        		CP cp = ((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo();
+        		CP cp = ((HasClassPropagationInfo)builtin).getClassPropagationInfo();
         		//System.out.println(cp);
         		if (!parse(cp.toString()).toString().equals(cp.toString())){
         			System.out.println("not indemptotent:\n"+cp+"\n"+parse(cp.toString()));        			
         		}
         		
-        		        		
-        		/*
+        		
             	//get new builtin spec
-        		CP cp2 = ((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo();
+        		CP cp2 = ((HasClassPropagationInfo)builtin).getClassPropagationInfo2();
+        		
         		//compare results
         		//System.out.println(builtin.getName());
         		ArrayList<ClassReference> classes = new ArrayList<ClassReference>();
@@ -275,7 +265,7 @@ public class ClassPropTool {
         		
         		int N = (classes.size()+1);
         		boolean same = true;
-        		for (int i = 0;i<N*N*N*N*N;i++){
+        		for (int i = 0;i<N*N*N*N*N*N;i++){
         			int n = i;
         			ArrayList<ClassReference> arglist = new ArrayList<ClassReference>();
         			while(n > 0){
@@ -296,10 +286,9 @@ public class ClassPropTool {
         			}
         		}
         		if (same) System.out.print(".");        		
-        		*/
         	}
         }
-        System.out.println("\ntest end");
+        System.out.println("test end");
     }
     /**
      * for testing
