@@ -67,7 +67,19 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
                     //System.err.println("abstract simplification attempted to access kind of uknown name expr "+expr.getPrettyPrinted());
                     kindAnalysis.analyze();
                 }
-                VFDatum kind = kindAnalysis.getFlowSets().get(name).contains(nameExpr.getName().getID());
+                VFFlowset flowset = kindAnalysis.getFlowSets().get(name);
+                /*
+                System.out.println("\n\n=========expr: "+expr.getPrettyPrinted()
+                		+"  in "+expr.getParent().getPrettyPrinted()
+                		+"\nfunction:\n"+kindAnalysis.getTree().getPrettyPrinted()
+                		+"\nflowset:\n"+flowset
+                		+"\nall flowsets:\n"+kindAnalysis.getFlowSets());
+                System.out.println("ALL");
+                for (ASTNode<?> node : kindAnalysis.getFlowSets().keySet()){
+                	System.out.println(node.getPrettyPrinted().replace('\n', ';')+"::"+kindAnalysis.getFlowSets().get(node));
+                }
+                */
+                VFDatum kind = flowset.contains(nameExpr.getName().getID());
                 return (kind!=null) && kind.isVariable();
             }
         }

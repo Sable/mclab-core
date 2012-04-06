@@ -18,13 +18,13 @@
 
 package natlab.toolkits.rewrite.inline;
 
-import natlab.tame.ir.IRCommentStmt;
+import natlab.tame.tir.TIRCommentStmt;
 import ast.*;
 
 /**
  * Represents a InlineQuery object, which can be used to inline functions in other functions.
  * It will add comments at the beginning and end of the inlined function's body.
- * This will insert IRCommentStmt's with comments (as opposed to EmptyStmts, it's parent class).
+ * This will insert TIRCommentStmt's with comments (as opposed to EmptyStmts, it's parent class).
  * 
  * @author ant6n
  */
@@ -32,8 +32,8 @@ public class PutCommentsInlineQuery implements InlineQuery<Function, Function> {
 
 
     public boolean doInline(InlineInfo<Function, Function> i) {
-        i.getInlinedScriptOrFunction().getStmtList().insertChild(new IRCommentStmt(getHeader(i)), 0);
-        i.getInlinedScriptOrFunction().getStmtList().add(new IRCommentStmt(getFooter(i)));
+        i.getInlinedScriptOrFunction().getStmtList().insertChild(new TIRCommentStmt(getHeader(i)), 0);
+        i.getInlinedScriptOrFunction().getStmtList().add(new TIRCommentStmt(getFooter(i)));
         return true;
     }
 
