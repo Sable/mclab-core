@@ -2,6 +2,8 @@ package natlab.tame.builtin.classprop;
 
 import java.util.*;
 
+import beaver.Symbol;
+
 import java.io.StringReader;
 import java.lang.System;
 import natlab.tame.builtin.Builtin;
@@ -27,7 +29,7 @@ public class ClassPropTool {
      * returns null if the parsing failes.
      */
     public static CP parse(String source){
-    	//System.err.println("parsing: "+source);
+    	System.err.println("parsing: "+source);
     	ClassPropParser parser = new ClassPropParser();
     	ClassPropScanner input = new ClassPropScanner(new StringReader(source));
     	try{
@@ -97,6 +99,11 @@ public class ClassPropTool {
      * main for testing
      */
     public static void main(String[] args) {
+    	
+    	System.out.println(parse("double|char -> logical int16"));
+    	//System.out.println(parse("(double -> double) (int16 -> int16)"));
+    	//System.out.println(parse("int16|double double->char || double->double"));
+    	//System.exit(0);
     	
         CPBuiltin dbl = new CPBuiltin("double");
         CPBuiltin chr = new CPBuiltin("char");

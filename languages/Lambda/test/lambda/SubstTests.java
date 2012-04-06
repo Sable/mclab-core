@@ -28,7 +28,7 @@ public class SubstTests extends TestCase {
 		parser = new LambdaParser();
 		Root value = (Root) parser.parse(scanner);
 		
-		Node revised = original.subst(new Var(varName), value.getNode());
+		SPNode revised = original.subst(new Var(varName), value.getNode());
 		assertEquals(originalAsString, expectedStructureString, revised.getStructureString());
 	}
 }
