@@ -6,12 +6,14 @@ import natlab.tame.builtin.classprop.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
 public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatrixValue>{
     public static boolean DEBUG = false;
-    ConstantPropagator constantProp = ConstantPropagator.getInstance();
+    ConstantPropagator<AggrValue<SimpleMatrixValue>> constantProp = ConstantPropagator.getInstance();
     
     public SimpleMatrixValuePropagator() {
         super(new SimpleMatrixValueFactory());
@@ -24,12 +26,8 @@ public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatri
     public Res<AggrValue<SimpleMatrixValue>> caseBuiltin(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> arg) {
         //ceal with constants
-        if (arg.isAllConstant()){
-            ArrayList<Constant> args = new ArrayList<Constant>();
-            for (AggrValue<SimpleMatrixValue> a : arg){
-                args.add(a.getConstant());
-            }
-            Constant cResult = builtin.visit(constantProp, args);
+        if (arg.isAllConstant()){ //FIXME
+            Constant cResult = builtin.visit(constantProp, arg);
             if (cResult != null){
                 return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(cResult));
             }
@@ -79,12 +77,12 @@ public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatri
     }
     
     
-    //TODO - move to cell prop
+    //TODO - move to aggr value prop
     @Override
     public Res<AggrValue<SimpleMatrixValue>> caseCellhorzcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<SimpleMatrixValue> shape = Shape.fromIndizes(this.factory, 
+        Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
                 Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
@@ -92,7 +90,7 @@ public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatri
     public Res<AggrValue<SimpleMatrixValue>> caseCellvertcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<SimpleMatrixValue> shape = Shape.fromIndizes(this.factory, 
+        Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
                 Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
@@ -101,7 +99,7 @@ public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatri
     public Res<AggrValue<SimpleMatrixValue>> caseCell(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> arg) {
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(
-                this.factory, this.factory.newShapeFromIndizes(arg),ValueSet.<AggrValue<SimpleMatrixValue>>newInstance()));
+                this.factory, factory.getShapeFactory().newShapeFromValues(arg),ValueSet.<AggrValue<SimpleMatrixValue>>newInstance()));
     }
 }
 

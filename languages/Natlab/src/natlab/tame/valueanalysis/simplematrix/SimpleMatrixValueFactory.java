@@ -3,12 +3,9 @@
  */
 package natlab.tame.valueanalysis.simplematrix;
 
-import natlab.tame.builtin.Builtin;
-import natlab.tame.builtin.classprop.ClassPropTool;
-import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.*;
 
 public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue>{

@@ -16,7 +16,10 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.constant;
+package natlab.tame.valueanalysis.components.constant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
@@ -24,7 +27,7 @@ import natlab.tame.classes.reference.PrimitiveClassReference;
 /**
  * currently a scalar double only.
  * 
- * TODO - should this be a matrix?
+ * TODO - Make this a vector!
  * @author adubra
  */
 
@@ -59,4 +62,13 @@ public class DoubleConstant extends Constant {
     public boolean isScalar() {
         return true;
     }
+    
+    @Override
+    public List<Integer> getShape() {
+    	ArrayList<Integer> list = new ArrayList<Integer>(2);
+    	list.add(1);
+    	list.add(1);
+    	return list;
+    }
+
 }

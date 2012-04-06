@@ -26,7 +26,8 @@ import java.util.Set;
 
 import natlab.tame.classes.reference.FunctionHandleClassReference;
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.path.FunctionReference;
 
@@ -123,12 +124,8 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
     }
     
     @Override
-    public Shape<D> getShape() {
-        return factory.newScalarShape();
-    }
-    @Override
-    public boolean hasShape() {
-        return true;
+    public Shape<AggrValue<D>> getShape() {
+        return factory.getShapeFactory().getScalarShape();
     }
     
     

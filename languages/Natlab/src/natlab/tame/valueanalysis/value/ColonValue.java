@@ -4,7 +4,8 @@ import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.shape.Shape;
 
 /**
  * this is a special value that represents the colon ':' used in indexing operations.
@@ -16,28 +17,8 @@ import natlab.tame.valueanalysis.constant.Constant;
 public class ColonValue<V extends Value<V>> extends SpecialValue<V> {
 
     @Override
-    public Constant getConstant() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ClassReference getMatlabClass() {
         return null;
-    }
-
-    @Override
-    public Shape<?> getShape() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean hasShape() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isConstant() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

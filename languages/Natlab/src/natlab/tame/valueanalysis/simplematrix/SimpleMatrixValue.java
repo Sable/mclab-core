@@ -3,7 +3,9 @@ package natlab.tame.valueanalysis.simplematrix;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
 
@@ -11,7 +13,7 @@ import natlab.tame.valueanalysis.aggrvalue.*;
  * represents a MatrixValue that is instantiable. It stores a constant,
  * on top of the matlab class
  */
-public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
+public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements HasConstant{
     static SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
     Constant constant;
     
@@ -32,6 +34,7 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
         return constant != null;
     }
     
+    @Override
     /**
      * returns the constant represented by this data, or null if it is not constant
      */
@@ -39,13 +42,6 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
         return constant;
     }
     
-    /**
-     * returns the MatlabClass for this object
-     * @author ant6n
-     */
-    public PrimitiveClassReference getMatlabClass(){
-        return classRef;
-    }
     
     
 
@@ -80,14 +76,6 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> {
     public static final SimpleMatrixValueFactory FACTORY = new SimpleMatrixValueFactory();
 
 
-    @Override
-    public Shape<SimpleMatrixValue> getShape() {
-        return null;
-    }
-    @Override
-    public boolean hasShape() {
-        return false;
-    }
     @Override
     public ValueSet<AggrValue<SimpleMatrixValue>> arraySubsref(Args<AggrValue<SimpleMatrixValue>> indizes) {
         return ValueSet.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(this.getMatlabClass()));

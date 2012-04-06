@@ -62,6 +62,7 @@ public abstract class ValuePropagator<V extends Value<V>>
      * Returns null if the combination of arguments is invalid
      *
      * TODO - should this be in a separate tools/class?
+     * should this be in 
      */
     public ClassReference getDominantCatArgClass(Args<V> args){
         if (args.size() == 0) return PrimitiveClassReference.DOUBLE;

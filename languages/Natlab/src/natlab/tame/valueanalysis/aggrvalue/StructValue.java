@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
-import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
 /**
@@ -14,9 +14,10 @@ import natlab.tame.valueanalysis.value.*;
  * Structs are a map from 
  * name -> Value
  * 
+ * TODO - implement struct-arrays at some point.
+ * 
  * @author ant6n
  */
-
 public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     HashMap<String,ValueSet<AggrValue<D>>> structMap = 
     		new HashMap<String,ValueSet<AggrValue<D>>>();
@@ -63,10 +64,6 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
         throw new UnsupportedOperationException();
     }
     
-    @Override
-    public Constant getConstant() {
-        return null;
-    }
 
     @Override
     public ClassReference getMatlabClass() {
@@ -74,20 +71,11 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     }
 
     @Override
-    public Shape<D> getShape() {
-        return factory.newScalarShape();
+    public Shape<AggrValue<D>> getShape() {
+        return factory.getShapeFactory().getScalarShape();
     }
 
-    @Override
-    public boolean hasShape() {
-        return true;
-    }
 
-    @Override
-    public boolean isConstant() {
-        return false;
-    }
-    
     @Override
     public StructValue<D> toFunctionArgument(boolean recursive) {
         StructValue<D> result = new StructValue<D>(factory);

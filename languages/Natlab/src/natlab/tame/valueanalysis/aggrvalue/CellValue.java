@@ -12,11 +12,12 @@ import java.util.*;
 import natlab.tame.classes.reference.BuiltinCompoundClassReference;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
-    private Shape<D> shape;
+    private Shape<AggrValue<D>> shape;
     private HashMap<Integer,ValueSet<AggrValue<D>>> cellMap = new HashMap<Integer, ValueSet<AggrValue<D>>>();
     private boolean usesMap = true; //uses the map, if false, just uses an overall ValueSet
     private ValueSet<AggrValue<D>> values = null;
@@ -26,7 +27,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
      */
     public CellValue(AggrValueFactory<D> factory){
         super(factory);
-        shape = factory.newEmptyShape();
+        shape = factory.getShapeFactory().getEmptyShape();
         
     }
     
@@ -34,7 +35,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     /**
      * creates cell array with given shape and internal values
      */
-    public CellValue(AggrValueFactory<D> factory, Shape<D> shape, ValueSet<AggrValue<D>> values){
+    public CellValue(AggrValueFactory<D> factory, Shape<AggrValue<D>> shape, ValueSet<AggrValue<D>> values){
         super(factory);
         usesMap = false;
         this.values = values;
@@ -58,7 +59,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         if (value instanceof CellValue<?>){
             CellValue<D> cell = (CellValue<D>)value;
             CellValue<D> result = new CellValue<D>(this.factory);
-            result.shape = this.shape.grow(factory.newShapeFromIndizes(indizes));
+            result.shape = this.shape.growByIndices(indizes);
             result.usesMap = false;
             result.values = cell.values.merge(toSingleValues().values);
             return result;
@@ -98,7 +99,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
             throw new UnsupportedOperationException();
         } else {
             CellValue<D> result = new CellValue<D>(this.factory);
-            result.shape = this.shape.grow(factory.newShapeFromIndizes(indizes));
+            result.shape = this.shape.growByIndices(indizes);
             result.usesMap = false;
             result.values = ValueSet.newInstance(values).merge(toSingleValues().values);
             return result;
@@ -107,28 +108,13 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     
 
     @Override
-    public Constant getConstant() {
-        return null;
-    }
-
-    @Override
     public ClassReference getMatlabClass() {
         return BuiltinCompoundClassReference.CELL;
     }
 
     @Override
-    public Shape<D> getShape() {
+    public Shape<AggrValue<D>> getShape() {
         return shape;
-    }
-
-    @Override
-    public boolean hasShape() {
-        return true;
-    }
-
-    @Override
-    public boolean isConstant() {
-        return false; //TODO - maybe we need a cell const?
     }
 
     @Override

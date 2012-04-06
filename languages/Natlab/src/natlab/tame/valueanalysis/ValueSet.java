@@ -1,10 +1,16 @@
 package natlab.tame.valueanalysis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
 import natlab.toolkits.analysis.Mergable;
 
 /**

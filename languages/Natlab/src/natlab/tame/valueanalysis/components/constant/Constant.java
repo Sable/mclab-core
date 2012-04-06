@@ -16,15 +16,14 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.constant;
+package natlab.tame.valueanalysis.components.constant;
 
 import ast.FPLiteralExpr;
 import ast.IntLiteralExpr;
 import ast.LiteralExpr;
 import ast.StringLiteralExpr;
-import natlab.tame.classes.*;
-import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import java.util.*;
 
 /**
  * represents an actual specific Matlab value.
@@ -85,4 +84,11 @@ public abstract class Constant {
     public String toString() {
         return getValue().toString();
     }
+    
+    /**
+     * returns the shape of the constant as a list of dimensions
+     */
+    abstract public List<Integer> getShape();
 }
+
+

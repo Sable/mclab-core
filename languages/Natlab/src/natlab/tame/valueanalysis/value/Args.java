@@ -8,6 +8,7 @@ import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+import natlab.tame.valueanalysis.components.constant.*;
 
 /**
  * A way to combine multiple argument abstract values together to make an
@@ -60,7 +61,7 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
      */
     boolean isAllPrimitive(){
         for (V v : this){
-            if (!(v instanceof MatrixValue<?>)){
+            if (!(v instanceof MatrixValue)){
                 return false;
             }
         }
@@ -70,10 +71,11 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
     /**
      * returns as a list of all primitive values, if the values are all primitive
      */
-    public List<MatrixValue<?>> asAllPrimitive(){
+    @SuppressWarnings("rawtypes")
+	public List<MatrixValue<?>> asAllPrimitive(){
         ArrayList<MatrixValue<?>> list = new ArrayList<MatrixValue<?>>(size());
         for (V v : this){
-            list.add((MatrixValue<?>)v);
+            list.add((MatrixValue)v);
         }
         return list;
     }
@@ -83,9 +85,26 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
      */
     public boolean isAllConstant(){
         for (V v : this){
-            if (!v.isConstant()) return false;
+            if (!(v instanceof HasConstant) || (null == ((HasConstant)v).getConstant())) 
+            		return false;
         }
         return true;        
+    }
+    
+    /**
+     * returns a list of constants, if all values are constant
+     * returns null if any value is not a constant
+     */
+    public List<Constant> getConstants(){
+    	List<Constant> list = new ArrayList<Constant>(this.size());
+        for (V v : this){
+            if (!(v instanceof HasConstant) || (null == ((HasConstant)v).getConstant())){
+            	return null;
+            } else {
+            	list.add(((HasConstant)v).getConstant());
+            }
+        }
+        return list;
     }
     
     

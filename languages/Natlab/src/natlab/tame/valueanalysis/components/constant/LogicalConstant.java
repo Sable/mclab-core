@@ -16,7 +16,10 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.constant;
+package natlab.tame.valueanalysis.components.constant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
@@ -53,5 +56,13 @@ public class LogicalConstant extends Constant {
     @Override
     public boolean isScalar() {
         return true;
+    }
+    
+    @Override
+    public List<Integer> getShape() {
+    	ArrayList<Integer> list = new ArrayList<Integer>(2);
+    	list.add(1);
+    	list.add(1);
+    	return list;
     }
 }

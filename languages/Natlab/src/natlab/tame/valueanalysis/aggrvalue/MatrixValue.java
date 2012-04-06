@@ -29,13 +29,13 @@ import natlab.tame.valueanalysis.value.Value;
  * represents a primitive value, i.e. a value that has a primitive type.
  * At this level this class stores just a matlab class.
  * Objects of this type are immutable.
- * Use SimpleMatrixValue for an implementation that is non-abstract, and 
+ * Use BasicMatrixValue for an implementation that is non-abstract, and 
  * which adds a constant.
  * 
  * Any actual implementation of this class has to be generic in itself.
  * Implementations have to provide a MatrixValueFactory. The convention
  * is that every implementation of MatrixValue provides a factory as a public
- * static final variable FACTORY (see SimpleMatrixValue).
+ * static final variable FACTORY (see BasicMatrixValue).
  * Note that any Value has to implement an equals method.
  * @author adubra
  */
@@ -59,12 +59,7 @@ public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D>
     @Override
     abstract public AggrValue<D> merge(AggrValue<D> other);
     
-    
-    public boolean isConstant(){
-        return getConstant() != null;
-    }
         
-    
     @Override
     abstract public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes);  
     

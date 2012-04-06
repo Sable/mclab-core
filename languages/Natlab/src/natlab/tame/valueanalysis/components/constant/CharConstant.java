@@ -16,7 +16,10 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.constant;
+package natlab.tame.valueanalysis.components.constant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import natlab.tame.classes.reference.*;
 
@@ -52,5 +55,13 @@ public class CharConstant extends Constant {
         if (obj == null) return false;
         if (!(obj instanceof CharConstant)) return false;
         return ((CharConstant)obj).value.equals(value);
+    }
+    
+    @Override
+    public List<Integer> getShape() {
+    	ArrayList<Integer> list = new ArrayList<Integer>(2);
+    	list.add(1);
+    	list.add(value.length());
+    	return list;
     }
 }

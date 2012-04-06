@@ -1,16 +1,7 @@
 package natlab.tame.valueanalysis.value;
 
-import java.util.Arrays;
-
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.aggrvalue.CellValue;
-import natlab.tame.valueanalysis.aggrvalue.FunctionHandleValue;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.aggrvalue.StructValue;
-import natlab.tame.valueanalysis.constant.*;
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.tame.valueanalysis.value.composite.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.toolkits.path.FunctionReference;
 
 /**
@@ -116,8 +107,11 @@ public abstract class ValueFactory<V extends Value<V>> {
 
     
     /**
-     * returns a value representing the 
-     * lower:inc:upper used as the range expression in a for loop.
+     * returns a value representing the i in 
+     *   i = lower:inc:upper 
+     * when used as the range expression in a for loop. The value for i has to be a valid
+     * representation for all iterations.
+     * 
      * inc is optional, and may be null.
      * lower, upper, inc should be values with matrix mclasses.
      * TODO - move this somewhere else.

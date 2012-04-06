@@ -3,22 +3,22 @@ package natlab.tame.valueanalysis;
 import java.util.*;
 import java.util.List;
 
-import ast.*;
 import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.*;
 import natlab.tame.tir.*;
 import natlab.tame.tir.analysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.constant.*;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.path.FunctionReference;
+import ast.*;
 
 /**
  * This analysis attempts to find the class of every variable.
  * It also propagates some constant information. This analysis
  * stores a flow set for every statement, which is a map of
- * variablename->classname->abstract value
+ * variablename->classname->value
  * 
  * This class operates on the static IR.
  * @author ant6n
@@ -148,11 +148,11 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (checkNonViable(condExpr)) return;
         ValueFlowMap<V> current = getCurrentInSet();
         ValueSet<V> values = current.get(((NameExpr)condExpr).getName().getID());
-        for (Value<V> value : values){
-            value.isConstant();
-            Constant aConst = value.getConstant();
-            Constant any = (Builtin.Any.getInstance().visit(ConstantPropagator.getInstance(),
-                    Collections.singletonList(aConst)));
+        for (V value : values){
+        	//call 'any' on the condition value
+            Constant any = Builtin.Any.getInstance().visit(
+            		ConstantPropagator.<V>getInstance(),
+            		Args.newInstance(value));
             if (any != null && any instanceof LogicalConstant){
                 if (((LogicalConstant)any).equals(Constant.get(true))){
                     //result is true - false set is not viable
@@ -167,7 +167,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         setTrueFalseOutSet(current, current);
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void caseTIRArrayGetStmt(TIRArrayGetStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case array get: "+node.getPrettyPrinted());
@@ -178,7 +179,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         //go through all possible array values
         for (V arrayValue : array){
-            if (arrayValue instanceof MatrixValue<?>){
+            if (arrayValue instanceof MatrixValue){
                 if (node.getIndizes().size() == 0){
                     results.add(Res.newInstance(ValueSet.newInstance(arrayValue)));
                 } else {
@@ -189,10 +190,10 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                         results.add(Res.newInstance(arrayValue.arraySubsref(Args.newInstance(indizes))));
                     }
                 }
-            } else if (arrayValue instanceof FunctionHandleValue<?>){
+            } else if (arrayValue instanceof FunctionHandleValue){
                 //go through all function handles this may represent and get the result
                 //TODO - make this independent of the specific function handle value implementation
-                for (FunctionHandleValue.FunctionHandle<?> handle :((FunctionHandleValue<?>)arrayValue).getFunctionHandles()){
+                for (FunctionHandleValue.FunctionHandle handle :((FunctionHandleValue<?>)((Object)arrayValue)).getFunctionHandles()){
                     results.add(call(
                           handle.getFunction(), flow, node.getIndizes(), node.getTargets(), node, (List<ValueSet<V>>)(List<?>)handle.getPartialValues()));
                 }

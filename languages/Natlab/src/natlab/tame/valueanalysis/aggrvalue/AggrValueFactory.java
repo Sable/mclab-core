@@ -1,13 +1,22 @@
 package natlab.tame.valueanalysis.aggrvalue;
 
-import java.util.Arrays;
-import natlab.tame.valueanalysis.*;
-import natlab.tame.valueanalysis.constant.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.path.FunctionReference;
 
 
 public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFactory<AggrValue<D>> {
+	/**
+	 * constructor builds shape factor
+	 */
+	ShapeFactory<AggrValue<D>> shapeFactory;
+	public AggrValueFactory(){
+		this.shapeFactory = new ShapeFactory<AggrValue<D>>(this);
+	}
+	
+	
     /**
      * constructs a new Primitive Value from a constant
      * @param constant
@@ -35,7 +44,6 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
         return new FunctionHandleValue<D>(this,f,partialValues);
     }
     
-    
         
     /**
      * creates an empty struct
@@ -51,42 +59,11 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
         return new CellValue<D>(this);
     }
     
-
-    
-    
-    
-    
-    
-    
-    
     
     /**
-     * creates a scalar shape
+     * returns the shape factory
      */
-    public Shape<D> newScalarShape(){
-        return Shape.scalar(this);
+    public ShapeFactory<AggrValue<D>> getShapeFactory(){
+    	return shapeFactory;
     }
-    
-    /**
-     * creates a 0x0 shape
-     */
-    public Shape<D> newEmptyShape(){
-        return Shape.empty(this);
-    }
-    
-    /**
-     * creates a shape from the given collection of constants
-     */
-    public Shape<D> newShape(Constant... constants){
-        return Shape.newInstance(this,Arrays.asList(constants));
-    }
-    
-    /**
-     * returns a shape which would be the result when accessing an array with the given
-     * indizes (i.e., the shape [max(a1),max(a2),max(a3),...,max(an)])
-     */
-    public Shape<D> newShapeFromIndizes(Args<AggrValue<D>> indizes){
-        return Shape.fromIndizes(this, indizes);
-    }
-
 }

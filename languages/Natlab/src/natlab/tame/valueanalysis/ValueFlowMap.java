@@ -1,11 +1,14 @@
 package natlab.tame.valueanalysis;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.value.*;
-import natlab.toolkits.analysis.*;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.toolkits.analysis.FlowData;
+import natlab.toolkits.analysis.Mergable;
 
 /**
  * represents a flow map for the value analysis.

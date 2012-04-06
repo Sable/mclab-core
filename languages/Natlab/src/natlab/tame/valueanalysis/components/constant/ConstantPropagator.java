@@ -16,50 +16,72 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.valueanalysis.constant;
+package natlab.tame.valueanalysis.components.constant;
 
 import java.util.List;
 
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
+import natlab.tame.valueanalysis.value.*;
 
 /**
  * propagates constants.
- * For any case, takes the arguments as a list, and returns the result as a constant.
+ * For any case, takes the arguments as an args<V>, and returns
+ * the result as a constant.
  * If the result is not a constant, returns null.
  * This is a singleton class, whose only instance is returned via 'getInstance()'.
+ * Note that a builtin may return a constant, even if the arguments don't have constants
+ * associated with them (for example for the function 'class').
  * 
- * TODO: how to deal with error cases?
+ * 
+ * TODO: how to deal with error cases? -- for now just return null...
+ * TODO: right now this can only return ONE result. maybe it should be changed to return a list?
+ * 
+ * Is the value analyses evolve, this should grow big.
+ * 
  * 
  * @author adubra
  */
 
-public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>{
-    static ConstantPropagator instance = null;
-    static public ConstantPropagator getInstance(){
+public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>, Constant>{
+    @SuppressWarnings("rawtypes")
+	static ConstantPropagator instance = null;
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	static public <V extends Value<V>> ConstantPropagator<V> getInstance(){
         if (instance == null) instance = new ConstantPropagator();
         return instance;
     }
-    
-    private ConstantPropagator(){}
+    private ConstantPropagator(){} //hidden private constructor
      
     @Override
-    public Constant caseBuiltin(Builtin builtin, List<Constant> arg) {
+    public Constant caseBuiltin(Builtin builtin, Args<V> arg) {
         return null;
     }
     
-    /* the constants 
-     * TODO - check whether there are no arguments */
     @Override
-    public Constant casePi(Builtin builtin, List<Constant> arg) {
+    public Constant casePi(Builtin builtin, Args<V> arg) {
+    	if (arg.size() > 0) return null;
         return Constant.get(Math.PI);
     }
     
     @Override
-    public Constant caseIsequal(Builtin builtin, List<Constant> arg) {
-        if (arg.size() == 2){
-            Constant a = arg.get(0);
-            Constant b = arg.get(1);
+    public Constant caseTrue(Builtin builtin, Args<V> arg) {
+    	if (arg.size() > 0) return null;
+        return Constant.get(true);
+    }
+
+    @Override
+    public Constant caseFalse(Builtin builtin, Args<V> arg) {
+    	if (arg.size() > 0) return null;
+        return Constant.get(true);
+    }
+
+    @Override
+    public Constant caseIsequal(Builtin builtin, Args<V> arg) {
+    	List<Constant> constants;
+        if (arg.size() == 2 && ((constants=arg.getConstants())!=null)){
+            Constant a = constants.get(0);
+            Constant b = constants.get(1);
             if (a.getClass().equals(b.getClass())){
                 return Constant.get(a.equals(b));
             } else {
@@ -72,14 +94,15 @@ public class ConstantPropagator extends BuiltinVisitor<List<Constant>, Constant>
     
     
     @Override
-    public Constant caseEq(Builtin builtin, List<Constant> arg) {
+    public Constant caseEq(Builtin builtin, Args<V> arg) {
         return caseIsequal(builtin, arg);
     }
     
     @Override
-    public Constant caseAny(Builtin builtin, List<Constant> arg) {
-        if (arg.size() == 1){
-            Constant a = arg.get(0);
+    public Constant caseAny(Builtin builtin, Args<V> arg) {
+    	List<Constant> constants;
+        if (arg.size() == 1 && ((constants=arg.getConstants())!=null)){
+            Constant a = constants.get(0);
             if (a instanceof DoubleConstant){
                 return Constant.get(((DoubleConstant)a).getValue() != 0);
             } else if (a instanceof LogicalConstant){

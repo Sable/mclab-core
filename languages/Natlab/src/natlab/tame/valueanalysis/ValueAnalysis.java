@@ -5,8 +5,10 @@ import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysis;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.ValueFactory;
 
 public class ValueAnalysis<V extends Value<V>>
 extends InterproceduralAnalysis<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>>{
