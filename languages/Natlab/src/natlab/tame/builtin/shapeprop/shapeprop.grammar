@@ -1,0 +1,129 @@
+%package "natlab.tame.builtin.shapeprop";
+%import "natlab.tame.builtin.shapeprop.ast.*";
+%import "java.util.*";
+%class "ShapePropParser";
+
+
+%terminals NUMBER, ID, UPPERCASE, LOWERCASE, DOLLAR;
+%terminals OROR, ARROW, COMMA, LRPAREN, RRPAREN, QUESTION, MULT, PLUS, LSPAREN, RSPAREN, OR, EQUAL, SQUOTATION;
+
+%left  OR, EQUAL, RSPAREN, SQUOTATION;
+%left  COMMA;
+%left  RRPAREN;
+%left  PLUS, MULT, QUESTION;
+%left  ARROW;
+%left  OROR;
+
+
+%typeof NUMBER = "Number";
+%typeof ID, UPPERCASE, LOWERCASE = "String";
+%typeof caselist = "SPCaselist";
+%typeof case = "SPCase";
+%typeof pattern, patternElement, assignStmt, fnCall, assertStmt = "SPAbstractPattern";
+%typeof output = "SPOutput";
+%typeof matchExpr = "SPAbstractMatchExpr";
+%typeof vectorExpr = "SPAbstractVectorExpr";
+%typeof scalarExpr = "SPAbstractScalarExpr";
+%typeof vertcatExpr = "SPVertcatExpr";
+%typeof vertcatExprArglist = "SPVertExprArglist";
+%typeof AssignmentLhs, AssignmentRhs, arg, arglist, vertcatExprArg = "SPAbstractVertcatExprArg";
+
+
+%goal caselist;
+
+caselist
+    = case.c                                  {: return new SPCaselist(c, null); :}
+    | case.c OROR caselist.l                  {: return new SPCaselist(c, l); :}
+    ;
+
+case
+    = pattern.p ARROW output.o                {: return new SPCase(p, o); :}
+    ;
+
+output
+    = vectorExpr.v                            {: return new SPOutput(v, null); :}
+    | vectorExpr.v COMMA output.o             {: return new SPOutput(v, o); :}
+    ;
+    
+pattern 
+	= patternElement.e                        {: return new SPPatternList(e, null); :}
+	| patternElement.e COMMA pattern.p        {: return new SPPatternList(e, p); :}
+	;
+    
+patternElement
+    = matchExpr.m                             {: return m; :}
+    | assignStmt.a                            {: return a; :}
+    | assertStmt.a                            {: return a; :}
+    ;
+    
+matchExpr
+    = LRPAREN pattern.p RRPAREN               {: return new SPRParen(p); :}
+    | matchExpr.m QUESTION                    {: return new SPQuestion(m); :}
+    | matchExpr.m MULT                        {: return new SPMult(m); :}
+    | matchExpr.m PLUS                        {: return new SPPlus(m); :}
+    | vectorExpr.v                            {: return v; :}
+    | matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
+    ;
+    
+vectorExpr
+    = DOLLAR.d                                {: return new SPDollar(); :}
+    | UPPERCASE.u                             {: return new SPUppercase(u); :}
+    | LSPAREN RSPAREN                         {: return new SPEmptySetMatching(); :}
+    | vertcatExpr.v                           {: return v; :}
+    ;
+    
+vertcatExpr
+    = LSPAREN vertcatExprArglist.vl RSPAREN   {: return new SPVertcatExpr(vl); :}
+    ;
+    
+vertcatExprArglist
+    = vertcatExprArg.vt                       {: return new SPVertExprArglist(vt, null); :}
+    | vertcatExprArg.vt COMMA vertcatExprArglist.vtl {: return new SPVertExprArglist(vt, vtl); :}
+    ;
+
+vertcatExprArg
+    = scalarExpr.s                            {: return s; :}
+    | vectorExpr.v                            {: return v; :}
+    ;
+    
+scalarExpr
+    = NUMBER.n                                {: return new SPNumber(n); :}
+    | LOWERCASE.l                             {: return new SPLowercase(l); :}
+    ;
+
+assignStmt
+    = AssignmentLhs.l EQUAL AssignmentRhs.r   {: return new SPAssignStmt(l, r); :}
+    ;
+    
+AssignmentLhs
+    = LOWERCASE.l                             {: return new SPLowercase(l); :}
+    | UPPERCASE.u                             {: return new SPUppercase(u); :}
+    | UPPERCASE.u LRPAREN scalarExpr.s RRPAREN{: return new SPUpperIndex(u, s); :}
+    ;
+    
+AssignmentRhs
+    = scalarExpr.s                            {: return s; :}
+    | vectorExpr.v                            {: return v; :}
+    | fnCall.f                                {: return f; :}
+    | LOWERCASE.l PLUS fnCall.f                {: return new SPPlusFunCall(l, f); :}
+    ;
+
+fnCall
+    = ID.i LRPAREN RRPAREN                    {: return new SPFunCall(i, null); :}
+    | ID.i LRPAREN arglist.al RRPAREN         {: return new SPFunCall(i, al); :}
+    ;
+    
+arglist
+    = arg.a                                   {: return new SPArglist(a, null); :}
+    | arg.a COMMA arglist.al                  {: return new SPArglist(a, al); :}
+    ;
+
+arg
+    = scalarExpr.s                            {: return s; :}                          
+    | vectorExpr.v                            {: return v; :}
+    | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
+    ;
+
+assertStmt
+    = fnCall.f                                {: return f; :}
+    ;
