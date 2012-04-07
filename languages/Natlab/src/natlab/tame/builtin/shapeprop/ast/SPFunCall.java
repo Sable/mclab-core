@@ -8,7 +8,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 	{
 		this.i = i;
 		this.ls = ls;
-		System.out.println("functionCall:"+i);
+		//System.out.println("functionCall:"+i);
 	}
 	
 	public String toString()

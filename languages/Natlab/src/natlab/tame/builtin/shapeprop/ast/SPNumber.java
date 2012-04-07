@@ -6,7 +6,7 @@ public class SPNumber extends SPAbstractScalarExpr
 	public SPNumber (Number n)
 	{
 		this.n = n;
-		System.out.println(n.toString());
+		//System.out.println(n.toString());
 	}
 	
 	public String toString()

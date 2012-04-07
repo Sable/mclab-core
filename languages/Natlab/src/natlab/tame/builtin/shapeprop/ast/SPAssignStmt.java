@@ -8,7 +8,7 @@ public class SPAssignStmt extends SPAbstractPattern
 	{
 		this.lhs = lhs;
 		this.rhs = rhs;
-		System.out.println("=");
+		//System.out.println("=");
 	}
 	
 	public String toString()

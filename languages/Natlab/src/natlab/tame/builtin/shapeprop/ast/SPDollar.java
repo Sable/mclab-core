@@ -4,7 +4,7 @@ public class SPDollar extends SPAbstractVectorExpr
 {
 	public SPDollar ()
 	{
-		System.out.println("$");
+		//System.out.println("$");
 	}
 	
 	public String toString()

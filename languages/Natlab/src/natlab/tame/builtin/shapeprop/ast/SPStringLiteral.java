@@ -6,7 +6,7 @@ public class SPStringLiteral extends SPAbstractVertcatExprArg
 	public SPStringLiteral(String id)
 	{
 		this.id = id;
-		System.out.println(id);
+		//System.out.println(id);
 	}
 	
 	public String toString()

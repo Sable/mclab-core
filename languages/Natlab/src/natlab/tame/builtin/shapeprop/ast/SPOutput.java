@@ -9,10 +9,10 @@ public class SPOutput extends SPNode
 	{
 		this.first = first;
 		this.next = next;
-		if (next!=null)
+		/*if (next!=null)
 		{
 			System.out.println(",");
-		}
+		}*/
 	}
 	
 	public SPOutput()

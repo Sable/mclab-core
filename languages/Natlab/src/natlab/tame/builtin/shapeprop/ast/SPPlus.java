@@ -6,7 +6,7 @@ public class SPPlus extends SPAbstractMatchExpr
 	public SPPlus (SPAbstractMatchExpr sp)
 	{
 		this.sp = sp;
-		System.out.println("+");
+		//System.out.println("+");
 	}
 	
 	public String toString()

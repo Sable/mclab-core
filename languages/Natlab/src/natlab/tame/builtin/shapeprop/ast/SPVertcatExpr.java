@@ -6,7 +6,7 @@ public class SPVertcatExpr extends SPAbstractVectorExpr
 	public SPVertcatExpr(SPVertExprArglist vl)
 	{
 		this.vl = vl;
-		System.out.println("[]");
+		//System.out.println("[]");
 	}
 	
 	public String toString()

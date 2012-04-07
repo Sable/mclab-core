@@ -8,7 +8,7 @@ public class SPUpperIndex extends SPAbstractVertcatExprArg
 	{
 		this.s = s;
 		this.n = n;
-		System.out.println(s+"()");
+		//System.out.println(s+"()");
 	}
 	
 	public String toString()

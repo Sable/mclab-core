@@ -8,7 +8,7 @@ public class SPPlusFunCall extends SPAbstractVertcatExprArg
 	{
 		this.l = l;
 		this.f = f;
-		System.out.println("a plus of lowercase and fnCall");
+		//System.out.println("a plus of lowercase and fnCall");
 	}
 	
 	public String toString()

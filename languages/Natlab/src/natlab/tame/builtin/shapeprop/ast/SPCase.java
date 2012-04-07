@@ -8,7 +8,7 @@ public class SPCase extends SPNode
 	public SPCase(SPAbstractPattern p, SPOutput o)
 	{
 		this.first = p;
-		System.out.println("->");
+		//System.out.println("->");
 		this.next = o;
 	}
 	

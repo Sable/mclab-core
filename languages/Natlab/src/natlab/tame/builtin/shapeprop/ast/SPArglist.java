@@ -8,7 +8,7 @@ public class SPArglist extends SPAbstractVertcatExprArg
 	{
 		this.first = first;
 		this.next = next;
-		System.out.println(",");
+		//System.out.println(",");
 	}
 	
 	public String toString()

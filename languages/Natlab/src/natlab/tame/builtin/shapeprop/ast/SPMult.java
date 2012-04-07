@@ -6,7 +6,7 @@ public class SPMult extends SPAbstractMatchExpr
 	public SPMult (SPAbstractMatchExpr sp)
 	{
 		this.sp = sp;
-		System.out.println("*");
+		//System.out.println("*");
 	}
 	
 	public String toString()

@@ -6,7 +6,7 @@ public class SPLowercase extends SPAbstractScalarExpr
 	public SPLowercase(String s)
 	{
 		this.s = s;
-		System.out.println(s);
+		//System.out.println(s);
 	}
 	
 	public String toString()

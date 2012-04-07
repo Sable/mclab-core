@@ -9,14 +9,14 @@ public class SPCaselist extends SPNode
 	{
 		this.first = first;
 		this.next = next;
-		if (next!=null)
+		/*if (next!=null)
 		{
 			System.out.println("||");
-		}
+		}*/
 	}
 	
 	public String toString()
 	{
-		return first.toString()+(next==null?"":"\n||"+next);
+		return first.toString()+(next==null?"":"||"+next);
 	}
 }

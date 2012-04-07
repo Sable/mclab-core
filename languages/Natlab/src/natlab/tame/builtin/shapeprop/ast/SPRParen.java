@@ -6,7 +6,7 @@ public class SPRParen extends SPAbstractMatchExpr
 	public SPRParen (SPAbstractPattern p)
 	{
 		this.p = p;
-		System.out.println("()");
+		//System.out.println("()");
 	}
 	
 	public String toString()

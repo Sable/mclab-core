@@ -6,7 +6,7 @@ public class SPQuestion extends SPAbstractMatchExpr
 	public SPQuestion (SPAbstractMatchExpr spm)
 	{
 		this.spm = spm;
-		System.out.println("?");
+		//System.out.println("?");
 	}
 	
 	public String toString()

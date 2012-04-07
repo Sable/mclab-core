@@ -6,7 +6,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 	public SPUppercase (String s)
 	{
 		this.s = s;
-		System.out.println(s);
+		//System.out.println(s);
 	}
 	
 	public String toString()

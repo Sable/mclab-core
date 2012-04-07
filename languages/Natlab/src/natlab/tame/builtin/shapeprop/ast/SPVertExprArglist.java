@@ -8,7 +8,7 @@ public class SPVertExprArglist extends SPNode
 	{
 		this.first = first;
 		this.next = next;
-		System.out.println(",");
+		//System.out.println(",");
 	}
 	
 	public String toString()
