@@ -572,7 +572,7 @@ digraph builtins{
        //*** library funcitons that are not builtins!! TODO **********************
        abstractNotABuiltin[shape=plaintext,color=none,label="NotABuiltin"];
        abstractRoot -> abstractNotABuiltin;
-       imwrite[shape=box,label="imwrite\nsparse\nrealmax\nhistc\nblkdiag\ntoeplitz\nvar\nstd",rank="max"];
+       imwrite[shape=box,label="imwrite\nsparse\nrealmax\nhistc\nblkdiag\nvar\nstd",rank="max"];
        abstractNotABuiltin -> imwrite;
        //  {rank=same; objectFunction pi tril real uplus fix complex plus ldivide cross mtimes mldivide dot min sqrt sin sind sinh asin asind asinh logm atan2 hypot eps cumsum mode eig schur bitand bitcmp find nnz not isinf eq and colon ones inf true double cell cellhorzcat isfield sort upper strfind strcmp regexptranslate class size length isobject isempty isequalwithequalnans reshape squeeze horzcat subsasgn structfun superiorto clock assert eval import disp rand computer unix load sprintf imwrite }
 }

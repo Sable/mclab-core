@@ -80,14 +80,16 @@ public class Res<V extends Value<V>> extends ArrayList<ValueSet<V>>
         } else {
             Iterator<Res<V>> i = valueSets.iterator();
             Res<V> result = i.next();
-            while(i.hasNext()) result = result.merge(i.next());
+            while(i.hasNext()){
+            	result = result.merge(i.next());
+            }
             return result;
         }
     }
 
     @Override
     public Res<V> merge(Res<V> o) {
-        if (!isViable || o.isViable){
+        if (!isViable || !o.isViable){
             //TODO merge errors
             return isViable?this:o;
         }

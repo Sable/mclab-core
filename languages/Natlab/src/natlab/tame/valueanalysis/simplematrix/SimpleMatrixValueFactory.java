@@ -15,9 +15,10 @@ public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue
     }
     
 
-    static SimpleMatrixValuePropagator propagator = new SimpleMatrixValuePropagator();
+    static AggrValuePropagator<SimpleMatrixValue> propagator = 
+    		new AggrValuePropagator<SimpleMatrixValue>(new SimpleMatrixValuePropagator());
     @Override
-    public SimpleMatrixValuePropagator getValuePropagator() {
+    public AggrValuePropagator<SimpleMatrixValue> getValuePropagator() {
         return propagator;
     }
     

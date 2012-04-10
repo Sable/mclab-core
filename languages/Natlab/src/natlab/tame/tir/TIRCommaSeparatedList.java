@@ -122,7 +122,7 @@ public class TIRCommaSeparatedList extends List<Expr> implements TIRNode {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRCommaSeparatedList(this);
     }
 

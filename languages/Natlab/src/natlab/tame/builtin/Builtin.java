@@ -363,7 +363,6 @@ public abstract class Builtin {
         builtinMap.put("realmax",Realmax.getInstance());
         builtinMap.put("histc",Histc.getInstance());
         builtinMap.put("blkdiag",Blkdiag.getInstance());
-        builtinMap.put("toeplitz",Toeplitz.getInstance());
         builtinMap.put("var",Var.getInstance());
         builtinMap.put("std",Std.getInstance());
     }    
@@ -405,7 +404,7 @@ public abstract class Builtin {
         }
         
         public Object getShapePropagationInfo(){
-            return "[] -> $";
+            return "[] -> $"; //XU - FIX THIS -- CHECK CLASS PROP EXAMPLE!!
         }
 
 
@@ -7141,38 +7140,6 @@ public abstract class Builtin {
             //set classPropInfo if not defined
             if (classPropInfo == null){
                 classPropInfo = ClassPropTool.parse("numeric* -> double");
-                classPropInfo.setVar("parent",new CPNone());
-                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
-            }
-            return classPropInfo;
-        }
-
-    }
-    public static class Toeplitz extends AbstractNotABuiltin implements HasClassPropagationInfo {
-        //returns the singleton instance of this class
-        private static Toeplitz singleton = null;
-        public static Toeplitz getInstance(){
-            if (singleton == null) singleton = new Toeplitz();
-            return singleton;
-        }
-        //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
-            return visitor.caseToeplitz(this,arg);
-        }
-        //return name of builtin
-        public String getName(){
-            return "toeplitz";
-        }
-        
-        public CP getMatlabClassPropagationInfo(){{
-            return getClassPropagationInfo();
-        }}
-
-        private CP classPropInfo = null;
-        public CP getClassPropagationInfo(){
-            //set classPropInfo if not defined
-            if (classPropInfo == null){
-                classPropInfo = ClassPropTool.parse("single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1");
                 classPropInfo.setVar("parent",new CPNone());
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }

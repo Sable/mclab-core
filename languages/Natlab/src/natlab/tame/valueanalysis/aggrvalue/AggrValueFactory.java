@@ -26,6 +26,7 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
     
     /**
      * returns a ValuePropagator
+     * This should always be an AggrValuePropagator, containing a matrix value propagator
      */
     abstract public AggrValuePropagator<D> getValuePropagator();
     

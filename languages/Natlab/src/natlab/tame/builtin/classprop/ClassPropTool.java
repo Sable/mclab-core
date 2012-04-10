@@ -47,7 +47,7 @@ public class ClassPropTool {
      * returns a list of sets of return matlab classes.
      * returns null if the combination of argument classes is illegal.
      */
-    public static LinkedList<HashSet<ClassReference>> matchByValues(CP tree,
+    public static List<Set<ClassReference>> matchByValues(CP tree,
             List<? extends Value<?>> argValues){
         ArrayList<ClassReference> argClasses = new ArrayList<ClassReference>(argValues.size());
         for (Value<?> v : argValues){
@@ -61,7 +61,7 @@ public class ClassPropTool {
      * returns a list of sets of return matlab classes
      * returns null if the combination of argument classes is illegal.
      */
-    public static LinkedList<HashSet<ClassReference>> match(CP tree,
+    public static List<Set<ClassReference>> match(CP tree,
             List<ClassReference> argClasses){
         return match(tree,argClasses,null);
     }
@@ -72,7 +72,7 @@ public class ClassPropTool {
      * returns null if the combination of argument classes is illegal.
      */
 
-    public static LinkedList<HashSet<ClassReference>> match(CP tree,
+    public static List<Set<ClassReference>> match(CP tree,
             List<ClassReference> argClasses,List<? extends Value<?>> argValues){
         if (DEBUG) System.out.println("match "+tree+" with "+argValues);
         ClassPropMatch match = tree.match(true, new ClassPropMatch(), argClasses, argValues);
@@ -250,42 +250,6 @@ public class ClassPropTool {
         		if (!parse(cp.toString()).toString().equals(cp.toString())){
         			System.out.println("not indemptotent:\n"+cp+"\n"+parse(cp.toString()));        			
         		}
-        		
-        		
-            	//get new builtin spec
-        		CP cp2 = ((HasClassPropagationInfo)builtin).getClassPropagationInfo2();
-        		
-        		//compare results
-        		//System.out.println(builtin.getName());
-        		ArrayList<ClassReference> classes = new ArrayList<ClassReference>();
-        		for(ClassReference aClass : PrimitiveClassReference.values()){
-        			classes.add(aClass);
-        		}
-        		classes.add(FunctionHandleClassReference.getInstance());
-        		
-        		int N = (classes.size()+1);
-        		boolean same = true;
-        		for (int i = 0;i<N*N*N*N*N*N;i++){
-        			int n = i;
-        			ArrayList<ClassReference> arglist = new ArrayList<ClassReference>();
-        			while(n > 0){
-        				arglist.add(classes.get(Math.max(n%N-1,0)));
-        				n = n/N;
-        			}
-        			//System.out.println(arglist);
-        			LinkedList<HashSet<ClassReference>> 
-        				result1 = (match(cp,arglist)),
-        				result2 = (match(cp2,arglist));
-        			//System.out.println(result1+"\n"+result2+"\n--");
-        			if (result1 == null?result1 != result2:!result1.equals(result2)){
-            			System.out.println("\n\nbuiltin match failed for "+builtin.getName());
-            			System.out.println(cp+"\n"+cp2);
-        				System.out.println("with args: "+arglist+", producing: \n"+result1+"\n"+result2);
-        				same = false;
-        				break;
-        			}
-        		}
-        		if (same) System.out.print(".");        		
         	}
         }
         System.out.println("test end");

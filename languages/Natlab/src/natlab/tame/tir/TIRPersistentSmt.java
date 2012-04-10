@@ -18,7 +18,7 @@ public class TIRPersistentSmt extends PersistentStmt implements TIRStmt {
     }
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRPersistentStmt(this);
     }
 }

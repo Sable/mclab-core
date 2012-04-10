@@ -45,7 +45,7 @@ public class TIRAssignLiteralStmt extends TIRAbstractAssignToVarStmt {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRAssignLiteralStmt(this);
     }
 }

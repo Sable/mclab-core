@@ -25,5 +25,5 @@ import natlab.tame.tir.analysis.TIRNodeCaseHandler;
  * @author ant6n
  */
 public interface TIRNode {
-    public void irAnalyize(TIRNodeCaseHandler irHandler);
+    public void tirAnalyze(TIRNodeCaseHandler irHandler);
 }

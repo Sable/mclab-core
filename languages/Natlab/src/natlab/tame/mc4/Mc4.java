@@ -29,7 +29,10 @@ import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.FunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysis;
+import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
@@ -115,7 +118,7 @@ public class Mc4 {
 		    "spga", //end-issue???
 		    "svd" //uses nargout - cannot be all inlined
 		    };
-		for (String subfolder : subfolders){
+		/*for (String subfolder : subfolders){
 		    File dir = new File(bFolderString+subfolder);
 		    System.out.println(dir.getAbsolutePath());
 		    File[] list = dir.listFiles(new FilenameFilter() {
@@ -131,7 +134,15 @@ public class Mc4 {
 	        options.parse(args);
 	        main(options);
 	        //System.exit(0);//only do first
-		}
+		}*/
+		
+		String mainf = "/home/adubra/mclab/papers/oopsla12tame/main.m";
+	    System.err.println("reading "+mainf);
+	    args = new String[]{"-m",mainf};
+	    options = new Options();
+        options.parse(args);
+        main(options);
+		
 		System.out.println("\n---done---\n builtins: "+allRefs.size()+"\n\n");
 		//for (FunctionReference ref : allRefs) System.out.println(ref);
 		System.exit(0);
@@ -182,15 +193,31 @@ public class Mc4 {
 	            new SimpleMatrixValueFactory());
         System.out.println(analysis);
         //System.out.println(analysis.getPrettyPrinted());
+        //print code
+        for (int i = 0; i < analysis.getNodeList().size(); i++){
+        	System.out.println(analysis.getNodeList().get(i).getAnalysis().getTree().getPrettyPrinted());        	
+        }
+        System.out.println("**********************************************************************");
+        for (int i = 0; i < analysis.getNodeList().size(); i++){
+        	System.out.println(ValueAnalysisPrinter.prettyPrint(
+        			analysis.getNodeList().get(i).getAnalysis()));        	
+        }
+
+        
+        //System.out.println(ValueAnalysisPrinter.prettyPrint(analysis.getMainNode().getAnalysis()));
+	    System.exit(0);
 	    } catch (StackOverflowError e){
 	        System.err.println("stackoverflow in "+functions.getMain().name);
 	        e.printStackTrace();
 	        System.exit(0);
 	    }
 	    System.out.println("=> finished "+functions.getMain().name);
+	    
+	    
 	    //FlowAnalysisTestTool test = new FlowAnalysisTestTool(classAnalysis);
 	    //System.out.println(test.run(true,true));
 	}
+
 }
 
 

@@ -5,6 +5,7 @@ package natlab.tame.valueanalysis.basicmatrix;
 
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.value.ValueFactory;
 
 public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
     @Override
@@ -12,10 +13,11 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
         return new BasicMatrixValue(constant);
     }
     
-
-    static BasicMatrixValuePropagator propagator = new BasicMatrixValuePropagator();
+    
+    static AggrValuePropagator<BasicMatrixValue> propagator = 
+    		new AggrValuePropagator<BasicMatrixValue>(new BasicMatrixValuePropagator());
     @Override
-    public BasicMatrixValuePropagator getValuePropagator() {
+    public AggrValuePropagator<BasicMatrixValue> getValuePropagator() {
         return propagator;
     }
     

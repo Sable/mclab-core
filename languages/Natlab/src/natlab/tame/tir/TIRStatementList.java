@@ -49,7 +49,7 @@ public class TIRStatementList extends List<Stmt> implements TIRNode {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRStatementList(this);
     }
 

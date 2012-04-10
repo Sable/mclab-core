@@ -56,7 +56,7 @@ public class TIRWhileStmt extends WhileStmt implements TIRStmt {
     }
 
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRWhileStmt(this);
     }
 }

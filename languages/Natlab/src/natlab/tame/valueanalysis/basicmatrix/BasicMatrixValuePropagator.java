@@ -12,7 +12,7 @@ import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 
-public class BasicMatrixValuePropagator extends AggrValuePropagator<BasicMatrixValue>{
+public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValue>{
     public static boolean DEBUG = false;
     ConstantPropagator<AggrValue<BasicMatrixValue>> constantProp = ConstantPropagator.getInstance();
     

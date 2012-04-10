@@ -7,7 +7,7 @@ public class TIRBreakStmt extends BreakStmt implements TIRStmt {
     private static final long serialVersionUID = 1L;
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRBreakStmt(this);
     }
 }

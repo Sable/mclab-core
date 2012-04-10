@@ -61,7 +61,7 @@ public class TIRCellArrayGetStmt extends TIRAbstractAssignToListStmt {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRCellArrayGetStmt(this);
     }
 

@@ -62,7 +62,7 @@ public class TIRArrayGetStmt extends TIRAbstractAssignToListStmt {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRArrayGetStmt(this);
     }
 }

@@ -33,8 +33,17 @@ public abstract class ValuePropagator<V extends Value<V>>
         if (b == null){
             throw new UnsupportedOperationException("builtin "+builtin+" not found");
         }
+        return call(b, args);        
+    }
+    
+    /**
+     * same as the other call, but with the first argument a builtin
+     */
+    public Res<V> call(Builtin b,Args<V> args){
         return b.visit(this, args);        
     }
+    
+    
     
     protected ValueFactory<V> factory;
     /**
@@ -43,6 +52,13 @@ public abstract class ValuePropagator<V extends Value<V>>
      */
     public ValuePropagator(ValueFactory<V> factory){
         this.factory = factory;
+    }
+    
+    /**
+     * returns the value factory of this value propagator
+     */
+    public ValueFactory<V> getFactory(){
+    	return this.factory;
     }
     
     

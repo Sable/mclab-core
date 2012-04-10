@@ -59,7 +59,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @SuppressWarnings("unchecked")
     public void caseList(ast.List node) {
         if (node instanceof TIRNode){
-            ((TIRNode) node).irAnalyize(irHandler);
+            ((TIRNode) node).tirAnalyze(irHandler);
         } else {
             super.caseList(node);
         }
@@ -68,7 +68,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseFunction(Function node) {
         if (node instanceof TIRNode){
-            ((TIRFunction) node).irAnalyize(irHandler);
+            ((TIRFunction) node).tirAnalyze(irHandler);
         } else {
             super.caseFunction(node);
         }
@@ -79,7 +79,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseAssignStmt(AssignStmt node) {
         if (node instanceof TIRNode){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
         	super.caseAssignStmt(node);
         }
@@ -88,7 +88,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseEmptyStmt(EmptyStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseEmptyStmt(node);
         }
@@ -97,7 +97,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseForStmt(ForStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseForStmt(node);
         }
@@ -106,7 +106,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseIfStmt(IfStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseIfStmt(node);
         }
@@ -115,7 +115,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseWhileStmt(WhileStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseWhileStmt(node);
         }
@@ -124,7 +124,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseBreakStmt(BreakStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseBreakStmt(node);
         }
@@ -133,7 +133,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseContinueStmt(ContinueStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseContinueStmt(node);
         }
@@ -142,7 +142,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseReturnStmt(ReturnStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseReturnStmt(node);
         }
@@ -151,7 +151,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseGlobalStmt(GlobalStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseGlobalStmt(node);
         }
@@ -160,7 +160,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void casePersistentStmt(PersistentStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.casePersistentStmt(node);
         }
@@ -169,7 +169,7 @@ public class TIRNodeForwarder extends ForwardingNodeCaseHandler  {
     @Override
     public void caseTryStmt(TryStmt node) {
         if (node instanceof TIRStmt){
-            ((TIRStmt) node).irAnalyize(irHandler);
+            ((TIRStmt) node).tirAnalyze(irHandler);
         } else {
             super.caseTryStmt(node);
         }

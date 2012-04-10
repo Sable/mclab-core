@@ -171,7 +171,7 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
     public StaticFunction getFunction(){
         return function;
     }
-    public FunctionAnalysis<Arg, Res> getAnalysis(){
+    public FAnalysis getAnalysis(){
         return functionAnalysis;
     }
     public CallString<Arg> getCallString(){

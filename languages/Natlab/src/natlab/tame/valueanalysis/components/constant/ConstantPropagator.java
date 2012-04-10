@@ -114,7 +114,17 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
             return null;
         }
     }
+    
+    
+    @Override
+    public Constant caseClass(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 1){
+    		return Constant.get(arg.get(0).getMatlabClass().getName());    		
+    	}
+    	return null;
+    }
 }
+
 
 
 

@@ -29,7 +29,7 @@ public class TIRCreateFunctionReferenceStmt extends
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
     	irHandler.caseTIRCreateFunctionReferenceStmt(this);
     }
 }

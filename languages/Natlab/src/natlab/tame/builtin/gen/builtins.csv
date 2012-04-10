@@ -881,7 +881,6 @@ fclose
 # *** library funcitons that are not builtins!! TODO **********************
 notABuiltin; root
 #conv
-#toeplitz
 #dyaddown
 #flipud
 #linspace
@@ -890,7 +889,7 @@ sparse;;  Class((double|char|logical) (double|char|logical)* -> 0)
 realmax;; Class(typeString(float)|(none->double))
 histc;;   Class(numeric numeric numeric? -> double double)
 blkdiag;; Class(numeric* -> double)
-toeplitz;;Class(single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1)
+#toeplitz;;Class(single (single|double)? -> 0, single|double -> 0, double (single|double) -> 1)
 
 # at least variance should be a builtin, std = sqrt(var)
 var;; Class(coerce(char|logical -> double, float ->0) numeric? numeric?)

@@ -13,7 +13,7 @@ import natlab.toolkits.analysis.Mergable;
 
 
 public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
-	ValueFactory<V> factory;
+	private ValueFactory<V> factory;
     //FIXME -- actually put dimensions
 	
     protected Shape(ValueFactory<V> factory,List<V> dimensions) {

@@ -2,16 +2,15 @@ package natlab.tame.valueanalysis.simplematrix;
 
 import java.util.*;
 import natlab.tame.builtin.*;
-import natlab.tame.builtin.classprop.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
-public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatrixValue>{
+public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixValue>{
     public static boolean DEBUG = false;
     ConstantPropagator<AggrValue<SimpleMatrixValue>> constantProp = ConstantPropagator.getInstance();
     
@@ -26,38 +25,27 @@ public class SimpleMatrixValuePropagator extends AggrValuePropagator<SimpleMatri
     public Res<AggrValue<SimpleMatrixValue>> caseBuiltin(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> arg) {
         //ceal with constants
-        if (arg.isAllConstant()){ //FIXME
-            Constant cResult = builtin.visit(constantProp, arg);
-            if (cResult != null){
-                return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(cResult));
-            }
+    	Constant cResult = builtin.visit(constantProp, arg);
+    	if (cResult != null){
+    		return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(cResult));
+    	}
+    	
+    	//if the result is not a constant, just do mclass propagation
+        List<Set<ClassReference>> matchResult = 
+                builtin.visit(ClassPropagator.<AggrValue<SimpleMatrixValue>>getInstance(),arg);
+        if (matchResult == null){ //class prop returned error
+            return Res.newErrorResult(builtin.getName()+" is not defined for arguments "+arg);
         }
-        
-        
-        //if it's not constant check whether the Builtin implements class propagation
-        if (builtin instanceof HasClassPropagationInfo){
-            if (DEBUG) System.out.println("case builtin: "+builtin
-                    +" prop: "+((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo()
-                    +" args: "+arg);
-            LinkedList<HashSet<ClassReference>> matchResult = 
-                ClassPropTool.matchByValues(((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo(),arg);
-            if (matchResult == null){
-                return Res.newErrorResult(builtin.getName()+" is not defined for arguments "+arg);
-            }
-            return matchResultToRes(matchResult);
-        }
-        //else throw an error
-        throw new UnsupportedOperationException("No class propagation defined for builtin "+builtin);
+    	
+        //build results out of the result classes
+        return matchResultToRes(matchResult);
     }
     
-    private Res<AggrValue<SimpleMatrixValue>> matchResultToRes(LinkedList<HashSet<ClassReference>> matchResult){
+    private Res<AggrValue<SimpleMatrixValue>> matchResultToRes(List<Set<ClassReference>> matchResult){
         //go through and fill in result
         Res<AggrValue<SimpleMatrixValue>> result = Res.newInstance();
-        for (HashSet<ClassReference> values: matchResult){
+        for (Set<ClassReference> values: matchResult){
             HashMap<ClassReference,AggrValue<SimpleMatrixValue>> map = new HashMap<ClassReference,AggrValue<SimpleMatrixValue>>();
-            if (values.size() == 0){
-                throw new UnsupportedOperationException("encountered match result with 0 values");
-            }
             for (ClassReference classRef : values){
                 map.put(classRef,new SimpleMatrixValue((PrimitiveClassReference)classRef));
             }

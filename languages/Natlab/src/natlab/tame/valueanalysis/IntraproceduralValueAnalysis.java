@@ -30,7 +30,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ValueFactory<V> factory;
     ValuePropagator<V> valuePropagator;
     ValueFlowMap<V> argMap;
-    static boolean Debug = false;//true;
+    Args<V> args;
+    static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
@@ -49,6 +50,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             StaticFunction function, ValueFactory<V> factory, Args<V> args) {
         this(node,function,factory);
         argMap = new ValueFlowMap<V>();
+        this.args = args;
         //TODO check whether given args <= declared args
         for (int i = 0; i < args.size(); i++){
             argMap.put(
@@ -71,6 +73,13 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             result.add(flowResult.get(out.getID()));
         }
         return result;
+    }
+    
+    public Args<V> getArgs(){
+    	return args;
+    }
+    public ValueFlowMap<V> getArgMap(){
+    	return argMap;
     }
     
 
@@ -470,7 +479,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      * partial values will be prepended
      */
     private List<LinkedList<V>> cross(ValueFlowMap<V> flow,TIRCommaSeparatedList args,List<ValueSet<V>> partialValues){
-        if (Debug)System.out.println("cross - flow: "+flow+" args: "+args);
+        //if (Debug)System.out.println("cross - flow: "+flow+" args: "+args);
         //get list of value sets from the names        
         ArrayList<ValueSet<V>> values;
         if (partialValues == null){
@@ -552,6 +561,11 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             }
         }        
         if (Debug) System.out.println("called "+function+", received "+Res.newInstance(results));
+        if (cross(flow,args,partialArgs).size() > 1){
+        	System.out.println("exiting");
+        	System.out.println(results);
+        	//System.exit(0);
+        }
         //FIXME
         return Res.newInstance(results);
     }

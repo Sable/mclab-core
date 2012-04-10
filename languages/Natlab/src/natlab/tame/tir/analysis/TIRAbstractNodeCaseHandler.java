@@ -16,207 +16,167 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.tame.tir.analysis;
-
-import ast.*;
-import analysis.*;
-import nodecases.*;
-import natlab.tame.tir.*;
-import natlab.toolkits.analysis.*;
-
 /**
- * This is a TIRNodeCaseHandler, that, analogous to AbstractNodeCaseHandler,
- * forwards every call to the parent case of a supplied 
- * (NodeCaseHandler & TIRNodeCaseHandler)
- * 
- * For ast nodes, the call is forwarded to the same case of the callback
- * 
- * 
- * This can be used as a mixin, together with an AbstractNodeCasehandler
- * to handle all nodes, using a TIRNodeForwarder to call analyze on ast nodes.
- * 
- * Note that this should only the case of actual parent classes
- * - thus TIRStmt and TIRNode, being interfaces, will nevr be called
- * 
- * @author ant6n
- *
+ * A TIR Node case handler that just calls the parent for every case,
+ * analaoguous to AbstractNodeCaseHandler
  */
 
+package natlab.tame.tir.analysis;
 
-public class TIRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandler implements TIRNodeCaseHandler {
-    NodeCaseHandler callback; //these two refer to the same variable
-    TIRNodeCaseHandler irCallback; 
-    
-    public <T extends NodeCaseHandler & TIRNodeCaseHandler>
-    TIRParentForwardingNodeCasehandler(T handler) {
-        super(handler);
-        this.callback = handler;
-        this.irCallback = handler;
-    }
+import ast.Stmt;
+import natlab.tame.tir.*;
+import nodecases.AbstractNodeCaseHandler;
 
-    /**
-     * a constructor that uses two different handlers for the callbacks to the
-     * AST nodes and the IR nodes
-     * @param handler
-     * @param irHandler
-     */
-    public TIRParentForwardingNodeCasehandler(NodeCaseHandler handler, TIRNodeCaseHandler irHandler) {
-        super(handler);
-        this.callback = handler;
-        this.irCallback = irHandler;
-    }
-    
-    
+public abstract class TIRAbstractNodeCaseHandler extends
+        AbstractNodeCaseHandler implements TIRNodeCaseHandler {
+
     @Override
     public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
-        callback.caseAssignStmt(node);
+        caseAssignStmt(node);
     }
 
     @Override
     public void caseTIRAbstractAssignToListStmt(TIRAbstractAssignToListStmt node) {
-        irCallback.caseTIRAbstractAssignStmt(node);
+        caseTIRAbstractAssignStmt(node);
     }
 
     @Override
     public void caseTIRAbstractAssignFromVarStmt(TIRAbstractAssignFromVarStmt node){
-        irCallback.caseTIRAbstractAssignStmt(node);
+    	caseTIRAbstractAssignStmt(node);
     }
     
     @Override
     public void caseTIRArrayGetStmt(TIRArrayGetStmt node) {
-        irCallback.caseTIRAbstractAssignToListStmt(node);
+        caseTIRAbstractAssignToListStmt(node);
     }
 
     @Override
     public void caseTIRArraySetStmt(TIRArraySetStmt node) {
-        irCallback.caseTIRAbstractAssignFromVarStmt(node);
+        caseTIRAbstractAssignFromVarStmt(node);
     }
 
     @Override
     public void caseTIRCopyStmt(TIRCopyStmt node) {
-        irCallback.caseTIRAbstractAssignToVarStmt(node);
+        caseTIRAbstractAssignToVarStmt(node);
     }
     
     @Override
     public void caseTIRAbstractCreateFunctionHandleStmt(TIRAbstractCreateFunctionHandleStmt node) {
-        irCallback.caseTIRAbstractAssignToVarStmt(node);
+        caseTIRAbstractAssignToVarStmt(node);
     }
     
     @Override
     public void caseTIRCreateFunctionReferenceStmt(
     		TIRCreateFunctionReferenceStmt node) {
-    	irCallback.caseTIRAbstractCreateFunctionHandleStmt(node);
+    	caseTIRAbstractCreateFunctionHandleStmt(node);
     }
     
     @Override
     public void caseTIRCreateLambdaStmt(TIRCreateLambdaStmt node) {
-    	irCallback.caseTIRAbstractCreateFunctionHandleStmt(node);
+    	caseTIRAbstractCreateFunctionHandleStmt(node);
     }
 
     @Override
     public void caseTIRAssignLiteralStmt(TIRAssignLiteralStmt node) {
-        irCallback.caseTIRAbstractAssignToVarStmt(node);
+        caseTIRAbstractAssignToVarStmt(node);
     }
 
     @Override
     public void caseTIRAbstractAssignToVarStmt(TIRAbstractAssignToVarStmt node) {
-        irCallback.caseTIRAbstractAssignStmt(node);
+        caseTIRAbstractAssignStmt(node);
     }
 
     @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
-        irCallback.caseTIRAbstractAssignToListStmt(node);
+        caseTIRAbstractAssignToListStmt(node);
     }
 
     @Override
     public void caseTIRCellArrayGetStmt(TIRCellArrayGetStmt node) {
-        irCallback.caseTIRAbstractAssignToListStmt(node);
+        caseTIRAbstractAssignToListStmt(node);
     }
 
     @Override
     public void caseTIRCellArraySetStmt(TIRCellArraySetStmt node) {
-        irCallback.caseTIRAbstractAssignFromVarStmt(node);
+        caseTIRAbstractAssignFromVarStmt(node);
     }
 
     @Override
     public void caseTIRCommaSeparatedList(TIRCommaSeparatedList node) {
-        callback.caseList(node);
+        caseList(node);
     }
 
     @Override
     public void caseTIRCommentStmt(TIRCommentStmt node) {
-        callback.caseEmptyStmt(node);
+        caseEmptyStmt(node);
     }
 
     @Override
     public void caseTIRForStmt(TIRForStmt node) {
-        callback.caseRangeForStmt(node);
+        caseRangeForStmt(node);
     }
 
     @Override
     public void caseTIRFunction(TIRFunction node) {
-        callback.caseFunction(node);
+        caseFunction(node);
     }
 
     @Override
     public void caseTIRIfStmt(TIRIfStmt node) {
-        callback.caseIfStmt(node);
+        caseIfStmt(node);
     }
 
     @Override
     public void caseTIRStatementList(TIRStatementList node) {
-        callback.caseList(node);
+        caseList(node);
     }
 
     @Override
     public void caseTIRStmt(TIRStmt node) {
-        callback.caseStmt((Stmt)node);
+        caseStmt((Stmt)node);
     }
 
     @Override
     public void caseTIRWhileStmt(TIRWhileStmt node) {
-        callback.caseWhileStmt(node);
+        caseWhileStmt(node);
     }
 
     @Override
     public void caseTIRBreakStmt(TIRBreakStmt node) {
-        callback.caseBreakStmt(node);
+        caseBreakStmt(node);
     }
 
     @Override
     public void caseTIRContinueStmt(TIRContinueStmt node) {
-        callback.caseContinueStmt(node);
+        caseContinueStmt(node);
     }
 
     @Override
     public void caseTIRDotGetStmt(TIRDotGetStmt node) {
-        irCallback.caseTIRAbstractAssignToListStmt(node);
+        caseTIRAbstractAssignToListStmt(node);
     }
 
     @Override
     public void caseTIRDotSetStmt(TIRDotSetStmt node) {
-        irCallback.caseTIRAbstractAssignFromVarStmt(node);
+        caseTIRAbstractAssignFromVarStmt(node);
     }
 
     @Override
     public void caseTIRGlobalStmt(TIRGlobalStmt node) {
-        callback.caseGlobalStmt(node);
+        caseGlobalStmt(node);
     }
 
     @Override
     public void caseTIRPersistentStmt(TIRPersistentSmt node) {
-        callback.casePersistentStmt(node);
+        casePersistentStmt(node);
     }
 
     @Override
     public void caseTIRTryStmt(TIRTryStmt node) {
-        callback.caseTryStmt(node);
+        caseTryStmt(node);
     }
     
     public void caseTIRReturnStmt(TIRReturnStmt node){
-        callback.caseReturnStmt(node);
+        caseReturnStmt(node);
     }
-
 }
-
-

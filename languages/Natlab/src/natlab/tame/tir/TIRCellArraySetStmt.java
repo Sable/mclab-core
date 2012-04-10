@@ -49,7 +49,7 @@ public class TIRCellArraySetStmt extends TIRAbstractAssignFromVarStmt {
     }
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRCellArraySetStmt(this);
     }
 

@@ -64,7 +64,7 @@ public class TIRCreateLambdaStmt extends TIRAbstractCreateFunctionHandleStmt {
 
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
     	irHandler.caseTIRCreateLambdaStmt(this);
     }
 }

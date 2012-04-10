@@ -54,7 +54,7 @@ public class TIRForStmt extends ForStmt implements TIRStmt {
     
     
     @Override
-    public void irAnalyize(TIRNodeCaseHandler irHandler) {
+    public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRForStmt(this);
     }
     

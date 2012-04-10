@@ -18,6 +18,7 @@
 
 package natlab.tame.interproceduralAnalysis;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import natlab.tame.callgraph.FunctionCollection;
@@ -98,6 +99,14 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     public InterproceduralAnalysisNode<F, A, R> getNode(
             FunctionReference ref,A arg){
         return nodes.get(new Key(ref,arg));
+    }
+    
+    
+    /**
+     * returns all nodes in this list
+     */
+    public java.util.List<InterproceduralAnalysisNode<F, A, R>> getNodeList(){
+    	return new ArrayList<InterproceduralAnalysisNode<F, A, R>>(nodes.values());
     }
     
     /**

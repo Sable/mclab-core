@@ -1,9 +1,6 @@
 package natlab.tame.builtin.classprop;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
+import java.util.*;
 import natlab.tame.classes.reference.ClassReference;
 
 
@@ -89,11 +86,12 @@ public class ClassPropMatch{
     /**
      * returns all results as a linked list of sets of matlab classes
      * returns null if the match result is erroneous
+     * every set in the list has at least one value.
      */
-    public LinkedList<HashSet<ClassReference>> getAllResults(){
+    public List<Set<ClassReference>> getAllResults(){
         //check if matchresult is error
         if (isError) return null;
-        LinkedList<HashSet<ClassReference>> results = new LinkedList<HashSet<ClassReference>>();
+        LinkedList<Set<ClassReference>> results = new LinkedList<Set<ClassReference>>();
         PriorityQueue<ClassPropMatch> pq = new PriorityQueue<ClassPropMatch>(10,new Comparator<ClassPropMatch>() {
             public int compare(ClassPropMatch o1, ClassPropMatch o2) {
                 return o2.numEmittedResults - o1.numEmittedResults;
@@ -101,12 +99,16 @@ public class ClassPropMatch{
         });
         pq.add(this);
         int currentIndex = numEmittedResults;
-        HashSet<ClassReference> currentSet = new HashSet<ClassReference>();
+        Set<ClassReference> currentSet = new HashSet<ClassReference>();
         while(pq.size() > 0){
             ClassPropMatch current = pq.poll();
             //start a new set
             if (currentIndex != current.numEmittedResults){
                 results.addFirst(currentSet);
+                if (currentSet.size() == 0){
+                	throw new UnsupportedOperationException(
+                			"Class propagation resulted in an empty result. This should be impossible");
+                }
                 currentSet = new HashSet<ClassReference>();
                 currentIndex = current.numEmittedResults;
             }

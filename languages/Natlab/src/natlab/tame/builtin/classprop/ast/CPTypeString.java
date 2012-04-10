@@ -19,7 +19,7 @@ public class CPTypeString extends CP{
     public CPTypeString(CP tree){
         this.tree = tree;
         //get all allowed types from tree
-        LinkedList<HashSet<ClassReference>> treeResult = tree.match(
+        List<Set<ClassReference>> treeResult = tree.match(
                 false, new ClassPropMatch(), new LinkedList<ClassReference>(), new LinkedList<Value<?>>()).getAllResults();
         if (treeResult.size() != 1) throw new UnsupportedOperationException(
                 "typeString arguments neeed emit one result, got "+treeResult+" for "+this);
