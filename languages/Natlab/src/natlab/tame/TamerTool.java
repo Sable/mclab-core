@@ -50,7 +50,7 @@ public class TamerTool {
 		IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = 
 				new IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>(
 						null, function, new SimpleMatrixValueFactory(), 
-						Args.<AggrValue<SimpleMatrixValue>>newInstance());
+						Args.<AggrValue<SimpleMatrixValue>>newInstance(inputValues));
 		analysis.analyze(); //run analysis
 		return analysis;
 	}
