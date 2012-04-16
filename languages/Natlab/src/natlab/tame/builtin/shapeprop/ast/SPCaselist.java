@@ -1,5 +1,12 @@
 package natlab.tame.builtin.shapeprop.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import natlab.tame.builtin.shapeprop.ShapePropMatch;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
+
 public class SPCaselist extends SPNode
 {
 	SPCase first;
@@ -13,6 +20,16 @@ public class SPCaselist extends SPNode
 		{
 			System.out.println("||");
 		}*/
+	}
+	
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues){
+		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
+		if (match.outputIsDone() == true) {
+			System.out.println("matching and results emmitting successfully!\n");
+			return match;
+		}
+		else
+			return next.match(isPatternSide, previousMatchResult, argValues);		
 	}
 	
 	public String toString()
