@@ -110,13 +110,13 @@ public class ShapePropTool {
     	arg1.add(m);
 		ShapePropMatch spMatch1 = splist1.match(true, new ShapePropMatch(), arg1);*/
 		
-		/*int n =8;
+		int n =8;
 		SPCaselist splist2 = parse("$,n=previousScalar()->[n,n]");
 		System.err.println("for equation true("+n+"), one corresponding shape equation is "+splist2+", the argument is "+n);
 		System.out.println("start to matching...");
 		ArrayList<Integer> arg2 = new ArrayList<Integer>(1);
     	arg2.add(n);
-		ShapePropMatch spMatch2 = splist2.match(true, new ShapePropMatch(), arg2);*/		
+		ShapePropMatch spMatch2 = splist2.match(true, new ShapePropMatch(), arg2);		
 		
 		/*int m = 6, n = 8;
 		SPCaselist splist3 = parse("$,$->$");
