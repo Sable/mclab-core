@@ -2,13 +2,16 @@ package natlab.tame.builtin.shapeprop;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.*;
+import java.lang.*;
 
-import beaver.Symbol;
 import beaver.Parser;
 
 import natlab.tame.builtin.shapeprop.ast.*;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.value.*;
 
-public class ShapePropPrinter {
+public class ShapePropTool {
 	
     public static SPCaselist parse(String source){
     	//System.err.println("parsing: "+source);
@@ -23,9 +26,16 @@ public class ShapePropPrinter {
     	}
     }
 	
+/*    public static HashMap<String, Shape<?>> match(SPCaselist tree, List<? extends Value<?>> argValues){
+    	ShapePropMatch spMatch = tree.match(true, new ShapePropMatch(), argValues);
+    	//System.out.println(match.getAllResults());
+        if (spMatch == null || spMatch.isError || spMatch.numMatched != argValues.size()) return null;
+        return spMatch.getAllResults();
+    }*/
+    
 	static public void main(String[] args) throws IOException, Parser.Exception
-	{
-		System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
+	{			
+		/*System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
 		String s1 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
 		System.out.println("reparsed "+parse(s1));
 		
@@ -75,6 +85,45 @@ public class ShapePropPrinter {
 		
 		System.out.println("parsed:  "+parse("[1,j]|[j,1],($,k=presaclar())?,n=j+abs(k)->[n,n]||[m,n],($,k=prescalar())?->[k,1]"));
 		String s13 = parse("[1,j]|[j,1],($,k=presaclar())?,n=j+abs(k)->[n,n]||[m,n],($,k=prescalar())?->[k,1]").toString();
-		System.out.println("reparsed "+parse(s13));
+		System.out.println("reparsed "+parse(s13));*/
+		
+		/*int n = 6;
+		SPCaselist splist0 = parse("$->[]");
+		System.err.println("for equation cat("+n+"), one corresponding shape equation is "+splist0+", the argument is "+n);
+		System.out.println("start to matching...");
+		ArrayList<Integer> arg0 = new ArrayList<Integer>(1);
+    	arg0.add(n);
+		ShapePropMatch spMatch0 = splist0.match(true, new ShapePropMatch(), arg0);*/
+		
+		/*SPCaselist splist = parse("[]->$");
+		System.err.println("for equation class(), one corresponding shape equation is "+splist+", the argument is []");
+		System.out.println("start to matching...");
+		ArrayList<Integer> arg = new ArrayList<Integer>(1);
+    	arg.add(null);
+		ShapePropMatch spMatch = splist.match(true, new ShapePropMatch(), arg);*/
+		
+		/*int m = 10;
+		SPCaselist splist1 = parse("$->$");
+		System.err.println("for equation real("+m+"), one corresponding shape equation is "+splist1+", the argument is "+m);
+		System.out.println("start to matching...");
+		ArrayList<Integer> arg1 = new ArrayList<Integer>(1);
+    	arg1.add(m);
+		ShapePropMatch spMatch1 = splist1.match(true, new ShapePropMatch(), arg1);*/
+		
+		/*int n =8;
+		SPCaselist splist2 = parse("$,n=previousScalar()->[n,n]");
+		System.err.println("for equation true("+n+"), one corresponding shape equation is "+splist2+", the argument is "+n);
+		System.out.println("start to matching...");
+		ArrayList<Integer> arg2 = new ArrayList<Integer>(1);
+    	arg2.add(n);
+		ShapePropMatch spMatch2 = splist2.match(true, new ShapePropMatch(), arg2);*/		
+		
+		/*int m = 6, n = 8;
+		SPCaselist splist3 = parse("$,$->$");
+		System.err.println("for equation min("+m+","+n+"), one corresponding shape equation is "+splist3+", the argument is "+m+","+n);
+		ArrayList<Integer> arg3 = new ArrayList<Integer>(2);
+    	arg3.add(m);
+    	arg3.add(n);
+		ShapePropMatch spMatch1 = splist3.match(true, new ShapePropMatch(), arg3);*/
 	}
 }
