@@ -55,7 +55,7 @@ import natlab.toolkits.path.BuiltinQuery;
 import natlab.tame.builtin.classprop.*;
 import natlab.tame.builtin.classprop.ast.*;
 import natlab.tame.builtin.shapeprop.*;
-//import natlab.tame.builtin.shapeprop.ast.*; //XU -- remove this!!!!!
+import natlab.tame.builtin.shapeprop.ast.*; //XU -- remove this!!!!! XU did
 
 
 public abstract class Builtin {

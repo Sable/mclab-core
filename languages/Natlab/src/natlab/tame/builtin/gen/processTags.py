@@ -132,25 +132,39 @@ def MatlabClass(builtin, tagArgs, iset):
 """.format(treeString=treeString, javaName=builtin.javaName, parentInfo=parentInfo);
 
 
-
+# the Shape tag
 def Shape(builtin, tagArgs, iset):
-    iset.add("HasShapePropagationInfo"); # add 'has shape' to the implemented interfaces of the builtin
-    shape = tagArgs.strip()[1:-1]; # get the shape info -- strip parentheses
+    iset.add("HasShapePropagationInfo"); # add the interface
+    treeString = tagArgs.strip()[1:-1];  # building string to parse - remove parentheses
+    
+    # java expr for parent info - find if tag 'Shape' is defined for a parent
+    if (builtin.parent and builtin.parent.getAllTags().has_key('Shape')):
+      parentInfo = 'super.getShapePropagationInfo()'
+    else:
+      parentInfo = 'new SPNone()'
+    
+    # produce code
     return """
-        public Object getShapePropagationInfo(){{
-            return "{shape}"; //XU - FIX THIS -- CHECK CLASS PROP EXAMPLE!!
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){{
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){{
+                shapePropInfo = ShapePropTool.parse("{treeString}");
+            }}
+            return shapePropInfo;
         }}
-
-""".format(shape=shape); # return the java method
-
+""".format(treeString=treeString, javaName=builtin.javaName, parentInfo=parentInfo);
 
 
-
-
-
-
-
-
+#def Shape(builtin, tagArgs, iset):
+#    iset.add("HasShapePropagationInfo"); # add 'has shape' to the implemented interfaces of the builtin
+#    shape = tagArgs.strip()[1:-1]; # get the shape info -- strip parentheses
+#    return """
+#        public Object getShapePropagationInfo(){{
+#            return "{shape}"; //XU - FIX THIS -- CHECK CLASS PROP EXAMPLE!!
+#        }}
+#
+#""".format(shape=shape); # return the java method
 
 
 

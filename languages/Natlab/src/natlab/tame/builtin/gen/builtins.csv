@@ -92,7 +92,7 @@ constant; matrixFunction
 
 doubleConstant; constant; 
 -Class(none -> double)
--Shape([] -> $)
+-Shape([]->$)
 pi
 i
 j
