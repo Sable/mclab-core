@@ -12,9 +12,6 @@ public class ShapePropagator<V extends Value<V>>
 	//this is a singleton class -- make it singleton, ignore all the generic stuff
     @SuppressWarnings("rawtypes")
 	static ShapePropagator instance = null;
-    private ShapePropagator(){} //hidden private constructor
-    
-
     /**
      * return singleton instance of shape propagator
      */
@@ -23,8 +20,8 @@ public class ShapePropagator<V extends Value<V>>
         if (instance == null) instance = new ShapePropagator();
         return instance;
     }
+    private ShapePropagator(){} //hidden private constructor
 
-    
 	@Override
 	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
 		// TODO

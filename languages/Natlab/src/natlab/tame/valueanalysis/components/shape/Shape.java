@@ -3,25 +3,43 @@ package natlab.tame.valueanalysis.components.shape;
 import java.util.*;
 
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
 /**
  * represents a shape. it is represented using an array of values.
- * TODO - what to do about top?
+ * TODO - what to do about top?                 XU: question mark?
  */
 
 
 public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
 	private ValueFactory<V> factory;
-    //FIXME -- actually put dimensions
+	List<V> dimensions;                       //XU
+    //FIXME -- actually put dimensions,         XU comment: List<V> dimensions?
 	
     protected Shape(ValueFactory<V> factory,List<V> dimensions) {
         this.factory = factory;
+        this.dimensions = dimensions;         //XU
         //FIXME -- actually put dimensions
     }
+       
+    public int getSize(){                     //XU made
+    	return dimensions.size();
+    }
     
+    public V getCertainDimensionSize(int i){  //XU made
+    	V value = dimensions.get(i);
+    	if (value==null){
+    		return null;
+    	}
+    	else
+    		return value;
+    }
     
+    public void printShapeInfo(){
+    	System.out.println(dimensions);
+    }
     
     
     /**
@@ -33,10 +51,10 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     }
     
     /**
-     * returns true if this shape is known to be scalar.
+     * returns true if this shape is known to be scalar. XU comment: scalar is [1,1]
      * returns false if this shape may or may not be scalar.
      */
-    public boolean isSclar(){
+    public boolean isScalar(){
     	return false;//TODO
     }
 
@@ -89,10 +107,14 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     }
 
     /**
-     * returns true if the shape is known
+     * returns true if the shape is known  XU modified
      * @return
      */
     public boolean isConstant() {
-        return false; //TODO
+    	for (V valueOfDimension: dimensions){
+    		if (!(valueOfDimension instanceof HasConstant) || (null == ((HasConstant)valueOfDimension).getConstant())) 
+        		return false;
+    	}
+        return true; //TODO
     }    
 }

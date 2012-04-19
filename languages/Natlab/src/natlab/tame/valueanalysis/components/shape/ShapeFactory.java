@@ -10,6 +10,7 @@ import natlab.tame.valueanalysis.value.*;
  */
 public class ShapeFactory<V extends Value<V>> {
 	ValueFactory<V> factory;
+	
 	public ShapeFactory(ValueFactory<V> factory){
 		this.factory = factory;
 	}
@@ -19,13 +20,18 @@ public class ShapeFactory<V extends Value<V>> {
      * returns a shape with the given dimensions.
      * The given constants should be scalar.
      */
-    public Shape<V> newShapeFromConstants(List<Constant> dims){   
-        throw new UnsupportedOperationException();//return new Shape<D>(factory);
+    public Shape<V> newShapeFromConstants(List<Constant> dims){
+    	ArrayList<V> list = new ArrayList<V>(dims.size());
+    	for (Constant dim : dims){
+    		list.add(factory.newMatrixValue(dim));
+    	}
+    	return new Shape<V>(factory, list);
+        //throw new UnsupportedOperationException();//return new Shape<D>(factory); XU modified
     }
 
     
     /**
-     * returns a shape using the givnen values as dimensions
+     * returns a shape using the given values as dimensions
      */
     public Shape<V> newShapeFromValues(List<V> dims){
     	return new Shape<V>(factory,dims);
