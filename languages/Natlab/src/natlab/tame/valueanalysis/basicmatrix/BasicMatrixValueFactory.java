@@ -8,7 +8,8 @@ import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.ValueFactory;
 
 public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
-    @Override
+    
+	@Override
     public BasicMatrixValue newMatrixValue(Constant constant) {
         return new BasicMatrixValue(constant);
     }

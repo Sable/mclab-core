@@ -1,10 +1,10 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
-import natlab.tame.classes.reference.*;
+import natlab.tame.classes.reference.*;                 //class    component
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.constant.*; //constant component
+import natlab.tame.valueanalysis.components.shape.*;    //shape    component
 import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
 
@@ -23,6 +23,13 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         super(aClass);
         this.shape = shape;
     }
+    
+    public BasicMatrixValue(PrimitiveClassReference aClass) {
+        super(aClass);
+    }
+    /**
+     * how to deal with a constant
+     */
     public BasicMatrixValue(Constant constant){
         super(constant.getMatlabClass());
         shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(constant.getShape());
@@ -70,7 +77,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     
     @Override
     public String toString() {
-        return "("+classRef+(isConstant()?(","+constant):"")+")";
+        return "("+classRef+(isConstant()?(","+constant):"")+shape.toString()+")";//XU added shape.toString
     }
     
     
