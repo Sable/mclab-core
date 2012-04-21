@@ -14,7 +14,7 @@ import natlab.toolkits.analysis.varorfun.ValueDatumPair;
 import natlab.toolkits.utils.NodeFinder;
 
 public class LivelinessAnalysis extends
-		AbstractStructuralBackwardAnalysis<HashSetFlowSet<String>> implements FixedPointScriptAnalysis<HashSetFlowSet<String>> {
+		AbstractSimpleStructuralBackwardAnalysis<HashSetFlowSet<String>> implements FixedPointScriptAnalysis<HashSetFlowSet<String>> {
 
 	public LivelinessAnalysis(ASTNode tree) {
 		super(tree);	
@@ -24,7 +24,7 @@ public class LivelinessAnalysis extends
 	public void caseStmt(Stmt s) {
 		outFlowSets.put(s, currentOutSet.copy());
 		caseASTNode(s);
-		inFlowSets.put(s, currentOutSet.copy());
+		inFlowSets.put(s, currentInSet.copy());
 
 	}
 	
@@ -50,7 +50,7 @@ public class LivelinessAnalysis extends
 		return ne;
 	}
 	public void caseNameExpr(NameExpr ne){
-		currentOutSet.add(ne.getName().getID());
+		currentInSet.add(ne.getName().getID());
 	}
 	
 	@Override
@@ -78,17 +78,17 @@ public class LivelinessAnalysis extends
 			if (!lValues.contains(n))
 				currentOutSet.add(n.getName().getID());
 
-		inFlowSets.put(s, currentOutSet.copy());
+		inFlowSets.put(s, currentInSet.copy());
 
 	}
 
 	@Override
 	public void caseFunction(Function node) {
 		currentOutSet = newInitialFlow();
-		currentInSet = currentOutSet;
+		currentInSet = currentOutSet.copy();
 		outFlowSets.put(node, currentOutSet);
 		node.getStmts().analyze(this);
-		inFlowSets.put(node, currentOutSet);
+		inFlowSets.put(node, currentInSet);
 
 	}
 
@@ -96,10 +96,10 @@ public class LivelinessAnalysis extends
 	@Override
 	public void caseScript(Script node) {
 		currentOutSet = newInitialFlow();
-		currentInSet = currentOutSet;
+		currentInSet = currentOutSet.copy();
 		outFlowSets.put(node, currentOutSet);
 		node.getStmts().analyze(this);
-		inFlowSets.put(node, currentOutSet);
+		inFlowSets.put(node, currentInSet);
 	}
 
 	
@@ -115,16 +115,13 @@ public class LivelinessAnalysis extends
 
 	@Override
 	public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest) {
-		dest.clear();
-		dest.addAll(source);
+		source.copy(dest);
 	}
 
 	@Override
 	public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2,
 			HashSetFlowSet<String> out) {
-		out.clear();
-		out.addAll(in1);
-		out.addAll(in2);		
+		in1.union(in2, out);
 	}
 
 	@Override
