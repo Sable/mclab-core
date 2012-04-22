@@ -319,7 +319,8 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         annotateNode(n.getName());
     	caseMyLValue(node);
     }
-    public void caseLambdaExpr(LambdaExpr node){/*
+
+    public void caseLambdaExpr(LambdaExpr node){
     	VFFlowset backup = currentSet.copy();
     	Set<String> inputSet=new TreeSet<String>();
     	for (Name inputParam: node.getInputParams()){
@@ -329,9 +330,9 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     	caseASTNode(node);
     	for (Entry<String, VFDatum> p:currentSet.getMap().entrySet()){
     		if (! inputSet.contains(p.getKey()))
-    			backup.add(new ValueDatumPair<String, VFDatum>(p.getKey(),p.getValue()));
+    			backup.add(new ValueDatumPair(p.getKey(), p.getValue()));
     	}
-    	currentSet=backup;*/
+    	currentSet=backup;
     }
     
     
