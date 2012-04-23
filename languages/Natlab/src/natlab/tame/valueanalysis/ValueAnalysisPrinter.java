@@ -34,6 +34,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 	@Override
 	public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode node) {
 		buf.append(node.getPrettyPrintedLessComments());
+		//buf.append("~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	}	
 	
 	/** cases containing other statements ****************************/
@@ -48,10 +49,13 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 				buf.append(", ");
 			}
 			buf.append(param.getPrettyPrinted());
+			
 			first = false;
 		}
 		buf.append("] = ");
 		buf.append(node.getName());
+		
+				
 		buf.append("(");
 		first = true;
 		for(Name param : node.getInputParams()) {
@@ -59,6 +63,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 				buf.append(", ");
 			}
 			buf.append(param.getPrettyPrinted());
+			
 			first = false;
 		}
 		buf.append(")");
@@ -128,6 +133,11 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 		}
 	}
 	
+	
+	
+	
+	
+	
 	/*** value analysis printer cases ********************************/
 	@Override
 	public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
@@ -139,7 +149,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 		ArrayList<String> vars = new ArrayList<String>();
 		if (node instanceof TIRAbstractAssignToVarStmt){
 			vars.add(((TIRAbstractAssignToVarStmt)node).getTargetName().getID());
-		} else if (node instanceof TIRAbstractAssignToListStmt){
+		} else if (node instanceof TIRAbstractAssignToListStmt){// buf.append("~~"); 
 			for(ast.Name name : ((TIRAbstractAssignToListStmt)node).getTargets().asNameList()){
 				vars.add(name.getID());				
 			}
