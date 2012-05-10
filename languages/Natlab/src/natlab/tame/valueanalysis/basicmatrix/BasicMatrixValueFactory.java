@@ -3,9 +3,11 @@
  */
 package natlab.tame.valueanalysis.basicmatrix;
 
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.value.ValueFactory;
+import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
     
@@ -13,7 +15,6 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
     public BasicMatrixValue newMatrixValue(Constant constant) {
         return new BasicMatrixValue(constant);
     }
-    
     
     static AggrValuePropagator<BasicMatrixValue> propagator = 
     		new AggrValuePropagator<BasicMatrixValue>(new BasicMatrixValuePropagator());
@@ -26,9 +27,23 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
 	@Override
 	public AggrValue<BasicMatrixValue> forRange(
 			AggrValue<BasicMatrixValue> lower,
-			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {
+			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {  //XU try to add shape result into it
 		//FIXME do something proper here
-		throw new UnsupportedOperationException();
+		if (inc != null){//FIXME
+			return new BasicMatrixValue(
+					(PrimitiveClassReference)
+					(propagator.call("colon", Args.newInstance(lower,inc,upper))
+							.get(0).iterator().next().getMatlabClass()));
+		} else {
+			System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
+					.get(0).iterator().next())).getShape());
+			return new BasicMatrixValue((new BasicMatrixValue(
+					(PrimitiveClassReference)
+					(propagator.call("colon", Args.newInstance(lower,upper))
+							.get(0).iterator().next().getMatlabClass()))),((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
+									.get(0).iterator().next())).getShape());
+
+		}
 	}
 }
 
