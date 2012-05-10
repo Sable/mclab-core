@@ -2,6 +2,8 @@ package natlab.tame.valueanalysis.components.shape;
 
 import java.util.*;
 
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.*;
 
@@ -11,6 +13,9 @@ import natlab.tame.valueanalysis.value.*;
 public class ShapeFactory<V extends Value<V>> {
 	ValueFactory<V> factory;
 	
+	public ShapeFactory(){
+	}
+	
 	public ShapeFactory(ValueFactory<V> factory){
 		this.factory = factory;
 	}
@@ -19,13 +24,15 @@ public class ShapeFactory<V extends Value<V>> {
     /**
      * returns a shape with the given dimensions.
      * The given constants should be scalar.
+     * 
      */
     public Shape<V> newShapeFromConstants(List<Constant> dims){
     	ArrayList<V> list = new ArrayList<V>(dims.size());
     	for (Constant dim : dims){
     		list.add(factory.newMatrixValue(dim));
     	}
-    	return new Shape<V>(factory, list);
+    	return null;
+    	//return new Shape<V>(factory, list);
         //throw new UnsupportedOperationException();//return new Shape<D>(factory); XU modified
     }
 
@@ -34,7 +41,8 @@ public class ShapeFactory<V extends Value<V>> {
      * returns a shape using the given values as dimensions
      */
     public Shape<V> newShapeFromValues(List<V> dims){
-    	return new Shape<V>(factory,dims);
+    	return null;
+    	//return new Shape<V>(factory,dims);
     }
     
     
@@ -42,23 +50,23 @@ public class ShapeFactory<V extends Value<V>> {
      * return a shape using the given integer list as dimensions
      */
     public Shape<V> newShapeFromIntegers(List<Integer> dims){
-    	ArrayList<V> list = new ArrayList<V>(dims.size());
-    	for (int dim : dims){
-    		list.add(factory.newMatrixValue(dim));
-    	}
-    	return new Shape<V>(factory,list);
+    	/*ArrayList<V> list = new ArrayList<V>(dims.size());
+    	for (V dim : dims){
+    		list.add(factory.newMatrixValue(dim)); //this line lead to infinite loop!!!
+    	}*/
+    	return new Shape<V>(factory,dims);
     }
-    
     
     /**
      * returns a 0x0 shape
      */
     @SuppressWarnings("unchecked")
 	public Shape<V> getEmptyShape(){
-        return new Shape<V>(factory,Arrays.asList(
+    	return null;
+/*        return new Shape<V>(factory,Arrays.asList(
         		factory.newMatrixValue(0),
         		factory.newMatrixValue(0)        		
-        		));
+        		));*/
     }
     
     
@@ -67,10 +75,11 @@ public class ShapeFactory<V extends Value<V>> {
      */
     @SuppressWarnings("unchecked")
 	public Shape<V> getScalarShape(){
-        return new Shape<V>(factory,Arrays.asList(
+    	return null;
+/*        return new Shape<V>(factory,Arrays.asList(
         		factory.newMatrixValue(1),
         		factory.newMatrixValue(1)
-        		));
+        		));*/
     }
     
 	

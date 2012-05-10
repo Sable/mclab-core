@@ -2,6 +2,8 @@ package natlab.tame.valueanalysis.components.shape;
 
 import java.util.*;
 
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.value.*;
@@ -9,32 +11,49 @@ import natlab.toolkits.analysis.Mergable;
 
 /**
  * represents a shape. it is represented using an array of values.
- * TODO - what to do about top?                 XU: question mark?
+ * TODO - what to do about top?                 XU: two options...just don't know nothing.
  */
 
 
 public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
 	private ValueFactory<V> factory;
-	List<V> dimensions;                       //XU
+	List<Integer> dimensions;                       //change V to Integer
+	boolean isTop = false;
+	boolean isError = false;
     //FIXME -- actually put dimensions,         XU comment: List<V> dimensions?
 	
-    protected Shape(ValueFactory<V> factory,List<V> dimensions) {
-        this.factory = factory;
-        this.dimensions = dimensions;         //XU
-        //FIXME -- actually put dimensions
+	public Shape(ValueFactory<V> factory, List<Integer> dimensions){ //change V to Integer
+		this.factory = factory;
+		this.dimensions = dimensions;
+	}
+	
+    public List<Integer> getDimensions(){
+    	return dimensions;
     }
-       
+    
     public int getSize(){                     //XU made
     	return dimensions.size();
     }
     
-    public V getCertainDimensionSize(int i){  //XU made
-    	V value = dimensions.get(i);
+    public Integer getCertainDimensionSize(int i){  //change V to Integer
+    	Integer value = dimensions.get(i);          //change V to Integer
     	if (value==null){
     		return null;
     	}
     	else
     		return value;
+    }
+    
+    public String toString(){
+    	if(this.isTop==true){
+    		return "[is top]";
+    	}
+    	else if(this.isError==true){
+    		return "[MATLAB syntax error, check your code]";
+    	}
+    	else{
+    		return this.dimensions.toString();
+    	}
     }
     
     public void printShapeInfo(){
@@ -75,12 +94,64 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	throw new UnsupportedOperationException(); //TODO
     }
     
-    
-    @Override
-    public Shape<V> merge(Shape<V> o) {
-        return this; //FIXME
+    public void FlagItsTop(){
+    	this.isTop=true;
     }
     
+    public void FlagItsError(){
+    	this.isError=true;
+    }
+    
+    @Override
+    public Shape<V> merge(Shape<V> o){
+    	System.out.println("inside shape merge!");
+    	if(this.equals(o)){
+    		return this;
+    	}
+    	else{
+    		if(this.getSize()!=o.getSize()){
+    			System.out.println("return a top shape!");//currently, just from toString to show it's a top shape
+    			Shape<V> topShape = new Shape<V>(this.factory, null);
+    			topShape.FlagItsTop();
+    			return topShape;
+    		}
+    		else{
+    			int j=0;
+    			ArrayList<Integer> newDimensions = new ArrayList<Integer>(this.getSize());
+    			for(Integer i : this.dimensions){
+        			System.out.println(this.dimensions.size());    				
+    				if(i==o.getCertainDimensionSize(j)){
+    					newDimensions.add(j, i);
+    				}
+    				else{
+    					newDimensions.add(j, null);
+    				}
+    				j = j+1;
+    			}
+    			return new Shape<V>(this.factory, newDimensions);
+    		}
+    	}
+    }
+    
+
+    public boolean equals(Shape<V> o){
+    	if(this.getSize()==o.getSize()){
+    		int j=0;
+    		for(Integer i : this.dimensions){
+    			System.out.println("testing weather or not shape equals!");
+    			//System.out.println("i is "+i+", j is "+o.getCertainDimensionSize(j));
+    			if(i==o.getCertainDimensionSize(j)){
+    				j=j+1;
+    			}
+    			else{
+    				System.out.println("inside shape equals false!");
+    				return false;
+    			}
+    		}
+    		return true;
+    	}
+    	return false;//FIXME
+    }
     
     /**
      * returns a shape that is the result of growing this to the given shape.
@@ -111,10 +182,10 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
      * @return
      */
     public boolean isConstant() {
-    	for (V valueOfDimension: dimensions){
+/*    	for (V valueOfDimension: dimensions){
     		if (!(valueOfDimension instanceof HasConstant) || (null == ((HasConstant)valueOfDimension).getConstant())) 
         		return false;
-    	}
+    	}*/
         return true; //TODO
     }    
 }
