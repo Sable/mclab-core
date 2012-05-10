@@ -19,7 +19,7 @@ public class SPPlusFunCall extends SPAbstractVertcatExprArg
 		//System.out.println("a plus of lowercase and fnCall");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		return previousMatchResult;
 	}

@@ -19,7 +19,7 @@ public class SPAssignStmt extends SPAbstractPattern
 		//System.out.println("=");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		//System.out.println("inside assignment");
 		//System.out.println(previousMatchResult.getAllLowerCase());

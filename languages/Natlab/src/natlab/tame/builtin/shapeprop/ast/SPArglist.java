@@ -19,7 +19,7 @@ public class SPArglist extends SPAbstractVertcatExprArg
 		//System.out.println(",");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		return previousMatchResult;
 	}

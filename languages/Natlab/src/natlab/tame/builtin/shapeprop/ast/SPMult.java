@@ -17,8 +17,16 @@ public class SPMult extends SPAbstractMatchExpr
 		//System.out.println("*");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
+		while(argValues.size()>(previousMatchResult.getNumMatched()))
+		{
+			System.out.println("inside star while"+previousMatchResult.getNumMatched());
+			System.out.println(previousMatchResult.getNumMatched());
+			System.out.println("index doesn't point null, keep matching!");
+			previousMatchResult = sp.match(isPatternSide, previousMatchResult, argValues);
+		}
+		
 		return previousMatchResult;
 	}
 	

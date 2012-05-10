@@ -178,7 +178,7 @@ public class ShapePropParser extends Parser {
 			new Action() {	// [17] vectorExpr = DOLLAR.d
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
-					 return new SPDollar();
+					 return new SPScalar();
 				}
 			},
 			new Action() {	// [18] vectorExpr = UPPERCASE.u

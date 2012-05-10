@@ -3,43 +3,66 @@ package natlab.tame.builtin.shapeprop;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-import java.lang.*;
 
 import beaver.Parser;
 
 import natlab.tame.builtin.shapeprop.ast.*;
-import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.*;
 
 public class ShapePropTool {
 	
-    public static SPCaselist parse(String source){
+    public static SPNode parse(String source){
     	//System.err.println("parsing: "+source);
     	ShapePropParser parser = new ShapePropParser();
     	ShapePropScanner input = new ShapePropScanner(new StringReader(source));
     	try{
-    		SPCaselist splist = (SPCaselist) parser.parse(input);
-        	return splist;
+    		SPNode sp = (SPNode) parser.parse(input);
+        	return sp;
     	}catch(Exception e){
     		e.printStackTrace();
     		return null;
     	}
     }
 	
-/*    public static HashMap<String, Shape<?>> match(SPCaselist tree, List<? extends Value<?>> argValues){
-    	ShapePropMatch spMatch = tree.match(true, new ShapePropMatch(), argValues);
-    	//System.out.println(match.getAllResults());
-        if (spMatch == null || spMatch.isError || spMatch.numMatched != argValues.size()) return null;
-        return spMatch.getAllResults();
-    }*/
+    
+    
+    public static List<Shape<AggrValue<BasicMatrixValue>>> matchByValues(SPNode tree, List<? extends Value<?>> argValues){
+    	if(argValues!=null)
+    	{
+    		System.out.println("inside ShapePropTool matchByValues method.");
+    		for(Value<?> arg:argValues){
+    			if(((HasShape)arg).getShape()==null){
+    				System.out.println(arg+"'s shape is undefined");
+/*    				ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
+    				emptyList.add(null);
+    				return emptyList;*/
+    			}
+    		}
+    	}
+    	System.out.println(tree+" with arguments "+argValues);
+    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues);
+    	//System.out.println(spmatch.getOutputVertcatExpr());
+        if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
+        	return null;
+        }
+        System.out.println("inside shapeproptool-matchbyvalue, all the results are "+spmatch.getAllResults());
+        return spmatch.getAllResults();
+    }
     
 	static public void main(String[] args) throws IOException, Parser.Exception
-	{			
+	{	
+		System.out.println("print:   "+parse("[m,n],[n,k]->[m,k]"));
+		String s1 = parse("[m,n],[n,k]->[m,k]").toString();
+		System.out.println("reparsed "+parse(s1));
 		/*System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
 		String s1 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
-		System.out.println("reparsed "+parse(s1));
+		System.out.println("reparsed "+parse(s1));*/
 		
-		System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=prescalar(),M(d)=1->M,M"));
+		/*System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=prescalar(),M(d)=1->M,M"));
 		String s2 = parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=prescalar(),M(d)=1->M,M").toString();
 		System.out.println("reparsed "+parse(s2));
 		
@@ -87,43 +110,43 @@ public class ShapePropTool {
 		String s13 = parse("[1,j]|[j,1],($,k=presaclar())?,n=j+abs(k)->[n,n]||[m,n],($,k=prescalar())?->[k,1]").toString();
 		System.out.println("reparsed "+parse(s13));*/
 		
-		/*int n = 6;
-		SPCaselist splist0 = parse("$->[]");
-		System.err.println("for equation cat("+n+"), one corresponding shape equation is "+splist0+", the argument is "+n);
+/*		int n = 6;
+		SPNode sp0 = parse("$->[]");
+		System.err.println("for equation cat("+n+"), one corresponding shape equation is "+sp0+", the argument is "+n);
 		System.out.println("start to matching...");
 		ArrayList<Integer> arg0 = new ArrayList<Integer>(1);
     	arg0.add(n);
-		ShapePropMatch spMatch0 = splist0.match(true, new ShapePropMatch(), arg0);*/
+		ShapePropMatch spMatch0 = sp0.match(true, new ShapePropMatch(), arg0);
 		
-		/*SPCaselist splist = parse("[]->$");
-		System.err.println("for equation class(), one corresponding shape equation is "+splist+", the argument is []");
+		SPNode sp = parse("[]->$");
+		System.err.println("for equation class(), one corresponding shape equation is "+sp+", the argument is []");
 		System.out.println("start to matching...");
 		ArrayList<Integer> arg = new ArrayList<Integer>(1);
     	arg.add(null);
-		ShapePropMatch spMatch = splist.match(true, new ShapePropMatch(), arg);*/
+		ShapePropMatch spMatch = sp.match(true, new ShapePropMatch(), arg);
 		
-		/*int m = 10;
-		SPCaselist splist1 = parse("$->$");
-		System.err.println("for equation real("+m+"), one corresponding shape equation is "+splist1+", the argument is "+m);
+		int m = 10;
+		SPNode sp1 = parse("$->$");
+		System.err.println("for equation real("+m+"), one corresponding shape equation is "+sp1+", the argument is "+m);
 		System.out.println("start to matching...");
 		ArrayList<Integer> arg1 = new ArrayList<Integer>(1);
     	arg1.add(m);
-		ShapePropMatch spMatch1 = splist1.match(true, new ShapePropMatch(), arg1);*/
+		ShapePropMatch spMatch1 = sp1.match(true, new ShapePropMatch(), arg1);
 		
-		int n =8;
-		SPCaselist splist2 = parse("$,n=previousScalar()->[n,n]");
-		System.err.println("for equation true("+n+"), one corresponding shape equation is "+splist2+", the argument is "+n);
+		int j =8;
+		SPNode sp2 = parse("$,n=previousScalar()->[n,n]");
+		System.err.println("for equation true("+j+"), one corresponding shape equation is "+sp2+", the argument is "+j);
 		System.out.println("start to matching...");
 		ArrayList<Integer> arg2 = new ArrayList<Integer>(1);
-    	arg2.add(n);
-		ShapePropMatch spMatch2 = splist2.match(true, new ShapePropMatch(), arg2);		
+    	arg2.add(j);
+		ShapePropMatch spMatch2 = sp2.match(true, new ShapePropMatch(), arg2);		
 		
-		/*int m = 6, n = 8;
-		SPCaselist splist3 = parse("$,$->$");
-		System.err.println("for equation min("+m+","+n+"), one corresponding shape equation is "+splist3+", the argument is "+m+","+n);
+		int k = 6, l = 8;
+		SPNode sp3 = parse("$,$->$");
+		System.err.println("for equation min("+k+","+l+"), one corresponding shape equation is "+sp3+", the argument is "+k+","+l);
 		ArrayList<Integer> arg3 = new ArrayList<Integer>(2);
-    	arg3.add(m);
-    	arg3.add(n);
-		ShapePropMatch spMatch1 = splist3.match(true, new ShapePropMatch(), arg3);*/
+    	arg3.add(k);
+    	arg3.add(l);
+		ShapePropMatch spMatch3 = sp3.match(true, new ShapePropMatch(), arg3);*/
 	}
 }

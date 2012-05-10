@@ -199,9 +199,9 @@ complex
 -Class(coerce(logical|char->double, (numeric (double|0)? ->0) | (double|1 numeric->1)))
 -MatlabClass(char|logical -> error, char|logical any->error, any char|logical->error, natlab)
 
-
 # elemewise binary arithmetic
 elementalBinaryArithmetic; elementalBinaryNumericFunction
+-Shape(M,M->M)
 plus
 minus
 times
@@ -224,7 +224,7 @@ cross
 # binary matrix arithmetic - doesn't mix integer types
 arrayBinaryArithmetic; arrayBinaryNumericFunction
 -MatlabClass(logical 0->error, parent)
-
+-Shape([m,n],[n,k]->[m,k])
 mtimes;; MatlabClass(logical 0->double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower
@@ -477,6 +477,7 @@ isnan
 # binary return logicals
 binaryToLogicalMatrixQuery; toLogicalMatrixQuery
 -Class(matrix matrix -> logical)
+-Shape(M,M->M)
 
 elementalBinaryToLogicalMatrixQuery; binaryToLogicalMatrixQuery
 
@@ -504,7 +505,7 @@ matrixCreation; matrixFunction
 colon
 -Class(coerce(logical -> double, matlab))
 -MatlabClass(logical logical logical?->error, logical|double double|logical  (double|logical)? -> double, numeric double|0  (double|0)? -> 0, double|-1 (double|-1 numeric) | numeric -> -1, double|1 numeric double|1 -> 1, char (char|double char)|char -> char)
-
+-Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k])
 
 
 # construct arrays via their dimensions; and possibly a type
@@ -512,6 +513,7 @@ byShapeAndTypeMatrixCreation; matrixCreation
 
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
 -Class((numeric|logical)* typeString(numeric)|(none->double))
+-Shape(($,n=previousScalar(),add())*->M)
 ones
 zeros
 # eye takes at most 2 dims

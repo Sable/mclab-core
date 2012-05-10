@@ -25,7 +25,7 @@ public class SPOutput extends SPNode
 	
 	public SPOutput() {}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);//here, previousMatchResult would be the pattern part result, and that part match successfully.
 		if (next == null) {

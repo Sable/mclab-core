@@ -19,12 +19,11 @@ public class SPVertExprArglist extends SPNode
 		//System.out.println(",");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if(next!=null){
 			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);
-			//System.out.println(continueMatch.getLatestMatchedLowerCase());
 			return continueMatch;
 		}
 		else

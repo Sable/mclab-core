@@ -17,9 +17,13 @@ public class SPPlus extends SPAbstractMatchExpr
 		//System.out.println("+");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		return previousMatchResult;
+		ShapePropMatch keepMatch = sp.match(isPatternSide, previousMatchResult, argValues);
+		while(argValues.get(keepMatch.getNumMatched())!=null){
+			keepMatch = sp.match(isPatternSide, keepMatch, argValues);
+		}
+		return keepMatch;
 	}
 	
 	public String toString()

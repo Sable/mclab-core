@@ -20,7 +20,7 @@ public class SPCase extends SPNode
 		this.next = o;
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		//System.out.println("inside SPCase");
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);

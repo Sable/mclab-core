@@ -16,11 +16,11 @@ public class SPNumber extends SPAbstractScalarExpr
 		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		if(isPatternSide==true){
 			HashMap<String, Integer> assignment = new HashMap<String, Integer>();
-			assignment.put(previousMatchResult.getLatestMatchedLowerCase(), n.intValue());
+			assignment.put(previousMatchResult.getLatestMatchedLowercase(), n.intValue());
 			ShapePropMatch newMatch = new ShapePropMatch(previousMatchResult, assignment, null);
 			return newMatch;
 		}

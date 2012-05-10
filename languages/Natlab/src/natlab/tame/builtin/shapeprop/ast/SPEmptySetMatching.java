@@ -15,7 +15,7 @@ public class SPEmptySetMatching extends SPAbstractVectorExpr
 		//System.out.println("an empty vector matching");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		//System.out.println(argValues.get(previousMatchResult.getNumMatched()));
 		ShapePropMatch match = new ShapePropMatch(previousMatchResult);

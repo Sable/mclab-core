@@ -1,24 +1,30 @@
 package natlab.tame.builtin.shapeprop;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.shape.Shape;;
+import natlab.tame.valueanalysis.components.shape.*;
 
-public class ShapePropMatch {
+public class ShapePropMatch{
+	public BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	int numMatched = 0;             //number of matched arguments, act as the index of arguments 
 	int numEmittedResults = 0;      //number of emitted results, I cannot say its index of shape equation,
 	                                //because there is also non-matching expression in the language.
-	HashMap<String, Integer> lowerCase = new HashMap<String, Integer>();  //lowerCase is used like m=prevScalar()
-	HashMap<String, List<Integer>> upperCase = new HashMap<String, List<Integer>>();  //mostly, upperCase is used for matching a shape
+	int numInVertcat = 0;           //index in vertcat;
+	HashMap<String, Integer> lowercase = new HashMap<String, Integer>();  //lowercase is used like m=prevScalar()
+	HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();  //mostly, uppercase is used for matching a shape
 	boolean isError = false;
 	boolean matchingIsDone = false;
 	boolean outputIsDone = false;
-	String previousMatchedLowerCase = null;
-	String previousMatchedUpperCase = null;
+	boolean isInsideVertcat = false;//this boolean is used for distinguish the lowercase in vertcat or not, like n=previousScalar() and [m,n]
+	String previousMatchedLowercase = null;
+	String previousMatchedUppercase = null;
 	ArrayList<Integer> needForVertcat = new ArrayList<Integer>();
+	HashMap<String, Shape<?>> output = new HashMap<String, Shape<?>>();  //used for output results 
 	
 	
 	public ShapePropMatch(){}
@@ -28,38 +34,46 @@ public class ShapePropMatch {
 	 * @param parent
 	 */
 	public ShapePropMatch(ShapePropMatch parent){
+		this.factory = parent.factory;
         this.numMatched = parent.numMatched;
         this.numEmittedResults = parent.numEmittedResults;
-        this.lowerCase = parent.lowerCase;
-        this.upperCase = parent.upperCase;
+        this.numInVertcat = parent.numInVertcat;
+        this.lowercase = parent.lowercase;
+        this.uppercase = parent.uppercase;
         this.isError = parent.isError;
         this.matchingIsDone = parent.matchingIsDone;
         this.outputIsDone = parent.outputIsDone;
-        this.previousMatchedLowerCase = parent.previousMatchedLowerCase;
-        this.previousMatchedUpperCase = parent.previousMatchedUpperCase;
+        this.isInsideVertcat = parent.isInsideVertcat;
+        this.previousMatchedLowercase = parent.previousMatchedLowercase;
+        this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.needForVertcat = parent.needForVertcat;
+        this.output = parent.output;
 	}
 	
 	/**
-	 * add new lowerCase or upperCase into current result
+	 * add new lower case or upper case into current result
 	 */
-	public ShapePropMatch(ShapePropMatch parent, HashMap<String, Integer> lowerCase, HashMap<String, List<Integer>> upperCase){
+	public ShapePropMatch(ShapePropMatch parent, HashMap<String, Integer> lowercase, HashMap<String, Shape<?>> uppercase){
+		this.factory = parent.factory;
 		this.numMatched = parent.numMatched;
 		this.numEmittedResults = parent.numEmittedResults;
-		this.lowerCase = parent.lowerCase;
-		this.upperCase = parent.upperCase;
-		if(lowerCase!=null){
-			this.lowerCase.putAll(lowerCase);  //using HashMap putAll
+		this.numInVertcat = parent.numInVertcat;
+		this.lowercase = parent.lowercase;
+		this.uppercase = parent.uppercase;
+		if(lowercase!=null){
+			this.lowercase.putAll(lowercase);  //using HashMap putAll
 		}
-		if(upperCase!=null){
-			this.upperCase.putAll(upperCase);
+		if(uppercase!=null){
+			this.uppercase.putAll(uppercase);
 		}
 	    this.isError = parent.isError;
 	    this.matchingIsDone = parent.matchingIsDone;
 	    this.outputIsDone = parent.outputIsDone;
-        this.previousMatchedLowerCase = parent.previousMatchedLowerCase;
-        this.previousMatchedUpperCase = parent.previousMatchedUpperCase;
+	    this.isInsideVertcat = parent.isInsideVertcat;
+        this.previousMatchedLowercase = parent.previousMatchedLowercase;
+        this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.needForVertcat = parent.needForVertcat;
+        this.output = parent.output;
 	}
 
     /**
@@ -69,20 +83,20 @@ public class ShapePropMatch {
     	this.numMatched = this.numMatched+1;
     }
     
-    public void saveLatestMatchedLowerCase(String latestMatchedLowerCase){
-    	this.previousMatchedLowerCase = latestMatchedLowerCase;
+    public void saveLatestMatchedLowercase(String latestMatchedLowerCase){
+    	this.previousMatchedLowercase = latestMatchedLowerCase;
     }
     
-    public String getLatestMatchedLowerCase(){
-    	return this.previousMatchedLowerCase;
+    public String getLatestMatchedLowercase(){
+    	return this.previousMatchedLowercase;
     }
     
-    public void saveLatestMatchedUpperCase(String latestMatchedUpperCase){
-    	this.previousMatchedUpperCase = latestMatchedUpperCase;
+    public void saveLatestMatchedUppercase(String latestMatchedUpperCase){
+    	this.previousMatchedUppercase = latestMatchedUpperCase;
     }
     
-    public String getLatestMatchedUpperCase(){
-    	return this.previousMatchedUpperCase;
+    public String getLatestMatchedUppercase(){
+    	return this.previousMatchedUppercase;
     }
     
     public int getNumMatched(){
@@ -93,12 +107,24 @@ public class ShapePropMatch {
     	return numEmittedResults;
     }
     
+    public void setNumInVertcat(int index){
+    	this.numInVertcat = index;
+    }
+    
+    public int getNumInVertcat(){
+    	return this.numInVertcat;
+    }
+    
     public void setMatchingIsDone(){
     	this.matchingIsDone = true;
     }
     
     public void setOutputIsDone(){
     	this.outputIsDone = true;
+    }
+    
+    public void setIsInsideVertcat(boolean condition){
+    	this.isInsideVertcat = condition;
     }
     
     public boolean matchingIsDone(){
@@ -109,26 +135,56 @@ public class ShapePropMatch {
     	return outputIsDone;
     }
     
-    public int getValueOfVariable(String key){
-    	int value = this.lowerCase.get(key);
-    	return value;
-    }
-
-    public HashMap<String, List<Integer>> getAllResults(){
-    	return upperCase;
+    public boolean isInsideVertcat(){
+    	return isInsideVertcat;
     }
     
-    public HashMap<String, Integer> getAllLowerCase(){
-    	return lowerCase;
+    public int getValueOfVariable(String key){
+    	int value = this.lowercase.get(key);
+    	return value;
+    }
+    
+    public Shape<?> getShapeOfVariable(String key){
+    	Shape<?> shape = this.uppercase.get(key);
+    	return shape;
+    }
+    
+    public List<Shape<AggrValue<BasicMatrixValue>>> getAllResults(){//FIXME better!
+    	LinkedList<Shape<AggrValue<BasicMatrixValue>>> results = new LinkedList<Shape<AggrValue<BasicMatrixValue>>>();
+    	System.out.println(output);
+    	System.out.println(needForVertcat);
+    	for(Object value: output.values()){
+    		results.add((Shape<AggrValue<BasicMatrixValue>>)value);    		
+    	}
+    	return results;
+    }
+    
+    public HashMap<String, Integer> getAllLowercase(){
+    	return lowercase;
     }
     
     public void addToVertcatExpr(Integer i){
     	this.needForVertcat.add(i);
     }
     
-    public ArrayList<Integer> printVertcatExpr(){
+    public ArrayList<Integer> getOutputVertcatExpr(){
     	return needForVertcat;
     }
+    
+    public void addToOutput(String s,Shape<?> value){
+    	this.output.put(s, value);
+    }
+    
+    public Shape<?> getOutput(String key){
+    	return output.get(key);
+    }
+    
+    public void copyVertcatToOutput(String defaultM){
+    	Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(this.getOutputVertcatExpr());
+    	System.out.println("inside copy vertcat to output "+needForVertcat);
+    	this.addToOutput(defaultM, shape);
+    }
+    
 /*    @Override
     public String toString() {
         return "machresult-"+numMatched+"-"+getAllResults();

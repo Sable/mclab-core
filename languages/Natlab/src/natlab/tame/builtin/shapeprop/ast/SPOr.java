@@ -20,7 +20,7 @@ public class SPOr extends SPAbstractMatchExpr
 		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValuess)
 	{
 		return previousMatchResult;
 	}

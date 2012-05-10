@@ -22,7 +22,7 @@ public class SPCaselist extends SPNode
 		}*/
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, ArrayList<Integer> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if (match.outputIsDone() == true) {
 			System.out.println("matching and results emmitting successfully!\n");

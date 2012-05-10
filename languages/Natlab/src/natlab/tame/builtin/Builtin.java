@@ -1006,12 +1006,21 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractElementalBinaryArithmetic extends AbstractElementalBinaryNumericFunction  {
+    public static abstract class AbstractElementalBinaryArithmetic extends AbstractElementalBinaryNumericFunction implements HasShapePropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractElementalBinaryArithmetic(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,M->M");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static class Plus extends AbstractElementalBinaryArithmetic  {
         //returns the singleton instance of this class
@@ -1202,7 +1211,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractArrayBinaryArithmetic extends AbstractArrayBinaryNumericFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractArrayBinaryArithmetic extends AbstractArrayBinaryNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractArrayBinaryArithmetic(this,arg);
@@ -1217,6 +1226,15 @@ public abstract class Builtin {
                 matlabClassPropInfo.setVar("natlab",getClassPropagationInfo());
             }
             return matlabClassPropInfo;
+        }
+
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[m,n],[n,k]->[m,k]");
+            }
+            return shapePropInfo;
         }
 
     }
@@ -3417,12 +3435,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasClassPropagationInfo {
+    public static abstract class AbstractBinaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryToLogicalMatrixQuery(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -3620,7 +3647,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Colon extends AbstractMatrixCreation implements HasClassPropagationInfo {
+    public static class Colon extends AbstractMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Colon singleton = null;
         public static Colon getInstance(){
@@ -3636,6 +3663,15 @@ public abstract class Builtin {
             return "colon";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]");
+            }
+            return shapePropInfo;
+        }
+
         private CP matlabClassPropInfo = null;
         public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
@@ -3666,12 +3702,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
+    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("($,n=previousScalar(),add())*->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
