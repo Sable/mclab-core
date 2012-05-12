@@ -115,7 +115,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 
     @Override
     public boolean equals(Object obj) {
-    	System.out.println("cao ni ma sha bi!");
         if (obj == null) return false;
         if (!(obj instanceof BasicMatrixValue)) return false;
         BasicMatrixValue m = (BasicMatrixValue)obj;
@@ -123,7 +122,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         System.out.println(m.getMatlabClass());
         System.out.println(((HasShape)((BasicMatrixValue)obj)).getShape());
         if((shape==null)&&(((HasShape)((BasicMatrixValue)obj)).getShape()==null)){
-        	System.out.println("cao ni mei!");
         	return (classRef.equals(m.getMatlabClass()))&&true;
         }
         return (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape)((BasicMatrixValue)obj)).getShape()));

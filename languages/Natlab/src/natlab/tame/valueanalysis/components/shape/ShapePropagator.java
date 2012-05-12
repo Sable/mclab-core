@@ -29,7 +29,7 @@ public class ShapePropagator<V extends Value<V>>
 	@Override
 	public List<Shape<AggrValue<BasicMatrixValue>>> caseBuiltin(Builtin builtin, Args<V> arg) {
 		// TODO
-		System.out.println("inside ShapePropgatpr, builtin fn is "+builtin);
+		System.out.println("inside ShapePropgator, builtin fn is "+builtin);
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
 			return ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg);

@@ -8,9 +8,12 @@ import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.components.shape.ShapePropagator;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValue>{
@@ -66,12 +69,29 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
             HashMap<ClassReference,AggrValue<BasicMatrixValue>> map = new HashMap<ClassReference,AggrValue<BasicMatrixValue>>();
             System.out.println(matchShapeResult.get(0));
             for (ClassReference classRef : values){
-                map.put(classRef,new BasicMatrixValue(new BasicMatrixValue((PrimitiveClassReference)classRef),matchShapeResult.get(0)));
+                map.put(classRef,new BasicMatrixValue(new BasicMatrixValue((PrimitiveClassReference)classRef),matchShapeResult.get(0)));//FIXME a little bit tricky
             }
             result.add(ValueSet.newInstance(map));
             System.out.println(result);
         }
         return result;
+    }
+    
+    @Override
+    public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
+            Args<AggrValue<BasicMatrixValue>> arg) {
+    	System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation!");//XU
+    	//XU add this block
+    	List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = 
+        		builtin.visit(shapeProp, arg);
+        System.out.println("shapeProp results are "+matchShapeResult);
+        if (matchShapeResult == null){
+        	System.out.println("shape results are empty");
+        }
+        //this block ends
+        return Res.<AggrValue<BasicMatrixValue>>newInstance(
+                new BasicMatrixValue(new BasicMatrixValue(
+                        (PrimitiveClassReference)getDominantCatArgClass(arg)),matchShapeResult.get(0)));//FIXME a little bit tricky
     }
 }
 
