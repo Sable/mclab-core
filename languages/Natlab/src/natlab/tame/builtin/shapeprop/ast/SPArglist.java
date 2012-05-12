@@ -21,6 +21,11 @@ public class SPArglist extends SPAbstractVertcatExprArg
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
+		previousMatchResult = first.match(isPatternSide, previousMatchResult, argValues);
+		if(next!=null){
+			ShapePropMatch continueMatch = next.match(isPatternSide, previousMatchResult, argValues);
+			return continueMatch;
+		}
 		return previousMatchResult;
 	}
 	

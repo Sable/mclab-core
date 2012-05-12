@@ -21,7 +21,7 @@ public class SPMult extends SPAbstractMatchExpr
 	{
 		while(argValues.size()>(previousMatchResult.getNumMatched()))
 		{
-			System.out.println("inside star while"+previousMatchResult.getNumMatched());
+			System.out.println("inside star loop "+previousMatchResult.getNumMatched());
 			System.out.println(previousMatchResult.getNumMatched());
 			System.out.println("index doesn't point null, keep matching!");
 			previousMatchResult = sp.match(isPatternSide, previousMatchResult, argValues);

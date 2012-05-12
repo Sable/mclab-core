@@ -47,7 +47,8 @@ Lowercase = [a-z]
 	{Identifier} { return newToken(Terminals.ID,        new String(yytext())); }
 	{Uppercase}  { return newToken(Terminals.UPPERCASE, new String(yytext())); }
 	{Lowercase}  { return newToken(Terminals.LOWERCASE, new String(yytext())); }
-	"$"          { return newToken(Terminals.DOLLAR,    yytext()); }
+	"$"          { return newToken(Terminals.SCALAR,    yytext()); }
+	"#"          { return newToken(Terminals.ANY,       yytext()); }
 	"||"         { return newToken(Terminals.OROR,      yytext()); }
 	"->"         { return newToken(Terminals.ARROW,     yytext()); }
 	","          { return newToken(Terminals.COMMA,     yytext()); }

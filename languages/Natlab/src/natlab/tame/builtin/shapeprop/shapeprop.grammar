@@ -4,7 +4,7 @@
 %class "ShapePropParser";
 
 
-%terminals NUMBER, ID, UPPERCASE, LOWERCASE, DOLLAR;
+%terminals NUMBER, ID, UPPERCASE, LOWERCASE, SCALAR, ANY;
 %terminals OROR, ARROW, COMMA, LRPAREN, RRPAREN, QUESTION, MULT, PLUS, LSPAREN, RSPAREN, OR, EQUAL, SQUOTATION;
 
 %left  OR, EQUAL, RSPAREN, SQUOTATION;
@@ -16,7 +16,7 @@
 
 
 %typeof NUMBER = "Number";
-%typeof ID, UPPERCASE, LOWERCASE = "String";
+%typeof ID, UPPERCASE, LOWERCASE, SCALAR, ANY = "String";
 %typeof caselist = "SPCaselist";
 %typeof case = "SPCase";
 %typeof pattern, patternElement, assignStmt, fnCall, assertStmt = "SPAbstractPattern";
@@ -66,8 +66,9 @@ matchExpr
     ;
     
 vectorExpr
-    = DOLLAR.d                                {: return new SPDollar(); :}
+    = SCALAR.d                                {: return new SPScalar(d); :}
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
+    | ANY.a                                   {: return new SPAny(a); :}
     | LSPAREN RSPAREN                         {: return new SPEmptySetMatching(); :}
     | vertcatExpr.v                           {: return v; :}
     ;
@@ -99,6 +100,7 @@ AssignmentLhs
     = LOWERCASE.l                             {: return new SPLowercase(l); :}
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
     | UPPERCASE.u LRPAREN scalarExpr.s RRPAREN{: return new SPUpperIndex(u, s); :}
+    | ANY.a LRPAREN scalarExpr.s RRPAREN      {: return new SPUpperIndex(a, s); :}
     ;
     
 AssignmentRhs

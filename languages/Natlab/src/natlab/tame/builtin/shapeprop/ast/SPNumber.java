@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
+import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPNumber extends SPAbstractScalarExpr
@@ -18,11 +19,29 @@ public class SPNumber extends SPAbstractScalarExpr
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		if(isPatternSide==true){
-			HashMap<String, Integer> assignment = new HashMap<String, Integer>();
-			assignment.put(previousMatchResult.getLatestMatchedLowercase(), n.intValue());
-			ShapePropMatch newMatch = new ShapePropMatch(previousMatchResult, assignment, null);
-			return newMatch;
+		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
+			if(previousMatchResult.getArrayIndexAssign()==true){
+				//FIXME
+				System.out.println("inside number of an arrayIndex assignment!");
+				System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
+				List<Integer> dimensions = new ArrayList<Integer>(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions());
+				dimensions.remove((previousMatchResult.getLatestMatchedNumber()-1));
+				dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), n.intValue());
+				System.out.println(previousMatchResult.getAllUppercase());
+				System.out.println("new dimension is "+dimensions);
+				System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+				System.out.println(uppercase);
+				System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
+				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+				System.out.println("currently, all the matched matrix are "+match.getAllUppercase());
+				match.setArrayIndexAssign(false);
+				return match;
+			}
+			System.out.println("inside match a number!");
+			previousMatchResult.saveLatestMatchedNumber(n.intValue());
+			return previousMatchResult;
 		}
 		else{
 			return null;

@@ -8,6 +8,7 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPLowercase extends SPAbstractScalarExpr
@@ -36,11 +37,31 @@ public class SPLowercase extends SPAbstractScalarExpr
 				match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 				return match;
 			}
+			if(previousMatchResult.getAllLowercase().containsKey(s)){
+				if(previousMatchResult.getArrayIndexAssign()==true){
+					//FIXME
+					System.out.println("inside lowercase of an arrayIndex assignment!");
+					List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+					dimensions.remove((previousMatchResult.getLatestMatchedNumber()-1));
+					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), previousMatchResult.getValueOfVariable(s));
+					System.out.println("new dimension is "+dimensions);
+					System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+					uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+					System.out.println(uppercase);
+					ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+					match.setArrayIndexAssign(false);
+					return match;
+				}
+				System.out.println(s+" is contained in the hashmap!");
+				previousMatchResult.saveLatestMatchedLowercase(s);
+				return previousMatchResult;
+			}
 			HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 			lowercase.put(s, null);
 			ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
 			match.saveLatestMatchedLowercase(s);
-			System.out.println("inside SPLowercase, vertcat expression now: "+match.getOutputVertcatExpr());
+			System.out.println("inside SPLowercase "+match.getLatestMatchedLowercase()+", vertcat expression now: "+match.getOutputVertcatExpr());
 			return match;
 		}
 		else{

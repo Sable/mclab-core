@@ -15,12 +15,15 @@ public class ShapePropMatch{
 	int numEmittedResults = 0;      //number of emitted results, I cannot say its index of shape equation,
 	                                //because there is also non-matching expression in the language.
 	int numInVertcat = 0;           //index in vertcat;
+	int previousMatchedNumber = 0;
 	HashMap<String, Integer> lowercase = new HashMap<String, Integer>();  //lowercase is used like m=prevScalar()
 	HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();  //mostly, uppercase is used for matching a shape
+	boolean ArrayIndexAssign = false;   //used for M(2)=0 kind of case, so everytime, in number node, we should check whether or not in a arrayIndex assignment, kind of tricky?
 	boolean isError = false;
 	boolean matchingIsDone = false;
 	boolean outputIsDone = false;
 	boolean isInsideVertcat = false;//this boolean is used for distinguish the lowercase in vertcat or not, like n=previousScalar() and [m,n]
+	boolean isInsideAssign = false;
 	String previousMatchedLowercase = null;
 	String previousMatchedUppercase = null;
 	ArrayList<Integer> needForVertcat = new ArrayList<Integer>();
@@ -38,12 +41,15 @@ public class ShapePropMatch{
         this.numMatched = parent.numMatched;
         this.numEmittedResults = parent.numEmittedResults;
         this.numInVertcat = parent.numInVertcat;
+        this.previousMatchedNumber = parent.previousMatchedNumber;
         this.lowercase = parent.lowercase;
         this.uppercase = parent.uppercase;
+        this.ArrayIndexAssign = parent.ArrayIndexAssign;
         this.isError = parent.isError;
         this.matchingIsDone = parent.matchingIsDone;
         this.outputIsDone = parent.outputIsDone;
         this.isInsideVertcat = parent.isInsideVertcat;
+        this.isInsideAssign = parent.isInsideAssign;
         this.previousMatchedLowercase = parent.previousMatchedLowercase;
         this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.needForVertcat = parent.needForVertcat;
@@ -58,6 +64,7 @@ public class ShapePropMatch{
 		this.numMatched = parent.numMatched;
 		this.numEmittedResults = parent.numEmittedResults;
 		this.numInVertcat = parent.numInVertcat;
+		this.previousMatchedNumber = parent.previousMatchedNumber;
 		this.lowercase = parent.lowercase;
 		this.uppercase = parent.uppercase;
 		if(lowercase!=null){
@@ -66,10 +73,12 @@ public class ShapePropMatch{
 		if(uppercase!=null){
 			this.uppercase.putAll(uppercase);
 		}
+		this.ArrayIndexAssign = parent.ArrayIndexAssign;
 	    this.isError = parent.isError;
 	    this.matchingIsDone = parent.matchingIsDone;
 	    this.outputIsDone = parent.outputIsDone;
 	    this.isInsideVertcat = parent.isInsideVertcat;
+	    this.isInsideAssign = parent.isInsideAssign;
         this.previousMatchedLowercase = parent.previousMatchedLowercase;
         this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.needForVertcat = parent.needForVertcat;
@@ -83,8 +92,32 @@ public class ShapePropMatch{
     	this.numMatched = this.numMatched+1;
     }
     
-    public void saveLatestMatchedLowercase(String latestMatchedLowerCase){
-    	this.previousMatchedLowercase = latestMatchedLowerCase;
+    public void setIsError(){
+    	this.isError = true;
+    }
+    
+    public boolean getIsError(){
+    	return this.isError;
+    }
+    
+    public void setArrayIndexAssign(boolean condition){
+    	this.ArrayIndexAssign = condition;
+    }
+    
+    public boolean getArrayIndexAssign(){
+    	return this.ArrayIndexAssign;
+    }
+    
+    public void saveLatestMatchedNumber(int latestMatchedNumber){
+    	this.previousMatchedNumber = latestMatchedNumber;
+    }
+    
+    public int getLatestMatchedNumber(){
+    	return previousMatchedNumber;
+    }
+    
+    public void saveLatestMatchedLowercase(String latestMatchedLowercase){
+    	this.previousMatchedLowercase = latestMatchedLowercase;
     }
     
     public String getLatestMatchedLowercase(){
@@ -139,6 +172,14 @@ public class ShapePropMatch{
     	return isInsideVertcat;
     }
     
+    public void setIsInsideAssign(boolean condition){
+    	this.isInsideAssign = condition;
+    }
+    
+    public boolean isInsideAssign(){
+    	return isInsideAssign;
+    }
+    
     public int getValueOfVariable(String key){
     	int value = this.lowercase.get(key);
     	return value;
@@ -161,6 +202,10 @@ public class ShapePropMatch{
     
     public HashMap<String, Integer> getAllLowercase(){
     	return lowercase;
+    }
+    
+    public HashMap<String, Shape<?>> getAllUppercase(){
+    	return uppercase;
     }
     
     public void addToVertcatExpr(Integer i){

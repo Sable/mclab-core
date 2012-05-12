@@ -24,6 +24,10 @@ public class SPUppercase extends SPAbstractVectorExpr
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		if(isPatternSide==true){
+			if(previousMatchResult.isInsideAssign()==true){
+				previousMatchResult.saveLatestMatchedUppercase(s);
+				return previousMatchResult;
+			}
 			if(argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing current Matrix Value from args
 				BasicMatrixValue argument = (BasicMatrixValue)argValues.get(previousMatchResult.getNumMatched());

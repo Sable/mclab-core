@@ -14,8 +14,11 @@ import natlab.tame.valueanalysis.components.shape.*;
 
 public class SPScalar extends SPAbstractVectorExpr
 {
-	public SPScalar ()
+	String s;
+	
+	public SPScalar (String s)
 	{
+		this.s = s;
 		//System.out.println("$");
 	}
 	
@@ -29,12 +32,12 @@ public class SPScalar extends SPAbstractVectorExpr
 				System.out.println(argument);
 				if((((HasConstant)argument).getConstant()==null)&&((((HasShape)argument).getShape())==null)){
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put("Scalar", null);
+					lowercase.put(s, null);
 					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-					uppercase.put("Scalar", (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
+					uppercase.put(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
-					match.saveLatestMatchedUppercase("Scalar");
+					match.saveLatestMatchedUppercase(s);
 					//System.out.println(match.getValueOfVariable("Scalar"));
 					//System.out.println(match.getAllResults());
 					System.out.println(match.getAllLowercase());
@@ -44,13 +47,13 @@ public class SPScalar extends SPAbstractVectorExpr
 				//get its constant int value
 				if((((HasConstant)argument).getConstant()==null)){
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put("Scalar", null);
+					lowercase.put(s, null);
 					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
 					Shape<?> argumentShape = ((HasShape)argument).getShape();
-					uppercase.put("Scalar", argumentShape);
+					uppercase.put(s, argumentShape);
 					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
-					match.saveLatestMatchedUppercase("Scalar");
+					match.saveLatestMatchedUppercase(s);
 					//System.out.println(match.getValueOfVariable("Scalar"));
 					//System.out.println(match.getAllResults());
 					System.out.println(match.getAllLowercase());
@@ -65,13 +68,13 @@ public class SPScalar extends SPAbstractVectorExpr
 				System.out.println("argument shape is "+argumentShape);
 				
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put("Scalar", argumentIntValue);
+				lowercase.put(s, argumentIntValue);
 				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put("Scalar", argumentShape);
+				uppercase.put(s, argumentShape);
 				ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 				match.comsumeArg();
-				match.saveLatestMatchedUppercase("Scalar");
-				//System.out.println(match.getValueOfVariable("DOLLAR"));
+				match.saveLatestMatchedUppercase(s);
+				//System.out.println(match.getValueOfVariable(s));
 				//System.out.println(match.getAllResults());
 				//System.out.println(match.getAllLowercase());
 				System.out.println("mathcing a Scalar!");
@@ -95,6 +98,6 @@ public class SPScalar extends SPAbstractVectorExpr
 	
 	public String toString()
 	{
-		return "$";
+		return s.toString();
 	}
 }
