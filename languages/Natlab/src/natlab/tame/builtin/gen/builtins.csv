@@ -688,7 +688,9 @@ ctranspose
 
 # all these take multiple args
 Concatenation; versatileFunction
+-Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
 horzcat
+-Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
 vertcat
 # generalization of horz/vert cat
 cat
