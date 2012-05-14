@@ -88,7 +88,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 			return previousMatchResult;
 		}
 		else{
-			System.out.println("inside output uppercase "+s);
+			if (Debug) System.out.println("inside output uppercase "+s);
 			//default
 			if(previousMatchResult.getShapeOfVariable(s)==null){
 				if(previousMatchResult.getOutputVertcatExpr().size()==1){
