@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
-    
+    static boolean Debug = false;
 	@Override
     public BasicMatrixValue newMatrixValue(Constant constant) {
         return new BasicMatrixValue(constant);
@@ -35,7 +35,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
 					(propagator.call("colon", Args.newInstance(lower,inc,upper))
 							.get(0).iterator().next().getMatlabClass()));
 		} else {
-			System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
+			if (Debug) System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
 					.get(0).iterator().next())).getShape());
 			return new BasicMatrixValue((new BasicMatrixValue(
 					(PrimitiveClassReference)

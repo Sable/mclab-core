@@ -16,7 +16,8 @@ import natlab.tame.valueanalysis.aggrvalue.*;
  * on top of the matlab class
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements HasConstant, HasShape<AggrValue<BasicMatrixValue>>{
-    static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
+    static boolean Debug = false;
+	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
     Constant constant;
     Shape<AggrValue<BasicMatrixValue>> shape;
     //TODO -- also need complex
@@ -41,8 +42,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
      */
     public BasicMatrixValue(Constant constant){
         super(constant.getMatlabClass());
-        System.out.println("inside basicmatrixvalue constant");
-        System.out.println(constant.getShape());
+        if (Debug) System.out.println("inside basicmatrixvalue constant");
+        if (Debug) System.out.println(constant.getShape());
         shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(constant.getShape());//XU study this line!!! infinite loop!!!
         this.constant = constant;
     }
@@ -80,9 +81,9 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
                 "only Values with the same class can be merged, trying to merge :"+this+", "+other);
         System.out.println("this constant is "+constant);
         if (constant == null){
-        	System.out.println("this constant is null!");
+        	if (Debug) System.out.println("this constant is null!");
         	if(((BasicMatrixValue)other).constant==null){
-        		System.out.println("inside both constant null!");
+        		if (Debug) System.out.println("inside both constant null!");
         		if(shape==null){
         			return this;
         		}
@@ -93,13 +94,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	return this;	
         }
         if (constant.equals(((BasicMatrixValue)other).constant)){
-        	System.out.println("this constant is equal to that one!");
+        	if (Debug) System.out.println("this constant is equal to that one!");
         	return this;
         }
-        BasicMatrixValue cao = new BasicMatrixValue(new BasicMatrixValue(this.classRef),this.shape.merge(((BasicMatrixValue)other).getShape()));
-        System.out.println(cao);
-        //System.exit(0);
-        return cao;
+        BasicMatrixValue newMatrix = new BasicMatrixValue(new BasicMatrixValue(this.classRef),this.shape.merge(((BasicMatrixValue)other).getShape()));
+        if (Debug) System.out.println(newMatrix);
+        return newMatrix;
        }
 
     @Override
@@ -108,8 +108,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         if (!(obj instanceof BasicMatrixValue)) return false;
         BasicMatrixValue m = (BasicMatrixValue)obj;
         if (isConstant()) return constant.equals(m.constant);
-        System.out.println(m.getMatlabClass());
-        System.out.println(((HasShape)((BasicMatrixValue)obj)).getShape());
+        if (Debug) System.out.println(m.getMatlabClass());
+        if (Debug) System.out.println(((HasShape)((BasicMatrixValue)obj)).getShape());
         if((shape==null)&&(((HasShape)((BasicMatrixValue)obj)).getShape()==null)){
         	return (classRef.equals(m.getMatlabClass()))&&true;
         }
@@ -157,7 +157,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     				double castDou = ((DoubleConstant)((HasConstant)((BasicMatrixValue)index)).getConstant()).getValue();
     				int castInt = (int) castDou;
     				if(castInt>(this.getShape().getDimensions().get(1))){
-    					System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
+    					if (Debug) System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
     					ArrayList<Integer> dim = new ArrayList<Integer>(2);
     					dim.add(1);
     					dim.add(castInt);
@@ -167,7 +167,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			//deal with matrix index
     			if((((BasicMatrixValue)index).getShape())!=null){
     				if((((BasicMatrixValue)index).getShape().getDimensions().get(1))>(this.getShape().getDimensions().get(1))){
-                		System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
+    					if (Debug) System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
                 		return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(((HasShape)((BasicMatrixValue)index)).getShape().getDimensions()));
                 	}
     			}
