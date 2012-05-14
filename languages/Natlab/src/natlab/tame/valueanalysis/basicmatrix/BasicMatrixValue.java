@@ -1,5 +1,7 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
+import java.util.*;
+
 import natlab.tame.classes.reference.*;                 //class    component
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
@@ -98,20 +100,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         System.out.println(cao);
         //System.exit(0);
         return cao;
-        /*if (constant.equals(((BasicMatrixValue)other).constant)){
-        	return this;
-        }
-        System.out.println("constant not equal! wocaonima!");
-        if (shape == null) return this;//XU added
-        if (shape.equals(((BasicMatrixValue)other).getShape())){
-        	BasicMatrixValue bm = new BasicMatrixValue(this.getMatlabClass());
-        	bm.setConstantNull();
-        	return bm;//XU added
-        }
-        System.out.println(this.shape);
-        System.out.println(((BasicMatrixValue)other).getShape());
-        BasicMatrixValue bm = new BasicMatrixValue(new BasicMatrixValue(this.classRef),this.shape.merge(((BasicMatrixValue)other).getShape()));
-*/    }
+       }
 
     @Override
     public boolean equals(Object obj) {
@@ -160,8 +149,34 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     
     @Override
     public AggrValue<BasicMatrixValue> arraySubsasgn(
-            Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {
-    	throw new UnsupportedOperationException(); //TODO
+            Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {//XU: we don't need to care about value, but we should care about index!
+    	for(AggrValue<BasicMatrixValue> index:indizes){
+    		try{
+    			//deal with constant index
+    			if((((BasicMatrixValue)index).getConstant())!=null){
+    				double castDou = ((DoubleConstant)((HasConstant)((BasicMatrixValue)index)).getConstant()).getValue();
+    				int castInt = (int) castDou;
+    				if(castInt>(this.getShape().getDimensions().get(1))){
+    					System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
+    					ArrayList<Integer> dim = new ArrayList<Integer>(2);
+    					dim.add(1);
+    					dim.add(castInt);
+    					return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(dim));
+    				}
+    			}
+    			//deal with matrix index
+    			if((((BasicMatrixValue)index).getShape())!=null){
+    				if((((BasicMatrixValue)index).getShape().getDimensions().get(1))>(this.getShape().getDimensions().get(1))){
+                		System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
+                		return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(((HasShape)((BasicMatrixValue)index)).getShape().getDimensions()));
+                	}
+    			}
+    		}catch (Exception e){
+    			return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), this.getShape());
+    		}
+    		
+    	}
+    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), this.getShape());//XU modified @21:24,May 13th
     }
     
     @Override

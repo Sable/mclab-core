@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.basicmatrix.*;
 public class ToyMain {
 
 	public static void main(String[] args){
-		String file = "/home/xuli/test/helloAll.m";
+		String file = "/home/xuli/test/hello.m";
 		TamerToolPlusShape tool = new TamerToolPlusShape();
 		IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>>  analysis = tool.tameMatlabToSingleFunctionFromClassReferences(
 				new java.io.File(file),Collections.singletonList(PrimitiveClassReference.DOUBLE));
