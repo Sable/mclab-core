@@ -16,6 +16,7 @@ import natlab.toolkits.analysis.Mergable;
 
 
 public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
+	static boolean Debug = false;
 	private ValueFactory<V> factory;
 	List<Integer> dimensions;                       //change V to Integer
 	boolean isTop = false;
@@ -104,13 +105,13 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     
     @Override
     public Shape<V> merge(Shape<V> o){
-    	System.out.println("inside shape merge!");
+    	if (Debug) System.out.println("inside shape merge!");
     	if(this.equals(o)){
     		return this;
     	}
     	else{
     		if(this.getSize()!=o.getSize()){
-    			System.out.println("return a top shape!");//currently, just from toString to show it's a top shape
+    			if (Debug) System.out.println("return a top shape!");//currently, just from toString to show it's a top shape
     			Shape<V> topShape = new Shape<V>(this.factory, null);
     			topShape.FlagItsTop();
     			return topShape;
@@ -119,7 +120,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     			int j=0;
     			ArrayList<Integer> newDimensions = new ArrayList<Integer>(this.getSize());
     			for(Integer i : this.dimensions){
-        			System.out.println(this.dimensions.size());    				
+    				if (Debug) System.out.println(this.dimensions.size());    				
     				if(i==o.getCertainDimensionSize(j)){
     					newDimensions.add(j, i);
     				}
@@ -138,13 +139,13 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	if(this.getSize()==o.getSize()){
     		int j=0;
     		for(Integer i : this.dimensions){
-    			System.out.println("testing weather or not shape equals!");
+    			if (Debug) System.out.println("testing weather or not shape equals!");
     			//System.out.println("i is "+i+", j is "+o.getCertainDimensionSize(j));
     			if(i==o.getCertainDimensionSize(j)){
     				j=j+1;
     			}
     			else{
-    				System.out.println("inside shape equals false!");
+    				if (Debug) System.out.println("inside shape equals false!");
     				return false;
     			}
     		}
