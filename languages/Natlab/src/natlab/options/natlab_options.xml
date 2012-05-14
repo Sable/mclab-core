@@ -250,7 +250,7 @@ No static linking is done.
       <alias>vfpreorder</alias>
     </boolopt>
   </section>
-
+<!--
   <section>
     <name>621 options</name>
     <boolopt>
@@ -258,6 +258,8 @@ No static linking is done.
       <alias>run</alias>
     </boolopt>
   </section>
+ -->
+ 
   <section>
     <name>play</name>
     <boolopt>
