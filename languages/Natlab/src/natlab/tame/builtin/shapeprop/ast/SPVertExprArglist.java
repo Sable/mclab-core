@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Args;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.value.*;
 
 public class SPVertExprArglist extends SPNode
 {
@@ -22,6 +22,9 @@ public class SPVertExprArglist extends SPNode
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
+		if(match.getIsError()==true){
+			return match;			
+		}
 		if(next!=null){
 			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);
 			return continueMatch;

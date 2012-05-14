@@ -26,6 +26,9 @@ public class SPPatternList extends SPAbstractPattern
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
+		if(match.getIsError()==true){
+			return match;
+		}
 		//System.out.println("matching part of pl successfully");
 		if(next!=null){
 			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);

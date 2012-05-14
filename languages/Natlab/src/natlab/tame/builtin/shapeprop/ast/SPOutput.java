@@ -28,7 +28,11 @@ public class SPOutput extends SPNode
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);//here, previousMatchResult would be the pattern part result, and that part match successfully.
-		if (next == null) {
+		if(match.getIsError()==true){
+			match.setOutputIsDone();
+			return match;
+		}
+		if(next == null){
 			System.out.println("output emitted done!");
 			match.setOutputIsDone();
 			return match;

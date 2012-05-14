@@ -1,6 +1,7 @@
 package natlab.tame.builtin.shapeprop.ast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
@@ -27,11 +28,25 @@ public class SPVertcatExpr extends SPAbstractVectorExpr
 			previousMatchResult.setIsInsideVertcat(true);
 			previousMatchResult.setNumInVertcat(0);//reset it
 			ShapePropMatch match = vl.match(isPatternSide, previousMatchResult, argValues);
+			if(match.getIsError()==true){
+				Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
+				errorShape.FlagItsError();
+				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+				uppercase.put("vertcat", errorShape);
+				ShapePropMatch errorMatch = new ShapePropMatch(previousMatchResult, null, uppercase);
+				match.setIsInsideVertcat(false);
+				match.comsumeArg();
+				return errorMatch;
+			}
 			match.setIsInsideVertcat(false);
 			match.comsumeArg();
 			return match;
 		}
 		else{
+			if(previousMatchResult.getIsError()==true){
+				previousMatchResult.addToOutput("vertcat", previousMatchResult.getShapeOfVariable("vertcat"));
+				return previousMatchResult;
+			}
 			//a vertcat in output side, it should return a shape, and now, I think it should return an ArrayList<Integer>, then call newShapeFromIntegers...
 			String[] arg = vl.toString().split(",");
 			if(arg[0].equals("1")){

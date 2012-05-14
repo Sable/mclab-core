@@ -45,10 +45,9 @@ public class ShapePropTool {
     	}
     	System.out.println(tree+" with arguments "+argValues);
     	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues);
-    	//System.out.println(spmatch.getOutputVertcatExpr());
-        if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
+        /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
         	return null;
-        }
+        }*/
         System.out.println("inside shapeproptool-matchbyvalue, all the results are "+spmatch.getAllResults());
         return spmatch.getAllResults();
     }
