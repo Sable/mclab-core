@@ -9,6 +9,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPCaselist extends SPNode
 {
+	static boolean Debug = false;
 	SPCase first;
 	SPCaselist next;
 	
@@ -25,7 +26,7 @@ public class SPCaselist extends SPNode
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if (match.outputIsDone() == true) {
-			System.out.println("matching and results emmitting successfully!\n");
+			if (Debug) System.out.println("matching and results emmitting successfully!\n");
 			return match;
 		}
 		else

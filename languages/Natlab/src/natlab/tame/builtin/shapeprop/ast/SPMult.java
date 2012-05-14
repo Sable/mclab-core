@@ -10,6 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPMult extends SPAbstractMatchExpr
 {
+	static boolean Debug = false;
 	SPAbstractMatchExpr sp;
 	public SPMult (SPAbstractMatchExpr sp)
 	{
@@ -21,9 +22,9 @@ public class SPMult extends SPAbstractMatchExpr
 	{
 		while(argValues.size()>(previousMatchResult.getNumMatched()))
 		{
-			System.out.println("inside star loop "+previousMatchResult.getNumMatched());
-			System.out.println(previousMatchResult.getNumMatched());
-			System.out.println("index doesn't point null, keep matching!");
+			if (Debug) System.out.println("inside star loop "+previousMatchResult.getNumMatched());
+			if (Debug) System.out.println(previousMatchResult.getNumMatched());
+			if (Debug) System.out.println("index doesn't point null, keep matching!");
 			previousMatchResult = sp.match(isPatternSide, previousMatchResult, argValues);
 		}
 		

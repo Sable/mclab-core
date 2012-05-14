@@ -10,6 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPOutput extends SPNode
 {
+	static boolean Debug;
 	SPAbstractVectorExpr first;
 	SPOutput next;
 	
@@ -33,7 +34,7 @@ public class SPOutput extends SPNode
 			return match;
 		}
 		if(next == null){
-			System.out.println("output emitted done!");
+			if (Debug) System.out.println("output emitted done!");
 			match.setOutputIsDone();
 			return match;
 		}

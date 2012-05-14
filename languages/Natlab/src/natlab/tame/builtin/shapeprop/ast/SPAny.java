@@ -19,6 +19,7 @@ import natlab.tame.valueanalysis.value.Value;
  */
 public class SPAny extends SPAbstractVectorExpr
 {
+	static boolean Debug = false;
 	String s;
 	public SPAny(String a)
 	{
@@ -28,7 +29,7 @@ public class SPAny extends SPAbstractVectorExpr
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		System.out.println("inside ANY!");
+		if (Debug) System.out.println("inside ANY!");
 		if(isPatternSide==true){
 			if(argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing current Matrix Value from args
@@ -43,14 +44,14 @@ public class SPAny extends SPAbstractVectorExpr
 				match.comsumeArg();
 				match.saveLatestMatchedUppercase(s);
 				//System.out.println(match.getValueOfVariable(s));
-				System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-				System.out.println("mathcing "+match.getLatestMatchedUppercase());
+				if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
+				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 				return match;
 			}
 			return previousMatchResult;
 		}
 		else{
-			System.out.println("inside output uppercase "+s);
+			if (Debug) System.out.println("inside output uppercase "+s);
 			//default
 			if(previousMatchResult.getShapeOfVariable(s)==null){
 				if(previousMatchResult.getOutputVertcatExpr().size()==1){

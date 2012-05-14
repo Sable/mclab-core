@@ -10,6 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPCase extends SPNode
 {
+	static boolean Debug = false;
 	SPAbstractPattern first;
 	SPOutput next;
 	
@@ -28,13 +29,13 @@ public class SPCase extends SPNode
 		//System.out.println(match.getNumMatched());
 		if(match.getIsError()==true){
 			isPatternSide = false;
-			System.out.println("matching part is done!");
+			if (Debug) System.out.println("matching part is done!");
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues); //I sense that maybe we don't need argValues in output
 			return outputMatch;
 		}
 		if(match.getNumMatched()==argValues.size()){  //if pattern part is done with successful matching
 			isPatternSide = false;
-			System.out.println("matching part is done!");
+			if (Debug) System.out.println("matching part is done!");
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues); //I sense that maybe we don't need argValues in output
 			return outputMatch;
 		}

@@ -15,6 +15,8 @@ import natlab.tame.valueanalysis.value.*;
 
 public class ShapePropTool {
 	
+	static boolean Debug = false;
+	
     public static SPNode parse(String source){
     	//System.err.println("parsing: "+source);
     	ShapePropParser parser = new ShapePropParser();
@@ -33,22 +35,22 @@ public class ShapePropTool {
     public static List<Shape<AggrValue<BasicMatrixValue>>> matchByValues(SPNode tree, List<? extends Value<?>> argValues){
     	if(argValues!=null)
     	{
-    		System.out.println("inside ShapePropTool matchByValues method.");
+    		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
     		for(Value<?> arg:argValues){
     			if(((HasShape)arg).getShape()==null){
-    				System.out.println(arg+"'s shape is undefined");
+    				if (Debug) System.out.println(arg+"'s shape is undefined");
 /*    				ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
     				emptyList.add(null);
     				return emptyList;*/
     			}
     		}
     	}
-    	System.out.println(tree+" with arguments "+argValues);
+    	if (Debug) System.out.println(tree+" with arguments "+argValues);
     	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues);
         /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
         	return null;
         }*/
-        System.out.println("inside shapeproptool-matchbyvalue, all the results are "+spmatch.getAllResults());
+    	if (Debug) System.out.println("inside shapeproptool matchByValue method, all the results are "+spmatch.getAllResults());
         return spmatch.getAllResults();
     }
     

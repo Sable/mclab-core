@@ -14,6 +14,7 @@ import natlab.tame.valueanalysis.components.shape.*;
 
 public class SPScalar extends SPAbstractVectorExpr
 {
+	static boolean Debug;
 	String s;
 	
 	public SPScalar (String s)
@@ -29,7 +30,7 @@ public class SPScalar extends SPAbstractVectorExpr
 			if (argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing basicMatrixValue
 				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
-				System.out.println(argument);
+				if (Debug) System.out.println(argument);
 				if((((HasConstant)argument).getConstant()==null)&&((((HasShape)argument).getShape())==null)){
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					lowercase.put(s, null);
@@ -40,8 +41,8 @@ public class SPScalar extends SPAbstractVectorExpr
 					match.saveLatestMatchedUppercase(s);
 					//System.out.println(match.getValueOfVariable("Scalar"));
 					//System.out.println(match.getAllResults());
-					System.out.println(match.getAllLowercase());
-					System.out.println("mathcing a Scalar!");
+					if (Debug) System.out.println(match.getAllLowercase());
+					if (Debug) System.out.println("mathcing a Scalar!");
 					return match;
 				}
 				//get its constant int value
@@ -56,16 +57,16 @@ public class SPScalar extends SPAbstractVectorExpr
 					match.saveLatestMatchedUppercase(s);
 					//System.out.println(match.getValueOfVariable("Scalar"));
 					//System.out.println(match.getAllResults());
-					System.out.println(match.getAllLowercase());
-					System.out.println("mathcing a Scalar!");
+					if (Debug) System.out.println(match.getAllLowercase());
+					if (Debug) System.out.println("mathcing a Scalar!");
 					return match;
 				}
 				double argumentConstantDouble = (Double) ((HasConstant)argument).getConstant().getValue();
 				int argumentIntValue = (int) argumentConstantDouble;
-				System.out.println("argument value is "+argumentIntValue);
+				if (Debug) System.out.println("argument value is "+argumentIntValue);
 				//get its shape information
 				Shape<?> argumentShape = ((HasShape)argument).getShape();
-				System.out.println("argument shape is "+argumentShape);
+				if (Debug) System.out.println("argument shape is "+argumentShape);
 				
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(s, argumentIntValue);
@@ -77,7 +78,7 @@ public class SPScalar extends SPAbstractVectorExpr
 				//System.out.println(match.getValueOfVariable(s));
 				//System.out.println(match.getAllResults());
 				//System.out.println(match.getAllLowercase());
-				System.out.println("mathcing a Scalar!");
+				if (Debug) System.out.println("mathcing a Scalar!");
 				return match;
 			}
 			else

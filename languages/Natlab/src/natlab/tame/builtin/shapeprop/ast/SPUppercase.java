@@ -14,6 +14,7 @@ import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
 public class SPUppercase extends SPAbstractVectorExpr
 {
+	static boolean Debug;
 	String s;
 	public SPUppercase (String s)
 	{
@@ -42,7 +43,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 						Shape<AggrValue<BasicMatrixValue>> oldShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(l);
 						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
 						if(argumentShape.equals(oldShape)==false){//FIXME
-							System.out.println("MATLAB syntax error!");
+							if (Debug) System.out.println("MATLAB syntax error!");
 							Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(null);
 							errorShape.FlagItsError();
 							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
@@ -53,8 +54,8 @@ public class SPUppercase extends SPAbstractVectorExpr
 							match.comsumeArg();
 							match.saveLatestMatchedUppercase(s);
 							//System.out.println(match.getValueOfVariable(s));
-							System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-							System.out.println("matched matrix expression "+match.getLatestMatchedUppercase());
+							if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
+							if (Debug) System.out.println("matched matrix expression "+match.getLatestMatchedUppercase());
 							return match;
 						}
 						//if new shape and old shape are equals, just return this shape!
@@ -66,8 +67,8 @@ public class SPUppercase extends SPAbstractVectorExpr
 						match.comsumeArg();
 						match.saveLatestMatchedUppercase(s);
 						//System.out.println(match.getValueOfVariable(s));
-						System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-						System.out.println("mathcing "+match.getLatestMatchedUppercase());
+						if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
+						if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 						return match;
 					}
 					
@@ -80,8 +81,8 @@ public class SPUppercase extends SPAbstractVectorExpr
 				match.comsumeArg();
 				match.saveLatestMatchedUppercase(s);
 				//System.out.println(match.getValueOfVariable(s));
-				System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-				System.out.println("mathcing "+match.getLatestMatchedUppercase());
+				if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
+				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 				return match;
 			}
 			return previousMatchResult;

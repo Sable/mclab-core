@@ -10,6 +10,7 @@ import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.components.shape.*;
 
 public class ShapePropMatch{
+	static boolean Debug;
 	public BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	int numMatched = 0;             //number of matched arguments, act as the index of arguments 
 	int numEmittedResults = 0;      //number of emitted results, I cannot say its index of shape equation,
@@ -192,8 +193,8 @@ public class ShapePropMatch{
     
     public List<Shape<AggrValue<BasicMatrixValue>>> getAllResults(){//FIXME better!
     	LinkedList<Shape<AggrValue<BasicMatrixValue>>> results = new LinkedList<Shape<AggrValue<BasicMatrixValue>>>();
-    	System.out.println(output);
-    	System.out.println(needForVertcat);
+    	if (Debug) System.out.println(output);
+    	if (Debug) System.out.println(needForVertcat);
     	for(Object value: output.values()){
     		results.add((Shape<AggrValue<BasicMatrixValue>>)value);    		
     	}
@@ -226,7 +227,7 @@ public class ShapePropMatch{
     
     public void copyVertcatToOutput(String defaultM){
     	Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(this.getOutputVertcatExpr());
-    	System.out.println("inside copy vertcat to output "+needForVertcat);
+    	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
     	this.addToOutput(defaultM, shape);
     }
     
