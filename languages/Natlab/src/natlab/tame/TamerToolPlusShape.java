@@ -18,7 +18,6 @@ public class TamerToolPlusShape {
 
 	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
 	        tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<BasicMatrixValue>> inputValues){
-		System.out.println("inside TTPS first function!");
 		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
 		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
 		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
@@ -30,7 +29,7 @@ public class TamerToolPlusShape {
 		        new IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>>(
 		        		null, function, new BasicMatrixValueFactory(), 
 		        		Args.<AggrValue<BasicMatrixValue>>newInstance(inputValues));
-		System.out.println("before analyze!");
+		//System.out.println("before analyze!");
 		analysis.analyze(); //run analysis
 		return analysis;
 	}
@@ -44,7 +43,6 @@ public class TamerToolPlusShape {
 	//XU expands it to support initial shape input
 	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-		System.out.println("inside TTPS second function!");
 		//System.out.println(inputValues);
 		BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(inputValues.size());
