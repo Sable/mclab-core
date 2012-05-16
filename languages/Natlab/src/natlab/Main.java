@@ -397,6 +397,13 @@ public class Main
 			
                         //checks if dependence analysis flag is set.
                         //If the flag is set then the type of dependence test that needs to be applied.
+                        
+                        //Xu added tamer here
+                        if( options.tamer() ){ //begin tamer
+                            natlab.tame.valueanalysis.simplematrix.SimpleMain.main(file);
+                            return;
+                        } //end tamer
+                        
                         if(options.danalysis()){                            
                             //Program prog = null;
                             dependenceAnalyzerOptions(options,file);
@@ -560,7 +567,7 @@ public class Main
                         System.out.println( counts[0]+"/"+counts[1]+"/"+counts[2] );
 			*/
                     }
-                    else if( options.run() ){
+                    /*else if( options.run() ){
                         Validator v = new Validator( cu );
                         v.analyze();
                         if( v.isValid() )
@@ -571,7 +578,7 @@ public class Main
                             System.out.println(v.getReasons());
                         }
                                                
-                    }
+                    }*/ //XU added block comment
                     else if( options.df() ){
                         String mainFileName = "";
                         if( options.main().length()>0 ){
