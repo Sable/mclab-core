@@ -27,7 +27,17 @@ public class ICoutputValueList extends ICNode{
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (null != ovl)
+		{
+		isComplexInfoPropMatch listOfArgsMatch = ovl.match(isPatternSide, previousMatchResult, argValues);
+		isComplexInfoPropMatch match = ov.match(isPatternSide, listOfArgsMatch, argValues);
+		return match;
+		}
+		else
+		{
+			isComplexInfoPropMatch match = ov.match(isPatternSide, previousMatchResult, argValues);
+			return match;
+		}
 	}
 }

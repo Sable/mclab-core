@@ -25,7 +25,7 @@ public class ICoutputValue extends ICAbstractValue{
 	
 	public isComplexInfoPropMatch match(boolean isPatternSide, isComplexInfoPropMatch previousMatchResult, List<Integer> argValues)
 	{
-		return null;
+		return ov.match(isPatternSide, previousMatchResult, argValues);
 	}
 	//TODO - is this correct ?
 }

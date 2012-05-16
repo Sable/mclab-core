@@ -24,7 +24,7 @@ public class ICQmult extends ICQOp{
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
 		// TODO Auto-generated method stub
-		return null;
+		return previousMatchResult;
 	}
 
 }

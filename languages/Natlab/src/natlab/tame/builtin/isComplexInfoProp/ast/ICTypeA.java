@@ -3,6 +3,7 @@ package natlab.tame.builtin.isComplexInfoProp.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import natlab.tame.builtin.isComplexInfoProp.ArgICType;
 import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropMatch;
 import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropTool;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
@@ -41,7 +42,9 @@ public class ICTypeA extends ICType{
 			{
 				int argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
 			//	ArgICType isArgComplex = new ArgICType(argument); //returns -1=complex, 0=any, 1= real
-				 int isArgComplex =  ArgICType.getArgICType(argument);
+				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
+				
+				//int isArgComplex =0;
 				//TODO - implement this method
 				if (0 == isArgComplex) //i.e it is any
 				{

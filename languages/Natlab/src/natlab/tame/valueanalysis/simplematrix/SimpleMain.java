@@ -1,6 +1,7 @@
 package natlab.tame.valueanalysis.simplematrix;
 
 import java.util.Collections;
+import java.util.*;
 
 import natlab.tame.TamerTool;
 import natlab.tame.classes.reference.PrimitiveClassReference;
@@ -14,8 +15,13 @@ public class SimpleMain {
 	public static void main(String args){
 		String file = args;
 		TamerTool tool = new TamerTool();
+		List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(4);
+		ls.add(PrimitiveClassReference.DOUBLE);
+		ls.add(PrimitiveClassReference.DOUBLE);
+		ls.add(PrimitiveClassReference.DOUBLE);
+		ls.add(PrimitiveClassReference.DOUBLE);
 		IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>  analysis = tool.tameMatlabToSingleFunctionFromClassReferences(
-				new java.io.File(file),Collections.singletonList(PrimitiveClassReference.DOUBLE));
+				new java.io.File(file),ls);
 		
 		TIRFunction function = analysis.getTree();
 		System.out.println("-------------IR-ast-----------------");
