@@ -399,7 +399,7 @@ public class Main
                         //If the flag is set then the type of dependence test that needs to be applied.
                         
                         //Xu added tamer here
-                        if( options.tamer() ){ //begin tamer
+                        if( options.tame() ){ //begin tamer
                             natlab.tame.valueanalysis.simplematrix.SimpleMain.main(file);
                             return;
                         } //end tamer
