@@ -7,6 +7,7 @@ import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropMatch;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.builtin.isComplexInfoProp.ast.*;
 
 public class ICComplexValueQ extends ICAbstractValue{
 	
@@ -56,10 +57,11 @@ public class ICComplexValueQ extends ICAbstractValue{
 		}
 		else if (qop.toString().equals("?"))
 		{
-			//TODO - do something
+			isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, previousMatchResult, argValues);
+			return lastMatch;
 		}
 		//return match;
-		return previousMatchResult; //TODO - make sure of this
+		else	return previousMatchResult; //TODO - make sure of this
 		
 	}
 }
