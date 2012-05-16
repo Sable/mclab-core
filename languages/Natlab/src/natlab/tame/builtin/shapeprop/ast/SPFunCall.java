@@ -85,8 +85,8 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 			String[] arg = ls.toString().split(",");
 			if(arg.length==2){
 				if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" compare with "+previousMatchResult.getShapeOfVariable(arg[1]));
-				Shape<AggrValue<BasicMatrixValue>> first = (Shape<AggrValue<BasicMatrixValue>>)previousMatchResult.getShapeOfVariable(arg[0]);
-				Shape<AggrValue<BasicMatrixValue>> second = (Shape<AggrValue<BasicMatrixValue>>)previousMatchResult.getShapeOfVariable(arg[1]);
+				Shape<?> first = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[0]);
+				Shape<?> second = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[1]);
 				if(first.equals(second)){
 					if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" is equal to "+previousMatchResult.getShapeOfVariable(arg[1]));
 					return previousMatchResult;
