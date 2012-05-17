@@ -29,6 +29,10 @@ public class ICComplexValue extends ICAbstractValue{
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
 		
 		isComplexInfoPropMatch match = xv.match(isPatternSide, previousMatchResult, argValues);
+		if (false == match.getLastMatchSucceed())
+		{
+			match.setError(true);
+		}
 		return match;
 		//this will propagate to any, real or compex - ICType
 	}

@@ -3,6 +3,7 @@ package natlab.tame.builtin.isComplexInfoProp.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import natlab.tame.builtin.isComplexInfoProp.ArgICType;
 import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropMatch;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
@@ -27,6 +28,65 @@ public class ICTypeX extends ICType{
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
 		// TODO Auto-generated method stub
-		return null;
+		if(true==isPatternSide)//on the symbol on the LHS
+		{
+			
+			isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
+
+			
+			if(argValues.size() > previousMatchResult.getNumMatched())
+			{
+				int argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
+		
+				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
+				 System.out.println("argument is #"+argument+"\n");
+				
+				 
+			
+				if (-1 == isArgComplex) //i.e it is any
+				{
+				
+					match.consumeArg();
+					match.setLastMatchSucceed(true);
+					match.setLastMatchICType("COMPLEX");
+					match.incNumXargs(1);
+					System.out.println("matched argument to COMPLEX\n");
+										
+				}
+				else
+				{   
+
+					match.setLastMatchSucceed(false);
+					
+				}
+			}
+			else
+			{
+				match.setError(true);
+				
+			}
+			if (null == match.getLastMatchICType())
+			{
+				match.setLastMatchSucceed(false);
+			}
+			return match;
+		}
+		else
+		{	//RHS
+			isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
+			if (match.getNumMatched() == argValues.size())
+			{
+				//LHS matched 
+				match.loadOutput("COMPLEX");
+				System.out.println("COMPLEX.");
+				return match;
+			}
+			else
+			{
+				//match fail somewhere on LHS
+				match.setError(true);
+				return match;
+			}
+		}
 	}
 }

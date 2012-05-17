@@ -27,13 +27,26 @@ public class ICCaselist extends ICNode{
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
 		
-		isComplexInfoPropMatch match = csl.match(isPatternSide, previousMatchResult, argValues);
-		if (match.getIsOutputDone() == true) {
-			System.out.println("matching done successfully!\n");
-			return match;
+		isComplexInfoPropMatch match ;
+		if (csl != null)
+		{
+		match = csl.match(isPatternSide, previousMatchResult, argValues);
 		}
 		else
-			return cs.match(isPatternSide, previousMatchResult, argValues);
+		{
+		match = cs.match(isPatternSide, previousMatchResult, argValues);
+		}
+		
+		if (match.getIsOutputDone() == true) {
+			System.out.println("matching done successfully!\n");
+			
+			return match;
+		}
+		else{
+			System.out.println("matching unsuccessful!\n");
+		
+		   return match;
+		}
 	
 	}
 	

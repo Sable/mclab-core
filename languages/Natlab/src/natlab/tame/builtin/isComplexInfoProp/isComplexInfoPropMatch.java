@@ -18,13 +18,13 @@ public class isComplexInfoPropMatch {
 	int numAargs = 0;
 	
 	boolean isError = false; 
-	boolean lastMatchSucceed = false;
+	boolean lastMatchSucceed = true;
 	boolean isMatchDone = false;
 	boolean isOutputDone = false;
 	
 	String lastMatchICType;
 	
-	HashMap<String, String> output = new HashMap<String, String>();  //used for output results 
+	List<String> output = new ArrayList<String>();  //used for output results 
 	/*TODO - change string to isComplex object defined in component class */
 	
 	
@@ -44,7 +44,21 @@ public class isComplexInfoPropMatch {
 		this.output = parent.output;
 	}
 	
+	public String getOutputString()
+	{
+		String buff = "";
+		
+		    for (int i=0; i<this.output.size();i++)
+			buff = buff+this.output.get(i);
+			return buff;
+	}
+	
 	//TODO Add more constructors as required
+	
+	public void loadOutput(String op)
+	{
+		this.output.add(op);
+	}
 	
 	public void setLastMatchSucceed(boolean success)
 	{
@@ -125,6 +139,15 @@ public class isComplexInfoPropMatch {
 	public void setLastMatchICType(String ICType)
 	{
 		this.lastMatchICType = ICType;
+	}
+	
+	public void setError(boolean er)
+	{
+		this.isError = er;
+	}
+	public boolean getError()
+	{
+		return this.isError ;
 	}
 	
 	//TODO - add getAllResults method

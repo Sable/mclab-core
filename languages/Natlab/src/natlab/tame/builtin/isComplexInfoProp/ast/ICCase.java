@@ -30,18 +30,25 @@ public class ICCase extends ICNode{
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
 		
-		isComplexInfoPropMatch match = ivl.match(isPatternSide, previousMatchResult, argValues);
+		isComplexInfoPropMatch matchCase = ivl.match(isPatternSide, previousMatchResult, argValues);
 		
-		if (match.getNumMatched() == argValues.size())  // input args have been matched
-		{
+		if (matchCase.getNumMatched() == argValues.size() && false == matchCase.getError())  // input args have been matched
+		{	
+			matchCase.setMatchIsDone();
 			System.out.println("input args matched...matching output args now");
 			isPatternSide = false;
-			isComplexInfoPropMatch outputMatch = ovl.match(isPatternSide, previousMatchResult, argValues);
+			isComplexInfoPropMatch outputMatch = ovl.match(isPatternSide, matchCase, argValues);
+			outputMatch.setOutputIsDone();
+			//
+			System.out.println("number of A args = "+outputMatch.getNumAargs());
 			return outputMatch;
 		}
 		else
-			
-		return null;
+		{
+			System.out.println("Cannot match the arguments to equation!!! ");
+			return null;
+		}
+		
 	}
 
 }

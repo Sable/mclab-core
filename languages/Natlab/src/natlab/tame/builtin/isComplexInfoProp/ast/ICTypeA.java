@@ -38,12 +38,15 @@ public class ICTypeA extends ICType{
 			 */
 			isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
 
-			if(null != argValues.get(previousMatchResult.getNumMatched()))
+			//if(null != argValues.get(previousMatchResult.getNumMatched()))
+			if(argValues.size() > previousMatchResult.getNumMatched())
 			{
 				int argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
 			//	ArgICType isArgComplex = new ArgICType(argument); //returns -1=complex, 0=any, 1= real
 				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
 				
+				
+				 
 				//int isArgComplex =0;
 				//TODO - implement this method
 				if (0 == isArgComplex) //i.e it is any
@@ -61,14 +64,37 @@ public class ICTypeA extends ICType{
 				}
 				else
 				{
+
 					match.setLastMatchSucceed(false);
 				}
+			}
+			else
+			{
+				match.setError(true);
+			
+			}
+			if (null == match.getLastMatchICType())
+			{
+				match.setLastMatchSucceed(false);
 			}
 			return match;
 		}
 		else
-		{
-			return previousMatchResult; //TODO change for RHS
+		{	//RHS
+			isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
+			if (match.getNumMatched() == argValues.size())
+			{
+				//LHS matched 
+				match.loadOutput("ANY");
+				System.out.println("ANY.");
+				return match;
+			}
+			else
+			{
+				//match fail somewhere on LHS
+				match.setError(true);
+				return match;
+			}
 		}
 		
 	}

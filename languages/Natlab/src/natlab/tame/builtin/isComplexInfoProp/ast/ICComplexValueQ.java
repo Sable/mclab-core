@@ -32,25 +32,26 @@ public class ICComplexValueQ extends ICAbstractValue{
 		
 		if (qop.toString().equals("*"))
 		{
-	        String typeOfEquationValue = xv.toString();// save the type of xv i.e X,R or A
-	         isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, previousMatchResult, argValues); //match returns same as previousmatch instead of null
-			while (!lastMatch.equals(previousMatchResult) && lastMatch.getLastMatchICType().equals(typeOfEquationValue)) 
-			{
-				lastMatch = xv.match(isPatternSide, previousMatchResult, argValues);
-			}
-			
-			return lastMatch ;
+	        //String typeOfEquationValue = xv.toString();// save the type of xv i.e X,R or A
+			 int localMatchCtr =0;
+	         isComplexInfoPropMatch lastMatch = new isComplexInfoPropMatch(previousMatchResult); //match returns same as previousmatch instead of null
+	         while (lastMatch.getNumMatched()<argValues.size() && (true == lastMatch.getLastMatchSucceed() || localMatchCtr==0))
+				{
+					lastMatch = xv.match(isPatternSide, lastMatch, argValues);
+					localMatchCtr++;
+				}
+				return lastMatch;
 			
 		}
 		else if (qop.toString().equals("+"))
 		{
-			isComplexInfoPropMatch firstMatch = xv.match(isPatternSide, previousMatchResult, argValues); 
-			String typeOfEquationValue = xv.toString();
-			isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, firstMatch, argValues); //match returns same as previousmatch instead of null
+			isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, previousMatchResult, argValues); 
 			
-			while (!lastMatch.equals(previousMatchResult) && lastMatch.getLastMatchICType().equals(typeOfEquationValue))  //check once
+			System.out.println(lastMatch.getNumMatched()+"~"+lastMatch.getLastMatchICType()+"\n");
+		
+			while (lastMatch.getNumMatched()<argValues.size() && true == lastMatch.getLastMatchSucceed())
 			{
-				lastMatch = xv.match(isPatternSide, firstMatch, argValues);
+				lastMatch = xv.match(isPatternSide, lastMatch, argValues);
 			}
 			return lastMatch;
 			
@@ -58,10 +59,14 @@ public class ICComplexValueQ extends ICAbstractValue{
 		else if (qop.toString().equals("?"))
 		{
 			isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, previousMatchResult, argValues);
+			if(true == lastMatch.getError())
+			{
+				lastMatch = previousMatchResult;
+			}
 			return lastMatch;
 		}
-		//return match;
-		else	return previousMatchResult; //TODO - make sure of this
+	//	return lastMatch;
+		return previousMatchResult; //TODO - make sure of this
 		
 	}
 }
