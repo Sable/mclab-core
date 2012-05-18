@@ -11,7 +11,7 @@ import natlab.toolkits.analysis.Mergable;
 
 /**
  * represents a shape. it is represented using an array of values.
- * TODO - what to do about top?                 XU: two options...just don't know nothing.
+ * TODO - what to do about top?
  */
 
 
