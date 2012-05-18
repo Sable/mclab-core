@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPFunCall extends SPAbstractVertcatExprArg
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	String i;
 	SPAbstractVertcatExprArg ls;
 	public SPFunCall(String i, SPAbstractVertcatExprArg ls)
@@ -87,7 +87,8 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 				if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" compare with "+previousMatchResult.getShapeOfVariable(arg[1]));
 				Shape<?> first = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[0]);
 				Shape<?> second = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[1]);
-				if(first.equals(second)){
+				//actually, I don't know what happened here, need more consideration later.
+				if(((Shape<AggrValue<BasicMatrixValue>>)first).equals((Shape<AggrValue<BasicMatrixValue>>)second)){
 					if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" is equal to "+previousMatchResult.getShapeOfVariable(arg[1]));
 					return previousMatchResult;
 				}

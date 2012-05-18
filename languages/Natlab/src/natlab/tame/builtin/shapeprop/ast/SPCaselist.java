@@ -9,7 +9,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPCaselist extends SPNode
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	SPCase first;
 	SPCaselist next;
 	

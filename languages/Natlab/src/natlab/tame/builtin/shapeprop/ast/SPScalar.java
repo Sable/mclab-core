@@ -14,7 +14,7 @@ import natlab.tame.valueanalysis.components.shape.*;
 
 public class SPScalar extends SPAbstractVectorExpr
 {
-	static boolean Debug;
+	static boolean Debug = true;
 	String s;
 	
 	public SPScalar (String s)

@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPOutput extends SPNode
 {
-	static boolean Debug;
+	static boolean Debug = true;
 	SPAbstractVectorExpr first;
 	SPOutput next;
 	

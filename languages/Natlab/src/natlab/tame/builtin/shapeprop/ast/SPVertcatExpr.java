@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPVertcatExpr extends SPAbstractVectorExpr
 {
-	static boolean Debug;
+	static boolean Debug = true;
 	SPVertExprArglist vl;
 	public SPVertcatExpr(SPVertExprArglist vl)
 	{

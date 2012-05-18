@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPNumber extends SPAbstractScalarExpr
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	Number n;
 	public SPNumber (Number n)
 	{

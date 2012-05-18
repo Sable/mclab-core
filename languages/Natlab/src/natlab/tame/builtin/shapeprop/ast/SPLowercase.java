@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPLowercase extends SPAbstractScalarExpr
 {
-	static boolean Debug;
+	static boolean Debug = true;
 	String s;
 	public SPLowercase(String s)
 	{

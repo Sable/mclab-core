@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPMult extends SPAbstractMatchExpr
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	SPAbstractMatchExpr sp;
 	public SPMult (SPAbstractMatchExpr sp)
 	{

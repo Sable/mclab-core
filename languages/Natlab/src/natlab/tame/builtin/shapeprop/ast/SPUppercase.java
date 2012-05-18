@@ -14,7 +14,7 @@ import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
 public class SPUppercase extends SPAbstractVectorExpr
 {
-	static boolean Debug;
+	static boolean Debug = true;
 	String s;
 	public SPUppercase (String s)
 	{

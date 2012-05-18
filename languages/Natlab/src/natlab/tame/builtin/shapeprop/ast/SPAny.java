@@ -19,7 +19,7 @@ import natlab.tame.valueanalysis.value.Value;
  */
 public class SPAny extends SPAbstractVectorExpr
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	String s;
 	public SPAny(String a)
 	{

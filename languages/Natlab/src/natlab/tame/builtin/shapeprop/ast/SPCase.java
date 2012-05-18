@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.value.Value;
 
 public class SPCase extends SPNode
 {
-	static boolean Debug = false;
+	static boolean Debug = true;
 	SPAbstractPattern first;
 	SPOutput next;
 	
