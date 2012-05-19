@@ -67,7 +67,7 @@ public class SPVertcatExpr extends SPAbstractVectorExpr
 				return previousMatchResult;
 			}
 			else{
-				//FIXME deal with the [m,k] kinds of output
+				//FIXME deal with the [m,k] or [m,k,j,..] kinds of output
 				if (Debug) System.out.println("inside output vertcat expression!");
 				ArrayList<Integer> al = new ArrayList<Integer>(arg.length);
 				for(String i : arg){

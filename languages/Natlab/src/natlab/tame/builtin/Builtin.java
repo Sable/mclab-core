@@ -958,12 +958,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryNumericFunction extends AbstractProperNumericFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractBinaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryNumericFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,M?->M");
+            }
+            return shapePropInfo;
+        }
+
         private CP matlabClassPropInfo = null;
         public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
@@ -1100,7 +1109,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Power extends AbstractElementalBinaryArithmetic implements HasClassPropagationInfo {
+    public static class Power extends AbstractElementalBinaryArithmetic implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Power singleton = null;
         public static Power getInstance(){
@@ -1125,6 +1134,15 @@ public abstract class Builtin {
                 matlabClassPropInfo.setVar("natlab",getClassPropagationInfo());
             }
             return matlabClassPropInfo;
+        }
+
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
+            }
+            return shapePropInfo;
         }
 
     }

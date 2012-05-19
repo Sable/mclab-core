@@ -19,6 +19,11 @@ public class SPQuestion extends SPAbstractMatchExpr
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
+		if(argValues.size()>previousMatchResult.getNumMatched()){
+			System.out.println("inside ? expression");
+			ShapePropMatch match = spm.match(isPatternSide, previousMatchResult, argValues);
+			return match;
+		}
 		return previousMatchResult;
 	}
 	

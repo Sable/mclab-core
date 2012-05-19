@@ -193,6 +193,7 @@ arrayUnaryArithmetic; arrayUnaryNumericFunction; abstract
 binaryNumericFunction; properNumericFunction
 -Class(coerce(logical|char->double, (numeric double|0->0) | (double|1 numeric->1)))
 -MatlabClass((int logical)|(logical int)->error, natlab)
+-Shape(M,M?->M)
 
 # elemental binary numeric matrix function
 elementalBinaryNumericFunction; binaryNumericFunction
@@ -209,6 +210,7 @@ minus
 times
 # integers can only be combined with scalar doubles
 power;; MatlabClass(logical 0->error, parent)
+-Shape($|M,$|M->M)
 
 dividingElementalArithmetic; elementalBinaryArithmetic
 -MatlabClass(logical 0->error, parent)
