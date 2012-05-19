@@ -1146,7 +1146,7 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic implements HasClassPropagationInfo {
+    public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDividingElementalArithmetic(this,arg);
@@ -1161,6 +1161,15 @@ public abstract class Builtin {
                 matlabClassPropInfo.setVar("natlab",getClassPropagationInfo());
             }
             return matlabClassPropInfo;
+        }
+
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
+            }
+            return shapePropInfo;
         }
 
     }
@@ -1232,12 +1241,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractArrayBinaryNumericFunction extends AbstractBinaryNumericFunction  {
+    public static abstract class AbstractArrayBinaryNumericFunction extends AbstractBinaryNumericFunction implements HasShapePropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractArrayBinaryNumericFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,M,anyDimensionBigger(3)->M");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static class Cross extends AbstractArrayBinaryNumericFunction  {
         //returns the singleton instance of this class
@@ -1311,7 +1329,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Mpower extends AbstractArrayBinaryArithmetic  {
+    public static class Mpower extends AbstractArrayBinaryArithmetic implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mpower singleton = null;
         public static Mpower getInstance(){
@@ -1327,13 +1345,31 @@ public abstract class Builtin {
             return "mpower";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$,$|M->M||$|M,$->M");
+            }
+            return shapePropInfo;
+        }
+
     }
-    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic  {
+    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic implements HasShapePropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDividingArrayArithmetic(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,M->M");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static class Mldivide extends AbstractDividingArrayArithmetic  {
         //returns the singleton instance of this class

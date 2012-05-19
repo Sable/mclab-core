@@ -214,6 +214,7 @@ power;; MatlabClass(logical 0->error, parent)
 
 dividingElementalArithmetic; elementalBinaryArithmetic
 -MatlabClass(logical 0->error, parent)
+-Shape($|M,$|M->M)
 # the following do not allow both args to be double under certain circumstances (...)
 ldivide
 rdivide
@@ -222,6 +223,7 @@ rem
 
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
+-Shape(M,M,anyDimensionBigger(3)->M)
 cross
 
 
@@ -232,7 +234,9 @@ arrayBinaryArithmetic; arrayBinaryNumericFunction
 mtimes;; MatlabClass(logical 0->double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower
+-Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
+-Shape(M,M->M)
 mldivide
 mrdivide
 
