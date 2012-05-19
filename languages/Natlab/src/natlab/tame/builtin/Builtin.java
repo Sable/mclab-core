@@ -542,12 +542,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDiagonalSensitive(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,$?->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -598,7 +607,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Diag extends AbstractDiagonalSensitive  {
+    public static class Diag extends AbstractDiagonalSensitive implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Diag singleton = null;
         public static Diag getInstance(){
@@ -614,6 +623,15 @@ public abstract class Builtin {
             return "diag";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[m,n],k=minimum(m,n)->[k,1]");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static abstract class AbstractDimensionSensitiveAnyMatrixFunction extends AbstractImproperAnyMatrixFunction  {
         //visit visitor
@@ -643,12 +661,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryNumericFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}

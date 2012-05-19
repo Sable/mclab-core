@@ -136,9 +136,11 @@ improperAnyMatrixFunction; anyMatrixFunction
 
 diagonalSensitive; improperAnyMatrixFunction
 -Class(matrix matrix? -> 0)
+-Shape(M,$?->M)
 tril
 triu
 diag
+-Shape([m,n],k=minimum(m,n)->[k,1])
 
 
 # functions of the form f(matrix,[dimension]), where matrix is any matrix
@@ -163,7 +165,7 @@ properNumericFunction; numericFunction
 # unary numeric function
 unaryNumericFunction; properNumericFunction
 -Class(numeric -> 0, char|logical -> double)
-
+-Shape(M->M)
 elementalUnaryNumericFunction; unaryNumericFunction; abstract
 real
 imag
