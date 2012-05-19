@@ -25,8 +25,7 @@ public class SPScalar extends SPAbstractVectorExpr
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		//System.out.println("inside dollar");
-		if (isPatternSide==true){  //we find a DOLLAR in the tree, we have to distinguish whether it is in pattern matching part, or output part
+		if (isPatternSide==true){  //we find a scalar in the tree, we have to distinguish whether it is in pattern matching part, or output part
 			if (argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing basicMatrixValue
 				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
@@ -75,9 +74,6 @@ public class SPScalar extends SPAbstractVectorExpr
 				ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 				match.comsumeArg();
 				match.saveLatestMatchedUppercase(s);
-				//System.out.println(match.getValueOfVariable(s));
-				//System.out.println(match.getAllResults());
-				//System.out.println(match.getAllLowercase());
 				if (Debug) System.out.println("mathcing a Scalar!");
 				return match;
 			}
@@ -85,13 +81,7 @@ public class SPScalar extends SPAbstractVectorExpr
 				return null;
 		}
 		else{
-			//System.out.println("printing the output shape info:");
-			//System.out.println(previousMatchResult.getAllResults());
-			//System.out.println(previousMatchResult.getAllLowerCase());
-			ArrayList<Integer> dollarShape = new ArrayList<Integer>(2);
-			dollarShape.add(1);
-			dollarShape.add(1);
-			System.err.println("the output shape is "+dollarShape);
+			previousMatchResult.addToOutput(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 			return previousMatchResult;
 		}
 	}

@@ -20,7 +20,8 @@ public class SPEmptySetMatching extends SPAbstractVectorExpr
 		//System.out.println(argValues.get(previousMatchResult.getNumMatched()));
 		ShapePropMatch match = new ShapePropMatch(previousMatchResult);
 		if(isPatternSide==true){
-			if(argValues.get(match.getNumMatched())==null){
+			System.out.println(argValues);
+			if(argValues.isEmpty()){
 				match.comsumeArg();
 				System.out.println("matching an empty arg!");
 				return match;

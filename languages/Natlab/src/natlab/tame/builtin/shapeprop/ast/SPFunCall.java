@@ -119,6 +119,21 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 			if (Debug) System.out.println(match.getAllUppercase());
 			return match;
 		}
+		else if(i.indexOf("minimum")==0){
+			if (Debug) System.out.println("inside minimum("+ls.toString()+")");
+			String[] arg = ls.toString().split(",");
+			if(arg.length==2){
+				int f = previousMatchResult.getValueOfVariable(arg[0]);
+				int s = previousMatchResult.getValueOfVariable(arg[1]);
+				String result = (f<s)?arg[0]:arg[1];
+				if (Debug) System.out.println("the minimum one is "+result);
+				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(result));
+				ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+				return match;
+				}
+			//return error shape, FIXME
+		}
 		if (Debug) System.out.println("not find function!");
 		return null;
 	}

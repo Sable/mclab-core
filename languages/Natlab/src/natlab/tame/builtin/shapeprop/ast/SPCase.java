@@ -39,6 +39,12 @@ public class SPCase extends SPNode
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues); //I sense that maybe we don't need argValues in output
 			return outputMatch;
 		}
+		if((match.getNumMatched()==1)&&(argValues.isEmpty()==true)){  //for matching an empty argument list
+			isPatternSide = false;
+			if (Debug) System.out.println("matching an empty argument list is done!");
+			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues);
+			return outputMatch;
+		}
 		else
 			return null;
 	}
