@@ -107,7 +107,6 @@ AssignmentRhs
     = scalarExpr.s                            {: return s; :}
     | vectorExpr.v                            {: return v; :}
     | fnCall.f                                {: return f; :}
-    | LOWERCASE.l PLUS fnCall.f                {: return new SPPlusFunCall(l, f); :}
     ;
 
 fnCall

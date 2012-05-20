@@ -23,11 +23,8 @@ public class SPCase extends SPNode
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		//System.out.println("inside SPCase");
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
-		//System.out.println(match.getLatestMatchedLowerCase());
-		//System.out.println(match.getNumMatched());
-		if(match.getIsError()==true){
+		if(match.getIsError()==true){//FIXME!!!
 			isPatternSide = false;
 			if (Debug) System.out.println("matching part is done!");
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues); //I sense that maybe we don't need argValues in output

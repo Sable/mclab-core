@@ -134,6 +134,24 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 				}
 			//return error shape, FIXME
 		}
+		else if(i.indexOf("anyDimensionBigger")==0){
+			if (Debug) System.out.println("inside anyDimensionBigger than "+ls.toString());
+			previousMatchResult = ls.match(isPatternSide, previousMatchResult, argValues);
+			int latestMatchedNum = previousMatchResult.getLatestMatchedNumber();
+			List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+			for(Integer d : dimensions){
+				if(d>=latestMatchedNum){
+					return previousMatchResult;
+				}
+			}
+			Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
+			errorShape.FlagItsError();
+			HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+			uppercase.put(previousMatchResult.getLatestMatchedUppercase(), errorShape);
+			ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+			return match;
+			
+		}
 		if (Debug) System.out.println("not find function!");
 		return null;
 	}

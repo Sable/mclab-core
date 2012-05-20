@@ -20,9 +20,16 @@ public class SPOr extends SPAbstractMatchExpr
 		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValuess)
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
-		return previousMatchResult;
+		int indexBeforeOr = previousMatchResult.getNumMatched();
+		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
+		int indexAfterOr = match.getNumMatched();
+		if(indexBeforeOr==indexAfterOr){
+			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);//actually, here, match is the same to previousMatchResult
+			return continueMatch;
+		}
+		return match;
 	}
 	
 	public String toString()

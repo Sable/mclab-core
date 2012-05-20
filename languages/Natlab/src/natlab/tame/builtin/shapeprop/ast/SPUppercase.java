@@ -44,7 +44,8 @@ public class SPUppercase extends SPAbstractVectorExpr
 						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
 						if(argumentShape.equals(oldShape)==false){//FIXME
 							if (Debug) System.out.println("MATLAB syntax error!");
-							Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(null);
+							//Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(null);
+							Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
 							errorShape.FlagItsError();
 							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 							lowercase.put(s, null);
@@ -53,6 +54,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 							ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 							match.comsumeArg();
 							match.saveLatestMatchedUppercase(s);
+							match.setIsError();//this is important!! break from matching algorithm.
 							//System.out.println(match.getValueOfVariable(s));
 							if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
 							if (Debug) System.out.println("matched matrix expression "+match.getLatestMatchedUppercase());
@@ -89,14 +91,20 @@ public class SPUppercase extends SPAbstractVectorExpr
 		}
 		else{
 			if (Debug) System.out.println("inside output uppercase "+s);
-			//default
+			//default, which means in the pattern match side, there is no Uppercase matched.
 			if(previousMatchResult.getShapeOfVariable(s)==null){
-				if(previousMatchResult.getOutputVertcatExpr().size()==1){
+				if(previousMatchResult.getOutputVertcatExpr().size()==0){
+					if(previousMatchResult.getLatestMatchedUppercase().equals("$")){
+						previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable("$"));
+						return previousMatchResult;
+					}
+				}
+				else if(previousMatchResult.getOutputVertcatExpr().size()==1){
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
 					previousMatchResult.copyVertcatToOutput(s);
 					return previousMatchResult;
 				}
-				else{
+				else {
 					previousMatchResult.copyVertcatToOutput(s);
 					return previousMatchResult;
 				}

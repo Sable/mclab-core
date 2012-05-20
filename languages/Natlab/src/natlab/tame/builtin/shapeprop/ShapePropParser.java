@@ -20,34 +20,34 @@ public class ShapePropParser extends Parser {
 		static public final short LOWERCASE = 5;
 		static public final short LRPAREN = 6;
 		static public final short RRPAREN = 7;
-		static public final short ID = 8;
-		static public final short NUMBER = 9;
+		static public final short NUMBER = 8;
+		static public final short ID = 9;
 		static public final short EQUAL = 10;
 		static public final short RSPAREN = 11;
 		static public final short COMMA = 12;
 		static public final short SQUOTATION = 13;
-		static public final short PLUS = 14;
-		static public final short OROR = 15;
-		static public final short ARROW = 16;
-		static public final short QUESTION = 17;
-		static public final short MULT = 18;
+		static public final short OROR = 14;
+		static public final short ARROW = 15;
+		static public final short QUESTION = 16;
+		static public final short MULT = 17;
+		static public final short PLUS = 18;
 		static public final short OR = 19;
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9nzbDbFKr4Gnh$IGakXA5kvBLXQi81RmHKNG5JSY8cFlfXeJDGtuxin6byq$W7YYw#Og8b" +
-		"BNDxz3zpt5NUB#ouwVkVqb9vUBzpcTsVccpFJoRdtN02NCGDn4VGZWJ8qOYRQqG4$IX115Q" +
-		"QWKkUl$9SlrVeVhKyRrvNsLslfSItV9uOW5Y80HrwX3ZNenGgirfdrc8umvjknl6HSg2n77" +
-		"4rmq8QfHLMXuYhCiggwwCybZjMdWNsYL7AsryhKeXhpcAb5$RYwW1qpN3a7dUYXNMRk#VnA" +
-		"FTTiUOp5M8GKxqlHZ2HQKA5tuXQwqShUCIp1AlPsv2QMemy3M2EFi1Rh07b8dd0$wW5EvN1" +
-		"jd3lNn3rDi9UFpy7FFLFvDe#yLvsNbkzJolqBSlPoJbX98bQcZ4geAAueYbNVIbO6gTkhag" +
-		"wgS54Subw5M5NS9qebP#q9Kjov1cQKpQjb$ELMDXYRknVoAaxpNrlvjAhqlPflLotdKfaWV" +
-		"mvxbt9szQzg$WWd2kf9emZotGyhk6U3#w6l7b92EiW0IP0qgJ3vRd9K#JQyDXZRPMo6x2Nz" +
-		"xhKcp#UFJSO$uieTCdOBsUXHkvdizD2takt6FqWwZN$Ss66ocvosQiwG4rOyH4wIS#GiEKz" +
-		"EaOla0hcareb8Dbz3VyogxxFymnupRlFGThWrLpuqWJvaRCqajNicq7TP$ZwF$879PZ9hZh" +
-		"dYOLSy2DSbO$ARzr$oJaObI#yjUMroB#IvF9CHUIC$6VsGx$9PFib7#kzr$ejyaw$oGVjFv" +
-		"O7SbtioGl#kLkwGswRJ3RckxJMvAgD6orfZPFWzyUalJ3FFKO8awITfOxGnsZXj7eUnmpDH" +
-		"8AVLqHOeqRQUkZg$BRGfMaNKq4IjaJP7G9EcNy3FSwu8y1pxY9ydscVmwozP#pys6Da3");
+		"U9nzL4Tl4s4GVN7YajWcfBZ5YPquTa8B2IN4G81GGYw88n8N3aX888w012V8YKj0uf8$m0K" +
+		"9X6Xt$WEzzuv3xmI6ztt#rjvTDlcavvbvRsPsTdQz02vZFjf4aC4Q19360lHY7chXGnHpq8" +
+		"Y8rg$yf$ir$qVp7HMU78AQArGugqzA$c8fafLu5TPYW$Os8uywD630mTIprq2rMiT9D2E4k" +
+		"OwyiBnqLiehj3egsx6GbNQc1ql89DWnZkMSf3hZJQocqe8cenf5Rl5AAyaKiO9g38lfzs4O" +
+		"$OOTmI2M8OjET26dzx08tLX7TeXT7$6QINd8pkkn4PimAW$08uyvQOnEWagADMdEsi7zPL7" +
+		"39r3BhIYznqFtgbDSeukp#lYP7UJkh3XgKmAynmZtQsTKBpkZuX32lB#m8q$5pigmgrU4Jp" +
+		"RaO8BC2kcESVfHXr9FHMsmh5fAq4mKPxUg6kMTbhquTvtdUz74zwD5SmNk8Q1PFw$lPrSrX" +
+		"UgZhjaWF6I0iIFGPvZm4OF4A94XKaJOw4LYIFbsy6mrTeknEuXnOfixr#YxYEt6dtHfnutT" +
+		"IUppgDrDxFNW3n3znZzax0InNwNOyWuJ9spnAU8CSOuuJLmWpX8NYVF49PN7HPMi6lhJjlg" +
+		"YpH$nc6kF1tVGpRdqq0pyfB7DizGUdO4Vz#0cPfl3v1npnITTyHXSHwRbDtz$oJkPaXAzjy" +
+		"HhexsGv$9CdieR#SdeXtoNp$99Fj9$h$Klyas#oWVjFv7xSa$kQlyESTlqk27NjRqcLsNAS" +
+		"2NR07tyLjJehqUM$viCqKc$apP5cw9jexMGO9pWMrz5cMkbhSAdROnyZZP7sqMh43Te9vUc" +
+		"BQDEeq3VGf9waboUVfv#DsqPjVeBrViFkF3GS0==");
 
 	private final Action[] actions;
 
@@ -323,23 +323,14 @@ public class ShapePropParser extends Parser {
 					 return f;
 				}
 			},
-			new Action() {	// [37] AssignmentRhs = LOWERCASE.l PLUS fnCall.f
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_l = _symbols[offset + 1];
-					final String l = (String) _symbol_l.value;
-					final Symbol _symbol_f = _symbols[offset + 3];
-					final SPAbstractPattern f = (SPAbstractPattern) _symbol_f.value;
-					 return new SPPlusFunCall(l, f);
-				}
-			},
-			new Action() {	// [38] fnCall = ID.i LRPAREN RRPAREN
+			new Action() {	// [37] fnCall = ID.i LRPAREN RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					 return new SPFunCall(i, null);
 				}
 			},
-			new Action() {	// [39] fnCall = ID.i LRPAREN arglist.al RRPAREN
+			new Action() {	// [38] fnCall = ID.i LRPAREN arglist.al RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -348,14 +339,14 @@ public class ShapePropParser extends Parser {
 					 return new SPFunCall(i, al);
 				}
 			},
-			new Action() {	// [40] arglist = arg.a
+			new Action() {	// [39] arglist = arg.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg a = (SPAbstractVertcatExprArg) _symbol_a.value;
 					 return new SPArglist(a, null);
 				}
 			},
-			new Action() {	// [41] arglist = arg.a COMMA arglist.al
+			new Action() {	// [40] arglist = arg.a COMMA arglist.al
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg a = (SPAbstractVertcatExprArg) _symbol_a.value;
@@ -364,28 +355,28 @@ public class ShapePropParser extends Parser {
 					 return new SPArglist(a, al);
 				}
 			},
-			new Action() {	// [42] arg = scalarExpr.s
+			new Action() {	// [41] arg = scalarExpr.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final SPAbstractScalarExpr s = (SPAbstractScalarExpr) _symbol_s.value;
 					 return s;
 				}
 			},
-			new Action() {	// [43] arg = vectorExpr.v
+			new Action() {	// [42] arg = vectorExpr.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final SPAbstractVectorExpr v = (SPAbstractVectorExpr) _symbol_v.value;
 					 return v;
 				}
 			},
-			new Action() {	// [44] arg = SQUOTATION ID.i SQUOTATION
+			new Action() {	// [43] arg = SQUOTATION ID.i SQUOTATION
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 2];
 					final String i = (String) _symbol_i.value;
 					 return new SPStringLiteral(i);
 				}
 			},
-			new Action() {	// [45] assertStmt = fnCall.f
+			new Action() {	// [44] assertStmt = fnCall.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_f = _symbols[offset + 1];
 					final SPAbstractPattern f = (SPAbstractPattern) _symbol_f.value;

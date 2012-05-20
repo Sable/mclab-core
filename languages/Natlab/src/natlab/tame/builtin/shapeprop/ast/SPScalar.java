@@ -38,14 +38,18 @@ public class SPScalar extends SPAbstractVectorExpr
 					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
 					match.saveLatestMatchedUppercase(s);
-					//System.out.println(match.getValueOfVariable("Scalar"));
-					//System.out.println(match.getAllResults());
 					if (Debug) System.out.println(match.getAllLowercase());
-					if (Debug) System.out.println("mathcing a Scalar!");
+					if (Debug) System.out.println("inside empty constant value and shape value mathcing a Scalar!");
 					return match;
 				}
 				//get its constant int value
-				if((((HasConstant)argument).getConstant()==null)){
+				if((((HasConstant)argument).getConstant()==null)){//maybe it's a scalar but value is unknown or it's not a scalar, which means not matched!
+					//first, test whether or not it's not a scalar, which means, constant value is empty but shape is not [1,1]
+					if(((HasShape)argument).getShape().equals((new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())))!=true){
+						if (Debug) System.out.println("it's definitely not a scalar");
+						previousMatchResult.setIsError();
+						return previousMatchResult;
+					}
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					lowercase.put(s, null);
 					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
@@ -54,10 +58,8 @@ public class SPScalar extends SPAbstractVectorExpr
 					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
 					match.saveLatestMatchedUppercase(s);
-					//System.out.println(match.getValueOfVariable("Scalar"));
-					//System.out.println(match.getAllResults());
 					if (Debug) System.out.println(match.getAllLowercase());
-					if (Debug) System.out.println("mathcing a Scalar!");
+					if (Debug) System.out.println("inside empty constant value mathcing a Scalar!");
 					return match;
 				}
 				double argumentConstantDouble = (Double) ((HasConstant)argument).getConstant().getValue();
