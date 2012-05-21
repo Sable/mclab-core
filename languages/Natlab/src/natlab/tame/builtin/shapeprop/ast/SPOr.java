@@ -26,6 +26,9 @@ public class SPOr extends SPAbstractMatchExpr
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		int indexAfterOr = match.getNumMatched();
 		if(indexBeforeOr==indexAfterOr){
+			if(match.getIsError()==true){
+				match.resetIsError();
+			}
 			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);//actually, here, match is the same to previousMatchResult
 			return continueMatch;
 		}

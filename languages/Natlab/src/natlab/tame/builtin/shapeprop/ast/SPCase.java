@@ -26,9 +26,13 @@ public class SPCase extends SPNode
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if(match.getIsError()==true){//FIXME!!!
 			isPatternSide = false;
-			if (Debug) System.out.println("matching part is done!");
+			if(match.getNumMatched()!=argValues.size()){
+				if (Debug) System.out.println("matching part is over, break out!");
+				return match;
+			}
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues); //I sense that maybe we don't need argValues in output
 			return outputMatch;
+			
 		}
 		if(match.getNumMatched()==argValues.size()){  //if pattern part is done with successful matching
 			isPatternSide = false;

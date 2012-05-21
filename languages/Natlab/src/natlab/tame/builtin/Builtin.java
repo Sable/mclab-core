@@ -1419,7 +1419,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Dot extends AbstractDimensionSensitiveNumericFunction implements HasClassPropagationInfo {
+    public static class Dot extends AbstractDimensionSensitiveNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Dot singleton = null;
         public static Dot getInstance(){
@@ -1435,6 +1435,15 @@ public abstract class Builtin {
             return "dot";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1],[1,n]|[n,1]->$||M,M,M(1)=1->M");
+            }
+            return shapePropInfo;
+        }
+
         private CP matlabClassPropInfo = null;
         public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined

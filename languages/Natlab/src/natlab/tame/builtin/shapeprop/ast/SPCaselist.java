@@ -25,12 +25,20 @@ public class SPCaselist extends SPNode
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
-		if (match.outputIsDone() == true) {
+		//first case match successfully!
+		if((match.outputIsDone()==true)&&(match.getIsError()==false)) {
 			if (Debug) System.out.println("matching and results emmitting successfully!\n");
 			return match;
 		}
+		//first case doesn't match, new a new one, start matching again.
+		else if((match.getIsError()==true)&&(next!=null)){
+			ShapePropMatch newMatch = new ShapePropMatch();
+			newMatch = next.match(isPatternSide, newMatch, argValues);
+			return newMatch;
+		}
+		//only one case and doesn't match successfully.
 		else
-			return next.match(isPatternSide, previousMatchResult, argValues);		
+			return match;		
 	}
 	
 	public String toString()

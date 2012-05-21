@@ -249,6 +249,7 @@ improperNumericFunction; numericFunction
 dimensionSensitiveNumericFunction; improperNumericFunction
 # TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
 dot
+-Shape([1,n]|[n,1],[1,n]|[n,1]->$||M,M,M(1)=1->M)
 -Class(coerce(logical|char->double,(single float)|(float single)->single || numeric double|0->double || double|1 numeric->double) (numeric|logical)?)
 -MatlabClass(logical any->error, natlab)
 

@@ -96,6 +96,10 @@ public class ShapePropMatch{
     public void setIsError(){
     	this.isError = true;
     }
+    //resetIsError is for OR case
+    public void resetIsError(){
+    	this.isError = false;
+    }
     
     public boolean getIsError(){
     	return this.isError;

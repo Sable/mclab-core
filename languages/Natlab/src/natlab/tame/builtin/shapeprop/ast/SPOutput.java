@@ -38,7 +38,7 @@ public class SPOutput extends SPNode
 			match.setOutputIsDone();
 			return match;
 		}
-		return next.match(isPatternSide, previousMatchResult, argValues);
+		return next.match(isPatternSide, match, argValues);//FIXME
 	}
 	
 	public String toString()
