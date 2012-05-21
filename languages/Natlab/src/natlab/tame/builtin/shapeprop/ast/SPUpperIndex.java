@@ -24,8 +24,10 @@ public class SPUpperIndex extends SPAbstractVertcatExprArg
 		//for M(2), this node just want to get the value of M's second dimension size, if in an assignment, just modify the number of second dimension.
 		//just save string s and mostly number n as the latest matched thing, and set inArrayIndex true
 		previousMatchResult.saveLatestMatchedUppercase(s);
+		previousMatchResult.setArrayIndexAssignLeft(true);
 		previousMatchResult = n.match(isPatternSide, previousMatchResult, argValues);
-		previousMatchResult.setArrayIndexAssign(true);
+		previousMatchResult.setArrayIndexAssignLeft(false);
+		previousMatchResult.setArrayIndexAssignRight(true);
 		return previousMatchResult;
 	}
 	

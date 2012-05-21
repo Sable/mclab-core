@@ -19,7 +19,9 @@ public class ShapePropMatch{
 	int previousMatchedNumber = 0;
 	HashMap<String, Integer> lowercase = new HashMap<String, Integer>();  //lowercase is used like m=prevScalar()
 	HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();  //mostly, uppercase is used for matching a shape
-	boolean ArrayIndexAssign = false;   //used for M(2)=0 kind of case, so everytime, in number node, we should check whether or not in a arrayIndex assignment, kind of tricky?
+	boolean whetherLatestMatchedIsNum = false;
+	boolean ArrayIndexAssignLeft = false;
+	boolean ArrayIndexAssignRight = false;
 	boolean isError = false;
 	boolean matchingIsDone = false;
 	boolean outputIsDone = false;
@@ -45,7 +47,9 @@ public class ShapePropMatch{
         this.previousMatchedNumber = parent.previousMatchedNumber;
         this.lowercase = parent.lowercase;
         this.uppercase = parent.uppercase;
-        this.ArrayIndexAssign = parent.ArrayIndexAssign;
+        this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
+        this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
+        this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
         this.isError = parent.isError;
         this.matchingIsDone = parent.matchingIsDone;
         this.outputIsDone = parent.outputIsDone;
@@ -74,7 +78,9 @@ public class ShapePropMatch{
 		if(uppercase!=null){
 			this.uppercase.putAll(uppercase);
 		}
-		this.ArrayIndexAssign = parent.ArrayIndexAssign;
+		this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
+		this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
+		this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
 	    this.isError = parent.isError;
 	    this.matchingIsDone = parent.matchingIsDone;
 	    this.outputIsDone = parent.outputIsDone;
@@ -105,12 +111,28 @@ public class ShapePropMatch{
     	return this.isError;
     }
     
-    public void setArrayIndexAssign(boolean condition){
-    	this.ArrayIndexAssign = condition;
+    public void setWhetherLatestMatchedIsNum(boolean condition){
+    	this.whetherLatestMatchedIsNum = condition;
     }
     
-    public boolean getArrayIndexAssign(){
-    	return this.ArrayIndexAssign;
+    public boolean getWhetherLatestMatchedIsNum(){
+    	return this.whetherLatestMatchedIsNum;
+    }
+    
+    public void setArrayIndexAssignLeft(boolean condition){
+    	this.ArrayIndexAssignLeft = condition;
+    }
+    
+    public boolean isArrayIndexAssignLeft(){
+    	return this.ArrayIndexAssignLeft;
+    }
+    
+    public void setArrayIndexAssignRight(boolean condition){
+    	this.ArrayIndexAssignRight = condition;
+    }
+    
+    public boolean isArrayIndexAssignRight(){
+    	return this.ArrayIndexAssignRight;
     }
     
     public void saveLatestMatchedNumber(int latestMatchedNumber){

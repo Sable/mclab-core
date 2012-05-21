@@ -22,7 +22,7 @@ public class SPLowercase extends SPAbstractScalarExpr
 	{
 		if(isPatternSide==true){
 			//for matching a vertcat expression, this step should be similar to Uppercase matching, to exam whether equals!
-			if(previousMatchResult.isInsideVertcat()){
+			if(previousMatchResult.isInsideVertcat()==true){
 				if (Debug) System.out.println("a lowercase inside vertcat!");
 				if (Debug) System.out.println(previousMatchResult.getNumInVertcat());
 				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
@@ -60,9 +60,9 @@ public class SPLowercase extends SPAbstractScalarExpr
 				match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 				return match;
 			}
-			//for assign a lowercase's value to an ArrayIndex
+			//for assign a lowercase's value to an ArrayIndex FIXME
 			if(previousMatchResult.getAllLowercase().containsKey(s)){
-				if(previousMatchResult.getArrayIndexAssign()==true){
+				if(previousMatchResult.isArrayIndexAssignRight()==true){
 					//FIXME
 					if (Debug) System.out.println("inside lowercase of an arrayIndex assignment!");
 					List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
@@ -74,7 +74,7 @@ public class SPLowercase extends SPAbstractScalarExpr
 					uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
 					if (Debug) System.out.println(uppercase);
 					ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-					match.setArrayIndexAssign(false);
+					match.setArrayIndexAssignRight(false);
 					return match;
 				}
 				if (Debug) System.out.println(s+" is contained in the hashmap!");

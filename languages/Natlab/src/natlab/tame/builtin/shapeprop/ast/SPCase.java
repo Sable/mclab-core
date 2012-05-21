@@ -46,6 +46,10 @@ public class SPCase extends SPNode
 			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues);
 			return outputMatch;
 		}
+		if(match.getNumMatched()!=argValues.size()){ //match unsuccessful
+			match.setIsError();
+			return match;
+		}
 		else
 			return null;
 	}
