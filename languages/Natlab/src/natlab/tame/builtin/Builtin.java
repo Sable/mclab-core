@@ -1474,12 +1474,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractMinOrMax extends AbstractDimensionCollapsingNumericFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractMinOrMax extends AbstractDimensionCollapsingNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractMinOrMax(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1]->$||M,M(1)=1->M||M,M->M||M,[],$,n=previousScalar(),M(n)=1->M");
+            }
+            return shapePropInfo;
+        }
+
         private CP matlabClassPropInfo = null;
         public CP getMatlabClassPropagationInfo(){
             //set classPropInfo if not defined
@@ -1537,7 +1546,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Median extends AbstractMinOrMax  {
+    public static class Median extends AbstractMinOrMax implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Median singleton = null;
         public static Median getInstance(){
@@ -1553,6 +1562,15 @@ public abstract class Builtin {
             return "median";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1]->$||M,M(1)=1->M||M,M->M||M,$,n=previousScalar(),M(n)=1->M");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static abstract class AbstractFloatFunction extends AbstractMatrixFunction  {
         //visit visitor
@@ -1568,12 +1586,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryFloatFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -2551,12 +2578,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractBinaryFloatFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -2628,7 +2664,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Eps extends AbstractImproperFloatFunction implements HasClassPropagationInfo {
+    public static class Eps extends AbstractImproperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Eps singleton = null;
         public static Eps getInstance(){
@@ -2644,6 +2680,15 @@ public abstract class Builtin {
             return "eps";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M->M||'double'|'single'->$");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -2660,12 +2705,21 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDimensionSensitiveFloatFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,$?->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -2738,7 +2792,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Mode extends AbstractDimensionCollapsingFloatFunction  {
+    public static class Mode extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mode singleton = null;
         public static Mode getInstance(){
@@ -2754,8 +2808,17 @@ public abstract class Builtin {
             return "mode";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M");
+            }
+            return shapePropInfo;
+        }
+
     }
-    public static class Prod extends AbstractDimensionCollapsingFloatFunction  {
+    public static class Prod extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Prod singleton = null;
         public static Prod getInstance(){
@@ -2771,8 +2834,17 @@ public abstract class Builtin {
             return "prod";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M");
+            }
+            return shapePropInfo;
+        }
+
     }
-    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasClassPropagationInfo {
+    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sum singleton = null;
         public static Sum getInstance(){
@@ -2788,6 +2860,15 @@ public abstract class Builtin {
             return "sum";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1],('double'|'native')?->$||M,M(1)=1,('double'|'native')?->M||M,$,n=previousScalar(),M(n)=1,('double'|'native')?->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -2804,7 +2885,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements HasClassPropagationInfo {
+    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Mean singleton = null;
         public static Mean getInstance(){
@@ -2820,6 +2901,15 @@ public abstract class Builtin {
             return "mean";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1]->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}

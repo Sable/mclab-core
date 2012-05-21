@@ -139,8 +139,7 @@ diagonalSensitive; improperAnyMatrixFunction
 -Shape(M,$?->M)
 tril
 triu
-diag
--Shape([m,n],k=minimum(m,n)->[k,1])
+diag;; Shape([m,n],k=minimum(m,n)->[k,1])
 
 
 # functions of the form f(matrix,[dimension]), where matrix is any matrix
@@ -209,8 +208,7 @@ plus
 minus
 times
 # integers can only be combined with scalar doubles
-power;; MatlabClass(logical 0->error, parent)
--Shape($|M,$|M->M)
+power;; MatlabClass(logical 0->error, parent);; Shape($|M,$|M->M)
 
 dividingElementalArithmetic; elementalBinaryArithmetic
 -MatlabClass(logical 0->error, parent)
@@ -233,8 +231,7 @@ arrayBinaryArithmetic; arrayBinaryNumericFunction
 -Shape([m,n],[n,k]->[m,k])
 mtimes;; MatlabClass(logical 0->double, parent)
 # integers can only be comibned with scalar doubles -- or not?
-mpower
--Shape($,$|M->M||$|M,$->M)
+mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
 -Shape(M,M->M)
 mldivide
@@ -249,9 +246,9 @@ improperNumericFunction; numericFunction
 dimensionSensitiveNumericFunction; improperNumericFunction
 # TODO dot results in floats - but has the same input constraints as numeric - different category? not a builtin?
 dot
--Shape([1,n]|[n,1],[1,n]|[n,1]->$||M,M,M(1)=1->M)
 -Class(coerce(logical|char->double,(single float)|(float single)->single || numeric double|0->double || double|1 numeric->double) (numeric|logical)?)
 -MatlabClass(logical any->error, natlab)
+-Shape([1,n]|[n,1],[1,n]|[n,1]->$||M,M,M(1)=1->M)
 
 
 # functions that collapse the specified dimension
@@ -260,12 +257,12 @@ dimensionCollapsingNumericFunction; dimensionSensitiveNumericFunction
 minOrMax; dimensionCollapsingNumericFunction
 -Class(matrix any (numeric|logical)->0 double, logical logical->logical double, coerce(logical|char->double, numeric (double|0)?->0 double || double|1 numeric->1 double), matrix->0 double)
 -MatlabClass(logical logical->logical double, char|logical -> error, char|logical any->error, any char|logical->error, natlab)
+-Shape([1,n]|[n,1]->$||M,M(1)=1->M||M,M->M||M,[],$,n=previousScalar(),M(n)=1->M)
 min
 max
 
 # median does not support logical matrizes
-median
-
+median;; Shape([1,n]|[n,1]->$||M,M(1)=1->M||M,M->M||M,$,n=previousScalar(),M(n)=1->M)
 
 
 
@@ -279,6 +276,7 @@ properFloatFunction; floatFunction
 # unary functions operating on floating point matrizes
 unaryFloatFunction; properFloatFunction
 -Class(float->0)
+-Shape(M->M)
 
 # elemental unary functions operating on floating point matrizes
 elementalUnaryFloatFunction; unaryFloatFunction
@@ -362,6 +360,7 @@ inv
 # binary matrix function operaitng on float matrices
 binaryFloatFunction; properFloatFunction
 -Class(float double|0 -> 0, double|1 float -> 1)
+-Shape($|M,$|M->M)
 
 # elemental binary functino operating on floats matrizes
 elementalBinaryFloatFunction; binaryFloatFunction
@@ -375,22 +374,23 @@ hypot
 # improper float matrix functions do not have a fixed arity, and extra arguments are either
 # options or different possible operands.
 improperFloatFunction; floatFunction
-eps;; Class(none->double, float->0, typeString(float))
+eps;; Class(none->double, float->0, typeString(float)) ;; Shape(M->M||'double'|'single'->$)
 
 # functions of the form f(matrix,[dimension])
 dimensionSensitiveFloatFunction; improperFloatFunction
 -Class(float (numeric|logical)? -> 0)
+-Shape(M,$?->M)
 # cumsum coerces logicals to double
 cumsum;; Class(coerce(logical->double, parent))
 cumprod
 
 # numeric function that collapses a dimension (optional second arg tells which)
 dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
-mode
-prod
+mode;; Shape($->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
+prod;; Shape($->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
 #TODO - sum takes a possible string parameter
-sum;; Class(coerce(int|char|logical->double,parent))
-mean;; Class(coerce(int|char|logical->double,parent))
+sum;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1],('double'|'native')?->$||M,M(1)=1,('double'|'native')?->M||M,$,n=previousScalar(),M(n)=1,('double'|'native')?->M)
+mean;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1]->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
 
 
 # standard matrix math functions with optional arguments
@@ -697,10 +697,8 @@ ctranspose
 
 # all these take multiple args
 Concatenation; versatileFunction
--Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
-horzcat
--Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
-vertcat
+horzcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
+vertcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
 # generalization of horz/vert cat
 cat
 
