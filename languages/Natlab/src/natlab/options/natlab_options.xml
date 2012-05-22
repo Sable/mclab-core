@@ -260,18 +260,6 @@ No static linking is done.
   </section>
  -->
 
-  <section>
-    <name>tamer tool</name>
-    <boolopt>
-      <name>tame Matlab code</name>
-      <alias>t</alias>
-      <alias>tame</alias>
-      <long_desc>
-        produce a Tamer IR, a complete call graph and an estimation of 
-        classes for all variables
-      </long_desc>
-    </boolopt>
-  </section>
 
   <section>
     <name>play</name>

@@ -396,13 +396,7 @@ public class Main
                         fileNames.add( file );
 			
                         //checks if dependence analysis flag is set.
-                        //If the flag is set then the type of dependence test that needs to be applied.
-                        
-                        //Xu added tamer here
-                        if( options.tame() ){ //begin tamer
-                            natlab.tame.valueanalysis.simplematrix.SimpleMain.main(file);
-                            return;
-                        } //end tamer
+                        //If the flag is set then the type of dependence test that needs to be applied.                   
                         
                         if(options.danalysis()){                            
                             //Program prog = null;
