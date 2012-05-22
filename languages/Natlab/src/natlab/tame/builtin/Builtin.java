@@ -627,7 +627,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[m,n],k=minimum(m,n)->[k,1],[k,1]");
+                shapePropInfo = ShapePropTool.parse("[m,n],k=minimum(m,n)->[k,1]");
             }
             return shapePropInfo;
         }

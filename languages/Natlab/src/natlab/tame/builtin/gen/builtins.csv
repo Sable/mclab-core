@@ -139,7 +139,7 @@ diagonalSensitive; improperAnyMatrixFunction
 -Shape(M,$?->M)
 tril
 triu
-diag;; Shape([m,n],k=minimum(m,n)->[k,1],[k,1])
+diag;; Shape([m,n],k=minimum(m,n)->[k,1])
 
 
 # functions of the form f(matrix,[dimension]), where matrix is any matrix
