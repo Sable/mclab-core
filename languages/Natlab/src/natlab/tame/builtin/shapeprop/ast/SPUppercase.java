@@ -8,9 +8,13 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Value;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
+
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.constant.Constant;
 
 public class SPUppercase extends SPAbstractVectorExpr
 {
@@ -34,6 +38,12 @@ public class SPUppercase extends SPAbstractVectorExpr
 				BasicMatrixValue argument = (BasicMatrixValue)argValues.get(previousMatchResult.getNumMatched());
 				//get shape info from current Matrix Value
 				Shape<AggrValue<BasicMatrixValue>> argumentShape = ((HasShape)argument).getShape();
+				Constant argumentConstant =((HasConstant)argument).getConstant();
+				if(argumentConstant!=null){
+					System.out.println("it's a constant!");
+					previousMatchResult.setIsError();
+					return previousMatchResult;
+				}
 				//check whether or not current uppercase already in the previousMatchResult
 				try{
 					if(previousMatchResult.getLatestMatchedUppercase().equals(s)){
@@ -87,6 +97,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 				return match;
 			}
+			//FIXME if index pointing empty, means not match, do something
 			return previousMatchResult;
 		}
 		else{
@@ -98,6 +109,8 @@ public class SPUppercase extends SPAbstractVectorExpr
 						previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable("$"));
 						return previousMatchResult;
 					}
+					previousMatchResult.addToOutput(s, null);
+					return previousMatchResult;
 				}
 				else if(previousMatchResult.getOutputVertcatExpr().size()==1){
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
@@ -109,10 +122,10 @@ public class SPUppercase extends SPAbstractVectorExpr
 					return previousMatchResult;
 				}
 			}
-			else
+			else{
 				previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable(s));
 				return previousMatchResult;
-				
+			}	
 		}
 	}
 	
