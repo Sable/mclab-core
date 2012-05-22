@@ -62,6 +62,7 @@ matchExpr
     | matchExpr.m MULT                        {: return new SPMult(m); :}
     | matchExpr.m PLUS                        {: return new SPPlus(m); :}
     | vectorExpr.v                            {: return v; :}
+    | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
     | matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
     ;
     
@@ -122,7 +123,6 @@ arglist
 arg
     = scalarExpr.s                            {: return s; :}                          
     | vectorExpr.v                            {: return v; :}
-    | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
     ;
 
 assertStmt
