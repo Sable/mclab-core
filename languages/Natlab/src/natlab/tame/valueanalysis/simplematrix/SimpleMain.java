@@ -1,6 +1,5 @@
 package natlab.tame.valueanalysis.simplematrix;
 
-import java.util.Collections;
 import java.util.*;
 
 import natlab.tame.TamerTool;

@@ -60,23 +60,45 @@ public class SPLowercase extends SPAbstractScalarExpr
 				match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 				return match;
 			}
-			//for assign a lowercase's value to an ArrayIndex FIXME
-			if(previousMatchResult.getAllLowercase().containsKey(s)){
-				if(previousMatchResult.isArrayIndexAssignRight()==true){
-					//FIXME
-					if (Debug) System.out.println("inside lowercase of an arrayIndex assignment!");
-					List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+			//for assign a lowercase's value to an ArrayIndex
+			if(previousMatchResult.isArrayIndexAssignRight()==true){
+				if (Debug) System.out.println("trying to assign the value of "+s.toString()+" to an array!");
+				List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
+					if (Debug) System.out.println("inside assigning a lowercase's value to array with num index!");//i.e. M(2)=n;
+					//deal with the case that index overflow
+					if((dimensions.size()-1)<(previousMatchResult.getLatestMatchedNumber()-1)){
+						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getLatestMatchedNumber());
+						if (Debug) System.out.println("dimension should not be changed!");
+						previousMatchResult.setArrayIndexAssignRight(false);
+						return previousMatchResult;
+					}
 					dimensions.remove((previousMatchResult.getLatestMatchedNumber()-1));
 					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), previousMatchResult.getValueOfVariable(s));
-					if (Debug) System.out.println("new dimension is "+dimensions);
-					if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-					uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
-					if (Debug) System.out.println(uppercase);
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-					match.setArrayIndexAssignRight(false);
-					return match;
 				}
+				else{
+					if (Debug) System.out.println("inside assigning a lowercase's value to array with lowercase index!");//i.e. M(n)=m;
+					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
+					//deal with the case that index overflow
+					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1)){
+						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
+						if (Debug) System.out.println("dimension should not be changed!");
+						previousMatchResult.setArrayIndexAssignRight(false);
+						return previousMatchResult;
+					}
+					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1);
+					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1, previousMatchResult.getValueOfVariable(s));
+				}
+				if (Debug) System.out.println("new dimension is "+dimensions);
+				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+				if (Debug) System.out.println(uppercase);
+				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+				match.setArrayIndexAssignRight(false);
+				return match;
+			}
+			if(previousMatchResult.getAllLowercase().containsKey(s)){
 				if (Debug) System.out.println(s+" is contained in the hashmap!");
 				previousMatchResult.saveLatestMatchedLowercase(s);
 				return previousMatchResult;

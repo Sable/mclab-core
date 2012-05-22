@@ -39,7 +39,7 @@ public class ShapePropTool {
     		for(Value<?> arg:argValues){
     			if(((HasShape)arg).getShape()==null){
     				if (Debug) System.out.println(arg+"'s shape is undefined");
-/*    				ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
+    			    /*ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
     				emptyList.add(null);
     				return emptyList;*/
     			}
