@@ -627,7 +627,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[m,n],k=minimum(m,n)->[k,1]");
+                shapePropInfo = ShapePropTool.parse("[m,n],k=minimum(m,n)->[k,1],[k,1]");
             }
             return shapePropInfo;
         }
@@ -5632,21 +5632,12 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractConcatenation extends AbstractVersatileFunction implements HasShapePropagationInfo {
+    public static abstract class AbstractConcatenation extends AbstractVersatileFunction  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractConcatenation(this,arg);
         }
         
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K");
-            }
-            return shapePropInfo;
-        }
-
     }
     public static class Horzcat extends AbstractConcatenation implements HasShapePropagationInfo {
         //returns the singleton instance of this class
@@ -5668,13 +5659,13 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K");
+                shapePropInfo = ShapePropTool.parse("M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K");
             }
             return shapePropInfo;
         }
 
     }
-    public static class Vertcat extends AbstractConcatenation  {
+    public static class Vertcat extends AbstractConcatenation implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Vertcat singleton = null;
         public static Vertcat getInstance(){
@@ -5690,6 +5681,15 @@ public abstract class Builtin {
             return "vertcat";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static class Cat extends AbstractConcatenation  {
         //returns the singleton instance of this class
