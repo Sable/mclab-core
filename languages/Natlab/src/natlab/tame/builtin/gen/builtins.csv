@@ -395,7 +395,7 @@ mean;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1]->$||M,
 
 # standard matrix math functions with optional arguments
 matrixLibaryFunction; improperFloatFunction
-eig
+eig;; Shape([n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n])
 norm;; Class(float (float|logical|char)?->0)
 # query?
 rank;; Class(float matrix?->double)

@@ -2933,7 +2933,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Eig extends AbstractMatrixLibaryFunction  {
+    public static class Eig extends AbstractMatrixLibaryFunction implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Eig singleton = null;
         public static Eig getInstance(){
@@ -2949,6 +2949,15 @@ public abstract class Builtin {
             return "eig";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n]");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static class Norm extends AbstractMatrixLibaryFunction implements HasClassPropagationInfo {
         //returns the singleton instance of this class

@@ -63,6 +63,7 @@ matchExpr
     | matchExpr.m PLUS                        {: return new SPPlus(m); :}
     | vectorExpr.v                            {: return v; :}
     | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
+    | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
     | matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
     ;
     
