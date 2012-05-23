@@ -11,20 +11,17 @@ import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPFunCall extends SPAbstractVertcatExprArg
-{
+public class SPFunCall extends SPAbstractVertcatExprArg{
 	static boolean Debug = true;
 	String i;
 	SPAbstractVertcatExprArg ls;
-	public SPFunCall(String i, SPAbstractVertcatExprArg ls)
-	{
+	public SPFunCall(String i, SPAbstractVertcatExprArg ls){
 		this.i = i;
 		this.ls = ls;
 		//System.out.println("functionCall:"+i);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		//System.out.println("function: "+i);
 		if((i.indexOf("previousScalar")==0)&(ls==null)){
 			if (Debug) System.out.println("inside previousScalar");
@@ -156,8 +153,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg
 		return null;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return i.toString()+"("+(ls==null?"":ls.toString())+")";
 	}
 }

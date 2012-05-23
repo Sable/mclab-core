@@ -8,13 +8,11 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPPatternList extends SPAbstractPattern
-{
+public class SPPatternList extends SPAbstractPattern{
 	SPAbstractPattern first;
 	SPAbstractPattern next;
 	
-	public SPPatternList (SPAbstractPattern first, SPAbstractPattern next)
-	{
+	public SPPatternList (SPAbstractPattern first, SPAbstractPattern next){
 		this.first = first;
 		this.next = next;
 		/*if (next!=null)
@@ -23,8 +21,7 @@ public class SPPatternList extends SPAbstractPattern
 		}*/
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if(match.getIsError()==true){
 			return match;
@@ -38,8 +35,7 @@ public class SPPatternList extends SPAbstractPattern
 			return match;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return first.toString()+(next==null?"":","+next);
 	}
 }

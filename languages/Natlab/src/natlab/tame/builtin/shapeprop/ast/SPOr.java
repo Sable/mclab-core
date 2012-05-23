@@ -8,20 +8,17 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPOr extends SPAbstractMatchExpr
-{
+public class SPOr extends SPAbstractMatchExpr{
 	SPAbstractMatchExpr first;
 	SPAbstractMatchExpr next;
 	
-	public SPOr (SPAbstractMatchExpr first,SPAbstractMatchExpr next)
-	{
+	public SPOr (SPAbstractMatchExpr first,SPAbstractMatchExpr next){
 		this.first = first;
 		this.next = next;
 		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		int indexBeforeOr = previousMatchResult.getNumMatched();
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		int indexAfterOr = match.getNumMatched();
@@ -35,8 +32,7 @@ public class SPOr extends SPAbstractMatchExpr
 		return match;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return first.toString()+"|"+next.toString();
 	}
 }

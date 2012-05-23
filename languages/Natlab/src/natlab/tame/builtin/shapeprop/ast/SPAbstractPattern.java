@@ -4,8 +4,7 @@ import java.util.ArrayList;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 
-public abstract class SPAbstractPattern extends SPNode
-{
+public abstract class SPAbstractPattern extends SPNode{
 
 }
 

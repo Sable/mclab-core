@@ -8,18 +8,15 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPMult extends SPAbstractMatchExpr
-{
+public class SPMult extends SPAbstractMatchExpr{
 	static boolean Debug = true;
 	SPAbstractMatchExpr sp;
-	public SPMult (SPAbstractMatchExpr sp)
-	{
+	public SPMult (SPAbstractMatchExpr sp){
 		this.sp = sp;
 		//System.out.println("*");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		while(argValues.size()>(previousMatchResult.getNumMatched()))
 		{
 			if (Debug) System.out.println("inside star loop "+previousMatchResult.getNumMatched());
@@ -31,8 +28,7 @@ public class SPMult extends SPAbstractMatchExpr
 		return previousMatchResult;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return sp.toString()+"*";
 	}
 }

@@ -8,18 +8,15 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPNumber extends SPAbstractScalarExpr
-{
+public class SPNumber extends SPAbstractScalarExpr{
 	static boolean Debug = true;
 	Number n;
-	public SPNumber (Number n)
-	{
+	public SPNumber (Number n){
 		this.n = n;
 		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
 			if(previousMatchResult.isArrayIndexAssignRight()==true){
 				//FIXME
@@ -72,8 +69,7 @@ public class SPNumber extends SPAbstractScalarExpr
 		
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return n.toString();
 	}
 }

@@ -14,18 +14,15 @@ import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPStringLiteral extends SPAbstractVertcatExprArg
-{
+public class SPStringLiteral extends SPAbstractVertcatExprArg{
 	static boolean Debug = true;
 	String id;
-	public SPStringLiteral(String id)
-	{
+	public SPStringLiteral(String id){
 		this.id = id;
 		//System.out.println(id);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		//a string literal used to match a constant string argument
 		if(argValues.get(previousMatchResult.getNumMatched())!=null){
 			System.out.println(argValues.size());
@@ -47,8 +44,7 @@ public class SPStringLiteral extends SPAbstractVertcatExprArg
 		return previousMatchResult;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return "'"+id.toString()+"'";
 	}
 }

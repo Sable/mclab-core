@@ -33,8 +33,7 @@ public class ShapePropTool {
     
     
     public static List<Shape<AggrValue<BasicMatrixValue>>> matchByValues(SPNode tree, List<? extends Value<?>> argValues){
-    	if(argValues!=null)
-    	{
+    	if(argValues!=null){
     		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
     		for(Value<?> arg:argValues){
     			if(((HasShape)arg).getShape()==null){
@@ -54,10 +53,9 @@ public class ShapePropTool {
         return spmatch.getAllResults();
     }
     
-	static public void main(String[] args) throws IOException, Parser.Exception
-	{	
-		System.out.println("print:   "+parse("[n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n]"));
-		String s1 = parse("[n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n]").toString();
+	static public void main(String[] args) throws IOException, Parser.Exception{	
+		System.out.println("print:   "+parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$"));
+		String s1 = parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$").toString();
 		System.out.println("reparsed "+parse(s1));
 		/*System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
 		String s1 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();

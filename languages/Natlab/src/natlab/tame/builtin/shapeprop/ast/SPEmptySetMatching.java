@@ -8,15 +8,12 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPEmptySetMatching extends SPAbstractVectorExpr
-{
-	public SPEmptySetMatching()
-	{
+public class SPEmptySetMatching extends SPAbstractVectorExpr{
+	public SPEmptySetMatching(){
 		//System.out.println("an empty vector matching");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		//System.out.println(argValues.get(previousMatchResult.getNumMatched()));
 		ShapePropMatch match = new ShapePropMatch(previousMatchResult);
 		if(isPatternSide==true){
@@ -37,8 +34,7 @@ public class SPEmptySetMatching extends SPAbstractVectorExpr
 		}
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return "[]";
 	}
 }

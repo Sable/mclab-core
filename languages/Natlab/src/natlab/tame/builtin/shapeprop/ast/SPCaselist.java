@@ -7,14 +7,12 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPCaselist extends SPNode
-{
+public class SPCaselist extends SPNode{
 	static boolean Debug = true;
 	SPCase first;
 	SPCaselist next;
 	
-	public SPCaselist(SPCase first, SPCaselist next)
-	{
+	public SPCaselist(SPCase first, SPCaselist next){
 		this.first = first;
 		this.next = next;
 		/*if (next!=null)
@@ -41,8 +39,7 @@ public class SPCaselist extends SPNode
 			return match;		
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return first.toString()+(next==null?"":"||"+next);
 	}
 }

@@ -8,7 +8,6 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public abstract class SPAbstractScalarExpr extends SPAbstractVertcatExprArg
-{
+public abstract class SPAbstractScalarExpr extends SPAbstractVertcatExprArg{
 	
 }

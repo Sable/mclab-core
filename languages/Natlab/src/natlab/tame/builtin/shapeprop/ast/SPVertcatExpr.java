@@ -11,18 +11,15 @@ import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPVertcatExpr extends SPAbstractVectorExpr
-{
+public class SPVertcatExpr extends SPAbstractVectorExpr{
 	static boolean Debug = true;
 	SPVertExprArglist vl;
-	public SPVertcatExpr(SPVertExprArglist vl)
-	{
+	public SPVertcatExpr(SPVertExprArglist vl){
 		this.vl = vl;
 		//System.out.println("[]");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		//System.out.println(isPatternSide);
 		if(isPatternSide==true){
 			if (Debug) System.out.println("just get into SPVertcatExpr, setIsInsideVertcat is true!");
@@ -81,8 +78,7 @@ public class SPVertcatExpr extends SPAbstractVectorExpr
 		}
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return "["+vl.toString()+"]";
 	}
 }

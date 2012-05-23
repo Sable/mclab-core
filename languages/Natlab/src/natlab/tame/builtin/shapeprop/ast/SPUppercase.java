@@ -16,18 +16,15 @@ import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.components.constant.Constant;
 
-public class SPUppercase extends SPAbstractVectorExpr
-{
+public class SPUppercase extends SPAbstractVectorExpr{
 	static boolean Debug = true;
 	String s;
-	public SPUppercase (String s)
-	{
+	public SPUppercase (String s){
 		this.s = s;
 		//System.out.println(s);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if(isPatternSide==true){
 			if(previousMatchResult.isInsideAssign()==true){
 				previousMatchResult.saveLatestMatchedUppercase(s);
@@ -129,8 +126,7 @@ public class SPUppercase extends SPAbstractVectorExpr
 		}
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return s.toString();
 	}
 }

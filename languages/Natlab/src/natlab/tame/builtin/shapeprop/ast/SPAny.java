@@ -21,14 +21,12 @@ public class SPAny extends SPAbstractVectorExpr
 {
 	static boolean Debug = true;
 	String s;
-	public SPAny(String a)
-	{
+	public SPAny(String a){
 		this.s = a;
 		//System.out.println(a);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if (Debug) System.out.println("inside ANY!");
 		if(isPatternSide==true){
 			if(argValues.get(previousMatchResult.getNumMatched())!=null){
@@ -71,8 +69,7 @@ public class SPAny extends SPAbstractVectorExpr
 		}
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return s.toString();
 	}
 }

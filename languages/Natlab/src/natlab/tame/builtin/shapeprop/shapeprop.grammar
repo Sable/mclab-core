@@ -57,14 +57,16 @@ patternElement
     ;
     
 matchExpr
-    = LRPAREN pattern.p RRPAREN               {: return new SPRParen(p); :}
+    = matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
+    | LRPAREN pattern.p RRPAREN               {: return new SPRParen(p); :}
     | matchExpr.m QUESTION                    {: return new SPQuestion(m); :}
     | matchExpr.m MULT                        {: return new SPMult(m); :}
     | matchExpr.m PLUS                        {: return new SPPlus(m); :}
     | vectorExpr.v                            {: return v; :}
     | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
     | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
-    | matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
+    | ID.i                                    {: return new SPStringMatching(i);:}
+    |
     ;
     
 vectorExpr

@@ -12,19 +12,16 @@ import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.*;
 //import natlab.tame.valueanalysis.basicmatrix.*;
 
-public class SPScalar extends SPAbstractVectorExpr
-{
+public class SPScalar extends SPAbstractVectorExpr{
 	static boolean Debug = true;
 	String s;
 	
-	public SPScalar (String s)
-	{
+	public SPScalar (String s){
 		this.s = s;
 		//System.out.println("$");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if (isPatternSide==true){  //we find a scalar in the tree, we have to distinguish whether it is in pattern matching part, or output part
 			if (argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing basicMatrixValue
@@ -89,8 +86,7 @@ public class SPScalar extends SPAbstractVectorExpr
 	}
 		
 	
-	public String toString()
-	{
+	public String toString(){
 		return s.toString();
 	}
 }

@@ -8,21 +8,18 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPCase extends SPNode
-{
+public class SPCase extends SPNode{
 	static boolean Debug = true;
 	SPAbstractPattern first;
 	SPOutput next;
 	
-	public SPCase(SPAbstractPattern p, SPOutput o)
-	{
+	public SPCase(SPAbstractPattern p, SPOutput o){
 		this.first = p;
 		//System.out.println("->");
 		this.next = o;
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
 		if(match.getIsError()==true){//FIXME!!!
 			isPatternSide = false;
@@ -54,8 +51,7 @@ public class SPCase extends SPNode
 			return null;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return first.toString()+"->"+next.toString();
 	}
 }

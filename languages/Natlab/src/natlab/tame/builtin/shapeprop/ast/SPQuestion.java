@@ -8,17 +8,14 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
-public class SPQuestion extends SPAbstractMatchExpr
-{
+public class SPQuestion extends SPAbstractMatchExpr{
 	SPAbstractMatchExpr spm;
-	public SPQuestion (SPAbstractMatchExpr spm)
-	{
+	public SPQuestion (SPAbstractMatchExpr spm){
 		this.spm = spm;
 		//System.out.println("?");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues)
-	{
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if(argValues.size()>previousMatchResult.getNumMatched()){
 			System.out.println("inside ? expression");
 			ShapePropMatch match = spm.match(isPatternSide, previousMatchResult, argValues);
@@ -27,8 +24,7 @@ public class SPQuestion extends SPAbstractMatchExpr
 		return previousMatchResult;
 	}
 	
-	public String toString()
-	{
+	public String toString(){
 		return spm.toString()+"?";
 	}
 }
