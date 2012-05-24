@@ -30,10 +30,13 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
 			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {  //XU try to add shape result into it
 		//FIXME do something proper here
 		if (inc != null){//FIXME
-			return new BasicMatrixValue(
+			if (Debug) System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
+					.get(0).iterator().next())).getShape());
+			return new BasicMatrixValue((new BasicMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,inc,upper))
-							.get(0).iterator().next().getMatlabClass()));
+					(propagator.call("colon", Args.newInstance(lower,upper))
+							.get(0).iterator().next().getMatlabClass()))),((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
+									.get(0).iterator().next())).getShape());
 		} else {
 			if (Debug) System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
 					.get(0).iterator().next())).getShape());
