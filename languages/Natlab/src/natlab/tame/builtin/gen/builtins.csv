@@ -233,7 +233,7 @@ mtimes;; MatlabClass(logical 0->double, parent)
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
--Shape(M,M->M)
+-Shape($|M,$|M->M)
 mldivide
 mrdivide
 
