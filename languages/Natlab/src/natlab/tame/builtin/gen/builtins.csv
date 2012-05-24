@@ -164,7 +164,7 @@ properNumericFunction; numericFunction
 # unary numeric function
 unaryNumericFunction; properNumericFunction
 -Class(numeric -> 0, char|logical -> double)
--Shape(M->M)
+-Shape($|M->M)
 elementalUnaryNumericFunction; unaryNumericFunction; abstract
 real
 imag
@@ -203,7 +203,7 @@ complex
 
 # elemewise binary arithmetic
 elementalBinaryArithmetic; elementalBinaryNumericFunction
--Shape(M,M->M)
+-Shape($|M,$|M->M)
 plus
 minus
 times
@@ -396,7 +396,7 @@ mean;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1]->$||M,
 # standard matrix math functions with optional arguments
 matrixLibaryFunction; improperFloatFunction
 eig;; Shape([n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n])
-norm;; Class(float (float|logical|char)?->0);; Shape(M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$)
+norm;; Class(float (float|logical|char)?->0);; Shape($|M,($|'fro')?->$)
 # query?
 rank;; Class(float matrix?->double)
 
@@ -522,7 +522,7 @@ byShapeAndTypeMatrixCreation; matrixCreation
 
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
 -Class((numeric|logical)* typeString(numeric)|(none->double))
--Shape(($,n=previousScalar(),add())*->M)
+-Shape([]->$||($,n=previousScalar(),add())+->M)
 ones
 zeros
 # eye takes at most 2 dims
@@ -530,6 +530,7 @@ eye
 
 floatByShapeAndTypeMatrixCreation; numericalByShapeAndTypeMatrixCreation;
 -Class((numeric|logical)* typeString(float)|(none->double))
+-Shape([]|'double'|'single'->$||($,n=previousScalar(),add())+->M)
 inf
 nan
 
@@ -697,8 +698,8 @@ ctranspose
 
 # all these take multiple args
 Concatenation; versatileFunction
-horzcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
-vertcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
+horzcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
+vertcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
 # generalization of horz/vert cat
 cat
 
