@@ -9,6 +9,7 @@ import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPPlus extends SPAbstractMatchExpr{
+	static boolean Debug = true;
 	SPAbstractMatchExpr sp;
 	public SPPlus (SPAbstractMatchExpr sp){
 		this.sp = sp;
@@ -17,7 +18,10 @@ public class SPPlus extends SPAbstractMatchExpr{
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		ShapePropMatch keepMatch = sp.match(isPatternSide, previousMatchResult, argValues);
-		while(argValues.get(keepMatch.getNumMatched())!=null){
+		while((argValues.size()>keepMatch.getNumMatched())&&(keepMatch.getIsError()==false)){
+			if (Debug) System.out.println("inside plus loop "+keepMatch.getNumMatched());
+			if (Debug) System.out.println(keepMatch.getNumMatched());
+			if (Debug) System.out.println("index doesn't point null, keep matching!");
 			keepMatch = sp.match(isPatternSide, keepMatch, argValues);
 		}
 		return keepMatch;

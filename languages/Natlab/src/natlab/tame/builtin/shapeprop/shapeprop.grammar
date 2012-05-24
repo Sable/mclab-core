@@ -65,7 +65,6 @@ matchExpr
     | vectorExpr.v                            {: return v; :}
     | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
     | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
-    | ID.i                                    {: return new SPStringMatching(i);:}
     |
     ;
     

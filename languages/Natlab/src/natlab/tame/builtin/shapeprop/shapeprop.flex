@@ -34,7 +34,7 @@ LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f]
 
 Number = -? [:digit:] [:digit:]*
-Identifier = -? [:jletter:] [:jletterdigit:]+
+Identifier = [:jletter:] [:jletterdigit:]+
 Uppercase = [A-Z]
 Lowercase = [a-z]
 

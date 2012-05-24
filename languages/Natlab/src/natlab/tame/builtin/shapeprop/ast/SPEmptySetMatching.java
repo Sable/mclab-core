@@ -25,7 +25,8 @@ public class SPEmptySetMatching extends SPAbstractVectorExpr{
 				}
 			else{
 				System.out.println("inside not empty");
-				return null;
+				previousMatchResult.setIsError();
+				return previousMatchResult;
 				}
 			}
 		else{

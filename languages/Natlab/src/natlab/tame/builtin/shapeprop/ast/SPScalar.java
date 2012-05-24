@@ -23,6 +23,11 @@ public class SPScalar extends SPAbstractVectorExpr{
 	
 	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
 		if (isPatternSide==true){  //we find a scalar in the tree, we have to distinguish whether it is in pattern matching part, or output part
+			//if the whole argument is null
+			if(argValues.isEmpty()){
+				previousMatchResult.setIsError();
+				return previousMatchResult;
+			}
 			if (argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing basicMatrixValue
 				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
@@ -59,25 +64,33 @@ public class SPScalar extends SPAbstractVectorExpr{
 					if (Debug) System.out.println("inside empty constant value mathcing a Scalar!");
 					return match;
 				}
-				double argumentConstantDouble = (Double) ((HasConstant)argument).getConstant().getValue();
-				int argumentIntValue = (int) argumentConstantDouble;
-				if (Debug) System.out.println("argument value is "+argumentIntValue);
-				//get its shape information
-				Shape<?> argumentShape = ((HasShape)argument).getShape();
-				if (Debug) System.out.println("argument shape is "+argumentShape);
+				try{//for the case, the argument is a char or string constant!
+					double argumentConstantDouble = (Double) ((HasConstant)argument).getConstant().getValue();
+					int argumentIntValue = (int) argumentConstantDouble;
+					if (Debug) System.out.println("argument value is "+argumentIntValue);
+					//get its shape information
+					Shape<?> argumentShape = ((HasShape)argument).getShape();
+					if (Debug) System.out.println("argument shape is "+argumentShape);
+					
+					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
+					lowercase.put(s, argumentIntValue);
+					HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+					uppercase.put(s, argumentShape);
+					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
+					match.comsumeArg();
+					match.saveLatestMatchedUppercase(s);
+					if (Debug) System.out.println("mathcing a Scalar!");
+					return match;
+				}catch (Exception e){
+					previousMatchResult.setIsError();
+					return previousMatchResult;
+				}
 				
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(s, argumentIntValue);
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(s, argumentShape);
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
-				match.comsumeArg();
-				match.saveLatestMatchedUppercase(s);
-				if (Debug) System.out.println("mathcing a Scalar!");
-				return match;
 			}
+			//if the argument is empty, of course, this is not-matched case
 			else
-				return null;
+				previousMatchResult.setIsError();
+				return previousMatchResult;
 		}
 		else{
 			previousMatchResult.addToOutput(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));

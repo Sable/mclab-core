@@ -20,9 +20,9 @@ public class ShapePropParser extends Parser {
 		static public final short SCALAR = 5;
 		static public final short LRPAREN = 6;
 		static public final short SQUOTATION = 7;
-		static public final short ID = 8;
-		static public final short RRPAREN = 9;
-		static public final short NUMBER = 10;
+		static public final short RRPAREN = 8;
+		static public final short NUMBER = 9;
+		static public final short ID = 10;
 		static public final short EQUAL = 11;
 		static public final short RSPAREN = 12;
 		static public final short COMMA = 13;
@@ -35,19 +35,19 @@ public class ShapePropParser extends Parser {
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9obbCTl4q4Knh#rW#EMWi6ndHWdSUo47dheeGU840V41I4Ed3XmuW0I4X8SE26k710d3f7" +
-		"eGdJ#0Axqtdj2GkyGU7mp7Y$hPG4X9lhDU$EzDsydRxmBu0o6eLO46Sn207MOWXOCXHy#LA" +
-		"0ILOZg#DbVuWEq$athGsoT6igrbhUrHPYD#RfI3iFH#i$hb7sIeaqYZ6fxfR8MEx9Y2F4KO" +
-		"vdrKrDAEu8bcZfh10qbMe9QZJoafZrCvjmcZp0OWp2miA8NHngZv3icO1ncK9kE4PZ9rIJK" +
-		"en5PDA5CBc4EwwOm4TFa5fenNYvY9EicCHfZC9NCnJmiG0SMoarmo0svpUV4wIRqcMhPmJH" +
-		"xcs5L7pjUnfwhUBD7t6kVqgfSccLN2l2UWl#nBjemUnVzRLPKdoB4BAlaVmYoxswjWMTrQp" +
-		"Mi43PUSLsXUrnOAQ#2Uy2UvuocRbcjgdbZCTvM9PyVO8x5p3nlFAJ$obatp3b09S1T8JD7X" +
-		"8DQX3KxDqEFLk8ZkqWRoP0K2Plu4h9C#KuubXgxqjYjP3tPvCuryUsatVWxo0gFd0wonqFV" +
-		"IGuQ$x2nHyXgu#yrThVPii#nzn1Pwr7pcB5TP3yvIewJa#G0EK5EaTF5FMnTdyFlTzHQxl1" +
-		"NUJnhdOUsmQsvua67lyOZ7llJVe$yZHxQ5Wzjsr$gTBdMNlVLoGxrAgSmq$RBLyvVv9dqI3" +
-		"Uzf#InYJsG#t9FxieJ#Iozyaa#SdudR#Irl5BxvQryaFVoKkU#8C#bZ$CLSjbKk23djRqZr" +
-		"#MQNALtJdfCh1jcg5tyCZNpNQdN#FbRz$FDj8YVltcB#FariMmIN1VmEN3goWVVJSk1Jziu" +
-		"urdQB6qZhQB6aAPMHrkWJ9EdNoJ9U99QZdwEVXEjGdtZMdu0ZJxejW==");
+		"U9nzb4bJ4r4KXKyd69eCWb4WGCG44b1HSG0L701nOk5MD#vSMcwqIXPMMMnqmHzmmS85Iyj" +
+		"v#W7#0UTvdi4upufUptlzw3ITngI#lkUTUz$jrwy709Um0FKYQ4GF8cX0Eren7s64aC1CL2" +
+		"AkyvTByZEq$qVxSrsV7igrbtUzhUZ5HjqfXuNo0dFGETL358jBl3OaIxmATkz4dRkoMevha" +
+		"88jpr7byTEOZLdqlRKjrAle5PqKbc8HZvDZTORItYiObyiDT60zrJgiOUzge$lqzIv3HXwW" +
+		"6wlTkTrOYtd8eWdDQito5qkmahqte4kken#RiGanfEG#jg1CxW7oaBjI3V2iQeNrtBiqTxM" +
+		"HNKBSwpBkjigt1EI3vYclqkTPRgS8xr2SQutwl0J7VY$AIh#dkdizDQxXTMPO6$Vu2Rq35L" +
+		"DgRMgRNj6fu4wKy#WzGsbl9zgy8aSvlHqTqJ7FwurnltFkNAMh#1maUSUSNIfdhQNxgB#Qc" +
+		"T7djtdVOdm7OgmP68B#jPCGEKswI2Ef8r6Jxo2ZIdlXRuU9lIQsaVrakx$Mv7UIVgD7oC60" +
+		"ccraTu3VHmQDFcRYNh8heFOusMFq2HE7oI5oqbTxXEmZfyWPSewS9HV8UN9HrOb8ON8EzOH" +
+		"tNHuz4h2MWG1lqE$vyhP73mVaa$#R7r1$O1f$AC0xF4tjKTzur3SUuCuKb72EZ1FocyTVya" +
+		"R6POpgDNbfSi$agJoHn$9AVaf1ViXt7h$89$ae7zHy#IpVvAkyrxNlo5kj7ibTkIEtjRv5R" +
+		"ffkr#IgN95nCnf3yTVExuZ5BuSYpESwpBV08c4#tnO9yvjXkTHox13ouFN1jylo4DAnchac" +
+		"nYR6B6DMltaEQNeDZ0vbcZpr92dcK$Hor3dgPaQ5#egr$WCPozvX");
 
 	private final Action[] actions;
 
@@ -160,7 +160,7 @@ public class ShapePropParser extends Parser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_m = _symbols[offset + 1];
 					final SPAbstractMatchExpr m = (SPAbstractMatchExpr) _symbol_m.value;
-					 return new SPMult(m);
+					 return new SPStar(m);
 				}
 			},
 			new Action() {	// [15] matchExpr = matchExpr.m PLUS
@@ -191,62 +191,55 @@ public class ShapePropParser extends Parser {
 					 return new SPStringLiteral(i);
 				}
 			},
-			new Action() {	// [19] matchExpr = ID.i
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
-					 return new SPStringMatching(i);
-				}
-			},
-			Action.NONE,  	// [20] matchExpr = 
-			new Action() {	// [21] vectorExpr = SCALAR.d
+			Action.NONE,  	// [19] matchExpr = 
+			new Action() {	// [20] vectorExpr = SCALAR.d
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_d = _symbols[offset + 1];
 					final String d = (String) _symbol_d.value;
 					 return new SPScalar(d);
 				}
 			},
-			new Action() {	// [22] vectorExpr = UPPERCASE.u
+			new Action() {	// [21] vectorExpr = UPPERCASE.u
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_u = _symbols[offset + 1];
 					final String u = (String) _symbol_u.value;
 					 return new SPUppercase(u);
 				}
 			},
-			new Action() {	// [23] vectorExpr = ANY.a
+			new Action() {	// [22] vectorExpr = ANY.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final String a = (String) _symbol_a.value;
 					 return new SPAny(a);
 				}
 			},
-			new Action() {	// [24] vectorExpr = LSPAREN RSPAREN
+			new Action() {	// [23] vectorExpr = LSPAREN RSPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					 return new SPEmptySetMatching();
 				}
 			},
-			new Action() {	// [25] vectorExpr = vertcatExpr.v
+			new Action() {	// [24] vectorExpr = vertcatExpr.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final SPVertcatExpr v = (SPVertcatExpr) _symbol_v.value;
 					 return v;
 				}
 			},
-			new Action() {	// [26] vertcatExpr = LSPAREN vertcatExprArglist.vl RSPAREN
+			new Action() {	// [25] vertcatExpr = LSPAREN vertcatExprArglist.vl RSPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_vl = _symbols[offset + 2];
 					final SPVertExprArglist vl = (SPVertExprArglist) _symbol_vl.value;
 					 return new SPVertcatExpr(vl);
 				}
 			},
-			new Action() {	// [27] vertcatExprArglist = vertcatExprArg.vt
+			new Action() {	// [26] vertcatExprArglist = vertcatExprArg.vt
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_vt = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg vt = (SPAbstractVertcatExprArg) _symbol_vt.value;
 					 return new SPVertExprArglist(vt, null);
 				}
 			},
-			new Action() {	// [28] vertcatExprArglist = vertcatExprArg.vt COMMA vertcatExprArglist.vtl
+			new Action() {	// [27] vertcatExprArglist = vertcatExprArg.vt COMMA vertcatExprArglist.vtl
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_vt = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg vt = (SPAbstractVertcatExprArg) _symbol_vt.value;
@@ -255,35 +248,35 @@ public class ShapePropParser extends Parser {
 					 return new SPVertExprArglist(vt, vtl);
 				}
 			},
-			new Action() {	// [29] vertcatExprArg = scalarExpr.s
+			new Action() {	// [28] vertcatExprArg = scalarExpr.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final SPAbstractScalarExpr s = (SPAbstractScalarExpr) _symbol_s.value;
 					 return s;
 				}
 			},
-			new Action() {	// [30] vertcatExprArg = vectorExpr.v
+			new Action() {	// [29] vertcatExprArg = vectorExpr.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final SPAbstractVectorExpr v = (SPAbstractVectorExpr) _symbol_v.value;
 					 return v;
 				}
 			},
-			new Action() {	// [31] scalarExpr = NUMBER.n
+			new Action() {	// [30] scalarExpr = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final Number n = (Number) _symbol_n.value;
 					 return new SPNumber(n);
 				}
 			},
-			new Action() {	// [32] scalarExpr = LOWERCASE.l
+			new Action() {	// [31] scalarExpr = LOWERCASE.l
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final String l = (String) _symbol_l.value;
 					 return new SPLowercase(l);
 				}
 			},
-			new Action() {	// [33] assignStmt = AssignmentLhs.l EQUAL AssignmentRhs.r
+			new Action() {	// [32] assignStmt = AssignmentLhs.l EQUAL AssignmentRhs.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg l = (SPAbstractVertcatExprArg) _symbol_l.value;
@@ -292,21 +285,21 @@ public class ShapePropParser extends Parser {
 					 return new SPAssignStmt(l, r);
 				}
 			},
-			new Action() {	// [34] AssignmentLhs = LOWERCASE.l
+			new Action() {	// [33] AssignmentLhs = LOWERCASE.l
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final String l = (String) _symbol_l.value;
 					 return new SPLowercase(l);
 				}
 			},
-			new Action() {	// [35] AssignmentLhs = UPPERCASE.u
+			new Action() {	// [34] AssignmentLhs = UPPERCASE.u
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_u = _symbols[offset + 1];
 					final String u = (String) _symbol_u.value;
 					 return new SPUppercase(u);
 				}
 			},
-			new Action() {	// [36] AssignmentLhs = UPPERCASE.u LRPAREN scalarExpr.s RRPAREN
+			new Action() {	// [35] AssignmentLhs = UPPERCASE.u LRPAREN scalarExpr.s RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_u = _symbols[offset + 1];
 					final String u = (String) _symbol_u.value;
@@ -315,7 +308,7 @@ public class ShapePropParser extends Parser {
 					 return new SPUpperIndex(u, s);
 				}
 			},
-			new Action() {	// [37] AssignmentLhs = ANY.a LRPAREN scalarExpr.s RRPAREN
+			new Action() {	// [36] AssignmentLhs = ANY.a LRPAREN scalarExpr.s RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final String a = (String) _symbol_a.value;
@@ -324,35 +317,35 @@ public class ShapePropParser extends Parser {
 					 return new SPUpperIndex(a, s);
 				}
 			},
-			new Action() {	// [38] AssignmentRhs = scalarExpr.s
+			new Action() {	// [37] AssignmentRhs = scalarExpr.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final SPAbstractScalarExpr s = (SPAbstractScalarExpr) _symbol_s.value;
 					 return s;
 				}
 			},
-			new Action() {	// [39] AssignmentRhs = vectorExpr.v
+			new Action() {	// [38] AssignmentRhs = vectorExpr.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final SPAbstractVectorExpr v = (SPAbstractVectorExpr) _symbol_v.value;
 					 return v;
 				}
 			},
-			new Action() {	// [40] AssignmentRhs = fnCall.f
+			new Action() {	// [39] AssignmentRhs = fnCall.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_f = _symbols[offset + 1];
 					final SPAbstractPattern f = (SPAbstractPattern) _symbol_f.value;
 					 return f;
 				}
 			},
-			new Action() {	// [41] fnCall = ID.i LRPAREN RRPAREN
+			new Action() {	// [40] fnCall = ID.i LRPAREN RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					 return new SPFunCall(i, null);
 				}
 			},
-			new Action() {	// [42] fnCall = ID.i LRPAREN arglist.al RRPAREN
+			new Action() {	// [41] fnCall = ID.i LRPAREN arglist.al RRPAREN
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -361,14 +354,14 @@ public class ShapePropParser extends Parser {
 					 return new SPFunCall(i, al);
 				}
 			},
-			new Action() {	// [43] arglist = arg.a
+			new Action() {	// [42] arglist = arg.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg a = (SPAbstractVertcatExprArg) _symbol_a.value;
 					 return new SPArglist(a, null);
 				}
 			},
-			new Action() {	// [44] arglist = arg.a COMMA arglist.al
+			new Action() {	// [43] arglist = arg.a COMMA arglist.al
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final SPAbstractVertcatExprArg a = (SPAbstractVertcatExprArg) _symbol_a.value;
@@ -377,21 +370,21 @@ public class ShapePropParser extends Parser {
 					 return new SPArglist(a, al);
 				}
 			},
-			new Action() {	// [45] arg = scalarExpr.s
+			new Action() {	// [44] arg = scalarExpr.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final SPAbstractScalarExpr s = (SPAbstractScalarExpr) _symbol_s.value;
 					 return s;
 				}
 			},
-			new Action() {	// [46] arg = vectorExpr.v
+			new Action() {	// [45] arg = vectorExpr.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final SPAbstractVectorExpr v = (SPAbstractVectorExpr) _symbol_v.value;
 					 return v;
 				}
 			},
-			new Action() {	// [47] assertStmt = fnCall.f
+			new Action() {	// [46] assertStmt = fnCall.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_f = _symbols[offset + 1];
 					final SPAbstractPattern f = (SPAbstractPattern) _symbol_f.value;
