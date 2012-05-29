@@ -4,6 +4,7 @@ import java.util.*;
 
 import natlab.tame.classes.reference.*;                 //class    component
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.components.constant.*; //constant component
 import natlab.tame.valueanalysis.components.shape.*;    //shape    component
@@ -16,7 +17,7 @@ import natlab.tame.valueanalysis.aggrvalue.*;
  * on top of the matlab class
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements HasConstant, HasShape<AggrValue<BasicMatrixValue>>{
-    static boolean Debug = false;
+    static boolean Debug = true;
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
     Constant constant;
     Shape<AggrValue<BasicMatrixValue>> shape;
@@ -128,16 +129,125 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 
 
     @Override
-    public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(Args<AggrValue<BasicMatrixValue>> indizes) {
-    	throw new UnsupportedOperationException(); //TODO
+    public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(Args<AggrValue<BasicMatrixValue>> indizes){
+    	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
+    	if(indizes.size()==2){
+    		if (Debug) System.out.println("this array get is with two arguments!");
+    		if(indizes.get(0) instanceof BasicMatrixValue){
+    			if(((HasConstant)indizes.get(0)).getConstant()==null){
+            		if (Debug) System.out.println("constant component is null!");
+            		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+            		List<Integer> dims = new ArrayList<Integer>(2);
+            		dims.add(1);
+            		dims.add(1);
+            		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+            			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+            			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	    	newLs.add(1);
+            	    	ls.remove(0);
+            	    	int result = 1;
+            	    	for(Integer dimNum : ls){
+            	    		result = result*dimNum;
+            	    	}
+            	    	newLs.add(result);
+            	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+            		}
+            		//deal with constant value is empty and the shape is not scalar
+            		//FIXME
+            		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
+            	}
+            	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
+            	int index = indexDouble.intValue();
+            	if(index>ls.get(0)){
+            		if (Debug) System.out.println("index exceeds matrix dimensions!");
+            		throw new UnsupportedOperationException();//FIXME
+            	}
+            	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	newLs.add(1);
+            	ls.remove(0);
+            	int result = 1;
+            	for(Integer dimNum : ls){
+            		result = result*dimNum;
+            	}
+            	newLs.add(result);
+            	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+    		}
+    		else{
+    			if(((HasConstant)indizes.get(1)).getConstant()==null){
+            		if (Debug) System.out.println("constant component is null!");
+            		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(1))).getShape();
+            		List<Integer> dims = new ArrayList<Integer>(2);
+            		dims.add(1);
+            		dims.add(1);
+            		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+            			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+            			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	    	newLs.add(1);
+            	    	ls.remove(0);
+            	    	int result = 1;
+            	    	for(Integer dimNum : ls){
+            	    		result = result*dimNum;
+            	    	}
+            	    	newLs.add(result);
+            	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+            		}
+            		//deal with constant value is empty and the shape is not scalar
+            		//FIXME
+            		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
+            	}
+            	Double indexDouble = (Double)((HasConstant)indizes.get(1)).getConstant().getValue();
+            	int index = indexDouble.intValue();
+            	if(index>ls.get(1)){
+            		if (Debug) System.out.println("index exceeds matrix dimensions!");
+            		throw new UnsupportedOperationException();//FIXME
+            	}
+            	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	newLs.add(ls.get(0));
+            	newLs.add(1);
+            	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+    		}
+    		
+    	}
+    	else{
+    		System.out.println("this array get is with one argument!");
+    		if(((HasConstant)indizes.get(0)).getConstant()==null){
+        		if (Debug) System.out.println("constant component is null!");
+        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+        		List<Integer> dims = new ArrayList<Integer>(2);
+        		dims.add(1);
+        		dims.add(1);
+        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	    	newLs.add(1);
+        	    	newLs.add(1);
+        	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+        		}
+        	}
+        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
+        	int index = indexDouble.intValue();
+        	int size = 1;
+        	for(Integer dimNum : ls){
+        		size = size*dimNum;
+        	}
+        	System.out.println(size);
+        	if(index>size){
+        		if (Debug) System.out.println("index exceeds matrix dimensions!");
+        		throw new UnsupportedOperationException();//FIXME
+        	}
+        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	newLs.add(1);
+        	newLs.add(1);
+        	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+    	}
+    	
     }
     
     @Override
     public ValueSet<AggrValue<BasicMatrixValue>> dotSubsref(String field) {
-        throw new UnsupportedOperationException("cannot dot-access a matrix");
+        throw new UnsupportedOperationException("cannot dot-access a matrix!");
         //return ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
     }
-    
     @Override
     public Res<AggrValue<BasicMatrixValue>> cellSubsref(Args<AggrValue<BasicMatrixValue>> indizes) {
         throw new UnsupportedOperationException(); //TODO
@@ -148,9 +258,82 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     }
     
     @Override
-    public AggrValue<BasicMatrixValue> arraySubsasgn(
+    public AggrValue<BasicMatrixValue> arraySubsasgn(//FIXME not correct, just for test!
             Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {//XU: we don't need to care about value, but we should care about index!
-    	for(AggrValue<BasicMatrixValue> index:indizes){
+    	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
+    	if(indizes.size()==2){
+    		if (Debug) System.out.println("this array get is with two arguments!");
+    		if(((HasConstant)indizes.get(0)).getConstant()==null){
+        		if (Debug) System.out.println("constant component is null!");
+        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+        		List<Integer> dims = new ArrayList<Integer>(2);
+        		dims.add(1);
+        		dims.add(1);
+        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	    	newLs.add(1);
+        	    	ls.remove(0);
+        	    	int result = 1;
+        	    	for(Integer dimNum : ls){
+        	    		result = result*dimNum;
+        	    	}
+        	    	newLs.add(result);
+        	    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
+        		}
+        		//deal with constant value is empty and the shape is not scalar
+        		//FIXME
+        		return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape());
+        	}
+        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
+        	int index = indexDouble.intValue();
+        	if(index>ls.get(0)){
+        		if (Debug) System.out.println("index exceeds matrix dimensions!");
+        		throw new UnsupportedOperationException();//FIXME
+        	}
+        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	newLs.add(1);
+        	ls.remove(0);
+        	int result = 1;
+        	for(Integer dimNum : ls){
+        		result = result*dimNum;
+        	}
+        	newLs.add(result);
+        	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
+    	}
+    	else{
+    		System.out.println("this array get is with one argument!");
+    		if(((HasConstant)indizes.get(0)).getConstant()==null){
+        		if (Debug) System.out.println("constant component is null!");
+        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+        		List<Integer> dims = new ArrayList<Integer>(2);
+        		dims.add(1);
+        		dims.add(1);
+        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	    	newLs.add(1);
+        	    	newLs.add(1);
+        	    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
+        		}
+        	}
+        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
+        	int index = indexDouble.intValue();
+        	int size = 1;
+        	for(Integer dimNum : ls){
+        		size = size*dimNum;
+        	}
+        	System.out.println(size);
+        	if(index>size){
+        		if (Debug) System.out.println("index exceeds matrix dimensions!");
+        		throw new UnsupportedOperationException();//FIXME
+        	}
+        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+        	newLs.add(1);
+        	newLs.add(1);
+        	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
+    	}
+    	/*for(AggrValue<BasicMatrixValue> index:indizes){
     		try{
     			//deal with constant index
     			if((((BasicMatrixValue)index).getConstant())!=null){
@@ -177,7 +360,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     		
     	}
     	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), this.getShape());//XU modified @21:24,May 13th
-    }
+*/    }
     
     @Override
     public AggrValue<BasicMatrixValue> toFunctionArgument(boolean recursive) {

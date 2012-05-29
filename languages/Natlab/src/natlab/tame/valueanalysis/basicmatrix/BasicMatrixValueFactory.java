@@ -10,7 +10,7 @@ import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
-    static boolean Debug = false;
+    static boolean Debug = true;
 	@Override
     public BasicMatrixValue newMatrixValue(Constant constant) {
         return new BasicMatrixValue(constant);
@@ -29,7 +29,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
 			AggrValue<BasicMatrixValue> lower,
 			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {  //XU try to add shape result into it
 		//FIXME do something proper here
-		if (inc != null){//FIXME
+		if (inc != null){
 			if (Debug) System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
 					.get(0).iterator().next())).getShape());
 			return new BasicMatrixValue((new BasicMatrixValue(
