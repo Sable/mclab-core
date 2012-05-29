@@ -2,10 +2,6 @@ package natlab.tame.valueanalysis.components.shape;
 
 import java.util.*;
 
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
@@ -67,7 +63,11 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
      * returns false if this shape is known to be non-scalar
      */
     public boolean maybeScalar(){
-        return true;//TODO
+    	if((this.dimensions.get(0)==1&&this.dimensions.get(1)==null)||(this.dimensions.get(0)==null&&this.dimensions.get(1)==1)){
+    		System.out.println("this may be a scalar!");
+    		return true;
+    	}
+        return false;//TODO
     }
     
     /**

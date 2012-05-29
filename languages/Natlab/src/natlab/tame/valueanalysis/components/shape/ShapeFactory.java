@@ -2,8 +2,6 @@ package natlab.tame.valueanalysis.components.shape;
 
 import java.util.*;
 
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.*;
 

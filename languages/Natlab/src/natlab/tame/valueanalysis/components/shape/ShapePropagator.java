@@ -7,7 +7,6 @@ import natlab.tame.builtin.shapeprop.ShapePropTool;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
-import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
 
