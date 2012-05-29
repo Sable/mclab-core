@@ -13,6 +13,8 @@ import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FilePathEnvironment;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
 public class TamerToolPlusShape {
 
@@ -47,7 +49,8 @@ public class TamerToolPlusShape {
 		BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(inputValues.size());
 		for (PrimitiveClassReference ref : inputValues){
-			list.add(new BasicMatrixValue(ref));         //here, we create list of basicMatrixValue with the input default class (double)
+			list.add(new BasicMatrixValue(Constant.get(1.0)));//XU modified @21:53 5.28.2012
+			//list.add(new BasicMatrixValue(new BasicMatrixValue(ref),(new ShapeFactory()).newShapeFromIntegers(Constant.get(1.0).getShape())));         //here, we create list of basicMatrixValue with the input default class (double)
 		}
 		return tameMatlabToSingleFunction(mainFile, list);
 	}
