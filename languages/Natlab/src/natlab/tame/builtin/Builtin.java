@@ -3643,7 +3643,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("M,M->M");
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
             }
             return shapePropInfo;
         }
@@ -3865,7 +3865,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]");
+                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k]");
             }
             return shapePropInfo;
         }

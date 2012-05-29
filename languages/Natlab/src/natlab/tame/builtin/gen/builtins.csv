@@ -486,7 +486,7 @@ isnan
 # binary return logicals
 binaryToLogicalMatrixQuery; toLogicalMatrixQuery
 -Class(matrix matrix -> logical)
--Shape(M,M->M)
+-Shape($|M,$|M->M)
 
 elementalBinaryToLogicalMatrixQuery; binaryToLogicalMatrixQuery
 
@@ -514,7 +514,7 @@ matrixCreation; matrixFunction
 colon
 -Class(coerce(logical -> double, matlab))
 -MatlabClass(logical logical logical?->error, logical|double double|logical  (double|logical)? -> double, numeric double|0  (double|0)? -> 0, double|-1 (double|-1 numeric) | numeric -> -1, double|1 numeric double|1 -> 1, char (char|double char)|char -> char)
--Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k])
+-Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k])
 
 
 # construct arrays via their dimensions; and possibly a type

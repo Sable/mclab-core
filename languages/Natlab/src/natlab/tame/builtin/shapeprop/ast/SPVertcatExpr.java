@@ -50,10 +50,18 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 			if(arg[0].equals("1")){
 				ArrayList<Integer> al = new ArrayList<Integer>(2);
 				al.add(1);
-				al.add(previousMatchResult.getValueOfVariable(arg[1]));
-				Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
-				previousMatchResult.addToOutput("vertcat", shape);
-				return previousMatchResult;
+				try{
+					al.add(previousMatchResult.getValueOfVariable(arg[1]));
+					Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
+					previousMatchResult.addToOutput("vertcat", shape);
+					return previousMatchResult;
+				}
+				catch(Exception e){
+					al.add(null);
+					Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
+					previousMatchResult.addToOutput("vertcat", shape);
+					return previousMatchResult;
+				}
 			}
 			if(arg[1].equals("1")){
 				ArrayList<Integer> al = new ArrayList<Integer>(2);
