@@ -207,7 +207,7 @@ complex
 # elemewise binary arithmetic
 elementalBinaryArithmetic; elementalBinaryNumericFunction
 -Shape($|M,$|M->M)
--isComplex(A,A -> NUMXARGS>0 ? X : R)
+-isComplex(R,R ->R || A,A->NUMXARGS>0?X:A)
 plus
 minus
 times
@@ -496,6 +496,7 @@ elementalBinaryToLogicalMatrixQuery; binaryToLogicalMatrixQuery
 
 # relational operators
 relationalOperator; elementalBinaryToLogicalMatrixQuery
+-isComplex(A,A->R)
 eq
 ne
 lt
