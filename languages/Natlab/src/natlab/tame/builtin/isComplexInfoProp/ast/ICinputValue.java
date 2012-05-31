@@ -25,7 +25,7 @@ public class ICinputValue extends ICAbstractValue{
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		return iv.match(isPatternSide, previousMatchResult, argValues);
 	}
 	

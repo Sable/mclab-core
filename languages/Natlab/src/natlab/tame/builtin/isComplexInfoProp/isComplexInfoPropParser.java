@@ -38,16 +38,16 @@ public class isComplexInfoPropParser extends Parser {
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9nrarbJ4q4KXSzab0HP4a38X2n0o88YYWegBrPPXQMMPOa#oAjbbK#Mwwil$aptVKFSST#" +
-		"EP#vqS2IJJdrzbpuzkTDp6y1rJ2CZzcFUE83Ds2HwaKKAVUZdJKoWYadKK4UZez#300MCaj" +
-		"gN2$TX2bkY7D9QRIe$O$aS1k6ZMwjD59sYVHwIVglfetXOyKWidiOsp66xAgwW2mF8OvUyd" +
-		"TY3lLBkDcK59PGnZZ6ky2LVy3cVyIbsO1RxfC#AKLKGKi6O4UZTQtfUMhLbhCOUdKHVHpyF" +
-		"JwVa0zfNjdtZEfKeLzTgJla1ovVb3TbgJfL5YlOvBrLW#YZkLvoFnM7L1QkufDCfI3iehwh" +
-		"J6P6oOCgIL86#O4Fy#mNwKe7gNBW16mT5KnnoyGanIVAZx4oOS$bCou$bkiMyM1Ipuh0u8e" +
-		"ucQ4#A9UTVYEKlYalYihWYhefhiVLbPslEPiLfvmyd$C$vZJczougpgp5ThxF5c6ujuNd7d" +
-		"9qBtzNvuPaTJz0kn#fjM##4ngApPrknEEFyKmdwSnlY1RZ1tpR$4e$ua0zudn$udkyG6xpD" +
-		"U$pCJroJVvTtDB$ca$yKj$XOymz#vpUBrGjymrM#ubj#vHV#v1#4NTDKDzOCNxV6rxtnXA#" +
-		"#z4HgtOQteqNHEjjRfshuwjcKEjCpIXreYBhXwmPvZfJkKaPqYRHHLdxgB$ELeZS=");
+		"U9nrarbJ4q4KXSzaX0HP4a38X2n0oAQ8eeBAYrLMOQbbMQ8FycfPvPFb#kgB$z9zNn5ttBV" +
+		"ZcJiT74dIgQ$lqgSdTthw0hY6QQJ4FimR#z65JQ8FQIJGZm7Um2JAc485LTGw#hq8aCCOgN" +
+		"sPS1yQs1pbaDHgNVaPosSm11yzMgqZxnIjyx3qMqmVnIEAHsFnDBPY3jjKSGdT64GME#Njm" +
+		"6xiaNANAKiee8W9Z7E5B$c2p$cCJx4TizWhVLgCgOAG4iQDGEzUqVEIgYrbDVRg9Fex#bbu" +
+		"EYKVqBwYxPlGgKIvgbOpoWzQlYXls5OpgYnIjCvPgGBJH$60ucmi3glEMSK5dKvEsY5vPPt" +
+		"Eg9GvKnQa2lG5Q#BVBz2N2bJdmdNOE23gug2BZuifaXzbPyASowUQVYpN8#R5efWLXyHXSQ" +
+		"IDzeHOSlxvMFw2k2WkYSlYYhWQMrzsjk9iMfno$aYR$pctCQTtMN5sDQRhSpOVqwsrUTvHP" +
+		"#V2TtL#U6R7scYNO$Msh7T2Oz7PCyrOd7R#oJRwinlY1RZ1tpR$4e$ua0zudn$udkyG6xpD" +
+		"U$pCJrpZBTxb7MLUyyb$YfjyhFa7l$ERnReBVCDLlk9RVkKN$kGVfHkwDvww9CHNr$Zg6q$" +
+		"ukfUUIApRi3kQvErcU#kK3LztDg6RwHc53jH4rV3LGPuZeLvAYMwHT7Ifppmq$W8NxgGq");
 
 	private final Action[] actions;
 
@@ -354,7 +354,18 @@ public class isComplexInfoPropParser extends Parser {
 					 return new ICtoeExp(ia, co, xv1, qop1, xv2, null);
 				}
 			},
-			new Action() {	// [38] inputAttribute = ID.i
+			new Action() {	// [38] ternaryOpExp = inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_ia = _symbols[offset + 1];
+					final ICinputAtt ia = (ICinputAtt) _symbol_ia.value;
+					final Symbol _symbol_co = _symbols[offset + 2];
+					final ICCondition co = (ICCondition) _symbol_co.value;
+					final Symbol _symbol_xv1 = _symbols[offset + 4];
+					final ICAbstractValue xv1 = (ICAbstractValue) _symbol_xv1.value;
+					 return new ICtoeExp(ia, co, xv1, null, null, null);
+				}
+			},
+			new Action() {	// [39] inputAttribute = ID.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;

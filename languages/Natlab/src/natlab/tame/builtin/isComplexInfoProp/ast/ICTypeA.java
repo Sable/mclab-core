@@ -21,13 +21,13 @@ public class ICTypeA extends ICType{
 	
 	public String toString()
 	{
-		return "A";
+		return "ANY";
 	}
 
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		
 		if(true==isPatternSide)//on the symbol on the LHS
 		{
@@ -41,7 +41,7 @@ public class ICTypeA extends ICType{
 			//if(null != argValues.get(previousMatchResult.getNumMatched()))
 			if(argValues.size() > previousMatchResult.getNumMatched())
 			{
-				int argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
+				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
 			//	ArgICType isArgComplex = new ArgICType(argument); //returns -1=complex, 0=any, 1= real
 				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
 				
@@ -49,7 +49,7 @@ public class ICTypeA extends ICType{
 				 
 				//int isArgComplex =0;
 				//TODO - implement this method
-				if (0 == isArgComplex) //i.e it is any
+				if (0 == isArgComplex || 1 == isArgComplex || -1 == isArgComplex) //i.e it is any
 				{
 					//mATCHED 
 					// set the attributes of match object 
@@ -59,6 +59,8 @@ public class ICTypeA extends ICType{
 					match.setLastMatchSucceed(true);
 					match.setLastMatchICType("ANY");
 					match.incNumAargs(1);
+					if(1 == isArgComplex) match.incNumRargs(1);
+					if(-1 == isArgComplex) match.incNumXargs(1);
 					System.out.println("matched argument to ANY\n");
 										
 				}

@@ -22,7 +22,7 @@ public class ICQplus extends ICQOp{
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		// TODO Auto-generated method stub
 		return previousMatchResult;
 	}

@@ -10,44 +10,50 @@ import beaver.Parser;
 import natlab.tame.builtin.isComplexInfoProp.ast.ICCaselist;
 import natlab.tame.builtin.isComplexInfoProp.ast.ICNode;
 import natlab.tame.builtin.isComplexInfoProp.*;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.value.*;
 
 public class isComplexInfoPropTool {
 
-	
-	 public static ICCaselist parse(String source){
-	    	//System.err.println("parsing: "+source);
-	    	isComplexInfoPropParser parser = new isComplexInfoPropParser();
-	    	isComplexInfoPropScanner input = new isComplexInfoPropScanner(new StringReader(source));
-	    	try{
-	    		ICCaselist iclist = (ICCaselist) parser.parse(input);
-	        	return iclist;
-	    	}catch(Exception e){
-	    		e.printStackTrace();
-	    		return null;
-	    	}
-	    }
-	 
-	 
-	 
-	 public static void main(String[] args) throws IOException, Parser.Exception
-		{
-		  
-		    String s1, s2;
-		    
-		    //s1 = parse("R* -> R").toString();
-		    System.out.println("parse result : "+parse("X,A?->A")+"\n");
-		    
-		    
-			ICNode ic1 = parse("X*,A->A");
-			//System.err.println("for equation min("+k+","+l+"), one corresponding shape equation is "+sp3+", the argument is "+k+","+l);
-			ArrayList<Integer> arg1 = new ArrayList<Integer>(3);
-	    	arg1.add(0);
-	    	arg1.add(0);
-	    //	arg1.add(0);
-			isComplexInfoPropMatch icMatch1 = ic1.match(true, new isComplexInfoPropMatch(), arg1);
-		    
-			System.out.println("result :"+icMatch1.getOutputString());
-		 
+	public static ICCaselist parse(String source) {
+		// System.err.println("parsing: "+source);
+		isComplexInfoPropParser parser = new isComplexInfoPropParser();
+		isComplexInfoPropScanner input = new isComplexInfoPropScanner(
+				new StringReader(source));
+		System.out.println(source);
+		try {
+			ICCaselist iclist = (ICCaselist) parser.parse(input);
+			return iclist;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
+	}
+
+	public static List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchByValues(
+			ICNode equation, List<? extends Value<?>> argValues) {
+isComplexInfoPropMatch icMatch = equation.match(true, new isComplexInfoPropMatch(), argValues);
+           return icMatch.getAllResults();
+	}
+
+//	public static void main(String[] args) throws IOException, Parser.Exception {
+//
+//		String s1, s2;
+//
+//		// s1 = parse("R* -> R").toString();
+//		System.out.println("parse result : "
+//				+ parse(" A,A -> NUMXARGS>0 ? X : R") + "\n");
+//
+//		 ICNode ic1 = parse("R,R ->R || A,A->NUMXARGS>0?X:A");
+//		
+//		 List<? extends Value<?>> arg1 = new ArrayList<Integer>(2);
+//		 arg1.add(1);
+//		 arg1.add(-1);
+//		 // arg1.add(0);
+//		isComplexInfoPropMatch icMatch1 = ic1.match(true, new isComplexInfoPropMatch(), arg1);
+//		System.out.println("result :"+icMatch1.getOutputString());
+//
+//	}
 }

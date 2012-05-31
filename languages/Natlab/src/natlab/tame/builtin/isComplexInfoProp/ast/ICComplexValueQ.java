@@ -28,7 +28,7 @@ public class ICComplexValueQ extends ICAbstractValue{
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		
 		if (qop.toString().equals("*"))
 		{

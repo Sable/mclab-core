@@ -20,13 +20,13 @@ public class ICTypeR extends ICType{
 	
 	public String toString()
 	{
-		return "R";
+		return "REAL";
 	}
 
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		// TODO Auto-generated method stub
 		if(true==isPatternSide)//on the symbol on the LHS
 		{
@@ -36,14 +36,14 @@ public class ICTypeR extends ICType{
 			
 			if(argValues.size() > previousMatchResult.getNumMatched())
 			{
-				int argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
+				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
 		
 				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
 				
 				
 				 
 			
-				if (1 == isArgComplex) //i.e it is any
+				if (1 == isArgComplex) 
 				{
 				
 					match.consumeArg();

@@ -20,10 +20,15 @@ public class ICNumber extends ICValue{
 	{
 		return n.toString();
 	}
+	
+	public int toNumber() {
+		// TODO Auto-generated method stub
+		return (Integer) n;
+	}
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		// TODO Auto-generated method stub
 		return null;
 	}

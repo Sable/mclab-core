@@ -23,7 +23,7 @@ public class ICoutputValue extends ICAbstractValue{
 		return ov.toString();
 	}
 	
-	public isComplexInfoPropMatch match(boolean isPatternSide, isComplexInfoPropMatch previousMatchResult, List<Integer> argValues)
+	public isComplexInfoPropMatch match(boolean isPatternSide, isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues)
 	{
 		return ov.match(isPatternSide, previousMatchResult, argValues);
 	}

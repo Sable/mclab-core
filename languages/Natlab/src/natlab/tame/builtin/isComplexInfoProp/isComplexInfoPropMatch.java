@@ -4,9 +4,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
 import natlab.tame.valueanalysis.components.shape.*;
 
 public class isComplexInfoPropMatch {
@@ -24,10 +27,10 @@ public class isComplexInfoPropMatch {
 	
 	String lastMatchICType;
 	
-	List<String> output = new ArrayList<String>();  //used for output results 
+	List<isComplexInfo<?>> output = new ArrayList<isComplexInfo<?>>();  //used for output results 
 	/*TODO - change string to isComplex object defined in component class */
 	
-	
+//	HashMap<String, isComplexInfo<?>> output = new HashMap<String, isComplexInfo<?>>(); 
 	public isComplexInfoPropMatch(){} //default constructor
 	
 	public isComplexInfoPropMatch(isComplexInfoPropMatch parent)  //copy parent
@@ -55,9 +58,15 @@ public class isComplexInfoPropMatch {
 	
 	//TODO Add more constructors as required
 	
-	public void loadOutput(String op)
+	public void loadOutput(isComplexInfo<?> op)
 	{
 		this.output.add(op);
+	}
+	public void loadOutput(String string) {
+		
+		isComplexInfoFactory fac = new isComplexInfoFactory();
+		loadOutput(fac.newisComplexInfoFromStr(string));
+		
 	}
 	
 	public void setLastMatchSucceed(boolean success)
@@ -150,8 +159,19 @@ public class isComplexInfoPropMatch {
 		return this.isError ;
 	}
 	
-	//TODO - add getAllResults method
+	@SuppressWarnings("unchecked")
+	public List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> getAllResults(){//FIXME better!
+    	LinkedList<isComplexInfo<AggrValue<AdvancedMatrixValue>>> results = new LinkedList<isComplexInfo<AggrValue<AdvancedMatrixValue>>>();
+    	System.out.println(output);
+    	
+    	for(Object value: output){
+    		results.add((isComplexInfo<AggrValue<AdvancedMatrixValue>>)(value));    		
+    	}
+    	return results;
+    }
 	//TODO - add more methods as required
+
+	
 	
 }
 

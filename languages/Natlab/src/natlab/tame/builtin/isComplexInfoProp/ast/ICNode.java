@@ -10,6 +10,6 @@ import natlab.tame.valueanalysis.value.*;
 
 public abstract class ICNode extends Symbol {
 	
-	abstract public isComplexInfoPropMatch match(boolean isPatternSide, isComplexInfoPropMatch previousMatchResult, List<Integer> argValues);
+	abstract public isComplexInfoPropMatch match(boolean isPatternSide, isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues);
 
 }

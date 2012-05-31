@@ -28,7 +28,7 @@ public class ICCase extends ICNode{
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		
 		isComplexInfoPropMatch matchCase = ivl.match(isPatternSide, previousMatchResult, argValues);
 		
@@ -46,7 +46,7 @@ public class ICCase extends ICNode{
 		else
 		{
 			System.out.println("Cannot match the arguments to equation!!! ");
-			return null;
+			return previousMatchResult;
 		}
 		
 	}

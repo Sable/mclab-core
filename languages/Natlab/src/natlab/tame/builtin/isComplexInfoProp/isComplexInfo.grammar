@@ -117,6 +117,8 @@ ternaryOpExp
 	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON isComplexValue.xv2					{: return new ICtoeExp(ia, co, xv1, null, xv2, null); :}
 	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON isComplexValue.xv2 QOp.qop2  {: return new ICtoeExp(ia, co, xv1, null, xv2, qop2); :}
 	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 QOp.qop1 COLON isComplexValue.xv2  {: return new ICtoeExp(ia, co, xv1, qop1, xv2, null); :}
+	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON								{: return new ICtoeExp(ia, co, xv1, null, null, null); :}
+	
 	;
 	
 inputAttribute

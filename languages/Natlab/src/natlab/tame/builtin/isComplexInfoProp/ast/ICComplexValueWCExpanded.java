@@ -26,7 +26,7 @@ public class ICComplexValueWCExpanded extends ICAbstractValue{
 			@Override
 			public isComplexInfoPropMatch match(boolean isPatternSide,
 					isComplexInfoPropMatch previousMatchResult,
-					List<Integer> argValues) {
+					List<? extends Value<?>> argValues) {
 				// TODO Auto-generated method stub
 				return null;
 			}

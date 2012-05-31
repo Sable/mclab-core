@@ -30,7 +30,7 @@ public class ICtoeExp extends ICternaryOpExp{
 	
 	public String toString ()
 	{
-		String qopVal1, qopVal2;
+		String qopVal1, qopVal2, xv2Val;
 		if (qop1 == null)
 			qopVal1 = "";
 		else
@@ -40,15 +40,104 @@ public class ICtoeExp extends ICternaryOpExp{
 			qopVal2 = "";
 		else
 			qopVal2 = qop2.toString();
+		
+		if (null == xv2)
+			xv2Val = "";
+		else
+			xv2Val = xv2.toString();
 	
-		return ia.toString()+co.toString()+"?"+xv1.toString()+qopVal1+":"+xv2.toString()+qopVal2;
+		return ia.toString()+co.toString()+"?"+xv1.toString()+qopVal1+":"+xv2Val+qopVal2;
 	}
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
+		
+		System.out.println("INSIDE teOp\n");
+		
+		isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
+		if (false == isPatternSide)//has to be on the RHS
+		{
+			
+			System.out.println("INSIDE teOp\n");
+			
+			if (match.getNumMatched() == argValues.size())
+			{	
+				if(ia.toString().equals("NUMXARGS"))
+				{
+					match = terMatch(previousMatchResult.getNumXargs(), match);
+				}
+				else if (ia.toString().equals("NUMAARGS"))
+				{
+					match = terMatch(previousMatchResult.getNumAargs(), match);
+				}
+				else if (ia.toString().equals("NUMRARGS"))
+				{
+					match = terMatch(previousMatchResult.getNumRargs(), match);
+				}
+			}
+			else
+			{
+				match.setError(true);
+			}
+		}
+		return match;
+		
+	}
+
+	private isComplexInfoPropMatch terMatch(int numTArgs, isComplexInfoPropMatch match) {
 		// TODO Auto-generated method stub
-		return null;
+		/*
+		 * 1. check for the condition
+		 * 2. based on the condition call a match on xv1 or xv2
+		 *
+		 */
+		
+		//isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
+		if(co.getOp().equals("<"))
+		{
+			if(numTArgs<co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		else if(co.getOp().equals(">"))
+		{
+			if(numTArgs>co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		else if(co.getOp().equals("<="))
+		{
+			if(numTArgs<=co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		else if(co.getOp().equals(">="))
+		{
+			if(numTArgs>=co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		else if(co.getOp().equals("=="))
+		{
+			if(numTArgs==co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		else if(co.getOp().equals("~="))
+		{
+			if(numTArgs!=co.getVal())
+				match.loadOutput(xv1.toString());
+			else
+				match.loadOutput(xv2.toString());
+		}
+		
+		return match;
 	}
 	
 

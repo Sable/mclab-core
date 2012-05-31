@@ -23,10 +23,21 @@ public class ICCondition extends ICNode{
 	{
 		return ro.toString()+val.toString();
 	}
+	
+	public String getOp()
+	{
+		return ro.toString();
+	}
+	
+	public int getVal()
+	{
+		return val.toNumber();
+	}
+	
 
 	@Override
 	public isComplexInfoPropMatch match(boolean isPatternSide,
-			isComplexInfoPropMatch previousMatchResult, List<Integer> argValues) {
+			isComplexInfoPropMatch previousMatchResult,List<? extends Value<?>> argValues) {
 		// TODO Auto-generated method stub
 		return null;
 	}
