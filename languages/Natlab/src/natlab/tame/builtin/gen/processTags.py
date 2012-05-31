@@ -166,21 +166,47 @@ def Shape(builtin, tagArgs, iset):
 #
 #""".format(shape=shape); # return the java method
 
+# the isComplex tag
+def isComplex(builtin, tagArgs, iset):
+    iset.add("HasisComplexPropagationInfo"); # add the interface
+    treeString = tagArgs.strip()[1:-1];  # building string to parse - remove parentheses
+    
+    # java expr for parent info - find if tag 'Shape' is defined for a parent
+    if (builtin.parent and builtin.parent.getAllTags().has_key('isComplex')):
+      parentInfo = 'super.getisComplexPropagationInfo()'
+    else:
+      parentInfo = 'new ICNone()'
+    
+    # produce code
+    return """
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){{
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){{
+                isComplexPropInfo = isComplexInfoPropTool.parse("{treeString}");
+            }}
+            return isComplexPropInfo;
+        }}
+""".format(treeString=treeString, javaName=builtin.javaName, parentInfo=parentInfo);
 
 
 
-# Idea for Vineet:
-#s = tagArgs.strip()[1:-1]
-#cases = s.split('||')
-#for case in cases:
-#   clause = case.split('->')
-#   if (len(clause) < 2):
-#       # perform replacements
-#       tags = clause[0].split(',');
-#       for tag in tas.split(',');
-#         tag = tag.strip();
-#         
-#   else:
-#       # there's an actual arrow expression
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
        

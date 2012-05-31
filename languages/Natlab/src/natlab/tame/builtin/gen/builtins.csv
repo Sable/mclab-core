@@ -94,8 +94,11 @@ doubleConstant; constant;
 -Class(none -> double)
 -Shape([]->$)
 pi
+-isComplex(A*->NUMAARGS==0?R)
 i
+-isComplex(A*->NUMAARGS==0?X:)
 j
+-isComplex(A*->NUMAARGS==0?X:)
 
 
 # ****************************************************************************************
@@ -204,6 +207,7 @@ complex
 # elemewise binary arithmetic
 elementalBinaryArithmetic; elementalBinaryNumericFunction
 -Shape($|M,$|M->M)
+-isComplex(A,A -> NUMXARGS>0 ? X : R)
 plus
 minus
 times

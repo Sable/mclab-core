@@ -56,6 +56,8 @@ import natlab.tame.builtin.classprop.*;
 import natlab.tame.builtin.classprop.ast.*;
 import natlab.tame.builtin.shapeprop.*;
 import natlab.tame.builtin.shapeprop.ast.*; //XU -- remove this!!!!! XU did
+import natlab.tame.builtin.isComplexInfo.*;
+import natlab.tame.builtin.isComplexInfo.ast.*;
 
 
 public abstract class Builtin {
