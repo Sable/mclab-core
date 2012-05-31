@@ -89,6 +89,8 @@ public abstract class Constant {
      * returns the shape of the constant as a list of dimensions
      */
     abstract public List<Integer> getShape();
+
+	abstract public String getisComplexInfo() ;
 }
 
 

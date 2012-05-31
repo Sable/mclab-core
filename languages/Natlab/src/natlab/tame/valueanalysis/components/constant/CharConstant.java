@@ -64,4 +64,10 @@ public class CharConstant extends Constant {
     	list.add(value.length());
     	return list;
     }
+
+	@Override
+	public String getisComplexInfo() {
+		// TODO Auto-generated method stub
+		return "REAL";
+	}
 }

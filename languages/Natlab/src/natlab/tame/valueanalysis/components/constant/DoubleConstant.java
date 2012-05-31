@@ -71,4 +71,10 @@ public class DoubleConstant extends Constant {
     	return list;
     }
 
+	@Override
+	public String getisComplexInfo() {
+		// TODO Auto-generated method stub
+		return "REAL";
+	}
+
 }

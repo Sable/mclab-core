@@ -65,4 +65,10 @@ public class LogicalConstant extends Constant {
     	list.add(1);
     	return list;
     }
+
+	@Override
+	public String getisComplexInfo() {
+		// TODO Auto-generated method stub
+		return "REAL";
+	}
 }
