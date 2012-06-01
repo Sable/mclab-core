@@ -10,7 +10,7 @@ import beaver.Parser;
 import natlab.tame.builtin.isComplexInfoProp.ast.ICCaselist;
 import natlab.tame.builtin.isComplexInfoProp.ast.ICNode;
 import natlab.tame.builtin.isComplexInfoProp.*;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.value.*;
@@ -32,8 +32,9 @@ public class isComplexInfoPropTool {
 		}
 	}
 
-	public static List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchByValues(
-			ICNode equation, List<? extends Value<?>> argValues) {
+//	public static List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchByValues(
+	public static List<isComplexInfo<?>> matchByValues(
+			ICNode equation, List<? extends Value<?>> argValues, int num) {
 isComplexInfoPropMatch icMatch = equation.match(true, new isComplexInfoPropMatch(), argValues);
            return icMatch.getAllResults();
 	}

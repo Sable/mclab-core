@@ -40,11 +40,11 @@ public class AdvancedMatrixValuePropagator extends
 	 */
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseBuiltin(Builtin builtin,
-			Args<AggrValue<AdvancedMatrixValue>> arg) {
+			Args<AggrValue<AdvancedMatrixValue>> arg, int num) {
 		// deal with constants
 		if (Debug)
 			System.out.println("built-in fn's arguments are " + arg);
-		Constant cResult = builtin.visit(constantProp, arg);
+		Constant cResult = builtin.visit(constantProp, arg, num);
 		if (cResult != null) {
 			return Res
 					.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
@@ -53,7 +53,7 @@ public class AdvancedMatrixValuePropagator extends
 
 		// if the result is not a constant, just do mclass propagation
 		List<Set<ClassReference>> matchClassResult = builtin.visit(classProp,
-				arg);
+				arg, num);
 		if (Debug)
 			System.out.println("classProp results are " + matchClassResult);
 		if (matchClassResult == null) { // class prop returned error
@@ -71,7 +71,7 @@ public class AdvancedMatrixValuePropagator extends
 //		}
 
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
-				.visit(isComplexInfoProp, arg);
+				.visit(isComplexInfoProp, arg, num);
 		if (matchisComplexInfoResult == null) {
 			System.out.println("no complexinfo results");
 		}
@@ -109,7 +109,7 @@ public class AdvancedMatrixValuePropagator extends
 
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseAbstractConcatenation(
-			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg) {
+			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg, int num) {
 		if (Debug)
 			System.out
 					.println("inside AdvancedMatrixValuePropagator caseAbstractConcatenation!");// XU
@@ -123,7 +123,7 @@ public class AdvancedMatrixValuePropagator extends
 //				System.out.println("shape results are empty");
 //		}
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
-				.visit(isComplexInfoProp, arg);
+				.visit(isComplexInfoProp, arg, num);
 		if (matchisComplexInfoResult == null) {
 			System.out.println("no complexinfo results");
 		}

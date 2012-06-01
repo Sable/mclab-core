@@ -4,9 +4,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.*;
+//import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
@@ -160,12 +160,12 @@ public class isComplexInfoPropMatch {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> getAllResults(){//FIXME better!
-    	LinkedList<isComplexInfo<AggrValue<AdvancedMatrixValue>>> results = new LinkedList<isComplexInfo<AggrValue<AdvancedMatrixValue>>>();
+	public List<isComplexInfo<?>> getAllResults(){//FIXME better!
+    	List<isComplexInfo<?>> results = new LinkedList<isComplexInfo<?>>();
     	System.out.println(output);
     	
     	for(Object value: output){
-    		results.add((isComplexInfo<AggrValue<AdvancedMatrixValue>>)(value));    		
+    		results.add((isComplexInfo<? extends Value<?>>)(value));    		
     	}
     	return results;
     }
