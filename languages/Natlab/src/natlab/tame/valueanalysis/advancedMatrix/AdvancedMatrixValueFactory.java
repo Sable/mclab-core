@@ -31,15 +31,15 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
 			
 			return new AdvancedMatrixValue((new AdvancedMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper))
-							.get(0).iterator().next().getMatlabClass()))),((HasisComplexInfo)(propagator.call("colon", Args.newInstance(lower,upper))
+					(propagator.call("colon", Args.newInstance(lower,upper),0)
+							.get(0).iterator().next().getMatlabClass()))),((HasisComplexInfo)(propagator.call("colon", Args.newInstance(lower,upper),0)
 									.get(0).iterator().next())).getisComplexInfo());
 		} else {
 			
 			return new AdvancedMatrixValue((new AdvancedMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper))
-							.get(0).iterator().next().getMatlabClass()))),((HasisComplexInfo)(propagator.call("colon", Args.newInstance(lower,upper))
+					(propagator.call("colon", Args.newInstance(lower,upper),0)
+							.get(0).iterator().next().getMatlabClass()))),((HasisComplexInfo)(propagator.call("colon", Args.newInstance(lower,upper),0)
 									.get(0).iterator().next())).getisComplexInfo());
 
 		}
