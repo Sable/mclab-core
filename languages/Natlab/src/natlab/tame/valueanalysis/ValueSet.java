@@ -221,6 +221,9 @@ public class ValueSet<V extends Value<V>> implements
             result = new ValueSet<V>(other);
             other = this;
         }
+        System.out.println("result: "+result);//XU added
+        System.out.println("smaller: "+other);//XU added
+        System.out.println("result size: "+result.size());//XU added
         if (other.size == 0) return result;
         //System.out.println(result+" "+other);
         //merge elements from the smaller set
@@ -228,6 +231,7 @@ public class ValueSet<V extends Value<V>> implements
             if (other.size == 1){
                 if (result.singleton.getMatlabClass().equals(other.singleton.getMatlabClass())){
                     result.singleton = (V)result.singleton.merge(other.singleton);
+                    System.out.println("inside singleton something...");//XU added
                 } else {
                     result.map = new LinkedHashMap<ClassReference, V>(3); //|result| = |size| = 1
                     result.map.put(result.singleton.getMatlabClass(), result.singleton);
@@ -258,6 +262,7 @@ public class ValueSet<V extends Value<V>> implements
             }
             result.size = result.map.size();
         }
+        System.out.println("after merging, the result is "+result);//XU added!
         return result;
     }
 

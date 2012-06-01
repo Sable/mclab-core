@@ -17,12 +17,12 @@ public class SPUpperIndex extends SPAbstractVertcatExprArg{
 		//System.out.println(s+"()");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		//for M(2), this node just want to get the value of M's second dimension size, if in an assignment, just modify the number of second dimension.
 		//just save string s and mostly number n as the latest matched thing, and set inArrayIndex true
 		previousMatchResult.saveLatestMatchedUppercase(s);
 		previousMatchResult.setArrayIndexAssignLeft(true);
-		previousMatchResult = n.match(isPatternSide, previousMatchResult, argValues);
+		previousMatchResult = n.match(isPatternSide, previousMatchResult, argValues, num);
 		previousMatchResult.setArrayIndexAssignLeft(false);
 		previousMatchResult.setArrayIndexAssignRight(true);
 		return previousMatchResult;

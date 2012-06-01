@@ -24,6 +24,7 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
     public SimpleMatrixValue(Constant constant){
         super(constant.getMatlabClass());
         this.constant = constant;
+        System.out.println("simple..constant been called  "+constant);//XU added
     }
     
     

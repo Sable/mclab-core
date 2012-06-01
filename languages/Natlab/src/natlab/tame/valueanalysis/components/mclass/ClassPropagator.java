@@ -25,20 +25,16 @@ public class ClassPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>,
     }
     private ClassPropagator() {} //hidden private constructor
     
-    
-    
-	@Override
-	public List<Set<ClassReference>> caseBuiltin(Builtin builtin, Args<V> arg) {
+    @Override
+    //XU add this to support...adding this desn't change anything of class propagation!
+	public List<Set<ClassReference>> caseBuiltin(Builtin builtin, Args<V> arg, int num) {
         if (builtin instanceof HasClassPropagationInfo){
         	//call class prop tool
             return ClassPropTool.matchByValues(((HasClassPropagationInfo)builtin).getMatlabClassPropagationInfo(),arg);
         }
 		throw new UnsupportedOperationException(
 				"ClassPropgator cannot propgate classes for "+builtin);
-	}
-
-	
-	
+	}	
 }
 
 

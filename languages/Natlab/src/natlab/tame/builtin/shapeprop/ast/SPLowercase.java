@@ -1,6 +1,5 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,14 +8,14 @@ import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPLowercase extends SPAbstractScalarExpr{
-	static boolean Debug = true;
+	static boolean Debug = false;
 	String s;
 	public SPLowercase(String s){
 		this.s = s;
 		//System.out.println(s);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if(isPatternSide==true){
 			//for matching a vertcat expression, this step should be similar to Uppercase matching, to exam whether equals!
 			if(previousMatchResult.isInsideVertcat()==true){

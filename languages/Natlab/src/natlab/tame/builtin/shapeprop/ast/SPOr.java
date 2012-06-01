@@ -1,11 +1,8 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPOr extends SPAbstractMatchExpr{
@@ -18,15 +15,15 @@ public class SPOr extends SPAbstractMatchExpr{
 		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		int indexBeforeOr = previousMatchResult.getNumMatched();
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues);
+		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
 		int indexAfterOr = match.getNumMatched();
 		if(indexBeforeOr==indexAfterOr){
 			if(match.getIsError()==true){
 				match.resetIsError();
 			}
-			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues);//actually, here, match is the same to previousMatchResult
+			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues, num);//actually, here, match is the same to previousMatchResult
 			return continueMatch;
 		}
 		return match;

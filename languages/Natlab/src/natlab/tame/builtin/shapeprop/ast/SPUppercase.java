@@ -6,8 +6,6 @@ import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.*;
 
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
@@ -17,14 +15,14 @@ import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.components.constant.Constant;
 
 public class SPUppercase extends SPAbstractVectorExpr{
-	static boolean Debug = true;
+	static boolean Debug = false;
 	String s;
 	public SPUppercase (String s){
 		this.s = s;
 		//System.out.println(s);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if(isPatternSide==true){
 			if(previousMatchResult.isInsideAssign()==true){
 				previousMatchResult.saveLatestMatchedUppercase(s);
@@ -32,12 +30,11 @@ public class SPUppercase extends SPAbstractVectorExpr{
 			}
 			if(argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing current Matrix Value from args
-				BasicMatrixValue argument = (BasicMatrixValue)argValues.get(previousMatchResult.getNumMatched());
 				//get shape info from current Matrix Value
-				Shape<AggrValue<BasicMatrixValue>> argumentShape = ((HasShape)argument).getShape();
-				Constant argumentConstant =((HasConstant)argument).getConstant();
+				Shape<?> argumentShape = ((HasShape)argValues.get(previousMatchResult.getNumMatched())).getShape();
+				Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getNumMatched())).getConstant();
 				if(argumentConstant!=null){
-					System.out.println("it's a constant!");
+					if (Debug) System.out.println("it's a constant!");
 					previousMatchResult.setIsError();
 					return previousMatchResult;
 				}
@@ -47,7 +44,7 @@ public class SPUppercase extends SPAbstractVectorExpr{
 						//cases like (M,M->M), those M should be definitely the same!!! if not, return error information, interesting!
 						List<Integer> l = new ArrayList<Integer>();
 						l = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
-						Shape<AggrValue<BasicMatrixValue>> oldShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(l);
+						Shape<?> oldShape = (new ShapeFactory()).newShapeFromIntegers(l);
 						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
 						if(argumentShape.equals(oldShape)==false){//FIXME
 							if (Debug) System.out.println("MATLAB syntax error!");

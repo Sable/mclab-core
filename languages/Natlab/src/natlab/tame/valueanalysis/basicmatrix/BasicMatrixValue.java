@@ -17,7 +17,7 @@ import natlab.tame.valueanalysis.aggrvalue.*;
  * on top of the matlab class
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements HasConstant, HasShape<AggrValue<BasicMatrixValue>>{
-    static boolean Debug = true;
+    static boolean Debug = false;
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
     Constant constant;
     Shape<AggrValue<BasicMatrixValue>> shape;
@@ -80,7 +80,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
                 "can only merge a Matrix Value with another Matrix Value");
         if (!other.getMatlabClass().equals(classRef)) throw new UnsupportedOperationException(
                 "only Values with the same class can be merged, trying to merge :"+this+", "+other);
-        System.out.println("this constant is "+constant);
+        if (Debug) System.out.println("this constant is "+constant);
         if (constant == null){
         	if (Debug) System.out.println("this constant is null!");
         	if(((BasicMatrixValue)other).constant==null){
@@ -209,7 +209,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     		
     	}
     	else{
-    		System.out.println("this array get is with one argument!");
+    		if (Debug) System.out.println("this array get is with one argument!");
     		if(((HasConstant)indizes.get(0)).getConstant()==null){
         		if (Debug) System.out.println("constant component is null!");
         		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
@@ -230,7 +230,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	for(Integer dimNum : ls){
         		size = size*dimNum;
         	}
-        	System.out.println(size);
+        	if (Debug) System.out.println(size);
         	if(index>size){
         		if (Debug) System.out.println("index exceeds matrix dimensions!");
         		throw new UnsupportedOperationException();//FIXME
@@ -302,7 +302,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
     	}
     	else{
-    		System.out.println("this array get is with one argument!");
+    		if (Debug) System.out.println("this array get is with one argument!");
     		if(((HasConstant)indizes.get(0)).getConstant()==null){
         		if (Debug) System.out.println("constant component is null!");
         		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
@@ -323,7 +323,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	for(Integer dimNum : ls){
         		size = size*dimNum;
         	}
-        	System.out.println(size);
+        	if (Debug) System.out.println(size);
         	if(index>size){
         		if (Debug) System.out.println("index exceeds matrix dimensions!");
         		throw new UnsupportedOperationException();//FIXME

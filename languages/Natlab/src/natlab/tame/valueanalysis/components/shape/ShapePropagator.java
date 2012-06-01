@@ -1,18 +1,15 @@
 package natlab.tame.valueanalysis.components.shape;
 
-import java.util.List;
+import java.util.*;
 
 import natlab.tame.builtin.*;
 import natlab.tame.builtin.shapeprop.ShapePropTool;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 
 
 public class ShapePropagator<V extends Value<V>> 
-	extends BuiltinVisitor<Args<V>, List<Shape<AggrValue<BasicMatrixValue>>>>{//XU modified at 4.28.12.55pm, very important!!!
+	extends BuiltinVisitor<Args<V>, List<Shape<V>>>{//XU modified at 4.28.12.55pm, very important!!!
 	//this is a singleton class -- make it singleton, ignore all the generic stuff
     @SuppressWarnings("rawtypes")
 	static ShapePropagator instance = null;
@@ -27,17 +24,24 @@ public class ShapePropagator<V extends Value<V>>
     }
     private ShapePropagator(){} //hidden private constructor
 
-	@Override
-	public List<Shape<AggrValue<BasicMatrixValue>>> caseBuiltin(Builtin builtin, Args<V> arg) {
+    @Override
+    //XU add this to support...
+	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg, int num) {
 		// TODO
 		if (Debug) System.out.println("inside ShapePropgator, builtin fn is "+builtin);
+		if (Debug) System.out.println("the number of output variables is "+num);
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
-			return ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg);
+			List<Shape<?>> result = ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg,num);
+			List<Shape<V>> vResult = new ArrayList<Shape<V>>();
+			for(Shape<?> res: result){
+				vResult.add((Shape<V>)res);
+			}
+			return vResult;
 		}
 		throw new UnsupportedOperationException();
 	}
-
+    
 }
 
 

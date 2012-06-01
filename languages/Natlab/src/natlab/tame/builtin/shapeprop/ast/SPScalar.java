@@ -1,19 +1,15 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.*;
-//import natlab.tame.valueanalysis.basicmatrix.*;
 
 public class SPScalar extends SPAbstractVectorExpr{
-	static boolean Debug = true;
+	static boolean Debug = false;
 	String s;
 	
 	public SPScalar (String s){
@@ -21,7 +17,7 @@ public class SPScalar extends SPAbstractVectorExpr{
 		//System.out.println("$");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if (isPatternSide==true){  //we find a scalar in the tree, we have to distinguish whether it is in pattern matching part, or output part
 			//if the whole argument is null
 			if(argValues.isEmpty()){

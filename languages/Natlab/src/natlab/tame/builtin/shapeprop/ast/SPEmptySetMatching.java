@@ -1,30 +1,28 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPEmptySetMatching extends SPAbstractVectorExpr{
+	static boolean Debug = false;
+	
 	public SPEmptySetMatching(){
 		//System.out.println("an empty vector matching");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
-		//System.out.println(argValues.get(previousMatchResult.getNumMatched()));
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		ShapePropMatch match = new ShapePropMatch(previousMatchResult);
 		if(isPatternSide==true){
-			System.out.println(argValues);
+			if (Debug) System.out.println("inside SPEmptySetMatching with arguments "+argValues);
 			if(argValues.isEmpty()){
 				match.comsumeArg();
-				System.out.println("matching an empty arg!");
+				if (Debug) System.out.println("matching an empty arg!");
 				return match;
 				}
 			else{
-				System.out.println("inside not empty");
+				if (Debug) System.out.println("inside not empty");
 				previousMatchResult.setIsError();
 				return previousMatchResult;
 				}

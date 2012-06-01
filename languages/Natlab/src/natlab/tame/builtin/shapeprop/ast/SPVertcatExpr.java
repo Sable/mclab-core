@@ -5,27 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPVertcatExpr extends SPAbstractVectorExpr{
-	static boolean Debug = true;
+	static boolean Debug = false;
 	SPVertExprArglist vl;
 	public SPVertcatExpr(SPVertExprArglist vl){
 		this.vl = vl;
 		//System.out.println("[]");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
-		//System.out.println(isPatternSide);
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if(isPatternSide==true){
 			if (Debug) System.out.println("just get into SPVertcatExpr, setIsInsideVertcat is true!");
 			previousMatchResult.setIsInsideVertcat(true);
 			previousMatchResult.setNumInVertcat(0);//reset it
-			ShapePropMatch match = vl.match(isPatternSide, previousMatchResult, argValues);
+			ShapePropMatch match = vl.match(isPatternSide, previousMatchResult, argValues, num);
 			if(match.getIsError()==true){
 				Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
 				errorShape.FlagItsError();
@@ -41,10 +38,6 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 			return match;
 		}
 		else{
-			if(previousMatchResult.getIsError()==true){  //I don't remember why I did this...@23:24 May 17th
-				previousMatchResult.addToOutput("vertcat", previousMatchResult.getShapeOfVariable("vertcat"));
-				return previousMatchResult;
-			}
 			//a vertcat in output side, it should return a shape, and now, I think it should return an ArrayList<Integer>, then call newShapeFromIntegers...
 			String[] arg = vl.toString().split(",");
 			if(arg[0].equals("1")){
@@ -52,24 +45,33 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 				al.add(1);
 				try{
 					al.add(previousMatchResult.getValueOfVariable(arg[1]));
-					Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
+					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 					previousMatchResult.addToOutput("vertcat", shape);
 					return previousMatchResult;
 				}
 				catch(Exception e){
 					al.add(null);
-					Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
+					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 					previousMatchResult.addToOutput("vertcat", shape);
 					return previousMatchResult;
 				}
 			}
 			if(arg[1].equals("1")){
 				ArrayList<Integer> al = new ArrayList<Integer>(2);
-				al.add(previousMatchResult.getValueOfVariable(arg[0]));
-				al.add(1);
-				Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
-				previousMatchResult.addToOutput("vertcat", shape);
-				return previousMatchResult;
+				try{
+					al.add(previousMatchResult.getValueOfVariable(arg[0]));
+					al.add(1);
+					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
+					previousMatchResult.addToOutput("vertcat", shape);
+					return previousMatchResult;
+				}
+				catch(Exception e){
+					al.add(null);
+					al.add(1);
+					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
+					previousMatchResult.addToOutput("vertcat", shape);
+					return previousMatchResult;
+				}
 			}
 			else{
 				//FIXME deal with the [m,k] or [m,k,j,..] kinds of output
@@ -79,7 +81,7 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 					al.add(previousMatchResult.getValueOfVariable(i));
 				}
 				if (Debug) System.out.println(al);
-				Shape<?> shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(al);
+				Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 				previousMatchResult.addToOutput("vertcat", shape);
 				return previousMatchResult;				
 			}

@@ -27,24 +27,26 @@ public abstract class ValuePropagator<V extends Value<V>>
      * produces the abstract interpretation result of calling the given builtin
      * This is the public interface that users of this class should use
      * @return
+     */    
+    /*
+     * XU add this function to support the number of output variables
      */
-    public Res<V> call(String builtin,Args<V> args){
-        Builtin b = Builtin.getInstance(builtin);
+    public Res<V> call(String builtin,Args<V> args,int num){
+    	Builtin b = Builtin.getInstance(builtin);
         if (b == null){
             throw new UnsupportedOperationException("builtin "+builtin+" not found");
         }
-        return call(b, args);        
+        return call(b, args, num); 
     }
-    
     /**
      * same as the other call, but with the first argument a builtin
      */
-    public Res<V> call(Builtin b,Args<V> args){
-        return b.visit(this, args);        
+    /*
+     * XU add this function to support the number of output variables
+     */
+    public Res<V> call(Builtin b,Args<V> args,int num){
+        return b.visit(this, args, num);        
     }
-    
-    
-    
     protected ValueFactory<V> factory;
     /**
      * constructor takes in a MatrixValueFactory

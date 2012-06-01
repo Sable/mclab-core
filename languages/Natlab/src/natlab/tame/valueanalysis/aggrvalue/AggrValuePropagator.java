@@ -30,11 +30,11 @@ final public class AggrValuePropagator<D extends MatrixValue<D>> extends ValuePr
 
 
 	@Override
-	public Res<AggrValue<D>> caseBuiltin(Builtin builtin, Args<AggrValue<D>> args) {
+	//XU add this to support...
+	public Res<AggrValue<D>> caseBuiltin(Builtin builtin, Args<AggrValue<D>> args, int num) {
 		//TODO - check whether values are only matrizes
-		return matrixValuePropagator.call(builtin, args);
+		return matrixValuePropagator.call(builtin, args, num);
 	}
-
 }
 
 

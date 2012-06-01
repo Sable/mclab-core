@@ -8,14 +8,11 @@ import beaver.Parser;
 
 import natlab.tame.builtin.shapeprop.ast.*;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.*;
 
-public class ShapePropTool {
+public class ShapePropTool{
 	
-	static boolean Debug = true;
+	static boolean Debug = false;
 	
     public static SPNode parse(String source){
     	//System.err.println("parsing: "+source);
@@ -29,10 +26,8 @@ public class ShapePropTool {
     		return null;
     	}
     }
-	
     
-    
-    public static List<Shape<AggrValue<BasicMatrixValue>>> matchByValues(SPNode tree, List<? extends Value<?>> argValues){
+    public static List<Shape<?>> matchByValues(SPNode tree, Args<?> argValues,int num){
     	if(argValues!=null){
     		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
     		for(Value<?> arg:argValues){
@@ -45,7 +40,7 @@ public class ShapePropTool {
     		}
     	}
     	if (Debug) System.out.println(tree+" with arguments "+argValues);
-    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues);
+    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues,num);
         /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
         	return null;
         }*/

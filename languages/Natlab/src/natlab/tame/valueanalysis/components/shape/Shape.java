@@ -134,7 +134,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	}
     }
     
-
     public boolean equals(Shape<V> o){
     	if(this.getSize()==o.getSize()){
     		int j=0;

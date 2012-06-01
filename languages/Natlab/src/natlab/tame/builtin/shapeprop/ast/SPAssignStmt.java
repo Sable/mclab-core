@@ -1,11 +1,8 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPAssignStmt extends SPAbstractPattern{
@@ -17,10 +14,10 @@ public class SPAssignStmt extends SPAbstractPattern{
 		//System.out.println("=");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		previousMatchResult.setIsInsideAssign(true);
-		ShapePropMatch match = lhs.match(isPatternSide, previousMatchResult, argValues);
-		ShapePropMatch rhsMatch = rhs.match(isPatternSide, match, argValues);
+		ShapePropMatch match = lhs.match(isPatternSide, previousMatchResult, argValues, num);
+		ShapePropMatch rhsMatch = rhs.match(isPatternSide, match, argValues, num);
 		rhsMatch.setIsInsideAssign(false);
 		return rhsMatch;
 	}

@@ -117,6 +117,7 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
      */
     @Override
     public ValueFlowMap<V> merge(ValueFlowMap<V> o) {
+    	System.out.println("inside valueFlowMap.merge!"+o);//XU added to debug!
         if (!isViable() || !o.isViable()){
             return isViable?new ValueFlowMap<V>(this):new ValueFlowMap<V>(o);            
         }
@@ -129,6 +130,8 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
             result = new ValueFlowMap<V>(o);
             smaller = this;
         }
+        System.out.println("the smaller one is "+smaller);//XU added to debug!
+        System.out.println("the bigger one is "+result);//XU added to debug!
         //merge in smaller set
         for (Entry<String, ValueSet<V>> e : smaller.map.entrySet()){
             result.mergePut(e.getKey(), e.getValue());
@@ -139,8 +142,10 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
     public void mergePut(String key,ValueSet<V> value){
         if (!isViable) return;
         if (!map.containsKey(key)){
+        	System.out.println("not contain "+key);//XU added to debug!
             map.put(key,value);
         } else {
+        	System.out.println("contain "+key);//XU added to debug!
             map.put(key,map.get(key).merge(value));
         }
     }

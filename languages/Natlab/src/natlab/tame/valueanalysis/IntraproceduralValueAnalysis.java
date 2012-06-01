@@ -23,7 +23,7 @@ import ast.*;
  * This class operates on the static IR.
  * @author ant6n
  */
-public class IntraproceduralValueAnalysis<V extends Value<V>>
+public class IntraproceduralValueAnalysis<V extends Value<V>>         //XU commentted: this class support Value, for me, I use BasicMatrixValue.
 extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<V>>
 implements FunctionAnalysis<Args<V>, Res<V>>{
     StaticFunction function;
@@ -31,7 +31,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ValuePropagator<V> valuePropagator;
     ValueFlowMap<V> argMap;
     Args<V> args;
-    static boolean Debug = false;
+    static boolean Debug = false;  //button of debug
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
@@ -48,7 +48,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory, Args<V> args) {
-        this(node,function,factory);
+    	this(node,function,factory);
         argMap = new ValueFlowMap<V>();
         this.args = args;
         //TODO check whether given args <= declared args
@@ -115,6 +115,10 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //find function
         FunctionReference ref = function.getCalledFunctions().get(node.getFunctionName().getID());
         //do call
+        /**************XU added here************/
+        /*I have to pass the number of variables which are waiting for the output to the equation analysis*/
+        if (Debug) System.out.println("The number of output variable(s) is "+node.getNumTargets());
+        /***************************************/
         setCurrentOutSet(assign(getCurrentInSet(),node.getTargets(),
                 call(ref, getCurrentInSet(), node.getArguments(), node.getTargets(), node, null)));
         //associate flowsets
@@ -144,6 +148,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                     node.getLowerName(),node.getUpperName())){
                 results.add(Res.newInstance(
                 		factory.forRange(list.getFirst(),list.getLast(),null)));
+                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);//XU added to debug
             }
         }
         //put results
@@ -155,13 +160,14 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     @Override
     public void caseIfCondition(Expr condExpr) {
         if (checkNonViable(condExpr)) return;
+    	if(Debug) System.out.println("inside caseIfCondition!");
         ValueFlowMap<V> current = getCurrentInSet();
         ValueSet<V> values = current.get(((NameExpr)condExpr).getName().getID());
         for (V value : values){
         	//call 'any' on the condition value
             Constant any = Builtin.Any.getInstance().visit(
             		ConstantPropagator.<V>getInstance(),
-            		Args.newInstance(value));
+            		Args.newInstance(value),0);//XU add 0 here
             if (any != null && any instanceof LogicalConstant){
                 if (((LogicalConstant)any).equals(Constant.get(true))){
                     //result is true - false set is not viable
@@ -174,6 +180,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             }
         }
         setTrueFalseOutSet(current, current);
+        if (Debug) System.out.println("end of caseIfCondition!");
     }
     
     @SuppressWarnings("unchecked")
@@ -297,10 +304,10 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //put in flow map
         ValueFlowMap<V> flow = getCurrentInSet();
         String targetName = node.getTargetName().getID();
-        
+
         //assign result
         setCurrentOutSet(assign(flow,targetName, 
-                Res.newInstance(factory.newValueSet(constant))));
+                Res.newInstance(factory.newValueSet(constant))));   //XU study this line!!!4.26.2.14am, after this line, we get class information, which means, type information is got here!!!
 
         //set in/out set
         associateInAndOut(node);
@@ -451,7 +458,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     public void caseStmt(Stmt node) {
         if (checkNonViable(node)) return;
         //if (Debug)
-        System.out.println("IntraproceduralValueAnalysis: Stmt "+node+"-"+node.getPrettyPrinted());
+        if (Debug) System.out.println("IntraproceduralValueAnalysis: Stmt "+node+"-"+node.getPrettyPrinted());
         //set in/out set
         associateInAndOut(node);
     }
@@ -493,7 +500,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 String name = ((NameExpr)expr).getName().getID();
                 ValueSet<V> vs = flow.get(name);
                 if (vs == null){
-                    System.out.println(function.toString());
+                    if (Debug) System.out.println(function.toString());
                     throw new UnsupportedOperationException("name "+name+" not found in "+flow);
                 }
                 values.add(vs);
@@ -538,7 +545,9 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 if (function.getname().equals("nargin") && argsObj.size() == 0){
                     results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
                 } else {
-                    results.add(valuePropagator.call(function.getname(), argsObj));
+                	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);    //XU
+                	int numOfOutputVariables = ((TIRCallStmt)callsite).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
+                    results.add(valuePropagator.call(function.getname(), argsObj, numOfOutputVariables));     //see line 531, results are LinkedList<Res<V>>, so the propagator should return Res<V>
                 }
             }else{
                 //simplify args
@@ -562,8 +571,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         }        
         if (Debug) System.out.println("called "+function+", received "+Res.newInstance(results));
         if (cross(flow,args,partialArgs).size() > 1){
-        	System.out.println("exiting");
-        	System.out.println(results);
+        	if (Debug) System.out.println("exiting");
+        	if (Debug) System.out.println(results);
         	//System.exit(0);
         }
         //FIXME
@@ -581,6 +590,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             String target, Res<V> values){
+    	if (Debug) System.out.println(values);//XU comment, at this point, the values are already combination of class and value, for me, U need to add shape into it.
         return assign(flow,new TIRCommaSeparatedList(new NameExpr(new Name(target))),values);
     }
     
@@ -596,7 +606,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             TIRCommaSeparatedList targets, Res<V> values){
-       if (Debug) System.out.println("assign: "+targets+" = "+values);
+       if (Debug) System.out.println("assign: "+targets+" = "+values);  //XU commented, at this point, values are already combination of class and value.
        ValueFlowMap<V> result = flow.copy();
        if (!values.isViable()){
            return ValueFlowMap.newInstance(false);
@@ -610,6 +620,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
        } else {
            throw new UnsupportedOperationException("no support for non-primitive assings");
        }
+	   if (Debug) System.out.println(result);
        return result;
     }
     

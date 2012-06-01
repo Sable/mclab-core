@@ -54,30 +54,31 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     private ConstantPropagator(){} //hidden private constructor
      
     @Override
-    public Constant caseBuiltin(Builtin builtin, Args<V> arg) {
+    //XU add this to support...
+    public Constant caseBuiltin(Builtin builtin, Args<V> arg, int num) {
         return null;
     }
     
     @Override
-    public Constant casePi(Builtin builtin, Args<V> arg) {
+    public Constant casePi(Builtin builtin, Args<V> arg, int num) {
     	if (arg.size() > 0) return null;
         return Constant.get(Math.PI);
     }
     
     @Override
-    public Constant caseTrue(Builtin builtin, Args<V> arg) {
+    public Constant caseTrue(Builtin builtin, Args<V> arg, int num) {
     	if (arg.size() > 0) return null;
         return Constant.get(true);
     }
 
     @Override
-    public Constant caseFalse(Builtin builtin, Args<V> arg) {
+    public Constant caseFalse(Builtin builtin, Args<V> arg, int num) {
     	if (arg.size() > 0) return null;
         return Constant.get(true);
     }
 
     @Override
-    public Constant caseIsequal(Builtin builtin, Args<V> arg) {
+    public Constant caseIsequal(Builtin builtin, Args<V> arg, int num) {
     	List<Constant> constants;
         if (arg.size() == 2 && ((constants=arg.getConstants())!=null)){
             Constant a = constants.get(0);
@@ -94,12 +95,12 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     
     
     @Override
-    public Constant caseEq(Builtin builtin, Args<V> arg) {
-        return caseIsequal(builtin, arg);
+    public Constant caseEq(Builtin builtin, Args<V> arg, int num) {
+        return caseIsequal(builtin, arg, num);
     }
     
     @Override
-    public Constant caseAny(Builtin builtin, Args<V> arg) {
+    public Constant caseAny(Builtin builtin, Args<V> arg, int num) {
     	List<Constant> constants;
         if (arg.size() == 1 && ((constants=arg.getConstants())!=null)){
             Constant a = constants.get(0);
@@ -117,7 +118,7 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     
     
     @Override
-    public Constant caseClass(Builtin builtin, Args<V> arg) {
+    public Constant caseClass(Builtin builtin, Args<V> arg, int num) {
     	if (arg.size() == 1){
     		return Constant.get(arg.get(0).getMatlabClass().getName());    		
     	}

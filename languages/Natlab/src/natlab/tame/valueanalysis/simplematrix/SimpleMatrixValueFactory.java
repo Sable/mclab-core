@@ -11,6 +11,7 @@ import natlab.tame.valueanalysis.value.*;
 public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue>{
     @Override
     public SimpleMatrixValue newMatrixValue(Constant constant) {
+    	System.out.println("newMatrixValue of simple..been called!!  "+constant);  //XU added
         return new SimpleMatrixValue(constant);
     }
     
@@ -31,12 +32,12 @@ public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue
 		if (inc != null){
 			return new SimpleMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,inc,upper))
+					(propagator.call("colon", Args.newInstance(lower,inc,upper), 0)//XU add 0 here!
 							.get(0).iterator().next().getMatlabClass()));
 		} else {
 			return new SimpleMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper))
+					(propagator.call("colon", Args.newInstance(lower,upper), 0)//XU add 0 here!
 							.get(0).iterator().next().getMatlabClass()));
 
 		}

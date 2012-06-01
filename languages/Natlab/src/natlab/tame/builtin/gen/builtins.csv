@@ -233,7 +233,7 @@ cross
 arrayBinaryArithmetic; arrayBinaryNumericFunction
 -MatlabClass(logical 0->error, parent)
 -Shape([m,n],[n,k]->[m,k])
-mtimes;; MatlabClass(logical 0->double, parent)
+mtimes;; MatlabClass(logical 0->double, parent);; Shape([m,n],[n,k]->[m,k]||$,[m,n]->[m,n]||[m,n],$->[m,n])
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
@@ -639,8 +639,11 @@ class
 # return numericals
 doubleResultVersatileQuery; versatileQuery
 -Class(any -> double)
+-Shape($|M->$)
+
 # TODO fix this output?!
 size;; Class(any (numeric|logical)? -> double double double double double double double double double double double double double double double)
+-Shape(numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$)
 
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
@@ -694,8 +697,9 @@ permute;; Class(any double -> 0)
 
 unaryShapeTransformation; shapeTransformation
 -Class(any -> 0)
+
 squeeze
-transpose
+transpose;; Shape([m,n]->[n,m])
 ctranspose
 
 
@@ -791,7 +795,7 @@ builtin
 # calls builtin - proper
 
 timeFunction; impureFunction
-clock;; Class(none -> double)
+clock;; Class(none -> double);; Shape([]->[1,6])
 tic
 toc
 cputime
@@ -852,6 +856,7 @@ format
 
 randomFunction; impureFunction
 -Class((numeric|logical)* typeString(float)|(none->double))
+-Shape([]->$||($,n=previousScalar(),add())+->M)
 rand
 randn
 randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))

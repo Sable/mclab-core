@@ -1,15 +1,11 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.Value;
 
 /*
@@ -19,21 +15,20 @@ import natlab.tame.valueanalysis.value.Value;
  */
 public class SPAny extends SPAbstractVectorExpr
 {
-	static boolean Debug = true;
+	static boolean Debug = false;
 	String s;
 	public SPAny(String a){
 		this.s = a;
 		//System.out.println(a);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if (Debug) System.out.println("inside ANY!");
 		if(isPatternSide==true){
 			if(argValues.get(previousMatchResult.getNumMatched())!=null){
 				//get indexing current Matrix Value from args
-				BasicMatrixValue argument = (BasicMatrixValue)argValues.get(previousMatchResult.getNumMatched());
 				//get shape info from current Matrix Value
-				Shape<AggrValue<BasicMatrixValue>> argumentShape = ((HasShape)argument).getShape();
+				Shape<?> argumentShape = ((HasShape)argValues.get(previousMatchResult.getNumMatched())).getShape();
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(s, null);
 				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();

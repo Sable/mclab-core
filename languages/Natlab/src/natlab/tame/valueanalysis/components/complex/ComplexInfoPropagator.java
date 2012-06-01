@@ -18,10 +18,10 @@ public class ComplexInfoPropagator<V extends Value<V>> extends BuiltinVisitor<Ar
     private ComplexInfoPropagator(){} //hidden private constructor
 
 	
-	@Override
-	public List<ComplexInfo> caseBuiltin(Builtin builtin, Args<V> arg) {
+    @Override
+    //XU add this to support...
+	public List<ComplexInfo> caseBuiltin(Builtin builtin, Args<V> arg, int num) {
 		// TODO base case -- use whatever the builtin's complex propagation info provides
 		return null;
 	}
-
 }

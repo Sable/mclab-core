@@ -9,14 +9,14 @@ import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPNumber extends SPAbstractScalarExpr{
-	static boolean Debug = true;
+	static boolean Debug = false;
 	Number n;
 	public SPNumber (Number n){
 		this.n = n;
 		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues){
+	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
 		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
 			if(previousMatchResult.isArrayIndexAssignRight()==true){
 				//FIXME

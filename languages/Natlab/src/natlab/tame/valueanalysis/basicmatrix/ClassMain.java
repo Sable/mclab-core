@@ -14,7 +14,7 @@ import natlab.tame.valueanalysis.simplematrix.*;
 public class ClassMain {
 
 	public static void main(String[] args){
-		String file = "/home/xuli/test/hello.m";
+		String file = "/home/xuli/test/drv_sorry.m";
 		
 		//  prompt the user to enter the number of input argument of this function
 		System.out.print("Please enter the number of input argument of this function: ");
