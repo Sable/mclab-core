@@ -11,8 +11,7 @@ import natlab.tame.valueanalysis.value.*;
 public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue>{
     @Override
     public SimpleMatrixValue newMatrixValue(Constant constant) {
-    	System.out.println("newMatrixValue of simple..been called!!  "+constant);  //XU added
-        return new SimpleMatrixValue(constant);
+    	return new SimpleMatrixValue(constant);
     }
     
 

@@ -32,8 +32,6 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     		return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(cResult));
     	}
     	
-    	System.out.println("inside simpelMatrixValuePropagator caseBuiltin!");//XU
-    	
     	//if the result is not a constant, just do mclass propagation
         List<Set<ClassReference>> matchResult = 
                 builtin.visit(ClassPropagator.<AggrValue<SimpleMatrixValue>>getInstance(),arg, num);
@@ -64,7 +62,6 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     @Override
     public Res<AggrValue<SimpleMatrixValue>> caseAbstractConcatenation(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> arg, int num) {
-    	System.out.println("inside simpelMatrixValuePropagator caseAbstractConcatenation!");//XU
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(
                 new SimpleMatrixValue(
                         (PrimitiveClassReference)getDominantCatArgClass(arg)));
@@ -75,7 +72,6 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     @Override
     public Res<AggrValue<SimpleMatrixValue>> caseCellhorzcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements, int num) {
-    	System.out.println("inside simpelMatrixValuePropagator caseCellhorzcat!");//XU
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
                 Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
@@ -84,7 +80,6 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     @Override
     public Res<AggrValue<SimpleMatrixValue>> caseCellvertcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements, int num) {
-    	System.out.println("inside simpelMatrixValuePropagator caseCellvertcat!");//XU
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
                 Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
@@ -94,7 +89,6 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     @Override
     public Res<AggrValue<SimpleMatrixValue>> caseCell(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> arg, int num) {
-    	System.out.println("inside simpelMatrixValuePropagator caseCell!");//XU
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(
                 this.factory, factory.getShapeFactory().newShapeFromValues(arg),ValueSet.<AggrValue<SimpleMatrixValue>>newInstance()));
     }

@@ -40,7 +40,6 @@ public class TamerTool {
 	 */
 	public IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> 
 			tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<SimpleMatrixValue>> inputValues){
-		System.out.println("inside tamerTool first function!");
 		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
 		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
 		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
@@ -64,8 +63,6 @@ public class TamerTool {
 	 */
 	public IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> 
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-		System.out.println("inside tamerTool second function!");
-		System.out.println(inputValues);
 		SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
 		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputValues.size());
 		for (PrimitiveClassReference ref : inputValues){
