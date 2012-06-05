@@ -139,7 +139,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractMinOrMax(Builtin builtin,Arg arg,int num){ return caseAbstractDimensionCollapsingNumericFunction(builtin,arg,num); }
     public Ret caseMin(Builtin builtin,Arg arg,int num){ return caseAbstractMinOrMax(builtin,arg,num); }
     public Ret caseMax(Builtin builtin,Arg arg,int num){ return caseAbstractMinOrMax(builtin,arg,num); }    
-    //median does not support logical matrizes
+    //median does not support logical matrizes,nu
     public Ret caseMedian(Builtin builtin,Arg arg,int num){ return caseAbstractMinOrMax(builtin,arg,num); }
     
     //operatoes on floating point matrizes

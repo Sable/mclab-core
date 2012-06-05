@@ -34,12 +34,20 @@ import natlab.tame.valueanalysis.components.constant.*;
  */
 public class Args<V extends Value<V>> extends ArrayList<V>{
     private static final long serialVersionUID = 1L;
+    private int nargout = 1;
     
     private Args(Collection<V> list){
         super(list);
     }
+    private Args(int nargout,Collection<V> list){
+        super(list);
+        this.nargout = nargout;
+    }
     public static <V extends Value<V>> Args<V> newInstance(Collection<V> list){
         return new Args<V>(list);
+    }
+    public static <V extends Value<V>> Args<V> newInstance(int nargout,Collection<V> list){
+        return new Args<V>(nargout,list);
     }
     public static <V extends Value<V>> Args<V> newInstance(V arg){
         LinkedList<V> values = new LinkedList<V>();
@@ -123,7 +131,15 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
     
     @Override
     public boolean equals(Object arg0) {
+    	if (arg0 instanceof Args){
+    		if (((Args)arg0).nargout != nargout) return false; 
+    	}
         return super.equals(arg0);
+    }
+    
+    
+    public int getNargout(){
+    	return nargout;
     }
 }
 

@@ -6,6 +6,8 @@ import natlab.tame.builtin.*;
 import natlab.tame.callgraph.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.simplematrix.*;
 import natlab.tame.valueanalysis.value.*;
@@ -74,7 +76,36 @@ public class TamerTool {
 	
 	
 	//TODO give more useful functions!
+	
+	
+	
+	public static void main(String[] args) {
+		
+		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
+		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
+		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
+		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
+		Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
+				callgraph, 
+				Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs , 1).get(0).get(PrimitiveClassReference.DOUBLE))), 
+				factory);
+		System.out.println(analysis.toString());
+		
+		
+        for (int i = 0; i < analysis.getNodeList().size(); i++){
+        	System.out.println(ValueAnalysisPrinter.prettyPrint(
+        			analysis.getNodeList().get(i).getAnalysis()));        	
+        }
+	}
+
+
+	//getCallgraph(inputfile,args)
+	//getCallgraph(inputfile,factory,args)
+	//...
 }
+
+
 
 
 

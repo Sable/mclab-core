@@ -23,15 +23,14 @@ import natlab.tame.valueanalysis.aggrvalue.*;
  */
 public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		implements HasConstant,
-		HasisComplexInfo<AggrValue<AdvancedMatrixValue>>
-// ,HasShape<AggrValue<AdvancedMatrixValue>>
+		HasisComplexInfo<AggrValue<AdvancedMatrixValue>>, HasShape<AggrValue<AdvancedMatrixValue>>
 {
 	static boolean Debug = false;
 	
 	static AdvancedMatrixValueFactory factory = new AdvancedMatrixValueFactory();
 	Constant constant;
 	
-//	Shape<AggrValue<AdvancedMatrixValue>> shape;
+	Shape<AggrValue<AdvancedMatrixValue>> shape;
 	isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex;
 
 	
@@ -40,19 +39,19 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		super(aClass);
 	}
 
-//	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
-//			Shape<AggrValue<AdvancedMatrixValue>> shape) {
-//		super(onlyClassInfo.classRef);
-//		this.shape = shape;
-//	}
+	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
+			Shape<AggrValue<AdvancedMatrixValue>> shape) {
+		super(onlyClassInfo.classRef);
+		this.shape = shape;
+	}
 	
-//	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
-//			Shape<AggrValue<AdvancedMatrixValue>> shape, isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
-//		super(onlyClassInfo.classRef);
-//		this.shape = shape;
-//		this.iscomplex = iscomplex;
-//
-//	}
+	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
+			Shape<AggrValue<AdvancedMatrixValue>> shape, isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
+		super(onlyClassInfo.classRef);
+		this.shape = shape;
+		this.iscomplex = iscomplex;
+
+	}
 
 	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
 			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
@@ -72,8 +71,8 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 //			System.out.println("inside AdvancedMatrixValue constant");
 //		if (Debug)
 //			System.out.println(constant.getShape());
-//		shape = (new ShapeFactory<AggrValue<AdvancedMatrixValue>>(factory))
-//				.newShapeFromIntegers(constant.getShape());
+		shape = (new ShapeFactory<AggrValue<AdvancedMatrixValue>>(factory))
+				.newShapeFromIntegers(constant.getShape());
 		iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
 				factory)).newisComplexInfoFromConst(constant.getisComplexInfo());// TODO
 		this.constant = constant;
@@ -168,8 +167,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 //				&& (((HasShape) ((AdvancedMatrixValue) obj)).getShape() == null)) {
 //			return (classRef.equals(m.getMatlabClass())) && true;
 //		}
-//		return (classRef.equals(m.getMatlabClass()) && shape
-//				.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
+//		return (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
 		
 		//TODO NOW - complex part
 		
@@ -184,6 +182,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	@Override
 	public String toString() {
 		return "(" + classRef + (isConstant() ? ("," + constant) : "") + ","
+				+ shape +","
 				+ "{"+iscomplex+"}" + ")";// XU added shape
 	}
 
@@ -270,12 +269,18 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	@Override
 	public AggrValue<AdvancedMatrixValue> toFunctionArgument(boolean recursive) {
-		throw new UnsupportedOperationException(); // TODO
+		return this; //FIXME !!!!!
 	}
 
 	@Override
 	public AggrValue<AdvancedMatrixValue> dotSubsasgn(String field,
 			AggrValue<AdvancedMatrixValue> value) {
 		throw new UnsupportedOperationException(); // TODO
+	}
+
+	@Override
+	public Shape<AggrValue<AdvancedMatrixValue>> getShape() {
+		// TODO Auto-generated method stub
+		return shape;
 	}
 }

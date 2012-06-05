@@ -533,21 +533,26 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             FunctionReference function,ValueFlowMap<V> flow,
             TIRCommaSeparatedList args,TIRCommaSeparatedList targets,
             ASTNode<?> callsite, List<ValueSet<V>> partialArgs){
-        LinkedList<Res<V>> results = new LinkedList<Res<V>>();
+    	//get number of requested results
+    	int numOfOutputVariables = 1;
+    	if (callsite instanceof TIRAbstractAssignToListStmt){                	
+    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
+    	}
+
+    	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
             //TODO - do overloading, deal with dominant args etc.
             //actually call
             //System.out.println("doFunctionCall result "+res);
             if (function.isBuiltin()){
-                Args<V> argsObj = Args.newInstance(argumentList);
+                Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
                 //spcial cases for some known functions
                 if (function.getname().equals("nargin") && argsObj.size() == 0){
                     results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
                 } else {
                 	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);    //XU
-                	int numOfOutputVariables = ((TIRCallStmt)callsite).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
-                    results.add(valuePropagator.call(function.getname(), argsObj, numOfOutputVariables));     //see line 531, results are LinkedList<Res<V>>, so the propagator should return Res<V>
+                	results.add(valuePropagator.call(function.getname(), argsObj, numOfOutputVariables));     //see line 531, results are LinkedList<Res<V>>, so the propagator should return Res<V>
                 }
             }else{
                 //simplify args

@@ -3,24 +3,24 @@ package natlab.tame.builtin.isComplexInfoProp;
 import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.advancedMatrix.*;
+import natlab.tame.valueanalysis.components.isComplex.*;
 
 public class ArgICType {
 
 	public int getArgICType(Value<?> argument)
 	{
 		//return argument;
-		if(null != ((AdvancedMatrixValue)argument).getisComplexInfo())
+		if(null != ((HasisComplexInfo)argument).getisComplexInfo())
 		{
-		if(((AdvancedMatrixValue)argument).getisComplexInfo().toString().equals("COMPLEX"))
+		if(((HasisComplexInfo)argument).getisComplexInfo().toString().equals("COMPLEX"))
 		{
 			return -1;
 		}
-		else if(((AdvancedMatrixValue)argument).getisComplexInfo().toString().equals("REAL"))
+		else if(((HasisComplexInfo)argument).getisComplexInfo().toString().equals("REAL"))
 		{
 			return 1;
 		}
-		else if(((AdvancedMatrixValue)argument).getisComplexInfo().toString().equals("ANY"))
+		else if(((HasisComplexInfo)argument).getisComplexInfo().toString().equals("ANY"))
 		{
 			return 0;
 		}

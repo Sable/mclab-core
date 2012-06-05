@@ -29,7 +29,7 @@ List<isComplexInfo<V>>>{
 		//num is the number of LHS arguments in the tame IR node
 		if(builtin instanceof HasisComplexPropagationInfo){
 			//call shape prop tool
-			List<isComplexInfo<?>> result =  isComplexInfoPropTool.matchByValues(((HasisComplexPropagationInfo)builtin).getisComplexPropagationInfo(),arg,num);
+			List<isComplexInfo<?>> result =  isComplexInfoPropTool.matchByValues(((HasisComplexPropagationInfo)builtin).getisComplexPropagationInfo(),arg);
 			 List<isComplexInfo<V>> res= new ArrayList<isComplexInfo<V>>();
 			 for (isComplexInfo<?>results : result)
 			 {

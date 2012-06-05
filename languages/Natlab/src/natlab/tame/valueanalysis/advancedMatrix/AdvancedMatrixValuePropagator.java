@@ -61,14 +61,13 @@ public class AdvancedMatrixValuePropagator extends
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-//		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin
-//				.visit(shapeProp, arg);
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg,num);
 //		if (Debug)
 //			System.out.println("shapeProp results are " + matchShapeResult);
-//		if (matchShapeResult == null) {
-//			if (Debug)
-//				System.out.println("shape results are empty");
-//		}
+		if (matchShapeResult == null) {
+			if (Debug)
+				System.out.println("shape results are empty");
+		}
 
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
 				.visit(isComplexInfoProp, arg, num);
@@ -78,14 +77,14 @@ public class AdvancedMatrixValuePropagator extends
 
 		// build results out of the result classes and shape XU modified, not
 		// finished!!!
-		return matchResultToRes(matchClassResult, /* matchShapeResult, */
+		return matchResultToRes(matchClassResult, matchShapeResult, 
 				matchisComplexInfoResult);
 
 	}
 
 	private Res<AggrValue<AdvancedMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
-			// List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult,
+			 List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult,
 			List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult) {
 		// go through and fill in result
 		Res<AggrValue<AdvancedMatrixValue>> result = Res.newInstance();
@@ -96,7 +95,7 @@ public class AdvancedMatrixValuePropagator extends
 				map.put(classRef, new AdvancedMatrixValue(
 						new AdvancedMatrixValue(
 								(PrimitiveClassReference) classRef),
-						// matchShapeResult.get(0),
+						 matchShapeResult.get(0),
 						matchisComplexInfoResult.get(0)));// FIXME a little bit
 															// tricky
 			}
@@ -132,7 +131,7 @@ public class AdvancedMatrixValuePropagator extends
 				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
 						new AdvancedMatrixValue(
 								(PrimitiveClassReference) getDominantCatArgClass(arg)),
-						// matchShapeResult.get(0),
+						 //matchShapeResult.get(0),
 						matchisComplexInfoResult.get(0)));// FIXME a little bit
 															// tricky
 	}

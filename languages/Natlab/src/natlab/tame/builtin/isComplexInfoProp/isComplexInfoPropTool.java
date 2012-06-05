@@ -34,7 +34,7 @@ public class isComplexInfoPropTool {
 
 //	public static List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchByValues(
 	public static List<isComplexInfo<?>> matchByValues(
-			ICNode equation, List<? extends Value<?>> argValues, int num) {
+			ICNode equation, List<? extends Value<?>> argValues) {
 isComplexInfoPropMatch icMatch = equation.match(true, new isComplexInfoPropMatch(), argValues);
            return icMatch.getAllResults();
 	}
