@@ -26,13 +26,13 @@ public class ShapePropagator<V extends Value<V>>
 
     @Override
     //XU add this to support...
-	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg, int num) {
+	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
 		// TODO
 		if (Debug) System.out.println("inside ShapePropgator, builtin fn is "+builtin);
-		if (Debug) System.out.println("the number of output variables is "+num);
+		if (Debug) System.out.println("the number of output variables is "+arg.getNargout());
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
-			List<Shape<?>> result = ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg,num);
+			List<Shape<?>> result = ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg);
 			List<Shape<V>> vResult = new ArrayList<Shape<V>>();
 			for(Shape<?> res: result){
 				vResult.add((Shape<V>)res);

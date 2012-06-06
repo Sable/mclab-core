@@ -104,10 +104,9 @@ public abstract class Builtin {
      * calls the BuiltinVisitor method associated with this Builtin, using the given argument,
      * and returns the value returned by the visitor.
      * (e.g. if this is a Builtin.Plus, calls visitor.casePlus)
-     * XU modified it by adding 'int num'.
      */
-    public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-        return visitor.caseBuiltin(this,arg,num);
+    public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+        return visitor.caseBuiltin(this,arg);
     }
     
     /**
@@ -157,8 +156,8 @@ def printClass(file,b):
         code =  """
     public static abstract class %s extends %s %s {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.case%s(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.case%s(this,arg);
         }
         """ % (b.javaName,b.parentJavaName,"%s",b.javaName);
     else:
@@ -171,8 +170,8 @@ def printClass(file,b):
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.case%s(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.case%s(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -197,12 +196,12 @@ def printBuiltinVisitorJava(file,builtin):
    file.write("""package natlab.tame.builtin;
 
 public abstract class BuiltinVisitor<Arg,Ret> {
-   public abstract Ret caseBuiltin(Builtin builtin,Arg arg,int num);""")
+   public abstract Ret caseBuiltin(Builtin builtin,Arg arg);""")
    for b in builtin:
       if (b.isAbstract) : file.write('\n')
       if (len(b.comments) > 0) : file.write('    \n    //%s' % b.comments)
       file.write("""
-    public Ret case%s(Builtin builtin,Arg arg,int num){ return case%s(builtin,arg,num); }""" % (b.javaName,b.parentJavaName))
+    public Ret case%s(Builtin builtin,Arg arg){ return case%s(builtin,arg); }""" % (b.javaName,b.parentJavaName))
    file.write("""
 }""")
     

@@ -3,7 +3,7 @@ package natlab.tame.valueanalysis.basicmatrix;
 import java.util.*;
 import java.io.*;
 
-import natlab.tame.TamerToolPlusShape;
+import natlab.tame.BasicTamerTool;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
@@ -37,7 +37,7 @@ public class BasicMain {
     	int intArgNum = 1;
 	    System.out.println("Thanks for the number of input argument of this function, " + intArgNum);
 	    
-		TamerToolPlusShape tool = new TamerToolPlusShape();
+		BasicTamerTool tool = new BasicTamerTool();
 		List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(intArgNum);
 		for(int i=1;i<=intArgNum;i++){
 			ls.add(PrimitiveClassReference.DOUBLE);

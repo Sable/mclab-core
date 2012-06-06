@@ -32,17 +32,17 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
     @Override
     //XU add this function to support the number of output variables
     public Res<AggrValue<BasicMatrixValue>> caseBuiltin(Builtin builtin,
-            Args<AggrValue<BasicMatrixValue>> arg,int num) {
+            Args<AggrValue<BasicMatrixValue>> arg) {
         //deal with constants
     	if (Debug) System.out.println("built-in fn's arguments are "+arg);
-    	Constant cResult = builtin.visit(constantProp, arg,num);
+    	Constant cResult = builtin.visit(constantProp, arg);
     	if (cResult != null){
     		return Res.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(cResult));
     	}
     	
     	//if the result is not a constant, just do mclass propagation
         List<Set<ClassReference>> matchClassResult = 
-                builtin.visit(classProp,arg,num);
+                builtin.visit(classProp,arg);
         if (Debug) System.out.println("classProp results are "+matchClassResult);
         if (matchClassResult == null){ //class prop returned error
             return Res.newErrorResult(builtin.getName()+" is not defined for arguments "+arg+"as class");
@@ -50,7 +50,7 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
         
         //deal with shape  XU added
         List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = 
-        		builtin.visit(shapeProp, arg, num);
+        		builtin.visit(shapeProp, arg);
         if (Debug) System.out.println("shapeProp results are "+matchShapeResult);
         if (matchShapeResult == null){
         	if (Debug) System.out.println("shape results are empty");
@@ -81,11 +81,11 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
     
     @Override
     public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
-            Args<AggrValue<BasicMatrixValue>> arg, int num) {
+            Args<AggrValue<BasicMatrixValue>> arg) {
     	if (Debug) System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation!");//XU
     	//XU add this block
     	List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = 
-        		builtin.visit(shapeProp, arg, num);
+        		builtin.visit(shapeProp, arg);
     	if (Debug) System.out.println("shapeProp results are "+matchShapeResult);
         if (matchShapeResult == null){
         	if (Debug) System.out.println("shape results are empty");

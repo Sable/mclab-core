@@ -16,7 +16,7 @@ import natlab.toolkits.path.FilePathEnvironment;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
-public class TamerToolPlusShape {
+public class BasicTamerTool {
 
 	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
 	        tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<BasicMatrixValue>> inputValues){

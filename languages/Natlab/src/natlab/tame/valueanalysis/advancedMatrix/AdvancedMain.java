@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import natlab.tame.AdvancedTamerTool;
-import natlab.tame.TamerToolPlusShape;
+import natlab.tame.BasicTamerTool;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;

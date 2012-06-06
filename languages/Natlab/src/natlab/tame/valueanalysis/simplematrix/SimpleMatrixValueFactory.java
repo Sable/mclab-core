@@ -31,12 +31,12 @@ public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue
 		if (inc != null){
 			return new SimpleMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,inc,upper), 0)//XU add 0 here!
+					(propagator.call("colon", Args.newInstance(lower,inc,upper))
 							.get(0).iterator().next().getMatlabClass()));
 		} else {
 			return new SimpleMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper), 0)//XU add 0 here!
+					(propagator.call("colon", Args.newInstance(lower,upper))
 							.get(0).iterator().next().getMatlabClass()));
 
 		}

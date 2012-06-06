@@ -31,12 +31,12 @@ public abstract class ValuePropagator<V extends Value<V>>
     /*
      * XU add this function to support the number of output variables
      */
-    public Res<V> call(String builtin,Args<V> args,int num){
+    public Res<V> call(String builtin,Args<V> args){
     	Builtin b = Builtin.getInstance(builtin);
         if (b == null){
             throw new UnsupportedOperationException("builtin "+builtin+" not found");
         }
-        return call(b, args, num); 
+        return call(b, args); 
     }
     /**
      * same as the other call, but with the first argument a builtin
@@ -44,8 +44,8 @@ public abstract class ValuePropagator<V extends Value<V>>
     /*
      * XU add this function to support the number of output variables
      */
-    public Res<V> call(Builtin b,Args<V> args,int num){
-        return b.visit(this, args, num);        
+    public Res<V> call(Builtin b,Args<V> args){
+        return b.visit(this, args);        
     }
     protected ValueFactory<V> factory;
     /**

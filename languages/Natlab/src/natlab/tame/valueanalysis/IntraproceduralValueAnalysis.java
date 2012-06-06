@@ -115,10 +115,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //find function
         FunctionReference ref = function.getCalledFunctions().get(node.getFunctionName().getID());
         //do call
-        /**************XU added here************/
-        /*I have to pass the number of variables which are waiting for the output to the equation analysis*/
-        if (Debug) System.out.println("The number of output variable(s) is "+node.getNumTargets());
-        /***************************************/
         setCurrentOutSet(assign(getCurrentInSet(),node.getTargets(),
                 call(ref, getCurrentInSet(), node.getArguments(), node.getTargets(), node, null)));
         //associate flowsets
@@ -167,7 +163,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         	//call 'any' on the condition value
             Constant any = Builtin.Any.getInstance().visit(
             		ConstantPropagator.<V>getInstance(),
-            		Args.newInstance(value),0);//XU add 0 here
+            		Args.newInstance(value));
             if (any != null && any instanceof LogicalConstant){
                 if (((LogicalConstant)any).equals(Constant.get(true))){
                     //result is true - false set is not viable
@@ -551,8 +547,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 if (function.getname().equals("nargin") && argsObj.size() == 0){
                     results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
                 } else {
-                	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);    //XU
-                	results.add(valuePropagator.call(function.getname(), argsObj, numOfOutputVariables));     //see line 531, results are LinkedList<Res<V>>, so the propagator should return Res<V>
+                	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);
+                	results.add(valuePropagator.call(function.getname(), argsObj));
                 }
             }else{
                 //simplify args

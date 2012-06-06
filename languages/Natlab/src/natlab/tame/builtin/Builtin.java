@@ -56,10 +56,9 @@ public abstract class Builtin {
      * calls the BuiltinVisitor method associated with this Builtin, using the given argument,
      * and returns the value returned by the visitor.
      * (e.g. if this is a Builtin.Plus, calls visitor.casePlus)
-     * XU modified it by adding 'int num'.
      */
-    public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-        return visitor.caseBuiltin(this,arg,num);
+    public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+        return visitor.caseBuiltin(this,arg);
     }
     
     /**
@@ -374,36 +373,36 @@ public abstract class Builtin {
     
     public static abstract class AbstractRoot extends Builtin  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRoot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRoot(this,arg);
         }
         
     }
     public static abstract class AbstractPureFunction extends AbstractRoot  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractPureFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractPureFunction(this,arg);
         }
         
     }
     public static abstract class AbstractMatrixFunction extends AbstractPureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractConstant extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractConstant(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractConstant(this,arg);
         }
         
     }
     public static abstract class AbstractDoubleConstant extends AbstractConstant implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDoubleConstant(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDoubleConstant(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -439,8 +438,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.casePi(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePi(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -465,8 +464,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseI(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseI(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -491,8 +490,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseJ(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseJ(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -511,71 +510,71 @@ public abstract class Builtin {
     }
     public static abstract class AbstractAnyMatrixFunction extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractProperAnyMatrixFunction extends AbstractAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractProperAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractProperAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractUnaryAnyMatrixFunction extends AbstractProperAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class ElementalUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseElementalUnaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseElementalUnaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class ArrayUnaryAnyMatrixFunction extends AbstractUnaryAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseArrayUnaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseArrayUnaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractBinaryAnyMatrixFunction extends AbstractProperAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBinaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBinaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class ElementalBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseElementalBinaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseElementalBinaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class ArrayBinaryAnyMatrixFunction extends AbstractBinaryAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseArrayBinaryAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseArrayBinaryAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractImproperAnyMatrixFunction extends AbstractAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImproperAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImproperAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDiagonalSensitive(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDiagonalSensitive(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -611,8 +610,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTril(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTril(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -628,8 +627,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTriu(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTriu(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -645,8 +644,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDiag(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDiag(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -665,36 +664,36 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDimensionSensitiveAnyMatrixFunction extends AbstractImproperAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDimensionSensitiveAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionSensitiveAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class DimensionCollapsingAnyMatrixFunction extends AbstractDimensionSensitiveAnyMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDimensionCollapsingAnyMatrixFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDimensionCollapsingAnyMatrixFunction(this,arg);
         }
         
     }
     public static abstract class AbstractNumericFunction extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractNumericFunction(this,arg);
         }
         
     }
     public static abstract class AbstractProperNumericFunction extends AbstractNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractProperNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractProperNumericFunction(this,arg);
         }
         
     }
     public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryNumericFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -724,8 +723,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalUnaryNumericFunction extends AbstractUnaryNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalUnaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryNumericFunction(this,arg);
         }
         
     }
@@ -737,8 +736,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseReal(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseReal(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -754,8 +753,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseImag(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImag(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -771,8 +770,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbs(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbs(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -788,8 +787,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseConj(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseConj(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -816,8 +815,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSign(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSign(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -838,8 +837,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalUnaryArithmetic extends AbstractElementalUnaryNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalUnaryArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryArithmetic(this,arg);
         }
         
     }
@@ -851,8 +850,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUplus(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUplus(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -868,8 +867,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUminus(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUminus(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -879,8 +878,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractRoundingOperation extends AbstractElementalUnaryNumericFunction implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRoundingOperation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRoundingOperation(this,arg);
         }
         
         private CP matlabClassPropInfo = null;
@@ -903,8 +902,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFix(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFix(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -931,8 +930,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRound(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRound(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -948,8 +947,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFloor(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFloor(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -965,8 +964,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCeil(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCeil(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -976,22 +975,22 @@ public abstract class Builtin {
     }
     public static abstract class AbstractArrayUnaryNumericFunction extends AbstractUnaryNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractArrayUnaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayUnaryNumericFunction(this,arg);
         }
         
     }
     public static abstract class ArrayUnaryArithmetic extends AbstractArrayUnaryNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseArrayUnaryArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseArrayUnaryArithmetic(this,arg);
         }
         
     }
     public static abstract class AbstractBinaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBinaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBinaryNumericFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1028,8 +1027,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalBinaryNumericFunction extends AbstractBinaryNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalBinaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryNumericFunction(this,arg);
         }
         
     }
@@ -1041,8 +1040,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseComplex(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseComplex(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1074,8 +1073,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalBinaryArithmetic extends AbstractElementalBinaryNumericFunction implements HasShapePropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalBinaryArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryArithmetic(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1105,8 +1104,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.casePlus(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePlus(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1122,8 +1121,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMinus(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMinus(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1139,8 +1138,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTimes(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTimes(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1156,8 +1155,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.casePower(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePower(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1187,8 +1186,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDividingElementalArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDividingElementalArithmetic(this,arg);
         }
         
         private CP matlabClassPropInfo = null;
@@ -1220,8 +1219,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLdivide(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLdivide(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1237,8 +1236,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRdivide(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRdivide(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1254,8 +1253,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMod(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMod(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1271,8 +1270,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRem(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRem(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1282,8 +1281,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractArrayBinaryNumericFunction extends AbstractBinaryNumericFunction implements HasShapePropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractArrayBinaryNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayBinaryNumericFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1304,8 +1303,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCross(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCross(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1315,8 +1314,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractArrayBinaryArithmetic extends AbstractArrayBinaryNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractArrayBinaryArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayBinaryArithmetic(this,arg);
         }
         
         private CP matlabClassPropInfo = null;
@@ -1348,8 +1347,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMtimes(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMtimes(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1385,8 +1384,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMpower(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMpower(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1405,8 +1404,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic implements HasShapePropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDividingArrayArithmetic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDividingArrayArithmetic(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1427,8 +1426,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMldivide(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMldivide(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1444,8 +1443,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMrdivide(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMrdivide(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1455,15 +1454,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractImproperNumericFunction extends AbstractNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImproperNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImproperNumericFunction(this,arg);
         }
         
     }
     public static abstract class AbstractDimensionSensitiveNumericFunction extends AbstractImproperNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDimensionSensitiveNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionSensitiveNumericFunction(this,arg);
         }
         
     }
@@ -1475,8 +1474,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1517,15 +1516,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDimensionCollapsingNumericFunction extends AbstractDimensionSensitiveNumericFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDimensionCollapsingNumericFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionCollapsingNumericFunction(this,arg);
         }
         
     }
     public static abstract class AbstractMinOrMax extends AbstractDimensionCollapsingNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMinOrMax(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMinOrMax(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1568,8 +1567,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1585,8 +1584,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMax(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMax(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1602,8 +1601,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMedian(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMedian(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1622,22 +1621,22 @@ public abstract class Builtin {
     }
     public static abstract class AbstractFloatFunction extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFloatFunction(this,arg);
         }
         
     }
     public static abstract class AbstractProperFloatFunction extends AbstractFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractProperFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractProperFloatFunction(this,arg);
         }
         
     }
     public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryFloatFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -1667,8 +1666,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalUnaryFloatFunction extends AbstractUnaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalUnaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryFloatFunction(this,arg);
         }
         
     }
@@ -1680,8 +1679,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSqrt(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSqrt(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1697,8 +1696,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRealsqrt(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRealsqrt(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1714,8 +1713,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseErf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseErf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1731,8 +1730,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseErfinv(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseErfinv(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1748,8 +1747,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseErfc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseErfc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1765,8 +1764,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseErfcinv(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseErfcinv(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1782,8 +1781,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseGamma(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGamma(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1799,8 +1798,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseGammaln(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGammaln(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1816,8 +1815,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseExp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1833,8 +1832,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLog(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLog(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1850,8 +1849,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLog2(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLog2(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1867,8 +1866,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLog10(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLog10(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1878,15 +1877,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractForwardTrigonometricFunction extends AbstractElementalUnaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractForwardTrigonometricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractForwardTrigonometricFunction(this,arg);
         }
         
     }
     public static abstract class AbstractRadianTrigonometricFunction extends AbstractForwardTrigonometricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRadianTrigonometricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRadianTrigonometricFunction(this,arg);
         }
         
     }
@@ -1898,8 +1897,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1915,8 +1914,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCos(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCos(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1932,8 +1931,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTan(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTan(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1949,8 +1948,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1966,8 +1965,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSec(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSec(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1983,8 +1982,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCsc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCsc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -1994,8 +1993,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDegreeTrigonometricFunction extends AbstractForwardTrigonometricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDegreeTrigonometricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDegreeTrigonometricFunction(this,arg);
         }
         
     }
@@ -2007,8 +2006,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSind(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSind(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2024,8 +2023,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCosd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCosd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2041,8 +2040,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTand(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTand(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2058,8 +2057,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCotd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCotd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2075,8 +2074,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSecd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSecd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2092,8 +2091,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCscd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCscd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2103,8 +2102,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractHyperbolicTrigonometricFunction extends AbstractForwardTrigonometricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractHyperbolicTrigonometricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractHyperbolicTrigonometricFunction(this,arg);
         }
         
     }
@@ -2116,8 +2115,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSinh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSinh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2133,8 +2132,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCosh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCosh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2150,8 +2149,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTanh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTanh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2167,8 +2166,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCoth(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCoth(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2184,8 +2183,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSech(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSech(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2201,8 +2200,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCsch(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCsch(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2212,15 +2211,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractInverseTrigonmetricFunction extends AbstractElementalUnaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractInverseTrigonmetricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractInverseTrigonmetricFunction(this,arg);
         }
         
     }
     public static abstract class AbstractRadianInverseTrigonmetricFunction extends AbstractInverseTrigonmetricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRadianInverseTrigonmetricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRadianInverseTrigonmetricFunction(this,arg);
         }
         
     }
@@ -2232,8 +2231,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2249,8 +2248,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcos(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcos(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2266,8 +2265,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAtan(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAtan(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2283,8 +2282,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2300,8 +2299,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsec(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsec(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2317,8 +2316,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcsc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcsc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2328,8 +2327,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDegreeInverseTrigonmetricFunction extends AbstractInverseTrigonmetricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDegreeInverseTrigonmetricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDegreeInverseTrigonmetricFunction(this,arg);
         }
         
     }
@@ -2341,8 +2340,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsind(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsind(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2358,8 +2357,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcosd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcosd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2375,8 +2374,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAtand(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAtand(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2392,8 +2391,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcotd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcotd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2409,8 +2408,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsecd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsecd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2426,8 +2425,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcscd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcscd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2437,8 +2436,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractHyperbolicInverseTrigonmetricFunction extends AbstractInverseTrigonmetricFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractHyperbolicInverseTrigonmetricFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractHyperbolicInverseTrigonmetricFunction(this,arg);
         }
         
     }
@@ -2450,8 +2449,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsinh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsinh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2467,8 +2466,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcosh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcosh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2484,8 +2483,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAtanh(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAtanh(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2501,8 +2500,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcoth(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcoth(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2518,8 +2517,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAsech(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAsech(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2535,8 +2534,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAcsch(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAcsch(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2546,15 +2545,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractArrayUnaryFloatFunction extends AbstractUnaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractArrayUnaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayUnaryFloatFunction(this,arg);
         }
         
     }
     public static abstract class AbstractSquareArrayUnaryFloatFunction extends AbstractArrayUnaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractSquareArrayUnaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractSquareArrayUnaryFloatFunction(this,arg);
         }
         
     }
@@ -2566,8 +2565,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLogm(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLogm(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2583,8 +2582,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSqrtm(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSqrtm(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2600,8 +2599,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseExpm(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExpm(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2617,8 +2616,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInv(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInv(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2628,8 +2627,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractBinaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBinaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBinaryFloatFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -2659,8 +2658,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalBinaryFloatFunction extends AbstractBinaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalBinaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryFloatFunction(this,arg);
         }
         
     }
@@ -2672,8 +2671,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAtan2(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAtan2(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2683,8 +2682,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractArrayBinaryFloatFunction extends AbstractBinaryFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractArrayBinaryFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractArrayBinaryFloatFunction(this,arg);
         }
         
     }
@@ -2696,8 +2695,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseHypot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHypot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2707,8 +2706,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractImproperFloatFunction extends AbstractFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImproperFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImproperFloatFunction(this,arg);
         }
         
     }
@@ -2720,8 +2719,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEps(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEps(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2755,8 +2754,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDimensionSensitiveFloatFunction extends AbstractImproperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDimensionSensitiveFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionSensitiveFloatFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -2792,8 +2791,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCumsum(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCumsum(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2824,8 +2823,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCumprod(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCumprod(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2835,8 +2834,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDimensionCollapsingFloatFunction extends AbstractDimensionSensitiveFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDimensionCollapsingFloatFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDimensionCollapsingFloatFunction(this,arg);
         }
         
     }
@@ -2848,8 +2847,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMode(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMode(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2874,8 +2873,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseProd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseProd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2900,8 +2899,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSum(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSum(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2941,8 +2940,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMean(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMean(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -2976,8 +2975,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatrixLibaryFunction extends AbstractImproperFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixLibaryFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixLibaryFunction(this,arg);
         }
         
     }
@@ -2989,8 +2988,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEig(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEig(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3015,8 +3014,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNorm(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNorm(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3056,8 +3055,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRank(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRank(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3088,8 +3087,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCond(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCond(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3105,8 +3104,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDet(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDet(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3122,8 +3121,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRcond(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRcond(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3139,8 +3138,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLinsolve(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLinsolve(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3150,8 +3149,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractFacotorizationFunction extends AbstractImproperFloatFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractFacotorizationFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFacotorizationFunction(this,arg);
         }
         
     }
@@ -3163,8 +3162,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSchur(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSchur(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3180,8 +3179,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseOrdschur(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseOrdschur(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3197,8 +3196,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLu(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLu(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3214,8 +3213,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseChol(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseChol(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3231,8 +3230,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSvd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSvd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3248,8 +3247,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseQr(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseQr(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3274,15 +3273,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractBitFunction extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBitFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBitFunction(this,arg);
         }
         
     }
     public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractProperBitFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractProperBitFunction(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -3309,8 +3308,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitand(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitand(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3326,8 +3325,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitor(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitor(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3343,8 +3342,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitxor(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitxor(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3354,8 +3353,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractImproperBitFunciton extends AbstractBitFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImproperBitFunciton(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImproperBitFunciton(this,arg);
         }
         
     }
@@ -3367,8 +3366,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitcmp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitcmp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3384,8 +3383,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitset(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitset(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3401,8 +3400,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitget(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitget(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3418,8 +3417,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBitshift(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBitshift(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3429,15 +3428,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatrixQuery extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixQuery(this,arg);
         }
         
     }
     public static abstract class AbstractToDoubleMatrixQuery extends AbstractMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractToDoubleMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractToDoubleMatrixQuery(this,arg);
         }
         
     }
@@ -3449,8 +3448,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFind(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFind(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3475,8 +3474,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractUnaryToScalarDoubleMatrixQuery extends AbstractToDoubleMatrixQuery implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryToScalarDoubleMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryToScalarDoubleMatrixQuery(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -3497,8 +3496,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractToScalarDoubleMatrixQuery extends AbstractUnaryToScalarDoubleMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractToScalarDoubleMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractToScalarDoubleMatrixQuery(this,arg);
         }
         
     }
@@ -3510,8 +3509,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNnz(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNnz(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3521,15 +3520,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractToLogicalMatrixQuery extends AbstractMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractToLogicalMatrixQuery(this,arg);
         }
         
     }
     public static abstract class AbstractUnaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryToLogicalMatrixQuery(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -3550,8 +3549,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractScalarUnaryToLogicalMatrixQuery extends AbstractUnaryToLogicalMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractScalarUnaryToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarUnaryToLogicalMatrixQuery(this,arg);
         }
         
     }
@@ -3563,8 +3562,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3580,8 +3579,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAny(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAny(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3597,8 +3596,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAll(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAll(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3614,8 +3613,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsreal(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsreal(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3625,8 +3624,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalUnaryToLogicalMatrixQuery extends AbstractUnaryToLogicalMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalUnaryToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalUnaryToLogicalMatrixQuery(this,arg);
         }
         
     }
@@ -3638,8 +3637,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsinf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsinf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3655,8 +3654,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsfinite(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsfinite(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3672,8 +3671,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsnan(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsnan(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3683,8 +3682,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractBinaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBinaryToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBinaryToLogicalMatrixQuery(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -3714,15 +3713,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractElementalBinaryToLogicalMatrixQuery extends AbstractBinaryToLogicalMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractElementalBinaryToLogicalMatrixQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractElementalBinaryToLogicalMatrixQuery(this,arg);
         }
         
     }
     public static abstract class AbstractRelationalOperator extends AbstractElementalBinaryToLogicalMatrixQuery implements HasisComplexPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRelationalOperator(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRelationalOperator(this,arg);
         }
         
         private ICNode isComplexPropInfo = null;
@@ -3743,8 +3742,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEq(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEq(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3760,8 +3759,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNe(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNe(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3777,8 +3776,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLt(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLt(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3794,8 +3793,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseGt(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGt(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3811,8 +3810,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLe(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLe(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3828,8 +3827,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseGe(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseGe(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3839,8 +3838,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractLogicalOperator extends AbstractElementalBinaryToLogicalMatrixQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractLogicalOperator(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractLogicalOperator(this,arg);
         }
         
     }
@@ -3852,8 +3851,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAnd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAnd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3869,8 +3868,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseOr(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseOr(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3886,8 +3885,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseXor(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseXor(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3897,8 +3896,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatrixCreation extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixCreation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixCreation(this,arg);
         }
         
     }
@@ -3910,8 +3909,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseColon(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseColon(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -3952,15 +3951,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractByShapeAndTypeMatrixCreation extends AbstractMatrixCreation  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractByShapeAndTypeMatrixCreation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractByShapeAndTypeMatrixCreation(this,arg);
         }
         
     }
     public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -3996,8 +3995,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseOnes(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseOnes(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4013,8 +4012,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseZeros(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseZeros(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4030,8 +4029,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEye(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEye(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4041,8 +4040,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractFloatByShapeAndTypeMatrixCreation extends AbstractNumericalByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractFloatByShapeAndTypeMatrixCreation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractFloatByShapeAndTypeMatrixCreation(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -4078,8 +4077,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4095,8 +4094,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNan(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNan(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4106,8 +4105,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractLogicalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractLogicalByShapeAndTypeMatrixCreation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractLogicalByShapeAndTypeMatrixCreation(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -4134,8 +4133,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTrue(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTrue(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4151,8 +4150,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFalse(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFalse(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4162,8 +4161,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatrixConstructor extends AbstractMatrixFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixConstructor(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixConstructor(this,arg);
         }
         
     }
@@ -4175,8 +4174,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDouble(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDouble(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4207,8 +4206,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSingle(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSingle(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4239,8 +4238,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseChar(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseChar(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4271,8 +4270,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLogical(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLogical(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4303,8 +4302,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInt8(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInt8(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4335,8 +4334,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInt16(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInt16(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4367,8 +4366,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInt32(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInt32(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4399,8 +4398,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInt64(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInt64(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4431,8 +4430,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUint8(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUint8(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4463,8 +4462,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUint16(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUint16(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4495,8 +4494,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUint32(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUint32(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4527,8 +4526,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUint64(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUint64(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4553,8 +4552,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractCellFunction extends AbstractPureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractCellFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractCellFunction(this,arg);
         }
         
     }
@@ -4566,8 +4565,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCell(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCell(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4577,8 +4576,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractCellCat extends AbstractCellFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractCellCat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractCellCat(this,arg);
         }
         
     }
@@ -4590,8 +4589,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCellhorzcat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCellhorzcat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4607,8 +4606,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCellvertcat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCellvertcat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4618,8 +4617,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractStructFunction extends AbstractPureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractStructFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractStructFunction(this,arg);
         }
         
     }
@@ -4631,8 +4630,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsfield(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsfield(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4648,8 +4647,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStruct(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStruct(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4665,8 +4664,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseObjectFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseObjectFunction(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4676,15 +4675,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractVersatileFunction extends AbstractPureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractVersatileFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractVersatileFunction(this,arg);
         }
         
     }
     public static abstract class AbstractMatrixOrCellOfCharFunction extends AbstractVersatileFunction implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatrixOrCellOfCharFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatrixOrCellOfCharFunction(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -4711,8 +4710,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSort(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSort(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4743,8 +4742,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUnique(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUnique(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4754,22 +4753,22 @@ public abstract class Builtin {
     }
     public static abstract class AbstractCharFunction extends AbstractMatrixOrCellOfCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractCharFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractCharFunction(this,arg);
         }
         
     }
     public static abstract class AbstractProperCharFunction extends AbstractCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractProperCharFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractProperCharFunction(this,arg);
         }
         
     }
     public static abstract class AbstractUnaryProperCharFunction extends AbstractProperCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryProperCharFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryProperCharFunction(this,arg);
         }
         
     }
@@ -4781,8 +4780,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUpper(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUpper(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4798,8 +4797,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLower(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLower(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4815,8 +4814,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDeblank(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDeblank(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4832,8 +4831,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrtrim(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrtrim(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4843,8 +4842,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractImproperCharFunction extends AbstractCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImproperCharFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImproperCharFunction(this,arg);
         }
         
     }
@@ -4856,8 +4855,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrfind(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrfind(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4873,8 +4872,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFindstr(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFindstr(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4890,8 +4889,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrrep(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrrep(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4901,8 +4900,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractStringCompare extends AbstractImproperCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractStringCompare(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractStringCompare(this,arg);
         }
         
     }
@@ -4914,8 +4913,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrcmp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrcmp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4931,8 +4930,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrcmpi(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrcmpi(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4948,8 +4947,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrncmpi(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrncmpi(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4965,8 +4964,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStrncmp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStrncmp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -4976,8 +4975,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractRegexpFunction extends AbstractImproperCharFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRegexpFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRegexpFunction(this,arg);
         }
         
     }
@@ -4989,8 +4988,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRegexptranslate(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRegexptranslate(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5006,8 +5005,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRegexp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRegexp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5023,8 +5022,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRegexpi(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRegexpi(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5040,8 +5039,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRegexprep(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRegexprep(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5051,8 +5050,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractVersatileQuery extends AbstractVersatileFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractVersatileQuery(this,arg);
         }
         
     }
@@ -5064,8 +5063,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseClass(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClass(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5090,8 +5089,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDoubleResultVersatileQuery extends AbstractVersatileQuery implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDoubleResultVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDoubleResultVersatileQuery(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -5127,8 +5126,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSize(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSize(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5162,8 +5161,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractScalarDoubleResultVersatileQuery extends AbstractDoubleResultVersatileQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractScalarDoubleResultVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarDoubleResultVersatileQuery(this,arg);
         }
         
     }
@@ -5175,8 +5174,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLength(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLength(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5192,8 +5191,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNdims(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNdims(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5209,8 +5208,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNumel(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNumel(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5241,8 +5240,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEnd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEnd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5267,8 +5266,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractLogicalResultVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractLogicalResultVersatileQuery(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -5289,15 +5288,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractScalarLogicalResultVersatileQuery extends AbstractLogicalResultVersatileQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractScalarLogicalResultVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarLogicalResultVersatileQuery(this,arg);
         }
         
     }
     public static abstract class AbstractClassQuery extends AbstractScalarLogicalResultVersatileQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractClassQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractClassQuery(this,arg);
         }
         
     }
@@ -5309,8 +5308,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsobject(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsobject(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5326,8 +5325,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsfloat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsfloat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5343,8 +5342,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsinteger(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsinteger(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5360,8 +5359,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIslogical(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIslogical(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5377,8 +5376,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsstruct(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsstruct(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5394,8 +5393,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIschar(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIschar(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5411,8 +5410,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIscell(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIscell(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5428,8 +5427,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsnumeric(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsnumeric(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5445,8 +5444,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsa(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsa(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5471,8 +5470,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractScalarLogicalShapeQuery extends AbstractScalarLogicalResultVersatileQuery  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractScalarLogicalShapeQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractScalarLogicalShapeQuery(this,arg);
         }
         
     }
@@ -5484,8 +5483,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsempty(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsempty(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5501,8 +5500,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsvector(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsvector(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5518,8 +5517,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsscalar(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsscalar(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5529,8 +5528,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -5557,8 +5556,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsequalwithequalnans(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsequalwithequalnans(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5574,8 +5573,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseIsequal(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsequal(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5585,15 +5584,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractVersatileConversion extends AbstractVersatileFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractVersatileConversion(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractVersatileConversion(this,arg);
         }
         
     }
     public static abstract class AbstractShapeTransformation extends AbstractVersatileConversion  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractShapeTransformation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractShapeTransformation(this,arg);
         }
         
     }
@@ -5605,8 +5604,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseReshape(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseReshape(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5637,8 +5636,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.casePermute(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePermute(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5663,8 +5662,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractUnaryShapeTransformation extends AbstractShapeTransformation implements HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractUnaryShapeTransformation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractUnaryShapeTransformation(this,arg);
         }
         
         public CP getMatlabClassPropagationInfo(){{
@@ -5691,8 +5690,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSqueeze(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSqueeze(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5708,8 +5707,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTranspose(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTranspose(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5734,8 +5733,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCtranspose(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCtranspose(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5745,8 +5744,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractConcatenation extends AbstractVersatileFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractConcatenation(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractConcatenation(this,arg);
         }
         
     }
@@ -5758,8 +5757,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseHorzcat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHorzcat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5784,8 +5783,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseVertcat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVertcat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5810,8 +5809,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5821,8 +5820,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractIndexing extends AbstractVersatileFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractIndexing(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractIndexing(this,arg);
         }
         
     }
@@ -5834,8 +5833,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSubsasgn(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSubsasgn(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5851,8 +5850,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSubsref(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSubsref(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5862,8 +5861,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMapOperator extends AbstractVersatileFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMapOperator(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMapOperator(this,arg);
         }
         
     }
@@ -5875,8 +5874,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStructfun(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStructfun(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5892,8 +5891,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseArrayfun(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseArrayfun(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5909,8 +5908,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCellfun(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCellfun(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5920,8 +5919,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractImpureFunction extends AbstractRoot  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractImpureFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractImpureFunction(this,arg);
         }
         
     }
@@ -5933,8 +5932,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSuperiorto(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSuperiorto(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5950,8 +5949,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSuperiorfloat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSuperiorfloat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5982,8 +5981,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseExit(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExit(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -5999,8 +5998,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseQuit(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseQuit(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6010,15 +6009,15 @@ public abstract class Builtin {
     }
     public static abstract class AbstractBuiltin extends AbstractImpureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractBuiltin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractBuiltin(this,arg);
         }
         
     }
     public static abstract class AbstractTimeFunction extends AbstractImpureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractTimeFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractTimeFunction(this,arg);
         }
         
     }
@@ -6030,8 +6029,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseClock(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClock(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6071,8 +6070,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTic(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTic(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6088,8 +6087,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseToc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseToc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6105,8 +6104,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCputime(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCputime(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6116,8 +6115,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatlabSystemFunction extends AbstractImpureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatlabSystemFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatlabSystemFunction(this,arg);
         }
         
     }
@@ -6129,8 +6128,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAssert(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAssert(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6146,8 +6145,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNargoutchk(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargoutchk(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6163,8 +6162,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNargchk(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargchk(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6180,8 +6179,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStr2func(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStr2func(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6197,8 +6196,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.casePause(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.casePause(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6208,8 +6207,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractDynamicMatlabFunction extends AbstractMatlabSystemFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractDynamicMatlabFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractDynamicMatlabFunction(this,arg);
         }
         
     }
@@ -6221,8 +6220,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEval(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEval(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6238,8 +6237,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEvalin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEvalin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6255,8 +6254,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFeval(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFeval(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6272,8 +6271,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAssignin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAssignin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6289,8 +6288,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInputname(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInputname(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6300,8 +6299,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractMatlabEnvironmentFunction extends AbstractMatlabSystemFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractMatlabEnvironmentFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractMatlabEnvironmentFunction(this,arg);
         }
         
     }
@@ -6313,8 +6312,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseImport(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImport(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6330,8 +6329,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseCd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseCd(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6347,8 +6346,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseExist(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseExist(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6364,8 +6363,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMatlabroot(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMatlabroot(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6381,8 +6380,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseWhos(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWhos(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6398,8 +6397,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseWhich(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWhich(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6415,8 +6414,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseVersion(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVersion(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6432,8 +6431,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseClear(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClear(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6449,8 +6448,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNargin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargin(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6481,8 +6480,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseNargout(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseNargout(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6513,8 +6512,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMethods(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMethods(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6530,8 +6529,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFieldnames(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFieldnames(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6541,8 +6540,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractReportFunction extends AbstractImpureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractReportFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractReportFunction(this,arg);
         }
         
     }
@@ -6554,8 +6553,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDisp(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDisp(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6586,8 +6585,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDisplay(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDisplay(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6603,8 +6602,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseClc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseClc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6620,8 +6619,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseError(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseError(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6652,8 +6651,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseWarning(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseWarning(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6684,8 +6683,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseEcho(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseEcho(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6701,8 +6700,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDiary(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDiary(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6718,8 +6717,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseMessage(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMessage(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6750,8 +6749,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLastwarn(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLastwarn(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6767,8 +6766,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLasterror(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLasterror(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6784,8 +6783,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFormat(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFormat(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6795,8 +6794,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractRandomFunction extends AbstractImpureFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractRandomFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractRandomFunction(this,arg);
         }
         
         private SPNode shapePropInfo = null;
@@ -6832,8 +6831,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRand(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRand(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6849,8 +6848,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRandn(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRandn(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6866,8 +6865,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRandi(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRandi(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6892,8 +6891,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractSystemFunction extends AbstractImpureFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractSystemFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractSystemFunction(this,arg);
         }
         
     }
@@ -6905,8 +6904,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseComputer(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseComputer(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6922,8 +6921,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBeep(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBeep(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6939,8 +6938,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDir(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDir(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6950,8 +6949,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractOperatingSystemCallFunction extends AbstractSystemFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractOperatingSystemCallFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractOperatingSystemCallFunction(this,arg);
         }
         
     }
@@ -6963,8 +6962,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseUnix(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseUnix(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6980,8 +6979,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseDos(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseDos(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -6997,8 +6996,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSystem(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSystem(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7008,8 +7007,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractIoFunction extends AbstractSystemFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractIoFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractIoFunction(this,arg);
         }
         
     }
@@ -7021,8 +7020,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseLoad(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseLoad(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7038,8 +7037,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSave(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSave(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7055,8 +7054,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseInput(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseInput(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7072,8 +7071,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseTextscan(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseTextscan(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7083,8 +7082,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractPosixIoFunction extends AbstractIoFunction  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractPosixIoFunction(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractPosixIoFunction(this,arg);
         }
         
     }
@@ -7096,8 +7095,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSprintf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSprintf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7128,8 +7127,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSscanf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSscanf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7145,8 +7144,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFprintf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFprintf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7177,8 +7176,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFtell(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFtell(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7194,8 +7193,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFerror(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFerror(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7211,8 +7210,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFopen(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFopen(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7228,8 +7227,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFread(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFread(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7245,8 +7244,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFrewind(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFrewind(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7262,8 +7261,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFscanf(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFscanf(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7279,8 +7278,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFseek(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFseek(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7296,8 +7295,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFwrite(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFwrite(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7313,8 +7312,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFgetl(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFgetl(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7330,8 +7329,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFgets(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFgets(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7347,8 +7346,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseFclose(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseFclose(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7358,8 +7357,8 @@ public abstract class Builtin {
     }
     public static abstract class AbstractNotABuiltin extends AbstractRoot  {
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseAbstractNotABuiltin(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseAbstractNotABuiltin(this,arg);
         }
         
     }
@@ -7371,8 +7370,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseImwrite(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseImwrite(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7403,8 +7402,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseSparse(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseSparse(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7435,8 +7434,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseRealmax(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRealmax(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7467,8 +7466,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseHistc(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseHistc(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7499,8 +7498,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseBlkdiag(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseBlkdiag(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7531,8 +7530,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseVar(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseVar(this,arg);
         }
         //return name of builtin
         public String getName(){
@@ -7563,8 +7562,8 @@ public abstract class Builtin {
             return singleton;
         }
         //visit visitor
-        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg, int num){
-            return visitor.caseStd(this,arg,num);
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseStd(this,arg);
         }
         //return name of builtin
         public String getName(){

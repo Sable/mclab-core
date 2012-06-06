@@ -24,7 +24,7 @@ List<isComplexInfo<V>>>{
 	@Override
 //	public List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> 
 //	public List<V extends Value<V>> 
-	public List<isComplexInfo<V>> caseBuiltin(Builtin builtin, Args<V> arg, int num) {
+	public List<isComplexInfo<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
 		// TODO base case -- use whatever the builtin's complex propagation info provides
 		//num is the number of LHS arguments in the tame IR node
 		if(builtin instanceof HasisComplexPropagationInfo){

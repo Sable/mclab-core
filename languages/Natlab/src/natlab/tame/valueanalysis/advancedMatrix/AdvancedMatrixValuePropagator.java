@@ -40,11 +40,11 @@ public class AdvancedMatrixValuePropagator extends
 	 */
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseBuiltin(Builtin builtin,
-			Args<AggrValue<AdvancedMatrixValue>> arg, int num) {
+			Args<AggrValue<AdvancedMatrixValue>> arg) {
 		// deal with constants
 		if (Debug)
 			System.out.println("built-in fn's arguments are " + arg);
-		Constant cResult = builtin.visit(constantProp, arg, num);
+		Constant cResult = builtin.visit(constantProp, arg);
 		if (cResult != null) {
 			return Res
 					.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
@@ -53,7 +53,7 @@ public class AdvancedMatrixValuePropagator extends
 
 		// if the result is not a constant, just do mclass propagation
 		List<Set<ClassReference>> matchClassResult = builtin.visit(classProp,
-				arg, num);
+				arg);
 		if (Debug)
 			System.out.println("classProp results are " + matchClassResult);
 		if (matchClassResult == null) { // class prop returned error
@@ -61,7 +61,7 @@ public class AdvancedMatrixValuePropagator extends
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg,num);
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
 //		if (Debug)
 //			System.out.println("shapeProp results are " + matchShapeResult);
 		if (matchShapeResult == null) {
@@ -70,7 +70,7 @@ public class AdvancedMatrixValuePropagator extends
 		}
 
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
-				.visit(isComplexInfoProp, arg, num);
+				.visit(isComplexInfoProp, arg);
 		if (matchisComplexInfoResult == null) {
 			System.out.println("no complexinfo results");
 		}
@@ -108,7 +108,7 @@ public class AdvancedMatrixValuePropagator extends
 
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseAbstractConcatenation(
-			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg, int num) {
+			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg) {
 		if (Debug)
 			System.out
 					.println("inside AdvancedMatrixValuePropagator caseAbstractConcatenation!");// XU
@@ -122,7 +122,7 @@ public class AdvancedMatrixValuePropagator extends
 //				System.out.println("shape results are empty");
 //		}
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
-				.visit(isComplexInfoProp, arg, num);
+				.visit(isComplexInfoProp, arg);
 		if (matchisComplexInfoResult == null) {
 			System.out.println("no complexinfo results");
 		}

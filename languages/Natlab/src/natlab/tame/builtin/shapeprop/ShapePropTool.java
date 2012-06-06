@@ -27,7 +27,7 @@ public class ShapePropTool{
     	}
     }
     
-    public static List<Shape<?>> matchByValues(SPNode tree, Args<?> argValues,int num){
+    public static List<Shape<?>> matchByValues(SPNode tree, Args<?> argValues){
     	if(argValues!=null){
     		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
     		for(Value<?> arg:argValues){
@@ -40,7 +40,7 @@ public class ShapePropTool{
     		}
     	}
     	if (Debug) System.out.println(tree+" with arguments "+argValues);
-    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues,num);
+    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues, argValues.getNargout());//FIXME make it better
         /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
         	return null;
         }*/
