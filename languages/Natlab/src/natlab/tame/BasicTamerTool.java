@@ -1,6 +1,7 @@
 package natlab.tame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import natlab.tame.builtin.Builtin;
@@ -8,9 +9,14 @@ import natlab.tame.callgraph.FunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
+import natlab.tame.valueanalysis.ValueAnalysis;
+import natlab.tame.valueanalysis.ValueAnalysisPrinter;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FilePathEnvironment;
 import natlab.tame.valueanalysis.components.constant.Constant;
@@ -56,4 +62,24 @@ public class BasicTamerTool {
 	}
 
 	//TODO give more useful functions!
+	
+	public static void main(String[] args){
+		
+		GenericFile gFile = GenericFile.create("/home/xuli/test/hello.m"); //file -> generic file
+		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
+		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
+		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+		Args<AggrValue<BasicMatrixValue>> someargs = Args.<AggrValue<BasicMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
+				callgraph, 
+				Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 
+				factory);
+		System.out.println(analysis.toString());
+		
+		
+        for (int i = 0; i < analysis.getNodeList().size(); i++){
+        	System.out.println(ValueAnalysisPrinter.prettyPrint(
+        			analysis.getNodeList().get(i).getAnalysis()));        	
+        }
+	}
 }

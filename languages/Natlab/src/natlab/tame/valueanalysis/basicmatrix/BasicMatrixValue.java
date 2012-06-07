@@ -364,7 +364,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     
     @Override
     public AggrValue<BasicMatrixValue> toFunctionArgument(boolean recursive) {
-    	throw new UnsupportedOperationException(); //TODO
+    	return this;
+    	//throw new UnsupportedOperationException(); //TODO
     }
     @Override
     public AggrValue<BasicMatrixValue> dotSubsasgn(String field,

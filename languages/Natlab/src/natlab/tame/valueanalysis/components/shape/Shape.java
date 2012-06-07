@@ -54,7 +54,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     }
     
     public void printShapeInfo(){
-    	System.out.println(dimensions);
+    	if (Debug) System.out.println(dimensions);
     }
     
     
@@ -64,7 +64,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
      */
     public boolean maybeScalar(){
     	if((this.dimensions.get(0)==1&&this.dimensions.get(1)==null)||(this.dimensions.get(0)==null&&this.dimensions.get(1)==1)){
-    		System.out.println("this may be a scalar!");
+    		if (Debug) System.out.println("this may be a scalar!");
     		return true;
     	}
         return false;//TODO
