@@ -87,6 +87,9 @@ public class FileEnvironment {
 		}
 		if (main.length() == 0) throw new UnsupportedOperationException("no main file provided");
 		this.main = GenericFile.create(main);
+		if (this.main == null || !this.main.exists()){
+			throw new UnsupportedOperationException("file "+main+" not found");
+		}
 		this.pwd = this.main.getParent();
 		this.pwdHandler = FolderHandler.getFolderHandler(this.pwd);
 

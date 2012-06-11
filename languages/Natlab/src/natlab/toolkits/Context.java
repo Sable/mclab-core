@@ -38,15 +38,23 @@ public class Context{
     */
     public FunctionReference resolve(String name, String dominantType){
 	if (inNested){
+		//FIXME this doesn't look like proper lookup among nested functions
 	    Function f = ((FunctionList)curProgram).getNested().get(name);
 	    if( f != null )
 		return new FunctionReference(curProgram.getFile(), f, FunctionReference.ReferenceType.NESTED);
 	}
 
 	if (inFunction){
+		//FIXME the getSiblings function seems to return an empty hashmap
 	    Function f = ((FunctionList)curProgram).getSiblings().get(name);
 	    if( f != null )
 		return new FunctionReference(curProgram.getFile(), f, FunctionReference.ReferenceType.SUBFUNCTION);
+	    
+	    //also do a different search .. this is probably broken, but we'll do a quick fix
+	    for (Function f1 : ((FunctionList)curProgram).getFunctions()){
+	    	if (f1.getName().equals(name)) return 
+	    			new FunctionReference(curProgram.getFile(), f1, FunctionReference.ReferenceType.SUBFUNCTION);
+	    }
 	}
 
 	if (curProgram.getName() == name){

@@ -31,8 +31,6 @@ import natlab.toolkits.filehandling.genericFile.*;
  *
  * This class is immutable
  * 
- * TODO - this should maybe be an enum, or the parent class of a set of different
- * things.
  * TODO - this should maybe store what class it belongs to
  */
 

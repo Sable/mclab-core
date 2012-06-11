@@ -40,7 +40,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 	/** cases containing other statements ****************************/
 	public void caseTIRFunction(TIRFunction node){
 		String indent = node.getIndent();
-		buf.append("% args: "+analysis.getArgMap()+"\n");
+		buf.append("% args: "+analysis.getArgMap().toString().replace("\n","\n%       ")+"\n");
 		buf.append(indent + "function ");
 		buf.append(" [");
 		boolean first = true;
@@ -78,7 +78,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 			buf.append('\n');
 		}
 		buf.append(indent + "end\n");
-		buf.append("% results: "+analysis.getResult());
+		buf.append("% results: "+analysis.getResult().toString().replace("\n","\n%          "));
     }
 	
 

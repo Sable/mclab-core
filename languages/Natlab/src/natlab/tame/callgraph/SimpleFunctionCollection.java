@@ -101,6 +101,10 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
     
     
     /*** Collecting files *******************************************************************/
+    public boolean collect(FunctionReference ref){
+    	return collect(ref, new ArrayList<CompilationProblem>());
+    }
+    
     /**
      * adds the matlab functions from the given filename to the collection
      * @return returns true on success
@@ -118,6 +122,7 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         if (program == null){
             throw new UnsupportedOperationException("cannot parse file "+file+":\n"+errList);
         }
+        program.setFile(file.getFile());
         
         //check whether the matlab file has a good type
         if (program instanceof Script){
