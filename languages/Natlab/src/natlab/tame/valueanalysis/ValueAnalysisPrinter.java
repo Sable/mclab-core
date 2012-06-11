@@ -135,9 +135,6 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 	
 	
 	
-	
-	
-	
 	/*** value analysis printer cases ********************************/
 	@Override
 	public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
@@ -173,5 +170,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 			prefix = ", ";
 		}
 	}
+	
+	
 	
 }

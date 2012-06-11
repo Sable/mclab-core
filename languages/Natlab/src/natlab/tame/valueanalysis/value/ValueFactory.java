@@ -39,7 +39,6 @@ public abstract class ValueFactory<V extends Value<V>> {
      * Creates a primitive scalar constant value
      */
     public V newMatrixValue(double value){
-    	System.out.println("inside ValueFactory!!!");
         return newMatrixValue(Constant.get(value));
     }
     /**

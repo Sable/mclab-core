@@ -212,6 +212,42 @@ No static linking is done.
 
   <!-- static stuff ********************************************** -->
   <section>
+  	<name>Tamer options</name>
+  	<boolopt>
+	  	<name>Tame a Matlab program</name>
+  		<alias>t</alias>
+  		<alias>tame</alias>
+  		<short_desc>Tame a Matlab program</short_desc>
+  		<long_desc>
+  			Runs the Tamer on a program, and will output a full Matlab program either
+  			as a single file or in a directory (viar -outdir/od). The programs will be transformed
+  			to the Tame intermediate representation.
+  		</long_desc>
+	</boolopt>
+  	<boolopt>
+  		<name>inline a whole program into one function</name>
+  		<alias>inline</alias>
+  		<short_desc>Inline the whole Matlab program in one function, if possible</short_desc>
+  		<long_desc>
+  			Inlines a whole Matlab program into one function, if it is non-recursive
+  			and does not include ambiguous call edges (i.e. overloading).
+  		</long_desc>
+  	</boolopt>
+  	<stropt>
+  		<name>Tamer arguments</name>
+  		<alias>args</alias>
+  		<alias>arguments</alias>
+  		<short_desc>Specifies type of arguments to the main function (default is 'double')</short_desc>
+  		<long_desc>
+			Specifies the type of the arguments to the main function.
+			The default is "double", i.e. one double. For now this uses the
+			same syntax as the class specification language for builtin functions.  			
+  		</long_desc>
+  	</stropt>
+  </section>
+  
+  
+  <section>
     <name>Static/Fortran Generator Options</name>
     <boolopt>
       <name>Generate Fortran</name>

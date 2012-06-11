@@ -18,9 +18,7 @@
 
 package natlab.toolkits.path;
 
-import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Collection;
 import java.util.Map;
 
 import natlab.options.Options;
@@ -41,6 +39,7 @@ import natlab.toolkits.filehandling.genericFile.*;
  *
  * Since the existence of builtin does not depend on the semantics of the lookup,
  * it has to be done by separate class, which only exists as an interface.
+ *
  *
  */
 public class FilePathEnvironment extends AbstractPathEnvironment {

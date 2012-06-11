@@ -53,7 +53,7 @@ public abstract class CP extends Symbol{
     
     
     /**
-     * returns an iterator over all the CP nodes contained in this ast.
+     * returns a list over all the CP nodes contained in this ast.
      * @return
      */
     @SuppressWarnings("unchecked")

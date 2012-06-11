@@ -28,13 +28,11 @@ import natlab.toolkits.filehandling.genericFile.*;
  * where files (*.m, *.mex, *.p) exist.
  * Does not model main, or builtins, or context.
  * Uses the Directory Cache to get quick access to directories.
- * 
- * TODO - this treats directories in a case sensitive way - is that bad?
- * TODO - this might be a bad name for the class
- * TODO - one should probably add constructors that allow different sets of 
- *        file extensions, like .p files
- * TODO - one should review the order in which files with different extensions are found
- * TODO - we need to deal with packages properly, probably
+ *
+ *
+ * TODO - move towards the folderhandler/context objects,
+ * so all the logic of finding functions should be deprecated/removed.
+ * This should only store the list of directories.
  * 
  * @author ant6n
  *
@@ -190,6 +188,14 @@ public class MatlabPath extends AbstractPathEnvironment {
             }
         }
         return map;
+    }
+    
+    public List<FolderHandler> getAsFolderHandlerList(){
+    	LinkedList<FolderHandler> list = new LinkedList<FolderHandler>();
+    	for (CachedDirectory dir : directories){
+    		list.add(FolderHandler.getFolderHandler(dir));
+    	}
+    	return list;
     }
     
 }

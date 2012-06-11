@@ -1,6 +1,6 @@
 package natlab.tame.valueanalysis;
 
-import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysis;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.value.ValueFactory;
 public class ValueAnalysis<V extends Value<V>>
 extends InterproceduralAnalysis<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>>{
 
-    public ValueAnalysis(FunctionCollection callgraph, Args<V> mainArgs, ValueFactory<V> valueFactory) {
+    public ValueAnalysis(SimpleFunctionCollection callgraph, Args<V> mainArgs, ValueFactory<V> valueFactory) {
         super(new Factory<V>(valueFactory), callgraph, mainArgs);
     }
     

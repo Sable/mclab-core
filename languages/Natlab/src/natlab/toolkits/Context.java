@@ -29,6 +29,7 @@ public class Context{
     public final FolderHandler fwd; 
     public final java.util.List<FolderHandler> path; 
     public final Program curProgram;
+    public final BuiltinQuery builtinQuery;
     
     
     /**
@@ -65,6 +66,14 @@ public class Context{
 	    
 	}
 		
+	
+	//TODO - is this the right position for the builtin query? What about overloading?
+	if (builtinQuery != null){
+		if (builtinQuery.isBuiltin(name)){
+			return new FunctionReference(name);
+		}
+	}
+	
 	for (FolderHandler p: path){
 	    GenericFile c = p.lookupClasses(name);
 	    if (c!=null) return new FunctionReference(c, FunctionReference.ReferenceType.CLASS_CONSTRUCTOR);
@@ -112,34 +121,56 @@ public class Context{
 	return res;
     }
     
-    public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path){
-	if (curFunction instanceof Function)
-	    this.inFunction=true;
-	else 
-	    this.inFunction=false;
+    public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path,BuiltinQuery query){
+    	if (curFunction instanceof Function)
+    		this.inFunction=true;
+    	else 
+    		this.inFunction=false;
 
-	if (curFunction.getParent()!=null && 
-	    curFunction.getParent().getParent() instanceof Function){
-	    inNested=true;
-	}
-	else
-	    inNested=false;
+    	if (curFunction.getParent()!=null && 
+    			curFunction.getParent().getParent() instanceof Function){
+    		inNested=true;
+    	}
+    	else
+    		inNested=false;
 
-	if (inNested){
-	    curProgram=NodeFinder.findParent(curFunction, Program.class);
-	}
-	else
-	    if (inFunction)
-		curProgram=(Program)curFunction.getParent().getParent();
-	    else
-		curProgram=(Program)curFunction;
+    	if (inNested){
+    		curProgram=NodeFinder.findParent(curFunction, Program.class);
+    	}
+    	else
+    		if (inFunction)
+    			curProgram=(Program)curFunction.getParent().getParent();
+    		else
+    			curProgram=(Program)curFunction;
+
+    	this.curFunction= curFunction;
+    	this.pwd = pwd;
+    	if (inFunction && fwd==null)
+    		this.fwd = FolderHandler.getFolderHandler(curProgram.getFile().getParent());
+    	else
+    		this.fwd = fwd;
+    	this.path=path;
+    	this.builtinQuery = query;
+    }
     
-	this.curFunction= curFunction;
-	this.pwd = pwd;
-	if (inFunction && fwd==null)
-	    this.fwd = FolderHandler.getFolderHandler(curProgram.getFile().getParent());
-	else
-	    this.fwd = fwd;
-	this.path=path;
+
+    
+    public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path){
+    	this(curFunction,pwd,fwd,path,null);
+    }
+    
+    public FunctionOrScriptQuery getFunctionOrScriptQuery(){
+    	return new FunctionOrScriptQuery() {
+			public boolean isPackage(String name) {
+				FunctionReference ref = resolve(name);
+				return (ref != null 
+						&& ref.referenceType == FunctionReference.ReferenceType.PACKAGE);
+			}
+			public boolean isFunctionOrScript(String name) {
+				FunctionReference ref = resolve(name);
+				return (ref != null 
+						&& ref.referenceType != FunctionReference.ReferenceType.PACKAGE);
+			}
+		};
     }
 }

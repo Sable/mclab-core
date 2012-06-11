@@ -132,17 +132,22 @@ public class Main
                 
                 
                 //setting and getting of preferences
-                if (options.pref()){
-                    NatlabPreferences.modify(options);
-                    return;
-                }
-                
                 if (options.show_pref()){
                 	System.out.println("preferences:");
                 	Map<String,Object> prefs = NatlabPreferences.getAllPreferences();
                 	for (String key : prefs.keySet()){
                 		System.out.println(key+"="+prefs.get(key));
                 	}
+                }
+                if (options.pref()){
+                    NatlabPreferences.modify(options);
+                    return;
+                }
+                
+                if (options.tame()){
+                	//TODO - the parsing of the options should probably not be done by the tamer tool
+                	natlab.tame.TamerTool.main(options);
+                	return;
                 }
                 
                 if( options.server() ){

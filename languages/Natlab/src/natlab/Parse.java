@@ -42,14 +42,10 @@ import java.util.List;
  * 
  * - method to open files and report errors?
  * 
- * 
- * 
+ * - Files should be read from genericfiles
+ *   - there may be something that reads genericfiles somewhere ... in main, maybe?
  * 
  */
-
-
-
-
 public class Parse {
     
     /**

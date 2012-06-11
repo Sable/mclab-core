@@ -27,7 +27,7 @@ import java.util.HashSet;
 
 import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
-import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
@@ -37,6 +37,7 @@ import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
+import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FilePathEnvironment;
 import natlab.toolkits.path.FunctionReference;
 
@@ -145,6 +146,7 @@ public class Mc4 {
 		
 		System.out.println("\n---done---\n builtins: "+allRefs.size()+"\n\n");
 		//for (FunctionReference ref : allRefs) System.out.println(ref);
+		System.out.println(allRefs);
 		System.exit(0);
 		/* */
 		
@@ -174,13 +176,11 @@ public class Mc4 {
 	public static void main(Options options){
         //object that resolves function names to files      
 	    long t = System.currentTimeMillis();
-	    FilePathEnvironment functionFinder;
-        functionFinder = new FilePathEnvironment(options, Builtin.getBuiltinQuery());
         //System.out.println("time "+(System.currentTimeMillis() - t));
         //System.exit(0);
         
 	    //collect all needed matlab files
-	    FunctionCollection functions = new FunctionCollection(functionFinder);
+	    SimpleFunctionCollection functions = new SimpleFunctionCollection(new FileEnvironment(options));
 	    allRefs.addAll(functions.getAllFunctionBuiltinReferences());
 	    //System.out.println(functions);
 	    
@@ -205,7 +205,7 @@ public class Mc4 {
 
         
         //System.out.println(ValueAnalysisPrinter.prettyPrint(analysis.getMainNode().getAnalysis()));
-	    System.exit(0);
+	    //System.exit(0);
 	    } catch (StackOverflowError e){
 	        System.err.println("stackoverflow in "+functions.getMain().name);
 	        e.printStackTrace();

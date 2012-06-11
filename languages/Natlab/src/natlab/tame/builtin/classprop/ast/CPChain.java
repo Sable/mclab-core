@@ -33,4 +33,25 @@ public class CPChain extends CP{
     	list.add(class2);
     	return list;
     }
+    
+    /**
+     * returns this chain as a list - recursively also turns children that are chains into
+     * list elements
+     */
+    public List<CP> asList(){
+    	LinkedList<CP> list = new LinkedList<CP>();
+    	if (class1 instanceof CPChain){
+    		list.addAll(((CPChain)class1).asList());
+    	} else {
+    		list.add(class1);
+    	}
+    	if (class2 instanceof CPChain){
+    		list.addAll(((CPChain)class2).asList());
+    	} else {
+    		list.add(class2);
+    	}
+    	return list;
+    }
 }
+
+

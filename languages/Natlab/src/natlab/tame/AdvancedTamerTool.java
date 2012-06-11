@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import natlab.tame.builtin.Builtin;
-import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
@@ -14,14 +14,15 @@ import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FilePathEnvironment;
 
 public class AdvancedTamerTool {
 	public IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>> 
     tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<AdvancedMatrixValue>> inputValues){
 		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
-		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
-		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
+		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		StaticFunction function = callgraph.getAsInlinedStaticFunction(); //inline all
 
 

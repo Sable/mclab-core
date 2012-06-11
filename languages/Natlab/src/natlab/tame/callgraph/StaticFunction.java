@@ -26,6 +26,7 @@ import java.util.Set;
 import natlab.tame.simplification.ThreeAddressToIR;
 import natlab.tame.tir.TIRFunction;
 import natlab.toolkits.BiMap;
+import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
@@ -41,11 +42,10 @@ import ast.FunctionList;
 
 /**
  * 
- * This represents a static function, as stored in a FunctionCollection Object.
+ * This represents a static function, as stored in a SimpleFunctionCollection Object.
  * It stores the AST of a function in IR form, it's location (via a FunctionReference),
  * and all the functions called (sort of a basic symbol table).
  * and other useful information.
- * TODO - this should not use the IR - some users might want to work with the AST?
  * 
  */
 public class StaticFunction implements Cloneable {
@@ -54,6 +54,7 @@ public class StaticFunction implements Cloneable {
     FunctionReference reference; //reference to this function
     String name;
     HashSet<String> siblings; //TODO - make these a hashmap<string,StaticFunction>
+    Context context;
 
     /**
      * references to functions being called
@@ -74,16 +75,15 @@ public class StaticFunction implements Cloneable {
      * @param source the file where it is from
      * @param a function finder, to resolve IDs into Function references
      */
-    public StaticFunction(Function function, FunctionReference reference) {
+    public StaticFunction(Function function, FunctionReference reference, Context context) {
         this.function = function.fullCopy();
         this.reference = reference;
         this.calledFunctions = new BiMap<String,FunctionReference>();
         this.name = function.getName();
-        
+        this.context = context;
         
         //set siblings
         siblings = new HashSet<String>(function.getSiblings().keySet());
-        
         
         //transform to IR
         transformToIR();
@@ -108,8 +108,7 @@ public class StaticFunction implements Cloneable {
     //creates and puts first order approximation of the symbol table - variable or function
     private void findAndResolveFunctions(){
         //perform variable or function analysis on function and get result
-        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function);
-            //TODO - use proper context, Mc4.functionFinder.getFunctionOrScriptQuery(reference.getFile()));
+        VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,this.context.getFunctionOrScriptQuery());
         functionAnalysis.analyze();        
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
@@ -119,20 +118,19 @@ public class StaticFunction implements Cloneable {
             VFDatum vf = flowset.getMap().get(name);
             
             if (vf.isFunction()){
-                calledFunctions.put(name, null); 
-                //TODO actually resolve names
+                calledFunctions.put(name, this.context.resolve(name));
             } else if (vf.isVariable()){
-            } else {
-                //System.err.println("symbol table: "+name+" in "+this.name+" cannot be resolved as a function or variable. vf:"+vf);
-                calledFunctions.put(name, null); 
+            } else { //just put unfound functions among unfound
+                calledFunctions.put(name, this.context.resolve(name)); 
             }
         }
-        //TODO are there any other symbols?
-        //TODO deal with errors
+        //TODO deal with errors - unresolved functions? - they may be overloaded functions
     }
     
     
-    //apply simplification on the thing
+    /**
+     * apply simplification on the ast
+     */
     public void applySimplification(Class<? extends AbstractSimplification> simplification){
         FunctionList fList = new FunctionList();
         fList.addFunction(function);
@@ -165,6 +163,7 @@ public class StaticFunction implements Cloneable {
     public Function getAst(){ return function; }
     public FunctionReference getReference(){ return reference; }
     public Set<String> getSiblings(){ return siblings; }
+    public Context getContext(){ return context; }
     
     
     

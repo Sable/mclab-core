@@ -7,7 +7,7 @@ import java.util.*;
 import natlab.FlowAnalysisTestTool;
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.classprop.ClassPropTool;
-import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
@@ -17,6 +17,7 @@ import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FilePathEnvironment;
 
 public class Test {    
@@ -63,8 +64,8 @@ public class Test {
     
     public static Res<?> runTest(GenericFile testFile){        
         //load the unit test
-        FilePathEnvironment functionFinder = new FilePathEnvironment(testFile, Builtin.getBuiltinQuery());
-        FunctionCollection functions = new FunctionCollection(functionFinder);
+        FileEnvironment fileEnvironment = new FileEnvironment(testFile);
+        SimpleFunctionCollection functions = new SimpleFunctionCollection(fileEnvironment);
         StaticFunction aFunction = functions.getAsInlinedStaticFunction();
         IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> classAnalysis =
             new IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>(null,

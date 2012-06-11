@@ -2,7 +2,10 @@ package natlab.tame;
 
 import java.util.*;
 
+import natlab.options.Options;
 import natlab.tame.builtin.*;
+import natlab.tame.builtin.classprop.ClassPropTool;
+import natlab.tame.builtin.classprop.ast.*;
 import natlab.tame.callgraph.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
@@ -43,8 +46,8 @@ public class TamerTool {
 	public IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> 
 			tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<SimpleMatrixValue>> inputValues){
 		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
-		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
-		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
+		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		StaticFunction function = callgraph.getAsInlinedStaticFunction(); //inline all
 
 		//build intra-analysis
@@ -76,14 +79,13 @@ public class TamerTool {
 	
 	
 	//TODO give more useful functions!
+	//TODO give usage example, like I showed Vineet
 	
-	
-	
+	//example main...
 	public static void main(String[] args) {
-		
 		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
-		FilePathEnvironment path = new FilePathEnvironment(gFile, Builtin.getBuiltinQuery()); //get path environment obj
-		FunctionCollection callgraph = new FunctionCollection(path); //build simple callgraph
+		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 		Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
 		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
@@ -103,6 +105,91 @@ public class TamerTool {
 	//getCallgraph(inputfile,args)
 	//getCallgraph(inputfile,factory,args)
 	//...
+
+	/**
+	 * given a file environment and input classes, returns a callgraph
+	 */
+	public static Callgraph<SimpleMatrixValue> getSimpleCallgraphFromClassReferences(FileEnvironment env,List<PrimitiveClassReference> inputClasses){
+		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputClasses.size());
+		for (PrimitiveClassReference ref : inputClasses){
+			list.add(new SimpleMatrixValue(ref));
+		}
+		return new Callgraph<SimpleMatrixValue>(
+				env,
+				Args.<AggrValue<SimpleMatrixValue>>newInstance(list),
+				new SimpleMatrixValueFactory());
+	}
+	
+	
+	public static Callgraph<SimpleMatrixValue> getSimpleCallgraph(FileEnvironment env,List<AggrValue<SimpleMatrixValue>> inputValues){
+		return new Callgraph<SimpleMatrixValue>(
+				env,
+				Args.<AggrValue<SimpleMatrixValue>>newInstance(inputValues),
+				new SimpleMatrixValueFactory());
+	}
+	
+	
+	public static <D extends MatrixValue<D>> Callgraph<D> getCallgraph(FileEnvironment env,List<AggrValue<D>> inputValues,AggrValueFactory<D> factory){
+		return new Callgraph<D>(
+				env,
+				Args.<AggrValue<D>>newInstance(inputValues),
+				factory);
+	}
+	
+	
+	
+	/**
+	 * the entry point coming from natlab.Main - uses the options object to select the proper behavior
+	 */
+	public static void main(Options options){
+		//** parse args ********
+		FileEnvironment fileEnvironment = new FileEnvironment(options); //get path/files
+		boolean inline = options.inline(); //get inline
+		boolean outputToFile = false; //output TODO
+
+		//arguments - TODO for now just parse them as inputs
+		String args = "double"; //start with the default
+		if (options.arguments() != null && options.arguments().length() > 0){
+			args = options.arguments();
+		}
+		CP classProp = ClassPropTool.parse(args);
+		List<CP> classPropList = new LinkedList<CP>();
+		if (classProp instanceof CPChain){
+			classPropList = ((CPChain)classProp).asList();
+		} else if (classProp instanceof CPBuiltin){
+			classPropList.add(classProp);
+		} else {
+			throw new UnsupportedOperationException("Arguments have to be a list of builtin classes");
+		}
+		List<PrimitiveClassReference> inputClasses = new LinkedList<PrimitiveClassReference>();
+		for (CP element : classPropList){
+			if (element instanceof CPBuiltin){
+				inputClasses.add(PrimitiveClassReference.valueOf(((CPBuiltin)element).toString().toUpperCase()));
+			} else {
+				throw new UnsupportedOperationException(
+						"Arguments have to be list of builtin classes, received "+element);
+			}
+		}
+		
+		
+		//** build callgraph *******		
+		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputClasses.size());
+		for (PrimitiveClassReference ref : inputClasses){
+			list.add(new SimpleMatrixValue(ref));
+		}
+		
+		
+		Callgraph<SimpleMatrixValue> callgraph = new Callgraph<SimpleMatrixValue>(
+				fileEnvironment,
+				Args.<AggrValue<SimpleMatrixValue>>newInstance(list),
+				new SimpleMatrixValueFactory());
+		
+		
+		//** output info ***********
+		System.out.println(callgraph.prettyPrint());
+		
+	}
+	
 }
 
 

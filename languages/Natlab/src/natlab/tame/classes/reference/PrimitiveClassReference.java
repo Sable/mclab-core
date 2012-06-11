@@ -37,7 +37,7 @@ public enum PrimitiveClassReference implements BuiltinClassReference {
     public boolean isInt(){ return false; }
     public boolean isFloat(){ return false; }
     public boolean isNumeric(){ return true; }
-    public boolean isMatrix(){ return false; }
+    public boolean isMatrix(){ return true; }
 
     
     @Override
