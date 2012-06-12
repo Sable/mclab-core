@@ -246,7 +246,7 @@ No static linking is done.
   	</stropt>
   </section>
   
-  
+<!--  
   <section>
     <name>Static/Fortran Generator Options</name>
     <boolopt>
@@ -279,6 +279,8 @@ No static linking is done.
 			<long_desc>This option ...</long_desc>
 		</multiopt>
   </section>
+ --> 
+
   <section>
     <name>Testing</name>
     <boolopt>

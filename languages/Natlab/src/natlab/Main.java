@@ -117,7 +117,7 @@ public class Main
                 }
 		
                 //fortran neither uses the below parser, nor is a server
-                if( options.fortran() ){ //begin fortran
+/*                if( options.fortran() ){ //begin fortran
                     //if( options.getFiles().size() == 0 ){
                     //    System.err.println("No files provided, must have at least one file.");
                     //    System.exit(1);
@@ -128,7 +128,7 @@ public class Main
                     natlab.tame.mc4.Mc4.main(args);
                     return;
                 } //end fortran
-                
+*/                
                 
                 
                 //setting and getting of preferences
