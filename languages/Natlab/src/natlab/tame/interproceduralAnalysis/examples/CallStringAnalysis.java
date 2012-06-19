@@ -39,7 +39,8 @@ public class CallStringAnalysis extends AbstractDepthFirstAnalysis<CallStringAna
     }
 
     /**
-     * factory for this object
+     * factory for the intraprocedural analysis - can be used to instiate
+     * the interprocedural analysis.
      */
     public static class Factory implements InterproceduralAnalysisFactory
     <CallStringAnalysis, CallString<?>, CallStrings>{
@@ -81,7 +82,9 @@ public class CallStringAnalysis extends AbstractDepthFirstAnalysis<CallStringAna
                     result.add(callstring.add(ref, null, null)); //TODO
                 } else {
                     System.out.println(" call "+ref);
-                    result.addAll(this.node.analyze(ref, callstring, null));
+                    Callsite<CallStringAnalysis,CallString<?>,CallStringAnalysis.CallStrings> callsite = this.node.getCallsiteObject(node);
+                    Call<CallString<?>> call = new Call<CallString<?>>(ref, callstring);
+                    result.addAll(this.node.analyze(call, callsite));
                 }
             }
         }

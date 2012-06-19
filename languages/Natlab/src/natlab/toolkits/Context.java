@@ -45,7 +45,7 @@ public class Context{
 	}
 
 	if (inFunction){
-		//FIXME the getSiblings function seems to return an empty hashmap
+		//FIXME the getsiblings has to be set up in the parser somewhere... is there a way to use jastadd functions that don't have to be set explicitly?
 	    Function f = ((FunctionList)curProgram).getSiblings().get(name);
 	    if( f != null )
 		return new FunctionReference(curProgram.getFile(), f, FunctionReference.ReferenceType.SUBFUNCTION);
@@ -75,7 +75,7 @@ public class Context{
 	}
 		
 	
-	//TODO - is this the right position for the builtin query? What about overloading?
+	//TODO - is this the right position for the builtin query?
 	if (builtinQuery != null){
 		if (builtinQuery.isBuiltin(name)){
 			return new FunctionReference(name);

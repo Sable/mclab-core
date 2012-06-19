@@ -181,8 +181,26 @@ public class FileEnvironment {
 			}
 		};
 	}
+	
+	/**
+	 * returns all overload methods (via folders) in all the folders in the path 
+	 * TODO - there may be builtin functions showing up as overloaded functions on the 
+	 * matlab path, which may not actually contain code, but just help files -- although that's unlikely
+	 */
+	public List<FunctionReference> getOverloadedMethods(String classname){
+		ArrayList<FunctionReference> list = new ArrayList<FunctionReference>();
+		ArrayList<FolderHandler> folders = new ArrayList<FolderHandler>(getFolderHandlers());
+		folders.add(pwdHandler);
+		for (FolderHandler handler : folders){
+			for (GenericFile f : handler.getAllSpecialized(classname)){
+				list.add(new FunctionReference(f,FunctionReference.ReferenceType.OVERLOADED));
+			}
+			GenericFile constructor = handler.lookupClasses(classname);
+			if (constructor != null){
+				list.add(new FunctionReference(constructor,FunctionReference.ReferenceType.CLASS_CONSTRUCTOR));
+			}
+		}
+		return list;
+	}
 }
-
-
-
 

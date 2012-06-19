@@ -21,7 +21,9 @@ import natlab.toolkits.path.FileEnvironment;
 public class Callgraph<D extends MatrixValue<D>> extends
 		GenericCallgraph<ValueAnalysis<AggrValue<D>>, IntraproceduralValueAnalysis<AggrValue<D>>, Args<AggrValue<D>>, Res<AggrValue<D>>>{
 	public Callgraph(FileEnvironment fileEnvironment,
-			Args<AggrValue<D>> args, AggrValueFactory<D> factory) {
+			Args<AggrValue<D>> args, AggrValueFactory<D> factory) 
+	//implements FunctionCollection  - TODO
+	{
 		super(new ValueAnalysis<AggrValue<D>>(
 				new IncrementalFunctionCollection(fileEnvironment), args, factory));
 	}

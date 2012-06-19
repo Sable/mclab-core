@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import natlab.CompilationProblem;
+import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
@@ -63,6 +64,7 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
     private FunctionReference main = null; //denotes which function is the entry point
     private FileEnvironment fileEnvironment;
     private static boolean DEBUG = false;
+    private ClassRepository classRepository;
     
     /**
      * The function collection gets created via a path environment object
@@ -73,6 +75,9 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         super();
         
         this.fileEnvironment = fileEnvironment;
+        
+        //build class repository
+        this.classRepository = new ClassRepository(fileEnvironment);
         
         //get main file (entrypoint)
         main = fileEnvironment.getMainFunctionReference();
@@ -90,6 +95,7 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         this.loadedFiles.addAll(other.loadedFiles);
         this.main = other.main;
         this.fileEnvironment = other.fileEnvironment;
+        this.classRepository = other.classRepository;
         
         for (FunctionReference ref : other.keySet()){
             this.put(ref,other.get(ref).clone());
@@ -130,6 +136,7 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
             return false;
         } else if (program instanceof ClassDef){
             System.err.println("The tamer does not support classes at this point.");
+            //TODO - also add the class to the class repository
         } else if (program instanceof EmptyProgram){
             System.err.println("The tamer does not support empty files at this point."); //TODO
         } else if (!(program instanceof FunctionList)){
@@ -182,7 +189,10 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         	}
         }
         if (unfoundFunctions.size() != 0){
-            throw new UnsupportedOperationException("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
+        	//TODO - should we do anything here? Just throw error if it's no an incremental collection
+        	if (!(this instanceof IncrementalFunctionCollection)){
+        		throw new UnsupportedOperationException("reference to "+unfoundFunctions+" in "+function.getName()+" not found");
+        	}
         }
         
         return success;
@@ -282,6 +292,11 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         }
         return s;
     }
+
+	@Override
+	public ClassRepository getClassRepository() {
+		return this.classRepository;
+	}
 
 }
 

@@ -17,6 +17,14 @@ public class Call<Arg> {
         this.argument = argument;
     }
     
+    public Arg getArguments(){
+    	return argument;
+    }
+    
+    public FunctionReference getFuncionReference(){
+    	return functionRef;
+    }
+    
     @Override
     public String toString() {
         return functionRef.getname()+"("+(argument!=null?argument:"")+")";

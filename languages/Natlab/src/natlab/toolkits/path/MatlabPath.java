@@ -56,7 +56,7 @@ public class MatlabPath extends AbstractPathEnvironment {
      */
     public MatlabPath(String path,boolean persistent){
         super(null);
-        System.out.println(path);
+        //System.out.println(path);
         this.persistent = persistent;
         if (path == null || path.length() == 0){
             return;

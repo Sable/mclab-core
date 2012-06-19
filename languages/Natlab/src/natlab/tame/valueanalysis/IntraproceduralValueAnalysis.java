@@ -1,10 +1,13 @@
 package natlab.tame.valueanalysis;
 
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.*;
 import java.util.List;
 
 import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.classes.ClassRepository;
+import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.interproceduralAnalysis.*;
 import natlab.tame.tir.*;
 import natlab.tame.tir.analysis.*;
@@ -33,6 +36,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     Args<V> args;
     static boolean Debug = false;  //button of debug
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
+    ClassRepository classRepository;
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -41,6 +45,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         this.function = function;
         this.factory = factory;
         this.valuePropagator = factory.getValuePropagator();
+        this.classRepository = node.getInterproceduralAnalysis().getFunctionCollection().getClassRepository();
     }
     
     /**
@@ -112,11 +117,26 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     public void caseTIRCallStmt(TIRCallStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
+        //set new callsite
+        Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite = this.node.getCallsiteObject(node);
         //find function
-        FunctionReference ref = function.getCalledFunctions().get(node.getFunctionName().getID());
+        String functionName = node.getFunctionName().getID();
+        FunctionReference ref = function.getCalledFunctions().get(functionName);
+        //find if function may be overloaded
+        boolean checkOverloading;
+        if (ref == null){ //the call couldn't be found - it has to be an overloaded function, otherwise an error
+        	checkOverloading = true; 
+        } else {
+        	if (ref.path != null && ref.path.equals(this.function.getReference().getFile())){
+        		checkOverloading = false; //if the found function is in the same file it cannot be overloaded
+        	} else {
+        		checkOverloading = true; //if it's not in the same function, we assume the function can be overloaded
+        		//TODO - check this, which functions can be overloaded?
+        	}
+        }
         //do call
         setCurrentOutSet(assign(getCurrentInSet(),node.getTargets(),
-                call(ref, getCurrentInSet(), node.getArguments(), node.getTargets(), node, null)));
+                call(ref, getCurrentInSet(), node.getArguments(), node.getTargets(), callsite, null, functionName, checkOverloading)));
         //associate flowsets
         associateInAndOut(node);
     }
@@ -185,6 +205,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case array get: "+node.getPrettyPrinted());
         ValueFlowMap<V> flow = getCurrentInSet(); //note copied!
+        Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite = null; //used if there is a call in this stmt
         //if (Debug) System.out.println(flow);
         ValueSet<V> array = flow.get(node.getArrayName().getID());
         if (array == null) throw new UnsupportedOperationException("attempting to access unknown array "+node.getArrayName().getID()+" in\n"+node.getPrettyPrinted()+"\n with flow "+flow);
@@ -196,7 +217,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                     results.add(Res.newInstance(ValueSet.newInstance(arrayValue)));
                 } else {
                     //go through all possible index setss
-                    //TODO - deal with overloading etc.
+                    //TODO - deal with overloading of subsref etc.
                     //TODO - errors on assign - use is assign to var??
                     for (List<V> indizes : cross(flow,node.getIndizes())){
                         results.add(Res.newInstance(arrayValue.arraySubsref(Args.newInstance(indizes))));
@@ -206,8 +227,12 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 //go through all function handles this may represent and get the result
                 //TODO - make this independent of the specific function handle value implementation
                 for (FunctionHandleValue.FunctionHandle handle :((FunctionHandleValue<?>)((Object)arrayValue)).getFunctionHandles()){
+                	if (callsite == null){ //create new callsite object if needed
+                		callsite = this.node.getCallsiteObject(node);
+                	}
                     results.add(call(
-                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), node, (List<ValueSet<V>>)(List<?>)handle.getPartialValues()));
+                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getname(),false));
+                    //TODO - we assume overloading is no possible for a function handle value - is that Matlab semantics?
                 }
             } else {
                 //TODO more possible values here
@@ -220,7 +245,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         associateInAndOut(node);
     }
     
-    //TODO make it deal with overloading properly
+    //TODO make it deal with overloading properly?
     @Override
     public void caseTIRAbstractCreateFunctionHandleStmt(TIRAbstractCreateFunctionHandleStmt node) {
         if (checkNonViable(node)) return;
@@ -524,22 +549,52 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     /**
      * implements the flow equations for calling functions
      * Returns a Result, doesn't modify anything
+     * 
+     * the function reference is used for overloading, the name is the
+     * name of the function that gets called (for overloading and error reporting purposes)
      */
     private Res<V> call(
-            FunctionReference function,ValueFlowMap<V> flow,
+            FunctionReference functionReference,ValueFlowMap<V> flow,
             TIRCommaSeparatedList args,TIRCommaSeparatedList targets,
-            ASTNode<?> callsite, List<ValueSet<V>> partialArgs){
+            Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite,
+            List<ValueSet<V>> partialArgs, String functionName, boolean checkOverloading){
+    	
     	//get number of requested results
     	int numOfOutputVariables = 1;
-    	if (callsite instanceof TIRAbstractAssignToListStmt){                	
-    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
+    	if (callsite.getASTNode() instanceof TIRAbstractAssignToListStmt){                	
+    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
     	}
 
     	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
-            //TODO - do overloading, deal with dominant args etc.
-            //actually call
+        	FunctionReference function = functionReference;
+
+        	//check overloading
+        	if (checkOverloading && argumentList.size() > 0){
+        		//find the dominant argument
+        		ClassReference dominant = argumentList.getFirst().getMatlabClass();
+        		for (V arg : argumentList){
+        			if (classRepository.getClass(arg.getMatlabClass()).isSuperior(classRepository.getClass(dominant))){
+        				dominant = arg.getMatlabClass();
+        			}
+        		}
+        		//overload if there's an overloaded version
+        		FunctionReference ref = classRepository.getClass(dominant).getMethods().get(functionName);
+        		if (ref != null){
+        			function = ref;
+        		}        	
+        	}
+        	
+        	//give an error if function call cannot be resolved
+        	if (function == null){
+        		//TODO - make proper errors
+        		throw new UnsupportedOperationException(
+        				"call to function "+functionName+" in function call "+this.node.getCall()+" cannot be resolved. trace: \n"
+        				+this.node.getCallString());
+        	}
+        	
+        	//actually call
             //System.out.println("doFunctionCall result "+res);
             if (function.isBuiltin()){
                 Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
@@ -616,6 +671,12 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
            Iterator<ValueSet<V>> iValues = values.iterator();
            Iterator<Name> iNames = targets.asNameList().iterator();
            while (iNames.hasNext()){
+        	   if (!iValues.hasNext()){
+        		   throw new UnsupportedOperationException(
+        				   "Not enough values produced for assignment in function call "
+        						   +this.node.getCall()+" cannot be resolved. trace: \n"
+        						   +this.node.getCallString());
+        	   }
                result.put(iNames.next().getID(), iValues.next());
            }
        } else {

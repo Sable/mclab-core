@@ -29,8 +29,6 @@ import natlab.toolkits.path.FunctionReference;
  * This will take a factory that can construct FunctionAnalysis objects,
  * and a call graph, and run the inter procedural analysis.
  * 
- * Mostly just a cache of analyses
- * 
  * TODO - add support for multiple entry points
  * 
  * @author ant6n
@@ -46,9 +44,8 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     private A mainArgs;
     // TODO - should this be weak or something?
     // should it be a hashmap of hashmaps?? -- or clear after analyze?
-    //see 'Key' below - TODO turn into Call<A>
-    LinkedHashMap<Key,InterproceduralAnalysisNode<F, A, R>> nodes =
-        new LinkedHashMap<Key, InterproceduralAnalysisNode<F,A,R>>();
+    LinkedHashMap<Call<A>,InterproceduralAnalysisNode<F, A, R>> nodes =
+        new LinkedHashMap<Call<A>, InterproceduralAnalysisNode<F,A,R>>();
     
     
     public InterproceduralAnalysis(
@@ -98,7 +95,7 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
      */
     public InterproceduralAnalysisNode<F, A, R> getNode(
             FunctionReference ref,A arg){
-        return nodes.get(new Key(ref,arg));
+        return nodes.get(new Call<A>(ref,arg));
     }
     
     
@@ -114,36 +111,9 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
      * TODO - add more info
      */
     public void putNode(FunctionReference ref, A arg, InterproceduralAnalysisNode<F, A, R> node){
-        nodes.put(new Key(ref,arg), node);
+        nodes.put(new Call<A>(ref,arg), node);
     }
     
-    class Key{
-        FunctionReference ref;
-        A arg;
-        private Key(FunctionReference ref,A arg){
-            this.ref = ref;
-            this.arg = arg;
-        }
-        public int hashCode() {
-            return 0;
-            //System.out.println((ref.hashCode() + 4783973*(arg == null?0:arg.hashCode()))+" - "+getPrettyPrinted());
-            //return ref.hashCode() + 4783973*(arg == null?0:arg.hashCode());
-        }
-        @SuppressWarnings("unchecked")
-        public boolean equals(Object obj) {
-            if (obj instanceof InterproceduralAnalysis.Key) {
-                InterproceduralAnalysis.Key key = (InterproceduralAnalysis.Key) obj;
-                return key.ref.equals(ref) &&
-                ((arg==null || key.arg==null)?(arg==key.arg):key.arg.equals(arg));
-            }
-            return false;
-        }
-        
-        @Override
-        public String toString() {
-            return ref.getname()+"("+arg+")";
-        }
-    }
     
     
     public String getPrettyPrinted(){
@@ -152,6 +122,13 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
             s += node.getPrettyPrinted()+"\n\n";
         }
         return s;
+    }
+    
+    /**
+     * return the function collection that this interprocedural analysis is built upon.
+     */
+    public FunctionCollection getFunctionCollection(){
+    	return callgraph;
     }
     
     @Override

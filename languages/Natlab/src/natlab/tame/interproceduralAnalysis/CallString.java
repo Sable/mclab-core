@@ -23,12 +23,13 @@ import ast.ASTNode;
 
 /**
  * represents a call string
- * This should allow printing stack traces
- * This should be immutable
- * @author ant6n
+ * This should allow printing stack traces when during an analysis an error is encountered.
  * 
- * TODO - intern this?
- * TODO - possibly keep a hashset of parents, to make containment checks faster?
+ * This should be immutable
+ * TODO some methods are not implemented (but easy), ast nodes (callsites) not properly implemented
+ * TODO 
+ *  should callsites be callsite objects, rather than ast nodes? 
+ *  Should the interprocedural analysis node be stored as well?
  * 
  * @param <A> The argument set used for each call
  */
@@ -48,6 +49,29 @@ public class CallString<A> {
     public CallString(CallString<A> parent,FunctionReference ref,A argument,ASTNode callsite){
         this.parent = parent;
         this.call = new Call<A>(ref,argument);
+    }
+    
+    
+    /**
+     * returns the number of elements in the call string
+     */
+    public int size(){
+    	if (parent == null) return 1;
+    	return parent.size() + 1;
+    }
+    
+    /**
+     * returns the most recent call in the call string
+     */
+    public Call<A> getTopCall(){
+    	return call;
+    }
+    
+    /**
+     * returns the parent call string
+     */
+    public CallString<A> getParent(){
+    	return parent;
     }
     
     
@@ -72,8 +96,7 @@ public class CallString<A> {
     
     @Override
     public String toString() {
-        return parent==null?"":parent.toString()
-                +" : "+call;
+        return (parent==null?"":parent.toString())+" : "+call;
     }
     
     @Override

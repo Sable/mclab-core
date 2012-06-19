@@ -39,11 +39,15 @@ public class IncrementalFunctionCollection extends SimpleFunctionCollection{
 	
 	@Override
 	public StaticFunction get(Object key) {
+		//load if necessary
+		if (!containsKey(key)){
+			collect((FunctionReference)key,errors);
+		}
 		//actually load if necessary
 		if (loadCache.contains(key)){
 			super.collect((FunctionReference)key, errors);
 			loadCache.remove(key);
-		}		
+		}
 		//then return
 		return super.get(key);
 	}

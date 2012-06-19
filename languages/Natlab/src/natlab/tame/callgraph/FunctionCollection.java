@@ -1,5 +1,6 @@
 package natlab.tame.callgraph;
 
+import natlab.tame.classes.ClassRepository;
 import natlab.toolkits.path.FunctionReference;
 /**
  * a collection of static functions, referenced by keys FunctionReference
@@ -9,6 +10,14 @@ import natlab.toolkits.path.FunctionReference;
 public interface FunctionCollection {
 	public StaticFunction get(Object functionReference);
 	public FunctionReference getMain();
+	
+	/**
+	 * every function collection should have a class repository associated with it.
+	 * The function collection stores functions which are referenced by function references,
+	 * the class repository stores matlab classes which are referenced by class references.
+	 * This method returns the class repository.
+	 */
+	public ClassRepository getClassRepository();
 	
 	/**
 	 * load the function into the collection. May also include other functions that

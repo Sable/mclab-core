@@ -38,19 +38,19 @@ import natlab.toolkits.path.FunctionReference;
 import analysis.StructuralAnalysis;
 import ast.ASTNode;
 
-public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,Res>, Arg, Res> {
+public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A,R>, A, R> {
     private StaticFunction function;
-    private FAnalysis functionAnalysis;
-    private CallString<Arg> callString;
-    private InterproceduralAnalysis<FAnalysis,Arg,Res> interprocAnalysis;
-    private InterproceduralAnalysisFactory<FAnalysis,Arg,Res> factory;
-    private Arg argument;
+    private F functionAnalysis;
+    private CallString<A> callString;
+    private InterproceduralAnalysis<F,A,R> interprocAnalysis;
+    private InterproceduralAnalysisFactory<F,A,R> factory;
+    private A argument;
     private FunctionCollection callgraph;
-    private HashMap<ASTNode<?>,InterproceduralAnalysisNode<FAnalysis, Arg, Res>> callsites = 
-        new HashMap<ASTNode<?>,InterproceduralAnalysisNode<FAnalysis,Arg,Res>>();
+    private HashMap<ASTNode<?>,Callsite<F,A,R>> callsites = 
+        new HashMap<ASTNode<?>,Callsite<F,A,R>>();
     static final boolean DEBUG = false;
     private boolean isRecursive = false; //this may change during analysis
-    private Res currentRecursiveResult = null;
+    private R currentRecursiveResult = null;
     
     /**
      * constructs an InterproceduralAnalysisNode,
@@ -63,12 +63,12 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
      *        include the call to the function this analysises)
      */
     protected InterproceduralAnalysisNode(
-            InterproceduralAnalysis<FAnalysis,Arg,Res> interprocAnalysis,
+            InterproceduralAnalysis<F,A,R> interprocAnalysis,
             FunctionCollection callgraph,
-            InterproceduralAnalysisFactory<FAnalysis, Arg, Res> analysisFactory,
+            InterproceduralAnalysisFactory<F, A, R> analysisFactory,
             FunctionReference ref,
-            CallString<Arg> callString,
-            Arg argument){
+            CallString<A> callString,
+            A argument){
         if (DEBUG) System.out.println("new intra proc anal node  "+ref+"("+argument+") - "+callString);
         
         //initialize/assign data
@@ -105,9 +105,17 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
     
     
     /**
+     * the same as the other analyze function, except the call object gets
+     * created within the funciton call
+     */
+    public R analyze(FunctionReference functionRef, A arguments, Callsite<F,A,R> callsite){
+    	return analyze(new Call<A>(functionRef,arguments),callsite);
+    }
+    
+    
+    /**
      * computes the Result for the given function, argument set, where the
-     * call is happening at the given callsite, using the given 
-     * function analysis factory.
+     * call is happening at the given callsite
      * 
      * If the given function/argument combination has already been analyzed,
      * then it will not be again analyzed, but rather the previously computed
@@ -120,12 +128,12 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
      * 
      * This should only be called by Function Analyses, during the analysis
      * phase.
-     * Note that this should work even if the supplied callsite is null (but
-     * call strings will be incomplete).
      */
-    public Res analyze(FunctionReference function,Arg arg,ASTNode callsite){
-        Res result = null;
-        InterproceduralAnalysisNode<FAnalysis, Arg, Res> node = null;
+    public R analyze(Call<A> call,Callsite<F,A,R> callsite){
+    	A arg = call.getArguments();
+    	FunctionReference function = call.getFuncionReference();
+        R result = null;
+        InterproceduralAnalysisNode<F, A, R> node = null;
         
         //check whether this is a recursive call
         if (callString.contains(function, arg)){
@@ -145,9 +153,9 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
             if (node == null){
                 if (DEBUG) System.out.println("creating new node "+function.name+"("+arg+")");
                 //create new interpocedural analysis
-                node = new InterproceduralAnalysisNode<FAnalysis, Arg, Res>(
+                node = new InterproceduralAnalysisNode<F, A, R>(
                         interprocAnalysis, callgraph, factory, function,
-                        callString.add(function, arg, callsite), arg);
+                        callString.add(function, arg, callsite.getASTNode()), arg);
             } else {
                 if (DEBUG) System.out.println("found existing node "+node.function.getName()+"("+node.argument+")");
             }
@@ -155,32 +163,38 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         }
         
         //register call site - will overwrite old, invalidated value
-        //TODO
-        setNodeForCallsite(callsite, node);
+        callsite.addCall(call,node);
         return result;
     }
 
     /**
-     * sets/overrides the callsite to call the given node
+     * sets/overrides the callsite object for the given ast node and returns it.
+     * For every pass of the analysis, this should be called to get/set a new
+     * callsite object
      */
-    protected void setNodeForCallsite(ASTNode<?> callsite, 
-            InterproceduralAnalysisNode<FAnalysis, Arg, Res> node){
-        callsites.put(callsite, node);        
+    public Callsite<F,A,R> getCallsiteObject(ASTNode<?> astNode){
+    	Callsite<F,A,R> callsite = new Callsite<F, A, R>(this, astNode);
+        callsites.put(astNode, callsite);
+        return callsite;
     }
     
     public StaticFunction getFunction(){
         return function;
     }
-    public FAnalysis getAnalysis(){
+    public F getAnalysis(){
         return functionAnalysis;
     }
-    public CallString<Arg> getCallString(){
+    public CallString<A> getCallString(){
         return callString;
     }
+    public Call<A> getCall(){
+    	return callString.getTopCall();
+    }
+    
     /**
      * returns the result of the function analysis.
      */
-    public Res getResult(){
+    public R getResult(){
         return functionAnalysis.getResult();
     }
     
@@ -196,6 +210,13 @@ public class InterproceduralAnalysisNode<FAnalysis extends FunctionAnalysis<Arg,
         return "AnalysisNode: "+function.getName()+"("+argument+"):\n"
             + function.getAst().getAnalysisPrettyPrinted((StructuralAnalysis<?>)functionAnalysis, true, true)
             + "\nresult: "+getResult();
+    }
+    
+    /**
+     * returns the interprocedural analysis that this node is part of
+     */
+    public InterproceduralAnalysis<F, A, R> getInterproceduralAnalysis(){
+    	return this.interprocAnalysis;
     }
 }
 

@@ -24,10 +24,10 @@ import natlab.toolkits.filehandling.genericFile.*;
 public class FolderHandler{
     private final Set<String> ACCEPTED_EXTENSIONS=new TreeSet<String>(Arrays.asList(new String[]{".m"}));
 //    private static HashMap<GenericFile, FolderHandler> cache=new HashMap<GenericFile, FolderHandler>(); //TODO only gets big over time. Garbage collect!
-    public Map<String, GenericFile> classes=new HashMap<String, GenericFile>();
-    public Map<String, GenericFile> packages=new HashMap<String, GenericFile>();
+    public Map<String, GenericFile> classes=new HashMap<String, GenericFile>(); //constructors?
+    public Map<String, GenericFile> packages=new HashMap<String, GenericFile>(); //overloaded methods besides constructors?
     public Map<String, GenericFile> functions=new HashMap<String, GenericFile>();
-    public Map<String, Map<String, GenericFile>> specializedFunction=new HashMap<String, Map<String, GenericFile>>();
+    public Map<String, Map<String, GenericFile>> specializedFunction=new HashMap<String, Map<String, GenericFile>>(); 
     public Map<String, GenericFile> privateFunctions=new HashMap<String, GenericFile>();
     
     private Collection<GenericFile> getFilteredChildren(GenericFile dir){
@@ -107,12 +107,21 @@ public class FolderHandler{
 	return null;
     }
     
+    
     public GenericFile lookupSpecialized(String name, String type){
 	if (specializedFunction.containsKey(name)){
 	    if (specializedFunction.get(name).containsKey(type))
 		return specializedFunction.get(name).get(type);
 	}
 	return null;
+    }
+    
+    public List<GenericFile> getAllSpecialized(String classname){
+    	ArrayList<GenericFile> list = new ArrayList<GenericFile>();
+    	for (Map<String,GenericFile> map : specializedFunction.values()){
+    		if (map.containsKey(classname)) list.add(map.get(classname));
+    	}
+    	return list;
     }
 
     public Map<String, GenericFile> lookupSpecializedAll(String name){
