@@ -2,6 +2,7 @@ package natlab.tame.valueanalysis.components.isComplex;
 
 import java.util.List;
 
+import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.Value;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.analysis.Mergable;
@@ -60,6 +61,14 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
     public void flagItsError(){
     	this.isError=true;
     }
+    
+    public boolean equals(isComplexInfo<V> o){
+    	if(this.geticType()==o.geticType()){
+    		return true;
+    	}
+    	else
+    	return false;//FIXME
+    }
 	
 	@Override
 	public isComplexInfo<V> merge(isComplexInfo<V> o) {
@@ -68,6 +77,9 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
 		if(this.equals(o)){
     		return this;
     	}
+		
+		
+		
 		
 		else
 		{
