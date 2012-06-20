@@ -1312,7 +1312,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractArrayBinaryArithmetic extends AbstractArrayBinaryNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractArrayBinaryArithmetic extends AbstractArrayBinaryNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractArrayBinaryArithmetic(this,arg);
@@ -1336,6 +1336,15 @@ public abstract class Builtin {
                 shapePropInfo = ShapePropTool.parse("[m,n],[n,k]->[m,k]");
             }
             return shapePropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("X,X ->R || R,R ->R || A,A->NUMXARGS>0?X:A");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -3901,7 +3910,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Colon extends AbstractMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static class Colon extends AbstractMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Colon singleton = null;
         public static Colon getInstance(){
@@ -3946,6 +3955,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R ->R || A,A->NUMXARGS>0?X:A");
+            }
+            return isComplexPropInfo;
         }
 
     }
