@@ -73,7 +73,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (! isAnalyzed()) this.analyze();
         Res<V> result = Res.newInstance();
         ValueFlowMap<V> flowResult = getOutFlowSets().get(function.getAst());
-        //TODO - make sure there's the right number of outputs
+        //TODO - make sure there's the right number of outputs<AggrValue<AdvancedMatrixValue>>
         for (Name out : function.getAst().getOutputParamList()){
             result.add(flowResult.get(out.getID()));
         }

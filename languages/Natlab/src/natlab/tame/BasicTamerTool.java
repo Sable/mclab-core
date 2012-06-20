@@ -66,7 +66,8 @@ public class BasicTamerTool {
 	
 	public static void main(String[] args){
 		
-		GenericFile gFile = GenericFile.create("/home/xuli/test/hello.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
+		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();

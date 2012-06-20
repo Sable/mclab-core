@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 public class BasicMain {
 
 	public static void main(String[] args){
-		String file = "/home/xuli/test/hello.m";
+		String file = "/home/2011/vkumar5/hello.m";
 
 		//  prompt the user to enter the number of input argument of this function
 		System.out.print("Please enter the number of input argument of this function: ");

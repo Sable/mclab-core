@@ -29,6 +29,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
 			AggrValue<BasicMatrixValue> lower,
 			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {  //XU try to add shape result into it
 		//FIXME do something proper here
+		System.out.println("Inside forRange");
 		if (inc != null){
 			if (Debug) System.out.println("inside forRange "+ ((HasShape)(propagator.call("colon", Args.newInstance(lower,upper))
 					.get(0).iterator().next())).getShape());
