@@ -41,9 +41,6 @@ public class AdvancedMatrixValuePropagator extends
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseBuiltin(Builtin builtin,
 			Args<AggrValue<AdvancedMatrixValue>> arg) {
-		// deal with constants
-		if (Debug)
-			System.out.println("built-in fn's arguments are " + arg);
 		Constant cResult = builtin.visit(constantProp, arg);
 		if (cResult != null) {
 			return Res
@@ -54,16 +51,14 @@ public class AdvancedMatrixValuePropagator extends
 		// if the result is not a constant, just do mclass propagation
 		List<Set<ClassReference>> matchClassResult = builtin.visit(classProp,
 				arg);
-		if (Debug)
-			System.out.println("classProp results are " + matchClassResult);
 		if (matchClassResult == null) { // class prop returned error
 			return Res.newErrorResult(builtin.getName()
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
-//		if (Debug)
-//			System.out.println("shapeProp results are " + matchShapeResult);
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = //null;
+/**/	builtin.visit(shapeProp, arg);
+
 		if (matchShapeResult == null) {
 			if (Debug)
 				System.out.println("shape results are empty");
@@ -77,14 +72,14 @@ public class AdvancedMatrixValuePropagator extends
 
 		// build results out of the result classes and shape XU modified, not
 		// finished!!!
-		return matchResultToRes(matchClassResult, matchShapeResult, 
+		return matchResultToRes(matchClassResult, matchShapeResult,
 				matchisComplexInfoResult);
 
 	}
 
 	private Res<AggrValue<AdvancedMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
-			 List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult,
+			List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult,
 			List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult) {
 		// go through and fill in result
 		Res<AggrValue<AdvancedMatrixValue>> result = Res.newInstance();
@@ -92,12 +87,14 @@ public class AdvancedMatrixValuePropagator extends
 			HashMap<ClassReference, AggrValue<AdvancedMatrixValue>> map = new HashMap<ClassReference, AggrValue<AdvancedMatrixValue>>();
 
 			for (ClassReference classRef : values) {
-				map.put(classRef, new AdvancedMatrixValue(
-						new AdvancedMatrixValue(
+				map.put(classRef,
+						new AdvancedMatrixValue(new AdvancedMatrixValue(
 								(PrimitiveClassReference) classRef),
-						 matchShapeResult.get(0),
-						matchisComplexInfoResult.get(0)));// FIXME a little bit
-															// tricky
+/**/								matchShapeResult.get(0),
+								matchisComplexInfoResult.get(0)));// FIXME a
+																	// little
+																	// bit
+																	// tricky
 			}
 			result.add(ValueSet.newInstance(map));
 			if (Debug)
@@ -106,21 +103,11 @@ public class AdvancedMatrixValuePropagator extends
 		return result;
 	}
 
+	
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseAbstractConcatenation(
 			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg) {
-		if (Debug)
-			System.out
-					.println("inside AdvancedMatrixValuePropagator caseAbstractConcatenation!");// XU
-		// XU add this block
-//		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin
-//				.visit(shapeProp, arg);
-//		if (Debug)
-//			System.out.println("shapeProp results are " + matchShapeResult);
-//		if (matchShapeResult == null) {
-//			if (Debug)
-//				System.out.println("shape results are empty");
-//		}
+
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
 				.visit(isComplexInfoProp, arg);
 		if (matchisComplexInfoResult == null) {
@@ -130,8 +117,8 @@ public class AdvancedMatrixValuePropagator extends
 		return Res
 				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
 						new AdvancedMatrixValue(
-								(PrimitiveClassReference) getDominantCatArgClass(arg)),
-						 //matchShapeResult.get(0),
+								(PrimitiveClassReference)getDominantCatArgClass(arg)),
+
 						matchisComplexInfoResult.get(0)));// FIXME a little bit
 															// tricky
 	}

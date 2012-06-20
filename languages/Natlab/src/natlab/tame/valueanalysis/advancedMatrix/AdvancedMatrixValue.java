@@ -67,10 +67,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	 */
 	public AdvancedMatrixValue(Constant constant) {
 		super(constant.getMatlabClass());
-//		if (Debug)
-//			System.out.println("inside AdvancedMatrixValue constant");
-//		if (Debug)
-//			System.out.println(constant.getShape());
+
 		shape = (new ShapeFactory<AggrValue<AdvancedMatrixValue>>(factory))
 				.newShapeFromIntegers(constant.getShape());
 		iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
@@ -78,7 +75,19 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		this.constant = constant;
 	}
 
-	
+	/**
+	 * Use this constructor if mclass and constant value is provided by the user
+	 */
+	public AdvancedMatrixValue(PrimitiveClassReference aClass, Constant constant) {
+		super(aClass);
+		
+		shape = (new ShapeFactory<AggrValue<AdvancedMatrixValue>>(factory))
+				.newShapeFromIntegers(constant.getShape());
+		iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+				factory)).newisComplexInfoFromConst(constant.getisComplexInfo());// TODO
+		this.constant = constant;
+		
+	}
 
 	/**
 	 * returns true if the represented data is a constant
@@ -95,10 +104,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		return constant;
 	}
 
-//	public Shape<AggrValue<AdvancedMatrixValue>> getShape() {
-//		return shape;
-//	}
-
+	
 	public isComplexInfo<AggrValue<AdvancedMatrixValue>> getisComplexInfo() {
 		return iscomplex;
 	}
@@ -109,6 +115,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	@Override
 	public AdvancedMatrixValue merge(AggrValue<AdvancedMatrixValue> other) {
+		
 		if (!(other instanceof AdvancedMatrixValue))
 			throw new UnsupportedOperationException(
 					"can only merge a Matrix Value with another Matrix Value");
@@ -116,14 +123,14 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 			throw new UnsupportedOperationException(
 					"only Values with the same class can be merged, trying to merge :"
 							+ this + ", " + other);
-		System.out.println("this constant is " + constant);
+		System.out.println("this constant is ~" + constant+" "+other);
 		
 		if (constant == null) {
 
 			if (((AdvancedMatrixValue) other).constant == null) {
 			
 				if (iscomplex == null) {
-					return this;
+							return this;
 				}
 				if (iscomplex.equals(((AdvancedMatrixValue) other).getisComplexInfo()) != true) {
 					return new AdvancedMatrixValue(new AdvancedMatrixValue(
@@ -132,7 +139,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 									.getisComplexInfo()));
 				}
 			}
-			  
+			
 			return this;
 			
 			
@@ -146,6 +153,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 				this.iscomplex.merge(((AdvancedMatrixValue) other).getisComplexInfo()));
 		
 			System.out.println(newMatrix);
+			
 		return newMatrix;
 	}
 
@@ -160,14 +168,12 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 			return constant.equals(m.constant);
 		if (Debug)
 			System.out.println(m.getMatlabClass());
-//		if (Debug)
-//			System.out.println(((HasShape) ((AdvancedMatrixValue) obj))
-//					.getShape());
-//		if ((shape == null)
-//				&& (((HasShape) ((AdvancedMatrixValue) obj)).getShape() == null)) {
-//			return (classRef.equals(m.getMatlabClass())) && true;
-//		}
-//		return (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
+
+		if ((shape == null)
+				&& (((HasShape) ((AdvancedMatrixValue) obj)).getShape() == null)) {
+			return (classRef.equals(m.getMatlabClass())) && true;
+		}
+		boolean bs = (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
 		
 		//TODO NOW - complex part
 		
@@ -175,8 +181,8 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 				&& (((HasisComplexInfo) ((AdvancedMatrixValue) obj)).getisComplexInfo() == null)){
 			return (classRef.equals(m.getMatlabClass())) && true;
 		}
-		return (classRef.equals(m.getMatlabClass()) && iscomplex
-				.equals(((HasisComplexInfo) ((AdvancedMatrixValue) obj)).getisComplexInfo()));
+		return ((classRef.equals(m.getMatlabClass()) && iscomplex
+				.equals(((HasisComplexInfo) ((AdvancedMatrixValue) obj)).getisComplexInfo()))&&bs);
 	}
 
 	@Override

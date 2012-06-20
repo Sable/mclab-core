@@ -26,12 +26,13 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
 	public AggrValue<AdvancedMatrixValue> forRange(
 			AggrValue<AdvancedMatrixValue> lower,
 			AggrValue<AdvancedMatrixValue> upper, AggrValue<AdvancedMatrixValue> inc) {  
+		System.out.println("Inside forRange");
 		//FIXME do something proper here
 		if (inc != null){//FIXME
 			
 			return new AdvancedMatrixValue((new AdvancedMatrixValue(
 					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper))
+					(propagator.call("colon", Args.newInstance(lower,inc,upper))
 							.get(0).iterator().next().getMatlabClass()))),((HasisComplexInfo)(propagator.call("colon", Args.newInstance(lower,upper))
 									.get(0).iterator().next())).getisComplexInfo());
 		} else {
