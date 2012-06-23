@@ -55,10 +55,18 @@ public class TIRCellArrayGetStmt extends TIRAbstractAssignToListStmt {
     }
     
     //get arguments
-    public TIRCommaSeparatedList getArguments(){
+    public TIRCommaSeparatedList getIndices(){
          return (TIRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
     }    
-    
+
+    /**
+     * deprecated, use getIndices() instead
+     */
+    @Deprecated
+    public TIRCommaSeparatedList getArguments(){
+        return (TIRCommaSeparatedList)(((CellIndexExpr)getRHS()).getArgList());
+   }    
+
     
     @Override
     public void tirAnalyze(TIRNodeCaseHandler irHandler) {

@@ -2,6 +2,7 @@ package natlab.tame.callgraph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import natlab.CompilationProblem;
 import natlab.toolkits.path.FileEnvironment;
@@ -45,8 +46,17 @@ public class IncrementalFunctionCollection extends SimpleFunctionCollection{
 		}
 		//actually load if necessary
 		if (loadCache.contains(key)){
-			super.collect((FunctionReference)key, errors);
-			loadCache.remove(key);
+			//make sure function is not actually loaded, so we won't load it a second time
+			if (super.containsKey(key)){
+				loadCache.remove(key);
+			} else {		
+				super.collect((FunctionReference)key, errors);
+				//remove whatever was loaded
+				Iterator<FunctionReference> iterator = loadCache.iterator();
+				while (iterator.hasNext()){
+					if (super.containsKey(iterator.next())) iterator.remove();
+				}
+			}
 		}
 		//then return
 		return super.get(key);

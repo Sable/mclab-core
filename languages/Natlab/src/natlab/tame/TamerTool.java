@@ -129,10 +129,11 @@ public class TamerTool {
 	}
 	
 	
-	public static <D extends MatrixValue<D>> Callgraph<D> getCallgraph(FileEnvironment env,List<AggrValue<D>> inputValues,AggrValueFactory<D> factory){
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <D extends MatrixValue<D>> Callgraph<D> getCallgraph(FileEnvironment env,List<? extends AggrValue<D>> inputValues,AggrValueFactory<D> factory){
 		return new Callgraph<D>(
 				env,
-				Args.<AggrValue<D>>newInstance(inputValues),
+				new Args(inputValues),
 				factory);
 	}
 	

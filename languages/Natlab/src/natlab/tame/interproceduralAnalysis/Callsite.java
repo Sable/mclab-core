@@ -16,6 +16,13 @@ import ast.ASTNode;
  * different callsite objects associated with it - i.e. up to one for each 
  * interprocedural analysis node.
  * 
+ * To add call edges that are analyzed by an interprocedural analysis, an analysis
+ * has to call the analyze method of an interprocedural analysis node. That's also
+ * where analyses have to create callsites.
+ * 
+ * Analyses can directly add un-analyzed call edges for example for calls to builtin
+ * nodes.
+ * 
  * TODO - should there be a second list of un-analyzed calls, for example to model builtin calls?
  * @author adubra
  */
@@ -24,6 +31,7 @@ public class Callsite<F extends FunctionAnalysis<A,R>, A, R> {
 	private ASTNode<?> astNode;
 	private HashMap<Call<A>,InterproceduralAnalysisNode<F,A,R>> calls
 			= new HashMap<Call<A>,InterproceduralAnalysisNode<F,A,R>>();
+	private HashSet<Call<A>> builtinCalls = new HashSet<Call<A>>();
 	
 	/**
 	 * creates a new callsite - should only be called from within the analysis framework
@@ -62,6 +70,21 @@ public class Callsite<F extends FunctionAnalysis<A,R>, A, R> {
 	 */
 	public Map<Call<A>,InterproceduralAnalysisNode<F,A,R>> getCalls(){
 		return Collections.unmodifiableMap(this.calls);
+	}
+	
+	/**
+	 * adds an un-analyzed call edges, for example a call to a builtin function.
+	 * This method should only be called  by an analysis.
+	 */
+	public void addBuiltinCall(Call<A> call){
+		builtinCalls.add(call);
+	}
+	
+	/**
+	 * returns the set of un-analyzed call edges as an unmodifiable set
+	 */
+	public Set<Call<A>> getBuiltinCalls(){
+		return Collections.unmodifiableSet(builtinCalls);
 	}
 }
 

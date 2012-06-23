@@ -5,7 +5,7 @@ import natlab.toolkits.path.FunctionReference;
 /**
  * an element of a call String
  * immutable
- * @author ant6n
+ * TODO - should there be a factory method, to get rid of annoying generic constructor?
  */
 public class Call<Arg> {
     private FunctionReference functionRef;

@@ -36,7 +36,7 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
     private static final long serialVersionUID = 1L;
     private int nargout = 1;
     
-    private Args(Collection<V> list){
+    public Args(Collection<V> list){
         super(list);
     }
     private Args(int nargout,Collection<V> list){

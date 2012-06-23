@@ -30,7 +30,8 @@ package natlab.tame.interproceduralAnalysis;
  */
 
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.*;
 
 import natlab.tame.callgraph.FunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
@@ -130,6 +131,7 @@ public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A,R>, A, R> 
      * phase.
      */
     public R analyze(Call<A> call,Callsite<F,A,R> callsite){
+    	System.out.println("analyze "+call);
     	A arg = call.getArguments();
     	FunctionReference function = call.getFuncionReference();
         R result = null;
@@ -143,8 +145,9 @@ public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A,R>, A, R> 
                 node.currentRecursiveResult = node.getAnalysis().getDefaultResult();
                 if (DEBUG) System.out.println("created default result "+node.currentRecursiveResult);
             }
-            //set the node to be recursive
+            //set the node to be recursianalyzeve
             node.isRecursive = true;
+            callsite.addCall(call, node);
             return node.currentRecursiveResult;
         } else {
             //not a recursive call - try to find the result in the interprocedural analysis
@@ -163,6 +166,7 @@ public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A,R>, A, R> 
         }
         
         //register call site - will overwrite old, invalidated value
+        System.out.println("add to callsite "+call);
         callsite.addCall(call,node);
         return result;
     }
@@ -172,10 +176,23 @@ public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A,R>, A, R> 
      * For every pass of the analysis, this should be called to get/set a new
      * callsite object
      */
-    public Callsite<F,A,R> getCallsiteObject(ASTNode<?> astNode){
+    public Callsite<F,A,R> createCallsiteObject(ASTNode<?> astNode){
     	Callsite<F,A,R> callsite = new Callsite<F, A, R>(this, astNode);
         callsites.put(astNode, callsite);
         return callsite;
+    }
+    
+    /**
+     * returns the call site object associated with the ast node
+     */
+    public Callsite<F, A, R> getCallsite(ASTNode<?> node){
+    	return callsites.get(node);
+    }
+    /**
+     * returns all call sites
+     */
+    public Map<ASTNode<?>,Callsite<F,A,R>> getAllCallsites(){
+    	return Collections.unmodifiableMap(callsites);
     }
     
     public StaticFunction getFunction(){

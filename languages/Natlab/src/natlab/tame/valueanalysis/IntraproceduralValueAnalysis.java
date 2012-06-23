@@ -1,6 +1,5 @@
 package natlab.tame.valueanalysis;
 
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.*;
 import java.util.List;
 
@@ -24,9 +23,9 @@ import ast.*;
  * variablename->classname->value
  * 
  * This class operates on the static IR.
- * @author ant6n
+ * 
  */
-public class IntraproceduralValueAnalysis<V extends Value<V>>         //XU commentted: this class support Value, for me, I use BasicMatrixValue.
+public class IntraproceduralValueAnalysis<V extends Value<V>>
 extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<V>>
 implements FunctionAnalysis<Args<V>, Res<V>>{
     StaticFunction function;
@@ -118,7 +117,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
         //set new callsite
-        Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite = this.node.getCallsiteObject(node);
+        Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite = this.node.createCallsiteObject(node);
         //find function
         String functionName = node.getFunctionName().getID();
         FunctionReference ref = function.getCalledFunctions().get(functionName);
@@ -131,7 +130,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         		checkOverloading = false; //if the found function is in the same file it cannot be overloaded
         	} else {
         		checkOverloading = true; //if it's not in the same function, we assume the function can be overloaded
-        		//TODO - check this, which functions can be overloaded?
+        		//TODO - check this, which functions can be overloaded? - what about private functions etc?
+        		//check via ref.referenceType
         	}
         }
         //do call
@@ -228,7 +228,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 //TODO - make this independent of the specific function handle value implementation
                 for (FunctionHandleValue.FunctionHandle handle :((FunctionHandleValue<?>)((Object)arrayValue)).getFunctionHandles()){
                 	if (callsite == null){ //create new callsite object if needed
-                		callsite = this.node.getCallsiteObject(node);
+                		callsite = this.node.createCallsiteObject(node);
                 	}
                     results.add(call(
                           handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getname(),false));
@@ -421,9 +421,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //go through all possible array values
         for (V arrayValue : array){
             //go through all possible index setss
-            //TODO - deal with overloading etc.
-            //TODO - errors on assign - use is assign to var??
-            for (List<V> indizes : cross(flow,node.getArguments())){
+            for (List<V> indizes : cross(flow,node.getIndices())){
+                //TODO - deal with overloading etc.
                 results.add(arrayValue.cellSubsref(Args.newInstance(indizes)));
             }
         }
@@ -569,7 +568,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
         	FunctionReference function = functionReference;
-
+        	
         	//check overloading
         	if (checkOverloading && argumentList.size() > 0){
         		//find the dominant argument
@@ -599,6 +598,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             if (function.isBuiltin()){
                 Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
                 //spcial cases for some known functions
+            	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
                 if (function.getname().equals("nargin") && argsObj.size() == 0){
                     results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
                 } else {

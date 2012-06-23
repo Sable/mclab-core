@@ -60,6 +60,15 @@ public class TIRCommaSeparatedList extends List<Expr> implements TIRNode {
             add(e);
         }
     }
+    
+    public static TIRCommaSeparatedList createFromNames(java.util.List<Name> names){
+        TIRCommaSeparatedList result = new TIRCommaSeparatedList();
+        for (Name e : names){
+            result.add(new NameExpr(e));
+        }
+        return result;
+    }
+    
 
     
     @Override

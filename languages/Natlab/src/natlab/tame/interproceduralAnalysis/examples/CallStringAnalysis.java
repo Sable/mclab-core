@@ -82,7 +82,7 @@ public class CallStringAnalysis extends AbstractDepthFirstAnalysis<CallStringAna
                     result.add(callstring.add(ref, null, null)); //TODO
                 } else {
                     System.out.println(" call "+ref);
-                    Callsite<CallStringAnalysis,CallString<?>,CallStringAnalysis.CallStrings> callsite = this.node.getCallsiteObject(node);
+                    Callsite<CallStringAnalysis,CallString<?>,CallStringAnalysis.CallStrings> callsite = this.node.createCallsiteObject(node);
                     Call<CallString<?>> call = new Call<CallString<?>>(ref, callstring);
                     result.addAll(this.node.analyze(call, callsite));
                 }

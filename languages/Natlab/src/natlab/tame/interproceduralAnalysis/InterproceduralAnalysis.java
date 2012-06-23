@@ -18,8 +18,7 @@
 
 package natlab.tame.interproceduralAnalysis;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import natlab.tame.callgraph.FunctionCollection;
 import natlab.toolkits.path.FunctionReference;
@@ -44,8 +43,8 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     private A mainArgs;
     // TODO - should this be weak or something?
     // should it be a hashmap of hashmaps?? -- or clear after analyze?
-    LinkedHashMap<Call<A>,InterproceduralAnalysisNode<F, A, R>> nodes =
-        new LinkedHashMap<Call<A>, InterproceduralAnalysisNode<F,A,R>>();
+    Map<Call<A>,InterproceduralAnalysisNode<F, A, R>> nodes =
+        new WeakHashMap<Call<A>, InterproceduralAnalysisNode<F,A,R>>();
     
     
     public InterproceduralAnalysis(
@@ -82,7 +81,6 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     
     /**
      * returns the node for the main
-     * TODO - this should be entry points
      */
     public InterproceduralAnalysisNode<F, A, R> getMainNode(){
         return getNode(callgraph.getMain(),mainArgs);
@@ -108,9 +106,8 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     
     /**
      * puts the node into the analysis
-     * TODO - add more info
      */
-    public void putNode(FunctionReference ref, A arg, InterproceduralAnalysisNode<F, A, R> node){
+    protected void putNode(FunctionReference ref, A arg, InterproceduralAnalysisNode<F, A, R> node){
         nodes.put(new Call<A>(ref,arg), node);
     }
     
