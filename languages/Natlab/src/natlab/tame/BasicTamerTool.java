@@ -11,8 +11,6 @@ import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.*;
 import natlab.tame.valueanalysis.value.Args;
@@ -66,7 +64,7 @@ public class BasicTamerTool {
 	
 	public static void main(String[] args){
 		
-		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/xuli/test/hello.m"); //file -> generic file
 		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
