@@ -209,6 +209,18 @@ No static linking is done.
     </boolopt>
   </section>
 
+  <section>
+  	<name>Version option</name>
+  	<boolopt>
+	  	<name>Current version of Natlab</name>
+  		<alias>v</alias>
+  		<alias>version</alias>
+  		<short_desc>Get the current version of Natlab</short_desc>
+  		<long_desc>
+  			Tells the version of the source code from which this jar file was compiled.
+  		</long_desc>
+	</boolopt>
+  </section>
 
   <!-- static stuff ********************************************** -->
   <section>
@@ -224,6 +236,9 @@ No static linking is done.
   			to the Tame intermediate representation.
   		</long_desc>
 	</boolopt>
+
+
+
   	<boolopt>
   		<name>inline a whole program into one function</name>
   		<alias>inline</alias>

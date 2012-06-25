@@ -22,6 +22,7 @@
 package natlab;
 
 import natlab.options.Options;
+
 //import natlab.toolkits.analysis.ForVisitor;
 import ast.*;
 import natlab.server.*;
@@ -47,7 +48,7 @@ import natlab.refactoring.*;
 
 import natlab.toolkits.rewrite.Validator;
 
-
+import natlab.VersionInfo;
 import natlab.toolkits.filehandling.*;
 
 /*import matlab.MatlabParser;
@@ -142,6 +143,11 @@ public class Main
                 if (options.pref()){
                     NatlabPreferences.modify(options);
                     return;
+                }
+                
+                if (options.version()){
+                	System.out.println("The version of this release is: "+VersionInfo.getVersion(options));
+                	return;
                 }
                 
                 if (options.tame()){
