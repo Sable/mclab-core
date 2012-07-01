@@ -22,6 +22,7 @@ import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FilePathEnvironment;
 
 public class AdvancedTamerTool {
+	
 	public IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>> 
     tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<AdvancedMatrixValue>> inputValues){
 		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
@@ -84,8 +85,8 @@ public static void main(String[] args){
 
 public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues() {
 	List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(1);
-	ls.add(PrimitiveClassReference.INT8);
-	//ls.add(PrimitiveClassReference.DOUBLE);
+	//ls.add(PrimitiveClassReference.INT8);
+	ls.add(PrimitiveClassReference.DOUBLE);
 	
 	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
 	for (PrimitiveClassReference ref : ls){

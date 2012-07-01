@@ -112,7 +112,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseRem(Builtin builtin,Arg arg){ return caseAbstractDividingElementalArithmetic(builtin,arg); }
     
     //array wise binary numeric matrix function
-    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }
+    public Ret caseAbstractArrayBinaryNumericFunction(Builtin builtin,Arg arg){ return caseAbstractBinaryNumericFunction(builtin,arg); }    
+    //TODO@Vineet confirm if the output has to be real ?
     public Ret caseCross(Builtin builtin,Arg arg){ return caseAbstractArrayBinaryNumericFunction(builtin,arg); }
     
     //binary matrix arithmetic - doesn't mix integer types

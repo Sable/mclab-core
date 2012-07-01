@@ -571,7 +571,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractDiagonalSensitive extends AbstractImproperAnyMatrixFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDiagonalSensitive(this,arg);
@@ -599,6 +599,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,A? -> R || X,A? -> A");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -690,7 +699,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractUnaryNumericFunction extends AbstractProperNumericFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryNumericFunction(this,arg);
@@ -720,6 +729,15 @@ public abstract class Builtin {
             return classPropInfo;
         }
 
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static abstract class AbstractElementalUnaryNumericFunction extends AbstractUnaryNumericFunction  {
         //visit visitor
@@ -745,7 +763,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Imag extends AbstractElementalUnaryNumericFunction  {
+    public static class Imag extends AbstractElementalUnaryNumericFunction implements HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Imag singleton = null;
         public static Imag getInstance(){
@@ -761,6 +779,15 @@ public abstract class Builtin {
             return "imag";
         }
         
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->X");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Abs extends AbstractElementalUnaryNumericFunction  {
         //returns the singleton instance of this class
@@ -835,12 +862,21 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractElementalUnaryArithmetic extends AbstractElementalUnaryNumericFunction  {
+    public static abstract class AbstractElementalUnaryArithmetic extends AbstractElementalUnaryNumericFunction implements HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractElementalUnaryArithmetic(this,arg);
         }
         
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->NUMXARGS>0?X:R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Uplus extends AbstractElementalUnaryArithmetic  {
         //returns the singleton instance of this class
@@ -876,7 +912,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractRoundingOperation extends AbstractElementalUnaryNumericFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractRoundingOperation extends AbstractElementalUnaryNumericFunction implements HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractRoundingOperation(this,arg);
@@ -891,6 +927,15 @@ public abstract class Builtin {
                 matlabClassPropInfo.setVar("natlab",getClassPropagationInfo());
             }
             return matlabClassPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->NUMXARGS>0?X:R");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -1032,7 +1077,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Complex extends AbstractElementalBinaryNumericFunction implements HasClassPropagationInfo {
+    public static class Complex extends AbstractElementalBinaryNumericFunction implements HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Complex singleton = null;
         public static Complex getInstance(){
@@ -1057,6 +1102,15 @@ public abstract class Builtin {
                 matlabClassPropInfo.setVar("natlab",getClassPropagationInfo());
             }
             return matlabClassPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R? -> X");
+            }
+            return isComplexPropInfo;
         }
 
         private CP classPropInfo = null;
@@ -1184,7 +1238,7 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractDividingElementalArithmetic extends AbstractElementalBinaryArithmetic implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDividingElementalArithmetic(this,arg);
@@ -1208,6 +1262,15 @@ public abstract class Builtin {
                 shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
             }
             return shapePropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A->A");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -1279,7 +1342,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractArrayBinaryNumericFunction extends AbstractBinaryNumericFunction implements HasShapePropagationInfo {
+    public static abstract class AbstractArrayBinaryNumericFunction extends AbstractBinaryNumericFunction implements HasShapePropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractArrayBinaryNumericFunction(this,arg);
@@ -1292,6 +1355,15 @@ public abstract class Builtin {
                 shapePropInfo = ShapePropTool.parse("M,M,anyDimensionBigger(3)->M");
             }
             return shapePropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A,R?->A");
+            }
+            return isComplexPropInfo;
         }
 
     }
