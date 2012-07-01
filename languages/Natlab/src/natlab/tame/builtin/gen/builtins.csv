@@ -235,7 +235,7 @@ rem
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
 -Shape(M,M,anyDimensionBigger(3)->M)
--isComplex(A,A,R?->A)
+-isComplex(A,A,R?->R)
 #TODO@Vineet confirm if the output has to be real ?
 cross
 
