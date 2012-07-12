@@ -38,6 +38,13 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	public AdvancedMatrixValue(PrimitiveClassReference aClass) {
 		super(aClass);
 	}
+	
+	public AdvancedMatrixValue(PrimitiveClassReference aClass, String isComplex) {
+		super(aClass);
+		this.iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+				factory)).newisComplexInfoFromConst(isComplex);
+	}
+	
 
 	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
 			Shape<AggrValue<AdvancedMatrixValue>> shape) {

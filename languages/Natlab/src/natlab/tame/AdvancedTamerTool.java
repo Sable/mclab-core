@@ -65,7 +65,7 @@ public static void main(String[] args){
 	GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
 	/*/home/xuli/test/hello.m */
 	FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
-	List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues();
+	List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
 	SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 	ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 	Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
@@ -83,16 +83,28 @@ public static void main(String[] args){
     }
 }
 
-public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues() {
+public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(String[] args) {
 	List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(1);
 	//ls.add(PrimitiveClassReference.INT8);
-	ls.add(PrimitiveClassReference.DOUBLE);
+//	ls.add(PrimitiveClassReference.DOUBLE);
+//	
+//	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
+//	for (PrimitiveClassReference ref : ls){
+//		list.add(new AdvancedMatrixValue(ref));      //TODO change to read isComplex input from user
+//	}
 	
-	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
-	for (PrimitiveClassReference ref : ls){
-		list.add(new AdvancedMatrixValue(ref));      //TODO change to read isComplex input from user
+	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(args.length);
+	for(String argSpecs : args)
+	{
+		String delims = "[\\&]";
+		String[] specs = argSpecs.split(delims);
+		
+		/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
+		list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,specs[2])); 
+		
+   	
 	}
-	
 	return list;
+
 }
 }
