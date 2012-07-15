@@ -73,6 +73,8 @@
 
 	<target name="gen.scanner.tests" depends="set.bin.dir">
           <echo message="${basedir}" />
+		<!--My additions-->
+		 <echo message="${bin.dir}" />
 		<echo message="Generating scanner tests" />
 		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${lexer.test.list.file}" />

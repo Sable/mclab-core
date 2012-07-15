@@ -83,6 +83,30 @@ public static void main(String[] args){
     }
 }
 
+public ValueAnalysis<AggrValue<AdvancedMatrixValue>> analyze(String[] args, FileEnvironment env){
+	
+	//GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); 
+	/*/home/xuli/test/hello.m */
+	//FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
+	List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
+	SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
+	ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
+	Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+	ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
+			callgraph, 
+			/*Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))*/
+			Args.newInstance(inputValues), 
+			factory);
+	System.out.println(analysis.toString());
+	
+	
+    for (int i = 0; i < analysis.getNodeList().size(); i++){
+    	System.out.println(ValueAnalysisPrinter.prettyPrint(
+    			analysis.getNodeList().get(i).getAnalysis()));        	
+    }
+	return analysis;
+}
+
 public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(String[] args) {
 	List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(1);
 	//ls.add(PrimitiveClassReference.INT8);
