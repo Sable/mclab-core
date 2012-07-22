@@ -52,8 +52,13 @@ public class ShapeFactory<V extends Value<V>> {
     	String[] array = s.split("[\\*]");
     	ArrayList<Integer> list = new ArrayList<Integer>();
     	for(String a : array){
-    		Integer i = Integer.parseInt(a);
-    		list.add(i);
+    		if(a.matches("[\\?]")){
+    			list.add(null);
+    		}
+    		else{
+        		Integer i = Integer.parseInt(a);
+        		list.add(i);
+    		}
     	}
     	return new Shape<V>(factory,list);
     }
@@ -96,7 +101,7 @@ public class ShapeFactory<V extends Value<V>> {
     
     public static void main(String[] args){
     	ShapeFactory sf = new ShapeFactory();
-    	Shape<AggrValue<BasicMatrixValue>> testShape = sf.newShapeFromInputString("3*3");
+    	Shape<AggrValue<BasicMatrixValue>> testShape = sf.newShapeFromInputString("3*?*2");
     	System.out.println(testShape);
     }
 	
