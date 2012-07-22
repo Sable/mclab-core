@@ -2,6 +2,8 @@ package natlab.tame.valueanalysis.components.shape;
 
 import java.util.*;
 
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.*;
 
@@ -43,6 +45,18 @@ public class ShapeFactory<V extends Value<V>> {
     	//return new Shape<V>(factory,dims);
     }
     
+    /**
+     * return a shape using the given input string, like 3x3...
+     */
+    public Shape<V> newShapeFromInputString(String s){
+    	String[] array = s.split("[\\*]");
+    	ArrayList<Integer> list = new ArrayList<Integer>();
+    	for(String a : array){
+    		Integer i = Integer.parseInt(a);
+    		list.add(i);
+    	}
+    	return new Shape<V>(factory,list);
+    }
     
     /**
      * return a shape using the given integer list as dimensions
@@ -80,5 +94,10 @@ public class ShapeFactory<V extends Value<V>> {
         		));*/
     }
     
+    public static void main(String[] args){
+    	ShapeFactory sf = new ShapeFactory();
+    	Shape<AggrValue<BasicMatrixValue>> testShape = sf.newShapeFromInputString("3*3");
+    	System.out.println(testShape);
+    }
 	
 }
