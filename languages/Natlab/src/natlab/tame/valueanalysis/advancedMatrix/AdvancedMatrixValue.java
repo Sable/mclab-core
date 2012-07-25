@@ -45,7 +45,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 				factory)).newisComplexInfoFromConst(isComplex);
 	}
 	/**
-	 * XU add this method to support initial input shape info. @25th,Jul,2012
+	 * XU add this method to support initial input shape info. svcn @25th,Jul,2012
 	 * @param aClass
 	 * @param shapeInfo
 	 * @param isComplex
