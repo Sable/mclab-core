@@ -124,7 +124,8 @@ public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(String[]
 		String[] specs = argSpecs.split(delims);
 		
 		/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
-		list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,specs[2])); 
+		list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,specs[1],specs[2])); 
+		//XU changed here to support initial input shape info. @25th,Jul,2012
 		
    	
 	}

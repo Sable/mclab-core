@@ -56,8 +56,8 @@ public class AdvancedMatrixValuePropagator extends
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = null;
-   //	builtin.visit(shapeProp, arg); //FIXME - commented to stop visiting shape propogation
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg); 
+		//FIXME - commented to stop visiting shape propogation
 
 		if (matchShapeResult == null) {
 			if (Debug)
@@ -90,7 +90,7 @@ public class AdvancedMatrixValuePropagator extends
 				map.put(classRef,
 						new AdvancedMatrixValue(new AdvancedMatrixValue(
 								(PrimitiveClassReference) classRef),
-//								matchShapeResult.get(0),  //FIXME - commented to stop visiting shape propogation
+								matchShapeResult.get(0),  //FIXME - commented to stop visiting shape propogation
 								matchisComplexInfoResult.get(0)));// FIXME a
 																	// little
 																	// bit

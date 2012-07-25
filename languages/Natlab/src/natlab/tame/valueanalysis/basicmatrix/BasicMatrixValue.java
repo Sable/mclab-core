@@ -39,6 +39,16 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	
     }
     /**
+     * return a BasicMatrixValue object by taking in a user typed input argument
+     * add this method @25th,Jul,2012
+     * @param onlyClassInfo
+     * @param shapeInfo
+     */
+    public BasicMatrixValue(BasicMatrixValue onlyClassInfo, String shapeInfo){
+    	super(onlyClassInfo.classRef);
+    	this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory).newShapeFromInputString(shapeInfo));
+    }
+    /**
      * how to deal with a constant
      */
     public BasicMatrixValue(Constant constant){

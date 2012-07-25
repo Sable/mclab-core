@@ -68,18 +68,55 @@ public class BasicTamerTool {
 		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
+		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
 		Args<AggrValue<BasicMatrixValue>> someargs = Args.<AggrValue<BasicMatrixValue>>newInstance(Collections.EMPTY_LIST); 
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 				callgraph, 
-				Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 
+				//Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 
+				Args.newInstance(inputValues),
 				factory);
 		System.out.println(analysis.toString());
-		
+		//System.out.println(analysis.getNodeList().get(0).getAnalysis().getTree());
 		
         for (int i = 0; i < analysis.getNodeList().size(); i++){
         	System.out.println(ValueAnalysisPrinter.prettyPrint(
         			analysis.getNodeList().get(i).getAnalysis()));        	
         }
+	}
+	
+	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(String[] args, FileEnvironment env){
+		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
+		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+		Args<AggrValue<BasicMatrixValue>> someargs = Args.<AggrValue<BasicMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
+				callgraph, 
+				/*Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))*/
+				Args.newInstance(inputValues), 
+				factory);
+		System.out.println(analysis.toString());
+		
+		
+	    for (int i = 0; i < analysis.getNodeList().size(); i++){
+	    	System.out.println(ValueAnalysisPrinter.prettyPrint(
+	    			analysis.getNodeList().get(i).getAnalysis()));        	
+	    }
+		return analysis;
+	}
+	
+	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args){
+		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(args.length);
+		for(String argSpecs : args)
+		{
+			String delims = "[\\&]";
+			String[] specs = argSpecs.split(delims);
+			
+			/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
+			list.add(new BasicMatrixValue((new BasicMatrixValue(PrimitiveClassReference.DOUBLE)),specs[1])); 
+			
+	   	
+		}
+		return list;
 	}
 }

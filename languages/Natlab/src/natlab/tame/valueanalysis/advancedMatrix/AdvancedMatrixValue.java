@@ -44,8 +44,19 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		this.iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
 				factory)).newisComplexInfoFromConst(isComplex);
 	}
+	/**
+	 * XU add this method to support initial input shape info. @25th,Jul,2012
+	 * @param aClass
+	 * @param shapeInfo
+	 * @param isComplex
+	 */
+	public AdvancedMatrixValue(PrimitiveClassReference aClass, String shapeInfo, String isComplex) {
+		super(aClass);
+		this.iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+				factory)).newisComplexInfoFromConst(isComplex);
+		this.shape = (new ShapeFactory<AggrValue<AdvancedMatrixValue>>(factory)).newShapeFromInputString(shapeInfo);
+	}
 	
-
 	public AdvancedMatrixValue(AdvancedMatrixValue onlyClassInfo,
 			Shape<AggrValue<AdvancedMatrixValue>> shape) {
 		super(onlyClassInfo.classRef);
