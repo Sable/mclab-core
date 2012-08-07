@@ -28,7 +28,7 @@ public class SPEmptySetMatching extends SPAbstractVectorExpr{
 				}
 			}
 		else{
-			System.err.println("the output shape is []");
+			if (Debug) System.out.println("the output shape is []");
 			return previousMatchResult;
 		}
 	}

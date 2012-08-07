@@ -1724,7 +1724,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("M->M");
+                shapePropInfo = ShapePropTool.parse("$|M->M");
             }
             return shapePropInfo;
         }
@@ -6635,7 +6635,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Disp extends AbstractReportFunction implements HasClassPropagationInfo {
+    public static class Disp extends AbstractReportFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Disp singleton = null;
         public static Disp getInstance(){
@@ -6651,6 +6651,15 @@ public abstract class Builtin {
             return "disp";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("#->[]");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -6664,6 +6673,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->X");
+            }
+            return isComplexPropInfo;
         }
 
     }

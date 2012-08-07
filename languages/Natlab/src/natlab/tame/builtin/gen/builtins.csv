@@ -292,7 +292,7 @@ properFloatFunction; floatFunction
 # unary functions operating on floating point matrizes
 unaryFloatFunction; properFloatFunction
 -Class(float->0)
--Shape(M->M)
+-Shape($|M->M)
 
 # elemental unary functions operating on floating point matrizes
 elementalUnaryFloatFunction; unaryFloatFunction
@@ -849,7 +849,7 @@ fieldnames
 
 reportFunction; impureFunction
 # errors should be seprated from warnings and displaying stuff?
-disp;; Class(any -> none)
+disp;; Class(any -> none);; Shape(#->[]);; isComplex(A->X)
 display
 clc
 #TODO rething error

@@ -49,9 +49,14 @@ public class ShapePropTool{
     }
     
 	static public void main(String[] args) throws IOException, Parser.Exception{	
-		System.out.println("print:   "+parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$"));
+		/*System.out.println("print:   "+parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$"));
 		String s1 = parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$").toString();
+		System.out.println("reparsed "+parse(s1));*/
+		
+		System.out.println("print:   "+parse("#->[]"));
+		String s1 = parse("#->[]").toString();
 		System.out.println("reparsed "+parse(s1));
+		
 		/*System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
 		String s1 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
 		System.out.println("reparsed "+parse(s1));*/
