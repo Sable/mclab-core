@@ -71,7 +71,8 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
             HashMap<ClassReference,AggrValue<BasicMatrixValue>> map = new HashMap<ClassReference,AggrValue<BasicMatrixValue>>();
             if (Debug) System.out.println(matchShapeResult.get(0));
             for (ClassReference classRef : values){
-                map.put(classRef,new BasicMatrixValue(new BasicMatrixValue((PrimitiveClassReference)classRef),matchShapeResult.get(0)));//FIXME a little bit tricky
+                map.put(classRef,new BasicMatrixValue(new BasicMatrixValue((PrimitiveClassReference)classRef),matchShapeResult.get(0)));
+                //FIXME
             }
             result.add(ValueSet.newInstance(map));
             if (Debug) System.out.println(result);
