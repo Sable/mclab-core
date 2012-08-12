@@ -242,7 +242,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="${entrypoint.class}" />
 			</manifest>
-			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class" />
+			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class"  />
                         <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
                           <patternset>
                             <exclude name="META-INF/**" />
@@ -277,6 +277,199 @@ java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
                 <chmod file="${entrypoint.script.name}" perm="755" />
 
 	</target>
+
+
+	<!-- jar build without tame and backend-->
+        <target name="jar-frontend" depends="annotations.build, matlab.build,
+		clean, jar_noclean_frontend" description="creates an executable
+		release jar" />
+	<target name="jar_noclean_frontend" depends="gen, compile" description="creates an executable release jar without cleaning first">
+		<jar destfile="${entrypoint.frontend.jarname}">
+			<manifest>
+				<attribute name="Main-Class" value="${entrypoint.class}" />
+			</manifest>
+			<fileset dir="${basedir}/${bin.dir}"
+				includes="**/*.class" excludes="**/tame/**, 
+			 **/backends/**" />
+                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset-->
+                        <fileset dir="resources" />
+		</jar>
+                <echo file="${entrypoint.frontend.script.name}">${entrypoint.script.header}
+java -jar ${basedir}/${entrypoint.frontend.jarname} $$*</echo>
+                <chmod file="${entrypoint.frontend.script.name}" perm="755" />
+
+	</target>
+
+
+	<!-- jar build without backend-->
+        <target name="jar-with-tamer" depends="annotations.build, matlab.build,
+		clean, jar_noclean_tame" description="creates an executable
+		release jar" />
+	<target name="jar_noclean_tame" depends="gen, compile" description="creates an executable release jar without cleaning first">
+		<jar destfile="${entrypoint.mcsaf_with_tamer.jarname}">
+			<manifest>
+				<attribute name="Main-Class" value="${entrypoint.class}" />
+			</manifest>
+			<fileset dir="${basedir}/${bin.dir}"
+				includes="**/*.class" excludes="**/backends/**" />
+                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset-->
+                        <fileset dir="resources" />
+		</jar>
+                <echo file="${entrypoint.mcsaf_with_tamer.script.name}">${entrypoint.script.header}
+java -jar ${basedir}/${entrypoint.mcsaf_with_tamer.jarname} $$*</echo>
+                <chmod file="${entrypoint.mcsaf_with_tamer.script.name}" perm="755" />
+
+	</target>
+
+ 
+	<!-- jar build with x10  backend-->
+        <target name="jar-mix10" depends="annotations.build, matlab.build,
+		clean, jar_noclean_mix10" description="creates an executable
+		release jar" />
+	<target name="jar_noclean_mix10" depends="gen, compile" description="creates an executable release jar without cleaning first">
+		<jar destfile="${entrypoint.x10_backend.jarname}">
+			<manifest>
+				<attribute name="Main-Class" value="${entrypoint.class}" />
+			</manifest>
+			<fileset dir="${basedir}/${bin.dir}"
+				includes="**/*.class" excludes="**/Fortran/**" />
+                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset-->
+                        <fileset dir="resources" />
+		</jar>
+		<echo file="${entrypoint.x10_backend.script.name}">${entrypoint.script.header}
+java -jar ${basedir}/${entrypoint.x10_backend.jarname} $$*</echo>
+                <chmod file="${entrypoint.x10_backend.script.name}" perm="755" />
+
+	</target>
+
+ 
+	<!-- jar build with fortran  backend-->
+        <target name="jar-fortran-backend" depends="annotations.build, matlab.build,
+		clean, jar_noclean_fb" description="creates an executable
+		release jar" />
+	<target name="jar_noclean_fb" depends="gen, compile" description="creates an executable release jar without cleaning first">
+		<jar destfile="${entrypoint.fortran_backend.jarname}">
+			<manifest>
+				<attribute name="Main-Class" value="${entrypoint.class}" />
+			</manifest>
+			<fileset dir="${basedir}/${bin.dir}"
+				includes="**/*.class" excludes="**/x10/**" />
+                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset>
+                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
+                          <patternset>
+                            <exclude name="META-INF/**" />
+                          </patternset>
+                        </zipfileset-->
+                        <fileset dir="resources" />
+		</jar>
+		<echo file="${entrypoint.fortran_backend.script.name}">${entrypoint.script.header}
+java -jar ${basedir}/${entrypoint.fortran_backend.jarname} $$*</echo>
+                <chmod file="${entrypoint.fortran_backend.script.name}" perm="755" />
+
+	</target>
+
+
+
+
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="annotations.eclipse.build, matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations and matlab), let Eclipse build" />
