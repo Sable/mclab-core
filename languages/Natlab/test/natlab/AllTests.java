@@ -33,6 +33,11 @@ public class AllTests {
                 //suite.addTestSuite(SimpleIfPassTests.class);
                 suite.addTestSuite(MultiRewritePassTests.class);
 
+        suite.addTestSuite(MScriptInlinerTest.class);
+        suite.addTestSuite(FEvalToCallTest.class);
+        suite.addTestSuite(FunctionInlinerTest.class);
+        suite.addTestSuite(ExtractFunctionTest.class);
+
 		//$JUnit-END$
 		return suite;
 	}
