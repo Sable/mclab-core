@@ -46,6 +46,13 @@ public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMa
 	private String getName(Expr e){
 		return ((NameExpr)e).getName().getID();
 	}
+
+	@Override
+	public void caseStmt(Stmt s){
+        outFlowSets.put( s, currentOutSet.copy() );
+	}
+
+
 	@Override
 	public void caseAssignStmt(AssignStmt s){
 		Set<NameExpr> lValues = new HashSet<NameExpr>();
@@ -71,6 +78,7 @@ public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMa
 		if ((s.getRHS() instanceof NameExpr) && (s.getLHS() instanceof NameExpr)){
 			currentOutSet.put(((NameExpr)s.getLHS()).getName().getID(), s);
 		}
+        outFlowSets.put( s, currentOutSet.copy() );
 	}
 	
 	@Override

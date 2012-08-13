@@ -131,33 +131,33 @@ public class Context{
     
     public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path,BuiltinQuery query){
     	if (curFunction instanceof Function)
-    		this.inFunction=true;
+    		this.inFunction = true;
     	else 
-    		this.inFunction=false;
+    		this.inFunction = false;
 
-    	if (curFunction.getParent()!=null && 
+    	if (curFunction.getParent() != null && 
     			curFunction.getParent().getParent() instanceof Function){
-    		inNested=true;
+    		inNested = true;
     	}
     	else
-    		inNested=false;
+    		inNested = false;
 
     	if (inNested){
-    		curProgram=NodeFinder.findParent(curFunction, Program.class);
+    		curProgram = NodeFinder.findParent(curFunction, Program.class);
     	}
     	else
     		if (inFunction)
-    			curProgram=(Program)curFunction.getParent().getParent();
+    			curProgram = (Program)curFunction.getParent().getParent();
     		else
-    			curProgram=(Program)curFunction;
+    			curProgram = (Program)curFunction;
 
-    	this.curFunction= curFunction;
+    	this.curFunction = curFunction;
     	this.pwd = pwd;
-    	if (inFunction && fwd==null)
+    	if (inFunction && fwd == null)
     		this.fwd = FolderHandler.getFolderHandler(curProgram.getFile().getParent());
     	else
     		this.fwd = fwd;
-    	this.path=path;
+    	this.path = path;
     	this.builtinQuery = query;
     }
     
