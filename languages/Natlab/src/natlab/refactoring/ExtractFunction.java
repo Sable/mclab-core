@@ -58,40 +58,45 @@ public class ExtractFunction {
         Set<String> liveBefore = liveAnalysisNew.getInFlowSets().get(f).getSet();
         Set<String> liveAfter = liveAnalysisOrig.getOutFlowSets().get(endStmt).getSet();
         VFFlowset kinds = kindAnalysis.getFlowSets().get(orig);
-        /*System.out.println(liveBefore);
+        System.out.println(liveBefore);
         System.out.println(liveAfter);
         System.out.println(reachingBefore);
         System.out.println(reachingAfter);
-        */
+        LinkedList<RefactorException> errors = new LinkedList<RefactorException>();
+        Set<String> addedGlobals = new HashSet<String>();
         //inputs 
         Set<String> inputs = new HashSet<String>();
         for (String id: liveBefore){
             if (kinds.getKind(id).isVariable()){
                 if (reachingBefore.get(id).contains(ReachingDefs.GLOBAL)){
-                    newStmtList.insertChild(new GlobalStmt(new ast.List<Name>().add(new Name(id))),0);
-                    continue;
-                }
-                if ((!reachingBefore.get(id).contains(ReachingDefs.UNDEF)) && 
+                    if (!addedGlobals.contains(id))
+                        newStmtList.insertChild(new GlobalStmt(new ast.List<Name>().add(new Name(id))),0);
+                } else if ((!reachingBefore.get(id).contains(ReachingDefs.UNDEF)) && 
                     (reachingBefore.size()>0)){
                     f.addInputParam(new Name(id));
                     inputs.add(id);
+                } else {
+                    errors.add(new Exceptions.FunctionInputCanBeUndefined(new Name(id)));
                 }
             }
         }
 
         for (String id: liveAfter){
-            if (kinds.getKind(id).isVariable() && reachingAfter.containsKey(id)){
-                if (reachingAfter.get(id).contains(ReachingDefs.GLOBAL)){
-                    continue;
-                }
+            if (kinds.getKind(id).isVariable() && reachingAfter.containsKey(id)) {
                 int reachings = reachingAfter.get(id).size();
-                if (reachings>1 || (reachings==1 && !reachingAfter.get(id).contains(ReachingDefs.UNDEF))){
-                    if (reachingAfter.get(id).contains(ReachingDefs.UNDEF) && !inputs.contains(id))
+                if (reachingAfter.get(id).contains(ReachingDefs.GLOBAL)) {
+                    if (!addedGlobals.contains(id))
+                        newStmtList.insertChild(new GlobalStmt(new ast.List<Name>().add(new Name(id))),0);
+                } else if (reachingAfter.get(id).contains(ReachingDefs.UNDEF)) {
+                    f.addOutputParam(new Name(id));
+                    if (!inputs.contains(id)) 
                         f.addInputParam(new Name(id));
+                    errors.add(new Exceptions.FunctionOutputCanBeUndefined(new Name(id)));
+                } else {
                     f.addOutputParam(new Name(id));
                 }
             }
         }
-        return new LinkedList<RefactorException>();
+        return errors;
     }
 }

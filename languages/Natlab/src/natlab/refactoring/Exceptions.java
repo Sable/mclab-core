@@ -113,4 +113,15 @@ public class Exceptions {
 		}
 	};
 
+	public static class FunctionInputCanBeUndefined extends RefactorException{
+		public FunctionInputCanBeUndefined (Name name) {
+			sym=name;
+		}
+	};
+
+	public static class FunctionOutputCanBeUndefined extends RefactorException{
+		public FunctionOutputCanBeUndefined (Name name) {
+			sym=name;
+		}
+	};
 }

@@ -124,8 +124,6 @@ public class MScriptInliner {
 		
 		
 		Set<Stmt> scriptCalls = findScripts(f);
-		if(!scriptCalls.isEmpty())
-			System.out.println("FOOUNDDDDD "+ scriptCalls.size());
 		LinkedList<LinkedList<Exception>> res= new LinkedList<LinkedList<Exception>>();
 		for (Stmt s: scriptCalls){
 			LinkedList<Exception> exceptionList = new LinkedList<Exception>();

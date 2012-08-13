@@ -31,7 +31,7 @@ public class FevalToCall {
 			context.push(f);
 			final VFFlowInsensitiveAnalysis kind = new VFFlowInsensitiveAnalysis(context.cu);
 			kind.analyze();
-			NodeFinder.apply(context.cu, ParameterizedExpr.class, new AbstractNodeFunction<ParameterizedExpr>() {
+			NodeFinder.apply(f, ParameterizedExpr.class, new AbstractNodeFunction<ParameterizedExpr>() {
 			public void apply(ParameterizedExpr node) {
 				if (! (node.getTarget() instanceof NameExpr)) return ;
 		        NameExpr target = (NameExpr)node.getTarget();
@@ -49,9 +49,13 @@ public class FevalToCall {
 	public List<RefactorException> replace(ParameterizedExpr node, VFFlowInsensitiveAnalysis kind){
 		List<RefactorException> errors = new LinkedList<RefactorException>();
 		String target = ((StringLiteralExpr)node.getArg(0)).getValue();
-		
 		if (kind.getFlowSets().get(context.peek().curFunction).getKind(target).isVariable())
 			errors.add(new RenameRequired(new Name(target)));
+        if (errors.isEmpty()) {
+            node.setTarget(new NameExpr(new Name(target)));
+            //ast.List<ast.Expr> argList = node.getArgList();
+            node.getArgList().removeChild(0);
+        }
 		return errors;
 	}
 }

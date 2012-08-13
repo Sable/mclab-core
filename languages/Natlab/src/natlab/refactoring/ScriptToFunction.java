@@ -55,7 +55,8 @@ public class ScriptToFunction {
 
 			@Override
 			public void apply(ExprStmt node) {
-				if (node.getExpr() instanceof NameExpr && ((NameExpr) node.getExpr()).getName().getID().equals(script.getName()))
+				if (node.getExpr() instanceof NameExpr && 
+                    ((NameExpr) node.getExpr()).getName().getID().equals(script.getName()))
 					calls.add(node);
 			}
 		});
@@ -86,8 +87,9 @@ public class ScriptToFunction {
 		TreeSet<String> outputArgs = null;
         boolean inlined = false;
 
-		System.out.println(script.getPrettyPrinted() + "\nAssigned:" + assignedVars + "\nLive:" +scriptLiveVars); 
-		for (ExprStmt call: calls){
+		System.out.println(script.getPrettyPrinted() + "\nAssigned:" + assignedVars + "\nLive:" +scriptLiveVars + " Calls: " + calls); 
+        
+		for (ExprStmt call: calls) {
 			Name name = ((NameExpr)call.getExpr()).getName();
 			Function callFunc = NodeFinder.findParent(call, Function.class);
 			if (callFunc == null){ //called inside script

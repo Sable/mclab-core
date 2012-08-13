@@ -75,14 +75,12 @@ public class FunctionInliner {
 							}
 							else if (!LookupFile.builtinFunctions.containsKey(ne.getName().getID())){
 								resolve_fail++;
-//								System.out.print(" " + ne.getName().getID()+ " ,");
 							}
 						}
 					}
 				}
 			}
 		}
-//		System.out.print("F: "+ resolve_fail+ " S:");
 		return res;
 	}
 
@@ -104,15 +102,11 @@ public class FunctionInliner {
         rs.transform();
 		int l=functionCalls(f).size();
 		HashMap<AssignStmt, LinkedList<RefactorException>> errors = new HashMap<AssignStmt, LinkedList<RefactorException>>();
-//		System.out.println("Orig: "+l);
 		for (int i=0;i<l;i++){
-			Function fb = f.fullCopy();
+			Function fb = f;
 			AssignStmt s = functionCalls(fb).get(i);
 			LinkedList<RefactorException> errors_tmp = inline(fb, s);
 			errors.put(s, errors_tmp);
-//			System.out.println("After round " + i + " " + functionCalls(f).size());
-//			if (errors_tmp.isEmpty())
-//				System.out.println(fb.getPrettyPrinted());
 		}
 		
 		return errors;
@@ -124,10 +118,9 @@ public class FunctionInliner {
 			Stmt aUse= NodeFinder.findParent(n, Stmt.class);
 			HashMapFlowMap<String, Set<AssignStmt>> output= defAnalysis.getOutFlowSets().get(aUse);
 			if (output == null){
-				System.out.println("null: "+ NodeFinder.findParent(s, Function.class).getName() + " "+ s.getPrettyPrinted() );
-				continue;
+                continue;
 			}
-			Set<AssignStmt> defs = defAnalysis.getOutFlowSets().get(aUse).get(n);
+ 			Set<AssignStmt> defs = defAnalysis.getOutFlowSets().get(aUse).get(n.getName().getID());
 			if (aUse != s && defs!=null && defs.contains(s))
 				uses.add(n);
 		}
@@ -137,7 +130,6 @@ public class FunctionInliner {
 	private boolean removeExtra(Function f, AssignStmt s){
 		String left = ((NameExpr)s.getLHS()).getName().getID();
 		String right = ((NameExpr)s.getRHS()).getName().getID();
-		System.out.print(" Running analysis l");
 		LivelinessAnalysis l = new LivelinessAnalysis(f);
 		ReachingDefs defs = new ReachingDefs(f);
 		CopyAnalysis copies = new CopyAnalysis(f);
@@ -145,16 +137,15 @@ public class FunctionInliner {
 		if (exprs == null)
 			throw new RuntimeException("exprs is null");
 		l.analyze();
-		System.out.print(" Running analysis def");
 		defs.analyze(); 
-		System.out.print(" Running analysis copies");
 		copies.analyze();
-		System.out.println(" done");
 		Collection<NameExpr> uses = getUses(s, exprs, defs);
 		for (NameExpr use: uses){
 			Stmt useStmt = NodeFinder.findParent(use, Stmt.class);
+            if (! copies.getOutFlowSets().get(useStmt).containsKey(left)) 
+                return false;
 			AssignStmt copy = copies.getOutFlowSets().get(useStmt).get(left);
-			if (copy != s)
+			if (copy != s  || copy == null)
 				return false;
 //			if (defs.getOutFlowSets())
 		}
@@ -172,11 +163,11 @@ public class FunctionInliner {
 	public LinkedList<RefactorException> inline(Function f, AssignStmt s){
 		LinkedList<RefactorException> errors = new LinkedList<RefactorException>();
 		context.push(f);
-		VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
+		VFFlowInsensitiveAnalysis kind_analysis_caller = 
+            new VFFlowInsensitiveAnalysis(f, 
+                                          context.peek().getFunctionOrScriptQuery());
 		kind_analysis_caller.analyze();
 		VFFlowset kind_caller_results = kind_analysis_caller.getFlowSets().get(f);
-		
-		
 		ParameterizedExpr rhs = (ParameterizedExpr) s.getRHS();
 		if (!(rhs.getChild(0) instanceof NameExpr)){
 			errors.add(new TargetNotFoundException(rhs.getTarget().getNameExpressions().iterator().next().getName()));
@@ -229,7 +220,7 @@ public class FunctionInliner {
 		for(int j=0;j<target.getStmtList().getNumChild();j++){
 			nlist.add(target.getStmtList().getChild(j));
 		}
-		if (s.getLHS() instanceof MatrixExpr){
+		if (s.getLHS() instanceof MatrixExpr) {
 			MatrixExpr me = (MatrixExpr) s.getLHS();
 			int provided = me.getRow(0).getNumElement(); 
 			if (provided > target.getNumOutputParam()){
@@ -249,13 +240,11 @@ public class FunctionInliner {
 				toRemove.add(newStmt);
 				nlist.add(newStmt);
 			}
-		}else if (target.getNumOutputParam()>0){
+		} else if (target.getNumOutputParam()>0) {
 			AssignStmt newStmt = new AssignStmt((Expr)(s.getLHS().copy()), new NameExpr(target.getOutputParam(0)));
 			toRemove.add(newStmt);
 			nlist.add(newStmt);
 		}
-			
-		Set<Stmt> nSet = new HashSet<Stmt>(nlist);
 		for(int j=nlist.size()-1;j>=0;j--){
 			list.insertChild(nlist.get(j),k);
 		}
