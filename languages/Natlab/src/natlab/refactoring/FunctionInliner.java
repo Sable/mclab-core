@@ -103,10 +103,8 @@ public class FunctionInliner {
 		int l=functionCalls(f).size();
 		HashMap<AssignStmt, LinkedList<RefactorException>> errors = new HashMap<AssignStmt, LinkedList<RefactorException>>();
 		for (int i=0;i<l;i++){
-			Function fb = f;
-			AssignStmt s = functionCalls(fb).get(i);
-			LinkedList<RefactorException> errors_tmp = inline(fb, s);
-			errors.put(s, errors_tmp);
+			AssignStmt s = functionCalls(f).get(i);
+            errors.put(s, inline(s));
 		}
 		
 		return errors;
@@ -160,8 +158,9 @@ public class FunctionInliner {
 		return true;
 	}
 	
-	public LinkedList<RefactorException> inline(Function f, AssignStmt s){
+	public LinkedList<RefactorException> inline(AssignStmt s){
 		LinkedList<RefactorException> errors = new LinkedList<RefactorException>();
+        Function f = NodeFinder.findParent(s, Function.class);
 		context.push(f);
 		VFFlowInsensitiveAnalysis kind_analysis_caller = 
             new VFFlowInsensitiveAnalysis(f, 

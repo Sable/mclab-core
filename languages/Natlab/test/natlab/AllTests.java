@@ -2,6 +2,7 @@ package natlab;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import natlab.refactoring.*;
 
 /** Top-level test suite.  Contains all tests. */
 public class AllTests {

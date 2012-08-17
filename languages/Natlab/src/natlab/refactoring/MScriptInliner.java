@@ -126,15 +126,15 @@ public class MScriptInliner {
 		Set<Stmt> scriptCalls = findScripts(f);
 		LinkedList<LinkedList<Exception>> res= new LinkedList<LinkedList<Exception>>();
 		for (Stmt s: scriptCalls){
-			LinkedList<Exception> exceptionList = new LinkedList<Exception>();
-			inlineStmt(f, s, exceptionList);
-			res.add(exceptionList);
+            res.add(inlineStmt(s));
 		}
 		return res;
 //		System.out.println("Result after inlining"+ f.getPrettyPrinted());
 	}
 
-	public void inlineStmt(Function f, Stmt s, java.util.List<Exception> e){
+	public java.util.LinkedList<Exception> inlineStmt(Stmt s) {
+        LinkedList<Exception> e = new LinkedList<Exception>();
+        Function f = NodeFinder.findParent(s, Function.class);
 		ParsedCompilationUnitsContextStack context = new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu); 
 		context.push(f);
 		VFFlowSensitiveAnalysis kind_analysis_f = new VFFlowSensitiveAnalysis(f);
@@ -149,7 +149,7 @@ public class MScriptInliner {
 			target = (Script) lookupres;
 		else{
 			e.add(new Exceptions.TargetNotAScript(ne.getName(), f, "Nope:"+ lookupres));
-			return;
+			return e;
 		}
 		VFFlowSensitiveAnalysis kind_analysis_s = new VFFlowSensitiveAnalysis(target);
 		kind_analysis_s.analyze();
@@ -192,5 +192,6 @@ public class MScriptInliner {
 			if (kind_s.isID() && kind_post.isFunction())
 				e.add(new Exceptions.WarnIDToFunException(n));
 		}
+        return e;
 	}
 }
