@@ -75,11 +75,16 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
      * returns false if this shape may or may not be scalar.
      */
     public boolean isScalar(){
-    	if(this.dimensions.get(0)==1&&this.dimensions.get(1)==1){
-    		if (Debug) System.out.println("this must be a scalar!");
-    		return true;
+    	try{
+    		if(this.dimensions.get(0)==1&&this.dimensions.get(1)==1){
+        		if (Debug) System.out.println("this must be a scalar!");
+        		return true;
+        	}
+        	return false;//TODO
     	}
-    	return false;//TODO
+    	catch(Exception e){
+    		return false;
+    	}
     }
 
     /**

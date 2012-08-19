@@ -38,6 +38,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	this.shape = shape;
     	
     }
+    
     /**
      * return a BasicMatrixValue object by taking in a user typed input argument
      * add this method @25th,Jul,2012
@@ -48,6 +49,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	super(onlyClassInfo.classRef);
     	this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory).newShapeFromInputString(shapeInfo));
     }
+    
     /**
      * how to deal with a constant
      */
@@ -58,7 +60,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(constant.getShape());//XU study this line!!! infinite loop!!!
         this.constant = constant;
     }
-   
     
     /**
      * returns true if the represented data is a constant
@@ -82,7 +83,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     public void setConstantNull(){
     	this.constant = null;
     }
-    
     
     @Override
     public BasicMatrixValue merge(AggrValue<BasicMatrixValue> other) {
@@ -132,11 +132,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         return "("+classRef+(isConstant()?(","+constant):"")+","+shape+")";//XU added shape
     }
     
-    
-        
-
     public static final BasicMatrixValueFactory FACTORY = new BasicMatrixValueFactory();
-
 
     @Override
     public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(Args<AggrValue<BasicMatrixValue>> indizes){
@@ -267,14 +263,39 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	newLs.add(1);
         	newLs.add(1);
         	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-    	}
-    	
+    	}	
     }
-    
+    @Override
+    public AggrValue<BasicMatrixValue> arraySubsasgn(
+            Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {
+    	/**
+    	 * Consider array set, like a(1,2)=3, indizes are 1,2, and value is 3.
+    	 * If the index doesn't exceed matrix dimension,
+    	 * the array set statement doesn't change the array's shape;
+    	 * if the index does exceed matrix dimension,
+    	 * the array's shape will be changed.
+    	 */
+    	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
+    	int size = ls.size();
+    	for(int i=0; i<size; i++){
+    		Double indexDouble = (Double)((HasConstant)indizes.get(i)).getConstant().getValue();
+        	int index = indexDouble.intValue();
+    		if(index>ls.get(i)){
+    			ls.remove(i);
+    			ls.add(i, index);
+    		}
+    	}
+    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));
+    }
     @Override
     public ValueSet<AggrValue<BasicMatrixValue>> dotSubsref(String field) {
         throw new UnsupportedOperationException("cannot dot-access a matrix!");
         //return ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
+    }
+    @Override
+    public AggrValue<BasicMatrixValue> dotSubsasgn(String field,
+            AggrValue<BasicMatrixValue> value) {
+    	throw new UnsupportedOperationException(); //TODO
     }
     @Override
     public Res<AggrValue<BasicMatrixValue>> cellSubsref(Args<AggrValue<BasicMatrixValue>> indizes) {
@@ -284,121 +305,10 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     public AggrValue<BasicMatrixValue> cellSubsasgn(Args<AggrValue<BasicMatrixValue>> indizes, Args<AggrValue<BasicMatrixValue>> values) {
         throw new UnsupportedOperationException(); //TODO
     }
-    
-    @Override
-    public AggrValue<BasicMatrixValue> arraySubsasgn(//FIXME not correct, just for test!
-            Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {//XU: we don't need to care about value, but we should care about index!
-    	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
-    	if(indizes.size()==2){
-    		if (Debug) System.out.println("this array get is with two arguments!");
-    		if(((HasConstant)indizes.get(0)).getConstant()==null){
-        		if (Debug) System.out.println("constant component is null!");
-        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
-        		List<Integer> dims = new ArrayList<Integer>(2);
-        		dims.add(1);
-        		dims.add(1);
-        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	    	newLs.add(1);
-        	    	ls.remove(0);
-        	    	int result = 1;
-        	    	for(Integer dimNum : ls){
-        	    		result = result*dimNum;
-        	    	}
-        	    	newLs.add(result);
-        	    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
-        		}
-        		//deal with constant value is empty and the shape is not scalar
-        		//FIXME
-        		return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape());
-        	}
-        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
-        	int index = indexDouble.intValue();
-        	if(index>ls.get(0)){
-        		if (Debug) System.out.println("index exceeds matrix dimensions!");
-        		throw new UnsupportedOperationException();//FIXME
-        	}
-        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	newLs.add(1);
-        	ls.remove(0);
-        	int result = 1;
-        	for(Integer dimNum : ls){
-        		result = result*dimNum;
-        	}
-        	newLs.add(result);
-        	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
-    	}
-    	else{
-    		if (Debug) System.out.println("this array get is with one argument!");
-    		if(((HasConstant)indizes.get(0)).getConstant()==null){
-        		if (Debug) System.out.println("constant component is null!");
-        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
-        		List<Integer> dims = new ArrayList<Integer>(2);
-        		dims.add(1);
-        		dims.add(1);
-        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	    	newLs.add(1);
-        	    	newLs.add(1);
-        	    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
-        		}
-        	}
-        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
-        	int index = indexDouble.intValue();
-        	int size = 1;
-        	for(Integer dimNum : ls){
-        		size = size*dimNum;
-        	}
-        	if (Debug) System.out.println(size);
-        	if(index>size){
-        		if (Debug) System.out.println("index exceeds matrix dimensions!");
-        		throw new UnsupportedOperationException();//FIXME
-        	}
-        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	newLs.add(1);
-        	newLs.add(1);
-        	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs));
-    	}
-    	/*for(AggrValue<BasicMatrixValue> index:indizes){
-    		try{
-    			//deal with constant index
-    			if((((BasicMatrixValue)index).getConstant())!=null){
-    				double castDou = ((DoubleConstant)((HasConstant)((BasicMatrixValue)index)).getConstant()).getValue();
-    				int castInt = (int) castDou;
-    				if(castInt>(this.getShape().getDimensions().get(1))){
-    					if (Debug) System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
-    					ArrayList<Integer> dim = new ArrayList<Integer>(2);
-    					dim.add(1);
-    					dim.add(castInt);
-    					return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(dim));
-    				}
-    			}
-    			//deal with matrix index
-    			if((((BasicMatrixValue)index).getShape())!=null){
-    				if((((BasicMatrixValue)index).getShape().getDimensions().get(1))>(this.getShape().getDimensions().get(1))){
-    					if (Debug) System.out.println("the array is going to be expanded, because the index boundary is larger than the array boundary!");
-                		return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)).newShapeFromIntegers(((HasShape)((BasicMatrixValue)index)).getShape().getDimensions()));
-                	}
-    			}
-    		}catch (Exception e){
-    			return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), this.getShape());
-    		}
-    		
-    	}
-    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()), this.getShape());//XU modified @21:24,May 13th
-*/    }
-    
     @Override
     public AggrValue<BasicMatrixValue> toFunctionArgument(boolean recursive) {
     	return this;
     	//throw new UnsupportedOperationException(); //TODO
-    }
-    @Override
-    public AggrValue<BasicMatrixValue> dotSubsasgn(String field,
-            AggrValue<BasicMatrixValue> value) {
-    	throw new UnsupportedOperationException(); //TODO
     }
 }
 
