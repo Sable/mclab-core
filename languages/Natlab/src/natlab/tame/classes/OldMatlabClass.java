@@ -14,7 +14,7 @@ abstract public class OldMatlabClass implements MatlabClass{
 	
 	public OldMatlabClass(String className, FileEnvironment fileEnvironment){
 		this.className = className;
-		System.out.println(className);
+		//System.out.println(className);
 		methods = new HashMap<String,FunctionReference>();
 		for (FunctionReference ref : fileEnvironment.getOverloadedMethods(className)){
 			//TODO check the ref for constructor? - deal with doubly defined methods?
