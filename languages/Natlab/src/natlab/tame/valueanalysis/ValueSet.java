@@ -32,6 +32,11 @@ public class ValueSet<V extends Value<V>> implements
     int size = 0; //number of elements in this
     public static boolean DEBUG = false;
     
+    //Xu add this method for code generation
+    public V getSingleton(){
+    	return singleton;
+    }
+    
     private ValueSet(){}
     public  static <V extends Value<V>> ValueSet<V> newInstance(){
         return new ValueSet<V>();
