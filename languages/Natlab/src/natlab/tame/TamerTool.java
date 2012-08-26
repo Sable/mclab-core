@@ -83,12 +83,12 @@ public class TamerTool {
 	
 	//example main...
 	public static void main(String[] args) {
-		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/xuli/for_test/benchmarks/drv_adpt.m"); //file -> generic file
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
-		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
-		Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
-		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
+		ValueFactory<AggrValue<SimpleMatrixValue>> factory = new SimpleMatrixValueFactory();
+		Args<AggrValue<SimpleMatrixValue>> someargs = Args.<AggrValue<SimpleMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		ValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = new ValueAnalysis<AggrValue<SimpleMatrixValue>>(
 				callgraph, 
 				Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 
 				factory);
