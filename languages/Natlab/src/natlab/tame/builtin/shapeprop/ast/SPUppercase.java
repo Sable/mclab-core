@@ -46,7 +46,9 @@ public class SPUppercase extends SPAbstractVectorExpr{
 						l = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
 						Shape<?> oldShape = (new ShapeFactory()).newShapeFromIntegers(l);
 						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
-						if(argumentShape.equals(oldShape)==false){//FIXME
+						if(argumentShape.getDimensions().equals(oldShape.getDimensions())==false){
+							//FIXME really weird, cannot call equals method in Shape class, the problem is still generic problem,
+							//cannot cast from Shape<?> to Shape<V>
 							if (Debug) System.out.println("MATLAB syntax error!");
 							//Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(null);
 							Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);

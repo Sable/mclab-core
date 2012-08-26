@@ -25,14 +25,13 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 			previousMatchResult.getLatestMatchedLowercase();
 			if (Debug) System.out.println(previousMatchResult.getLatestMatchedLowercase());
 			try{
-				if (Debug) System.out.println(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedUppercase()));
 			}catch (Exception e){
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
 				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
 				//System.out.println(matchResult.getAllLowercase());
 	            return matchResult;				
 			}
-			lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedUppercase()));
 			ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
 			//System.out.println(matchResult.getAllLowercase());
             return matchResult;
