@@ -151,7 +151,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
     			/**
-    			 * this situation is for array get like arr(1:5,1), the first index is not constant, it's a colon
+    			 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1:5,:)
     			 */
     			if(((HasConstant)indizes.get(0)).getConstant()==null){
             		if (Debug) System.out.println("constant component is null!");
@@ -180,7 +180,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
             				new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
             	}
     			/**
-				 * this situation is for array get whose first and second dimension are both basicMatrixValue.
+				 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1,1) or arr(1,1:5)
 				 */
     			if(indizes.get(1) instanceof BasicMatrixValue){
     				if(indizes.size()==ls.size()){
@@ -194,7 +194,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     				throw new UnsupportedOperationException();
     			}
 				/**
-				 * this situation is for array get like arr(1,:), the second dimension is a colon.
+				 * this situation is for array get like arr(1,:), arr(1:5,:).
 				 */
     			else{
     				Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();

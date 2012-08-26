@@ -1,19 +1,13 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
 import java.util.*;
-
 import natlab.tame.builtin.*;
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
-import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
-import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.components.shape.ShapeFactory;
-import natlab.tame.valueanalysis.components.shape.ShapePropagator;
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValue>{
@@ -95,6 +89,31 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
         return Res.<AggrValue<BasicMatrixValue>>newInstance(
                 new BasicMatrixValue(new BasicMatrixValue(
                         (PrimitiveClassReference)getDominantCatArgClass(arg)),matchShapeResult.get(0)));//FIXME a little bit tricky
+    }
+    
+  //TODO - move to aggr value prop. This comment is in Anton's SimpleMatrixValuePropagator.java, do we need to do this later?
+    @Override
+    public Res<AggrValue<BasicMatrixValue>> caseCellhorzcat(Builtin builtin,
+            Args<AggrValue<BasicMatrixValue>> elements) {
+        ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
+        Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
+                Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
+        return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(this.factory, shape, values));
+    }
+    @Override
+    public Res<AggrValue<BasicMatrixValue>> caseCellvertcat(Builtin builtin,
+            Args<AggrValue<BasicMatrixValue>> elements) {
+        ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
+        Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
+                Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
+        return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(this.factory, shape, values));
+    }
+    
+    @Override
+    public Res<AggrValue<BasicMatrixValue>> caseCell(Builtin builtin,
+            Args<AggrValue<BasicMatrixValue>> arg) {
+        return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(
+                this.factory, factory.getShapeFactory().newShapeFromValues(arg),ValueSet.<AggrValue<BasicMatrixValue>>newInstance()));
     }
 }
 
