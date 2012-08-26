@@ -146,15 +146,23 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
     	if(indizes.size()==2){
     		if (Debug) System.out.println("this array get is with two arguments!");
+    		
     		/**
 			 * this situation is for array get whose first dimension is basicMatrixValue.
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
+    			
     			/**
-    			 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1:5,:)
+    			 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1:5,:) 
+    			 * and arr(scalar,1), arr(scalar,1:5), arr(scalar,:)
+    			 * the scalar here we don't know its value, but we konw it's a scalar, because its shape is [1,1]
     			 */
     			if(((HasConstant)indizes.get(0)).getConstant()==null){
             		if (Debug) System.out.println("constant component is null!");
+            		
+            		/**
+            		 * the index maybe sacalar
+            		 */
             		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
             		List<Integer> dims = new ArrayList<Integer>(2);
             		dims.add(1);
@@ -173,7 +181,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
             	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
             		}
             		/**
-            		 * deal with constant value is empty and the shape is not scalar, like arr2 = arr1(1:2,2).
+            		 * deal with constant value is empty and the shape is not scalar, like arr2 = arr1(1:2,2),arr1(1:2,1:2) or arr1(1:2,:).
             		 */
             		//FIXME
             		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
@@ -355,6 +363,9 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         		    		}
         		    	}
         		    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));*/
+        				/**
+        				 * else, for array assign like arr(1:5,1)
+        				 */
         				return this;
         			}
         			/**
