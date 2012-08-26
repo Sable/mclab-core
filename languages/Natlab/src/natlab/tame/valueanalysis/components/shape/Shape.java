@@ -1,8 +1,11 @@
 package natlab.tame.valueanalysis.components.shape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -144,6 +147,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     }
     
     public boolean equals(Shape<V> o){
+    	//this is very important, because for loop check, merge and so on will use it!!!
     	if(this.getSize()==o.getSize()){
     		int j=0;
     		for(Integer i : this.dimensions){

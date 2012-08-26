@@ -147,9 +147,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	if(indizes.size()==2){
     		if (Debug) System.out.println("this array get is with two arguments!");
     		/**
-			 * this situation is for array assign whose first dimension is basicMatrixValue.
+			 * this situation is for array get whose first dimension is basicMatrixValue.
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
+    			/**
+    			 * this situation is for array get like arr(1:5,1), the first index is not constant, it's a colon
+    			 */
     			if(((HasConstant)indizes.get(0)).getConstant()==null){
             		if (Debug) System.out.println("constant component is null!");
             		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
@@ -177,7 +180,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
             				new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
             	}
     			/**
-				 * this situation is for array assign whose first and second dimension are both basicMatrixValue.
+				 * this situation is for array get whose first and second dimension are both basicMatrixValue.
 				 */
     			if(indizes.get(1) instanceof BasicMatrixValue){
     				if(indizes.size()==ls.size()){
@@ -191,7 +194,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     				throw new UnsupportedOperationException();
     			}
 				/**
-				 * this situation is for array assign like arr(1,:), the second dimension is a colon.
+				 * this situation is for array get like arr(1,:), the second dimension is a colon.
 				 */
     			else{
     				Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
@@ -213,11 +216,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			}	
     		}
     		/**
-			 * this situation is for array assign whose first dimension is not a basicMatrixValue, which is a colon, like array(:,1) or arr(:,:)
+			 * this situation is for array get whose first dimension is not a basicMatrixValue, which is a colon, like array(:,1) or arr(:,:)
 			 */
     		else{
     			/**
-				 * this situation is for array assign whose second dimension is a basicMatrixValue.
+				 * this situation is for array get whose second dimension is a basicMatrixValue.
 				 */
     			if(indizes.get(1) instanceof BasicMatrixValue){
     				if(((HasConstant)indizes.get(1)).getConstant()==null){
@@ -258,7 +261,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			}
 
     			/**
-    			 * this situation is for array assign whose first and second dimension are both not basicMatrixvalue, like arr(:,:).
+    			 * this situation is for array get whose first and second dimension are both not basicMatrixvalue, like arr(:,:).
     			 */
     			else{
     				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(this);
@@ -268,37 +271,42 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	}
     	else{
     		if (Debug) System.out.println("this array get is with one argument!");
-    		if(((HasConstant)indizes.get(0)).getConstant()==null){
-        		if (Debug) System.out.println("constant component is null!");
-        		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
-        		List<Integer> dims = new ArrayList<Integer>(2);
-        		dims.add(1);
-        		dims.add(1);
-        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-        			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-        			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	    	newLs.add(1);
-        	    	newLs.add(1);
-        	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-        		}
-        	}
-        	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
-        	int index = indexDouble.intValue();
-        	int size = 1;
-        	for(Integer dimNum : ls){
-        		size = size*dimNum;
-        	}
-        	if (Debug) System.out.println(size);
-        	if(index>size){
-        		if (Debug) System.out.println("index exceeds matrix dimensions!");
-        		throw new UnsupportedOperationException();//FIXME
-        	}
-        	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-        	newLs.add(1);
-        	newLs.add(1);
-        	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+    		if(indizes.get(0) instanceof BasicMatrixValue){
+    			if(((HasConstant)indizes.get(0)).getConstant()==null){
+            		if (Debug) System.out.println("constant component is null!");
+            		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+            		List<Integer> dims = new ArrayList<Integer>(2);
+            		dims.add(1);
+            		dims.add(1);
+            		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
+            			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
+            			List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	    	newLs.add(1);
+            	    	newLs.add(1);
+            	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+            	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+            		}
+            	}
+            	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
+            	int index = indexDouble.intValue();
+            	int size = 1;
+            	for(Integer dimNum : ls){
+            		size = size*dimNum;
+            	}
+            	if (Debug) System.out.println(size);
+            	if(index>size){
+            		if (Debug) System.out.println("index exceeds matrix dimensions!");
+            		throw new UnsupportedOperationException();//FIXME
+            	}
+            	List<Integer> newLs = new ArrayList<Integer>(ls.size());
+            	newLs.add(1);
+            	newLs.add(1);
+            	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+            			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
+    		}
+    		else{
+    			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(this);
+    		}
     	}	
     }
     @Override
@@ -306,6 +314,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
             Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {
     	/**
     	 * Consider array set, like a(1,2)=3, indizes are 1,2, and value is 3.
+    	 * There are 9 situation about two dimensional array assign.
     	 * If the index doesn't exceed matrix dimension,
     	 * the array set statement doesn't change the array's shape;
     	 * if the index does exceed matrix dimension,
@@ -317,10 +326,58 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 			 * this situation is for array assign whose first dimension is basicMatrixValue.
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
+    			/**
+    			 * this situation is for array assign like arr(1:5,1), arr(1:5,1:5), arr(1:5,:)
+    			 */
+    			if(((HasConstant)indizes.get(0)).getConstant()==null){
+    				/**
+    				 * this situation is for array assign like arr(1:5,1), arr(1:5,1:5)
+    				 */
+        			if(indizes.get(1) instanceof BasicMatrixValue){
+        				/**
+        				 * this situation is for array assign like arr(1:5,1:5)
+        				 */
+        				if(((HasConstant)indizes.get(1)).getConstant()==null){
+        					return this;
+        				}
+        				/**
+        				 * else, for array assign like arr(1:5, 1)
+        				 */
+        				/*List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
+        		    	int size = ls.size();
+        		    	for(int i=0; i<size; i++){
+        		    		Double indexDouble = (Double)((HasConstant)indizes.get(i)).getConstant().getValue();
+        		        	int index = indexDouble.intValue();
+        		    		if(index>ls.get(i)){
+        		    			if (Debug) System.out.println("index exceeds matrix dimensions, the matrix shape expands.");
+        		    			ls.remove(i);
+        		    			ls.add(i, index);
+        		    		}
+        		    	}
+        		    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));*/
+        				return this;
+        			}
+        			/**
+        			 * else, for array assign like arr(1:5,:)
+        			 */
+    				return this;
+    			}
 				/**
-				 * this situation is for array assign whose first and second dimension are both basicMatrixValue.
+				 * this situation is for array assign like arr(5,5), arr(5,1:5), arr(5,:).
 				 */
+    			/**
+    			 * this situation is for array assign like arr(5,5), arr(5,1:5)
+    			 */
     			if(indizes.get(1) instanceof BasicMatrixValue){
+    				/**
+    				 * this situation is for array assign like arr(5,1:5)
+    				 */
+    				if(((HasConstant)indizes.get(1)).getConstant()==null){
+    					return this;
+    				}
+    				/**
+    				 * this situation is for array assign like arr(5,5)
+    				 */
     				List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
     		    	int size = ls.size();
     		    	for(int i=0; i<size; i++){
@@ -335,24 +392,33 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     		    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));
     			}
 				/**
-				 * this situation is for array assign like arr(1,:), the second dimension is a colon.
+				 * this situation is for array assign like arr(5,:).
 				 */
     			else{
     				return this;
     			}
     		}
 			/**
-			 * this situation is for array assign whose first dimension is not a basicMatrixValue, which is a colon, like array(:,1) or arr(:,:)
+			 * this situation is for array assign like array(:,1), arr(:,1:5) or arr(:,:)
 			 */
     		else{
 				/**
-				 * this situation is for array assign whose second dimension is a basicMatrixValue.
+				 * this situation is for array assign like arr(:,1) or arr(:,1:5).
 				 */
     			if(indizes.get(1) instanceof BasicMatrixValue){
+    				/**
+    				 * this situation is for array assign like arr(:,1:5)
+    				 */
+    				if(((HasConstant)indizes.get(1)).getConstant()==null){
+    					return this;
+    				}
+    				/**
+    				 * this situation is for array assign like arr(:,5)
+    				 */
     				return this;
     			}
     			/**
-    			 * this situation if for array assign whose first and second dimension are both not basicMatrixvalue.
+    			 * this situation if for array assign like arr(:,:).
     			 */
     			else{
     				return this;
