@@ -142,303 +142,644 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	 * the array get statement doesn't change the array's shape;
     	 * if the index does exceed matrix dimension,
     	 * the array's shape will be changed.
+    	 * 
+    	 * each dimension can be scalar with exact value, scalar without exact value, 
+    	 * array with exact upper and lower boundary, array without exact upper and lower boundary,
+    	 * or just a colon, ":", i.e. arr(1,:).
+    	 * btw, only colon is not basicMatrixValue class.
     	 */
-    	List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
+    	List<Integer> arrayDimensionList = new ArrayList<Integer>(this.getShape().getDimensions());
     	if(indizes.size()==2){
     		if (Debug) System.out.println("this array get is with two arguments!");
     		
     		/**
-			 * this situation is for array get whose first dimension is basicMatrixValue.
+			 * to deal with array get whose first dimension is basicMatrixValue,
+			 * in anther word, not colon.
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
-    			
-    			/**
-    			 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1:5,:) 
-    			 * and arr(scalar,1), arr(scalar,1:5), arr(scalar,:)
-    			 * the scalar here we don't know its value, but we konw it's a scalar, because its shape is [1,1]
-    			 */
-    			if(((HasConstant)indizes.get(0)).getConstant()==null){
-            		if (Debug) System.out.println("constant component is null!");
-            		
-            		/**
-            		 * the index maybe sacalar
-            		 */
-            		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
-            		List<Integer> dims = new ArrayList<Integer>(2);
-            		dims.add(1);
-            		dims.add(1);
-            		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-            			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-            			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-            	    	newLs.add(1);
-            	    	ls.remove(0);
-            	    	int result = 1;
-            	    	for(Integer dimNum : ls){
-            	    		result = result*dimNum;
-            	    	}
-            	    	newLs.add(result);
-            	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-            	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-            		}
-            		/**
-            		 * deal with constant value is empty and the shape is not scalar, like arr2 = arr1(1:2,2),arr1(1:2,1:2) or arr1(1:2,:).
-            		 */
-            		//FIXME
-            		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-            				new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
-            	}
-    			/**
-				 * this situation is for array get like arr(1:5,1), arr(1:5,1:5), arr(1,1) or arr(1,1:5)
-				 */
-    			if(indizes.get(1) instanceof BasicMatrixValue){
-    				if(indizes.size()==ls.size()){
-    					List<Integer> newLs = new ArrayList<Integer>(ls.size());
-    					newLs.add(1);
-    					newLs.add(1);
-    					return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    							new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-    				}
-    				//TODO throw error, warning or exception?
-    				throw new UnsupportedOperationException();
-    			}
-				/**
-				 * this situation is for array get like arr(1,:), arr(1:5,:).
-				 */
-    			else{
-    				Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
-                	int index = indexDouble.intValue();
-                	if(index>ls.get(0)){
-                		if (Debug) System.out.println("index exceeds matrix dimensions!");
-                		throw new UnsupportedOperationException();//FIXME
-                	}
-                	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-                	newLs.add(1);
-                	ls.remove(0);
-                	int result = 1;
-                	for(Integer dimNum : ls){
-                		result = result*dimNum;
-                	}
-                	newLs.add(result);
-                	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-                			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-    			}	
-    		}
-    		/**
-			 * this situation is for array get whose first dimension is not a basicMatrixValue, which is a colon, like array(:,1) or arr(:,:)
-			 */
-    		else{
-    			/**
-				 * this situation is for array get whose second dimension is a basicMatrixValue.
-				 */
-    			if(indizes.get(1) instanceof BasicMatrixValue){
-    				if(((HasConstant)indizes.get(1)).getConstant()==null){
-                		if (Debug) System.out.println("constant component is null!");
-                		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(1))).getShape();
-                		List<Integer> dims = new ArrayList<Integer>(2);
-                		dims.add(1);
-                		dims.add(1);
-                		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-                			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-                			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-                	    	newLs.add(1);
-                	    	ls.remove(0);
-                	    	int result = 1;
-                	    	for(Integer dimNum : ls){
-                	    		result = result*dimNum;
-                	    	}
-                	    	newLs.add(result);
-                	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-                	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-                		}
-                		//deal with constant value is empty and the shape is not scalar
-                		//FIXME
-                		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-                				new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),this.getShape()));
-                	}
-                	Double indexDouble = (Double)((HasConstant)indizes.get(1)).getConstant().getValue();
-                	int index = indexDouble.intValue();
-                	if(index>ls.get(1)){
-                		if (Debug) System.out.println("index exceeds matrix dimensions!");
-                		throw new UnsupportedOperationException();//FIXME
-                	}
-                	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-                	newLs.add(ls.get(0));
-                	newLs.add(1);
-                	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-                			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-    			}
+    			Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+        		List<Integer> scalarShape = new ArrayList<Integer>(2);
+        		scalarShape.add(1);
+        		scalarShape.add(1);
 
     			/**
-    			 * this situation is for array get whose first and second dimension are both not basicMatrixvalue, like arr(:,:).
+    			 * to deal with array get whose first index is scalar
+    			 */
+        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        			
+        			/**
+        			 * to deal with array get whose first index is scalar without exact value
+        			 */
+        			if(((HasConstant)indizes.get(0)).getConstant()==null){
+        				if (Debug) System.out.println("first index's constant component is null!");
+        				if (Debug) System.out.println("first index's constant value is unknown, but it's definitely a scalar!");
+        				
+        				/**
+        				 * to deal with array get whose first index is scalar without exact value,
+        				 * the second index is basicMatrixValue, in another word, not colon.
+        				 */
+        				if(indizes.get(1) instanceof BasicMatrixValue){
+        					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+        	        		
+        					/**
+        					 * to deal with array get whose second index is scalar.
+        					 */
+        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        			
+        	        			/**
+        	        			 * to deal with array get whose second index is scalar without exact value.
+        	        			 */
+        	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+        	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        			}
+        	        			/**
+        	        			 * second index is scalar with exact value.
+        	        			 */
+        	        			else{
+        	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        			}
+        	        		}
+        	        		
+        	        		/**
+        	        		 * to deal with array set whose second index is not a scalar
+        	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+        	        		 * instinctively, the result will be the shape of this index array
+        	        		 * TODO more accurate!
+        	        		 */
+        	        		else{
+        	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(
+        	        							((BasicMatrixValue)indizes.get(1)).getShape().getDimensions())));
+        	        		}
+        				}
+        				
+        				/**
+        				 * to deal with array get whose first index is scalar without exact value,
+        				 * the second index is colon.
+        				 * instinctively, the result will be [1,dim], where dim is the second dimension of this array,
+        				 * if this array is only one dimension, then, arr(1,:) will be equal to arr itself.
+        				 */
+        				else{
+        					List<Integer> newShape = new ArrayList<Integer>(2);
+        	        		newShape.add(1);
+        	        		newShape.add(arrayDimensionList.get(1));
+        	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+        				}
+        			}
+        			
+        			/**
+        			 * to deal with array get whose first index is scalar with exact value
+        			 */
+        			else{
+        				if (Debug) System.out.println("first index's constant value is an exact scalar!");
+        				
+        				/**
+        				 * to deal with array get whose first index is scalar with exact value,
+        				 * the second index is basicMatrixValue, in another word, not colon.
+        				 */
+        				if(indizes.get(1) instanceof BasicMatrixValue){
+        					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+        	        		
+        					/**
+        					 * to deal with array get whose second index is scalar.
+        					 */
+        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        			
+        	        			/**
+        	        			 * to deal with array get whose second index is scalar without exact value.
+        	        			 */
+        	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+        	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        			}
+        	        			/**
+        	        			 * second index is scalar with exact value.
+        	        			 */
+        	        			else{
+        	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        			}
+        	        		}
+        	        		
+        	        		/**
+        	        		 * to deal with array set whose second index is not a scalar
+        	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+        	        		 * instinctively, the result will be the shape of this index array
+        	        		 * TODO more accurate!
+        	        		 */
+        	        		else{
+        	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(
+        	        							((BasicMatrixValue)indizes.get(1)).getShape().getDimensions())));
+        	        		}
+        				}
+        				
+        				/**
+        				 * to deal with array get whose first index is scalar with exact value,
+        				 * the second index is colon.
+        				 * instinctively, the result will be [1,dim], where dim is the second dimension of this array,
+        				 * if this array is only one dimension, then, arr(1,:) will be equal to arr itself.
+        				 */
+        				else{
+        					List<Integer> newShape = new ArrayList<Integer>(2);
+        	        		newShape.add(1);
+        	        		newShape.add(arrayDimensionList.get(1));
+        	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+        				}
+        			}
+        		}
+        		
+        		/**
+    			 * to deal with array get whose first index is basicMatrixValue, but not scalar,
+    			 * in another word, first index is an array,
+    			 * also this array's upper and lower boundary can both be either known or unknown.
+    			 * instinctively, the first dimension of result will be the size of this array,
+    			 * for example, brr = arr(2:3,don'tCare), the first dimension of brr will be 2.
+    			 */
+        		else{
+        			
+        			/**
+    				 * to deal with array get whose first index is an array,
+    				 * the second index is basicMatrixValue, in another word, not colon.
+    				 */
+    				if(indizes.get(1) instanceof BasicMatrixValue){
+    					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+    	        		
+    					/**
+    					 * to deal with array get whose second index is scalar.
+    					 */
+    	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+	        				List<Integer> newShape = new ArrayList<Integer>(2);
+        	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
+        	        		newShape.add(1);
+        	        		
+    	        			/**
+    	        			 * to deal with array get whose second index is scalar without exact value.
+    	        			 */
+    	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+    	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+    	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        			}
+    	        			/**
+    	        			 * second index is scalar with exact value.
+    	        			 */
+    	        			else{
+    	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+    	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        			}
+    	        		}
+    	        		
+    	        		/**
+    	        		 * to deal with array set whose second index is not a scalar
+    	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+    	        		 * so the two index are both array
+    	        		 * instinctively, the result's each dimension will be the size of each index array.
+    	        		 * TODO more accurate!
+    	        		 */
+    	        		else{
+    	        			List<Integer> newShape = new ArrayList<Integer>(2);
+        	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
+        	        		newShape.add(((BasicMatrixValue)indizes.get(1)).getShape().getDimensions().get(1));
+    	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+    	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        		}
+    				}
+    				
+    				/**
+    				 * to deal with array get whose first index is an array,
+    				 * the second index is colon.
+    				 * instinctively, the result will be [size,dim], 
+    				 * where size is the size of first index array,
+    				 *        dim is the second dimension of this array,
+    				 */
+    				else{
+    					List<Integer> newShape = new ArrayList<Integer>(2);
+    	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
+    	        		newShape.add(arrayDimensionList.get(1));
+    	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    				}
+        		}
+    		}
+    		
+    		/**
+			 * to deal with array get whose first dimension is colon,
+			 * so the result's first dimension will be the same size of this array's first dimension
+			 */
+    		else{
+        		List<Integer> scalarShape = new ArrayList<Integer>(2);
+        		scalarShape.add(1);
+        		scalarShape.add(1);
+        		
+    			/**
+				 * to deal with array get whose first index is colon,
+				 * the second index is basicMatrixValue, in another word, not colon.
+				 */
+				if(indizes.get(1) instanceof BasicMatrixValue){
+					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+	        		
+					/**
+					 * to deal with array get whose second index is scalar.
+					 */
+	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        				List<Integer> newShape = new ArrayList<Integer>(2);
+    	        		newShape.add(arrayDimensionList.get(0));
+    	        		newShape.add(1);
+    	        		
+	        			/**
+	        			 * to deal with array get whose second index is scalar without exact value.
+	        			 */
+	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        			}
+	        			/**
+	        			 * second index is scalar with exact value.
+	        			 */
+	        			else{
+	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        			}
+	        		}
+	        		
+	        		/**
+	        		 * to deal with array set whose second index is not a scalar
+	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+	        		 * so the two index are both array
+	        		 * instinctively, the result's each dimension will be the size of each index array.
+	        		 * TODO more accurate!
+	        		 */
+	        		else{
+	        			List<Integer> newShape = new ArrayList<Integer>(2);
+    	        		newShape.add(arrayDimensionList.get(0));
+    	        		newShape.add(((BasicMatrixValue)indizes.get(1)).getShape().getDimensions().get(1));
+	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        		}
+				}
+				
+				/**
+				 * to deal with array get whose first index is colon,
+				 * the second index is colon.
+				 * obviously, the result is the same as this array.
+				 */
+				else{
+					List<Integer> newShape = new ArrayList<Integer>(2);
+	        		newShape.add(arrayDimensionList.get(0));
+	        		newShape.add(arrayDimensionList.get(1));
+	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+    						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+				}
+    		}
+    	}
+    	
+    	/**
+    	 * only one index, TODO find all the situations.
+    	 * the index can be scalar, array and colon
+    	 */
+    	else{
+    		if (Debug) System.out.println("this array get is with one argument!");
+    		List<Integer> scalarShape = new ArrayList<Integer>(2);
+    		scalarShape.add(1);
+    		scalarShape.add(1);
+    		
+    		/**
+    		 * to deal with array get whose only index is basicMatrixValue.
+    		 */
+    		if(indizes.get(0) instanceof BasicMatrixValue){
+    			Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+    			
+    			/**
+    			 * to deal with array get whose only index is scalar, 
+    			 * actually, we don't care whether or not the scalar is with an exact value.
+    			 */
+    			if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+    						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+    			}
+    			
+    			/**
+    			 * to deal with array get whose only index is array.
     			 */
     			else{
-    				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(this);
+    				List<Integer> newShape = new ArrayList<Integer>(2);
+	        		newShape.add(1);
+	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
+        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
     			}
     		}
     		
-    	}
-    	else{
-    		if (Debug) System.out.println("this array get is with one argument!");
-    		if(indizes.get(0) instanceof BasicMatrixValue){
-    			if(((HasConstant)indizes.get(0)).getConstant()==null){
-            		if (Debug) System.out.println("constant component is null!");
-            		Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
-            		List<Integer> dims = new ArrayList<Integer>(2);
-            		dims.add(1);
-            		dims.add(1);
-            		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(dims))){
-            			if (Debug) System.out.println("constant value is unknown, but it's definitely a scalar!");
-            			List<Integer> newLs = new ArrayList<Integer>(ls.size());
-            	    	newLs.add(1);
-            	    	newLs.add(1);
-            	    	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-            	    			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-            		}
-            	}
-            	Double indexDouble = (Double)((HasConstant)indizes.get(0)).getConstant().getValue();
-            	int index = indexDouble.intValue();
-            	int size = 1;
-            	for(Integer dimNum : ls){
-            		size = size*dimNum;
-            	}
-            	if (Debug) System.out.println(size);
-            	if(index>size){
-            		if (Debug) System.out.println("index exceeds matrix dimensions!");
-            		throw new UnsupportedOperationException();//FIXME
-            	}
-            	List<Integer> newLs = new ArrayList<Integer>(ls.size());
-            	newLs.add(1);
-            	newLs.add(1);
-            	return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-            			new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newLs)));
-    		}
+    		/**
+    		 * to deal with array get whose only index is colon.
+    		 * in Matlab, if array1's shape is [2,3], after array2=array1(:), array2's shape will be [6,1].
+    		 */
     		else{
-    			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(this);
+    			int result = 1;
+    			try{
+    				for(int dim : arrayDimensionList){
+        				result = result*dim;
+        			}
+        			List<Integer> newShape = new ArrayList<Integer>(2);
+        			newShape.add(result);
+        			newShape.add(1);
+        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    			}
+    			catch(Exception e){
+    				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
+        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(arrayDimensionList)));
+    			}
+    			
     		}
-    	}	
+    	}
     }
+        				
+
     @Override
     public AggrValue<BasicMatrixValue> arraySubsasgn(
             Args<AggrValue<BasicMatrixValue>> indizes,AggrValue<BasicMatrixValue> value) {
     	/**
-    	 * Consider array set, like a(1,2)=3, indizes are 1,2, and value is 3.
-    	 * There are 9 situation about two dimensional array assign.
+    	 * Consider array assign, like a(1,2)=b, index are 1 and 2, b is value.
+    	 * one intresting thing is that, for array set, it doesn't care about value!!!
     	 * If the index doesn't exceed matrix dimension,
-    	 * the array set statement doesn't change the array's shape;
+    	 * the array get statement doesn't change the array's shape;
     	 * if the index does exceed matrix dimension,
     	 * the array's shape will be changed.
+    	 * 
+    	 * each dimension can be scalar with exact value, scalar without exact value, 
+    	 * array with exact upper and lower boundary, array without exact upper and lower boundary,
+    	 * or just a colon, ":", i.e. arr(1,:).
+    	 * btw, only colon is not basicMatrixValue class.
     	 */
+    	List<Integer> arrayDimensionList = new ArrayList<Integer>(this.getShape().getDimensions());
+		List<Integer> scalarShape = new ArrayList<Integer>(2);
+		scalarShape.add(1);
+		scalarShape.add(1);
     	if(indizes.size()==2){
-    		if (Debug) System.out.println("this array get is with two arguments!");
+    		if (Debug) System.out.println("this array assign is with two arguments!");
+    		
     		/**
-			 * this situation is for array assign whose first dimension is basicMatrixValue.
+			 * to deal with array assign whose first dimension is basicMatrixValue,
+			 * in anther word, not colon.
 			 */
     		if(indizes.get(0) instanceof BasicMatrixValue){
+    			Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+
     			/**
-    			 * this situation is for array assign like arr(1:5,1), arr(1:5,1:5), arr(1:5,:)
+    			 * to deal with array get whose first index is scalar
     			 */
-    			if(((HasConstant)indizes.get(0)).getConstant()==null){
-    				/**
-    				 * this situation is for array assign like arr(1:5,1), arr(1:5,1:5)
-    				 */
-        			if(indizes.get(1) instanceof BasicMatrixValue){
-        				/**
-        				 * this situation is for array assign like arr(1:5,1:5)
-        				 */
-        				if(((HasConstant)indizes.get(1)).getConstant()==null){
-        					return this;
-        				}
-        				/**
-        				 * else, for array assign like arr(1:5, 1)
-        				 */
-        				/*List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
-        		    	int size = ls.size();
-        		    	for(int i=0; i<size; i++){
-        		    		Double indexDouble = (Double)((HasConstant)indizes.get(i)).getConstant().getValue();
-        		        	int index = indexDouble.intValue();
-        		    		if(index>ls.get(i)){
-        		    			if (Debug) System.out.println("index exceeds matrix dimensions, the matrix shape expands.");
-        		    			ls.remove(i);
-        		    			ls.add(i, index);
-        		    		}
-        		    	}
-        		    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));*/
-        				/**
-        				 * else, for array assign like arr(1:5,1)
-        				 */
-        				return this;
-        			}
+        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        			
         			/**
-        			 * else, for array assign like arr(1:5,:)
+        			 * to deal with array assign whose first index is scalar without exact value
         			 */
-    				return this;
-    			}
-				/**
-				 * this situation is for array assign like arr(5,5), arr(5,1:5), arr(5,:).
-				 */
-    			/**
-    			 * this situation is for array assign like arr(5,5), arr(5,1:5)
+        			if(((HasConstant)indizes.get(0)).getConstant()==null){
+        				if (Debug) System.out.println("first index's constant component is null!");
+        				if (Debug) System.out.println("first index's constant value is unknown, but it's definitely a scalar!");
+        				
+        				/**
+        				 * to deal with array assign whose first index is scalar without exact value,
+        				 * the second index is basicMatrixValue, in another word, not colon.
+        				 */
+        				if(indizes.get(1) instanceof BasicMatrixValue){
+        					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+        	        		
+        					/**
+        					 * to deal with array assign whose second index is scalar.
+        					 */
+        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        			
+        	        			/**
+        	        			 * to deal with array assign whose second index is scalar without exact value.
+        	        			 */
+        	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+        	        				return this;
+        	        			}
+        	        			/**
+        	        			 * second index is scalar with exact value.
+        	        			 */
+        	        			else{
+        	        				return this;
+        	        			}
+        	        		}
+        	        		
+        	        		/**
+        	        		 * to deal with array assign whose second index is not a scalar
+        	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+        	        		 * TODO more accurate!
+        	        		 */
+        	        		else{
+        	        			return this;
+        	        		}
+        				}
+        				
+        				/**
+        				 * to deal with array assign whose first index is scalar without exact value,
+        				 * the second index is colon.
+        				 */
+        				else{
+        	        		return this;
+        				}
+        			}
+        			
+        			/**
+        			 * to deal with array assign whose first index is scalar with exact value
+        			 */
+        			else{
+        				if (Debug) System.out.println("first index's constant value is an exact scalar!");
+        				
+        				/**
+        				 * to deal with array assign whose first index is scalar with exact value,
+        				 * the second index is basicMatrixValue, in another word, not colon.
+        				 */
+        				if(indizes.get(1) instanceof BasicMatrixValue){
+        					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+        	        		
+        					/**
+        					 * to deal with array assign whose second index is scalar.
+        					 */
+        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        			
+        	        			/**
+        	        			 * to deal with array assign whose second index is scalar without exact value.
+        	        			 */
+        	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+        	        				return this;
+        	        			}
+        	        			/**
+        	        			 * second index is scalar with exact value.
+        	        			 */
+        	        			else{
+        	        				return this;
+        	        			}
+        	        		}
+        	        		
+        	        		/**
+        	        		 * to deal with array assign whose second index is not a scalar
+        	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+        	        		 * TODO more accurate!
+        	        		 */
+        	        		else{
+        	        			return this;
+        	        		}
+        				}
+        				
+        				/**
+        				 * to deal with array assign whose first index is scalar with exact value,
+        				 * the second index is colon.
+        				 */
+        				else{
+        	        		return this;
+        				}
+        			}
+        		}
+        		
+        		/**
+    			 * to deal with array assign whose first index is basicMatrixValue, but not scalar,
+    			 * in another word, first index is an array,
+    			 * also this array's upper and lower boundary can both be either known or unknown.
     			 */
-    			if(indizes.get(1) instanceof BasicMatrixValue){
-    				/**
-    				 * this situation is for array assign like arr(5,1:5)
+        		else{
+        			
+        			/**
+    				 * to deal with array assign whose first index is an array,
+    				 * the second index is basicMatrixValue, in another word, not colon.
     				 */
-    				if(((HasConstant)indizes.get(1)).getConstant()==null){
-    					return this;
+    				if(indizes.get(1) instanceof BasicMatrixValue){
+    					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+    	        		
+    					/**
+    					 * to deal with array assign whose second index is scalar.
+    					 */
+    	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        		
+    	        			/**
+    	        			 * to deal with array get whose second index is scalar without exact value.
+    	        			 */
+    	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+    	        				return this;
+    	        			}
+    	        			/**
+    	        			 * second index is scalar with exact value.
+    	        			 */
+    	        			else{
+    	        				return this;
+    	        			}
+    	        		}
+    	        		
+    	        		/**
+    	        		 * to deal with array assign whose second index is not a scalar
+    	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+    	        		 * so the two index are both array.
+    	        		 * TODO more accurate!
+    	        		 */
+    	        		else{
+    	        			return this;
+    	        		}
     				}
+    				
     				/**
-    				 * this situation is for array assign like arr(5,5)
+    				 * to deal with array assign whose first index is an array,
+    				 * the second index is colon.
     				 */
-    				List<Integer> ls = new ArrayList<Integer>(this.getShape().getDimensions());
-    		    	int size = ls.size();
-    		    	for(int i=0; i<size; i++){
-    		    		Double indexDouble = (Double)((HasConstant)indizes.get(i)).getConstant().getValue();
-    		        	int index = indexDouble.intValue();
-    		    		if(index>ls.get(i)){
-    		    			if (Debug) System.out.println("index exceeds matrix dimensions, the matrix shape expands.");
-    		    			ls.remove(i);
-    		    			ls.add(i, index);
-    		    		}
-    		    	}
-    		    	return new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(ls));
-    			}
-				/**
-				 * this situation is for array assign like arr(5,:).
-				 */
-    			else{
-    				return this;
-    			}
+    				else{
+    	        		return this;
+    				}
+        		}
     		}
-			/**
-			 * this situation is for array assign like array(:,1), arr(:,1:5) or arr(:,:)
+    		
+    		/**
+			 * to deal with array assign whose first dimension is colon.
 			 */
     		else{
-				/**
-				 * this situation is for array assign like arr(:,1) or arr(:,1:5).
-				 */
-    			if(indizes.get(1) instanceof BasicMatrixValue){
-    				/**
-    				 * this situation is for array assign like arr(:,1:5)
-    				 */
-    				if(((HasConstant)indizes.get(1)).getConstant()==null){
-    					return this;
-    				}
-    				/**
-    				 * this situation is for array assign like arr(:,5)
-    				 */
-    				return this;
-    			}
+        		
     			/**
-    			 * this situation if for array assign like arr(:,:).
-    			 */
-    			else{
-    				return this;
-    			}
+				 * to deal with array assign whose first index is colon,
+				 * the second index is basicMatrixValue, in another word, not colon.
+				 */
+				if(indizes.get(1) instanceof BasicMatrixValue){
+					Shape<AggrValue<BasicMatrixValue>> indizesShape2 = ((BasicMatrixValue)(indizes.get(1))).getShape();
+	        		
+					/**
+					 * to deal with array assign whose second index is scalar.
+					 */
+	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    	        		
+	        			/**
+	        			 * to deal with array assign whose second index is scalar without exact value.
+	        			 */
+	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
+	        				return this;
+	        			}
+	        			/**
+	        			 * second index is scalar with exact value.
+	        			 */
+	        			else{
+	        				return this;
+	        			}
+	        		}
+	        		
+	        		/**
+	        		 * to deal with array assign whose second index is not a scalar
+	        		 * so, it will be an array, whose upper and lower boundary can both be either exact or unknown.
+	        		 * so the two index are both array
+	        		 * TODO more accurate!
+	        		 */
+	        		else{
+	        			return this;
+	        		}
+				}
+				
+				/**
+				 * to deal with array assign whose first index is colon,
+				 * the second index is colon.
+				 */
+				else{
+	        		return this;
+				}
     		}
     	}
+    	
+    	/**
+    	 * only one index, TODO find all the situations.
+    	 * the index can be scalar, array and colon
+    	 */
     	else{
     		if (Debug) System.out.println("this array get is with one argument!");
-    		return this;
+    		
+    		/**
+    		 * to deal with array assign whose only index is basicMatrixValue.
+    		 */
+    		if(indizes.get(0) instanceof BasicMatrixValue){
+    			Shape<AggrValue<BasicMatrixValue>> indizesShape = ((BasicMatrixValue)(indizes.get(0))).getShape();
+    			
+    			/**
+    			 * to deal with array assign whose only index is scalar, 
+    			 * actually, we don't care whether or not the scalar is with an exact value.
+    			 */
+    			if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    				return this;
+    			}
+    			
+    			/**
+    			 * to deal with array assign whose only index is array.
+    			 */
+    			else{
+        			return this;
+    			}
+    		}
+    		
+    		/**
+    		 * to deal with array assign whose only index is colon.
+    		 */
+    		else{
+    			return this;
+    		}
     	}
     }
     @Override

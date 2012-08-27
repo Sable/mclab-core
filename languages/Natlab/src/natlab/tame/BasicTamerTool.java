@@ -70,7 +70,6 @@ public class BasicTamerTool {
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
-		Args<AggrValue<BasicMatrixValue>> someargs = Args.<AggrValue<BasicMatrixValue>>newInstance(Collections.EMPTY_LIST); 
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 				callgraph, 
 				//Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 

@@ -51,8 +51,32 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	else if(this.isError==true){
     		return "[MATLAB syntax error, check your code]";
     	}
+    	else if(isShapeExactlyKnown()==false){
+    		List<String> dimension = new ArrayList<String>();
+    		for(int i=0; i<this.dimensions.size(); i++){
+    			if(this.dimensions.get(i)==null){
+    				dimension.add("?");
+    			}
+    			else{
+    				dimension.add(this.dimensions.get(i).toString());
+    			}
+    		}
+    		return dimension.toString();
+    	}
     	else{
     		return this.dimensions.toString();
+    	}
+    }
+    
+    public boolean isShapeExactlyKnown(){
+    	try{
+    		for(int i : dimensions){
+    			int forNothing = i;
+    		}
+    		return true;
+    	}
+    	catch(Exception e){
+    			return false;
     	}
     }
     
