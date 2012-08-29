@@ -44,19 +44,7 @@ public class SPScalar extends SPAbstractVectorExpr{
 				if((((HasConstant)argument).getConstant()==null)){//maybe it's a scalar but value is unknown or it's not a scalar, which means not matched!
 					//first, test whether or not it's not a scalar, which means, constant value is empty but shape is not [1,1]
 					if(((HasShape)argument).getShape().equals((new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())))!=true){
-						if(((HasShape)argument).getShape().maybeScalar()){
-							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-							lowercase.put(s, null);
-							HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-							uppercase.put(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
-							ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, uppercase);
-							match.comsumeArg();
-							match.saveLatestMatchedUppercase(s);
-							if (Debug) System.out.println(match.getAllLowercase());
-							if (Debug) System.out.println("inside empty constant value and maybe a scalar value mathcing a Scalar!");
-							return match;
-						}
-						if (Debug) System.out.println("it's definitely not a scalar");
+						if (Debug) System.out.println("it's may not a scalar");
 						previousMatchResult.setIsError();
 						return previousMatchResult;
 					}
