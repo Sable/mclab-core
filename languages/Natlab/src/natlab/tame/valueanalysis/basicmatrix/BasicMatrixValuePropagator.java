@@ -28,7 +28,7 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
     public Res<AggrValue<BasicMatrixValue>> caseBuiltin(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> arg) {
         //deal with constants
-    	if (Debug) System.out.println("built-in fn's arguments are "+arg);
+    	if (Debug) System.out.println("built-in:"+builtin+" fn's arguments are "+arg);
     	Constant cResult = builtin.visit(constantProp, arg);
     	if (cResult != null){
     		return Res.<AggrValue<BasicMatrixValue>>newInstance(new BasicMatrixValue(cResult));

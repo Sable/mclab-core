@@ -531,7 +531,7 @@ matrixCreation; matrixFunction
 colon
 -Class(coerce(logical -> double, matlab))
 -MatlabClass(logical logical logical?->error, logical|double double|logical  (double|logical)? -> double, numeric double|0  (double|0)? -> 0, double|-1 (double|-1 numeric) | numeric -> -1, double|1 numeric double|1 -> 1, char (char|double char)|char -> char)
--Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k])
+-Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k])||M,M->[1,k])
 -isComplex(R,R ->R || A,A->NUMXARGS>0?X:A)
 
 # construct arrays via their dimensions; and possibly a type
