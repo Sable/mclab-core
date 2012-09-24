@@ -190,6 +190,23 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	return false;//FIXME
     }
     
+    public boolean bigger(Shape<V> o){
+    	int thisSize=1;
+    	int thatSize=1;
+    	for(Integer i : this.dimensions){
+    		thisSize = thisSize*i;
+    	}
+    	for(Integer j : o.dimensions){
+    		thatSize = thatSize*j;
+    	}
+    	if(thisSize>thatSize){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    }
+    
     /**
      * returns a shape that is the result of growing this to the given shape.
      * This is different than a merge, for example

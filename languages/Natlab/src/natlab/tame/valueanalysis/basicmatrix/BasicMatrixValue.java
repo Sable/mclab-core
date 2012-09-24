@@ -768,9 +768,17 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			
     			/**
     			 * to deal with array assign whose only index is array.
+    			 * here, we need to think about maybe the original array will be expanded by the index.
     			 */
     			else{
-        			return this;
+    				//TODO
+    				if(this.getShape().bigger(indizesShape)){
+    					return this;
+    				}
+    				else{
+    					return new BasicMatrixValue(new BasicMatrixValue(
+    							this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(indizesShape.getDimensions()));
+    				}
     			}
     		}
     		
