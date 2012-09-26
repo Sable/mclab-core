@@ -1,0 +1,47 @@
+package mclint.analyses;
+
+import mclint.AnalysisKit;
+import mclint.Lint;
+import mclint.LintAnalysis;
+import mclint.Message;
+import nodecases.AbstractNodeCaseHandler;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ForStmt;
+
+public class OutputSuppression extends AbstractNodeCaseHandler implements LintAnalysis {
+  private Lint lint;
+  private ASTNode tree;
+
+  private Message suppressOutput(ASTNode node) {
+    return Message.regarding(node, "OUTPUT", "Terminate this line with a semicolon to suppress output.");
+  }
+
+  public OutputSuppression(AnalysisKit kit) {
+    this.tree = kit.getAST();
+  }
+
+  @Override
+  public void analyze(Lint lint) {
+    this.lint = lint;
+    tree.analyze(this);
+  }
+
+  @Override
+  public void caseASTNode(ASTNode node) {
+    for (int i = 0; i < node.getNumChild(); ++i)
+      node.getChild(i).analyze(this);
+  }
+
+  @Override
+  public void caseAssignStmt(AssignStmt node) {
+    if (!node.isOutputSuppressed())
+      lint.report(suppressOutput(node));
+    caseASTNode(node);
+  }
+
+  @Override
+  public void caseForStmt(ForStmt node) {
+    node.getStmts().analyze(this);
+  }
+}
