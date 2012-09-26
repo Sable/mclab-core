@@ -14,7 +14,8 @@ public class AnalysisKit {
   private LivelinessAnalysis liveVars;
 
   public static AnalysisKit forAST(ASTNode tree) {
-    return new AnalysisKit(tree);
+    return new AnalysisKit(tree, new VFPreorderAnalysis(tree), new ReachingDefs(tree),
+        new LivelinessAnalysis(tree));
   }
 
   public ASTNode getAST() {
@@ -39,10 +40,10 @@ public class AnalysisKit {
     return (LivelinessAnalysis) ensureAnalyzed(liveVars);
   }
 
-  private AnalysisKit(ASTNode tree) {
+  private AnalysisKit(ASTNode tree, VFAnalysis vf, ReachingDefs rd, LivelinessAnalysis la) {
     this.tree = tree;
-    this.varorfun = new VFPreorderAnalysis(tree);
-    this.reachingDefs = new ReachingDefs(tree);
-    this.liveVars = new LivelinessAnalysis(tree);
+    this.varorfun = vf;
+    this.reachingDefs = rd;
+    this.liveVars = la;
   }
 }

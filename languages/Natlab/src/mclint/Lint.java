@@ -8,7 +8,6 @@ import java.util.List;
 
 import mclint.reports.ReportGenerator;
 
-
 /**
  * The analysis runner. This class calls the <tt>analyze</tt> method of each
  * analysis, passing itself as argument so it can gather the messages
