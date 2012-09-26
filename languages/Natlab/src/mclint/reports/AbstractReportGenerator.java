@@ -8,7 +8,7 @@ import java.util.List;
 
 import mclint.Message;
 
-public abstract class AbstractReportGenerator implements ReportGenerator {
+abstract class AbstractReportGenerator implements ReportGenerator {
 
   @Override
   public void write(List<Message> messages, OutputStream out) throws IOException {

@@ -1,12 +1,12 @@
 package mclint.reports;
 
 public class ReportGenerators {
-  public static ReportGenerator plainText() {
+  public static ReportGenerator plain() {
     return new PlainTextReportGenerator();
   }
 
   public static ReportGenerator html() {
-    return new HtmlTableReportGenerator();
+    return new HtmlReportGenerator();
   }
 
   private ReportGenerators() {}

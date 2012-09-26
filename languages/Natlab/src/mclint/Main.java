@@ -52,6 +52,6 @@ public class Main {
     List<LintAnalysis> analyses = AnalysisLoader.loadAnalyses(kit, pluginDirectory);
     Lint lint = new Lint(analyses);
     lint.runAnalyses();
-    lint.writeReport(ReportGenerators.plainText(), System.out);
+    lint.writeReport(ReportGenerators.plain(), System.out);
   }
 }
