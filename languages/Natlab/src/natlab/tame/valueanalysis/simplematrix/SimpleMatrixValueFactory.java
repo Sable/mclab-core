@@ -3,10 +3,9 @@
  */
 package natlab.tame.valueanalysis.simplematrix;
 
-import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 
 public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue>{
     @Override
@@ -23,23 +22,12 @@ public class SimpleMatrixValueFactory extends AggrValueFactory<SimpleMatrixValue
     }
     
 	@SuppressWarnings("unchecked")
+	static ClassPropagator<AggrValue<SimpleMatrixValue>> classPropagator = ClassPropagator.getInstance();
 	@Override
 	public AggrValue<SimpleMatrixValue> forRange(
 			AggrValue<SimpleMatrixValue> lower,
 			AggrValue<SimpleMatrixValue> upper, AggrValue<SimpleMatrixValue> inc) {
-		//FIXME do something proper here
-		if (inc != null){
-			return new SimpleMatrixValue(
-					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,inc,upper))
-							.get(0).iterator().next().getMatlabClass()));
-		} else {
-			return new SimpleMatrixValue(
-					(PrimitiveClassReference)
-					(propagator.call("colon", Args.newInstance(lower,upper))
-							.get(0).iterator().next().getMatlabClass()));
-
-		}
+		return new SimpleMatrixValue(classPropagator.forRange(lower, upper, inc));
 	}
 }
 

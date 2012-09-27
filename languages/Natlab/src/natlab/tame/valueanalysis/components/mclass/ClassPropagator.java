@@ -6,6 +6,8 @@ import natlab.tame.builtin.*;
 import natlab.tame.builtin.classprop.ClassPropTool;
 import natlab.tame.builtin.classprop.HasClassPropagationInfo;
 import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 
 /**
@@ -34,6 +36,33 @@ public class ClassPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>,
 		throw new UnsupportedOperationException(
 				"ClassPropgator cannot propgate classes for "+builtin);
 	}	
+    
+
+    
+    
+    
+    /**
+     * returns a classref of i in 
+     *   i = lower:inc:upper 
+     * when used as the range expression in a for loop. The classref for i has to be a valid
+     * representation for all iterations.
+     * 
+     * inc is optional, and may be null.
+     * lower, upper, inc should be values with matrix mclasses.
+     */
+    @SuppressWarnings("unchecked")
+	public PrimitiveClassReference forRange(V lower,	V upper, V inc){
+		//FIXME do something proper here
+		if (inc != null){
+			return (PrimitiveClassReference)
+					(this.caseBuiltin(Builtin.Colon.getInstance(), Args.newInstance(lower,inc,upper))
+							.get(0).iterator().next());
+		} else {
+			return (PrimitiveClassReference)
+					(this.caseBuiltin(Builtin.Colon.getInstance(), Args.newInstance(lower,upper))
+							.get(0).iterator().next());
+		}
+    }
 }
 
 

@@ -23,7 +23,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     Shape<AggrValue<BasicMatrixValue>> shape;
     //TODO -- also need complex
     
-    @Deprecated
+    
     public BasicMatrixValue(PrimitiveClassReference aClass, Shape<AggrValue<BasicMatrixValue>> shape) {
         super(aClass);
         this.shape = shape;
@@ -33,6 +33,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         super(aClass);
     }
     
+    @Deprecated
     public BasicMatrixValue(BasicMatrixValue onlyClassInfo, Shape<AggrValue<BasicMatrixValue>> shape) {
     	super(onlyClassInfo.classRef);
     	this.shape = shape;

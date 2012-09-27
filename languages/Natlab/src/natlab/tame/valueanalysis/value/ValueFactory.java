@@ -114,7 +114,6 @@ public abstract class ValueFactory<V extends Value<V>> {
      * 
      * inc is optional, and may be null.
      * lower, upper, inc should be values with matrix mclasses.
-     * TODO - move this somewhere else.
      */
     abstract public V forRange(V lower,	V upper, V inc);
 

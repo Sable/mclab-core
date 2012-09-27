@@ -83,7 +83,7 @@ public class TamerTool {
 	
 	//example main...
 	public static void main(String[] args) {
-		GenericFile gFile = GenericFile.create("/home/xuli/for_test/benchmarks/drv_adpt.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/2011/xli141/mclab/Benchmarks/matlabBenchmarks/adpt/drv_adpt.m"); //file -> generic file
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		ValueFactory<AggrValue<SimpleMatrixValue>> factory = new SimpleMatrixValueFactory();

@@ -64,7 +64,7 @@ public class BasicTamerTool {
 	
 	public static void main(String[] args){
 		
-		GenericFile gFile = GenericFile.create("/home/xu/for_test/benchmarks/drv_adpt.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/2011/xli141/for_test/test.m"); //file -> generic file
 		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
