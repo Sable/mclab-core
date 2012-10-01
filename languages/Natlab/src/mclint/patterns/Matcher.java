@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import mclint.Location;
 import mclint.util.Parsing;
 import natlab.refactoring.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
@@ -99,8 +100,8 @@ public class Matcher {
   }
 
   public static void main(String[] args) {
-    Program program = Parsing.string("for i = 1:5 \n disp(i) \n end");
-    List<Match> matches = findMatchingStatements("%z(%x)", program);
-    System.out.println(matches.get(0));
+    Program program = Parsing.string("repmat(0, x, y)");
+    List<Match> matches = findMatchingStatements("repmat(0, %x)", program);
+    System.out.println(matches);
   }
 }

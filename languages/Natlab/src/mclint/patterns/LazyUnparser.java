@@ -25,12 +25,26 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
       node.getChild(i).analyze(this);
     }
   }
+  
+  private List removeFirst(List node) {
+    List copy = new List();
+    for (int i = 1; i < node.getNumChild(); ++i) {
+      copy.add(node.getChild(i));
+    }
+    copy.setParent(node.getParent());
+    return copy;
+  }
 
   @Override
   public void caseList(List node) {
-    for (int i = 0; i < node.getNumChild(); ++i) {
-      tokens(node.getChild(i));
+    if (node.getNumChild() == 0) {
+      return;
     }
+    tokens(node.getChild(0));
+    if (node.getNumChild() > 1 && node.getParent() instanceof ParameterizedExpr) {
+      tokens(",");
+    }
+    tokens(removeFirst(node));
   }
 
   @Override
