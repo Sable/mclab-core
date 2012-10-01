@@ -5,6 +5,7 @@ import java.util.*;
 import natlab.tame.builtin.*;
 import natlab.tame.builtin.shapeprop.ShapePropTool;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.value.*;
 
 
@@ -25,7 +26,6 @@ public class ShapePropagator<V extends Value<V>>
     private ShapePropagator(){} //hidden private constructor
 
     @Override
-    //XU add this to support...
 	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
 		// TODO
 		if (Debug) System.out.println("inside ShapePropgator, builtin fn is "+builtin);
@@ -41,6 +41,18 @@ public class ShapePropagator<V extends Value<V>>
 		}
 		throw new UnsupportedOperationException();
 	}
+    
+    public Shape<V> forRange(V lower,	V upper, V inc){
+		//FIXME do something proper here
+		List<Integer> scalarShape = new ArrayList<Integer>(2);
+		scalarShape.add(1);
+		scalarShape.add(1);
+		if (inc != null){
+			return (new ShapeFactory<V>()).newShapeFromIntegers(scalarShape);
+		} else {
+			return (new ShapeFactory<V>()).newShapeFromIntegers(scalarShape);
+		}
+    }
     
 }
 

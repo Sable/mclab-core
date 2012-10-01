@@ -65,7 +65,7 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
             HashMap<ClassReference,AggrValue<BasicMatrixValue>> map = new HashMap<ClassReference,AggrValue<BasicMatrixValue>>();
             if (Debug) System.out.println(matchShapeResult.get(0));
             for (ClassReference classRef : values){
-                map.put(classRef,new BasicMatrixValue(new BasicMatrixValue((PrimitiveClassReference)classRef),matchShapeResult.get(0)));
+                map.put(classRef,new BasicMatrixValue((PrimitiveClassReference)classRef,matchShapeResult.get(0)));
                 //FIXME
             }
             result.add(ValueSet.newInstance(map));
@@ -87,8 +87,8 @@ public class BasicMatrixValuePropagator extends MatrixPropagator<BasicMatrixValu
         }
         //this block ends
         return Res.<AggrValue<BasicMatrixValue>>newInstance(
-                new BasicMatrixValue(new BasicMatrixValue(
-                        (PrimitiveClassReference)getDominantCatArgClass(arg)),matchShapeResult.get(0)));//FIXME a little bit tricky
+                new BasicMatrixValue(
+                        (PrimitiveClassReference)getDominantCatArgClass(arg),matchShapeResult.get(0)));//FIXME a little bit tricky
     }
     
   //TODO - move to aggr value prop. This comment is in Anton's SimpleMatrixValuePropagator.java, do we need to do this later?

@@ -2,15 +2,13 @@ package natlab.tame.valueanalysis.basicmatrix;
 
 import java.util.*;
 
-import natlab.tame.classes.reference.*;                 //class    component
+import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.*; //constant component
-import natlab.tame.valueanalysis.components.shape.*;    //shape    component
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.aggrvalue.*;
 
 /**
  * represents a MatrixValue that is instantiable. It stores a constant,
@@ -33,12 +31,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         super(aClass);
     }
     
-    @Deprecated
+    /*@Deprecated
     public BasicMatrixValue(BasicMatrixValue onlyClassInfo, Shape<AggrValue<BasicMatrixValue>> shape) {
     	super(onlyClassInfo.classRef);
     	this.shape = shape;
     	
-    }
+    }*/
     
     /**
      * return a BasicMatrixValue object by taking in a user typed input argument
@@ -100,7 +98,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         			return this;
         		}
         		if(shape.equals(((BasicMatrixValue)other).getShape())!=true){
-        			return new BasicMatrixValue(new BasicMatrixValue(this.classRef),this.shape.merge(((BasicMatrixValue)other).getShape()));
+        			return new BasicMatrixValue(this.classRef,this.shape.merge(((BasicMatrixValue)other).getShape()));
         		}
         	}
         	return this;	
@@ -109,7 +107,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	if (Debug) System.out.println("this constant is equal to that one!");
         	return this;
         }
-        BasicMatrixValue newMatrix = new BasicMatrixValue(new BasicMatrixValue(this.classRef),this.shape.merge(((BasicMatrixValue)other).getShape()));
+        BasicMatrixValue newMatrix = new BasicMatrixValue(this.classRef,this.shape.merge(((BasicMatrixValue)other).getShape()));
         if (Debug) System.out.println(newMatrix);
         return newMatrix;
        }
@@ -121,11 +119,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         BasicMatrixValue m = (BasicMatrixValue)obj;
         if (isConstant()) return constant.equals(m.constant);
         if (Debug) System.out.println(m.getMatlabClass());
-        if (Debug) System.out.println(((HasShape)((BasicMatrixValue)obj)).getShape());
-        if((shape==null)&&(((HasShape)((BasicMatrixValue)obj)).getShape()==null)){
+        if (Debug) System.out.println(((HasShape<AggrValue<BasicMatrixValue>>)((BasicMatrixValue)obj)).getShape());
+        if((shape==null)&&(((HasShape<AggrValue<BasicMatrixValue>>)((BasicMatrixValue)obj)).getShape()==null)){
         	return (classRef.equals(m.getMatlabClass()))&&true;
         }
-        return (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape)((BasicMatrixValue)obj)).getShape()));
+        return (classRef.equals(m.getMatlabClass()) && shape.equals(((HasShape<AggrValue<BasicMatrixValue>>)((BasicMatrixValue)obj)).getShape()));
     }
     
     @Override
@@ -166,7 +164,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
-        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        		if(indizesShape.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         			
         			/**
         			 * to deal with array get whose first index is scalar without exact value
@@ -185,21 +183,21 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         					/**
         					 * to deal with array get whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         	        			
         	        			/**
         	        			 * to deal with array get whose second index is scalar without exact value.
         	        			 */
         	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
         	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape)));
         	        			}
         	        			/**
         	        			 * second index is scalar with exact value.
         	        			 */
         	        			else{
         	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape)));
         	        			}
         	        		}
         	        		
@@ -211,7 +209,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	        		 */
         	        		else{
         	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(
+        	        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(
         	        							((BasicMatrixValue)indizes.get(1)).getShape().getDimensions())));
         	        		}
         				}
@@ -227,7 +225,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	        		newShape.add(1);
         	        		newShape.add(arrayDimensionList.get(1));
         	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
         				}
         			}
         			
@@ -247,21 +245,21 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         					/**
         					 * to deal with array get whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         	        			
         	        			/**
         	        			 * to deal with array get whose second index is scalar without exact value.
         	        			 */
         	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
         	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape)));
         	        			}
         	        			/**
         	        			 * second index is scalar with exact value.
         	        			 */
         	        			else{
         	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+        	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape)));
         	        			}
         	        		}
         	        		
@@ -273,7 +271,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	        		 */
         	        		else{
         	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(
+        	        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(
         	        							((BasicMatrixValue)indizes.get(1)).getShape().getDimensions())));
         	        		}
         				}
@@ -289,7 +287,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	        		newShape.add(1);
         	        		newShape.add(arrayDimensionList.get(1));
         	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
         				}
         			}
         		}
@@ -313,7 +311,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     					/**
     					 * to deal with array get whose second index is scalar.
     					 */
-    	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
 	        				List<Integer> newShape = new ArrayList<Integer>(2);
         	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
         	        		newShape.add(1);
@@ -323,14 +321,14 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	        			 */
     	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
     	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     	        			}
     	        			/**
     	        			 * second index is scalar with exact value.
     	        			 */
     	        			else{
     	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     	        			}
     	        		}
     	        		
@@ -346,7 +344,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
         	        		newShape.add(((BasicMatrixValue)indizes.get(1)).getShape().getDimensions().get(1));
     	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    	        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     	        		}
     				}
     				
@@ -362,7 +360,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
     	        		newShape.add(arrayDimensionList.get(1));
     	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     				}
         		}
     		}
@@ -386,7 +384,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 					/**
 					 * to deal with array get whose second index is scalar.
 					 */
-	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         				List<Integer> newShape = new ArrayList<Integer>(2);
     	        		newShape.add(arrayDimensionList.get(0));
     	        		newShape.add(1);
@@ -396,14 +394,14 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 	        			 */
 	        			if(((HasConstant)indizes.get(1)).getConstant()==null){
 	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
 	        			}
 	        			/**
 	        			 * second index is scalar with exact value.
 	        			 */
 	        			else{
 	        				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-	        						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
 	        			}
 	        		}
 	        		
@@ -419,7 +417,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	        		newShape.add(arrayDimensionList.get(0));
     	        		newShape.add(((BasicMatrixValue)indizes.get(1)).getShape().getDimensions().get(1));
 	        			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-	        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+	        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
 	        		}
 				}
 				
@@ -433,7 +431,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 	        		newShape.add(arrayDimensionList.get(0));
 	        		newShape.add(arrayDimensionList.get(1));
 	        		return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+    						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
 				}
     		}
     	}
@@ -458,9 +456,9 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			 * to deal with array get whose only index is scalar, 
     			 * actually, we don't care whether or not the scalar is with an exact value.
     			 */
-    			if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    			if(indizesShape.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
     				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-    						new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(scalarShape)));
+    						new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape)));
     			}
     			
     			/**
@@ -471,7 +469,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 	        		newShape.add(1);
 	        		newShape.add(((BasicMatrixValue)indizes.get(0)).getShape().getDimensions().get(1));
         			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     			}
     		}
     		
@@ -489,11 +487,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         			newShape.add(result);
         			newShape.add(1);
         			return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(newShape)));
+        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(newShape)));
     			}
     			catch(Exception e){
     				return ValueSet.<AggrValue<BasicMatrixValue>>newInstance(
-        					new BasicMatrixValue(new BasicMatrixValue(this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(arrayDimensionList)));
+        					new BasicMatrixValue(this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(arrayDimensionList)));
     			}
     			
     		}
@@ -517,8 +515,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     	 * or just a colon, ":", i.e. arr(1,:).
     	 * btw, only colon is not basicMatrixValue class.
     	 */
-    	List<Integer> arrayDimensionList = new ArrayList<Integer>(this.getShape().getDimensions());
-		List<Integer> scalarShape = new ArrayList<Integer>(2);
+    	List<Integer> scalarShape = new ArrayList<Integer>(2);
 		scalarShape.add(1);
 		scalarShape.add(1);
     	if(indizes.size()==2){
@@ -534,7 +531,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
-        		if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        		if(indizesShape.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         			
         			/**
         			 * to deal with array assign whose first index is scalar without exact value
@@ -553,7 +550,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         					/**
         					 * to deal with array assign whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         	        			
         	        			/**
         	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -604,7 +601,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
         					/**
         					 * to deal with array assign whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         	        			
         	        			/**
         	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -657,7 +654,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     					/**
     					 * to deal with array assign whose second index is scalar.
     					 */
-    	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
         	        		
     	        			/**
     	        			 * to deal with array get whose second index is scalar without exact value.
@@ -709,7 +706,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
 					/**
 					 * to deal with array assign whose second index is scalar.
 					 */
-	        		if(indizesShape2.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+	        		if(indizesShape2.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
     	        		
 	        			/**
 	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -763,7 +760,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     			 * to deal with array assign whose only index is scalar, 
     			 * actually, we don't care whether or not the scalar is with an exact value.
     			 */
-    			if(indizesShape.equals((new ShapeFactory()).newShapeFromIntegers(scalarShape))){
+    			if(indizesShape.equals((new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(scalarShape))){
     				return this;
     			}
     			
@@ -777,8 +774,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     					return this;
     				}
     				else{
-    					return new BasicMatrixValue(new BasicMatrixValue(
-    							this.getMatlabClass()),(new ShapeFactory()).newShapeFromIntegers(indizesShape.getDimensions()));
+    					return new BasicMatrixValue(
+    							this.getMatlabClass(),(new ShapeFactory<AggrValue<BasicMatrixValue>>()).newShapeFromIntegers(indizesShape.getDimensions()));
     				}
     			}
     		}
