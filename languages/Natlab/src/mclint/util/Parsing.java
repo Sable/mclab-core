@@ -44,7 +44,7 @@ public class Parsing {
 
   public static Program reader(Reader code) {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
-    Program program = Parse.parseFile("none>", code, errors);
+    Program program = Parse.parseFile("<none>", code, errors);
     if (!errors.isEmpty()) {
       System.err.println("The following errors occured during parsing:");
       for (CompilationProblem error : errors) {
@@ -52,6 +52,7 @@ public class Parsing {
       }
       System.exit(1);
     }
+    program.setFile(new FileFile("<none>"));
     return program;
   }
 
