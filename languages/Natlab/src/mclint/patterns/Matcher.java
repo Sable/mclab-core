@@ -16,9 +16,11 @@ import ast.Program;
 import ast.Stmt;
 
 public class Matcher {
+  private static final boolean DEBUG = false;
   private UnparsedPattern pattern;
   private Stack<Object> stack;
   private ASTNode tree;
+  private Map<Character, ASTNode> bindings = new HashMap<Character, ASTNode>();
 
   private static Match match(String pattern, ASTNode tree) {
     Stack<Object> stack = new Stack<Object>();
@@ -56,39 +58,49 @@ public class Matcher {
   }
 
   private Match match() {
-    Map<Character, ASTNode> bindings = new HashMap<Character, ASTNode>();
     while (!stack.isEmpty()) {
       if (stack.peek() instanceof String) {
         String top = (String) stack.peek();
         if (pattern.consume(top)) {
           stack.pop();
         } else {
-          System.out.println("Top: " + top);
-          System.out.println("Stack: " + stack);
-          System.out.println("Pattern: " + pattern);
+          if (DEBUG) {
+            System.out.println("Top: " + top);
+            System.out.println("Stack: " + stack);
+            System.out.println("Pattern: " + pattern);
+          }
           return null;
         }
       } else if (stack.peek() instanceof ASTNode) {
         if (pattern.startsWithMeta()) {
           if (stack.size() == 1 && !pattern.emptyAfterMeta()) {
-            return null;
+            unparse();
+          } else {
+            bind();
           }
-          bindings.put(pattern.popMeta(), (ASTNode) stack.pop());
         } else {
-          List<Object> tokens = LazyUnparser.unparse((ASTNode) stack.pop());
-          Collections.reverse(tokens);
-          for (Object token : tokens) {
-            stack.push(token);
-          }
+          unparse();
         }
       }
     }
     return new Match(tree, bindings, pattern);
   }
-  
+
+  private void bind() {
+    bindings.put(pattern.popMeta(), (ASTNode) stack.pop());
+  }
+
+  private void unparse() {
+    List<Object> tokens = LazyUnparser.unparse((ASTNode) stack.pop());
+    Collections.reverse(tokens);
+    for (Object token : tokens) {
+      stack.push(token);
+    }
+  }
+
   public static void main(String[] args) {
-    Program program = Parsing.string("disp(i)");
-    List<Match> matches = findMatchingStatements("disp(%x)", program);
-    System.out.println(matches.get(0).getBoundNode('x').getChild(0).getPrettyPrinted());
+    Program program = Parsing.string("for i = 1:5 \n disp(i) \n end");
+    List<Match> matches = findMatchingStatements("%z(%x)", program);
+    System.out.println(matches.get(0));
   }
 }
