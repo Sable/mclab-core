@@ -1,48 +1,62 @@
 package mclint.patterns;
 
 public class UnparsedPattern {
-  private String originalPattern;
   private String pattern;
+  private int index = 0;
 
   public static UnparsedPattern fromString(String pattern) {
     return new UnparsedPattern(pattern);
   }
 
   private UnparsedPattern(String pattern) {
-    this.originalPattern = pattern;
-    this.pattern = pattern.replaceAll("\\s+", "");
+    this.pattern = pattern;
+  }
+  
+  private void advance() {
+    if (index >= pattern.length()) {
+      return;
+    }
+    do {
+      ++index;
+    } while (index < pattern.length() && Character.isWhitespace(pattern.charAt(index)));
+  }
+  
+  private void advance(int by) {
+    for (int i = 0; i < by; ++i) {
+      advance();
+    }
   }
 
   public boolean consume(String token) {
-    if (pattern.startsWith(token)) {
-      pattern = pattern.substring(token.length());
+    if (pattern.regionMatches(index, token, 0, token.length())) {
+      advance(token.length());
       return true;
     }
     return false;
   }
 
   public boolean startsWithMeta() {
-    return pattern.length() >= 2 && pattern.charAt(0) == '%'
-        && Character.isLetter(pattern.charAt(1));
+    return pattern.length() - index >= 2 && pattern.charAt(index) == '%'
+        && Character.isLetter(pattern.charAt(index + 1));
   }
   
   public boolean emptyAfterMeta() {
-    return pattern.substring(2).isEmpty();
+    return index + 2 >= pattern.length();
   }
   
   // Precondition: startsWithMeta()
   public char popMeta() {
-    char meta = pattern.charAt(1);
-    pattern = pattern.substring(2);
+    char meta = pattern.charAt(index + 1);
+    advance(2);
     return meta;
   }
   
   public String asString() {
-    return originalPattern;
+    return pattern;
   }
   
   @Override
   public String toString() {
-    return String.format("<UnparsedPattern: %s>", originalPattern);
+    return String.format("<UnparsedPattern: %s>", pattern);
   }
 }
