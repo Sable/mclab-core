@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import mclint.Location;
 import mclint.util.Parsing;
 import natlab.refactoring.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
@@ -69,6 +68,7 @@ public class Matcher {
             System.out.println("Top: " + top);
             System.out.println("Stack: " + stack);
             System.out.println("Pattern: " + pattern);
+            System.out.println("Bindings: " + bindings);
           }
           return null;
         }
