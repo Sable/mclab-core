@@ -2,7 +2,7 @@ package mclint.reports;
 
 import mclint.Message;
 
-class HtmlTableReportGenerator extends AbstractReportGenerator {
+class HtmlReportGenerator extends AbstractReportGenerator {
   @Override
   protected String header() {
     return "<table id=\"mclint-messages\">\n" +

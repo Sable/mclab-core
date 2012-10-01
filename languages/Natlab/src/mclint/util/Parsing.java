@@ -22,7 +22,7 @@ public class Parsing {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
     CompilationUnits code = Parse.parseFiles(mfiles, errors);
     if (!errors.isEmpty()) {
-      System.err.println("Could not run analyses; the following errors occured during parsing:");
+      System.err.println("The following errors occured during parsing:");
       for (CompilationProblem error : errors) {
         System.err.println(error);
       }
@@ -33,20 +33,20 @@ public class Parsing {
     }
     return code;
   }
-  
+
   public static CompilationUnits files(String... mfiles) {
     return files(Arrays.asList(mfiles));
   }
-  
+
   public static Program file(String mfile) {
     return files(new String[] {mfile}).getProgram(0);
   }
-  
+
   public static Program reader(Reader code) {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
     Program program = Parse.parseFile("none>", code, errors);
     if (!errors.isEmpty()) {
-      System.err.println("Could not run analyses; the following errors occured during parsing:");
+      System.err.println("The following errors occured during parsing:");
       for (CompilationProblem error : errors) {
         System.err.println(error);
       }
@@ -54,10 +54,10 @@ public class Parsing {
     }
     return program;
   }
-  
+
   public static Program string(String code) {
     return reader(new StringReader(code));
   }
-  
-    private Parsing() {}
+
+  private Parsing() {}
 }
