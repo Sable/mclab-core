@@ -51,7 +51,6 @@ public class BasicTamerTool {
 	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
 		//System.out.println(inputValues);
-		BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(inputValues.size());
 		for (PrimitiveClassReference ref : inputValues){
 			list.add(new BasicMatrixValue(Constant.get(1.0)));//XU modified @21:53 5.28.2012
@@ -64,7 +63,7 @@ public class BasicTamerTool {
 	
 	public static void main(String[] args){
 		
-		GenericFile gFile = GenericFile.create("/home/2011/xli141/for_test/test.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/xu/Benchmarks/matlabBenchmarks/adpt/drv_adpt.m"); //file -> generic file
 		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
