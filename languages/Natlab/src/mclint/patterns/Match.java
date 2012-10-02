@@ -3,6 +3,9 @@ package mclint.patterns;
 import java.util.Map;
 
 import ast.ASTNode;
+import ast.Expr;
+import ast.List;
+import ast.Stmt;
 
 public class Match {
   private UnparsedPattern pattern;
@@ -21,6 +24,22 @@ public class Match {
   
   public ASTNode getBoundNode(char var) {
     return bindings.get(var);
+  }
+  
+  public <T extends ASTNode> T getBoundNode(char var, Class<T> clazz) {
+    return clazz.cast(getBoundNode(var));
+  }
+  
+  public List getBoundList(char var) {
+    return getBoundNode(var, List.class);
+  }
+  
+  public Stmt getBoundStmt(char var) {
+    return getBoundNode(var, Stmt.class);
+  }
+  
+  public Expr getBoundExpr(char var) {
+    return getBoundNode(var, Expr.class);
   }
   
   public UnparsedPattern getPattern() {
