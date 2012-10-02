@@ -51,10 +51,25 @@ public class Matcher {
     return findMatching(Expr.class, pattern, tree);
   }
 
+  public static List<Match> findAllMatches(String pattern, ASTNode tree) {
+    List<Match> matches = new ArrayList<Match>();
+    matches.addAll(findMatchingStatements(pattern, tree));
+    matches.addAll(findMatchingExpressions(pattern, tree));
+    return Collections.unmodifiableList(matches);
+  }
+
   private Matcher(UnparsedPattern pattern, ASTNode tree, Stack<Object> stack) {
     this.pattern = pattern;
     this.tree = tree;
     this.stack = stack;
+  }
+  
+  private void dumpState() {
+    if (DEBUG) {
+      System.out.println("Stack: " + stack);
+      System.out.println("Pattern: " + pattern);
+      System.out.println("Bindings: " + bindings);
+    }
   }
 
   private Match match() {
@@ -64,12 +79,7 @@ public class Matcher {
         if (pattern.consume(top)) {
           stack.pop();
         } else {
-          if (DEBUG) {
-            System.out.println("Top: " + top);
-            System.out.println("Stack: " + stack);
-            System.out.println("Pattern: " + pattern);
-            System.out.println("Bindings: " + bindings);
-          }
+          dumpState();
           return null;
         }
       } else if (stack.peek() instanceof ASTNode) {
@@ -83,6 +93,10 @@ public class Matcher {
           unparse();
         }
       }
+    }
+    if (!pattern.finished()) {
+      dumpState();
+      return null;
     }
     return new Match(tree, bindings, pattern);
   }
@@ -100,8 +114,8 @@ public class Matcher {
   }
 
   public static void main(String[] args) {
-    Program program = Parsing.string("repmat(0, x, y)");
-    List<Match> matches = findMatchingStatements("repmat(0, %x)", program);
+    Program program = Parsing.string("zeros(4, 5); for i = 1:10 \n disp(i); end");
+    List<Match> matches = findMatchingStatements("%x(%y)", program);
     System.out.println(matches);
   }
 }

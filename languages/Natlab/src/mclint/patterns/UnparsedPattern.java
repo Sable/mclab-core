@@ -51,6 +51,10 @@ public class UnparsedPattern {
     return meta;
   }
   
+  public boolean finished() {
+    return index >= pattern.length();
+  }
+  
   public String asString() {
     return pattern;
   }
