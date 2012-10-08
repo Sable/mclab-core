@@ -30,24 +30,23 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements H
     public BasicMatrixValue(PrimitiveClassReference aClass) {
         super(aClass);
     }
-    
-    /*@Deprecated
-    public BasicMatrixValue(BasicMatrixValue onlyClassInfo, Shape<AggrValue<BasicMatrixValue>> shape) {
-    	super(onlyClassInfo.classRef);
-    	this.shape = shape;
-    	
-    }*/
-    
+
     /**
      * return a BasicMatrixValue object by taking in a user typed input argument
      * add this method @25th,Jul,2012
      * @param onlyClassInfo
      * @param shapeInfo
      */
-    public BasicMatrixValue(BasicMatrixValue onlyClassInfo, String shapeInfo){
-    	super(onlyClassInfo.classRef);
+    public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo){
+    	super(aClass);
     	this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory).newShapeFromInputString(shapeInfo));
     }
+    /*@Deprecated
+    public BasicMatrixValue(BasicMatrixValue onlyClassInfo, Shape<AggrValue<BasicMatrixValue>> shape) {
+    	super(onlyClassInfo.classRef);
+    	this.shape = shape;
+    	
+    }*/
     
     /**
      * how to deal with a constant

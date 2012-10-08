@@ -111,7 +111,7 @@ public class BasicTamerTool {
 			String[] specs = argSpecs.split(delims);
 			
 			/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
-			list.add(new BasicMatrixValue((new BasicMatrixValue(PrimitiveClassReference.DOUBLE)),specs[1])); 
+			list.add(new BasicMatrixValue(PrimitiveClassReference.DOUBLE,specs[1])); 
 			
 	   	
 		}
