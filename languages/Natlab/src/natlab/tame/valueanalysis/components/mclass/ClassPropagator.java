@@ -36,11 +36,7 @@ public class ClassPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>,
 		throw new UnsupportedOperationException(
 				"ClassPropgator cannot propgate classes for "+builtin);
 	}	
-    
-
-    
-    
-    
+            
     /**
      * returns a classref of i in 
      *   i = lower:inc:upper 
@@ -51,7 +47,7 @@ public class ClassPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>,
      * lower, upper, inc should be values with matrix mclasses.
      */
     @SuppressWarnings("unchecked")
-	public PrimitiveClassReference forRange(V lower,	V upper, V inc){
+	public PrimitiveClassReference forRange(V lower,V upper, V inc){
 		//FIXME do something proper here
 		if (inc != null){
 			return (PrimitiveClassReference)
@@ -63,6 +59,7 @@ public class ClassPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>,
 							.get(0).iterator().next());
 		}
     }
+    
 }
 
 

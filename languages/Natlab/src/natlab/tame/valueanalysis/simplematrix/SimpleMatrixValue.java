@@ -2,9 +2,11 @@ package natlab.tame.valueanalysis.simplematrix;
 
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
@@ -75,18 +77,17 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
 
     public static final SimpleMatrixValueFactory FACTORY = new SimpleMatrixValueFactory();
 
-
+    
     @Override
     public ValueSet<AggrValue<SimpleMatrixValue>> arraySubsref(Args<AggrValue<SimpleMatrixValue>> indizes) {
         return ValueSet.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(this.getMatlabClass()));
-    }
-    
+    }    
     @Override
-    public ValueSet<AggrValue<SimpleMatrixValue>> dotSubsref(String field) {
-        throw new UnsupportedOperationException("cannot dot-access a matrix");
-        //return ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
-    }
-    
+    public AggrValue<SimpleMatrixValue> arraySubsasgn(
+            Args<AggrValue<SimpleMatrixValue>> indizes,AggrValue<SimpleMatrixValue> value) {
+        //TODO - check whether conversion is allowed
+        return new SimpleMatrixValue(this.getMatlabClass());
+    }    
     @Override
     public Res<AggrValue<SimpleMatrixValue>> cellSubsref(Args<AggrValue<SimpleMatrixValue>> indizes) {
         throw new UnsupportedOperationException();
@@ -94,23 +95,20 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
     @Override
     public AggrValue<SimpleMatrixValue> cellSubsasgn(Args<AggrValue<SimpleMatrixValue>> indizes, Args<AggrValue<SimpleMatrixValue>> values) {
         throw new UnsupportedOperationException();
-    }
-    
+    }    
     @Override
-    public AggrValue<SimpleMatrixValue> arraySubsasgn(
-            Args<AggrValue<SimpleMatrixValue>> indizes,AggrValue<SimpleMatrixValue> value) {
-        //TODO - check whether conversion is allowed
-        return new SimpleMatrixValue(this.getMatlabClass());
-    }
-    
-    @Override
-    public AggrValue<SimpleMatrixValue> toFunctionArgument(boolean recursive) {
-        return isConstant()?new SimpleMatrixValue(this.classRef):this;
+    public ValueSet<AggrValue<SimpleMatrixValue>> dotSubsref(String field) {
+        throw new UnsupportedOperationException("cannot dot-access a matrix");
+        //return ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
     }
     @Override
     public AggrValue<SimpleMatrixValue> dotSubsasgn(String field,
             AggrValue<SimpleMatrixValue> value) {
         throw new UnsupportedOperationException("cannot dot-assign a matrix");
+    }    
+    @Override
+    public AggrValue<SimpleMatrixValue> toFunctionArgument(boolean recursive) {
+        return isConstant()?new SimpleMatrixValue(this.classRef):this;
     }
 }
 
