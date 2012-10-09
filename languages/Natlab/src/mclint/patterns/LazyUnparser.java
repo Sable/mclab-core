@@ -2,6 +2,7 @@ package mclint.patterns;
 
 import java.util.LinkedList;
 
+import natlab.ASTToolBox;
 import nodecases.AbstractNodeCaseHandler;
 import ast.*;
 
@@ -155,45 +156,64 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
     tokens("function", "[", node.getOutputParams(), "]", node.getName(), "=", "(",
         node.getInputParams(), ")", node.getStmts(), "end");
   }
+  
+  @Override
+  public void caseStmt(Stmt node) {
+    if (node instanceof AssignStmt && node.getParent() instanceof ForStmt &&
+        node == ((ForStmt) node.getParent()).getAssignStmt()) {
+      return;
+    }
+    if (ASTToolBox.isInsideLoop(node)) {
+      tokens(";");
+    }
+  }
 
   @Override
   public void caseExprStmt(ExprStmt node) {
     tokens(node.getExpr());
+    caseStmt(node);
   }
 
   @Override
   public void caseAssignStmt(AssignStmt node) {
     tokens(node.getLHS(), "=", node.getRHS());
+    caseStmt(node);
   }
 
   @Override
   public void caseGlobalStmt(GlobalStmt node) {
     tokens("global", node.getNames());
+    caseStmt(node);
   }
 
   @Override
   public void casePersistentStmt(PersistentStmt node) {
     tokens("persistent", node.getNames());
+    caseStmt(node);
   }
 
   @Override
   public void caseShellCommandStmt(ShellCommandStmt node) {
     tokens("!", node.getCommand());
+    caseStmt(node);
   }
 
   @Override
   public void caseBreakStmt(BreakStmt node) {
     tokens("break");
+    caseStmt(node);
   }
 
   @Override
   public void caseContinueStmt(ContinueStmt node) {
     tokens("continue");
+    caseStmt(node);
   }
 
   @Override
   public void caseReturnStmt(ReturnStmt node) {
     tokens("return");
+    caseStmt(node);
   }
 
   @Override

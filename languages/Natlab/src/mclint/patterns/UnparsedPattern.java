@@ -12,13 +12,18 @@ public class UnparsedPattern {
     this.pattern = pattern;
   }
   
-  private void advance() {
+  private int nextAfter(int index) {
     if (index >= pattern.length()) {
-      return;
+      return index;
     }
     do {
       ++index;
     } while (index < pattern.length() && Character.isWhitespace(pattern.charAt(index)));
+    return index;
+  }
+  
+  private void advance() {
+    index = nextAfter(index);
   }
   
   private void advance(int by) {
@@ -40,27 +45,32 @@ public class UnparsedPattern {
         && Character.isLetter(pattern.charAt(index + 1));
   }
   
-  public boolean emptyAfterMeta() {
-    return index + 2 >= pattern.length();
+  public UnparsedPattern afterMeta() {
+    return UnparsedPattern.fromString(pattern.substring(nextAfter(index + 1)));
   }
-  
+
+  public boolean emptyAfterMeta() {
+    return nextAfter(index + 1) >= pattern.length();
+  }
+
   // Precondition: startsWithMeta()
   public char popMeta() {
     char meta = pattern.charAt(index + 1);
     advance(2);
     return meta;
   }
-  
+
   public boolean finished() {
-    return index >= pattern.length();
+    return nextAfter(index) >= pattern.length();
   }
-  
+
   public String asString() {
     return pattern;
   }
-  
+
   @Override
   public String toString() {
-    return String.format("<UnparsedPattern: %s>", pattern);
+    return String.format("<UnparsedPattern: %s, index %d, char %c>",
+        pattern, index, pattern.charAt(index));
   }
 }

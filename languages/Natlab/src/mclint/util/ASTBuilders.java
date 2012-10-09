@@ -4,6 +4,7 @@ import ast.Expr;
 import ast.List;
 import ast.Name;
 import ast.NameExpr;
+import ast.NotExpr;
 import ast.ParameterizedExpr;
 
 /**
@@ -32,6 +33,10 @@ public class ASTBuilders {
 
   public static ParameterizedExpr call(String name, Expr... args) {
     return call(name, exprs(args));
+  }
+  
+  public static NotExpr not(Expr expr) {
+    return new NotExpr(expr);
   }
 
   private ASTBuilders() {}

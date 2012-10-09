@@ -12,11 +12,12 @@ import natlab.refactoring.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Expr;
+import ast.ForStmt;
 import ast.Program;
 import ast.Stmt;
 
 public class Matcher {
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
   private UnparsedPattern pattern;
   private Stack<Object> stack;
   private ASTNode tree;
@@ -64,8 +65,13 @@ public class Matcher {
     this.stack = stack;
   }
   
-  private void dumpState() {
+  private Object lookahead() {
+    return stack.get(stack.size() - 2);
+  }
+  
+  private void dumpState(int stage) {
     if (DEBUG) {
+      System.out.println("Stage: " + stage);
       System.out.println("Stack: " + stack);
       System.out.println("Pattern: " + pattern);
       System.out.println("Bindings: " + bindings);
@@ -79,15 +85,26 @@ public class Matcher {
         if (pattern.consume(top)) {
           stack.pop();
         } else {
-          dumpState();
+          dumpState(1);
           return null;
         }
       } else if (stack.peek() instanceof ASTNode) {
+        // Resolve bind/unparse conflict
+        // Lookahead; if we bind, will we fail?
         if (pattern.startsWithMeta()) {
-          if (stack.size() == 1 && !pattern.emptyAfterMeta()) {
+          UnparsedPattern afterMeta = pattern.afterMeta();
+          if (stack.size() == 1) {
+            if (!pattern.emptyAfterMeta()) {
+              unparse();
+            }
+          } else if (lookahead() instanceof ASTNode && !afterMeta.startsWithMeta()
+                  || lookahead() instanceof String && !afterMeta.consume((String) lookahead())) {
             unparse();
           } else {
-            bind();
+            if (!bind()) {
+              dumpState(2);
+              return null;
+            }
           }
         } else {
           unparse();
@@ -95,14 +112,20 @@ public class Matcher {
       }
     }
     if (!pattern.finished()) {
-      dumpState();
+      dumpState(3);
       return null;
     }
     return new Match(tree, bindings, pattern);
   }
 
-  private void bind() {
-    bindings.put(pattern.popMeta(), (ASTNode) stack.pop());
+  private boolean bind() {
+    char meta = pattern.popMeta();
+    ASTNode tree = (ASTNode) stack.pop();
+    if (bindings.containsKey(meta) && !EqualityChecker.equals(tree, bindings.get(meta))) {
+      return false;
+    }
+    bindings.put(meta, tree);
+    return true;
   }
 
   private void unparse() {
@@ -114,8 +137,15 @@ public class Matcher {
   }
 
   public static void main(String[] args) {
-    Program program = Parsing.string("zeros(4, 5); for i = 1:10 \n disp(i); end");
-    List<Match> matches = findMatchingStatements("%x(%y)", program);
+    String pattern = new StringBuilder()
+      .append("for %i=(%l:%r)\n")
+      .append("  %a(%i) = %x;\n")
+      .append("end").toString();
+    Program program = Parsing.string(new StringBuilder()
+      .append("for i = (1:10) \n")
+      .append("  a(i) = 5; \n")
+      .append("end \n").toString());
+    List<Match> matches = findMatching(ForStmt.class, pattern, program);
     System.out.println(matches);
   }
 }
