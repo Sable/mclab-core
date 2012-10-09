@@ -44,8 +44,8 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
     // TODO - should this be weak or something?
     // should it be a hashmap of hashmaps?? -- or clear after analyze?
     Map<Call<A>,InterproceduralAnalysisNode<F, A, R>> nodes =
-        new WeakHashMap<Call<A>, InterproceduralAnalysisNode<F,A,R>>();
-    
+        new HashMap<Call<A>, InterproceduralAnalysisNode<F,A,R>>();
+        //XU change Anton's WeakHashMap to HashMap
     
     public InterproceduralAnalysis(
             InterproceduralAnalysisFactory<F, A, R> factory,

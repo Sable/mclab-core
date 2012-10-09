@@ -8,7 +8,7 @@ import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.value.*;
 
 
@@ -653,37 +653,59 @@ public class ShapePropagator<V extends Value<V>>
     		/**
     		 * to deal with array assign whose only index is basicMatrixValue.
     		 */
-    		if(indizes.get(0) instanceof Value<?>){
-    			Shape<V> indizesShape = ((HasShape<V>)(indizes.get(0))).getShape();
-    			
-    			/**
-    			 * to deal with array assign whose only index is scalar, 
-    			 * actually, we don't care whether or not the scalar is with an exact value.
-    			 */
-    			if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
-    				return arrayShape;
-    			}
-    			
-    			/**
-    			 * to deal with array assign whose only index is array.
-    			 * here, we need to think about maybe the original array will be expanded by the index.
-    			 */
-    			else{
-    				//TODO
-    				if(arrayShape.bigger(indizesShape)){
-    					return arrayShape;
-    				}
-    				else{
-    					return new ShapeFactory<V>().newShapeFromIntegers(indizesShape.getDimensions());
-    				}
-    			}
-    		}
-    		
-    		/**
-    		 * to deal with array assign whose only index is colon.
-    		 */
-    		else{
+    		if(!arrayShape.isShapeExactlyKnown()){
     			return arrayShape;
+    		}
+    		else{
+    			if((indizes.get(0) instanceof Value<?>)&&(!(indizes.get(0) instanceof ColonValue))){
+        			Shape<V> indizesShape = ((HasShape<V>)(indizes.get(0))).getShape();
+        			
+        			/**
+        			 * to deal with array assign whose only index is scalar, 
+        			 * actually, we don't care whether or not the scalar is with an exact value.
+        			 */
+        			if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        				/**
+        				 * here, we need to check the bound, in case the array may be expanded.
+        				 */
+        				if(((HasConstant)indizes.get(0)).getConstant()==null){
+        					return arrayShape;
+        				}
+        				else{
+        					double dbIndize = (Double) ((HasConstant)indizes.get(0)).getConstant().getValue();
+        					int intIndize = (int) dbIndize;
+        					int arraySize = 1;
+        			    	for(Integer i : arrayShape.getDimensions()){
+        			    		arraySize = arraySize*i;
+        			    	}
+        			    	if(intIndize>arraySize){
+        			    		arrayShape.getDimensions().set(1, intIndize/arrayShape.getDimensions().get(0));
+        			    	}
+        					return arrayShape;
+        				}
+        			}
+        			
+        			/**
+        			 * to deal with array assign whose only index is array.
+        			 * here, we need to think about maybe the original array will be expanded by the index.
+        			 */
+        			else{
+        				//TODO
+        				if(arrayShape.bigger(indizesShape)){
+        					return arrayShape;
+        				}
+        				else{
+        					return new ShapeFactory<V>().newShapeFromIntegers(indizesShape.getDimensions());
+        				}
+        			}
+        		}
+        		
+        		/**
+        		 * to deal with array assign whose only index is colon.
+        		 */
+        		else{
+        			return arrayShape;
+        		}
     		}
     	}
     }

@@ -3359,12 +3359,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements HasClassPropagationInfo {
+    public static abstract class AbstractProperBitFunction extends AbstractBitFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractProperBitFunction(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -3606,12 +3615,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasClassPropagationInfo {
+    public static abstract class AbstractUnaryToLogicalMatrixQuery extends AbstractToLogicalMatrixQuery implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryToLogicalMatrixQuery(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$->$");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}

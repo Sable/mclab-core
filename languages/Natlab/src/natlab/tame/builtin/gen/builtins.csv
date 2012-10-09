@@ -444,6 +444,7 @@ qr;; Class(float (float|logical)?->0 0 0)
 bitFunction; matrixFunction
 properBitFunction; bitFunction
 -Class(uint double|0->0, double|1 uint->1, logical logical->logical, double|logical double|logical->double)
+-Shape($|M,$|M->M)
 bitand
 bitor
 bitxor
@@ -485,7 +486,7 @@ toLogicalMatrixQuery; matrixQuery
 # unary return logicals
 unaryToLogicalMatrixQuery; toLogicalMatrixQuery
 -Class(matrix->logical)
-
+-Shape($->$)
 scalarUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
 not
 any

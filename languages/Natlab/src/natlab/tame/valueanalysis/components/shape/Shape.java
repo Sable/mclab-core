@@ -176,13 +176,14 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     		int j=0;
     		for(Integer i : this.dimensions){
     			if (Debug) System.out.println("testing weather or not shape equals!");
-    			//System.out.println("i is "+i+", j is "+o.getCertainDimensionSize(j));
+    			//TODO
     			if(i==o.getCertainDimensionSize(j)){
     				j=j+1;
     			}
     			else{
     				if (Debug) System.out.println("inside shape equals false!");
-    				return false;
+    				return true;
+    				//return false;
     			}
     		}
     		return true;

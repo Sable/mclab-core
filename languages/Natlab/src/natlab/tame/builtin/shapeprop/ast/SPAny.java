@@ -37,7 +37,6 @@ public class SPAny extends SPAbstractVectorExpr
 				match.comsumeArg();
 				match.saveLatestMatchedUppercase(s);
 				//System.out.println(match.getValueOfVariable(s));
-				if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
 				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 				return match;
 			}

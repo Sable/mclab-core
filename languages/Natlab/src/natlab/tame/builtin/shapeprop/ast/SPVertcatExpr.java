@@ -50,13 +50,13 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 					return previousMatchResult;
 				}
 				catch(Exception e){
-					try{
+					if(previousMatchResult.hasValue(arg[1])){
 						al.add(previousMatchResult.getValueOfVariable(arg[1]));
 						Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 						previousMatchResult.addToOutput("vertcat", shape);
 						return previousMatchResult;
 					}
-					catch(Exception e2){
+					else{
 						al.add(null);
 						Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 						previousMatchResult.addToOutput("vertcat", shape);
@@ -66,14 +66,14 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 			}
 			if(arg[1].equals("1")){
 				ArrayList<Integer> al = new ArrayList<Integer>(2);
-				try{
+				if(previousMatchResult.hasValue(arg[0])){
 					al.add(previousMatchResult.getValueOfVariable(arg[0]));
 					al.add(1);
 					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 					previousMatchResult.addToOutput("vertcat", shape);
 					return previousMatchResult;
 				}
-				catch(Exception e){
+				else{
 					al.add(null);
 					al.add(1);
 					Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
@@ -85,13 +85,21 @@ public class SPVertcatExpr extends SPAbstractVectorExpr{
 				//FIXME deal with the [m,k] or [m,k,j,..] kinds of output
 				if (Debug) System.out.println("inside output vertcat expression!");
 				ArrayList<Integer> al = new ArrayList<Integer>(arg.length);
+				/**
+				 * sometime, for loop can not be executed, so you can't put the return inside the for loop.
+				 */
 				for(String i : arg){
-					al.add(previousMatchResult.getValueOfVariable(i));
+					if(previousMatchResult.hasValue(i)){
+						al.add(previousMatchResult.getValueOfVariable(i));
+					}
+					else{
+						al.add(null);
+					}
 				}
 				if (Debug) System.out.println(al);
 				Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(al);
 				previousMatchResult.addToOutput("vertcat", shape);
-				return previousMatchResult;				
+				return previousMatchResult;	
 			}
 		}
 	}

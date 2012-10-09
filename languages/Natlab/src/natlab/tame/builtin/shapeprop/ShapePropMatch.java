@@ -201,6 +201,15 @@ public class ShapePropMatch{
     	return isInsideAssign;
     }
     
+    public boolean hasValue(String key){
+    	if(this.lowercase.get(key)==null){
+    		return false;
+    	}
+    	else{
+    		return true;
+    	}
+    }
+    
     public int getValueOfVariable(String key){
     	int value = this.lowercase.get(key);
     	return value;
