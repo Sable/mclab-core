@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import mclint.patterns.Match;
 import mclint.patterns.MatchHandler;
 import mclint.patterns.Matcher;
+import mclint.util.AstUtil;
 import mclint.util.Parsing;
 import natlab.refactoring.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
@@ -42,55 +43,16 @@ public class Refactoring {
     }
   }
 
-  public static void replace(ASTNode oldNode, ASTNode newNode) {
-    oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
-  }
-
-  private static ASTNode preprocess(String pattern) {
-    Pattern p = Pattern.compile("%[a-zA-Z]");
-    java.util.regex.Matcher m = p.matcher(pattern);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      m.appendReplacement(sb, "INTERNAL_BINDING_" + m.group().charAt(1));
-    }
-    m.appendTail(sb);
-    return ((Script) Parsing.string(sb.toString())).getStmtList().getChild(0);
-  }
-
-  public static Refactoring of(String fromPattern, String toPattern, Visit visit) {
-    final ASTNode preprocessed = preprocess(toPattern);
+  public static Refactoring of(String fromPattern, String toPattern, final Visit visit) {
+    final TreeWithPlaceholders preprocessed = TreeWithPlaceholders.fromPattern(toPattern);
     return of(fromPattern, new MatchHandler() {
-      @Override
       public void handle(final Match match) {
-        NodeFinder.apply(preprocessed, NameExpr.class, new AbstractNodeFunction<NameExpr>() {
-          @Override
-          public void apply(NameExpr node) {
-            String name = node.getName().getID();
-            if (name.startsWith("INTERNAL_BINDING_")) {
-              ASTNode binding = match.getBoundNode(name.charAt(name.length() - 1));
-              ASTNode parent = node.getParent();
-              if (binding instanceof ast.List && parent instanceof ast.List) {
-                int index = parent.getIndexOfChild(node);
-                node.getParent().removeChild(index);
-                for (Object element : (ast.List) binding) {
-                  parent.insertChild((ASTNode) element, index++);
-                }
-              } else {
-                replace(node, match.getBoundNode(name.charAt(name.length() - 1)));
-              }
-            }
-          }
-        });
-        if (preprocessed instanceof ExprStmt) {
-          ASTNode expr = ((ExprStmt) preprocessed).getExpr();
-          if (expr instanceof List && expr.getNumChild() == 1) {
-            System.out.println("got here: preprocessed expr was list");
-            expr = expr.getChild(0);
-          }
-          replace(match.getMatchingNode(), expr);
-        } else {
-          replace(match.getMatchingNode(), preprocessed);
+        preprocessed.handle(match);
+        ASTNode tree = preprocessed.getTree();
+        if (tree instanceof ExprStmt && visit == Visit.Expressions) {
+          tree = ((ExprStmt) tree).getExpr();
         }
+        AstUtil.replace(match.getMatchingNode(), tree);
       }
     }, visit);
   }
@@ -113,9 +75,5 @@ public class Refactoring {
     this.pattern = pattern;
     this.handler = handler;
     this.visit = visit;
-  }
-
-  public static void main(String[] args) {
-    preprocess("%x = %y");
   }
 }
