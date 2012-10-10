@@ -1,6 +1,5 @@
 package mclint.refactoring;
 
-
 public class Refactorings {
   public static Refactoring repmatToZeros() {
     return Refactoring.of("repmat(0, %x)", "zeros(%x)", Refactoring.Visit.Expressions);

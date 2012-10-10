@@ -39,10 +39,14 @@ public class UnparsedPattern {
     }
     return false;
   }
+  
+  private boolean validMeta(char x) {
+    return Character.isLetter(x) || x == '_';
+  }
 
   public boolean startsWithMeta() {
     return pattern.length() - index >= 2 && pattern.charAt(index) == '%'
-        && Character.isLetter(pattern.charAt(index + 1));
+        && validMeta(pattern.charAt(index + 1));
   }
   
   public UnparsedPattern afterMeta() {

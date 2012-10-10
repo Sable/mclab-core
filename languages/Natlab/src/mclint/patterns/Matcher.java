@@ -121,6 +121,9 @@ public class Matcher {
   private boolean bind() {
     char meta = pattern.popMeta();
     ASTNode tree = (ASTNode) stack.pop();
+    if (meta == '_') {
+      return true;
+    }
     if (bindings.containsKey(meta) && !EqualityChecker.equals(tree, bindings.get(meta))) {
       return false;
     }
@@ -139,7 +142,7 @@ public class Matcher {
   public static void main(String[] args) {
     String pattern = new StringBuilder()
       .append("for %i=(%l:%r)\n")
-      .append("  %a(%i) = %x;\n")
+      .append("  %a(%i) = %_;\n")
       .append("end").toString();
     Program program = Parsing.string(new StringBuilder()
       .append("for i = (1:10) \n")

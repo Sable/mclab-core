@@ -1,5 +1,6 @@
 package mclint.refactoring;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mclint.patterns.Match;
@@ -61,7 +62,7 @@ public class TreeWithPlaceholders implements MatchHandler {
 
   public static TreeWithPlaceholders fromPattern(String pattern) {
     Pattern p = Pattern.compile("%[a-zA-Z]");
-    java.util.regex.Matcher m = p.matcher(pattern);
+    Matcher m = p.matcher(pattern);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       m.appendReplacement(sb, placeholder(m.group()));
