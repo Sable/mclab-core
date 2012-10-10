@@ -26,9 +26,14 @@ public class Matcher {
   private static Match match(String pattern, ASTNode tree) {
     Stack<Object> stack = new Stack<Object>();
     stack.push(tree);
-    return new Matcher(UnparsedPattern.fromString(pattern), tree, stack).match();
+    Matcher matcher = new Matcher(UnparsedPattern.fromString(pattern), tree, stack);
+    Match match = matcher.match();
+    if (match == null && DEBUG) {
+      matcher.dumpState();
+    }
+    return match;
   }
-  
+
   private static <T extends ASTNode> List<Match> findMatching(Class<T> clazz,
       final String pattern, ASTNode tree) {
     final List<Match> matches = new ArrayList<Match>();
@@ -43,11 +48,11 @@ public class Matcher {
     });
     return Collections.unmodifiableList(matches);
   }
-  
+
   public static List<Match> findMatchingStatements(String pattern, ASTNode tree) {
     return findMatching(Stmt.class, pattern, tree);
   }
-  
+
   public static List<Match> findMatchingExpressions(String pattern, ASTNode tree) {
     return findMatching(Expr.class, pattern, tree);
   }
@@ -64,18 +69,15 @@ public class Matcher {
     this.tree = tree;
     this.stack = stack;
   }
-  
+
   private Object lookahead() {
     return stack.get(stack.size() - 2);
   }
-  
-  private void dumpState(int stage) {
-    if (DEBUG) {
-      System.out.println("Stage: " + stage);
-      System.out.println("Stack: " + stack);
-      System.out.println("Pattern: " + pattern);
-      System.out.println("Bindings: " + bindings);
-    }
+
+  private void dumpState() {
+    System.err.println("Stack: " + stack);
+    System.err.println("Pattern: " + pattern);
+    System.err.println("Bindings: " + bindings);
   }
 
   private Match match() {
@@ -85,7 +87,6 @@ public class Matcher {
         if (pattern.consume(top)) {
           stack.pop();
         } else {
-          dumpState(1);
           return null;
         }
       } else if (stack.peek() instanceof ASTNode) {
@@ -102,7 +103,6 @@ public class Matcher {
             unparse();
           } else {
             if (!bind()) {
-              dumpState(2);
               return null;
             }
           }
@@ -112,7 +112,6 @@ public class Matcher {
       }
     }
     if (!pattern.finished()) {
-      dumpState(3);
       return null;
     }
     return new Match(tree, bindings, pattern);
