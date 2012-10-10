@@ -17,7 +17,7 @@ import ast.Program;
 import ast.Stmt;
 
 public class Matcher {
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = false;
   private UnparsedPattern pattern;
   private Stack<Object> stack;
   private ASTNode tree;
