@@ -182,7 +182,8 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     					j=j+1;
     				}
     				else{
-    					return false;
+    					//TODO
+    					return true;
     				}
     			}
     			else{
@@ -191,7 +192,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
         			}
         			else{
         				if (Debug) System.out.println("inside shape equals false!");
-        				//return true;
         				return false;
         			}
     			}

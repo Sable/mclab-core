@@ -50,11 +50,20 @@ public class SPLowercase extends SPAbstractScalarExpr{
 					return previousMatchResult;
 				}
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-				if (Debug) System.out.println(match.getAllLowercase());
-				match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
-				return match;
+				if(argumentShape.getCertainDimensionSize(previousMatchResult.getNumInVertcat())==null){
+					lowercase.put(s, null);
+					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					if (Debug) System.out.println(match.getAllLowercase());
+					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
+					return match;
+				}
+				else{
+					lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
+					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					if (Debug) System.out.println(match.getAllLowercase());
+					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
+					return match;
+				}
 			}
 			//for assign a lowercase's value to an ArrayIndex
 			if(previousMatchResult.isArrayIndexAssignRight()==true){
@@ -70,7 +79,12 @@ public class SPLowercase extends SPAbstractScalarExpr{
 						return previousMatchResult;
 					}
 					dimensions.remove((previousMatchResult.getLatestMatchedNumber()-1));
-					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), previousMatchResult.getValueOfVariable(s));
+					if(previousMatchResult.hasValue(s)){
+						dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), previousMatchResult.getValueOfVariable(s));
+					}
+					else{
+						dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), null);
+					}
 				}
 				else{
 					if (Debug) System.out.println("inside assigning a lowercase's value to array with lowercase index!");//i.e. M(n)=m;
