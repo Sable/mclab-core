@@ -177,18 +177,37 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     		for(Integer i : this.dimensions){
     			if (Debug) System.out.println("testing weather or not shape equals!");
     			//TODO
-    			if(i==o.getCertainDimensionSize(j)){
-    				j=j+1;
+    			if(i==null){
+    				if(o.isDimensionEmpty(j)){
+    					j=j+1;
+    				}
+    				else{
+    					return false;
+    				}
     			}
     			else{
-    				if (Debug) System.out.println("inside shape equals false!");
-    				return true;
-    				//return false;
+    				if(i==o.getCertainDimensionSize(j)){
+        				j=j+1;
+        			}
+        			else{
+        				if (Debug) System.out.println("inside shape equals false!");
+        				//return true;
+        				return false;
+        			}
     			}
     		}
     		return true;
     	}
     	return false;//FIXME
+    }
+    
+    public boolean isDimensionEmpty(int dim){
+    	if(this.getCertainDimensionSize(dim)==null){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
     }
     
     public boolean bigger(Shape<V> o){
