@@ -22,9 +22,11 @@ public class EqualityChecker {
     if (left.getNumChild() != right.getNumChild()) {
       return false;
     }
-    for (int i = 0; i < left.getNumChild(); ++i) {
-      if (!equals(left.getChild(i), right.getChild(i))) {
-        return false;
+    if (left.getNumChild() > 0) {
+      for (int i = 0; i < left.getNumChild(); ++i) {
+        if (!equals(left.getChild(i), right.getChild(i))) {
+          return false;
+        }
       }
       return true;
     }
