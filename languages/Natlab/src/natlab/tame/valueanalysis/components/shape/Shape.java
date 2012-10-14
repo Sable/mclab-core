@@ -80,6 +80,18 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     	}
     }
     
+    public static boolean isDimensionExactlyKnow(ArrayList<Integer> dims){
+    	try{
+    		for(int i : dims){
+    			int forNothing = i;
+    		}
+    		return true;
+    	}
+    	catch(Exception e){
+    			return false;
+    	}
+    }
+    
     public void printShapeInfo(){
     	if (Debug) System.out.println(dimensions);
     }
