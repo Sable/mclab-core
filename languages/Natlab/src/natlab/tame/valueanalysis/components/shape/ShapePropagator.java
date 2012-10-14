@@ -87,7 +87,7 @@ public class ShapePropagator<V extends Value<V>>
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
-        		if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        		if(indizesShape.isScalar()){
         			
         			/**
         			 * to deal with array get whose first index is scalar without exact value
@@ -106,7 +106,7 @@ public class ShapePropagator<V extends Value<V>>
         					/**
         					 * to deal with array get whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.isScalar()){
         	        			
         	        			/**
         	        			 * to deal with array get whose second index is scalar without exact value.
@@ -164,7 +164,7 @@ public class ShapePropagator<V extends Value<V>>
         					/**
         					 * to deal with array get whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.isScalar()){
         	        			
         	        			/**
         	        			 * to deal with array get whose second index is scalar without exact value.
@@ -226,7 +226,7 @@ public class ShapePropagator<V extends Value<V>>
     					/**
     					 * to deal with array get whose second index is scalar.
     					 */
-    	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+    	        		if(indizesShape2.isScalar()){
 	        				List<Integer> newShape = new ArrayList<Integer>(2);
         	        		newShape.add(((HasShape<V>)(indizes.get(1))).getShape().getDimensions().get(1));
         	        		newShape.add(1);
@@ -295,7 +295,7 @@ public class ShapePropagator<V extends Value<V>>
 					/**
 					 * to deal with array get whose second index is scalar.
 					 */
-	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+	        		if(indizesShape2.isScalar()){
         				List<Integer> newShape = new ArrayList<Integer>(2);
     	        		newShape.add(arrayDimensionList.get(0));
     	        		newShape.add(1);
@@ -363,7 +363,7 @@ public class ShapePropagator<V extends Value<V>>
     			 * to deal with array get whose only index is scalar, 
     			 * actually, we don't care whether or not the scalar is with an exact value.
     			 */
-    			if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+    			if(indizesShape.isScalar()){
     				return new ShapeFactory<V>().newShapeFromIntegers(scalarShape);
     			}
     			
@@ -431,7 +431,7 @@ public class ShapePropagator<V extends Value<V>>
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
-        		if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        		if(indizesShape.isScalar()){
         			
         			/**
         			 * to deal with array assign whose first index is scalar without exact value
@@ -450,7 +450,7 @@ public class ShapePropagator<V extends Value<V>>
         					/**
         					 * to deal with array assign whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.isScalar()){
         	        			
         	        			/**
         	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -501,7 +501,7 @@ public class ShapePropagator<V extends Value<V>>
         					/**
         					 * to deal with array assign whose second index is scalar.
         					 */
-        	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        	        		if(indizesShape2.isScalar()){
         	        			
         	        			/**
         	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -554,7 +554,7 @@ public class ShapePropagator<V extends Value<V>>
     					/**
     					 * to deal with array assign whose second index is scalar.
     					 */
-    	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+    	        		if(indizesShape2.isScalar()){
         	        		
     	        			/**
     	        			 * to deal with array get whose second index is scalar without exact value.
@@ -606,7 +606,7 @@ public class ShapePropagator<V extends Value<V>>
 					/**
 					 * to deal with array assign whose second index is scalar.
 					 */
-	        		if(indizesShape2.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+	        		if(indizesShape2.isScalar()){
     	        		
 	        			/**
 	        			 * to deal with array assign whose second index is scalar without exact value.
@@ -664,7 +664,7 @@ public class ShapePropagator<V extends Value<V>>
         			 * to deal with array assign whose only index is scalar, 
         			 * actually, we don't care whether or not the scalar is with an exact value.
         			 */
-        			if(indizesShape.equals((new ShapeFactory<V>()).newShapeFromIntegers(scalarShape))){
+        			if(indizesShape.isScalar()){
         				/**
         				 * here, we need to check the bound, in case the array may be expanded.
         				 */
