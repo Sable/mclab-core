@@ -87,6 +87,9 @@ public class ShapePropagator<V extends Value<V>>
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
+        
+        		       		
+        		
         		if(indizesShape.isScalar()){
         			
         			/**
@@ -431,6 +434,9 @@ public class ShapePropagator<V extends Value<V>>
     			/**
     			 * to deal with array get whose first index is scalar
     			 */
+    			
+    			
+    			
         		if(indizesShape.isScalar()){
         			
         			/**

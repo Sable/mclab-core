@@ -146,7 +146,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 		ArrayList<String> vars = new ArrayList<String>();
 		if (node instanceof TIRAbstractAssignToVarStmt){
 			vars.add(((TIRAbstractAssignToVarStmt)node).getTargetName().getID());
-		} else if (node instanceof TIRAbstractAssignToListStmt){// buf.append("~~"); 
+		} else if (node instanceof TIRAbstractAssignToListStmt){ 
 			for(ast.Name name : ((TIRAbstractAssignToListStmt)node).getTargets().asNameList()){
 				vars.add(name.getID());				
 			}

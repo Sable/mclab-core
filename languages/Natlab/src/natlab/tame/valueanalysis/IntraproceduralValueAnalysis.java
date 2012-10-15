@@ -33,7 +33,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ValuePropagator<V> valuePropagator;
     ValueFlowMap<V> argMap;
     Args<V> args;
-    static boolean Debug = false;  //button of debug
+    static boolean Debug = true;  //button of debug
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
     

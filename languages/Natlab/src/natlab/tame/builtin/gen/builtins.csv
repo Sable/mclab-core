@@ -293,6 +293,7 @@ properFloatFunction; floatFunction
 unaryFloatFunction; properFloatFunction
 -Class(float->0)
 -Shape($|M->M)
+-isComplex(A->NUMXARGS>0?X:R)
 
 # elemental unary functions operating on floating point matrizes
 elementalUnaryFloatFunction; unaryFloatFunction
@@ -405,7 +406,8 @@ dimensionCollapsingFloatFunction; dimensionSensitiveFloatFunction
 mode;; Shape($->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
 prod;; Shape($->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
 #TODO - sum takes a possible string parameter
-sum;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1],('double'|'native')?->$||M,M(1)=1,('double'|'native')?->M||M,$,n=previousScalar(),M(n)=1,('double'|'native')?->M)
+sum;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1],('double'|'native')?->$||M,M(1)=1,('double'|'native')?->M||M,$,n=previousScalar(),M(n)=1,('double'|'native')?->M) 
+-isComplex(X,R? -> X || R,R? -> R)
 mean;; Class(coerce(int|char|logical->double,parent));; Shape([1,n]|[n,1]->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M)
 
 
@@ -533,7 +535,7 @@ colon
 -Class(coerce(logical -> double, matlab))
 -MatlabClass(logical logical logical?->error, logical|double double|logical  (double|logical)? -> double, numeric double|0  (double|0)? -> 0, double|-1 (double|-1 numeric) | numeric -> -1, double|1 numeric double|1 -> 1, char (char|double char)|char -> char)
 -Shape($,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k])||M,M->[1,k])
--isComplex(R,R ->R || A,A->NUMXARGS>0?X:A)
+-isComplex(R* ->R)
 
 # construct arrays via their dimensions; and possibly a type
 byShapeAndTypeMatrixCreation; matrixCreation
@@ -541,6 +543,7 @@ byShapeAndTypeMatrixCreation; matrixCreation
 numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
 -Class((numeric|logical)* typeString(numeric)|(none->double))
 -Shape([]->$||($,n=previousScalar(),add())+->M)
+-isComplex(A*->R)
 ones
 zeros
 # eye takes at most 2 dims
@@ -713,6 +716,7 @@ unaryShapeTransformation; shapeTransformation
 
 squeeze
 transpose;; Shape([m,n]->[n,m])
+-isComplex(R -> R || X->X || A->A )
 ctranspose
 
 
@@ -721,7 +725,9 @@ ctranspose
 # all these take multiple args
 Concatenation; versatileFunction
 horzcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
+-isComplex(A,A+ -> NUMXARGS>0?X:R)
 vertcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
+-isComplex(A,A+ -> NUMXARGS>0?X:R)
 # generalization of horz/vert cat
 cat
 

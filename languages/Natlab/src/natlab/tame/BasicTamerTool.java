@@ -23,38 +23,48 @@ import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
 public class BasicTamerTool {
 
-	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
-	        tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<BasicMatrixValue>> inputValues){
-		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
-		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
-		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
-		StaticFunction function = callgraph.getAsInlinedStaticFunction(); //inline all
+	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> tameMatlabToSingleFunction(
+			java.io.File mainFile, List<AggrValue<BasicMatrixValue>> inputValues) {
+		GenericFile gFile = GenericFile.create(mainFile); // file -> generic
+															// file
+		FileEnvironment env = new FileEnvironment(gFile); // get path
+															// environment obj
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
+																				// simple
+																				// callgraph
+		StaticFunction function = callgraph.getAsInlinedStaticFunction(); // inline
+																			// all
 
-		//build intra-analysis
+		// build intra-analysis
 		@SuppressWarnings("unchecked")
-		IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
-		        new IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>>(
-		        		null, function, new BasicMatrixValueFactory(), 
-		        		Args.<AggrValue<BasicMatrixValue>>newInstance(inputValues));
-		//System.out.println("before analyze!");
-		analysis.analyze(); //run analysis
+		IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>>(
+				null, function, new BasicMatrixValueFactory(),
+				Args.<AggrValue<BasicMatrixValue>> newInstance(inputValues));
+		// System.out.println("before analyze!");
+		analysis.analyze(); // run analysis
 		return analysis;
 	}
 
 	/**
-	 * This is the same as tameMatlabToSingleFunction, but takes 
-	 * a list of PrimitiveClassReferences as arguments, rather than
-	 * abstract values. PrimitiveClassReference is an enum of 
-	 * the builtin matlab classes representing matrizes.
+	 * This is the same as tameMatlabToSingleFunction, but takes a list of
+	 * PrimitiveClassReferences as arguments, rather than abstract values.
+	 * PrimitiveClassReference is an enum of the builtin matlab classes
+	 * representing matrizes.
 	 */
-	//XU expands it to support initial shape input
-	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> 
-			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-		//System.out.println(inputValues);
-		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(inputValues.size());
-		for (PrimitiveClassReference ref : inputValues){
-			list.add(new BasicMatrixValue(Constant.get(1.0)));//XU modified @21:53 5.28.2012
-			//list.add(new BasicMatrixValue(new BasicMatrixValue(ref),(new ShapeFactory()).newShapeFromIntegers(Constant.get(1.0).getShape())));         //here, we create list of basicMatrixValue with the input default class (double)
+	// XU expands it to support initial shape input
+	public IntraproceduralValueAnalysis<AggrValue<BasicMatrixValue>> tameMatlabToSingleFunctionFromClassReferences(
+			java.io.File mainFile, List<PrimitiveClassReference> inputValues) {
+		// System.out.println(inputValues);
+		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
+				inputValues.size());
+		for (PrimitiveClassReference ref : inputValues) {
+			list.add(new BasicMatrixValue(Constant.get(1.0)));// XU modified
+																// @21:53
+																// 5.28.2012
+			// list.add(new BasicMatrixValue(new BasicMatrixValue(ref),(new
+			// ShapeFactory()).newShapeFromIntegers(Constant.get(1.0).getShape())));
+			// //here, we create list of basicMatrixValue with the input default
+			// class (double)
 		}
 		return tameMatlabToSingleFunction(mainFile, list);
 	}
@@ -64,57 +74,66 @@ public class BasicTamerTool {
 	public static void main(String[] args){
 		
 		//GenericFile gFile = GenericFile.create("/home/xu/for_test/hello.m");
-		GenericFile gFile = GenericFile.create("/home/xu/for_test/McFor/mcfor_test/nb3d/drv_nb3d.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/2011/vkumar5/mclab/Project/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/adpt/main.m"); //file -> generic file
 		/*/home/xuli/test/hello.m */
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
-				callgraph, 
-				//Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 
-				Args.newInstance(inputValues),
-				factory);
+				callgraph,
+				// Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))),
+				Args.newInstance(inputValues), factory);
 		System.out.println(analysis.toString());
-		//System.out.println(analysis.getNodeList().get(0).getAnalysis().getTree());
-		
-        for (int i = 0; i < analysis.getNodeList().size(); i++){
-        	System.out.println(ValueAnalysisPrinter.prettyPrint(
-        			analysis.getNodeList().get(i).getAnalysis()));        	
-        }
+		// System.out.println(analysis.getNodeList().get(0).getAnalysis().getTree());
+
+		for (int i = 0; i < analysis.getNodeList().size(); i++) {
+			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+					.getNodeList().get(i).getAnalysis()));
+		}
 	}
-	
-	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(String[] args, FileEnvironment env){
-		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
+
+	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(String[] args,
+			FileEnvironment env) {
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
+																				// simple
+																				// callgraph
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
-		Args<AggrValue<BasicMatrixValue>> someargs = Args.<AggrValue<BasicMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		Args<AggrValue<BasicMatrixValue>> someargs = Args
+				.<AggrValue<BasicMatrixValue>> newInstance(Collections.EMPTY_LIST);
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
-				callgraph, 
-				/*Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))*/
-				Args.newInstance(inputValues), 
-				factory);
+				callgraph,
+				/*
+				 * Args.newInstance((factory.getValuePropagator().call(Builtin.
+				 * getInstance
+				 * ("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))
+				 */
+				Args.newInstance(inputValues), factory);
 		System.out.println(analysis.toString());
-		
-		
-	    for (int i = 0; i < analysis.getNodeList().size(); i++){
-	    	System.out.println(ValueAnalysisPrinter.prettyPrint(
-	    			analysis.getNodeList().get(i).getAnalysis()));        	
-	    }
+
+		for (int i = 0; i < analysis.getNodeList().size(); i++) {
+			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+					.getNodeList().get(i).getAnalysis()));
+		}
 		return analysis;
 	}
-	
-	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args){
-		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(args.length);
-		for(String argSpecs : args)
-		{
+
+	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(
+			String[] args) {
+		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
+				args.length);
+		for (String argSpecs : args) {
 			String delims = "[\\&]";
 			String[] specs = argSpecs.split(delims);
-			
-			/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
-			list.add(new BasicMatrixValue(PrimitiveClassReference.DOUBLE,specs[1])); 
-			
-	   	
+
+			/*
+			 * TODO Below is just to test. Add actual code to make sense of the
+			 * argument specs
+			 */
+			list.add(new BasicMatrixValue(PrimitiveClassReference.DOUBLE,
+					specs[1]));
+
 		}
 		return list;
 	}

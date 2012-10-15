@@ -2,10 +2,16 @@ package natlab.tame.valueanalysis.components.isComplex;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import natlab.tame.builtin.isComplexInfoProp.*;
+import natlab.tame.builtin.isComplexInfoProp.ast.*;
 import natlab.tame.builtin.*;
 import natlab.tame.builtin.isComplexInfoProp.HasisComplexPropagationInfo;
 import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropTool;
+import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.*;
 
 public class isComplexInfoPropagator<V extends Value<V>> extends BuiltinVisitor<Args<V>, 
@@ -38,8 +44,24 @@ List<isComplexInfo<V>>>{
 			 
 			 return res;
 		}
-		else
-		throw new UnsupportedOperationException();
+		else {
+		
+			return null ; //comment
 	}
+		
 
+}
+	
+	
+	public isComplexInfo<V> forRange(V lower,	V upper, V inc){
+		//FIXME do something proper here
+		List<Integer> scalarShape = new ArrayList<Integer>(2);
+		scalarShape.add(1);
+		scalarShape.add(1);
+		if (inc != null){
+			return (new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL");
+		} else {
+			return (new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL");
+		}
+    }
 }

@@ -41,6 +41,7 @@ public class AdvancedMatrixValuePropagator extends
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseBuiltin(Builtin builtin,
 			Args<AggrValue<AdvancedMatrixValue>> arg) {
+		System.out.println("Processing "+ builtin.getName());
 		Constant cResult = builtin.visit(constantProp, arg);
 		if (cResult != null) {
 			return Res
@@ -56,8 +57,9 @@ public class AdvancedMatrixValuePropagator extends
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg); 
-		//FIXME - commented to stop visiting shape propogation
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin
+				.visit(shapeProp, arg);
+		// FIXME - commented to stop visiting shape propogation
 
 		if (matchShapeResult == null) {
 			if (Debug)
@@ -67,7 +69,8 @@ public class AdvancedMatrixValuePropagator extends
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
 				.visit(isComplexInfoProp, arg);
 		if (matchisComplexInfoResult == null) {
-			System.out.println("no complexinfo results");
+			System.out.println("no complexinfo results for "+ builtin.getName());
+
 		}
 
 		// build results out of the result classes and shape XU modified, not
@@ -87,14 +90,21 @@ public class AdvancedMatrixValuePropagator extends
 			HashMap<ClassReference, AggrValue<AdvancedMatrixValue>> map = new HashMap<ClassReference, AggrValue<AdvancedMatrixValue>>();
 
 			for (ClassReference classRef : values) {
-				map.put(classRef,
-						new AdvancedMatrixValue(new AdvancedMatrixValue(
-								(PrimitiveClassReference) classRef),
-								matchShapeResult.get(0),  //FIXME - commented to stop visiting shape propogation
-								matchisComplexInfoResult.get(0)));// FIXME a
-																	// little
-																	// bit
-																	// tricky
+
+				
+
+					map.put(classRef, new AdvancedMatrixValue(
+							new AdvancedMatrixValue(
+									(PrimitiveClassReference) classRef),
+							matchShapeResult.get(0), // FIXME - commented to
+														// stop
+														// visiting shape
+														// propogation
+							matchisComplexInfoResult.get(0)));// FIXME a
+																// little
+																// bit
+																// tricky
+				
 			}
 			result.add(ValueSet.newInstance(map));
 			if (Debug)
@@ -103,10 +113,18 @@ public class AdvancedMatrixValuePropagator extends
 		return result;
 	}
 
-	
 	@Override
 	public Res<AggrValue<AdvancedMatrixValue>> caseAbstractConcatenation(
 			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg) {
+
+		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin
+				.visit(shapeProp, arg);
+		if (Debug)
+			System.out.println("shapeProp results are " + matchShapeResult);
+		if (matchShapeResult == null) {
+			if (Debug)
+				System.out.println("shape results are empty");
+		}
 
 		List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult = builtin
 				.visit(isComplexInfoProp, arg);
@@ -117,9 +135,9 @@ public class AdvancedMatrixValuePropagator extends
 		return Res
 				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
 						new AdvancedMatrixValue(
-								(PrimitiveClassReference)getDominantCatArgClass(arg)),
-
-						matchisComplexInfoResult.get(0)));// FIXME a little bit
-															// tricky
+								(PrimitiveClassReference) getDominantCatArgClass(arg)),
+						matchShapeResult.get(0), matchisComplexInfoResult
+								.get(0)));// FIXME a little bit
+											// tricky
 	}
 }

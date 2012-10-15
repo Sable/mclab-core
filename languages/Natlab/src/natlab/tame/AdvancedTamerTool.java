@@ -22,114 +22,87 @@ import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FilePathEnvironment;
 
 public class AdvancedTamerTool {
+
 	
-	public IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>> 
-    tameMatlabToSingleFunction(java.io.File mainFile, List<AggrValue<AdvancedMatrixValue>> inputValues){
-		GenericFile gFile = GenericFile.create(mainFile); //file -> generic file
-		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
-		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
-		StaticFunction function = callgraph.getAsInlinedStaticFunction(); //inline all
+
+	public static void main(String[] args) {
+		String file = "/home/2011/vkumar5/mclab/Project/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/adpt/main";
+		//String file = "/home/2011/vkumar5/for_test";
+		
+		String fileIn = file + ".m";
+		
+		GenericFile gFile = GenericFile.create(fileIn);
+		/* /home/xuli/test/hello.m */
+		FileEnvironment env = new FileEnvironment(gFile); // get path
+															// environment obj
+		AdvancedTamerTool tool = new AdvancedTamerTool();
+		// System.out.println(args[0]);
+		 tool.analyze(
+				args, env);
 
 
-		@SuppressWarnings("unchecked")
-		IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = 
-        new IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>>(
-        		null, function, new AdvancedMatrixValueFactory(), 
-        		Args.<AggrValue<AdvancedMatrixValue>>newInstance(inputValues));
-		//System.out.println("before analyze!");
-		analysis.analyze(); //run analysis
-		return analysis;
-}
+	}
 
-/**
-* This is the same as tameMatlabToSingleFunction, but takes 
-* a list of PrimitiveClassReferences as arguments, rather than
-* abstract values. PrimitiveClassReference is an enum of 
-* the builtin matlab classes representing matrizes.
-*/
+	public ValueAnalysis<AggrValue<AdvancedMatrixValue>> analyze(String[] args,
+			FileEnvironment env) {
 
-	public IntraproceduralValueAnalysis<AggrValue<AdvancedMatrixValue>> 
-	tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-//System.out.println(inputValues);
-		AdvancedMatrixValueFactory factory = new AdvancedMatrixValueFactory();
-		ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(inputValues.size());
-		for (PrimitiveClassReference ref : inputValues){
-			list.add(new AdvancedMatrixValue(Constant.get(0)));         //TODO change to read isComplex input from user
+		List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
+																				// simple
+																				// callgraph
+		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
+		Args<AggrValue<AdvancedMatrixValue>> someargs = Args
+				.<AggrValue<AdvancedMatrixValue>> newInstance(Collections.EMPTY_LIST);
+		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
+				callgraph,
+				/*
+				 * Args.newInstance((factory.getValuePropagator().call(Builtin.
+				 * getInstance
+				 * ("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))
+				 */
+				Args.newInstance(inputValues), factory);
+		System.out.println(analysis.toString());
+
+		for (int i = 0; i < analysis.getNodeList().size(); i++) {
+			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+					.getNodeList().get(i).getAnalysis()));
 		}
-		return tameMatlabToSingleFunction(mainFile, list);
+		return analysis;
 	}
 
+	public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(
+			String[] args) {
+		List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(
+				1);
+		// ls.add(PrimitiveClassReference.INT8);
+		// ls.add(PrimitiveClassReference.DOUBLE);
+		//
+		// ArrayList<AggrValue<AdvancedMatrixValue>> list = new
+		// ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
+		// for (PrimitiveClassReference ref : ls){
+		// list.add(new AdvancedMatrixValue(ref)); //TODO change to read
+		// isComplex input from user
+		// }
 
-public static void main(String[] args){
-	
-	GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); //file -> generic file
-	/*/home/xuli/test/hello.m */
-	FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
-	List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
-	SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
-	ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
-	Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
-	ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
-			callgraph, 
-			/*Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))*/
-			Args.newInstance(inputValues), 
-			factory);
-	System.out.println(analysis.toString());
-	
-	
-    for (int i = 0; i < analysis.getNodeList().size(); i++){
-    	System.out.println(ValueAnalysisPrinter.prettyPrint(
-    			analysis.getNodeList().get(i).getAnalysis()));        	
-    }
-}
+		ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(
+				args.length);
+		for (String argSpecs : args) {
+			// System.out.println(argSpecs);
+			String delims = "[\\&]";
+			String[] specs = argSpecs.split(delims);
 
-public ValueAnalysis<AggrValue<AdvancedMatrixValue>> analyze(String[] args, FileEnvironment env){
-	
-	//GenericFile gFile = GenericFile.create("/home/2011/vkumar5/hello.m"); 
-	/*/home/xuli/test/hello.m */
-	//FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
-	List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
-	SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
-	ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
-	Args<AggrValue<AdvancedMatrixValue>> someargs = Args.<AggrValue<AdvancedMatrixValue>>newInstance(Collections.EMPTY_LIST); 
-	ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
-			callgraph, 
-			/*Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))*/
-			Args.newInstance(inputValues), 
-			factory);
-	System.out.println(analysis.toString());
-	
-	
-    for (int i = 0; i < analysis.getNodeList().size(); i++){
-    	System.out.println(ValueAnalysisPrinter.prettyPrint(
-    			analysis.getNodeList().get(i).getAnalysis()));        	
-    }
-	return analysis;
-}
+			/*
+			 * TODO Below is just to test. Add actual code to make sense of the
+			 * argument specs
+			 */
+			/* TODO also add code to read INT, FLOAT, etc. */
+			list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,
+					specs[1], specs[2]));
+			// XU changed here to support initial input shape info.
+			// @25th,Jul,2012
 
-public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(String[] args) {
-	List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(1);
-	//ls.add(PrimitiveClassReference.INT8);
-//	ls.add(PrimitiveClassReference.DOUBLE);
-//	
-//	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
-//	for (PrimitiveClassReference ref : ls){
-//		list.add(new AdvancedMatrixValue(ref));      //TODO change to read isComplex input from user
-//	}
-	
-	ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(args.length);
-	for(String argSpecs : args)
-	{
-		String delims = "[\\&]";
-		String[] specs = argSpecs.split(delims);
-		
-		/*TODO Below is just to test. Add actual code to make sense of the argument specs*/ 
-		list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,specs[1],specs[2])); 
-		//XU changed here to support initial input shape info. @25th,Jul,2012
-		
-   	
+		}
+		return list;
+
 	}
-	return list;
-
-}
 }

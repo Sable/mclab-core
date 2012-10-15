@@ -1714,7 +1714,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractUnaryFloatFunction extends AbstractProperFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractUnaryFloatFunction(this,arg);
@@ -1742,6 +1742,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->NUMXARGS>0?X:R");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -2972,7 +2981,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Sum singleton = null;
         public static Sum getInstance(){
@@ -3010,6 +3019,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("X,R? -> X || R,R? -> R");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -4051,7 +4069,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("R,R ->R || A,A->NUMXARGS>0?X:A");
+                isComplexPropInfo = isComplexInfoPropTool.parse("R* ->R");
             }
             return isComplexPropInfo;
         }
@@ -4064,7 +4082,7 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static abstract class AbstractNumericalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg);
@@ -4092,6 +4110,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A*->R");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -5807,7 +5834,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Transpose extends AbstractUnaryShapeTransformation implements HasShapePropagationInfo {
+    public static class Transpose extends AbstractUnaryShapeTransformation implements HasShapePropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Transpose singleton = null;
         public static Transpose getInstance(){
@@ -5830,6 +5857,15 @@ public abstract class Builtin {
                 shapePropInfo = ShapePropTool.parse("[m,n]->[n,m]");
             }
             return shapePropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R -> R || X->X || A->A ");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -5857,7 +5893,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Horzcat extends AbstractConcatenation implements HasShapePropagationInfo {
+    public static class Horzcat extends AbstractConcatenation implements HasShapePropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Horzcat singleton = null;
         public static Horzcat getInstance(){
@@ -5882,8 +5918,17 @@ public abstract class Builtin {
             return shapePropInfo;
         }
 
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
-    public static class Vertcat extends AbstractConcatenation implements HasShapePropagationInfo {
+    public static class Vertcat extends AbstractConcatenation implements HasShapePropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Vertcat singleton = null;
         public static Vertcat getInstance(){
@@ -5906,6 +5951,15 @@ public abstract class Builtin {
                 shapePropInfo = ShapePropTool.parse("M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K");
             }
             return shapePropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+            }
+            return isComplexPropInfo;
         }
 
     }
