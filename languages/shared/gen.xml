@@ -39,11 +39,13 @@
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
+				<exclude name="**/backends/**" />
 			</fileset>
 			<fileset dir="${test.dir}">
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
+				<exclude name="**/backends/**" />
 			</fileset>
 		</jastadd>
 	</target>
