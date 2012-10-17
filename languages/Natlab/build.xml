@@ -221,7 +221,9 @@
 
         <!-- setup a path for the ast files used in Natlab language -->
           <fileset id="natlab.ast.fileset" dir="${Natlab.basedir}">
-            <include name="${src.dir}/**/*.ast" />
+		  <include name="${src.dir}/**/*.ast" />
+		  <exclude name="${src.dir}/**/backends/*.ast" />
+		 
           </fileset>
              
 	<!--=====================================================================-->
