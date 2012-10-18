@@ -50,6 +50,10 @@ public class CompilationProblem
         this.msg = msg;
         this.located = false;
     }
+    
+    public CompilationProblem(String format, Object... args) {
+      this(String.format(format, args));
+    }
 
     public boolean hasLocation()
     {

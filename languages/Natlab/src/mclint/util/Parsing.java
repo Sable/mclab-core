@@ -20,7 +20,7 @@ import ast.Program;
 public class Parsing {
   public static CompilationUnits files(List<String> mfiles) {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
-    CompilationUnits code = Parse.parseFiles(mfiles, errors);
+    CompilationUnits code = Parse.parseMatlabFiles(mfiles, errors);
     if (!errors.isEmpty()) {
       System.err.println("The following errors occured during parsing:");
       for (CompilationProblem error : errors) {

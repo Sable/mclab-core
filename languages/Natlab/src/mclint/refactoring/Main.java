@@ -16,17 +16,14 @@ public class Main {
         .append("Z = X + Y;\n")
         .append("if length(X) == 0\n")
         .append("  disp(sprintf('%f', Z));\n")
-        .append("end\n")
-        .append("x = logical(1);\n")
-        .append("y = inv(X) * Y;\n")
-        .append("z = inv(Y) * X;\n").toString());
+        .append("end\n").toString());
     System.out.println("Original program:");
     System.out.println(program.getPrettyPrinted());
     InputStream resource = Main.class.getResourceAsStream("refactorings.txt");
     for (Refactoring refactoring : Refactorings.fromReader(new InputStreamReader(resource))) {
       refactoring.apply(program);
     }
-    System.out.println("After appling all refactorings:");
+    System.out.println("After applying all refactorings:");
     System.out.println(program.getPrettyPrinted());
   }
 }
