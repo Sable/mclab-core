@@ -29,7 +29,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.PatternSyntaxException;
 
 import matlab.CompositePositionMap;
 import matlab.FunctionEndScanner;
@@ -41,6 +40,7 @@ import matlab.OffsetTracker;
 import matlab.PositionMap;
 import matlab.TextPosition;
 import matlab.TranslationProblem;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
 
 import org.antlr.runtime.ANTLRReaderStream;
 
@@ -51,30 +51,28 @@ import beaver.Parser;
 
 /**
  * Set of static methods to parse files.
- * Files should be read from genericfiles
- *   - there may be something that reads genericfiles somewhere ... in main, maybe?
  * 
+ * TODO(isbadawi): A lot of cruft in this class because it catches exceptions and populates a
+ * List<CompilationProblem>. Investigate changing API to use (possibly wrapped) exceptions instead.
  */
 public class Parse {
-  /**
-   * code that should get executed before any parsing
-   */
-  private static void parsePreamble() {
-    Stmt.setDefaultOutputSuppression(false);
-  }
-
-  /**
-   * code that should get executed after any parsing
-   */
-  private static void parsePostscript() {
-    Stmt.setDefaultOutputSuppression(true);
-  }
-
   private static Reader fileReader(String fName, List<CompilationProblem> errors) {
     try {
       return new FileReader(fName);
     } catch (FileNotFoundException e) {
       errors.add(new CompilationProblem("File not found: %s\nAborting!\n", fName));
+      return null;
+    }
+  }
+
+  private static Reader fileReader(GenericFile file, List<CompilationProblem> errors) {
+    try {
+      return file.getReader();
+    } catch (UnsupportedOperationException e) {
+      errors.add(new CompilationProblem("Reading not supported for %s\n", file.getName()));
+      return null;
+    } catch (IOException e) {
+      errors.add(new CompilationProblem("Error opening %s\n%s", file.getName(), e.getMessage()));
       return null;
     }
   }
@@ -108,47 +106,37 @@ public class Parse {
    * errors. If an error occurs then null is returned. 
    */
   public static Program parseFile(String fName, Reader file, List<CompilationProblem> errors) {
-    parsePreamble();
+    Stmt.setDefaultOutputSuppression(false);
     NatlabParser parser = new NatlabParser();
-    NatlabScanner scanner = null;
+    NatlabScanner scanner = new NatlabScanner(file);
     CommentBuffer cb = new CommentBuffer();
     parser.setCommentBuffer(cb);
+    scanner.setCommentBuffer(cb);
+    Program program = null;
     try {
-      scanner = new NatlabScanner(file);
-      scanner.setCommentBuffer(cb);
-      try {
-        Program program = (Program) parser.parse(scanner);
-        if (parser.hasError()) {
-          String delim = "],[";
-          for (String error : parser.getErrors()) {
-            // return an array of string with {line, column, msg}
-            CompilationProblem parserError;
-            try {
-              String[] message = error.split(delim);
-              parserError = new CompilationProblem(Integer.valueOf(message[0]).intValue(),
-                  Integer.valueOf(message[1]).intValue(),
-                  message[3]);
-            } catch (PatternSyntaxException e) {
-              parserError = new CompilationProblem(error);
-            }
-            errors.add(parserError);
-          }
-          program = null;
-        }
-        parsePostscript();
-        return program;
-      } catch(Parser.Exception e) {
-        StringBuilder errorMessage = new StringBuilder(e.getMessage()).append("\n");
-        for (String error : parser.getErrors()) {
-          errorMessage.append(error).append("\n");
-        }
-        errors.add(new CompilationProblem(errorMessage.toString()));
-        return null;
-      } 
-    } catch(IOException e) {
+      program = (Program) parser.parse(scanner);
+    } catch (Parser.Exception e) {
+      StringBuilder errorMessage = new StringBuilder(e.getMessage()).append("\n");
+      for (String error : parser.getErrors()) {
+        errorMessage.append(error).append("\n");
+      }
+      errors.add(new CompilationProblem(errorMessage.toString()));
+      return null;
+    } catch (IOException e) {
       errors.add(new CompilationProblem("Error parsing %s\n%s", fName, e.getMessage()));
       return null;
     }
+    if (parser.hasError()) {
+      for (String error : parser.getErrors()) {
+        // return an array of string with {line, column, msg}
+        String[] message = error.split("\\],\\[");
+        errors.add(new CompilationProblem(Integer.parseInt(message[0]),
+            Integer.parseInt(message[1]), message[3]));
+      }
+      program = null;
+    }
+    Stmt.setDefaultOutputSuppression(true);
+    return program;
   }
 
   /**
@@ -167,6 +155,14 @@ public class Parse {
       return null;
     }
     return parseFile(fName, reader, errors);
+  }
+
+  public static Program parseFile(GenericFile file, List<CompilationProblem> errors) {
+    Reader reader = fileReader(file, errors);
+    if (!errors.isEmpty()) {
+      return null;
+    }
+    return parseFile(file.getName(), reader, errors);
   }
 
   /**
@@ -199,11 +195,19 @@ public class Parse {
    */
   public static Program parseMatlabFile(String fName, Reader file, List<CompilationProblem> errors) {
     // TODO - something should be done about the mapping file
-    Reader natlabFile = Parse.translateFile(fName, file, errors);
+    Reader natlabFile = translateFile(fName, file, errors);
     if (!errors.isEmpty()) {
       return null;
     }
     return parseFile(fName, natlabFile, errors);
+  }
+
+  public static Program parseMatlabFile(GenericFile file, List<CompilationProblem> errors) {
+    Reader reader = fileReader(file, errors);
+    if (!errors.isEmpty()) {
+      return null;
+    }
+    return parseMatlabFile(file.getName(), reader, errors);
   }
 
   public static CompilationUnits parseMatlabFiles(List<String> files, List<CompilationProblem> errors) {
@@ -229,6 +233,14 @@ public class Parse {
       return null;
     }
     return translateFile(fName, reader, errors);
+  }
+
+  public static Reader translateFile(GenericFile file, List<CompilationProblem> errors) {
+    Reader reader = fileReader(file, errors);
+    if (!errors.isEmpty()) {
+      return null;
+    }
+    return translateFile(file.getName(), reader, errors);
   }
 
   /**
