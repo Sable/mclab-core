@@ -83,6 +83,6 @@ public abstract class DefinitionVisitor extends AbstractNodeCaseHandler {
       caseInParam(name);
     for (Name name : node.getOutputParams())
       caseOutParam(name);
-    node.getStmts().analyze(this);    
+    node.getStmts().analyze(this);
   }
 }

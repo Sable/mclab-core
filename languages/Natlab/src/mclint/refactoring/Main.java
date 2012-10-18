@@ -1,30 +1,32 @@
 package mclint.refactoring;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
+
 import mclint.util.Parsing;
 import ast.Program;
 
 public class Main {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     Program program = Parsing.string(new StringBuilder()
         .append("X = repmat(0, 4, 4);\n")
         .append("Y = repmat(1, 4, 4);\n")
         .append("Z = X + Y;\n")
         .append("if length(X) == 0\n")
         .append("  disp(sprintf('%f', Z));\n")
-        .append("end\n").toString());
+        .append("end\n")
+        .append("x = logical(1);\n")
+        .append("y = inv(X) * Y;\n")
+        .append("z = inv(Y) * X;\n").toString());
     System.out.println("Original program:");
     System.out.println(program.getPrettyPrinted());
-    Refactorings.repmatToZeros().apply(program);
-    System.out.println("After repmatToZeros:");
-    System.out.println(program.getPrettyPrinted());
-    Refactorings.repmatToOnes().apply(program);
-    System.out.println("After repmatToOnes:");
-    System.out.println(program.getPrettyPrinted());
-    Refactorings.dispSprintfToFprintf().apply(program);
-    System.out.println("After dispSprintfToFprintf:");
-    System.out.println(program.getPrettyPrinted());
-    Refactorings.lengthEqZeroToIsempty().apply(program);
-    System.out.println("After lengthEqZeroToIsempty");
+    InputStream resource = Main.class.getResourceAsStream("refactorings.txt");
+    for (Refactoring refactoring : Refactorings.fromReader(new InputStreamReader(resource))) {
+      refactoring.apply(program);
+    }
+    System.out.println("After appling all refactorings:");
     System.out.println(program.getPrettyPrinted());
   }
 }
