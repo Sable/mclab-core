@@ -25,84 +25,62 @@ import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.ForStmt;
-import ast.Function;
 import ast.IfStmt;
 import ast.ParameterizedExpr;
 import ast.Program;
-import ast.Script;
 import ast.Stmt;
 import ast.WhileStmt;
 
 public class ASTToolBox {
+  @Deprecated
   public static Stmt getParentStmtNode(ASTNode varNode) {
     return NodeFinder.findParent(varNode, Stmt.class);
   }
 
+  @Deprecated
   public static AssignStmt getParentAssignStmtNode(ASTNode varNode) {
     return NodeFinder.findParent(varNode,  AssignStmt.class);
   }
 
+  @Deprecated
   public static ast.List getParentStmtListNode(ASTNode varNode) {
     return NodeFinder.findParent(varNode, ast.List.class);
   }
 
+  @Deprecated
   public static ForStmt getParentForStmtNode(ASTNode varNode) {
     return NodeFinder.findParent(varNode, ForStmt.class);
   }
 
+  @Deprecated
   public static IfStmt getParentIfStmtNode(ASTNode varNode) {
     return NodeFinder.findParent(varNode, IfStmt.class);
+  }
+
+  @Deprecated
+  public static Program getSubtreeRoot(ASTNode varNode) {
+    return NodeFinder.findParent(varNode, Program.class);
+  }
+
+  public static boolean isInsideLoop(ASTNode varNode) {
+    return NodeFinder.findParent(varNode, ForStmt.class) != null
+        || NodeFinder.findParent(varNode, WhileStmt.class) != null;
   }
 
   public static boolean isInsideArray(ASTNode varNode) {
     boolean bResult = false;
     ASTNode parentNode = varNode;
-    do{
-      if((parentNode instanceof AssignStmt) ) {
+    do {
+      if (parentNode instanceof AssignStmt) {
         break;
-      } if((parentNode instanceof ParameterizedExpr) ) {
+      } if (parentNode instanceof ParameterizedExpr) {
         bResult = true;
         break;
       } else {
-        parentNode = parentNode.getParent(); 	   
+        parentNode = parentNode.getParent();
       }
-    } while((parentNode!=null) && !bResult);
+    } while (parentNode != null && !bResult);
 
     return bResult;
-  }
-  
-
-  public static boolean isInsideLoop(ASTNode varNode) {
-    boolean bResult = false;
-    ASTNode parentNode = varNode;
-    do{
-      if((parentNode instanceof WhileStmt) 
-          || (parentNode instanceof ForStmt)) {
-        bResult = true;
-        break;
-      } else {
-        parentNode = parentNode.getParent(); 	   
-      }
-    } while((parentNode!=null) && !(parentNode instanceof Program) && !bResult);
-
-    return bResult;
-  }
-
-  public static ASTNode getSubtreeRoot(ASTNode varNode) {
-    ASTNode parentNode = varNode.getParent();
-    // If the varNode is already the assignment-statement, then don't need 
-    // to find it's parent
-    if((varNode instanceof Script)|| (varNode instanceof Function)) {
-      parentNode = varNode;
-    } else {
-      // varNode/e.getNodeLocation() is NameExpr, it may directly belongs to
-      // AssignStmt, or ParameterizedExpr.
-      while ((parentNode!=null) && 
-          !((parentNode instanceof Script)||(parentNode instanceof Function))) {
-        varNode = parentNode;
-        parentNode = parentNode.getParent(); 	   
-      }
-    }
-    return parentNode;
   }
 }

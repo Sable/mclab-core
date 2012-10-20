@@ -26,11 +26,18 @@ public class NodeFinder {
     return res;
   }
 
+  /**
+   * Walks up the tree to find a parent of the specified type.
+   * Returns null if no such parent exists.
+   */
   public static <T extends ASTNode> T findParent(ASTNode n, Class<T> type) {
     while (n != null && (!type.isInstance(n))) {
       n = n.getParent();
     }
-    return type.cast(n);
+    if (type.isInstance(n)) {
+      return type.cast(n);
+    }
+    return null;
   }
 
   public static <T extends ASTNode> void apply(final ASTNode n, final Class<T> type,
