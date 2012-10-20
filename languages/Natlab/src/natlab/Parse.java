@@ -82,8 +82,10 @@ public class Parse {
    * This is useful when a Reader might need to be read multiple times; using
    * mark() and reset() is not always practical, so in those cases, use this method, and
    * create as many StringReaders as you need.
+   * 
+   * TODO(isbadawi): Move this to a more general utils class instead of making it public static here
    */
-  private static String readerToString(Reader reader) throws IOException {
+  public static String readerToString(Reader reader) throws IOException {
     StringBuilder sb = new StringBuilder();
     BufferedReader in = new BufferedReader(reader);
     String line = null;

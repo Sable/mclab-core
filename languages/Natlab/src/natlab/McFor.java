@@ -21,41 +21,70 @@
 
 package natlab;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Stack;
 
-import java.util.*;
-
-import org.antlr.runtime.ANTLRReaderStream;
-
-import matlab.CompositePositionMap;
-import matlab.FunctionEndScanner;
-import matlab.MatlabParser;
-import matlab.OffsetTracker;
-import matlab.PositionMap;
-import matlab.TextPosition;
-import matlab.TranslationProblem;
-import ast.*;
-import ast.List;
-
-import beaver.Parser;
-
-import natlab.toolkits.scalar.*;
-
-import natlab.SymbolTableScope;
-import natlab.SymbolTableEntry;
+import natlab.toolkits.scalar.AbstractFlowAnalysis;
+import natlab.toolkits.scalar.FlowSet;
+import natlab.toolkits.scalar.ReachingDefs;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.PrimitiveType;
 import annotations.ast.Size;
 import annotations.ast.Type;
-import annotations.ast.UnknownType;
-
-import matlab.*;
-import matlab.FunctionEndScanner.NoChangeResult;
-import matlab.FunctionEndScanner.ProblemResult;
-import matlab.FunctionEndScanner.TranslationResult;
-
-import org.antlr.runtime.ANTLRReaderStream;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.BreakStmt;
+import ast.CellArrayExpr;
+import ast.ColonExpr;
+import ast.ElseBlock;
+import ast.EmptyStmt;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.FPLiteralExpr;
+import ast.ForStmt;
+import ast.Function;
+import ast.FunctionDecl;
+import ast.FunctionList;
+import ast.GTExpr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.IntLiteralExpr;
+import ast.List;
+import ast.MTimesExpr;
+import ast.MatrixExpr;
+import ast.MinusExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.Opt;
+import ast.OrExpr;
+import ast.ParameterizedExpr;
+import ast.PlusExpr;
+import ast.Program;
+import ast.RangeExpr;
+import ast.Row;
+import ast.Script;
+import ast.Stmt;
+import ast.StringLiteralExpr;
+import ast.SwitchStmt;
+import ast.VariableDecl;
+import ast.WhileStmt;
+import beaver.Parser;
 
 /**
  * A  for translate MATLAB program to Fortran code
@@ -499,50 +528,26 @@ public class McFor {
         MATLAB2Natlab(filename);
         return filename +".n"; 
     }
+
     // This is taken from main() of matlab.Translator
     public static void MATLAB2Natlab(String filename) {
-        String basename = filename;
+      String basename = filename;
+      java.util.List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
+      Reader natlab = Parse.translateFile(basename + ".m", errors);
+      if (natlab == null) {
+        System.out.println(errors);
+        System.exit(0);
+      }
+      if (errors.isEmpty()) {
         try {
-            BufferedReader in = new BufferedReader(new FileReader(basename + ".m"));
-
-            FunctionEndScanner prescanner = new FunctionEndScanner(in);
-            FunctionEndScanner.Result result = prescanner.translate();
-            in.close();
-
-            if(result instanceof NoChangeResult) {
-                in = new BufferedReader(new FileReader(basename + ".m")); //just re-open original file
-            } else if(result instanceof ProblemResult) {
-                for(TranslationProblem prob : ((ProblemResult) result).getProblems()) {
-                    System.err.println(prob);
-                }
-                System.exit(0); //terminate early since extraction parser can't work without balanced 'end's
-            } else if(result instanceof TranslationResult) {
-                TranslationResult transResult = (TranslationResult) result;
-                in = new BufferedReader(new StringReader(transResult.getText()));
-            }
-
-            OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-            ArrayList<TranslationProblem> problems = new ArrayList<TranslationProblem>();
-            String destText = MatlabParser.translate(new ANTLRReaderStream(in), 1, 1, offsetTracker, problems);
-            
-            PrintWriter out = new PrintWriter(new FileWriter(basename + ".n"));
-            if(problems.isEmpty()) {
-                out.print(destText);
-            } else {
-                for(TranslationProblem prob : problems) {
-                    System.err.println("~" + prob);
-                }
-            }
-            out.close();
-            in.close();
-            // System.exit(0);
-        } catch(IOException e) {
-            e.printStackTrace();
-            // System.exit(2);
+          new FileWriter(basename + ".n").write(Parse.readerToString(natlab));
+        } catch (IOException e) {
+          e.printStackTrace();
+          System.exit(2);
         }
+      }
     }
 
-	
     /**
      * Executes system command in Linux, print out the outputs
      * @param cmd

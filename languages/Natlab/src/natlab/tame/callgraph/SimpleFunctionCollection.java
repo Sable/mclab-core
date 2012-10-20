@@ -17,7 +17,6 @@
 // =========================================================================== //
 
 package natlab.tame.callgraph;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,13 +24,12 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import natlab.CompilationProblem;
+import natlab.Parse;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.filehandling.genericFile.FileFile;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
-import natlab.toolkits.path.AbstractPathEnvironment;
 import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.Simplifier;
@@ -121,10 +119,7 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
         if (loadedFiles.contains(file)) return true;
         if (file.isBuiltin) return true;
         
-        //parse file TODO - use something that reads genericFiles
-        Program program;
-        File javaFile = ((FileFile)file.getFile()).getFileObject();
-        program = natlab.Parse.parseMatlabFile(javaFile.getAbsolutePath(), errList);
+        Program program = Parse.parseMatlabFile(file.getFile(), errList);
         if (program == null){
             throw new UnsupportedOperationException("cannot parse file "+file+":\n"+errList);
         }
@@ -143,13 +138,12 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
             System.err.println("The tamer encountered Matlab file of unknown/unsupported type "+
                     program.getClass()+".");
         }
-        
+
         //We reduce lambda expressions at this point, because they create extra functions
         program = (Program)Simplifier.simplify(program, 
                 new VFPreorderAnalysis(program, fileEnvironment.getFunctionOrScriptQuery(file.path)), 
                 LambdaSimplification.class);
-        //System.out.println(program.getPrettyPrinted());
-        
+
         loadedFiles.add(file.getFile());
         boolean success = true;
         
