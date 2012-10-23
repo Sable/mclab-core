@@ -1,8 +1,5 @@
 package natlab.toolkits.analysis;
 
-import java.util.*;
-
-
 /**
  * Represents mergable objects. It is understood that if a class
  * {@code C} implements this interface, then it must implement {@code

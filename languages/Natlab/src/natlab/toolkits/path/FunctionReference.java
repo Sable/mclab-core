@@ -17,16 +17,14 @@
 // =========================================================================== //
 
 package natlab.toolkits.path;
-import ast.ASTNode;
-import ast.Program;
-import natlab.toolkits.filehandling.genericFile.*;
-
+import natlab.toolkits.filehandling.genericFile.BuiltinFile;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
 
 /**
  * A function or script within a Matlab program can not be uniquely identified by a name alone
- * We need a soruce file as well
+ * We need a source file as well
  * 
- * This may refer to a funciton or script or class inside a matlab file on the path,
+ * This may refer to a function or script or class inside a matlab file on the path,
  * or a builtin
  *
  * This class is immutable
@@ -34,121 +32,109 @@ import natlab.toolkits.filehandling.genericFile.*;
  * TODO - this should maybe store what class it belongs to
  */
 
-
 public class FunctionReference {
-    public final GenericFile path;
-    public final String name;
-    public final ReferenceType referenceType;
-    public final boolean isBuiltin;
-    /**
-     * creates a Function Reference referring to a function inside a matlab file
-     * @param name the name of the function
-     * @param path the path of the function (as an absolute File)
-     */
+  public final GenericFile path;
+  public final String name;
+  public final ReferenceType referenceType;
+  public final boolean isBuiltin;
+  
+  private FunctionReference(String name, GenericFile path, boolean isBuiltin, ReferenceType type) {
+    this.name = name;
+    this.path = path;
+    this.isBuiltin = isBuiltin;
+    this.referenceType = type;
+  }
 
-    public FunctionReference(String name, GenericFile path){
-        this.path = path;
-        this.name = name;
-	if (path instanceof BuiltinFile)
-	    this.isBuiltin = true;
-	else this.isBuiltin = false;
-	referenceType = ReferenceType.UNKNOWN;
-    }
-    
-    /**
-     * creates a Function Reference referring to a function or script inside
-     * a matlab file - it will refer to the funciton or script with the same name as the given
-     * one
-     */
-    public FunctionReference(GenericFile path){
-        this.path = path;
-        this.name = natlab.toolkits.path.FolderHandler.getFileName(path);
-	if (path instanceof BuiltinFile)
-	    this.isBuiltin = true;
-	else this.isBuiltin = false;
-	referenceType = ReferenceType.UNKNOWN;
-    }
+  /**
+   * creates a Function Reference referring to a function inside a matlab file
+   * @param name the name of the function
+   * @param path the path of the function (as an absolute File)
+   */
+  public FunctionReference(String name, GenericFile path) {
+    this(name, path, path instanceof BuiltinFile, ReferenceType.UNKNOWN);
+  }
 
-    public FunctionReference(GenericFile path, ReferenceType t){
-        this.path = path;
-        this.name = natlab.toolkits.path.FolderHandler.getFileName(path);
-	if (path instanceof BuiltinFile)
-	    this.isBuiltin = true;
-	else this.isBuiltin = false;
-	referenceType=t;
-    }
+  /**
+   * creates a Function Reference referring to a function or script inside
+   * a matlab file - it will refer to the funciton or script with the same name as the given
+   * one
+   */
+  public FunctionReference(GenericFile path) {
+    this(FolderHandler.getFileName(path), path);
+  }
 
-    public FunctionReference(GenericFile path, ast.Function f, ReferenceType t){
-		this.path = path;
-		this.name = f.getName();
-		this.isBuiltin = false;
-		this.referenceType=t;
-    }
+  public FunctionReference(GenericFile path, ReferenceType type) {
+    this(FolderHandler.getFileName(path), path, path instanceof BuiltinFile, type);
+  }
 
-    /**
-     * returns the name of the function
-     */
-    public String getname(){
-        return name;
-    }
-    
-    /**
-     * returns the file where the Function which this FunctionReference refers
-     * to resides, or null if this file doesn't exist (for builtins).
-     */
-    public GenericFile getFile(){
-        return path;
-    }
-    
-    
-    /**
-     * creates a Functino Reference referring to a builtin matlab function
-     * @param name the name of the builtin
-     */
-    public FunctionReference(String name){
-    	this.name = name;
-    	this.isBuiltin = true;
-    	this.path = null;
-    	this.referenceType=ReferenceType.UNKNOWN;
-    }
+  public FunctionReference(GenericFile path, ast.Function f, ReferenceType type) {
+    this(f.getName(), path, false, type);
+  }
 
-    /**
-     * returns whether this function refers to a builtin
-     */
-    public boolean isBuiltin(){ return isBuiltin; }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof FunctionReference){
-            FunctionReference ref = (FunctionReference)obj;
-            if (isBuiltin){
-            	return ref.isBuiltin && ref.name.equals(name);
-            } else {            
-            	return !ref.isBuiltin && ref.name.equals(name) && ref.path.equals(path);
-            }
-        } else return false;
-    }
-    
-    @Override
-    public String toString() {
-    	if (isBuiltin) return name+"@builtin";
-    	else return name+"@"+path;
-    }
-    
-    @Override
-    public int hashCode() {
-    	return name.hashCode()+(isBuiltin?0:path.hashCode());
-    }
+  /**
+   * returns the name of the function
+   * TODO(isbadawi): Safe to rename this to getName?
+   */
+  public String getname() {
+    return name;
+  }
 
-    public enum ReferenceType{
-	UNKNOWN, /* path/name.m. It can be a script, functionlist or class */ 
-        PACKAGE, /* +name */ 
-        CLASS_CONSTRUCTOR, /* @type/type.m */
-        OVERLOADED,  /* @type/name */
-        PRIVATE, /* private/name.m */	 
-        NESTED, /* Nested function */
-        SUBFUNCTION, /* When Multiple functions are in the same file. NOT the first/main  function */
+  /**
+   * returns the file where the Function which this FunctionReference refers
+   * to resides, or null if this file doesn't exist (for builtins).
+   */
+  public GenericFile getFile() {
+    return path;
+  }
+
+  /**
+   * creates a Function Reference referring to a builtin matlab function
+   * @param name the name of the builtin
+   */
+  public FunctionReference(String name) {
+    this.name = name;
+    this.isBuiltin = true;
+    this.path = null;
+    this.referenceType = ReferenceType.UNKNOWN;
+  }
+
+  /**
+   * returns whether this function refers to a builtin
+   */
+  public boolean isBuiltin() {
+    return isBuiltin;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FunctionReference) {
+      FunctionReference ref = (FunctionReference) obj;
+      if (isBuiltin) {
+        return ref.isBuiltin && ref.name.equals(name);
+      } else {
+        return !ref.isBuiltin && ref.name.equals(name) && ref.path.equals(path);
+      }
     }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s@%s", name, isBuiltin ? "builtin" : path);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode() + (isBuiltin ? 0 : path.hashCode());
+  }
+
+  public enum ReferenceType{
+    UNKNOWN, /* path/name.m. It can be a script, functionlist or class */ 
+    PACKAGE, /* +name */ 
+    CLASS_CONSTRUCTOR, /* @type/type.m */
+    OVERLOADED,  /* @type/name */
+    PRIVATE, /* private/name.m */	 
+    NESTED, /* Nested function */
+    SUBFUNCTION, /* When Multiple functions are in the same file. NOT the first/main  function */
+  }
 }
-
-

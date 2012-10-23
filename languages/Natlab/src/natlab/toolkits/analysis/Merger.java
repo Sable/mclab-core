@@ -1,8 +1,5 @@
 package natlab.toolkits.analysis;
 
-import java.util.*;
-
-
 /**
  * Represents an object that can perform the merge operation between
  * tow objects. A merger object should be immutable.
