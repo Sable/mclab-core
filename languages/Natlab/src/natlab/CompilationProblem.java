@@ -29,65 +29,58 @@ import java.util.List;
  * problems, and general compilation problems
  */
 
-public class CompilationProblem 
-{
-    private final boolean located;
-    private final int line;
-    private final int col;
-    private final String msg;
+public class CompilationProblem {
+  private final boolean located;
+  private final int line;
+  private final int col;
+  private final String msg;
 
-    public CompilationProblem( int line, int col, String msg )
-    {
-        this.line = line;
-        this.col = col;
-        this.msg = msg;
-        this.located = true;
-    }
-    public CompilationProblem( String msg )
-    {
-        this.line = -1;
-        this.col = -1;
-        this.msg = msg;
-        this.located = false;
-    }
-    
-    public CompilationProblem(String format, Object... args) {
-      this(String.format(format, args));
-    }
+  public CompilationProblem(int line, int col, String msg) {
+    this.line = line;
+    this.col = col;
+    this.msg = msg;
+    this.located = true;
+  }
+  
+  public CompilationProblem(String msg) {
+    this.line = -1;
+    this.col = -1;
+    this.msg = msg;
+    this.located = false;
+  }
 
-    public boolean hasLocation()
-    {
-        return located;
-    }
+  public CompilationProblem(String format, Object... args) {
+    this(String.format(format, args));
+  }
 
-    public int getLine()
-    {
-        return line;
-    }
+  public boolean hasLocation() {
+    return located;
+  }
 
-    public int getColumn()
-    {
-        return col;
-    }
+  public int getLine() {
+    return line;
+  }
 
-    public String getMessage()
-    {
-        return msg;
-    }
+  public int getColumn() {
+    return col;
+  }
 
-    public String toString() 
-    {
-        if( located )
-            return "[" + line + ", " + col + "]  " + msg;
-        else
-            return msg;
+  public String getMessage() {
+    return msg;
+  }
+
+  public String toString() {
+    if (located) {
+      return String.format("[%d, %d] %s", line, col, msg);
     }
-    static public String toStringAll(List errors){
-    	String allErrors="";
-    	for(int i=0;i==errors.size();i++){
-    		allErrors += "/n"+errors.get(i).toString()+"/n";
-    	}
-    	return allErrors;
+    return msg;
+  }
+
+  public static String toStringAll(List<CompilationProblem> errors) {
+    StringBuilder sb = new StringBuilder();
+    for (CompilationProblem error : errors) {
+      sb.append(error.toString()).append("\n");
     }
-    
+    return sb.toString();
+  }
 }

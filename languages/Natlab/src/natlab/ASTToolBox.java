@@ -68,19 +68,16 @@ public class ASTToolBox {
   }
 
   public static boolean isInsideArray(ASTNode varNode) {
-    boolean bResult = false;
     ASTNode parentNode = varNode;
     do {
       if (parentNode instanceof AssignStmt) {
-        break;
-      } if (parentNode instanceof ParameterizedExpr) {
-        bResult = true;
-        break;
-      } else {
-        parentNode = parentNode.getParent();
+        return false;
+      } 
+      if (parentNode instanceof ParameterizedExpr) {
+        return true;
       }
-    } while (parentNode != null && !bResult);
-
-    return bResult;
+      parentNode = parentNode.getParent();
+    } while (parentNode != null);
+    return false;
   }
 }
