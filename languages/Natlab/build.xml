@@ -12,6 +12,7 @@
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
 	<path id="jastaddparser.jar.path" path="${lib.dir}/${jastaddparser.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+    <path id="guava.jar.path" path="${lib.dir}/${guava.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
 			<include name="${antlr.task.jar.path.prop}" />
@@ -206,6 +207,7 @@
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
+            <path refid="guava.jar.path" />
 			<path location="${basedir}/${annotations.bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 		</path>
@@ -213,6 +215,7 @@
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
+            <path refid="guava.jar.path" />
 			<path location="${basedir}/${bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 			<path location="${basedir}/${annotations.bin.dir}" />
@@ -265,6 +268,11 @@
                             <exclude name="META-INF/**" />
                           </patternset>
                         </zipfileset>
+                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+                            <patternset>
+                                <exclude name="META-INF/**" />
+                            </patternset>
+                        </zipfileset>
                         <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
                         <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
                         <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
@@ -313,6 +321,11 @@ java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
                             <exclude name="META-INF/**" />
                           </patternset>
                         </zipfileset>
+                         <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+                            <patternset>
+                                <exclude name="META-INF/**" />
+                            </patternset>
+                        </zipfileset>
                         <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
                         <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
                         <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
@@ -359,6 +372,11 @@ java -jar ${basedir}/${entrypoint.frontend.jarname} $$*</echo>
                           <patternset>
                             <exclude name="META-INF/**" />
                           </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+                            <patternset>
+                                <exclude name="META-INF/**" />
+                            </patternset>
                         </zipfileset>
                         <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
                         <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
@@ -407,6 +425,11 @@ java -jar ${basedir}/${entrypoint.mcsaf_with_tamer.jarname} $$*</echo>
                             <exclude name="META-INF/**" />
                           </patternset>
                         </zipfileset>
+                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+                            <patternset>
+                                <exclude name="META-INF/**" />
+                            </patternset>
+                        </zipfileset>
                         <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
                         <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
                         <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
@@ -453,6 +476,11 @@ java -jar ${basedir}/${entrypoint.x10_backend.jarname} $$*</echo>
                           <patternset>
                             <exclude name="META-INF/**" />
                           </patternset>
+                        </zipfileset>
+                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+                            <patternset>
+                                <exclude name="META-INF/**" />
+                            </patternset>
                         </zipfileset>
                         <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
                         <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />

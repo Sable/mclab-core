@@ -1,6 +1,5 @@
 package mclint.analyses;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -23,6 +22,8 @@ import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
+import com.google.common.collect.Sets;
+
 // TODO Nested invariants? Suggest moving expressions out of several loop levels?
 
 public class LoopInvariantComputation extends AbstractNodeCaseHandler implements LintAnalysis {
@@ -34,7 +35,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
 
   private Stack<ASTNode> loopStack = new Stack<ASTNode>();
   private Stack<Set<Expr>> invariantStack = new Stack<Set<Expr>>();
-  private Set<Expr> reported = new HashSet<Expr>();
+  private Set<Expr> reported = Sets.newHashSet();
 
   public LoopInvariantComputation(AnalysisKit kit) {
     this.tree = kit.getAST();
@@ -73,10 +74,10 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
 
   private void caseLoopStmt(ASTNode node) {
     loopStack.push(node);
-    invariantStack.push(new HashSet<Expr>());
+    invariantStack.push(Sets.<Expr>newHashSet());
     Set<Expr> oldInvariants;
     do {
-      oldInvariants = new HashSet<Expr>(invariantStack.peek());
+      oldInvariants = Sets.newHashSet(invariantStack.peek());
       if (node instanceof ForStmt)
         caseASTNode(((ForStmt)node).getStmts());
       else

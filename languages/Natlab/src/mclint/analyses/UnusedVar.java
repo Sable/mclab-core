@@ -17,13 +17,15 @@ import ast.Function;
 import ast.Name;
 import ast.Stmt;
 
+import com.google.common.collect.Sets;
+
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   private static final String WARNING = "Unused variable %s.";
 
   private LivelinessAnalysis liveVar;
 
   /* We shouldn't warn that output parameters aren't used. */
-  private Set<String> outputParams = new HashSet<String>();
+  private Set<String> outputParams = Sets.newHashSet();
 
   protected Lint lint;
 

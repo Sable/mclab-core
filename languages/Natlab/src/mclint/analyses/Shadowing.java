@@ -1,6 +1,5 @@
 package mclint.analyses;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import mclint.AnalysisKit;
@@ -13,11 +12,13 @@ import natlab.toolkits.path.BuiltinQuery;
 import ast.ASTNode;
 import ast.Name;
 
+import com.google.common.collect.Sets;
+
 public class Shadowing extends DefinitionVisitor implements LintAnalysis {
   private static final String WARNING = "Definition of %s shadows a builtin function or constant.";
 
   private BuiltinQuery query = Builtin.getBuiltinQuery();
-  private Set<String> reported = new HashSet<String>();
+  private Set<String> reported = Sets.newHashSet();
 
   protected Lint lint;
 

@@ -8,6 +8,8 @@ import java.util.List;
 
 import mclint.reports.ReportGenerator;
 
+import com.google.common.collect.Lists;
+
 /**
  * The analysis runner. This class calls the <tt>analyze</tt> method of each
  * analysis, passing itself as argument so it can gather the messages
@@ -17,7 +19,7 @@ import mclint.reports.ReportGenerator;
  */
 
 public class Lint {
-  private List<Message> messages = new ArrayList<Message>();
+  private List<Message> messages = Lists.newArrayList();
   private List<LintAnalysis> analyses;
 
   public Lint(List<LintAnalysis> analyses) {
@@ -36,10 +38,10 @@ public class Lint {
   public void writeReport(ReportGenerator reporter, OutputStream out) {
     Collections.sort(messages);
     try {
-      reporter.write(new ArrayList<Message>(messages), out);
+      reporter.write(Lists.newArrayList(messages), out);
     } catch (IOException e) {
       System.err.println("Could not write report: ");
       e.printStackTrace();
     }
-  }   
+  }
 }

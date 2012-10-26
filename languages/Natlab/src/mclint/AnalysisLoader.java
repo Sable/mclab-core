@@ -9,12 +9,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+
+import com.google.common.collect.Lists;
 
 /**
  * Loads and instantiates analyses. All the ugly ClassLoader/JAR hell code goes here.
@@ -36,8 +37,8 @@ public class AnalysisLoader {
     return loader.analyses;
   }
 
-  private List<Class<LintAnalysis>> analysisClasses = new ArrayList<Class<LintAnalysis>>();
-  private List<LintAnalysis> analyses = new ArrayList<LintAnalysis>();
+  private List<Class<LintAnalysis>> analysisClasses = Lists.newArrayList();
+  private List<LintAnalysis> analyses = Lists.newArrayList();
 
   /**
    * Inspects the given jar files and retrieves an array of fully qualified class names.
@@ -46,7 +47,7 @@ public class AnalysisLoader {
    * @throws IOException
    */
   private String[] getAllClasses(String[] jars) throws IOException {
-    List<String> classes = new ArrayList<String>();
+    List<String> classes = Lists.newArrayList();
     for (String jar : jars) {
       JarInputStream jarFile = new JarInputStream(new FileInputStream(jar));
       JarEntry jarEntry = null;
@@ -72,7 +73,7 @@ public class AnalysisLoader {
    * @return its interfaces
    */
   private List<Class<?>> getInterfaces(Class<?> clazz) {
-    List<Class<?>> interfaces = new ArrayList<Class<?>>();
+    List<Class<?>> interfaces = Lists.newArrayList();
     Class<?> current = clazz;
     while (current != null && current != Object.class) {  
       interfaces.addAll(Arrays.asList(current.getInterfaces()));
