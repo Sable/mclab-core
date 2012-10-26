@@ -1,7 +1,7 @@
 package mclint.refactoring;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 
 import mclint.util.Parsing;
 import ast.Program;
@@ -17,7 +17,8 @@ public class Main {
         .append("end\n").toString());
     System.out.println("Original program:");
     System.out.println(program.getPrettyPrinted());
-    for (Refactoring refactoring : Refactorings.fromResource(Main.class, "refactorings.txt")) {
+    URL resource = Main.class.getResource("refactorings.txt");
+    for (Refactoring refactoring : Refactorings.fromResource(resource)) {
       refactoring.apply(program);
     }
     System.out.println("After applying all refactorings:");

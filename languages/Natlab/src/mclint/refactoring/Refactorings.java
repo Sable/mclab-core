@@ -2,6 +2,8 @@ package mclint.refactoring;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Collections;
@@ -48,8 +50,7 @@ public class Refactorings {
     return fromInputSupplier(CharStreams.newReaderSupplier(string));
   }
   
-  public static List<Refactoring> fromResource(Class<?> clazz, String resource) throws IOException {
-    URL url = Resources.getResource(clazz, resource);
-    return fromInputSupplier(Resources.newReaderSupplier(url, Charsets.UTF_8));
+  public static List<Refactoring> fromResource(URL resource) throws IOException {
+    return fromInputSupplier(Resources.newReaderSupplier(resource, Charsets.UTF_8));
   }
 }
