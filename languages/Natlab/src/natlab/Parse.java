@@ -22,24 +22,23 @@
 package natlab;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import matlab.CompositePositionMap;
 import matlab.FunctionEndScanner;
-import matlab.FunctionEndScanner.NoChangeResult;
-import matlab.FunctionEndScanner.ProblemResult;
-import matlab.FunctionEndScanner.TranslationResult;
 import matlab.MatlabParser;
 import matlab.OffsetTracker;
 import matlab.PositionMap;
 import matlab.TextPosition;
 import matlab.TranslationProblem;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 
 import org.antlr.runtime.ANTLRReaderStream;
@@ -48,6 +47,13 @@ import ast.CompilationUnits;
 import ast.Program;
 import ast.Stmt;
 import beaver.Parser;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 
 /**
  * Set of static methods to parse files.
@@ -58,9 +64,9 @@ import beaver.Parser;
 public class Parse {
   private static Reader fileReader(String fName, List<CompilationProblem> errors) {
     try {
-      return new FileReader(fName);
+      return Files.newReader(new File(fName), Charsets.UTF_8);
     } catch (FileNotFoundException e) {
-      errors.add(new CompilationProblem("File not found: %s\nAborting!\n", fName));
+      errors.add(new CompilationProblem("File not found: %s\nAborting!", fName));
       return null;
     }
   }
@@ -69,30 +75,12 @@ public class Parse {
     try {
       return file.getReader();
     } catch (UnsupportedOperationException e) {
-      errors.add(new CompilationProblem("Reading not supported for %s\n", file.getName()));
+      errors.add(new CompilationProblem("Reading not supported for %s", file.getName()));
       return null;
     } catch (IOException e) {
-      errors.add(new CompilationProblem("Error opening %s\n%s", file.getName(), e.getMessage()));
+      errors.add(new CompilationProblem("Error opening %s: %s", file.getName(), e.getMessage()));
       return null;
     }
-  }
-
-  /**
-   * Convert a Reader to a String by reading all its contents.
-   * This is useful when a Reader might need to be read multiple times; using
-   * mark() and reset() is not always practical, so in those cases, use this method, and
-   * create as many StringReaders as you need.
-   * 
-   * TODO(isbadawi): Move this to a more general utils class instead of making it public static here
-   */
-  public static String readerToString(Reader reader) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    BufferedReader in = new BufferedReader(reader);
-    String line = null;
-    while ((line = in.readLine()) != null) {
-      sb.append(line).append("\n");
-    }
-    return sb.toString();
   }
 
   /**
@@ -118,14 +106,14 @@ public class Parse {
     try {
       program = (Program) parser.parse(scanner);
     } catch (Parser.Exception e) {
-      StringBuilder errorMessage = new StringBuilder(e.getMessage()).append("\n");
-      for (String error : parser.getErrors()) {
-        errorMessage.append(error).append("\n");
-      }
-      errors.add(new CompilationProblem(errorMessage.toString()));
+      List<String> errorMessages = ImmutableList.<String>builder()
+          .add(e.getMessage())
+          .addAll(parser.getErrors())
+          .build();
+      errors.add(new CompilationProblem(Joiner.on('\n').join(errorMessages)));
       return null;
     } catch (IOException e) {
-      errors.add(new CompilationProblem("Error parsing %s\n%s", fName, e.getMessage()));
+      errors.add(new CompilationProblem("Error parsing %s: %s", fName, e.getMessage()));
       return null;
     }
     if (parser.hasError()) {
@@ -275,7 +263,7 @@ public class Parse {
   {
     PositionMap prePosMap = null;
     try {
-      String sourceAsString = readerToString(source);
+      String sourceAsString = CharStreams.toString(source);
       BufferedReader in = new BufferedReader(new StringReader(sourceAsString));
       FunctionEndScanner.Result result = new FunctionEndScanner(in).translate();
       if (result instanceof NoChangeResult) {
@@ -292,7 +280,7 @@ public class Parse {
         return null; // terminate early since extraction parser can't work without balanced 'end's
       }
       OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-      List<TranslationProblem> problems = new ArrayList<TranslationProblem>();
+      List<TranslationProblem> problems = Lists.newArrayList();
       String destText = MatlabParser.translate(new ANTLRReaderStream(in),
           1, 1, offsetTracker, problems);
       if (problems.isEmpty()) {

@@ -23,6 +23,8 @@ package natlab;
 
 import java.util.List;
 
+import com.google.common.base.Joiner;
+
 /**
  * Describes the position and nature of a problem encountered while compiling
  * source. This can include matlab to natlab translation problems, parsing 
@@ -77,10 +79,6 @@ public class CompilationProblem {
   }
 
   public static String toStringAll(List<CompilationProblem> errors) {
-    StringBuilder sb = new StringBuilder();
-    for (CompilationProblem error : errors) {
-      sb.append(error.toString()).append("\n");
-    }
-    return sb.toString();
+    return Joiner.on('\n').join(errors);
   }
 }

@@ -86,6 +86,8 @@ import ast.VariableDecl;
 import ast.WhileStmt;
 import beaver.Parser;
 
+import com.google.common.io.CharStreams;
+
 /**
  * A  for translate MATLAB program to Fortran code
  * 
@@ -540,7 +542,8 @@ public class McFor {
       }
       if (errors.isEmpty()) {
         try {
-          new FileWriter(basename + ".n").write(Parse.readerToString(natlab));
+          
+          new FileWriter(basename + ".n").write(CharStreams.toString(natlab));
         } catch (IOException e) {
           e.printStackTrace();
           System.exit(2);
