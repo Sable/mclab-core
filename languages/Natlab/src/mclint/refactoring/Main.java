@@ -2,8 +2,6 @@ package mclint.refactoring;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 
 import mclint.util.Parsing;
 import ast.Program;
@@ -19,8 +17,7 @@ public class Main {
         .append("end\n").toString());
     System.out.println("Original program:");
     System.out.println(program.getPrettyPrinted());
-    InputStream resource = Main.class.getResourceAsStream("refactorings.txt");
-    for (Refactoring refactoring : Refactorings.fromReader(new InputStreamReader(resource))) {
+    for (Refactoring refactoring : Refactorings.fromResource(Main.class, "refactorings.txt")) {
       refactoring.apply(program);
     }
     System.out.println("After applying all refactorings:");

@@ -1,28 +1,55 @@
 package mclint.refactoring;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.LineProcessor;
+import com.google.common.io.Resources;
+
 public class Refactorings {
-  public static List<Refactoring> fromReader(Reader r) throws IOException {
-    List<Refactoring> refactorings = new ArrayList<Refactoring>();
-    BufferedReader in = new BufferedReader(r);
-    String line = null;
-    while ((line = in.readLine()) != null) {
-      String[] parts = line.trim().split("->");
-      String from = parts[0].trim();
-      String to = parts[1].trim();
-      refactorings.add(Refactoring.of(from, to, Refactoring.Visit.Expressions));
-    }
-    return Collections.unmodifiableList(refactorings);
+  public static <T extends Reader> List<Refactoring>
+      fromInputSupplier(InputSupplier<T> supplier) throws IOException{
+    return CharStreams.readLines(supplier,  new LineProcessor<List<Refactoring>>() {
+      private List<Refactoring> refactorings = Lists.newArrayList();
+      private final Splitter SPLITTER = Splitter.on("->").trimResults().omitEmptyStrings();
+
+      @Override
+      public List<Refactoring> getResult() {
+        return Collections.unmodifiableList(refactorings);
+      }
+
+      @Override
+      public boolean processLine(String line) {
+        Iterator<String> parts = SPLITTER.split(line).iterator();
+        String from = parts.next();
+        String to = parts.next();
+        refactorings.add(Refactoring.of(from, to, Refactoring.Visit.Expressions));
+        return true;
+      }
+    });
   }
 
-  public static List<Refactoring> fromFile(String filename) throws IOException {
-    return fromReader(new FileReader(filename));
+  public static List<Refactoring> fromFile(File file) throws IOException {
+    return fromInputSupplier(Files.newReaderSupplier(file, Charsets.UTF_8));
+  }
+  
+  public static List<Refactoring> fromString(String string) throws IOException {
+    return fromInputSupplier(CharStreams.newReaderSupplier(string));
+  }
+  
+  public static List<Refactoring> fromResource(Class<?> clazz, String resource) throws IOException {
+    URL url = Resources.getResource(clazz, resource);
+    return fromInputSupplier(Resources.newReaderSupplier(url, Charsets.UTF_8));
   }
 }

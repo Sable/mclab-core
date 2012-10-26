@@ -12,22 +12,26 @@ import natlab.toolkits.filehandling.genericFile.FileFile;
 import ast.CompilationUnits;
 import ast.Program;
 
+import com.google.common.base.Joiner;
+
 /**
  * A slightly nicer interface to natlab.Parse.
  * (TODO: refactor natlab.Parse to make this class unnecessary.)
  * @author isbadawi
  */
 public class Parsing {
+  private static void abortIfNotEmpty(List<CompilationProblem> errors) {
+    if (!errors.isEmpty()) {
+      System.err.println("The following errors occured during parsing:");
+      System.err.println(Joiner.on('\n').join(errors));
+      System.exit(1);
+    }
+  }
+  
   public static CompilationUnits files(List<String> mfiles) {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
     CompilationUnits code = Parse.parseMatlabFiles(mfiles, errors);
-    if (!errors.isEmpty()) {
-      System.err.println("The following errors occured during parsing:");
-      for (CompilationProblem error : errors) {
-        System.err.println(error);
-      }
-      System.exit(1);
-    }
+    abortIfNotEmpty(errors);
     for (int i = 0; i < mfiles.size(); i++) {
       code.getProgram(i).setFile(new FileFile(mfiles.get(i)));
     }
@@ -45,13 +49,7 @@ public class Parsing {
   public static Program reader(Reader code) {
     List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
     Program program = Parse.parseMatlabFile("<none>", code, errors);
-    if (!errors.isEmpty()) {
-      System.err.println("The following errors occured during parsing:");
-      for (CompilationProblem error : errors) {
-        System.err.println(error);
-      }
-      System.exit(1);
-    }
+    abortIfNotEmpty(errors);
     program.setFile(new FileFile("<none>"));
     return program;
   }
