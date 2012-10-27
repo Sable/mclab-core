@@ -9,7 +9,7 @@ import ast.StringLiteralExpr;
 
 public class EqualityChecker {
   
-  public static boolean equals(ASTNode left, ASTNode right) {
+  public static boolean equals(ASTNode<?> left, ASTNode<?> right) {
     if (left instanceof List && !(right instanceof List)) {
       return left.getNumChild() == 1 && equals(left.getChild(0), right);
     }

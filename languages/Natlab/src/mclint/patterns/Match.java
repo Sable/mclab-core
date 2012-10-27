@@ -9,24 +9,24 @@ import ast.Stmt;
 
 public class Match {
   private UnparsedPattern pattern;
-  private ASTNode tree;
-  private Map<Character, ASTNode> bindings;
+  private ASTNode<?> tree;
+  private Map<Character, ASTNode<?>> bindings;
   
-  Match(ASTNode tree, Map<Character, ASTNode> bindings, UnparsedPattern pattern) {
+  Match(ASTNode<?> tree, Map<Character, ASTNode<?>> bindings, UnparsedPattern pattern) {
     this.tree = tree;
     this.bindings = bindings;
     this.pattern = pattern;
   }
   
-  public ASTNode getMatchingNode() {
+  public ASTNode<?> getMatchingNode() {
     return tree;
   }
   
-  public ASTNode getBoundNode(char var) {
+  public ASTNode<?> getBoundNode(char var) {
     return bindings.get(var);
   }
   
-  public <T extends ASTNode> T getBoundNode(char var, Class<T> clazz) {
+  public <T extends ASTNode<?>> T getBoundNode(char var, Class<T> clazz) {
     return clazz.cast(getBoundNode(var));
   }
   
@@ -49,7 +49,7 @@ public class Match {
   private String getBindingsAsString() {
     StringBuilder sb = new StringBuilder("{");
     boolean first = true;
-    for (Map.Entry<Character, ASTNode> binding : bindings.entrySet()) {
+    for (Map.Entry<Character, ASTNode<?>> binding : bindings.entrySet()) {
       if (!first) {
         sb.append(", ");
       }

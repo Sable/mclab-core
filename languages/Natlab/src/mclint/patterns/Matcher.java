@@ -1,14 +1,11 @@
 package mclint.patterns;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import mclint.util.Parsing;
-import natlab.refactoring.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Expr;
@@ -16,110 +13,93 @@ import ast.ForStmt;
 import ast.Program;
 import ast.Stmt;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+
 public class Matcher {
-  private static final boolean DEBUG = false;
   private UnparsedPattern pattern;
   private Stack<Object> stack;
-  private ASTNode tree;
-  private Map<Character, ASTNode> bindings = new HashMap<Character, ASTNode>();
+  private ASTNode<?> tree;
+  private Map<Character, ASTNode<?>> bindings = Maps.newHashMap();
 
-  private static Match match(String pattern, ASTNode tree) {
+  private static Optional<Match> match(String pattern, ASTNode<?> tree) {
     Stack<Object> stack = new Stack<Object>();
     stack.push(tree);
-    Matcher matcher = new Matcher(UnparsedPattern.fromString(pattern), tree, stack);
-    Match match = matcher.match();
-    if (match == null && DEBUG) {
-      matcher.dumpState();
-    }
-    return match;
+    return new Matcher(UnparsedPattern.fromString(pattern), tree, stack).match();
   }
 
-  private static <T extends ASTNode> List<Match> findMatching(Class<T> clazz,
-      final String pattern, ASTNode tree) {
-    final List<Match> matches = new ArrayList<Match>();
-    NodeFinder.apply(tree, clazz, new AbstractNodeFunction<T>() {
-      @Override
-      public void apply(T node) {
-        Match match = match(pattern, node);
-        if (match != null) {
-          matches.add(match);
-        }
+  private static <T extends ASTNode<?>> Function<T, Optional<Match>> matchFunction(final String p) {
+    return new Function<T, Optional<Match>>() {
+      @Override public Optional<Match> apply(T node) {
+        return match(p, node);
       }
-    });
-    return Collections.unmodifiableList(matches);
+    };
   }
 
-  public static List<Match> findMatchingStatements(String pattern, ASTNode tree) {
+  private static <T extends ASTNode<?>> List<Match> findMatching(Class<T> clazz, String pattern,
+      ASTNode<?> tree) {
+    return ImmutableList.copyOf(Optional.presentInstances(Iterables.transform(
+        NodeFinder.find(tree,  clazz), matchFunction(pattern))));
+  }
+
+  public static List<Match> findMatchingStatements(String pattern, ASTNode<?> tree) {
     return findMatching(Stmt.class, pattern, tree);
   }
 
-  public static List<Match> findMatchingExpressions(String pattern, ASTNode tree) {
+  public static List<Match> findMatchingExpressions(String pattern, ASTNode<?> tree) {
     return findMatching(Expr.class, pattern, tree);
   }
 
-  public static List<Match> findAllMatches(String pattern, ASTNode tree) {
-    List<Match> matches = new ArrayList<Match>();
-    matches.addAll(findMatchingStatements(pattern, tree));
-    matches.addAll(findMatchingExpressions(pattern, tree));
-    return Collections.unmodifiableList(matches);
+  public static List<Match> findAllMatches(String pattern, ASTNode<?> tree) {
+    return ImmutableList.<Match>builder()
+        .addAll(findMatchingStatements(pattern, tree))
+        .addAll(findMatchingExpressions(pattern, tree))
+        .build();
   }
 
-  private Matcher(UnparsedPattern pattern, ASTNode tree, Stack<Object> stack) {
+  private Matcher(UnparsedPattern pattern, ASTNode<?> tree, Stack<Object> stack) {
     this.pattern = pattern;
     this.tree = tree;
     this.stack = stack;
   }
 
-  private Object lookahead() {
-    return stack.get(stack.size() - 2);
+  private boolean shouldUnparse() {
+    if (!pattern.startsWithMeta()) {
+      return true;
+    } else if (stack.size() == 1 && !pattern.emptyAfterMeta()) {
+      return true;
+    } else if (stack.size() == 1) {
+      return false;
+    }
+    UnparsedPattern afterMeta = pattern.afterMeta();
+    Object lookahead = stack.get(stack.size() - 2);
+    return lookahead instanceof ASTNode<?> && !afterMeta.startsWithMeta()
+        || lookahead instanceof String && !afterMeta.consume((String) lookahead);
   }
 
-  private void dumpState() {
-    System.err.println("Stack: " + stack);
-    System.err.println("Pattern: " + pattern);
-    System.err.println("Bindings: " + bindings);
-  }
-
-  private Match match() {
+  private Optional<Match> match() {
     while (!stack.isEmpty()) {
       if (stack.peek() instanceof String) {
         String top = (String) stack.peek();
-        if (pattern.consume(top)) {
-          stack.pop();
-        } else {
-          return null;
+        if (!pattern.consume(top)) {
+          return Optional.absent();
         }
-      } else if (stack.peek() instanceof ASTNode) {
-        // Resolve bind/unparse conflict
-        // Lookahead; if we bind, will we fail?
-        if (pattern.startsWithMeta()) {
-          UnparsedPattern afterMeta = pattern.afterMeta();
-          if (stack.size() == 1) {
-            if (!pattern.emptyAfterMeta()) {
-              unparse();
-            }
-          } else if (lookahead() instanceof ASTNode && !afterMeta.startsWithMeta()
-                  || lookahead() instanceof String && !afterMeta.consume((String) lookahead())) {
-            unparse();
-          } else {
-            if (!bind()) {
-              return null;
-            }
-          }
-        } else {
-          unparse();
-        }
+        stack.pop();
+      } else if (shouldUnparse()) {
+        unparse();
+      } else if (!bind()) {
+        return Optional.absent();
       }
     }
-    if (!pattern.finished()) {
-      return null;
-    }
-    return new Match(tree, bindings, pattern);
+    return Optional.of(pattern.finished() ? new Match(tree, bindings, pattern) : null);
   }
 
   private boolean bind() {
     char meta = pattern.popMeta();
-    ASTNode tree = (ASTNode) stack.pop();
+    ASTNode<?> tree = (ASTNode<?>) stack.pop();
     if (meta == '_') {
       return true;
     }
@@ -131,7 +111,7 @@ public class Matcher {
   }
 
   private void unparse() {
-    List<Object> tokens = LazyUnparser.unparse((ASTNode) stack.pop());
+    List<Object> tokens = LazyUnparser.unparse((ASTNode<?>) stack.pop());
     Collections.reverse(tokens);
     for (Object token : tokens) {
       stack.push(token);
