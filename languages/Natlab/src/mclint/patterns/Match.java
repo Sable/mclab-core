@@ -30,7 +30,7 @@ public class Match {
     return clazz.cast(getBoundNode(var));
   }
   
-  public List getBoundList(char var) {
+  public List<?> getBoundList(char var) {
     return getBoundNode(var, List.class);
   }
   

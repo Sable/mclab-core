@@ -18,7 +18,7 @@ public class Location implements Comparable<Location> {
   private int column;
   private String path;
 
-  public static Location of(ASTNode node) {
+  public static Location of(ASTNode<?> node) {
     int position = node.getStart();
     int line = Symbol.getLine(position);
     int col = Symbol.getColumn(position);
@@ -28,7 +28,7 @@ public class Location implements Comparable<Location> {
     return new Location(getPathOf(node), line, col);
   }
 
-  private static String getPathOf(ASTNode node) {
+  private static String getPathOf(ASTNode<?> node) {
     Program program = null;
     if (node instanceof CompilationUnits)
       program = ((CompilationUnits)node).getProgram(0);

@@ -20,7 +20,7 @@ public class Message implements Comparable<Message> {
     return new Message(location, code, description);
   }
 
-  public static Message regarding(ASTNode node, String code, String description) {
+  public static Message regarding(ASTNode<?> node, String code, String description) {
     return forLocation(Location.of(node), code, description);
   }
 

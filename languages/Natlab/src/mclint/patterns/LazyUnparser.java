@@ -1,34 +1,112 @@
 package mclint.patterns;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import natlab.ASTToolBox;
 import nodecases.AbstractNodeCaseHandler;
-import ast.*;
+import ast.ASTNode;
+import ast.AndExpr;
+import ast.ArrayTransposeExpr;
+import ast.AssignStmt;
+import ast.Attribute;
+import ast.BinaryExpr;
+import ast.BreakStmt;
+import ast.CellArrayExpr;
+import ast.CellIndexExpr;
+import ast.ClassBody;
+import ast.ClassDef;
+import ast.ClassEvents;
+import ast.ColonExpr;
+import ast.ContinueStmt;
+import ast.DefaultCaseBlock;
+import ast.DotExpr;
+import ast.EDivExpr;
+import ast.ELDivExpr;
+import ast.EPowExpr;
+import ast.EQExpr;
+import ast.ETimesExpr;
+import ast.ElseBlock;
+import ast.EndExpr;
+import ast.Event;
+import ast.ExprStmt;
+import ast.FPLiteralExpr;
+import ast.ForStmt;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.FunctionList;
+import ast.GEExpr;
+import ast.GTExpr;
+import ast.GlobalStmt;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.IntLiteralExpr;
+import ast.LEExpr;
+import ast.LTExpr;
+import ast.LValueExpr;
+import ast.LambdaExpr;
+import ast.MDivExpr;
+import ast.MLDivExpr;
+import ast.MPowExpr;
+import ast.MTimesExpr;
+import ast.MTransposeExpr;
+import ast.MatrixExpr;
+import ast.Methods;
+import ast.MinusExpr;
+import ast.NEExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.OrExpr;
+import ast.ParameterizedExpr;
+import ast.PersistentStmt;
+import ast.PlusExpr;
+import ast.Properties;
+import ast.Property;
+import ast.PropertyAccess;
+import ast.RangeExpr;
+import ast.ReturnStmt;
+import ast.Row;
+import ast.ShellCommandStmt;
+import ast.ShortCircuitAndExpr;
+import ast.ShortCircuitOrExpr;
+import ast.Signature;
+import ast.Stmt;
+import ast.StringLiteralExpr;
+import ast.SuperClass;
+import ast.SuperClassMethodExpr;
+import ast.SwitchCaseBlock;
+import ast.SwitchStmt;
+import ast.TryStmt;
+import ast.UMinusExpr;
+import ast.UPlusExpr;
+import ast.WhileStmt;
 
 public class LazyUnparser extends AbstractNodeCaseHandler {
-  private java.util.List<Object> tokens = new LinkedList<Object>();
-  public static java.util.List<Object> unparse(ASTNode node) {
+  private List<Object> tokens = new LinkedList<Object>();
+
+  public static List<Object> unparse(ASTNode<?> node) {
     LazyUnparser unparser = new LazyUnparser();
     node.analyze(unparser);
     return unparser.tokens;
   }
-  
+
   private void tokens(Object... args) {
     for (Object object : args) {
       tokens.add(object);
     }
   }
-  
+
+  @SuppressWarnings("rawtypes")
   @Override
   public void caseASTNode(ASTNode node) {
     for (int i = 0; i < node.getNumChild(); ++i) {
       node.getChild(i).analyze(this);
     }
   }
-  
-  private List removeFirst(List node) {
-    List copy = new List();
+
+  private <T extends ASTNode<?> >ast.List<T> removeFirst(ast.List<T> node) {
+    ast.List<T> copy = new ast.List<T>();
     for (int i = 1; i < node.getNumChild(); ++i) {
       copy.add(node.getChild(i));
     }
@@ -36,8 +114,9 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
     return copy;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
-  public void caseList(List node) {
+  public void caseList(ast.List node) {
     if (node.getNumChild() == 0) {
       return;
     }

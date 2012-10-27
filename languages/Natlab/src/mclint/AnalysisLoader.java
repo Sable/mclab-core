@@ -49,21 +49,29 @@ public class AnalysisLoader {
   private String[] getAllClasses(String[] jars) throws IOException {
     List<String> classes = Lists.newArrayList();
     for (String jar : jars) {
-      JarInputStream jarFile = new JarInputStream(new FileInputStream(jar));
-      JarEntry jarEntry = null;
-      while ((jarEntry = jarFile.getNextJarEntry()) != null) {
-        String name = jarEntry.getName();
-        if (name.endsWith(".class")) 
-          classes.add(name.replace("/", ".").substring(0, name.length() - ".class".length()));
+      JarInputStream jarFile = null;
+      try {
+        jarFile = new JarInputStream(new FileInputStream(jar));
+        JarEntry jarEntry = null;
+        while ((jarEntry = jarFile.getNextJarEntry()) != null) {
+          String name = jarEntry.getName();
+          if (name.endsWith(".class")) {
+            classes.add(name.replace("/", ".").substring(0, name.length() - ".class".length()));
+          }
+        }
+      } finally {
+        jarFile.close();
       }
     }
     return classes.toArray(new String[0]);
   }
 
+  @SuppressWarnings("deprecation")
   private URLClassLoader getClassLoader(String[] jars) throws MalformedURLException {
     URL[] urls = new URL[jars.length];
-    for (int i = 0; i < jars.length; ++i)
+    for (int i = 0; i < jars.length; ++i) {
       urls[i] = new URL("jar", "", new File(jars[i]).toURL() + "!/");
+    }
     return new URLClassLoader(urls);
   }
 
@@ -90,8 +98,9 @@ public class AnalysisLoader {
         return name.endsWith(".jar");
       }
     });
-    for (int i = 0; i < jars.length; ++i)
+    for (int i = 0; i < jars.length; ++i) {
       jars[i] = new File(pluginDirectory, jars[i]).getAbsolutePath();
+    }
     String[] classes = getAllClasses(jars);
     URLClassLoader loader = getClassLoader(jars);
     for (String className : classes) {
@@ -101,8 +110,9 @@ public class AnalysisLoader {
       } catch (ClassNotFoundException e) {
         continue;
       }
-      if (getInterfaces(clazz).contains(LintAnalysis.class))
+      if (getInterfaces(clazz).contains(LintAnalysis.class)) {
         analysisClasses.add((Class<LintAnalysis>)clazz);
+      }
     }
   }
 
@@ -123,8 +133,9 @@ public class AnalysisLoader {
       } catch (NoSuchMethodException e) {
         System.err.println(name + " does not implement an (AnalysisKit) constructor.");
       }
-      if (constructor == null)
+      if (constructor == null) {
         continue;
+      }
       try {
         analyses.add(constructor.newInstance(code));
       } catch (IllegalArgumentException e) {
