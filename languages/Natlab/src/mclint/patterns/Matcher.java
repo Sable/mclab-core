@@ -94,7 +94,7 @@ public class Matcher {
         return Optional.absent();
       }
     }
-    return Optional.of(pattern.finished() ? new Match(tree, bindings, pattern) : null);
+    return Optional.fromNullable(pattern.finished() ? new Match(tree, bindings, pattern) : null);
   }
 
   private boolean bind() {
