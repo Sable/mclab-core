@@ -18,8 +18,8 @@ import nodecases.AbstractNodeCaseHandler;
  */
 public abstract class DefinitionVisitor extends AbstractNodeCaseHandler {
   private boolean inLHS = false;
-  protected ASTNode tree;
-  public DefinitionVisitor(ASTNode tree) {
+  protected ASTNode<?> tree;
+  public DefinitionVisitor(ASTNode<?> tree) {
     this.tree = tree;
   }
 
@@ -40,6 +40,7 @@ public abstract class DefinitionVisitor extends AbstractNodeCaseHandler {
     caseDefinition(node);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void caseASTNode(ASTNode node) {
     for (int i = 0; i < node.getNumChild(); ++i)

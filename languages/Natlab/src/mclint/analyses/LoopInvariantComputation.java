@@ -29,11 +29,11 @@ import com.google.common.collect.Sets;
 public class LoopInvariantComputation extends AbstractNodeCaseHandler implements LintAnalysis {
   private static final String WARNING = "Consider computing %s outside the loop.";
 
-  private ASTNode tree;
+  private ASTNode<?> tree;
   private Lint lint;
   private ReachingDefs reachingDefs;
 
-  private Stack<ASTNode> loopStack = new Stack<ASTNode>();
+  private Stack<ASTNode<?>> loopStack = new Stack<ASTNode<?>>();
   private Stack<Set<Expr>> invariantStack = new Stack<Set<Expr>>();
   private Set<Expr> reported = Sets.newHashSet();
 
@@ -42,7 +42,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
     this.reachingDefs = kit.getReachingDefinitionsAnalysis();
   }
 
-  private Message loopInvariant(ASTNode node) {
+  private Message loopInvariant(ASTNode<?> node) {
     String message = String.format(WARNING, node.getPrettyPrinted());
     return Message.regarding(node, "LOOP_INVARIANT", message);
   }
@@ -53,13 +53,14 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
     this.tree.analyze(this);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void caseASTNode(ASTNode node) {
     for (int i = 0; i < node.getNumChild(); ++i)
       node.getChild(i).analyze(this);
   }
 
-  private boolean allDefsOutsideLoop(Set<AssignStmt> defs, ASTNode loop) {
+  private boolean allDefsOutsideLoop(Set<AssignStmt> defs, ASTNode<?> loop) {
     List<AssignStmt> loopDefs = NodeFinder.find(loop, AssignStmt.class);
     for (AssignStmt def : defs) {
       if (def == ReachingDefs.UNDEF)
@@ -72,7 +73,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
     return true;
   }
 
-  private void caseLoopStmt(ASTNode node) {
+  private void caseLoopStmt(ASTNode<?> node) {
     loopStack.push(node);
     invariantStack.push(Sets.<Expr>newHashSet());
     Set<Expr> oldInvariants;

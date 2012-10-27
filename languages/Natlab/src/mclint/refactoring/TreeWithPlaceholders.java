@@ -20,7 +20,7 @@ import ast.Script;
  * @author isbadawi
  */
 public class TreeWithPlaceholders implements MatchHandler {
-  private ASTNode tree;
+  private ASTNode<?> tree;
   
   private static String placeholder(String meta) {
     return String.format("INTERNAL_BINDING_%c", meta.charAt(1));
@@ -35,10 +35,10 @@ public class TreeWithPlaceholders implements MatchHandler {
     return name.charAt(name.length() - 1);
   }
 
-  private void replacePlaceholder(NameExpr node, ASTNode binding) {
-    ASTNode parent = node.getParent();
+  private void replacePlaceholder(NameExpr node, ASTNode<?> binding) {
+    ASTNode<?> parent = node.getParent();
     if (binding instanceof ast.List && parent instanceof ast.List) {
-      AstUtil.replaceWithContents(node, (ast.List) binding);
+      AstUtil.replaceWithContents(node, (ast.List<?>) binding);
     } else {
       AstUtil.replace(node, binding);
     }
@@ -56,23 +56,22 @@ public class TreeWithPlaceholders implements MatchHandler {
     });
   }
 
-  public ASTNode getTree() {
+  public ASTNode<?> getTree() {
     return tree;
   }
 
   public static TreeWithPlaceholders fromPattern(String pattern) {
-    Pattern p = Pattern.compile("%[a-zA-Z]");
-    Matcher m = p.matcher(pattern);
+    Matcher m = Pattern.compile("%[a-zA-Z]").matcher(pattern);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       m.appendReplacement(sb, placeholder(m.group()));
     }
     m.appendTail(sb);
-    ASTNode tree = ((Script) Parsing.string(sb.toString())).getStmtList().getChild(0);
+    ASTNode<?> tree = ((Script) Parsing.string(sb.toString())).getStmtList().getChild(0);
     return new TreeWithPlaceholders(tree);
   }
 
-  private TreeWithPlaceholders(ASTNode tree) {
+  private TreeWithPlaceholders(ASTNode<?> tree) {
     this.tree = tree;
   }
 }

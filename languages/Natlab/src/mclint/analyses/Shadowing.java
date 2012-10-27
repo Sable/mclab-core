@@ -26,14 +26,15 @@ public class Shadowing extends DefinitionVisitor implements LintAnalysis {
     super(kit.getAST());
   }
 
-  private Message shadow(ASTNode node, String name) {
+  private Message shadow(ASTNode<?> node, String name) {
     return Message.regarding(node, "SHADOW_BUILTIN", String.format(WARNING, name));
   }
 
   @Override
   public void caseDefinition(Name node) {
-    if (reported.contains(node.getID()))
+    if (reported.contains(node.getID())) {
       return;
+    }
     if (query.isBuiltin(node.getID())) {
       lint.report(shadow(node, node.getID()));
       reported.add(node.getID());

@@ -1,7 +1,6 @@
 package mclint.util;
 
 import ast.ASTNode;
-import ast.List;
 
 /**
  * Useful methods for manipulating ASTs.
@@ -11,7 +10,8 @@ public class AstUtil {
   /**
    * Replaces a subtree with another, correctly updating parent/child links.
    */
-  public static void replace(ASTNode oldNode, ASTNode newNode) {
+  @SuppressWarnings("unchecked")
+  public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
   }
 
@@ -21,12 +21,13 @@ public class AstUtil {
    * Technically this will always work, but it really only makes sense if the replaced node is an
    * element of a list to begin with. 
    */
-  public static void replaceWithContents(ASTNode node, ast.List source) {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public static void replaceWithContents(ASTNode<?> node, ast.List<?> source) {
     ASTNode parent = node.getParent();
     int index = parent.getIndexOfChild(node);
     node.getParent().removeChild(index);
     for (Object element : source) {
-      parent.insertChild((ASTNode) element, index++);
+      parent.insertChild((ASTNode<?>) element, index++);
     }
   }
   private AstUtil() {}

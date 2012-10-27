@@ -1,6 +1,5 @@
 package mclint.analyses;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import mclint.AnalysisKit;
@@ -29,7 +28,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   protected Lint lint;
 
-  private Message unused(ASTNode node, String name) {
+  private Message unused(ASTNode<?> node, String name) {
     return Message.regarding(node, "UNUSED_VAR", String.format(WARNING, name));
   }
 
@@ -40,36 +39,40 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   @Override
   public void caseFunction(Function node) {
-    Set<String> outputParamsCopy = new HashSet<String>(outputParams);
+    Set<String> outputParamsCopy = Sets.newHashSet(outputParams);
     outputParams.addAll(node.getOutParamSet());
     super.caseFunction(node);
     outputParams.retainAll(outputParamsCopy);
   }
 
   private boolean isLive(Name node) {
-    ASTNode parentStmt = NodeFinder.findParent(node, Stmt.class);
+    Stmt parentStmt = NodeFinder.findParent(node, Stmt.class);
     HashSetFlowSet<String> setToCheck;
     if (parentStmt.getParent() instanceof ForStmt) {
-      Stmt first = ((ForStmt)(parentStmt.getParent())).getStmt(0);
+      Stmt first = ((ForStmt) (parentStmt.getParent())).getStmt(0);
       setToCheck = liveVar.getInFlowSets().get(first);
-    } else
+    } else {
       setToCheck = liveVar.getOutFlowSets().get(parentStmt);
+    }
     return setToCheck.contains(node.getID());
   }
 
   @Override
   public void caseLHSName(Name node) {
-    if (outputParams.contains(node.getID()))
+    if (outputParams.contains(node.getID())) {
       return;
-    if (!isLive(node))
+    }
+    if (!isLive(node)) {
       lint.report(unused(node, node.getID()));
+    }
   }
 
   @Override
   public void caseInParam(Name node) {
     Stmt firstStatement = NodeFinder.findParent(node, Function.class).getStmt(0);
-    if (!liveVar.isLive(firstStatement, node.getID()))
+    if (!liveVar.isLive(firstStatement, node.getID())) {
       lint.report(unused(node, node.getID()));
+    }
   }
 
   @Override

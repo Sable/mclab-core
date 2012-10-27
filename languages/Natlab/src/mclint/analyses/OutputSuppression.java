@@ -11,10 +11,11 @@ import ast.ForStmt;
 
 public class OutputSuppression extends AbstractNodeCaseHandler implements LintAnalysis {
   private Lint lint;
-  private ASTNode tree;
+  private ASTNode<?> tree;
 
-  private Message suppressOutput(ASTNode node) {
-    return Message.regarding(node, "OUTPUT", "Terminate this line with a semicolon to suppress output.");
+  private Message suppressOutput(ASTNode<?> node) {
+    return Message.regarding(node, "OUTPUT",
+        "Terminate this line with a semicolon to suppress output.");
   }
 
   public OutputSuppression(AnalysisKit kit) {
@@ -27,16 +28,19 @@ public class OutputSuppression extends AbstractNodeCaseHandler implements LintAn
     tree.analyze(this);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void caseASTNode(ASTNode node) {
-    for (int i = 0; i < node.getNumChild(); ++i)
+    for (int i = 0; i < node.getNumChild(); ++i) {
       node.getChild(i).analyze(this);
+    }
   }
 
   @Override
   public void caseAssignStmt(AssignStmt node) {
-    if (!node.isOutputSuppressed())
+    if (!node.isOutputSuppressed()) {
       lint.report(suppressOutput(node));
+    }
     caseASTNode(node);
   }
 

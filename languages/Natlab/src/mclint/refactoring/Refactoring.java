@@ -2,19 +2,13 @@ package mclint.refactoring;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import mclint.patterns.Match;
 import mclint.patterns.MatchHandler;
 import mclint.patterns.Matcher;
 import mclint.util.AstUtil;
-import mclint.util.Parsing;
-import natlab.refactoring.AbstractNodeFunction;
-import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.ExprStmt;
-import ast.NameExpr;
-import ast.Script;
 
 public class Refactoring {
   private String pattern;
@@ -23,22 +17,22 @@ public class Refactoring {
 
   public static enum Visit {
     Statements {
-      public List<Match> getMatches(String pattern, ASTNode tree) {
+      public List<Match> getMatches(String pattern, ASTNode<?> tree) {
         return Matcher.findMatchingStatements(pattern, tree);
       }
     },
     Expressions {
-      public List<Match> getMatches(String pattern, ASTNode tree) {
+      public List<Match> getMatches(String pattern, ASTNode<?> tree) {
         return Matcher.findMatchingExpressions(pattern, tree);
       }
     },
     All {
-      public List<Match> getMatches(String pattern, ASTNode tree) {
+      public List<Match> getMatches(String pattern, ASTNode<?> tree) {
         return Matcher.findAllMatches(pattern, tree);
       }
     };
 
-    public List<Match> getMatches(String pattern, ASTNode tree) {
+    public List<Match> getMatches(String pattern, ASTNode<?> tree) {
       return Collections.emptyList();
     }
   }
@@ -48,7 +42,7 @@ public class Refactoring {
     return of(fromPattern, new MatchHandler() {
       public void handle(final Match match) {
         preprocessed.handle(match);
-        ASTNode tree = preprocessed.getTree();
+        ASTNode<?> tree = preprocessed.getTree();
         if (tree instanceof ExprStmt && visit == Visit.Expressions) {
           tree = ((ExprStmt) tree).getExpr();
         }
@@ -65,7 +59,7 @@ public class Refactoring {
     return new Refactoring(pattern, handler, visit);
   }
 
-  public void apply(ASTNode tree) {
+  public void apply(ASTNode<?> tree) {
     for (Match match : visit.getMatches(pattern, tree)) {
       handler.handle(match);
     }
