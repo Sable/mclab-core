@@ -66,18 +66,19 @@ public class Matcher {
     this.stack = stack;
   }
 
-  private boolean shouldUnparse() {
-    if (!pattern.startsWithMeta()) {
-      return true;
-    } else if (stack.size() == 1 && !pattern.emptyAfterMeta()) {
-      return true;
-    } else if (stack.size() == 1) {
-      return false;
-    }
-    UnparsedPattern afterMeta = pattern.afterMeta();
+  private String lookahead() {
     Object lookahead = stack.get(stack.size() - 2);
-    return lookahead instanceof ASTNode<?> && !afterMeta.startsWithMeta()
-        || lookahead instanceof String && !afterMeta.consume((String) lookahead);
+    if (lookahead instanceof String) {
+      return (String) lookahead;
+    }
+    return LazyUnparser.lookahead((ASTNode<?>) lookahead);
+  }
+
+  private boolean shouldUnparse() {
+    return !pattern.startsWithMeta()
+        || stack.size() == 1 && !pattern.emptyAfterMeta()
+        || stack.size() == 1
+        || !pattern.afterMeta().consume(lookahead());
   }
 
   private Optional<Match> match() {

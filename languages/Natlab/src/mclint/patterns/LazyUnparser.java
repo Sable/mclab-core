@@ -1,6 +1,5 @@
 package mclint.patterns;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import natlab.ASTToolBox;
@@ -82,13 +81,23 @@ import ast.UMinusExpr;
 import ast.UPlusExpr;
 import ast.WhileStmt;
 
+import com.google.common.collect.Lists;
+
 public class LazyUnparser extends AbstractNodeCaseHandler {
-  private List<Object> tokens = new LinkedList<Object>();
+  private List<Object> tokens = Lists.newLinkedList();
 
   public static List<Object> unparse(ASTNode<?> node) {
     LazyUnparser unparser = new LazyUnparser();
     node.analyze(unparser);
     return unparser.tokens;
+  }
+
+  public static String lookahead(ASTNode<?> node) {
+    Object result = unparse(node).get(0);
+    while (result instanceof ASTNode<?>) {
+      result = unparse((ASTNode<?>) result).get(0);
+    }
+    return (String) result;
   }
 
   private void tokens(Object... args) {
@@ -121,10 +130,12 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
       return;
     }
     tokens(node.getChild(0));
-    if (node.getNumChild() > 1 && node.getParent() instanceof ParameterizedExpr) {
-      tokens(",");
+    if (node.getNumChild() > 1) {
+      if (node.getParent() instanceof ParameterizedExpr) {
+        tokens(",");
+      }
+      tokens(removeFirst(node));
     }
-    tokens(removeFirst(node));
   }
 
   @Override
