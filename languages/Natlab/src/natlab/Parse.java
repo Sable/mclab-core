@@ -133,6 +133,59 @@ public class Parse {
   }
 
   /**
+   * Perform the translation from a given Reader containing source code.
+   *
+   * @param fName    The name of the file to which the source belongs.
+   * @param source   The string containing the source code.
+   * @param errors  A list of errors for error collection.
+   * 
+   * @return A reader object giving access to the translated
+   * source.
+   */
+  public static Reader translateFile(String fName, Reader source, List<CompilationProblem> errors)
+  {
+    PositionMap prePosMap = null;
+    try {
+      String sourceAsString = CharStreams.toString(source);
+      BufferedReader in = new BufferedReader(new StringReader(sourceAsString));
+      FunctionEndScanner.Result result = new FunctionEndScanner(in).translate();
+      if (result instanceof NoChangeResult) {
+        in = new BufferedReader(new StringReader(sourceAsString));
+      } else if (result instanceof TranslationResult) {
+        TranslationResult transResult = (TranslationResult) result;
+        in = new BufferedReader(new StringReader(transResult.getText()));
+        prePosMap = transResult.getPositionMap();
+      } else if (result instanceof ProblemResult) {
+        for (TranslationProblem problem : ((ProblemResult) result).getProblems()) {
+          errors.add(new CompilationProblem(problem.getLine(), problem.getColumn(),
+              problem.getMessage() + "\n"));
+        }
+        return null; // terminate early since extraction parser can't work without balanced 'end's
+      }
+      OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
+      List<TranslationProblem> problems = Lists.newArrayList();
+      String destText = MatlabParser.translate(new ANTLRReaderStream(in),
+          1, 1, offsetTracker, problems);
+      if (problems.isEmpty()) {
+        PositionMap posMap = offsetTracker.buildPositionMap();
+        if (prePosMap != null) {
+          posMap = new CompositePositionMap(posMap, prePosMap);
+        }
+        // TODO-JD: do something with the posMap
+        return new StringReader(destText);
+      }
+      for (TranslationProblem problem : problems) {
+        errors.add(new CompilationProblem(problem.getLine(), problem.getColumn(),
+            problem.getMessage() + "\n"));
+      }
+      return null;
+    } catch (IOException e) {
+      errors.add(new CompilationProblem("Error translating %s\n%s", fName, e.getMessage()));
+      return null;
+    }
+  }
+
+  /**
    * Parse a given file and return the Program ast node. This
    * expects the program to already be in natlab syntax.
    *
@@ -309,58 +362,5 @@ public class Parse {
    */
   public static Reader translateFile(String fName, String source, List<CompilationProblem> errors) {
     return translateFile(fName, new StringReader(source), errors);
-  }
-
-  /**
-   * Perform the translation from a given Reader containing source code.
-   *
-   * @param fName    The name of the file to which the source belongs.
-   * @param source   The string containing the source code.
-   * @param errors  A list of errors for error collection.
-   * 
-   * @return A reader object giving access to the translated
-   * source.
-   */
-  public static Reader translateFile(String fName, Reader source, List<CompilationProblem> errors)
-  {
-    PositionMap prePosMap = null;
-    try {
-      String sourceAsString = CharStreams.toString(source);
-      BufferedReader in = new BufferedReader(new StringReader(sourceAsString));
-      FunctionEndScanner.Result result = new FunctionEndScanner(in).translate();
-      if (result instanceof NoChangeResult) {
-        in = new BufferedReader(new StringReader(sourceAsString));
-      } else if (result instanceof TranslationResult) {
-        TranslationResult transResult = (TranslationResult) result;
-        in = new BufferedReader(new StringReader(transResult.getText()));
-        prePosMap = transResult.getPositionMap();
-      } else if (result instanceof ProblemResult) {
-        for (TranslationProblem problem : ((ProblemResult) result).getProblems()) {
-          errors.add(new CompilationProblem(problem.getLine(), problem.getColumn(),
-              problem.getMessage() + "\n"));
-        }
-        return null; // terminate early since extraction parser can't work without balanced 'end's
-      }
-      OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-      List<TranslationProblem> problems = Lists.newArrayList();
-      String destText = MatlabParser.translate(new ANTLRReaderStream(in),
-          1, 1, offsetTracker, problems);
-      if (problems.isEmpty()) {
-        PositionMap posMap = offsetTracker.buildPositionMap();
-        if (prePosMap != null) {
-          posMap = new CompositePositionMap(posMap, prePosMap);
-        }
-        // TODO-JD: do something with the posMap
-        return new StringReader(destText);
-      }
-      for (TranslationProblem problem : problems) {
-        errors.add(new CompilationProblem(problem.getLine(), problem.getColumn(),
-            problem.getMessage() + "\n"));
-      }
-      return null;
-    } catch (IOException e) {
-      errors.add(new CompilationProblem("Error translating %s\n%s", fName, e.getMessage()));
-      return null;
-    }
   }
 }
