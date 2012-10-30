@@ -24,18 +24,58 @@ package natlab;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import ast.*;
-
-import natlab.SymbolTableScope;
-import natlab.SymbolTableEntry;
-
-// import JFlex.Out;
+import natlab.toolkits.utils.NodeFinder;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
-import annotations.ast.Type;
 import annotations.ast.PrimitiveType;
 import annotations.ast.Size;
+import annotations.ast.Type;
 import annotations.ast.UnknownType;
+import ast.ASTNode;
+import ast.AndExpr;
+import ast.ArrayTransposeExpr;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.ColonExpr;
+import ast.EDivExpr;
+import ast.EQExpr;
+import ast.ETimesExpr;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.FPLiteralExpr;
+import ast.ForStmt;
+import ast.Function;
+import ast.GEExpr;
+import ast.GTExpr;
+import ast.IntLiteralExpr;
+import ast.LEExpr;
+import ast.LTExpr;
+import ast.List;
+import ast.LiteralExpr;
+import ast.MDivExpr;
+import ast.MTimesExpr;
+import ast.MTransposeExpr;
+import ast.MatrixExpr;
+import ast.MinusExpr;
+import ast.NEExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.Opt;
+import ast.OrExpr;
+import ast.ParameterizedExpr;
+import ast.PlusExpr;
+import ast.RangeExpr;
+import ast.Row;
+import ast.Script;
+import ast.ShortCircuitAndExpr;
+import ast.ShortCircuitOrExpr;
+import ast.Stmt;
+import ast.StringLiteralExpr;
+import ast.UMinusExpr;
+import ast.UPlusExpr;
+import ast.UnaryExpr;
+import ast.VariableDecl;
+// import JFlex.Out;
 
 /**
  * A utility for TypeInferenceEngine
@@ -719,7 +759,7 @@ public class TypeInferenceEngine {
 					if(expr instanceof MDivExpr) {
 						if(isIntegerType(varType)) {
 							// If this expression is not belong to any array index
-							if(!ASTToolBox.isInsideArray(expr)) {
+							if(!isInsideArray(expr)) {
 								// Transform LHS to an double expression
 								transformInteger2Double(expr.getLHS());
 								varType = new PrimitiveType(TYPENAME_DOUBLE);
@@ -733,6 +773,20 @@ public class TypeInferenceEngine {
 		
         // DEBUG
 		return varType;
+	}
+	
+	private static boolean isInsideArray(ASTNode varNode) {
+    ASTNode parentNode = varNode;
+    do {
+      if (parentNode instanceof AssignStmt) {
+        return false;
+      } 
+      if (parentNode instanceof ParameterizedExpr) {
+        return true;
+      }
+      parentNode = parentNode.getParent();
+    } while (parentNode != null);
+    return false;
 	}
 
 	// If it's a row vector A(5), translate into A(1,5)
@@ -1268,7 +1322,7 @@ public class TypeInferenceEngine {
 		boolean isInteger = false;
 		boolean bForStmtIndex = false;
 		
-    	Stmt stmt = ASTToolBox.getParentStmtNode(expr);
+    	Stmt stmt = NodeFinder.findParent(expr, Stmt.class);
     	if(stmt instanceof AssignStmt && stmt.getParent() instanceof ForStmt) {
     		bForStmtIndex = true;
     	}
@@ -1476,7 +1530,7 @@ public class TypeInferenceEngine {
 					
 					if(bForStmtIndex) {
 						// ForStmt's index variable
-						Stmt stmtNode = ASTToolBox.getParentStmtNode(expr);
+						Stmt stmtNode = NodeFinder.findParent(expr, Stmt.class);
 						// if(stmtNode.getParent() instanceof ForStmt) 
 	            		List<Stmt> stmtList = ((ForStmt) stmtNode.getParent()).getStmtList();
 	        			// (2) Replace by another temporary variable
@@ -2109,7 +2163,7 @@ public class TypeInferenceEngine {
 	public static void SpecialTransform(NameExpr node, String varName) {
 		if(specialFuncList.contains(varName))
 			return;
-		Stmt stmt = ASTToolBox.getParentStmtNode(node);
+		Stmt stmt = NodeFinder.findParent(node, Stmt.class);
 		// The 'stmt' maybe an assignment statement in ForStmt, 
 		// which will be returned by following if(..)
 		if(!(stmt.getParent() instanceof ast.List)) {

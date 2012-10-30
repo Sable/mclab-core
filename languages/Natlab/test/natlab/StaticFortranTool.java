@@ -1,23 +1,63 @@
 package natlab;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Stack;
 
-import java.util.*;
-
-import ast.*;
-import ast.List;
-
-import beaver.Parser;
-
-import natlab.toolkits.scalar.*;
-
-import natlab.SymbolTableScope;
-import natlab.SymbolTableEntry;
+import natlab.toolkits.scalar.AbstractFlowAnalysis;
+import natlab.toolkits.scalar.FlowSet;
+import natlab.toolkits.scalar.ReachingDefs;
+import natlab.toolkits.utils.NodeFinder;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.PrimitiveType;
 import annotations.ast.Size;
 import annotations.ast.Type;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.BreakStmt;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.FPLiteralExpr;
+import ast.ForStmt;
+import ast.Function;
+import ast.FunctionDecl;
+import ast.FunctionList;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.IntLiteralExpr;
+import ast.List;
+import ast.MTimesExpr;
+import ast.MatrixExpr;
+import ast.MinusExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.ParameterizedExpr;
+import ast.PlusExpr;
+import ast.Program;
+import ast.RangeExpr;
+import ast.Row;
+import ast.Script;
+import ast.Stmt;
+import ast.StringLiteralExpr;
+import ast.VariableDecl;
+import ast.WhileStmt;
+import beaver.Parser;
 
 /**
  * A utility for testing the MATLAB to Fortran code generator  
@@ -1905,7 +1945,7 @@ public class StaticFortranTool {
 		if(!(varNode instanceof AssignStmt) || ((AssignStmt)varNode).isCall)
 				return; 
 		
-		ASTNode parentNode = ASTToolBox.getParentAssignStmtNode(varNode);
+		ASTNode parentNode = NodeFinder.findParent(varNode, AssignStmt.class);
 	    if(parentNode!=null && ((AssignStmt) parentNode).getRHS() instanceof ParameterizedExpr) {
 	    	ParameterizedExpr rhs = (ParameterizedExpr)((AssignStmt) parentNode).getRHS();
 	    	Expr lhs = ((AssignStmt) parentNode).getLHS();
@@ -1987,7 +2027,7 @@ public class StaticFortranTool {
 		    dumpTypeInfo(orgType, "[inferSymbolEntry]<"+varNode.getNodeID()+">["+e.getSymbol()+"] "+varNode.getStructureString()+" isFirm=["+e.isFirmType+"]Original Type:");
 		    // Find the assignment statement of the variable, 
 		    // varNode should be the LHS of it. 
-		    AssignStmt parentNode = ASTToolBox.getParentAssignStmtNode(varNode);
+		    AssignStmt parentNode = NodeFinder.findParent(varNode, AssignStmt.class);
     		Expr lhs = ((AssignStmt) parentNode).getLHS();
     		Expr rhs = ((AssignStmt) parentNode).getRHS();
 

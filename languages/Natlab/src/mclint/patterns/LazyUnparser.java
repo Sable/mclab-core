@@ -2,7 +2,7 @@ package mclint.patterns;
 
 import java.util.List;
 
-import natlab.ASTToolBox;
+import natlab.toolkits.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AndExpr;
@@ -247,13 +247,18 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
         node.getInputParams(), ")", node.getStmts(), "end");
   }
   
+  private boolean isInsideLoop(ASTNode<?> node) {
+    return NodeFinder.findParent(node, ForStmt.class) != null
+        || NodeFinder.findParent(node, WhileStmt.class) != null;
+  }
+  
   @Override
   public void caseStmt(Stmt node) {
     if (node instanceof AssignStmt && node.getParent() instanceof ForStmt &&
         node == ((ForStmt) node.getParent()).getAssignStmt()) {
       return;
     }
-    if (ASTToolBox.isInsideLoop(node)) {
+    if (isInsideLoop(node)) {
       tokens(";");
     }
   }

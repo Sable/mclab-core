@@ -40,6 +40,7 @@ import java.util.Stack;
 import natlab.toolkits.scalar.AbstractFlowAnalysis;
 import natlab.toolkits.scalar.FlowSet;
 import natlab.toolkits.scalar.ReachingDefs;
+import natlab.toolkits.utils.NodeFinder;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.PrimitiveType;
@@ -1163,7 +1164,7 @@ public class McFor {
         for(SymbolTableEntry e:	gArrayVarCheckNodeMap.keySet()) {
             HashSet<ASTNode> nodeSet = gArrayVarCheckNodeMap.get(e);
             for(ASTNode node: nodeSet) {
-                ASTNode root = ASTToolBox.getSubtreeRoot(node);
+                ASTNode root = NodeFinder.findParent(node, Program.class);
                 if(root!=null) {
                     Integer check = gTreeCheckMap.get(root);
                     if(check!=null && check==0) {
@@ -2955,7 +2956,7 @@ public class McFor {
         if(!(varNode instanceof AssignStmt) || ((AssignStmt)varNode).isCall)
             return; 
 		
-        ASTNode parentNode = ASTToolBox.getParentAssignStmtNode(varNode);
+        ASTNode parentNode = NodeFinder.findParent(varNode, AssignStmt.class);
         if(parentNode!=null && ((AssignStmt) parentNode).getRHS() instanceof ParameterizedExpr) {
             ParameterizedExpr rhs = (ParameterizedExpr)((AssignStmt) parentNode).getRHS();
             Expr lhs = ((AssignStmt) parentNode).getLHS();
@@ -3060,7 +3061,7 @@ public class McFor {
             Type orgType = varDecl.getType();
             // Find the assignment statement of the variable, 
             // varNode should be the LHS of it. 
-            AssignStmt parentNode = ASTToolBox.getParentAssignStmtNode(varNode);
+            AssignStmt parentNode = NodeFinder.findParent(varNode, AssignStmt.class);
             Expr lhs = ((AssignStmt) parentNode).getLHS();
             Expr rhs = ((AssignStmt) parentNode).getRHS();
 
@@ -3252,7 +3253,7 @@ public class McFor {
                             if(nodeList.size()==2) {
                                 // Second one is inside the loop
                                 // First one is out side the loop
-                                ForStmt forStmt2 = ASTToolBox.getParentForStmtNode(nodeList.get(1));
+                                ForStmt forStmt2 = NodeFinder.findParent(nodeList.get(1), ForStmt.class);
                                 if(forStmt2!=null) {
                                     ASTNode parent1 = nodeList.get(0).getParent();
                                     ASTNode parent2 = forStmt2.getParent();
@@ -3371,7 +3372,7 @@ public class McFor {
                                 varType = varDecl.getType();
                             }
 		        		
-                            boolean insideIf = (ASTToolBox.getParentIfStmtNode(parentNode)!=null);
+                            boolean insideIf = NodeFinder.findParent(parentNode, IfStmt.class) != null;
 
                             // Skip those cases that under if statement, they are not predictable! e.g.,clos
                             mType = TypeInferenceEngine.adjustMatrixType(varType, expr);
@@ -4187,7 +4188,7 @@ public class McFor {
     // @return: true: rename happened; false: not the case
     private static boolean renameRedefineForVariable(ASTNode codeNode, String newVarName, SymbolTableScope symtbl) {
         // Renaming-[#3] Loop variable renaming inside loop
-        ForStmt forStmt = ASTToolBox.getParentForStmtNode(codeNode);
+        ForStmt forStmt = NodeFinder.findParent(codeNode, ForStmt.class);
         if(forStmt!=null && forStmt.getAssignStmt().getLHS().getVarName().equals(newVarName)) {
 
             String newName = TypeInferenceEngine.getNewVarName(newVarName, symtbl);
