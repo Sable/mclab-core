@@ -1,12 +1,12 @@
 package mclint;
 
-import com.google.common.collect.ComparisonChain;
-
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
 import ast.Program;
 import beaver.Symbol;
+
+import com.google.common.collect.ComparisonChain;
 
 /**
  * A code location; a file path together with line and column numbers.
