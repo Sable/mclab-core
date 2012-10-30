@@ -12,6 +12,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import natlab.CompilationProblem;
 import natlab.Parse;
@@ -70,22 +72,33 @@ public class NatlabServer {
     log("Client connected");
 
     BufferedReader in = null;
-    PrintWriter out = null;
+    final PrintWriter out;
     try {
       out = new PrintWriter(clientSocket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     } catch (IOException e) {
       System.err.println("Server input stream creation failed");
       System.exit(1);
+      return;
     }
     int inCharInt = 0;
     StringBuffer commandBuf;
     XMLCommandHandler xmlCH = new XMLCommandHandler();
     boolean shutdown = false;
-    HeartBeatFlag hbFlag = new HeartBeatFlag();
+    final AtomicBoolean hbFlag = new AtomicBoolean(true);
     Timer heartBeat = new Timer();
     if (!options.noheart()) {
-      heartBeat.schedule(new HeartBeatTask(hbFlag, out, options.quiet()), HEART_DELAY, HEART_RATE);
+      heartBeat.schedule(new TimerTask() {
+        @Override public void run() {
+          if (!hbFlag.getAndSet(false)) {
+            log("server timed out, aborting");
+            //TODO: is this thread safe? probably not
+            out.print("<errorlist><error>server timed out, aborting</error></errorlist>\0");
+            out.flush();
+            System.exit(1);
+          }
+        }
+      }, HEART_DELAY, HEART_RATE);
     }
 
     while(!shutdown) {
@@ -177,7 +190,7 @@ public class NatlabServer {
           continue;
         }
         else if (cmd.equalsIgnoreCase("heartbeat")) {
-          hbFlag.set();
+          hbFlag.set(true);
         } else{
           log("ignored cmd");
         }
@@ -200,7 +213,7 @@ public class NatlabServer {
             if( source == null ){
               String fooEstr="";
               if (!options.quiet())
-              fooEstr+="skipping file"+"/n";
+                fooEstr+="skipping file"+"/n";
               CompilationProblem Foocerror = new CompilationProblem(fooEstr+="<errorlist><error>Error has occured in translating, more information to come later</error></errorlist>\0");
               errors.add(Foocerror);
               continue;
