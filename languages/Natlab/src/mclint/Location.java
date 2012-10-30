@@ -1,5 +1,7 @@
 package mclint;
 
+import com.google.common.collect.ComparisonChain;
+
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
@@ -64,14 +66,11 @@ public class Location implements Comparable<Location> {
 
   @Override
   public int compareTo(Location location) {
-    int pathCompare = getPath().compareTo(location.getPath());
-    if (pathCompare == 0) {
-      int lineCompare = Integer.valueOf(getLine()).compareTo(Integer.valueOf(location.getLine()));
-      if (lineCompare == 0)
-        return Integer.valueOf(getColumn()).compareTo(Integer.valueOf(location.getColumn()));
-      return lineCompare;
-    }
-    return pathCompare;
+    return ComparisonChain.start()
+        .compare(getPath(), location.getPath())
+        .compare(getLine(), location.getLine())
+        .compare(getColumn(), location.getColumn())
+        .result();
   }
 
   @Override
