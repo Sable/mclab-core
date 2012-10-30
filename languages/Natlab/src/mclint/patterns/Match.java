@@ -7,6 +7,11 @@ import ast.Expr;
 import ast.List;
 import ast.Stmt;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+
 public class Match {
   private UnparsedPattern pattern;
   private ASTNode<?> tree;
@@ -46,31 +51,28 @@ public class Match {
     return pattern;
   }
   
-  private String getBindingsAsString() {
-    StringBuilder sb = new StringBuilder("{");
-    boolean first = true;
-    for (Map.Entry<Character, ASTNode<?>> binding : bindings.entrySet()) {
-      if (!first) {
-        sb.append(", ");
+  private static Function<ASTNode<?>, String> prettyPrintFunction() {
+    return new Function<ASTNode<?>, String>() {
+      @Override public String apply(ASTNode<?> node) {
+        return node.getPrettyPrinted();
       }
-      first = false;
-      sb.append(binding.getKey());
-      sb.append(": ");
-      if (binding.getValue() instanceof ast.List) {
-        for (int i = 0; i < binding.getValue().getNumChild(); ++i) {
-          if (i != 0) {
-            sb.append(", ");
-          }
-          sb.append(binding.getValue().getChild(i).getPrettyPrinted());
-        }
-      } else {
-        sb.append(binding.getValue().getPrettyPrinted());
-      }
-    }
-    sb.append("}");
-    return sb.toString();
+    };
   }
   
+  private String getBindingsAsString() {
+    return String.format("{%s}", Joiner.on(", ").withKeyValueSeparator(": ")
+        .join(Maps.transformValues(bindings, new Function<ASTNode<?>, String>() {
+          @Override public String apply(ASTNode<?> node) {
+            if (!(node instanceof ast.List)) {
+              return node.getPrettyPrinted();
+            }
+            @SuppressWarnings("unchecked")
+            ast.List<? extends ASTNode<?>> list = (ast.List<? extends ASTNode<?>>) node;
+            return Joiner.on(", ").join(Iterables.transform(list, prettyPrintFunction()));
+          }
+        })));
+  }
+
   @Override
   public String toString() {
     return String.format("Match %s against %s\nBindings: %s", pattern.asString(),
