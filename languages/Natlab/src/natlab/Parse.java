@@ -127,9 +127,7 @@ public class Parse {
     }
     Stmt.setDefaultOutputSuppression(true);
     if (program != null) {
-      String filename = new File(fName).getName();
-      program.setName(filename.substring(0, filename.lastIndexOf('.')));
-      program.setFullPath(fName);
+      program.setFile(GenericFile.create(fName));
     }
     return program;
   }

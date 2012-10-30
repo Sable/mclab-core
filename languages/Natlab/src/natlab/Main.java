@@ -145,13 +145,9 @@ public class Main {
         System.out.println(cu.getPrettyPrinted());
       } else {
         File outputDir = new File(options.od());
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-          System.err.println( "Could not create output directory." );
-          System.err.println( "Some directories may have been created though." );
-          System.exit(1);
-        }
         for (Program program : cu.getPrograms()) {
           File outputFile = new File(outputDir, new File(program.getFullPath()).getName());
+          Files.createParentDirs(outputFile);
           Files.write(program.getPrettyPrinted(), outputFile, Charsets.UTF_8);
         }
       }
