@@ -42,8 +42,7 @@ import com.google.common.io.Files;
 /**
  * Main entry point for McLab compiler. Includes a main method that
  * deals with command line options and performs the desired
- * functions. Also includes static methods used to simplify tasks such
- * as parsing program code and translating from matlab to natlab.
+ * functions.
  */
 public class Main {
   private static Options options;
