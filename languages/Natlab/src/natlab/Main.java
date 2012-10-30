@@ -125,7 +125,7 @@ public class Main {
     if (options.matlab()) {
       cu = Parse.parseMatlabFiles(files, errors);
     } else {
-      cu = Parse.parseFiles(files, errors);
+      cu = Parse.parseNatlabFiles(files, errors);
     }
 
     if (!errors.isEmpty()) {

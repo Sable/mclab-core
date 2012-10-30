@@ -220,7 +220,7 @@ public class NatlabServer {
             }
           }
           log("parsing");
-          Program prog = Parse.parseFile( fileName, source, serverErrors );
+          Program prog = Parse.parseNatlabFile( fileName, source, serverErrors );
           if( serverErrors.size() > 0){
             String serverEstr="";
             if(!options.quiet())

@@ -15,7 +15,7 @@ public class RewritePassTestBase extends TestCase {
     {
         FileReader fileReader = new FileReader( fName );
         ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
-        Program prog = Parse.parseFile( fName, fileReader, errList );
+        Program prog = Parse.parseNatlabFile( fName, fileReader, errList );
         if( prog == null )
             throw new Exception( "Error parsing file " +fName+ ":\n" + 
                                  CompilationProblem.toStringAll( errList ) );

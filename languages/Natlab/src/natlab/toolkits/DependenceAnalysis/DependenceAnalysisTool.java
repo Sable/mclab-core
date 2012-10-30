@@ -41,7 +41,7 @@ public class DependenceAnalysisTool {
             List<CompilationProblem> errors = Lists.newArrayList();
             Reader fileReader = new StringReader("");
             fileReader=Parse.translateFile(name + "/" + fileName[i],errors);
-            Program prog = Parse.parseFile(name +"/" + fileName[i],  fileReader, errors );  
+            Program prog = Parse.parseNatlabFile(name +"/" + fileName[i],  fileReader, errors );  
             if(options.prof()){           
               ProfilerDriver pDriver=new ProfilerDriver();
               pDriver.setDirName("Dep"+name);

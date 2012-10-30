@@ -77,7 +77,7 @@ public class FlowAnalysisTestTool
                 Reader source = Parse.translateFile( fName, errList );
                 if( source == null )
                     throw new Exception( "Error translating file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
-                Program prog = Parse.parseFile( fName, source, errList );
+                Program prog = Parse.parseNatlabFile( fName, source, errList );
                 if( prog == null )
                     throw new Exception( "Error parsing file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
                 cu.addProgram( prog );
@@ -126,7 +126,7 @@ public class FlowAnalysisTestTool
     {
         FileReader fileReader = new FileReader( fName );
         ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
-        Program prog = Parse.parseFile( fName, fileReader, errList );
+        Program prog = Parse.parseNatlabFile( fName, fileReader, errList );
         if( prog == null )
             //TODO-JD create proper compilation exception
             throw new Exception( "Error parsing file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );

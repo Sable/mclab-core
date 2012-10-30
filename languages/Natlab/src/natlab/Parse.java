@@ -95,7 +95,7 @@ public class Parse {
    * @return The Program node for the given file being parsed if no
    * errors. If an error occurs then null is returned. 
    */
-  public static Program parseFile(String fName, Reader file, List<CompilationProblem> errors) {
+  public static Program parseNatlabFile(String fName, Reader file, List<CompilationProblem> errors) {
     Stmt.setDefaultOutputSuppression(false);
     NatlabParser parser = new NatlabParser();
     NatlabScanner scanner = new NatlabScanner(file);
@@ -195,12 +195,12 @@ public class Parse {
    * @return The Program node for the given file being parsed if no
    * errors. If an error occurs then null is returned. 
    */
-  public static Program parseFile(String fName, List<CompilationProblem> errors) {
+  public static Program parseNatlabFile(String fName, List<CompilationProblem> errors) {
     Reader reader = fileReader(fName, errors);
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseFile(fName, reader, errors);
+    return parseNatlabFile(fName, reader, errors);
   }
 
   /**
@@ -213,12 +213,12 @@ public class Parse {
    * @return The Program node for the given file being parsed if no
    * errors. If an error occurs then null is returned. 
    */
-  public static Program parseFile(GenericFile file, List<CompilationProblem> errors) {
+  public static Program parseNatlabFile(GenericFile file, List<CompilationProblem> errors) {
     Reader reader = fileReader(file, errors);
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseFile(file.getName(), reader, errors);
+    return parseNatlabFile(file.getName(), reader, errors);
   }
 
   /**
@@ -235,7 +235,7 @@ public class Parse {
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseFile(fName, source, errors);
+    return parseNatlabFile(fName, source, errors);
   }
 
   /**
@@ -255,7 +255,7 @@ public class Parse {
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseFile(fName, natlabFile, errors);
+    return parseNatlabFile(fName, natlabFile, errors);
   }
 
   /**
@@ -280,7 +280,7 @@ public class Parse {
     CompilationUnits cu = new CompilationUnits();
     for (String fName : files) {
       List<CompilationProblem> fileErrors = Lists.newArrayList();
-      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseFile(fName, errors);
+      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, errors);
       if (program != null) {
         cu.addProgram(program);
       } else {
@@ -310,7 +310,7 @@ public class Parse {
    * @param errors a list of errors for error collection
    * @return a CompilationUnits object containing those programs that were successfully parsed
    */
-  public static CompilationUnits parseFiles(List<String> files, List<CompilationProblem> errors) {
+  public static CompilationUnits parseNatlabFiles(List<String> files, List<CompilationProblem> errors) {
     return parseMultipleFiles(false, files, errors);
   }
 

@@ -17,7 +17,7 @@ public class FunctionInlinerTest extends TestCase {
 
     private Program addFile(String filename, String content) {
         ArrayList<CompilationProblem> errorList = new ArrayList<CompilationProblem>();
-        Program p = Parse.parseFile(filename, new StringReader(content), errorList);
+        Program p = Parse.parseNatlabFile(filename, new StringReader(content), errorList);
         assertTrue(errorList.isEmpty());
         p.setFile(root.getBuiltin(filename));
         cu.addProgram(p);
