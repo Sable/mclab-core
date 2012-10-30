@@ -123,9 +123,14 @@ public class Parse {
         errors.add(new CompilationProblem(Integer.parseInt(message[0]),
             Integer.parseInt(message[1]), message[3]));
       }
-      program = null;
+      return null;
     }
     Stmt.setDefaultOutputSuppression(true);
+    if (program != null) {
+      String filename = new File(fName).getName();
+      program.setName(filename.substring(0, filename.lastIndexOf('.')));
+      program.setFullPath(fName);
+    }
     return program;
   }
 
@@ -199,13 +204,28 @@ public class Parse {
     }
     return parseMatlabFile(file.getName(), reader, errors);
   }
-
-  public static CompilationUnits parseMatlabFiles(List<String> files, List<CompilationProblem> errors) {
+  
+  private static CompilationUnits parseMultipleFiles(boolean matlab, List<String> files,
+      List<CompilationProblem> errors) {
     CompilationUnits cu = new CompilationUnits();
     for (String fName : files) {
-      cu.addProgram(parseMatlabFile(fName, errors));
+      List<CompilationProblem> fileErrors = Lists.newArrayList();
+      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseFile(fName, errors);
+      if (program != null) {
+        cu.addProgram(program);
+      } else {
+        errors.addAll(fileErrors);
+      }
     }
     return cu;
+  }
+
+  public static CompilationUnits parseMatlabFiles(List<String> files, List<CompilationProblem> errors) {
+    return parseMultipleFiles(true, files, errors);
+  }
+
+  public static CompilationUnits parseFiles(List<String> files, List<CompilationProblem> errors) {
+    return parseMultipleFiles(false, files, errors);
   }
 
   /**
