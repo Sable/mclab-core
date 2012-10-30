@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 
 import natlab.options.Options;
 import natlab.server.NatlabServer;
+import natlab.tame.TamerTool;
 import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
 import natlab.toolkits.DependenceAnalysis.McFlatDriver;
 import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
@@ -46,6 +46,7 @@ import ast.CompilationUnits;
 import ast.Program;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -126,7 +127,7 @@ public class Main
 
     if (options.tame()){
       //TODO - the parsing of the options should probably not be done by the tamer tool
-      natlab.tame.TamerTool.main(options);
+      TamerTool.main(options);
       return;
     }
 
@@ -139,13 +140,12 @@ public class Main
       System.err.println("No files provided, must have at least one file.");
       return;
     }
-    //Plain cmd line mode
 
     //parse each file and put them in a list of Programs
-    ArrayList<Program> programs = new ArrayList<Program>( options.getFiles().size() );
-    ArrayList<String> fileNames = new ArrayList<String>( options.getFiles().size() );
-    TreeMap<String, Program> programMap=new TreeMap<String, Program>();
-    for( Object o : options.getFiles() ){
+    List<Program> programs = Lists.newArrayListWithCapacity(options.getFiles().size());
+    List<String> fileNames = Lists.newArrayListWithCapacity(options.getFiles().size());
+    Map<String, Program> programMap = Maps.newTreeMap();
+    for (Object o : options.getFiles()) {
       //When processing files there are currently two options.
       //Either the matlab flag is set or it isn't.
       //When it is set, each file is translated to natlab.
@@ -159,65 +159,44 @@ public class Main
 
       fileNames.add( file );
 
-      //checks if dependence analysis flag is set.
-      //If the flag is set then the type of dependence test that needs to be applied.                   
-
-      if(options.danalysis()){                            
-        //Program prog = null;
-        dependenceAnalyzerOptions(options,file);
-        if( !quiet )
-          System.err.println("Dependence Tester");
-        if(options.bj()){
-          if( !quiet )
-            System.err.println("Dependence Analysis with Banerjee's Test");
-        } 
+      if(options.danalysis()) {
+        dependenceAnalyzerOptions(options, file);
+        log("Dependence Tester");
+        logIf(options.bj(), "Dependence Analysis with Banerjee's Test");
       }
 
-      if( options.matlab() ){
-        //translate each file from matlab to natlab
-        //if successful the result will end up as a StringReader instance 
-        // in fileReader variable
-        //try{
-        if( !quiet )
-          System.err.println("Translating "+file+" to Natlab");
+      if(options.matlab()) {
+        log("Translating " + file + " to Natlab");
         fileReader = Parse.translateFile( file, errors );
 
-        if( errors.size() > 0 )
-          System.err.print( errors.toString() );
-        if( fileReader == null ){
-          System.err.println("\nSkipping " + file);
+        if (!errors.isEmpty()) {
+          System.err.println(CompilationProblem.toStringAll(errors));
+        }
+        if(fileReader == null) {
+          System.err.println("Skipping " + file);
           break;
         }
-      }
-      else{
-        //treat as a natlab input, set fileReader to a new 
-        //FileReader instance pointing to the current file
-        try{
-          fileReader = new FileReader( file );
-        }catch(FileNotFoundException e){
-          System.err.println("File "+file+" not found!\nAborting");
+      } else {
+        try {
+          fileReader = new FileReader(file);
+        } catch(FileNotFoundException e){
+          System.err.println("File "+ file +" not found!\nAborting");
           System.exit(1);
         }
       }
-      if( !quiet )
-        System.err.println("Parsing: " + file);
-      //parse the file
+      log("Parsing: " + file);
+
       Program prog = Parse.parseFile( file,  fileReader, errors );
 
-      //report errors
-      if( errors.size() > 0 )
-        System.err.print( errors.toString() );
+      if (!errors.isEmpty()) {
+        System.err.println(CompilationProblem.toStringAll(errors));
+      }
 
-      if( prog == null ){
-        System.err.println("\nSkipping " + file);
+      if(prog == null) {
+        System.err.println("Skipping " + file);
         break;
       }
 
-      //Weeding checks
-      //if(prog.errorCheck()){
-      //    System.err.println("\nWeeding Failed, Skipping: " + file);
-      //    break;
-      //}
       String[] parts=file.split(File.separator);
       String filename= parts[parts.length-1];
       prog.setName(filename.substring(0,filename.length()-2)); //#FIXME Soroush: find the extension? 
@@ -227,52 +206,48 @@ public class Main
       programMap.put(prog.getName(), prog);
       programs.add(prog);
     }
-    //Take all resulting Program nodes and place them in a
-    //CompilationUnits instance
+
     CompilationUnits cu = new CompilationUnits();
     for( Program p : programs ){
       cu.addProgram( p );
     }
 
-    if( options.xml() ){
-      //System.out.println(cu.ASTtoXML());
+    if (options.xml()) {
       System.out.print(cu.XMLtoString(cu.ASTtoXML()));
-    }
-    else if( options.pretty() ){
-      if( !quiet )
-        System.err.println("Pretty Printing");
+    } else if (options.pretty()) {
+      log("Pretty Printing");
 
       //NOTE: This might be fragile, what if Program nodes are removed?
-      if( options.od().length() > 0 ){
-        File outputDir = new File( options.od() );
-        try{
-          if( !outputDir.exists() && !outputDir.mkdirs() ){
+      if (options.od().length() > 0) {
+        File outputDir = new File(options.od());
+        try {
+          if (!outputDir.exists() && !outputDir.mkdirs()) {
             System.err.println( "Could not create output directory." );
             System.err.println( "Some directories may have been created though." );
             System.exit(1);
           }
-        }catch( SecurityException e ){
-          System.err.println( "Security error, is there a security manager active?" );
-          System.err.println( e );
+        } catch(SecurityException e) {
+          System.err.println("Security error, is there a security manager active?");
+          System.err.println(e);
           System.exit(1);
         }
         FileWriter outFile;
         String fileName;
-        for( int i = 0; i<fileNames.size(); i++ ){
-          fileName = (new File(fileNames.get(i)) ).getName();
-          try{
-            outFile = new FileWriter( new File( outputDir, fileName ) );
-            outFile.write( cu.getProgram(i).getPrettyPrinted() );
+        for (int i = 0; i < fileNames.size(); i++) {
+          fileName = new File(fileNames.get(i)).getName();
+          try {
+            outFile = new FileWriter(new File(outputDir, fileName));
+            outFile.write(cu.getProgram(i).getPrettyPrinted());
             outFile.close();
-          }catch( IOException e ){
-            System.err.println( "Problem writing to file "+new File( outputDir, fileName ) );
-            System.err.println( e );
+          } catch(IOException e ) {
+            System.err.println("Problem writing to file " + new File(outputDir, fileName));
+            System.err.println(e);
             System.exit(1);
           }
         }
-      }
-      else
+      } else {
         System.out.println(cu.getPrettyPrinted());
+      }
     }
     else if( options.vfpreorder() ){
 
@@ -297,12 +272,7 @@ public class Main
       //                        CDAnalysis c = new CDAnalysis( cu );
       FlowAnalysisTestTool testTool = new FlowAnalysisTestTool( cu, ReachingDefs.class);
       System.out.println(testTool.run());
-
-
-
-
       /*
-
                         System.out.println( "********\ndoing vf data collection");
                         VFDataCollector vfdata = new VFDataCollector( cu );
                         vfdata.analyze();
