@@ -150,6 +150,16 @@ public class Parse {
     return parseFile(fName, reader, errors);
   }
 
+  /**
+   * Parse a given file and return the Program ast node. This
+   * expects the program to already be in natlab syntax.
+   *
+   * @param file The file to be parsed
+   * @param errors   A list of errors for error collection.
+   *
+   * @return The Program node for the given file being parsed if no
+   * errors. If an error occurs then null is returned. 
+   */
   public static Program parseFile(GenericFile file, List<CompilationProblem> errors) {
     Reader reader = fileReader(file, errors);
     if (!errors.isEmpty()) {
@@ -195,6 +205,15 @@ public class Parse {
     return parseFile(fName, natlabFile, errors);
   }
 
+  /**
+   * Parse a given file as a Matlab file and return the Program ast node.
+   *
+   * @param file   The file to be parsed.
+   * @param errors   A list of errors for error collection.
+   *
+   * @return The Program node for the given file being parsed if no
+   * errors. If an error occurs then null is returned. 
+   */
   public static Program parseMatlabFile(GenericFile file, List<CompilationProblem> errors) {
     Reader reader = fileReader(file, errors);
     if (!errors.isEmpty()) {
@@ -202,7 +221,7 @@ public class Parse {
     }
     return parseMatlabFile(file.getName(), reader, errors);
   }
-  
+
   private static CompilationUnits parseMultipleFiles(boolean matlab, List<String> files,
       List<CompilationProblem> errors) {
     CompilationUnits cu = new CompilationUnits();
@@ -218,10 +237,26 @@ public class Parse {
     return cu;
   }
 
+  /**
+   * Parse several matlab files; use this instead of building up CompilationUnits manually.
+   * Files which can't be parsed for whatever reason are skipped, with all their errors added
+   * to the errors list.
+   * @param files a list of filenames to be parsed
+   * @param errors a list of errors for error collection
+   * @return a CompilationUnits object containing those programs that were successfully parsed
+   */
   public static CompilationUnits parseMatlabFiles(List<String> files, List<CompilationProblem> errors) {
     return parseMultipleFiles(true, files, errors);
   }
 
+  /**
+   * Parse several natlab files; use this instead of building up CompilationUnits manually.
+   * Files which can't be parsed for whatever reason are skipped, with all their errors added
+   * to the errors list.
+   * @param files a list of filenames to be parsed
+   * @param errors a list of errors for error collection
+   * @return a CompilationUnits object containing those programs that were successfully parsed
+   */
   public static CompilationUnits parseFiles(List<String> files, List<CompilationProblem> errors) {
     return parseMultipleFiles(false, files, errors);
   }
@@ -243,6 +278,15 @@ public class Parse {
     return translateFile(fName, reader, errors);
   }
 
+  /**
+   * Perform the reading and translation of a given file.
+   *
+   * @param file    the file to be translated
+   * @param errors  A list of errors for error collection.
+   * 
+   * @return A reader object giving access to the translated
+   * source.
+   */
   public static Reader translateFile(GenericFile file, List<CompilationProblem> errors) {
     Reader reader = fileReader(file, errors);
     if (!errors.isEmpty()) {
