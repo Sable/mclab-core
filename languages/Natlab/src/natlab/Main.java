@@ -22,13 +22,9 @@
 package natlab;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -45,8 +41,11 @@ import natlab.toolkits.filehandling.DirectoryFileFilter;
 import ast.CompilationUnits;
 import ast.Program;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -54,19 +53,15 @@ import com.google.common.collect.Maps;
  * functions. Also includes static methods used to simplify tasks such
  * as parsing program code and translating from matlab to natlab.
  */
-public class Main
-{
+public class Main {
   private static Options options;
-
-
-  private static boolean quiet;
 
   private static void log(String message) {
     logIf(true, message);
   }
 
   private static void logIf(boolean condition, String message) {
-    if (!quiet && condition) {
+    if (!options.quiet() && condition) {
       System.err.println(message);
     }
   }
@@ -88,31 +83,14 @@ public class Main
       System.err.println(options.getUsage());
       return;
     }
-    quiet = options.quiet();  //check if quiet mode is active
 
     logIf(options.e(), "exhaustive list");
     logIf(options.d(), "dynamic linking");
 
-    //fortran neither uses the below parser, nor is a server
-    /*                if( options.fortran() ){ //begin fortran
-                    //if( options.getFiles().size() == 0 ){
-                    //    System.err.println("No files provided, must have at least one file.");
-                    //    System.exit(1);
-                    //}
-                    //System.out.println("compiling to fortran "+options.getFiles());
-                    //String[] fargs = {"-d",(String)options.getFiles().get(0)};
-                    //System.out.println("calling McFor with "+fargs);
-                    natlab.tame.mc4.Mc4.main(args);
-                    return;
-                } //end fortran
-     */
-
     if (options.show_pref()) {
-      System.out.println("preferences:");
-      Map<String,Object> prefs = NatlabPreferences.getAllPreferences();
-      for (String key : prefs.keySet()) {
-        System.out.println(key + "=" + prefs.get(key));
-      }
+      System.out.println("Preferences:");
+      System.out.println(Joiner.on('\n').withKeyValueSeparator(" = ")
+          .join(NatlabPreferences.getAllPreferences()));
     }
 
     if (options.pref()) {
@@ -141,84 +119,55 @@ public class Main
       return;
     }
 
-    //parse each file and put them in a list of Programs
-    List<Program> programs = Lists.newArrayListWithCapacity(options.getFiles().size());
-    List<String> fileNames = Lists.newArrayListWithCapacity(options.getFiles().size());
     Map<String, Program> programMap = Maps.newTreeMap();
     for (Object o : options.getFiles()) {
-      //When processing files there are currently two options.
-      //Either the matlab flag is set or it isn't.
-      //When it is set, each file is translated to natlab.
-      //The resulting string is put into a StringReader and 
-      //assigned to fileReader. Otherwise fileReader is 
-      //assigned a FileReader instance pointing to the 
-      //current file. In either case, fileReader has 
-      //the correct value.
       String file = (String) o;
-      Reader fileReader = new StringReader("");
-
-      fileNames.add( file );
 
       if(options.danalysis()) {
-        dependenceAnalyzerOptions(options, file);
+        dependenceAnalyzerOptions(file);
         log("Dependence Tester");
         logIf(options.bj(), "Dependence Analysis with Banerjee's Test");
       }
 
-      if(options.matlab()) {
-        log("Translating " + file + " to Natlab");
-        fileReader = Parse.translateFile( file, errors );
-
-        if (!errors.isEmpty()) {
-          System.err.println(CompilationProblem.toStringAll(errors));
-        }
-        if(fileReader == null) {
-          System.err.println("Skipping " + file);
-          break;
-        }
-      } else {
-        try {
-          fileReader = new FileReader(file);
-        } catch(FileNotFoundException e){
-          System.err.println("File "+ file +" not found!\nAborting");
-          System.exit(1);
-        }
-      }
       log("Parsing: " + file);
-
-      Program prog = Parse.parseFile( file,  fileReader, errors );
+      Program program = null;
+      if (options.matlab()) {
+        program = Parse.parseMatlabFile(file, errors);
+      } else {
+        program = Parse.parseFile(file, errors);
+      }
 
       if (!errors.isEmpty()) {
         System.err.println(CompilationProblem.toStringAll(errors));
       }
 
-      if(prog == null) {
+      if (program == null) {
         System.err.println("Skipping " + file);
         break;
       }
 
-      String[] parts=file.split(File.separator);
-      String filename= parts[parts.length-1];
-      prog.setName(filename.substring(0,filename.length()-2)); //#FIXME Soroush: find the extension? 
-
-      prog.setFullPath(file);
-
-      programMap.put(prog.getName(), prog);
-      programs.add(prog);
+      String filename = new File(file).getName();
+      program.setName(filename.substring(0, filename.lastIndexOf('.')));
+      program.setFullPath(file);
+      programMap.put(program.getName(), program);
     }
 
     CompilationUnits cu = new CompilationUnits();
-    for( Program p : programs ){
-      cu.addProgram( p );
+    for (Program p : programMap.values()) {
+      cu.addProgram(p);
     }
 
     if (options.xml()) {
       System.out.print(cu.XMLtoString(cu.ASTtoXML()));
-    } else if (options.pretty()) {
-      log("Pretty Printing");
+      return;
+    }
 
-      //NOTE: This might be fragile, what if Program nodes are removed?
-      if (options.od().length() > 0) {
+    if (options.pretty()) {
+      log("Pretty printing");
+      
+      if (options.od().length() == 0) {
+        System.out.println(cu.getPrettyPrinted());
+      } else {
         File outputDir = new File(options.od());
         try {
           if (!outputDir.exists() && !outputDir.mkdirs()) {
@@ -231,26 +180,21 @@ public class Main
           System.err.println(e);
           System.exit(1);
         }
-        FileWriter outFile;
-        String fileName;
-        for (int i = 0; i < fileNames.size(); i++) {
-          fileName = new File(fileNames.get(i)).getName();
+        for (Map.Entry<String, Program> entry : programMap.entrySet()) {
+          File outputFile = new File(outputDir, new File(entry.getKey()).getName());
           try {
-            outFile = new FileWriter(new File(outputDir, fileName));
-            outFile.write(cu.getProgram(i).getPrettyPrinted());
-            outFile.close();
-          } catch(IOException e ) {
-            System.err.println("Problem writing to file " + new File(outputDir, fileName));
+            Files.write(entry.getValue().getPrettyPrinted(), outputFile, Charsets.UTF_8);
+          } catch (IOException e) {
+            System.err.println("Problem writing to file " + outputFile);
             System.err.println(e);
             System.exit(1);
           }
         }
-      } else {
-        System.out.println(cu.getPrettyPrinted());
       }
+      return;
     }
-    else if( options.vfpreorder() ){
 
+    if (options.vfpreorder()) {
       DefinitelyAssignedAnalysis a = new DefinitelyAssignedAnalysis( cu );
       a.analyze();
       /*
@@ -331,18 +275,14 @@ public class Main
       System.out.println( f2.compareTo(f3) );
       System.out.println( (new DirectoryFileFilter()).accept(f2) );
       System.out.println( (new DirectoryFileFilter()).accept(f3) );
-
-
     }
   }
 
-  /*  
-   *  
-   * This function computes dependence information on a bunch of files in a directory or on a single file..
-   * 
+  /* 
+   * This function computes dependence information on a bunch of files
+   * in a directory or on a single file.
    */ 
-
-  private static void dependenceAnalyzerOptions(Options options,String name){ //name is the directory name for dir option.
+  private static void dependenceAnalyzerOptions(String name) {
     System.err.println("Dependence Analysis");  
     if(options.dir()){	  
       File file = new File(name);	
@@ -350,8 +290,8 @@ public class Main
       if(exists){
         String[] fileName=file.list();
         for(int i=0;i<fileName.length;i++){
-          if(!fileName[i].startsWith("drv") && fileName[i].endsWith(".m")){    			  
-            ArrayList errors=new ArrayList();
+          if(!fileName[i].startsWith("drv") && fileName[i].endsWith(".m")) {
+            List<CompilationProblem> errors = Lists.newArrayList();
             Reader fileReader = new StringReader("");
             fileReader=Parse.translateFile(name + "/" + fileName[i],errors);
             Program prog = Parse.parseFile(name +"/" + fileName[i],  fileReader, errors );	
@@ -386,7 +326,7 @@ public class Main
                 hDriver.setDirName("Dep"+name);
                 hDriver.parseXmlFile();
               }
-              else{
+              else {
                 System.out.println("Heuristic Engine:InComplete information Data file not present");    					
               }	  
             }//end of if*/
@@ -398,48 +338,40 @@ public class Main
     				  mDriver.checkFiles(prog,false); 
     				  //System.out.println(prog.getPrettyPrinted());
     			   }//end of if */ 
-          }//end of if
-        }//end of for  	  
-      }//end of if      
+          }
+        }
+      }
       System.exit(0);
-    }//end of if 
+    }
 
-    if(options.prof()){ //This is the option when dependence calculation needs to be done on a single file
-      ArrayList errors=new ArrayList();
-      Reader fileReader = new StringReader("");
-      fileReader=Parse.translateFile(name ,errors);
-      Program prog = Parse.parseFile(name ,  fileReader, errors );  
-      if(prog!=null){
-        System.out.println("Profiling in file");	
+    if (options.prof()) {
+      List<CompilationProblem> errors = Lists.newArrayList();
+      Program program = Parse.parseMatlabFile(name, errors);
+      if (program != null) {
+        log("Profiling in file");	
         ProfilerDriver pDriver=new ProfilerDriver();
         StringTokenizer st = new StringTokenizer(name,".");
         String dirName=st.nextToken();
         pDriver.setDirName("Dep"+dirName);
         pDriver.setFileName(name);
-        pDriver.traverseFile(prog);      
-        pDriver.generateInstrumentedFile(prog);
-      }//end of if
-    }//end of if
-
-    if(options.heur()){
-      ArrayList errors=new ArrayList();
-      Reader fileReader = new StringReader("");
-      StringTokenizer st = new StringTokenizer(name,".");
-      String dirName=st.nextToken();
-      fileReader=Parse.translateFile(name ,errors);
-      Program prog = Parse.parseFile( name ,  fileReader, errors );
-      System.out.println("heuristic engine");
-      File file = new File("Dep"+dirName+"/"+name+".xml");	
-      boolean exists = file.exists();      
-      if(exists){ //this step will generate rangeData.xml 
-        HeuristicEngineDriver hDriver=new HeuristicEngineDriver(name+".m");
-        hDriver.parseXmlFile();
+        pDriver.traverseFile(program);      
+        pDriver.generateInstrumentedFile(program);
       }
-      else{
-        System.out.println("Heuristic Engine:InComplete information Data file not present");
+    }
+
+    if (options.heur()) {
+      StringTokenizer st = new StringTokenizer(name,".");
+      String dirName = st.nextToken();
+      log("heuristic engine");
+      File file = new File("Dep"+dirName+"/"+name+".xml");
+      if (file.exists()) { //this step will generate rangeData.xml 
+        HeuristicEngineDriver hDriver = new HeuristicEngineDriver(name + ".m");
+        hDriver.parseXmlFile();
+      } else {
+        System.err.println("Heuristic Engine:InComplete information Data file not present");
         return;
-      }	  
-    }//end of if*/
+      }
+    }
 
     /*if(options.rda()){
 	  ArrayList errors=new ArrayList();
@@ -464,10 +396,7 @@ public class Main
    }*/  
     //cal = Calendar.getInstance();        
     //System.out.println(cal.getTime());
-    System.exit(0);
-
-  }//end of function
-
+  }
 
   /*
    * This program serves as a driver program for LoopAnalysis and Transformation framework.
