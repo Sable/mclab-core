@@ -21,53 +21,39 @@
 
 package natlab;
 
-import natlab.options.Options;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TreeMap;
 
-//import natlab.toolkits.analysis.ForVisitor;
-import ast.*;
-import natlab.server.*;
-import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
+import natlab.options.Options;
+import natlab.server.HeartBeatFlag;
+import natlab.server.HeartBeatTask;
+import natlab.server.XMLCommandHandler;
 import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
 import natlab.toolkits.DependenceAnalysis.McFlatDriver;
-import natlab.toolkits.DependenceAnalysis.Profiler;
-import natlab.toolkits.analysis.ForVisitor;
-
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
-import natlab.toolkits.analysis.example.*;
-import natlab.toolkits.analysis.test.*;
-import natlab.toolkits.analysis.handlepropagation.*;
-import natlab.toolkits.analysis.callgraph.*;
-import natlab.example.*;
-import natlab.toolkits.rewrite.multireturn.*;
-import natlab.toolkits.rewrite.threeaddress.*;
-import natlab.toolkits.scalar.AbstractFlowAnalysis;
-import natlab.toolkits.analysis.isscalar.*;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
-import natlab.refactoring.*;
-
-import natlab.toolkits.rewrite.Validator;
-
-import natlab.VersionInfo;
-import natlab.toolkits.filehandling.*;
-
-/*import matlab.MatlabParser;
-import matlab.TranslationProblem;
-import matlab.OffsetTracker;
-import matlab.TextPosition;*/
-import matlab.*;
-import matlab.MatlabParser.program_return;
-
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
-import java.util.prefs.Preferences;
-
 import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
- 
+import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
+import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.filehandling.DirectoryFileFilter;
+import ast.CompilationUnits;
+import ast.Program;
 
+import com.google.common.collect.Lists;
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -82,26 +68,17 @@ public class Main
     private static final long HEART_RATE = 4000; //in milliseconds
     private static final long HEART_DELAY = 5000; //delay till first heart beat check is made
     
-    
     /**
      * Main method deals with command line options and execution of
      * desired functions.
      */
     public static void main(String[] args) throws Exception
     {	
-
-     // natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
-       // System.exit(0);
-
-        //natlab.toolkits.analysis.functionhandle.TestAnalysis.main(args);
-        //System.exit(0);
-
         boolean quiet; //controls the suppression of messages
-        ArrayList errors = new ArrayList();
+        List<CompilationProblem> errors = Lists.newArrayList();
         options = new Options();
         
-        if( processCmdLine( args ) ){
-            
+        if (processCmdLine(args)) {
             if( options.help() ){
                 System.err.println(options.getUsage());
             }
@@ -116,21 +93,6 @@ public class Main
                     if( !quiet )
                         System.err.println("dynamic linking");
                 }
-		
-                //fortran neither uses the below parser, nor is a server
-/*                if( options.fortran() ){ //begin fortran
-                    //if( options.getFiles().size() == 0 ){
-                    //    System.err.println("No files provided, must have at least one file.");
-                    //    System.exit(1);
-                    //}
-                    //System.out.println("compiling to fortran "+options.getFiles());
-                    //String[] fargs = {"-d",(String)options.getFiles().get(0)};
-                    //System.out.println("calling McFor with "+fargs);
-                    natlab.tame.mc4.Mc4.main(args);
-                    return;
-                } //end fortran
-*/                
-                
                 
                 //setting and getting of preferences
                 if (options.show_pref()){
@@ -322,10 +284,6 @@ public class Main
                             
                             if( parsing ) {
                                 if( options.matlab() ){
-                                    /*if( !quiet )
-                                      System.err.println(" translating ");
-                                      source = translateFile( fileName, source, serverErrors );
-                                    */
                                     if( serverErrors.size() > 0 ){
                                         String serverEstr="";
                                         if( !quiet )
@@ -722,121 +680,22 @@ private static void dependenceAnalyzerOptions(Options options,String name){ //na
 		return;
 	  }	  
   }//end of if*/
-  
-  /*if(options.rda()){
-	  ArrayList errors=new ArrayList();
-	  Reader fileReader = new StringReader("");
-	  fileReader=translateFile(name,errors);
-	  Program prog = parseFile( name,  fileReader, errors );
-	  System.out.println("Runtime dependence analysis");
-	  parseProgramNode(prog,name,true);	    
-   }//end of if*/  
-  
-  /*if(options.sda()){
-	  System.out.println("Compiletime dependence analysis");
-	  ArrayList errors=new ArrayList();
-	  Reader fileReader = new StringReader("");
-	  fileReader=translateFile(name ,errors);
-	  Program prog = parseFile(name ,  fileReader, errors );
-	  McFlatDriver mDriver=new McFlatDriver();
-	  mDriver.setDirName("Dep"+name);//this sets the directory name where all files will be placed after dependence calculation.
-	  mDriver.setFileName(name);
-	  mDriver.checkFiles(prog,false);  
-	  //parseProgramNode(prog,fileName,false);	    
-   }*/  
-  //cal = Calendar.getInstance();        
-  //System.out.println(cal.getTime());
+ 
   System.exit(0);
      
  }//end of function
-    
-    
-    /*
-     * This program serves as a driver program for LoopAnalysis and Transformation framework.
-     * 1.It instruments the input .m File.
-     * 2.Then invokes the heuristicEngine to determine appropriate range values.
-     * 3.Invokes dependence Analysis Driver and applies transformations on the loops if applicable.
-     * 4.Then writes the transformed code to a new file.
-     * 
-     */
-/*private static void parseProgramNode(Program prog,String testType,String fileName){
-	
-    	ProfilerDriver pDriver=new ProfilerDriver();
-    	pDriver.setFileName(fileName);
-    	pDriver.traverseFile(prog);
-        //ForVisitor forVisitor = new ForVisitor();
-        //forVisitor.setProfDriver(pDriver);
-        //prog.apply(forVisitor);
-        pDriver.generateInstrumentedFile(prog);
-        
-    	HeuristicEngineDriver hDriver=new HeuristicEngineDriver(fileName);
-		hDriver.parseXmlFile();		
-        
-		
-		DependenceAnalysisDriver dDriver=new DependenceAnalysisDriver();
-		dDriver.setFileName(fileName);
-		String fName=dDriver.getFileName();
-		dDriver.setPredictedLoopValues(hDriver.getTable());		
-		ArrayList errors = new ArrayList();
-		  try{
-              Reader fileReader = new FileReader( fName);
-              Program program = parseFile( fName,  fileReader, errors );             
-      		  dDriver.traverseFile(program);	
-          }catch(FileNotFoundException e){
-              System.err.println("File "+fName+" not found!\nAborting");
-              System.exit(1);
-          }
-          
-          //TODO:Put a check that if there is no change prog node then dont write to the file
-         /* Writer output; 
-          StringTokenizer st = new StringTokenizer(fName,".");
-      	  String fiName=st.nextToken();
-          File file = new File(fiName+"/"+"transformed"+ fiName + ".m");
-          try {
-			  output = new BufferedWriter(new FileWriter(file));
-			  output.write(prog.getPrettyPrinted());
-	          output.close();
-		   } catch (IOException e) {			  
-			  e.printStackTrace();
-		 } */  	
-		   
-	    //Reader fileReader = new StringReader(fName);
-	    //ArrayList errors = new ArrayList();
-	    //System.out.println( fName );
-	    //fileReader=translateFile(fName,errors);
-		//Program program = parseFile( fName,  fileReader, errors );
-		//System.out.println(program.dumpTreeAll());
-		//dDriver.traverseFile(program);	
-        
-        //pDriver.traverseProgram(fileName); 
-        //System.out.println(prog.getPrettyPrinted());
-    	
-    	
-    	
-    	//Profiler prof =new Profiler();
-    	//prof.setProg(prog);
-    	//prof.setFileName(fileName);
-    	//System.out.println(prog.dumpTreeAll());
-    	//prof.changeAST();
-    	//ProfilerDriver profDriver =new ProfilerDriver(prog);
-    	//profDriver.traverseProgram();
-    //}
-    
-    private static boolean processCmdLine(String[] args)
-    {
-        try{
-            options.parse( args );
-            
-            if( args.length == 0 ){
-                System.err.println("No options given\n" +
-                                   "Try -help for usage");
-                return false;
-            }
-            return true;
-        }catch( NullPointerException e ){
-            System.err.println("options variable not initialized");
-            throw e;
-        }
+
+  private static boolean processCmdLine(String[] args) {
+    if (args.length == 0) {
+      System.err.println("No options given\nTry -help for usage");
+      return false;
     }
-    
+    try {
+      options.parse( args );
+      return true;
+    } catch (NullPointerException e) {
+      System.err.println("options variable not initialized");
+      throw e;
+    }
+  }
 }
