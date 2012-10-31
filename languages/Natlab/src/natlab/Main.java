@@ -44,11 +44,7 @@ public class Main {
   private static Options options;
 
   private static void log(String message) {
-    logIf(true, message);
-  }
-
-  private static void logIf(boolean condition, String message) {
-    if (!options.quiet() && condition) {
+    if (!options.quiet()) {
       System.err.println(message);
     }
   }
@@ -62,15 +58,13 @@ public class Main {
       System.err.println("No options given\nTry -help for usage");
       return;
     }
+
     options = new Options();
     options.parse(args);
     if (options.help()) {
       System.err.println(options.getUsage());
       return;
     }
-
-    logIf(options.e(), "exhaustive list");
-    logIf(options.d(), "dynamic linking");
 
     if (options.show_pref()) {
       System.out.println("Preferences:");
