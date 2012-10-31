@@ -1,15 +1,12 @@
 package natlab.toolkits.utils;
 
 import java.util.List;
-import java.util.Map;
 
 import natlab.refactoring.AbstractNodeFunction;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
-import ast.EmptyStmt;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class NodeFinder {
   public static <T extends ASTNode<?>> List<T> find(ASTNode<?> n, final Class<T> type) {
@@ -53,25 +50,5 @@ public class NodeFinder {
         }
       }
     }.caseASTNode(n);
-  }
-
-  public static Map<ASTNode<?>, Integer> nodeCount(ASTNode<?> t) {
-    final Map<ASTNode<?>, Integer> res = Maps.newHashMap();
-    new AbstractNodeCaseHandler() {
-      int count = 0;
-      public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode n) {
-        int before = count;
-        if (n instanceof EmptyStmt) {
-          res.put(n, 0);
-          return;
-        }
-        count++;
-        for (int i = 0; i < n.getNumChild(); i++) {
-          caseASTNode(n.getChild(i));
-        }
-        res.put(n, count - before);
-      }
-    }.caseASTNode(t);
-    return res;
   }
 }
