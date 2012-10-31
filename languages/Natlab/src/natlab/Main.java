@@ -27,9 +27,6 @@ import java.util.List;
 import natlab.options.Options;
 import natlab.tame.TamerTool;
 import natlab.toolkits.DependenceAnalysis.DependenceAnalysisTool;
-import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
-import natlab.toolkits.analysis.test.ReachingDefs;
-import natlab.toolkits.filehandling.DirectoryFileFilter;
 import ast.CompilationUnits;
 import ast.Program;
 
