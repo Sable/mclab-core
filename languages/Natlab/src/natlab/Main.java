@@ -66,16 +66,17 @@ public class Main {
       return;
     }
 
+    if (options.pref()) {
+      NatlabPreferences.modify(options);
+      return;
+    }
+
     if (options.show_pref()) {
       System.out.println("Preferences:");
       System.out.println(Joiner.on('\n').withKeyValueSeparator(" = ")
           .join(NatlabPreferences.getAllPreferences()));
     }
 
-    if (options.pref()) {
-      NatlabPreferences.modify(options);
-      return;
-    }
 
     if (options.version()) {
       System.out.println("The version of this release is: " + VersionInfo.getVersion());
