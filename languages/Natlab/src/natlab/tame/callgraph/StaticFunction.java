@@ -18,14 +18,11 @@
 
 package natlab.tame.callgraph;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.simplification.ThreeAddressToIR;
 import natlab.tame.tir.TIRFunction;
-import natlab.toolkits.BiMap;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
@@ -40,6 +37,9 @@ import natlab.toolkits.rewrite.simplification.CommentSimplification;
 import ast.Function;
 import ast.FunctionList;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 /**
  * 
  * This represents a static function, as stored in a SimpleFunctionCollection Object.
@@ -53,7 +53,7 @@ public class StaticFunction implements Cloneable {
     Function function; //ast tree
     FunctionReference reference; //reference to this function
     String name;
-    HashSet<String> siblings; //TODO - make these a hashmap<string,StaticFunction>
+    Set<String> siblings; //TODO - make these a hashmap<string,StaticFunction>
     Context context;
 
     /**
@@ -64,7 +64,7 @@ public class StaticFunction implements Cloneable {
      *- either because it doesn't exist, or because it is only overloaded,
      *  or is a variable coming from a script
      */
-    BiMap<String,FunctionReference> calledFunctions; 
+    Map<String,FunctionReference> calledFunctions;
     
 
     /**
@@ -78,12 +78,12 @@ public class StaticFunction implements Cloneable {
     public StaticFunction(Function function, FunctionReference reference, Context context) {
         this.function = function.fullCopy();
         this.reference = reference;
-        this.calledFunctions = new BiMap<String,FunctionReference>();
+        this.calledFunctions = Maps.newHashMap();
         this.name = function.getName();
         this.context = context;
         
         //set siblings
-        siblings = new HashSet<String>(function.getSiblings().keySet());
+        siblings = Sets.newHashSet(function.getSiblings().keySet());
         
         //transform to IR
         transformToIR();
@@ -99,9 +99,9 @@ public class StaticFunction implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
-        f.calledFunctions = new BiMap<String,FunctionReference>(getCalledFunctions());
+        f.calledFunctions = Maps.newHashMap(getCalledFunctions());
         f.function = function.fullCopy();
-        f.siblings = new HashSet<String>(siblings);
+        f.siblings = Sets.newHashSet(siblings);
         return f;
     }
     
@@ -109,7 +109,7 @@ public class StaticFunction implements Cloneable {
     private void findAndResolveFunctions(){
         //perform variable or function analysis on function and get result
         VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,this.context.getFunctionOrScriptQuery());
-        functionAnalysis.analyze();        
+        functionAnalysis.analyze();
         VFFlowset flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
         
@@ -158,7 +158,7 @@ public class StaticFunction implements Cloneable {
     
     
     //getter methods
-    public BiMap<String,FunctionReference> getCalledFunctions(){ return calledFunctions; }
+    public Map<String,FunctionReference> getCalledFunctions(){ return calledFunctions; }
     public String getName(){ return name; }
     public Function getAst(){ return function; }
     public FunctionReference getReference(){ return reference; }
@@ -172,8 +172,7 @@ public class StaticFunction implements Cloneable {
      * Note: in order to inline multiple functions, use inline(Map<FunctionReference, StaticFunction>)
      */
     public void inline(StaticFunction other){
-        HashMap<FunctionReference,StaticFunction> map = 
-            new HashMap<FunctionReference,StaticFunction>();
+        Map<FunctionReference,StaticFunction> map = Maps.newHashMap();
         map.put(other.reference, other);
         inline(map);
     }
@@ -184,7 +183,7 @@ public class StaticFunction implements Cloneable {
      * and which are called from this function
      */
     public void inline(Map<FunctionReference, StaticFunction> map){
-    	HashMap<String, Function> inlinerMap = new HashMap<String,Function>();
+    	Map<String, Function> inlinerMap = Maps.newHashMap();
     	
     	System.out.println("inlining everything in "+name);
     	
@@ -212,12 +211,6 @@ public class StaticFunction implements Cloneable {
     	        for (String name : inlinerMap.keySet()){
     	            calledFunctions.remove(name);
     	        }
-    	        
-    	        
-    	        //for (String name : calledFunctions.getKeys(ref)){
-    	        //    //put it in the inline list
-    	        //    inlinerMap.put(name, otherFunction.function);
-    	        //}
     		}
     	}
 
@@ -269,8 +262,8 @@ public class StaticFunction implements Cloneable {
      */
     public void mergeSymbols(StaticFunction otherFunction,String prefix){
         //the rename maps for both functions
-        HashMap<String,String> renameOther = new HashMap<String,String>();
-        HashMap<String,String> renameThis = new HashMap<String,String>();
+        Map<String, String> renameOther = Maps.newHashMap();
+        Map<String, String> renameThis = Maps.newHashMap();
 
         Set<String> symbols = function.getSymbols();
         Set<String> otherSymbols = otherFunction.function.getSymbols();
