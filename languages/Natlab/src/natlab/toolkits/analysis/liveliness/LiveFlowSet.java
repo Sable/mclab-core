@@ -1,19 +1,21 @@
 package natlab.toolkits.analysis.liveliness;
 
-import java.util.*;
-import analysis.*;
-import analysis.natlab.*;
-import natlab.toolkits.analysis.*;
+import java.util.Iterator;
+import java.util.Set;
+
+import natlab.toolkits.analysis.FlowSet;
+
+import com.google.common.collect.Sets;
 
 public class LiveFlowSet implements FlowSet<String> {
 	Set<String> set;
 	
 	public LiveFlowSet(){
-		set = new HashSet<String>();
+		set = Sets.newHashSet();
 	}
 	
 	public LiveFlowSet(LiveFlowSet old){
-		set = new HashSet<String>(old.set);
+		set = Sets.newHashSet(old.set);
 	}
 	
 	@Override
@@ -23,7 +25,7 @@ public class LiveFlowSet implements FlowSet<String> {
 
 	@Override
 	public void clear() {
-		set.clear();		
+		set.clear();
 	}
 
 	@Override
@@ -61,5 +63,4 @@ public class LiveFlowSet implements FlowSet<String> {
 	public int size() {
 		return set.size();
 	}
-
 }
