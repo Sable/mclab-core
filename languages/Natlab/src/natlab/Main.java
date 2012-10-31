@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.List;
 
 import natlab.options.Options;
-import natlab.server.NatlabServer;
 import natlab.tame.TamerTool;
 import natlab.toolkits.DependenceAnalysis.DependenceAnalysisTool;
 import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
