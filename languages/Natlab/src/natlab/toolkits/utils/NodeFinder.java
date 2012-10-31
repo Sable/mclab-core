@@ -1,7 +1,5 @@
 package natlab.toolkits.utils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +8,14 @@ import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.EmptyStmt;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 public class NodeFinder {
-  public static <T extends ASTNode> List<T> find(ASTNode n, final Class<T> type) {
-    final List<T> res = new LinkedList<T>();
+  public static <T extends ASTNode<?>> List<T> find(ASTNode<?> n, final Class<T> type) {
+    final List<T> res = Lists.newLinkedList();
     new AbstractNodeCaseHandler() {
-      public void caseASTNode(ASTNode n) {
+      public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode n) {
         if (type.isInstance(n)) {
           res.add(type.cast(n));
         }
@@ -30,7 +31,7 @@ public class NodeFinder {
    * Walks up the tree to find a parent of the specified type.
    * Returns null if no such parent exists.
    */
-  public static <T extends ASTNode> T findParent(ASTNode n, Class<T> type) {
+  public static <T extends ASTNode<?>> T findParent(ASTNode<?> n, Class<T> type) {
     while (n != null && (!type.isInstance(n))) {
       n = n.getParent();
     }
@@ -40,10 +41,10 @@ public class NodeFinder {
     return null;
   }
 
-  public static <T extends ASTNode> void apply(final ASTNode n, final Class<T> type,
+  public static <T extends ASTNode<?>> void apply(final ASTNode<?> n, final Class<T> type,
       final AbstractNodeFunction<T> func) {
     new AbstractNodeCaseHandler() {
-      public void caseASTNode(ASTNode n) {
+      public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode n) {
         if (type.isInstance(n)) {
           func.apply(type.cast(n));
         }
@@ -54,11 +55,11 @@ public class NodeFinder {
     }.caseASTNode(n);
   }
 
-  public static Map<ASTNode, Integer> nodeCount(ASTNode t) {
-    final Map<ASTNode, Integer> res = new HashMap<ASTNode, Integer>();
+  public static Map<ASTNode<?>, Integer> nodeCount(ASTNode<?> t) {
+    final Map<ASTNode<?>, Integer> res = Maps.newHashMap();
     new AbstractNodeCaseHandler() {
       int count = 0;
-      public void caseASTNode(ASTNode n) {
+      public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode n) {
         int before = count;
         if (n instanceof EmptyStmt) {
           res.put(n, 0);
