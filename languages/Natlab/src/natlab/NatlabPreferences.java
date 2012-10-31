@@ -89,7 +89,7 @@ public class NatlabPreferences {
     putLongString(MATLAB_PATH_KEY, path);
   }
 
-  private static String getMatlabPath(){
+  public static String getMatlabPath(){
     return getLongString(MATLAB_PATH_KEY, MATLAB_PATH_DEFAULT);
   }
 
@@ -97,7 +97,7 @@ public class NatlabPreferences {
     putLongString(NATLAB_PATH_KEY,path);
   }
 
-  private static String getNatlabPath() {
+  public static String getNatlabPath() {
     return getLongString(NATLAB_PATH_KEY, NATLAB_PATH_DEFAULT);
   }
 
