@@ -26,7 +26,7 @@ public class ValueDatumPair< V, D >
     }
     public boolean equals( Object o )
     {
-        return value.equals( ((ValueDatumPair)o).getValue() );
+        return value.equals( ((ValueDatumPair<?,?>)o).getValue() );
     }
 
     public int hashCode()
@@ -41,12 +41,8 @@ public class ValueDatumPair< V, D >
         return new ValueDatumPair<V,D>( value, datum);
     }
 
-    public static <A> String toString(Object v, A d){
-        return "< " + v.toString() + ", " + d.toString() + " >";
-    }
     public String toString()
     {
-        return toString( value, datum );
+      return String.format("<%s, %s>", value, datum);
     }
-        
 }

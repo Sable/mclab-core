@@ -1,6 +1,13 @@
 package natlab.toolkits.analysis;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of the FlowSet based on HashSets.
@@ -15,7 +22,7 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
      * Creates a new HashSet.
      */
     public HashSetFlowSet(){
-        set = new HashSet<D>();
+        set = Sets.newHashSet();
     }
 
     /**
@@ -30,13 +37,12 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
      */
     public HashSetFlowSet<D> copy()
     {
-        HashSet<D> copySet = new HashSet<D>(set);
-        return new HashSetFlowSet<D>( copySet );
+        return new HashSetFlowSet<D>(Sets.newHashSet(set));
     }
     
     public HashSetFlowSet<D> emptySet()
     {
-        return new HashSetFlowSet<D>(new HashSet<D>());
+        return new HashSetFlowSet<D>(Sets.<D>newHashSet());
     }
 
     /**
@@ -77,10 +83,7 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
     }
     public List<D> toList()
     {
-        List<D> list = new ArrayList<D>( set.size() );
-        for( D i : set )
-            list.add( i );
-        return list;
+        return Lists.newArrayList(set);
     }
 
     /**
@@ -90,19 +93,24 @@ public class HashSetFlowSet<D> extends AbstractFlowSet<D>
      */
     public Set<D> getSet()
     {
-        return new HashSet<D>( this.set );
+        return Sets.newHashSet(set);
     }
+    
+    @Override
     public Iterator<D> iterator()
     {
         return set.iterator();
     }
 
+    @Override
     public boolean equals(Object o){
         if( o instanceof HashSetFlowSet )
-            return set.equals( ((HashSetFlowSet)o).set );
+            return set.equals( ((HashSetFlowSet<?>)o).set );
         else
             return super.equals(o);
     }
+    
+    @Override
     public int hashCode() {
         return set.hashCode();
     }

@@ -19,14 +19,18 @@ public class DataPair< K, V >
     {
         return key;
     }
+    
+    @Override
     public boolean equals( Object o )
     {
         try{
-            return key.equals( ((DataPair)o).getKey() );
+            return key.equals( ((DataPair<?,?>)o).getKey() );
         }catch( Exception e){
             return false;
         }
     }
+    
+    @Override
     public int hashCode()
     {
         return key.hashCode();
@@ -44,12 +48,9 @@ public class DataPair< K, V >
         return new DataPair<K,V>( key, value );
     }
 
-    public static String toString(Object k, Object v){
-        return "< " + k.toString() + ", " + v.toString() + " >";
-    }
+    @Override
     public String toString()
     {
-        return toString( key, value );
+        return String.format("<%s, %s>", key, value);
     }
-        
 }

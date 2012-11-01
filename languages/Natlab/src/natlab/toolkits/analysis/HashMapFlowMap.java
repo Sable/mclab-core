@@ -19,8 +19,9 @@
 package natlab.toolkits.analysis;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
+
+import com.google.common.collect.Maps;
 /**
  * A {@link FlowMap} implementation based on a {@link
  * HashMap}. Operations are created to take advantage of the
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
 {
-    Map<K,V> map = new HashMap<K,V>();
+    Map<K,V> map = Maps.newHashMap();
 
     public HashMapFlowMap( Merger<V> m){
         super(m);
@@ -39,20 +40,9 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
         super();
     }
 
-    // Some private helper constructors
-    private HashMapFlowMap( Map<K,V> map ){
-        super();
-        setMap( new HashMap<K,V>(map) );
-    }
-
-    private HashMapFlowMap( Merger<V> m, Map<K,V> map ){
-        super(m);
-        setMap( new HashMap<K,V>(map) );
-    }
-
     private HashMapFlowMap( HashMapFlowMap<K,V> hmfm ){
         super();
-        setMap( new HashMap<K,V>(hmfm.getMap()) );
+        setMap(Maps.newHashMap(hmfm.getMap()) );
         setMerger( hmfm.getMerger() );
     }
       
@@ -68,7 +58,7 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
      * Setter for the underlying map. This is private because it
      * should only be used internally.
      */
-    private void setMap(HashMap<K,V> map)
+    private void setMap(Map<K,V> map)
     {
         this.map = map;
     }
@@ -83,11 +73,8 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
     public void copy(FlowMap<K,V> dest)
     {
         if( dest instanceof HashMapFlowMap ){
-            // suppress unchecked warnings is legal because the map is
-            // a HashMapFlowMap and a FlowMap<K,V> so must be a HashMapFlowMap<K,V>
-            @SuppressWarnings("unchecked")
             HashMapFlowMap<K,V> hmDest = (HashMapFlowMap<K,V>)dest;
-            hmDest.setMap( new HashMap<K,V>(getMap()) );
+            hmDest.setMap(Maps.newHashMap(getMap()) );
             hmDest.setMerger(getMerger());
         }
         else
@@ -143,19 +130,19 @@ public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
     @Override
     public HashMapFlowMap<K,V> emptyMap()
     {
-        return new HashMapFlowMap();
+        return new HashMapFlowMap<K, V>();
     }
 
     @Override
     public boolean equals(Object o){
     	if (o!=null && (o instanceof HashMapFlowMap))
-    		return ((HashMapFlowMap)o).map.equals(map);
+    		return ((HashMapFlowMap<?,?>)o).map.equals(map);
     	return false;
     }
     
     
     public Map<K, V> toMap(){
-    	return new HashMap<K, V>(map);
+    	return Maps.newHashMap(map);
     }
     
     @Override

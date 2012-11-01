@@ -18,7 +18,12 @@
 
 package natlab.toolkits.analysis;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * An abstract implementation of {@link FlowMap} intended to make new
@@ -189,14 +194,12 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      * null. If any argument is null, an IllegalArgumentException is
      * thrown. 
      *
-     * @throws IllegalArgumentException If any of the arguments are null
+     * @throws NullPointerException If any of the arguments are null
      */
     private void checkMergeInput( Merger<V> m, FlowMap<K,V>... maps )
     {
-        if( m == null )
-            throw new IllegalArgumentException("Null merger was given as input");
-        else
-            checkMergeInput(maps);
+        Preconditions.checkNotNull(m);
+        checkMergeInput(maps);
     }
     /**
      * Checks if the input to one of the merge operations is
@@ -208,8 +211,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      */
     private void checkMergeInput( FlowMap<K,V>... maps )
     {
-        if( anyNull( maps ))
-            throw new IllegalArgumentException("Input FlowMap was null");
+        Preconditions.checkArgument(!anyNull(maps), "Input FlowMap was null");
     }
 
     /**
@@ -226,6 +228,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      *
      * @throws ClassCastException If merging cannot be done
      */
+    @SuppressWarnings("unchecked")
     public void union(FlowMap<K,V> other){
         checkMergeInput( other );
         if( other == this )
@@ -252,6 +255,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      *
      * @throws ClassCastException If merging cannot be done
      */
+    @SuppressWarnings("unchecked")
     public void union(FlowMap<K,V> other, FlowMap<K,V> dest){
         checkMergeInput( other, dest );
         if( other == dest && other == this )
@@ -274,13 +278,13 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      * the two values. The given {@link Merger} is used to perform the
      * merge operation. 
      */
+    @SuppressWarnings("unchecked")
     public void union(Merger<V> m, FlowMap<K,V> other){
         checkMergeInput( m, other );
         if( this == other )
             return;
-        else
-            for( K key : other.keySet() )
-                mergePut( m, key, other.get(key) );
+        for( K key : other.keySet() )
+            mergePut( m, key, other.get(key) );
     }
     /**
      * Unions {@code other} and {@code this} into {@code dest}. {@code
@@ -292,11 +296,12 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      * result is the merge of the two values. The given {@link Merger}
      * is used to perform the merge operation.
      */
+    @SuppressWarnings("unchecked")
     public void union(Merger<V> m, FlowMap<K,V> other, FlowMap<K,V> dest){
         checkMergeInput( m, other, dest );
         if( this == other && this == dest )
             return;
-        else if( this == dest )
+        if( this == dest )
             union( m, other );
         else if( other == dest )
             for( K key : keySet() )
@@ -327,6 +332,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
      *
      * @throws ClassCastException If merging cannot be done
      */
+    @SuppressWarnings("unchecked")
     public void intersection(FlowMap<K,V> other){
         checkMergeInput( other );
         if( other == this )
@@ -338,6 +344,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
             intersection( m, other );
         }
     }
+    @SuppressWarnings("unchecked")
     public void intersection(FlowMap<K,V> other, FlowMap<K,V> dest){
         checkMergeInput( other, dest );
         if( other == dest && other == this )
@@ -361,8 +368,8 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
         if( m1 == m2 )
             return;
         else{
-            List<K> keysToRemove = new LinkedList<K>();
-            List<K> keysToMerge = new LinkedList<K>();
+            List<K> keysToRemove = Lists.newLinkedList();
+            List<K> keysToMerge = Lists.newLinkedList();
             for( K key : m2.keySet() )
                 if( !m1.containsKey( key ) )
                     keysToRemove.add( key );
@@ -374,6 +381,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void intersection(Merger<V> m, FlowMap<K,V> other){
         checkMergeInput( m, other );
         if( this == other )
@@ -383,6 +391,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void intersection(Merger<V> m, FlowMap<K,V> other, FlowMap<K,V> dest){
         checkMergeInput( m, other, dest );
         if( other == dest && other == this )

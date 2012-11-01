@@ -1,10 +1,11 @@
 package natlab.toolkits.analysis;
-/**
- * Adapted from soot.toolkits.scalar.AbstractFlowSet.java
- */
 
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * Provides functional code for most of the methods. Subclasses are invited to
@@ -22,8 +23,6 @@ import java.util.*;
  */
 public abstract class AbstractFlowSet<D> implements FlowSet<D>
 {
-
-
     @Override public AbstractFlowSet<D> copy()
     {
         AbstractFlowSet<D> theCopy = emptySet();
@@ -31,13 +30,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         return theCopy;
     }
     
-    
     abstract public AbstractFlowSet<D> emptySet();
-    /*public AbstractFlowSet<D> emptySet() {
-        AbstractFlowSet<D> t = copy();
-        t.clear();
-        return t;
-        }*/
     
     public void copy(FlowSet<? super D> dest) {
     	if (this == dest) return;
@@ -51,7 +44,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
      * implemented, but *very* inefficient.
      */
     public void clear() {
-        List<D> data = new ArrayList<D>(size());
+        List<D> data = Lists.newArrayListWithCapacity(size());
         for( D i : this )
             data.add(i);
         for( D i : data )
@@ -65,13 +58,11 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     /**
      * @param other    set being unioned with this
      * @param dest     set where the result is put
-     * @throws IllegalArgumentException   when any argument is null
+     * @throws NullPointerException   when any argument is null
      */    
     public void union(FlowSet<? extends D> other, FlowSet<? super D> dest) {
-        if( other == null )
-            throw new IllegalArgumentException( "Null was given as other set for union." );
-        if( dest == null )
-            throw new IllegalArgumentException( "Null was given as dest set for union." );
+        Preconditions.checkNotNull(other);
+        Preconditions.checkNotNull(dest);
 
         if (dest != this && dest != other)
             dest.clear();
@@ -83,14 +74,9 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         }
         
         if (dest != other) {
-            Iterator otherIt = other.iterator();
+            Iterator<? extends D> otherIt = other.iterator();
             while (otherIt.hasNext()){
-                //otherIt is iterator from other
-                //other contains things that extend from D
-                //the elements can be safely upcast to D
-                @SuppressWarnings("unchecked")
-                    D elmnt = (D)otherIt.next();
-                dest.add(elmnt);
+                dest.add((D) otherIt.next());
             }
         }
     }
@@ -101,13 +87,11 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     /**
      * @param other    set being intersected with this
      * @param dest     set where the result is put
-     * @throws IllegalArgumentException   when any argument is null
+     * @throws NullPointerException   when any argument is null
      */
     public void intersection(FlowSet<? extends D> other, FlowSet<? super D> dest) {
-        if( other == null )
-            throw new IllegalArgumentException( "Null was given as other set for intersection." );
-        if( dest == null )
-            throw new IllegalArgumentException( "Null was given as dest set for intersection." );
+        Preconditions.checkNotNull(other);
+        Preconditions.checkNotNull(dest);
 
         if (dest == this && dest == other)
             return;
@@ -117,7 +101,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
                 dest.add( i );
         }
         else if( dest == this ){
-            List<D> toRemove = new LinkedList<D>();
+            List<D> toRemove = Lists.newLinkedList();
             for( D i : this )
                 if( other.contains( i ) )
                     toRemove.add(i);
@@ -125,7 +109,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
                 dest.remove(i);
         }
         else if( dest == other ){
-            List<D> toRemove = new LinkedList<D>();
+            List<D> toRemove = Lists.newLinkedList();
             for( D i : other )
                 if( this.contains( i ) )
                     toRemove.add(i);
@@ -152,13 +136,11 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
      *
      * @param other    set being removed from this
      * @param dest     set where the result is put
-     * @throws IllegalArgumentException   when any argument is null
+     * @throws NullPointerException   when any argument is null
      */
     public void difference(FlowSet<? extends D> other, FlowSet<? super D> dest) {
-        if( other == null )
-            throw new IllegalArgumentException( "Null was given as other set for difference." );
-        if( dest == null )
-            throw new IllegalArgumentException( "Null was given as dest set for difference." );
+        Preconditions.checkNotNull(other);
+        Preconditions.checkNotNull(dest);
 
         if (dest == this && dest == other) {
             dest.clear();
@@ -191,36 +173,23 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     public abstract int size();
     
     public abstract void add(D obj);
-    
-    /*public void add(D obj, FlowSet<? super D> dest) {
-        if (dest != this)
-            copy(dest);
-        dest.add(obj);
-    }*/
-    
+
     @Override
     public abstract boolean remove(Object obj);
-    
-    /*public boolean remove(D obj, FlowSet<? super D> dest) {
-        if (dest != this)
-            copy(dest);
-        return dest.remove(obj);
-        }*/
     
     public abstract boolean contains(Object obj);
     
     public abstract Iterator<D> iterator();
     
-    //public abstract List<D> toList();
-    
     /**
      * Assumes that if o is a FlowSet, it's contains method does
      * nothing destructive, Even if it throws an exception.
      */
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof FlowSet))
             return false;
-        FlowSet other = (FlowSet) o;
+        FlowSet<?> other = (FlowSet<?>) o;
         if (size() != other.size())
             return false;
         for( D i : this ){
@@ -239,6 +208,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         return true;
     }
     
+    @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
@@ -248,18 +218,8 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         return result;
     }
     
+    @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer("{");
-        boolean first = true;
-        for( D i : this ){
-            if( first ){
-                buffer.append( i );
-                first = false;
-            }
-            else
-                buffer.append(", " + i);
-        }
-        buffer.append("}");
-        return buffer.toString();
+        return String.format("{%s}", Joiner.on(", ").join(this));
     }
 }
