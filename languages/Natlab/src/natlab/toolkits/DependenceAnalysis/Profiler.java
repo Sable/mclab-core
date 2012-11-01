@@ -18,7 +18,6 @@
 
 package natlab.toolkits.DependenceAnalysis;
 import ast.*;
-import natlab.toolkits.analysis.ForVisitor;
 import natlab.IntNumericLiteralValue;
 import java.math.*;
 import java.util.LinkedList;

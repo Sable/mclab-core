@@ -77,7 +77,6 @@ public class Main {
           .join(NatlabPreferences.getAllPreferences()));
     }
 
-
     if (options.version()) {
       System.out.println("The version of this release is: " + VersionInfo.getVersion());
       return;

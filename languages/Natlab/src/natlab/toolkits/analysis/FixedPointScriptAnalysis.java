@@ -1,9 +1,9 @@
 package natlab.toolkits.analysis;
 
-import analysis.*;
-import analysis.natlab.*;
-import ast.*;
-import java.util.*;
+import java.util.Map;
+
+import analysis.Analysis;
+import ast.Script;
 
 /**
  * Interface for structural analysis. Note: implementations should

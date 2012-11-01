@@ -6,7 +6,7 @@
  * encountered or visited this class instantiates an object of annotated loop transformation
  * class.
  */
-package natlab.toolkits.analysis;
+package natlab.toolkits.DependenceAnalysis;
 
 import ast.Opt;
 import natlab.IntNumericLiteralValue;
@@ -23,9 +23,7 @@ import ast.Stmt;
 import ast.SwitchStmt;
 import ast.UPlusExpr;
 //import natlab.toolkits.DependenceAnalysis.SVPCTest;
-import natlab.toolkits.DependenceAnalysis.DependenceAnalysisDriver;
-import natlab.toolkits.DependenceAnalysis.HeuristicEngineDriver;
-import natlab.toolkits.DependenceAnalysis.ProfilerDriver;
+import natlab.toolkits.analysis.ASTVisitor;
 import ast.WhileStmt;
 
 //import natlab.looptransformations.LoopFusion;

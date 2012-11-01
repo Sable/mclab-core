@@ -51,7 +51,6 @@ import natlab.CompilationProblem;
 import natlab.IntNumericLiteralValue;
 import natlab.NatlabParser;
 import natlab.NatlabScanner;
-import natlab.toolkits.analysis.ForVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

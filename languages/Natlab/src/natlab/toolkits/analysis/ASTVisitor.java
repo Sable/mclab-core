@@ -9,12 +9,9 @@
 
 package natlab.toolkits.analysis;
 
-import java.util.*;
-import java.util.List;
-
-import ast.*;
-import natlab.toolkits.scalar.*;
-
+import ast.ASTNode;
+import ast.IfStmt;
+import ast.SwitchStmt;
 
 public interface ASTVisitor 
 {

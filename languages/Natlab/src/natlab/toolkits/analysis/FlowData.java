@@ -1,9 +1,5 @@
 package natlab.toolkits.analysis;
 
-import java.util.*;
-
-
-
 /**
  * Interface intended to represent flow data. This is primarily
  * intended to tag a class as representing flow data. 
@@ -12,6 +8,4 @@ import java.util.*;
  */
 public interface FlowData
 {
-
-
 }
