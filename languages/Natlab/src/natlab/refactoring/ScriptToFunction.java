@@ -72,8 +72,6 @@ public class ScriptToFunction {
 		scriptKind.analyze();
 		scriptReaching.analyze();
 		
-//		Set<String> scriptAssigned= assigned.getOutFlowSets().get(script).getSet();
-		Map<String, VFDatum> kindScriptResult = scriptKind.getFlowSets().get(script).getMap();
 		Set<String> scriptLiveVars = live.getOutFlowSets().get(script).getSet();
 		Set<String> assignedVars = new HashSet<String>();
 		for (Map.Entry<String, Set<AssignStmt>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
@@ -173,7 +171,7 @@ public class ScriptToFunction {
         }
 		funcKind.analyze();
 		VFFlowset funcRes = funcKind.getFlowSets().get(f);
-		for (Map.Entry<String, VFDatum> entry: scriptKind.getFlowSets().get(script).getMap().entrySet()){
+		for (Map.Entry<String, VFDatum> entry: scriptKind.getFlowSets().get(script)){
 			if (entry.getValue()!=null && entry.getValue().isID() && funcRes.getKind(entry.getKey()).isID())
 				errors.add(new IDConflictException(new Name(entry.getKey())));
             if (entry.getValue()!=null && entry.getValue().isID() && funcRes.getKind(entry.getKey()).isFunction())

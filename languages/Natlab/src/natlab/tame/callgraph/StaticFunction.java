@@ -114,14 +114,12 @@ public class StaticFunction implements Cloneable {
         flowset = functionAnalysis.getFlowSets().get(function);
         
         //go through all symbols, and put them in the symbol table
-        for (String name : flowset.getMap().keySet()){
-            VFDatum vf = flowset.getMap().get(name);
+        for (Map.Entry<String, VFDatum> entry : flowset) {
+            String name = entry.getKey();
+            VFDatum vf = entry.getValue();
             
-            if (vf.isFunction()){
+            if (vf.isFunction() || !vf.isVariable()){
                 calledFunctions.put(name, this.context.resolve(name));
-            } else if (vf.isVariable()){
-            } else { //just put unfound functions among unfound
-                calledFunctions.put(name, this.context.resolve(name)); 
             }
         }
         //TODO deal with errors - unresolved functions? - they may be overloaded functions

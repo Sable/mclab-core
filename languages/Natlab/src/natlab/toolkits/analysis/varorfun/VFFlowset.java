@@ -166,27 +166,9 @@ public class VFFlowset extends AbstractFlowSet<Map.Entry<String, VFDatum>>
         return s.toString();
     }
 
-    @Deprecated
-    public HashMap<String,VFDatum> getMap(){return set;}
-
     public Iterator<Map.Entry<String,VFDatum>> iterator()
     {
-        return new Iterator<Map.Entry<String,VFDatum>>(){
-            Iterator<Map.Entry<String,VFDatum>> mapIterator = set.entrySet().iterator();
-            public boolean hasNext()
-            {
-                return mapIterator.hasNext();
-            }
-            public Map.Entry<String,VFDatum> next()
-            {
-                Map.Entry<String,VFDatum> entry = mapIterator.next();
-                return entry;
-            }
-            public void remove()
-            {
-                mapIterator.remove();
-            }
-        };
+        return set.entrySet().iterator();
     }
 
 }

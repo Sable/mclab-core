@@ -328,7 +328,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     		inputSet.add(inputParam.getID());
     	}
     	caseASTNode(node);
-    	for (Entry<String, VFDatum> p:currentSet.getMap().entrySet()){
+    	for (Entry<String, VFDatum> p:currentSet){
     		if (! inputSet.contains(p.getKey()))
     			backup.add(new ValueDatumPair(p.getKey(), p.getValue()));
     	}
