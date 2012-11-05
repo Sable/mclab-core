@@ -105,7 +105,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         currentFunction=node;
         currentSet = newInitialFlow();
         if (node.getParent() != null && node.getParent().getParent() != null && node.getParent().getParent() instanceof Function){
-            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).toList() ){
+            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent())) {
                 if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
                     currentSet.add( pair );
             }        	

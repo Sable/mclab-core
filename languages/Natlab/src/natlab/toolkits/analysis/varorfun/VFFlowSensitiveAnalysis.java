@@ -87,7 +87,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
         currentInSet = newInitialFlow();
         currentOutSet = currentInSet;
         if (node.getParent().getParent() instanceof Function){
-            for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).toList() ){
+            for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent())) {
                 if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
                     currentInSet.add( pair );
             }        	

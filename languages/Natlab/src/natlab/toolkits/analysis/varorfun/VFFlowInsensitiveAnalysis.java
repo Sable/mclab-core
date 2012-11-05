@@ -79,7 +79,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractPreorderAnalysis<VFFlowse
         // If a nested function, get the list of variables defined in the outer function
         if (node.getParent().getParent() instanceof Function){
         	if (flowSets.containsKey(node.getParent().getParent()))
-            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).toList() ){
+            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent())){
                 if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
                     currentSet.add( pair );
             }        	

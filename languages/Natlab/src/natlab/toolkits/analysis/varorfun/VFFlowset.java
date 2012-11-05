@@ -17,8 +17,14 @@ Copyright Jesse Doherty, Soroush Radpour and McGill University.
 
 package natlab.toolkits.analysis.varorfun;
 
-import java.util.*;
-import natlab.toolkits.analysis.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import natlab.toolkits.analysis.AbstractFlowSet;
+
+import com.google.common.collect.Lists;
 
 /**
  * Special implementation of FlowSet for the varorfun analysis. This
@@ -42,7 +48,7 @@ public class VFFlowset extends AbstractFlowSet<Map.Entry<String, VFDatum>>
     public void copy(VFFlowset dest) {
     	if (this == dest) return;
         dest.clear();
-        for (Map.Entry<String,VFDatum> element : toList()){
+        for (Map.Entry<String,VFDatum> element : this) {
             dest.add(element);
         }
     }
@@ -136,11 +142,6 @@ public class VFFlowset extends AbstractFlowSet<Map.Entry<String, VFDatum>>
     	if (set.containsKey(n))
     		return set.get(n);
     	return VFDatum.UNDEF;
-    }
-    
-    public List< Map.Entry<String, VFDatum> > toList()
-    {
-        return new ArrayList<Map.Entry<String, VFDatum>>( set.entrySet() );
     }
 
     public String toString()
