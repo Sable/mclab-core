@@ -50,6 +50,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class NatlabPreferences {
   //*** the keys and defaults for the options ********************************
+  private static final String PATH_SEPARATOR = System.getProperty("path.separator");
   private static final String MATLAB_PATH_KEY = "matlab_path";
   private static final String MATLAB_PATH_DEFAULT = "";
   private static final String NATLAB_PATH_KEY = "natlab_path";
@@ -68,7 +69,7 @@ public class NatlabPreferences {
   }
 
   public static void modify(Options options) {
-    Joiner joiner = Joiner.on(";");
+    Joiner joiner = Joiner.on(PATH_SEPARATOR);
     if (!options.set_matlab_path().isEmpty()){
       setMatlabPath(joiner.join(options.set_matlab_path()));
     }

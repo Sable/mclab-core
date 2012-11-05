@@ -12,7 +12,7 @@ p = path();
 fprintf('found matlab path: %s\n\n',p);
 
 % split path
-c = regexp(p,';','split');
+c = regexp(p, pathsep, 'split');
 
 % reset path
 system('java -jar Natlab.jar -pref -set_matlab_path ""');
@@ -21,7 +21,7 @@ system('java -jar Natlab.jar -pref -set_matlab_path ""');
 N = 4000; % maximum path string we add each time
 s = '';
 for i = 1:numel(c)
-    s = [s ';' c{i}];
+    s = [s pathsep c{i}];
     if (numel(s) > N) % if we have collected enough strings, add to path
         t = ['"', s(2:end), '"'];
         fprintf('adding %d chars: %s',length(t),t);
