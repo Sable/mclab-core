@@ -198,7 +198,7 @@ public class NatlabServer {
 
       CompilationUnits cu = new CompilationUnits();
       cu.addProgram(program);
-      String ast = cu.XMLtoString(cu.ASTtoXML());
+      String ast = cu.XMLtoString(cu.ASTtoXML(false));
       log("Sending response: \n" + ast);
       out.print(ast + "\0");
       out.flush();

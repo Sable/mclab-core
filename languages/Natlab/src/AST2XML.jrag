@@ -53,6 +53,7 @@ aspect ASTtoXML {
         syn lazy long ASTNode.getuID();
         eq ASTNode.getuID() = makeUId();
         syn long CompilationUnits.makeUId() = 0;
+        protected static boolean ASTNode.include_kinds_in_xml = true;
         protected static VFFlowInsensitiveAnalysis ASTNode.kind_analysis_insensitive = null;
         protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
         protected static VFPreorderAnalysis ASTNode.kind_analysis_preorder = null;
@@ -83,21 +84,31 @@ aspect ASTtoXML {
 			((CompilationUnits)node).nodeCounter = count;
 	    }
 	}
-    
-  	//syn Document ASTNode.ASTtoXML() {
+
+    public Document CompilationUnits.ASTtoXML(boolean includeKinds) {
+        boolean oldIncludeKinds = include_kinds_in_xml;
+        include_kinds_in_xml = includeKinds;
+        Document result = ASTtoXML();
+        include_kinds_in_xml = oldIncludeKinds;
+        return result;
+    }
+
 	public Document CompilationUnits.ASTtoXML() {
 		try{
 	        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 	        Document doc = docBuilder.newDocument();
-            kind_analysis_sensitive=new VFFlowSensitiveAnalysis(this);
-            kind_analysis_sensitive.analyze();
 
-            kind_analysis_insensitive=new VFFlowInsensitiveAnalysis(this);
-            kind_analysis_insensitive.analyze();
+            if (include_kinds_in_xml) {
+                kind_analysis_sensitive=new VFFlowSensitiveAnalysis(this);
+                kind_analysis_sensitive.analyze();
 
-            kind_analysis_preorder=new VFPreorderAnalysis(this);
-            kind_analysis_preorder.analyze();
+                kind_analysis_insensitive=new VFFlowInsensitiveAnalysis(this);
+                kind_analysis_insensitive.analyze();
+
+                kind_analysis_preorder=new VFPreorderAnalysis(this);
+                kind_analysis_preorder.analyze();
+            }
 
             parentProgram=null;
 	        long id = nodeCounter();
@@ -105,7 +116,7 @@ aspect ASTtoXML {
 			
 			Element e = doc.createElement("CompilationUnits");
 			e.setAttribute("id", Long.toString(id));
-			e.setAttribute("name", "name"); //TODO - was 'name);' - fix this!
+			e.setAttribute("name", "name"); 
 			for(Program p : getPrograms()){
 		    	p.getXML(doc, e);
 			}
@@ -854,35 +865,31 @@ parent.appendChild(e);
         long id = nodeCounter();
         setuID(id);
 		Name t = getName();
-		
-        VFFlowset out_sensitive=null;
-        if (parentProgram!=null)
-            out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( parentProgram );
-        else
-            out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( t );
-
-
-        VFFlowset out_insensitive=null;
-        if (parentProgram!=null)
-            out_insensitive = kind_analysis_insensitive.getFlowSets().get( parentProgram );
-        else
-            out_insensitive = kind_analysis_insensitive.getFlowSets().get( t );
-
-        VFFlowset out_preorder = kind_analysis_preorder.getFlowSets().get(t );
-
-
 		String nameid = getName().getID();
-        
-        
-
 		Element e = doc.createElement("NameExpr");
 		e.setAttribute("id", Long.toString(id));
         getName().getXML(doc, e);
         e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
-        annotateXMLWithKind(e, "kind", out_preorder, nameid);
-        annotateXMLWithKind(e, "kind_insensitive", out_insensitive, nameid);
-        annotateXMLWithKind(e, "kind_sensitive", out_sensitive, nameid);
+        if (include_kinds_in_xml) {
+            VFFlowset out_sensitive=null;
+            if (parentProgram!=null)
+                out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( parentProgram );
+            else
+                out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( t );
+
+
+            VFFlowset out_insensitive=null;
+            if (parentProgram!=null)
+                out_insensitive = kind_analysis_insensitive.getFlowSets().get( parentProgram );
+            else
+                out_insensitive = kind_analysis_insensitive.getFlowSets().get( t );
+
+            VFFlowset out_preorder = kind_analysis_preorder.getFlowSets().get(t );  
+            annotateXMLWithKind(e, "kind", out_preorder, nameid);
+            annotateXMLWithKind(e, "kind_insensitive", out_insensitive, nameid);
+            annotateXMLWithKind(e, "kind_sensitive", out_sensitive, nameid);
+        }
         return true;
     }
     
