@@ -149,7 +149,7 @@ public class NatlabServer {
   public void start() {
     connect();
 
-    while (true) {
+    while (in.hasNext()) {
       Command command = parseCommand(in.next());
 
       if (command.command.equals("heartbeat")) {
