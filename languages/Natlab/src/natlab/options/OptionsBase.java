@@ -1,96 +1,77 @@
-/* Soot - a J*va Optimization Framework
- * Copyright (C) 2003 Ondrej Lhotak
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2012 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
 
 package natlab.options;
-import java.util.*;
+import java.util.LinkedList;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
-/** Soot command-line options parser base class.
- * @author Ondrej Lhotak
+/** Natlab command-line options parser base class.
  */
-
 abstract class OptionsBase {
-    private String pad( int initial, String opts, int tab, String desc ) {
-        StringBuffer b = new StringBuffer();
-        for( int i = 0; i < initial; i++ ) b.append( " " );
-        b.append(opts);
-        int i;
-        if( tab <= opts.length() ) {
-            b.append( "\n" );
-            i = 0;
-        } else i = opts.length()+initial;
-        for( ; i <= tab; i++ ) {
-            b.append(" ");
-        }
-        for( StringTokenizer t = new StringTokenizer( desc );
-                t.hasMoreTokens(); )  {
-            String s = t.nextToken();
-            if( i + s.length() > 78 ) {
-                b.append( "\n" );
-                i = 0;
-                for( ; i <= tab; i++ ) {
-                    b.append(" ");
-                }
-            }
-            b.append( s );
-            b.append( " " );
-            i += s.length() + 1;
-        }
-        b.append( "\n" );
-        return b.toString();
+  private String pad(int initial, String opts, int tab, String desc) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(Strings.repeat(" ", initial)).append(opts);
+    int i = opts.length() + initial;
+    if (tab <= opts.length()) {
+      sb.append("\n");
+      i = 0;
     }
-
-    protected String padOpt( String opts, String desc ) {
-        return pad( 1, opts, 30, desc );
+    sb.append(Strings.repeat(" ", tab - i + 1));
+    for (String s : Splitter.on(CharMatcher.WHITESPACE).split(desc)) {
+      if (i + s.length() > 78) {
+        sb.append("\n");
+        i = 0;
+        sb.append(Strings.repeat(" ", tab - i + 1));
+      }
+      sb.append(s).append(" ");
+      i += s.length() + 1;
     }
+    return sb.append("\n").toString();
+  }
 
-    protected String padVal( String vals, String desc ) {
-        return pad( 4, vals, 32, desc );
-    }
+  protected String padOpt(String opts, String desc) {
+    return pad(1, opts, 30, desc);
+  }
 
-    /*protected String getPhaseUsage() {
-        StringBuffer b = new StringBuffer();
-        b.append( "\nPhases and phase options:\n" );
-        for (Pack p : PackManager.v().allPacks()) {
-            b.append( padOpt( p.getPhaseName(), p.getDeclaredOptions() ) );
-            for( Iterator phIt = p.iterator(); phIt.hasNext(); ) {
-                final HasPhaseOptions ph = (HasPhaseOptions) phIt.next();
-                b.append( padVal( ph.getPhaseName(), ph.getDeclaredOptions() ) );
-            }
-        }
-        return b.toString();
-        }*/
+  protected String padVal(String vals, String desc ) {
+    return pad(4, vals, 32, desc);
+  }
 
-    private final LinkedList<String> options = new LinkedList<String>();
-    protected void pushOptions( String s ) {
-        options.addFirst( s );
-    }
+  private final LinkedList<String> options = Lists.newLinkedList();
+  protected void pushOptions( String s ) {
+    options.addFirst( s );
+  }
 
-    protected boolean hasMoreOptions() { return !options.isEmpty(); }
-    protected String nextOption() { return options.removeFirst(); }
+  protected boolean hasMoreOptions() {
+    return !options.isEmpty();
+  }
 
-    protected LinkedList files = new LinkedList();
-    public LinkedList getFiles() { return files; }
+  protected String nextOption() {
+    return options.removeFirst();
+  }
 
-    /*public boolean setPhaseOption( String phase, String option ) {
-        return PhaseOptions.v().processPhaseOptions( phase, option );
-        }*/
-
+  protected LinkedList<String> files = Lists.newLinkedList();
+  public LinkedList<String> getFiles() { return files; }
 }
-  

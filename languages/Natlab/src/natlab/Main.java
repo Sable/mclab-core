@@ -105,10 +105,7 @@ public class Main {
       return;
     }
 
-    List<String> files = Lists.newLinkedList();
-    for (Object o : options.getFiles()) {
-      files.add((String) o);
-    }
+    List<String> files = options.getFiles();
     log("Parsing " + Joiner.on(", ").join(files));
     List<CompilationProblem> errors = Lists.newArrayList();
     CompilationUnits cu;

@@ -42,8 +42,6 @@ public class Options extends OptionsBase {
 <xsl:apply-templates mode="constants" select="/options/section"/>
 
     public boolean parse( String[] argv ) {
-        LinkedList phaseOptions = new LinkedList();
-
         for( int i = argv.length; i > 0; i-- ) {
             pushOptions( argv[i-1] );
         }
@@ -158,7 +156,6 @@ public class Options extends OptionsBase {
     </xsl:for-each>
             ) {
                 if( !hasMoreOptions() ) {
-                    //G.v().out.println( "No value given for option -"+option );
                     System.out.println( "No value given for option -"+option );
                     return false;
                 }
@@ -167,7 +164,6 @@ public class Options extends OptionsBase {
                 if( <xsl:copy-of select="$name"/>.length() == 0 )
                     <xsl:copy-of select="$name"/> = value;
                 else {
-                    //G.v().out.println( "Duplicate values "+<xsl:copy-of select="$name"/>+" and "+value+" for option -"+option );
                     System.out.println( "Duplicate values "+<xsl:copy-of select="$name"/>+" and "+value+" for option -"+option );
                     return false;
                 }
