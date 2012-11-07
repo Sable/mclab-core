@@ -14,17 +14,25 @@ Copyright 2011 Soroush Radpour and McGill University.
   limitations under the License.
 */
 package natlab.toolkits;
-import java.util.*;
-import ast.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.path.BuiltinQuery;
+import natlab.toolkits.path.FolderHandler;
+import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.utils.NodeFinder;
-import natlab.toolkits.filehandling.*;
-import natlab.toolkits.filehandling.genericFile.*;
-import natlab.toolkits.path.*;
+import ast.ASTNode;
+import ast.Function;
+import ast.FunctionList;
+import ast.Program;
 
 public class Context{
     public final boolean inFunction;
     public final boolean inNested;
-    public final ASTNode curFunction; 
+    public final ASTNode<?> curFunction; 
     public final FolderHandler pwd; 
     public final FolderHandler fwd; 
     public final java.util.List<FolderHandler> path; 
@@ -129,7 +137,7 @@ public class Context{
 	return res;
     }
     
-    public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path,BuiltinQuery query){
+    public Context(ASTNode<?> curFunction, FolderHandler pwd, FolderHandler fwd, List<FolderHandler> path,BuiltinQuery query){
     	if (curFunction instanceof Function)
     		this.inFunction = true;
     	else 
@@ -163,7 +171,7 @@ public class Context{
     
 
     
-    public Context(ASTNode curFunction, FolderHandler pwd, FolderHandler fwd, java.util.List<FolderHandler> path){
+    public Context(ASTNode<?> curFunction, FolderHandler pwd, FolderHandler fwd, List<FolderHandler> path){
     	this(curFunction,pwd,fwd,path,null);
     }
     

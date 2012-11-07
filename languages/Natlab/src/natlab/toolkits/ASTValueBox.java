@@ -27,7 +27,6 @@ package natlab.toolkits;
  *  - 2008.06 created by Jun Li
  *  	 
  */
-import java.io.Serializable;
 
 /** Reference implementation for ValueBox;  */
 public class ASTValueBox implements ValueBox
