@@ -1,4 +1,4 @@
-<?xml-sheet type="text/xsl" href="soot_options.xsl"  ?>
+<?xml-sheet type="text/xsl" ?>
 <!-- =========================================================================== -->
 <!--                                                                             -->
 <!-- Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    -->
@@ -36,34 +36,17 @@
       </long_desc>
     </boolopt>
     <boolopt>
-      <name>Exhaustive</name>
-      <alias>e</alias>
-      <short_desc>file list is exhaustive</short_desc>
-      <long_desc>
-        The Provided list of files represents all files that will be in the execution 
-environment.
-      </long_desc>
-    </boolopt>
-    <boolopt>
-      <name>Dynamic linking</name>
-      <alias>d</alias>
-      <short_desc>Force dynamic linking</short_desc>
-      <long_desc>
-No static linking is done.
-      </long_desc>
-    </boolopt>
-    <boolopt>
       <name>Prettyprint</name>
       <alias>pretty</alias>
       <short_desc>Prettyprint the files</short_desc>
-      <long_desc>Prettyprints the input files. Overides all other
+      <long_desc>Prettyprints the input files. Overrides all other
       options.</long_desc>
     </boolopt>
     <boolopt>
       <name>XML IR</name>
       <alias>x</alias>
       <alias>xml</alias>
-      <short_desc>Prints the xml IR</short_desc>
+      <short_desc>Prints the XML IR</short_desc>
       <long_desc>Print the XML IR after performing various
       transformations.</long_desc>
     </boolopt>
@@ -80,13 +63,6 @@ No static linking is done.
       <short_desc>Suppress all information messages</short_desc>
       <long_desc>All messages will be suppressed, unless an error occurs. </long_desc>
     </boolopt>
-    <!--boolopt>
-      <name>Aspect Mode</name>
-      <alias>a</alias>
-      <alias>aspect</alias>
-      <short_desc>Use Natlab and Aspect files</short_desc>
-      <long_desc>Use Aspect files to weave into Natlab files.</long_desc>
-    </boolopt -->
     <stropt>
       <name>Output Directory</name>
       <set_arg_label>dir</set_arg_label>
@@ -237,8 +213,6 @@ No static linking is done.
   		</long_desc>
 	</boolopt>
 
-
-
   	<boolopt>
   		<name>inline a whole program into one function</name>
   		<alias>inline</alias>
@@ -261,70 +235,6 @@ No static linking is done.
   	</stropt>
   </section>
   
-<!--  
-  <section>
-    <name>Static/Fortran Generator Options</name>
-    <boolopt>
-      <name>Generate Fortran</name>
-      <alias>f</alias>
-      <alias>fortran</alias>
-      <short_desc>Generates fortran code</short_desc>
-      <long_desc>
-        Run the fortran code generator to produce a fortran code
-        representation of the input sounce.
-      </long_desc>
-    </boolopt>
-		<multiopt>
-			<name>static</name>
-			<alias>static</alias>
-			<alias>static phases</alias>
-				<value>
-					<name>collect</name>
-					<alias>c</alias>
-					<alias>collect</alias>
-					<short_desc>collects all required .m files, and flattens output into one directory</short_desc>
-				</value>
-				<value>
-					<name>transform to IR</name>
-					<alias>ir</alias>
-					<short_desc>outputs files after IR transformation</short_desc>
-				</value>
-			<default>none</default>
-			<short_desc>Performs static compiler passes up to specified pass and outputs files</short_desc>
-			<long_desc>This option ...</long_desc>
-		</multiopt>
-  </section>
- --> 
-
-  <section>
-    <name>Testing</name>
-    <boolopt>
-      <name>Var or function preorder test</name>
-      <alias>vfpreorder</alias>
-    </boolopt>
-  </section>
-<!--
-  <section>
-    <name>621 options</name>
-    <boolopt>
-      <name>run analysis</name>
-      <alias>run</alias>
-    </boolopt>
-  </section>
- -->
-
-
-  <section>
-    <name>play</name>
-    <boolopt>
-      <name>play</name>
-      <alias>play</alias>
-    </boolopt>
-    <boolopt>
-      <name>Discover Files</name>
-      <alias>df</alias>
-    </boolopt>
-  </section>
   <section>
     <name>path and file options</name>
     <listopt>
@@ -352,7 +262,6 @@ No static linking is done.
       </long_desc>
     </stropt>
   </section>
-
 
   <section>
     <name>Setting Natlab Stored Preferences</name>
