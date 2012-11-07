@@ -2,7 +2,6 @@ package natlab.toolkits.utils;
 
 import java.util.List;
 
-import natlab.refactoring.AbstractNodeFunction;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 

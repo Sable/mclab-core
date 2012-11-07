@@ -1,25 +1,25 @@
 package natlab.refactoring;
 
-import java.util.*;
-import natlab.toolkits.analysis.*;
-import natlab.refactoring.Exceptions.*;
-import natlab.refactoring.Exceptions.RenameRequired;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.utils.NodeFinder;
-import ast.ASTNode;
+import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.Function;
-import ast.Name;
-import ast.AssignStmt;
 import ast.GlobalStmt;
+import ast.Name;
 import ast.Stmt;
-import ast.NameExpr;
-import ast.ParameterizedExpr;
-import ast.StringLiteralExpr;
-import natlab.toolkits.analysis.test.ReachingDefs;
 
 public class ExtractFunction {
 	ParsedCompilationUnitsContextStack context;

@@ -1,14 +1,16 @@
 package natlab.refactoring;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import static natlab.refactoring.Exceptions.*;
+import natlab.refactoring.Exceptions.RefactorException;
 import natlab.refactoring.Exceptions.RenameRequired;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import natlab.toolkits.analysis.varorfun.ValueDatumPair;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.utils.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;

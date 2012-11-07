@@ -7,7 +7,7 @@ import mclint.patterns.Match;
 import mclint.patterns.MatchHandler;
 import mclint.util.AstUtil;
 import mclint.util.Parsing;
-import natlab.refactoring.AbstractNodeFunction;
+import natlab.toolkits.utils.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
 import ast.ASTNode;
 import ast.NameExpr;

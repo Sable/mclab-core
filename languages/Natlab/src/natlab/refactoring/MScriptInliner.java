@@ -1,25 +1,33 @@
 package natlab.refactoring;
 
-import ast.*;
-import ast.List;
-import natlab.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import natlab.refactoring.Exceptions.RefactorException;
-import natlab.toolkits.Context;
-import natlab.toolkits.ContextStack;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
+import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.test.ReachingDefs;
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.analysis.*;
-import nodecases.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
-import natlab.toolkits.path.FunctionReference.ReferenceType;
 import natlab.toolkits.utils.NodeFinder;
-import static natlab.refactoring.Exceptions.*;
+import nodecases.AbstractNodeCaseHandler;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CompilationUnits;
+import ast.ExprStmt;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.FunctionList;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
+import ast.Script;
+import ast.Stmt;
 
 public class MScriptInliner {	
 	private CompilationUnits cu;

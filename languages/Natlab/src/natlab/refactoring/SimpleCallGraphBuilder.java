@@ -1,10 +1,19 @@
 package natlab.refactoring;
-import ast.*;
-import natlab.*;
-import java.util.*;
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.analysis.*;
-import nodecases.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import nodecases.AbstractNodeCaseHandler;
+import nodecases.NodeCaseHandler;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CompilationUnits;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.NameExpr;
 
 public class SimpleCallGraphBuilder{
     public SimpleCallGraphBuilder(CompilationUnits cu){

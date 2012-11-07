@@ -1,21 +1,24 @@
 package natlab.refactoring;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
-import natlab.refactoring.Exceptions.RenameRequired;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.defassigned.AssignedFlowSet;
-import natlab.toolkits.analysis.example.DefiniteAssignment;
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.utils.AbstractNodeFunction;
 import natlab.toolkits.utils.NodeFinder;
-import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.ExprStmt;
@@ -23,9 +26,7 @@ import ast.Function;
 import ast.FunctionList;
 import ast.Name;
 import ast.NameExpr;
-import ast.ParameterizedExpr;
 import ast.Script;
-import ast.StringLiteralExpr;
 
 public class ScriptToFunction {
 	ParsedCompilationUnitsContextStack context;
