@@ -10,6 +10,7 @@ import natlab.toolkits.analysis.*;
 import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
 import natlab.toolkits.analysis.varorfun.*;
 import natlab.toolkits.loadfunction.*;
+import natlab.utils.LoadFunction;
 
 /**
  * This is an intraprocedural function handle propagation analysis. 
@@ -828,7 +829,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         if( name.equals( "load" ) ){
             if( inExprStmt ){
-                HashSet<String> set = LoadFunction.loadWhat( args );
+                Set<String> set = LoadFunction.loadWhat( args );
                 if( set == null )
                     destroyInfo();
                 else
