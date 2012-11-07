@@ -16,9 +16,15 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.persistent;
+package natlab.utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -192,6 +198,7 @@ public abstract class PersistentlyCachedObject implements Serializable {
         try{
             fStream = new FileInputStream(tempFile);
             ObjectInputStream oStream = new ObjectInputStream(fStream);
+            @SuppressWarnings("unchecked")
             T object = (T)(oStream.readObject());
             object.registerShutdownHook();
             object.key = key;

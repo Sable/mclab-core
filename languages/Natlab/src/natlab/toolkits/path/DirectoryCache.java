@@ -19,12 +19,12 @@
 package natlab.toolkits.path;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.ref.SoftReference;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import natlab.toolkits.filehandling.genericFile.*;
-import natlab.toolkits.persistent.*;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.utils.PersistentlyCachedObject;
 
 /**
  * represents a cache of directories that is used by path objects
