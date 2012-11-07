@@ -293,64 +293,6 @@ public class Options extends OptionsBase {
 +padOpt("<xsl:for-each select="alias"> -<xsl:value-of select="."/></xsl:for-each>", "<xsl:apply-templates select="short_desc"/>" )<xsl:text/>
   </xsl:template>
 
-<!-- code to justify comments -->
-  <xsl:template name="wrap-string">
-    <xsl:param name="text"/>
-    <xsl:call-template name="wrap">
-      <xsl:with-param name="text" select="$text"/>
-      <xsl:with-param name="newline"><xsl:text>\n</xsl:text></xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="wrap-comment">
-    <xsl:param name="text"/>
-    <xsl:call-template name="wrap">
-      <xsl:with-param name="text" select="$text"/>
-      <xsl:with-param name="newline"><xsl:text>
-     * </xsl:text></xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="wrap">
-    <xsl:param name="text"/>
-    <xsl:param name="newline"/>
-    <xsl:call-template name="wrap-guts">
-      <xsl:with-param name="text" select="translate($text,'&#10;',' ')"/>
-      <xsl:with-param name="width" select='0'/>
-      <xsl:with-param name="newline" select="$newline"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="wrap-guts">
-    <xsl:param name="text"/>
-    <xsl:param name="width"/>
-    <xsl:param name="newline"/>
-    <xsl:variable name="print" select="concat(substring-before(concat($text,' '),' '),' ')"/>
-    <xsl:choose>
-      <xsl:when test="string-length($print) > number($width)">
-        <xsl:copy-of select="$newline"/>
-        <xsl:call-template name="wrap-guts">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="width" select='65'/>
-          <xsl:with-param name="newline" select="$newline"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:copy-of select="substring($print,1,string-length($print)-1)"/>
-        <xsl:if test="contains($text,' ')">
-          <xsl:if test="string-length($print) > 1">
-            <xsl:text> </xsl:text>
-          </xsl:if>
-          <xsl:call-template name="wrap-guts">
-            <xsl:with-param name="text" select="substring-after($text,' ')"/>
-            <xsl:with-param name="width" select="number($width) - string-length($print)"/>
-            <xsl:with-param name="newline" select="$newline"/>
-          </xsl:call-template>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <xsl:template match="use_arg_label">
     <xsl:call-template name="arg-label"/>
   </xsl:template>
