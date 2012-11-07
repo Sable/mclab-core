@@ -18,15 +18,13 @@
 
 package natlab.toolkits.analysis.test;
 
-import analysis.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.varorfun.*;
-
-import ast.*;
-
-
 import java.util.Set;
-import java.util.HashSet;
+
+import natlab.toolkits.analysis.HashSetFlowSet;
+import analysis.AbstractSimpleStructuralBackwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Stmt;
 
 /**
  * Performs a naive Live Variable analysis. It ignores the possibility
@@ -44,7 +42,7 @@ public class MaybeLive
     private UseCollector useCollector;
 
 
-    public MaybeLive( ASTNode tree)
+    public MaybeLive( ASTNode<?> tree)
     {
         super(tree);
 
@@ -125,7 +123,7 @@ public class MaybeLive
     public void caseStmt( Stmt node )
     {
         outFlowSets.put( node, currentOutSet );
-        HashSetFlowSet myInSet = copy(currentOutSet);
+        HashSetFlowSet<String> myInSet = copy(currentOutSet);
 
         caseASTNode( node );
 

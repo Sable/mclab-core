@@ -1,9 +1,13 @@
 package natlab.toolkits.analysis.test;
 
-import java.util.*;
-import ast.*;
-import analysis.*;
+import java.util.Set;
+
 import natlab.toolkits.analysis.HashSetFlowSet;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Name;
+import ast.ParameterizedExpr;
 
 /**
  * @author Jesse Doherty
@@ -13,7 +17,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
     protected HashSetFlowSet<String> fullSet;
     protected boolean inLHS = false;
 
-    public NameCollector(ASTNode tree)
+    public NameCollector(ASTNode<?> tree)
     {
         super(tree);
         fullSet = new HashSetFlowSet<String>();

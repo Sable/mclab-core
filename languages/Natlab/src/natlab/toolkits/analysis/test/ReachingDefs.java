@@ -18,14 +18,20 @@
 
 package natlab.toolkits.analysis.test;
 
-import analysis.*;
-import natlab.toolkits.analysis.*;
-import natlab.utils.NodeFinder;
-import ast.*;
-
-import java.util.Collections;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
+import natlab.toolkits.analysis.HashMapFlowMap;
+import natlab.toolkits.analysis.Merger;
+import natlab.toolkits.analysis.Mergers;
+import natlab.utils.NodeFinder;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Function;
+import ast.Name;
+import ast.Script;
+import ast.Stmt;
 
 /**
  * A simple forward analysis example, computing reaching definitions. 
@@ -39,19 +45,12 @@ public class ReachingDefs
 	public static final AssignStmt PARAM = new AssignStmt();
 	public static final AssignStmt GLOBAL = new AssignStmt();
 
-	private Merger merger = new Merger<Set<ASTNode>>(){
-        public Set<ASTNode> merge( Set<ASTNode> s1, Set<ASTNode> s2 )
-        {
-            Set<ASTNode> ms = new HashSet<ASTNode>( s1 );
-            ms.addAll( s2 );
-            return ms;
-        }
-    };
+	private Merger<Set<AssignStmt>> merger = Mergers.union();
 
     private HashMapFlowMap<String,Set<AssignStmt>> startMap;
     private NameCollector nameCollector;
 
-    public ReachingDefs( ASTNode tree )
+    public ReachingDefs( ASTNode<?> tree )
     {
         super(tree);
 //        DEBUG=true;

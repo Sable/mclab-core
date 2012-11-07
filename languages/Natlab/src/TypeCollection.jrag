@@ -28,12 +28,6 @@
 import java.util.*;
 
 aspect TypeCollection {
-
-	// TODO: TIEngine should be replace by "natlab.TypeInferenceEngine", since we only call its static methods
-	//public static natlab.TypeInferenceEngine ASTNode.TIEngine;
-	//public void ASTNode.setTypeInferenceEngine(natlab.TypeInferenceEngine tie) {
-	//	TIEngine = tie;
-	//}
 	public static natlab.SymbolTableScope ASTNode.gstScope;
 	public void ASTNode.setSymbolTableScope(natlab.SymbolTableScope scope) {
 		gstScope = scope;

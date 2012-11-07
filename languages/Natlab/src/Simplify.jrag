@@ -26,14 +26,6 @@
 import java.util.*;
 
 aspect Simplify {
-
-	//-------------------------------------------------------------------------
-	// Notes: This is an extra funcition temporarily put here!
-	// Used to disable "Refine" rewrite defined in TypeInference.jrag 
-  //  public void VariableDecl.setRefine(boolean b) {
-  //  	isRefined = b;
-  //  }
-
 	//-------------------------------------------------------------------------
 	// int childLocation: The child-index in the stmt-list, at which location 
 	// the new assign-stmt (splited from complex expression) will be added.

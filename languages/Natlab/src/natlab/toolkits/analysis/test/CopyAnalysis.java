@@ -1,21 +1,26 @@
 package natlab.toolkits.analysis.test;
 
-import natlab.toolkits.analysis.*;
-import analysis.*;
-import analysis.natlab.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
-import natlab.utils.NodeFinder;
-
-import java.util.*;
-import java.util.List;
-
-import ast.*;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CellIndexExpr;
+import ast.DotExpr;
+import ast.Expr;
+import ast.MatrixExpr;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Stmt;
 public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, AssignStmt>>{
 	
 	private LivelinessAnalysis live;
 	
-	public CopyAnalysis(ASTNode tree) {
+	public CopyAnalysis(ASTNode<?> tree) {
 		super(tree);
 		live = new LivelinessAnalysis(tree);
 		live.analyze();
