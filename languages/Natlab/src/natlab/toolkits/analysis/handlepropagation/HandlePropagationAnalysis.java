@@ -1,16 +1,44 @@
 package natlab.toolkits.analysis.handlepropagation;
 
 
-import ast.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-import java.util.*;
 import natlab.LookupFile;
-import analysis.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.loadfunction.*;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.AbstractValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.AnonymousHandleValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.NamedHandleValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.utils.LoadFunction;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CellArrayExpr;
+import ast.CellIndexExpr;
+import ast.DotExpr;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.FunctionList;
+import ast.GlobalStmt;
+import ast.LambdaExpr;
+import ast.LiteralExpr;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.PersistentStmt;
+import ast.Row;
+import ast.Script;
+import ast.Stmt;
+import ast.StringLiteralExpr;
 
 /**
  * This is an intraprocedural function handle propagation analysis. 
