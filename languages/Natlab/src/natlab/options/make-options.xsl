@@ -80,7 +80,7 @@ public class Options extends OptionsBase {
 <!--*************************************************************************-->
 
   <xsl:template mode="parse" match="section">
-      <xsl:apply-templates mode="parse" select="boolopt|multiopt|listopt|phaseopt|stropt|macroopt"/>
+      <xsl:apply-templates mode="parse" select="boolopt|multiopt|listopt|stropt|macroopt"/>
   </xsl:template>
 
 <!--* BOOLEAN_OPTION *******************************************************-->
@@ -189,7 +189,7 @@ public class Options extends OptionsBase {
 <!--*************************************************************************-->
 
   <xsl:template mode="vars" match="section">
-      <xsl:apply-templates mode="vars" select="boolopt|multiopt|listopt|phaseopt|stropt|macroopt"/>
+      <xsl:apply-templates mode="vars" select="boolopt|multiopt|listopt|stropt|macroopt"/>
   </xsl:template>
 
 <!--* BOOLEAN_OPTION *******************************************************-->
