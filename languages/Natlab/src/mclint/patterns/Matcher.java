@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import mclint.util.Parsing;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Expr;
 import ast.ForStmt;

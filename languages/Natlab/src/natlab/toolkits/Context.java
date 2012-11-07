@@ -23,7 +23,7 @@ import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.BuiltinQuery;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Function;
 import ast.FunctionList;

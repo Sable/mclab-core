@@ -5,7 +5,7 @@ import analysis.*;
 import analysis.natlab.*;
 
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 
 import java.util.*;
 import java.util.List;

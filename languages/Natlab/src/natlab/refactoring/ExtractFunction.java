@@ -13,7 +13,7 @@ import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.Function;

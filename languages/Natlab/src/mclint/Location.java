@@ -1,6 +1,6 @@
 package mclint;
 
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
 import ast.Program;

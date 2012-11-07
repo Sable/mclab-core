@@ -2,7 +2,7 @@ package mclint.patterns;
 
 import java.util.List;
 
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AndExpr;

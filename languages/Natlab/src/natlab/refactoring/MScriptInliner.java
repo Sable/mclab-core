@@ -14,7 +14,7 @@ import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AssignStmt;

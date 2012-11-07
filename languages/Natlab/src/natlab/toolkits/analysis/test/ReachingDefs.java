@@ -20,7 +20,7 @@ package natlab.toolkits.analysis.test;
 
 import analysis.*;
 import natlab.toolkits.analysis.*;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.*;
 
 import java.util.Collections;

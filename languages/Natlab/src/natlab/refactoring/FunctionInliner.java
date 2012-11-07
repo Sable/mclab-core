@@ -28,7 +28,7 @@ import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.path.FunctionReference.ReferenceType;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.*;
 
 public class FunctionInliner {

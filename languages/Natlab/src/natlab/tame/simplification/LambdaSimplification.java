@@ -13,7 +13,7 @@ import natlab.toolkits.rewrite.TempFactory;
 import natlab.toolkits.rewrite.TempFunctionBuilderHelper;
 import natlab.toolkits.rewrite.TransformedNode;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;

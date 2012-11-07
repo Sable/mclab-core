@@ -24,7 +24,7 @@ package natlab;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.PrimitiveType;

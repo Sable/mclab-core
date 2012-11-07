@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import natlab.toolkits.analysis.HashSetFlowSet;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;

@@ -9,7 +9,7 @@ import mclint.Message;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.ForStmt;
 import ast.Function;
