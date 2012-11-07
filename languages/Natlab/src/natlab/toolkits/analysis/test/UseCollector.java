@@ -34,7 +34,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
     private HashSetFlowSet<String> fullSet;
     private boolean inLHS = false;
 
-    public UseCollector(ASTNode tree)
+    public UseCollector(ASTNode<?> tree)
     {
         super(tree);
         fullSet = new HashSetFlowSet<String>();
@@ -135,7 +135,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
      * treated like it isn't the target of an assignment. It saves and
      * restores the state of {@code inLHS}
      */
-    private void analyzeAsNotLHS( ASTNode node ) 
+    private void analyzeAsNotLHS( ASTNode<?> node ) 
     {
         boolean bakInLHS = inLHS;
         inLHS = false;
