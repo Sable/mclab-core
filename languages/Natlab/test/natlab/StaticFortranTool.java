@@ -19,7 +19,7 @@ import java.util.Stack;
 import natlab.toolkits.scalar.AbstractFlowAnalysis;
 import natlab.toolkits.scalar.FlowSet;
 import natlab.toolkits.scalar.ReachingDefs;
-import natlab.toolkits.utils.NodeFinder;
+import natlab.utils.NodeFinder;
 import annotations.ast.ArgTupleType;
 import annotations.ast.MatrixType;
 import annotations.ast.PrimitiveType;
