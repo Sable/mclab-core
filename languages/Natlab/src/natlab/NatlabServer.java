@@ -39,8 +39,6 @@ public class NatlabServer {
   private Scanner in;
   private AtomicBoolean heartbeatFlag = new AtomicBoolean(true);
   private Timer heartbeatTimer = new Timer();
-  private ServerSocket serverSocket;
-  private Socket clientSocket;
 
   public static NatlabServer create(Options options) {
     int port = SERVER_PORT;
@@ -66,6 +64,7 @@ public class NatlabServer {
   private void connect() {
     log("Server mode");
     log("Opening server on port " + port);
+    ServerSocket serverSocket = null;
     try{
       serverSocket = new ServerSocket( port );
     } catch (IOException e) {
@@ -74,6 +73,7 @@ public class NatlabServer {
     }
     log("Server started");
 
+    Socket clientSocket = null;
     try {
       clientSocket = serverSocket.accept();
     } catch (IOException e) {
@@ -109,14 +109,8 @@ public class NatlabServer {
     out.print("<shutdown />\0");
     out.flush();
     heartbeatTimer.cancel();
-    try {
-      clientSocket.close();
-      out.close();
-      in.close();
-      serverSocket.close();
-    } catch (IOException e) {
-      // Doesn't matter, we're shutting down
-    }
+    out.close();
+    in.close();
   }
   
   private static class Command {
