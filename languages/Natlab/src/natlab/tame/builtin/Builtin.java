@@ -4038,7 +4038,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,$,m=previousScalar(),k=minus(m,n)->[1,k])||M,M->[1,k]");
+                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,i=previousScalar(),$,m=previousScalar(),k=minus(m,n),d=div(k,i)->[1,d]");
             }
             return shapePropInfo;
         }
@@ -4837,7 +4837,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Sort extends AbstractMatrixOrCellOfCharFunction implements HasClassPropagationInfo {
+    public static class Sort extends AbstractMatrixOrCellOfCharFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Sort singleton = null;
         public static Sort getInstance(){
@@ -4853,6 +4853,15 @@ public abstract class Builtin {
             return "sort";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}

@@ -45,7 +45,7 @@ public class ShapePropagator<V extends Value<V>>
 		throw new UnsupportedOperationException();
 	}
     
-    public Shape<V> forRange(V lower,	V upper, V inc){
+    public Shape<V> forRange(V lower, V upper, V inc){
 		//FIXME do something proper here
 		List<Integer> scalarShape = new ArrayList<Integer>(2);
 		scalarShape.add(1);

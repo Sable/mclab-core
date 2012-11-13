@@ -76,6 +76,29 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 			}
 			return previousMatchResult;
 		}
+		else if(i.indexOf("div")==0){
+			if (Debug) System.out.println("inside div("+ls.toString()+")");
+			String[] arg = ls.toString().split(",");
+			if(arg.length==2){
+				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
+					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
+					int div = previousMatchResult.getValueOfVariable(arg[0])/previousMatchResult.getValueOfVariable(arg[1]);
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), div);
+					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					if (Debug) System.out.println(matchResult.getAllLowercase());
+		            return matchResult;
+				}
+				else{
+					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
+					if (Debug) System.out.println("one of the arguments is null!");
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
+					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					if (Debug) System.out.println(matchResult.getAllLowercase());
+		            return matchResult;
+				}
+			}
+			return previousMatchResult;
+		}
 		else if(i.indexOf("previousShapeDim")==0){
 			if(ls==null){
 				if (Debug) System.out.println("inside previousShapeDim()");
