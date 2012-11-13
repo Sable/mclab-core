@@ -18,12 +18,17 @@
 
 package natlab.toolkits.rewrite;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
-import ast.*;
-import natlab.toolkits.rewrite.simplification.*;
-import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.rewrite.simplification.AbstractSimplification;
+import ast.ASTNode;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Performs simplifications. Takes care of dependencies and any needed
@@ -42,11 +47,6 @@ public class Simplifier
     //dependencies should be met.
     protected LinkedList<AbstractSimplification> simplifications;
 
-    public String simpsToStr()
-    {
-        return simplifications.toString();
-    }
-
     protected ASTNode tree;
     protected VFPreorderAnalysis kind;
 
@@ -57,7 +57,7 @@ public class Simplifier
      */
     @SuppressWarnings("unchecked")
     public Simplifier(ASTNode tree,Class... todo){
-        this(tree,new HashSet<Class<? extends AbstractSimplification>>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)));
+        this(tree, Sets.newHashSet(Arrays.<Class<? extends AbstractSimplification>>asList(todo)));
     }
 
     /**
@@ -69,7 +69,7 @@ public class Simplifier
             VFPreorderAnalysis kindAnalysis,
             Class ... todo){
         this(tree,
-             new HashSet<Class<? extends AbstractSimplification>>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
+             Sets.newHashSet(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
              kindAnalysis);
     }
     
@@ -105,18 +105,13 @@ public class Simplifier
                        Set<Class<? extends AbstractSimplification>> todo, 
                        VFPreorderAnalysis kindAna )
     {
-        simplifications = new LinkedList();
+        simplifications = Lists.newLinkedList();
         kind = kindAna;
         if( !kind.isAnalyzed() )
             kind.analyze();
 
         this.tree = tree;
         buildDependencies( todo );
-        /*for( Class<? extends AbstractSimplification> simpClass : todo ){
-            AbstractSimplification simpInst = constrSimp( simpClass );
-            buildDependencies( simpInst, todo );
-            simplifications.add( simpInst );
-            }*/
     }
 
     /**
@@ -139,7 +134,7 @@ public class Simplifier
      */
     protected void buildDependencies( Set<Class<? extends AbstractSimplification>> startSet )
     {
-        Set<Class<? extends AbstractSimplification>> seenStartSet = new HashSet();
+        Set<Class<? extends AbstractSimplification>> seenStartSet = Sets.newHashSet();
         while( !startSet.isEmpty() ){
             Iterator<Class<? extends AbstractSimplification>> iter = startSet.iterator();
             Class<? extends AbstractSimplification> simpClass = iter.next();
@@ -167,9 +162,8 @@ public class Simplifier
             if( !seenStartSet.contains( depClass )){
                 startSet.remove( depClass );
                 seenStartSet.add( depClass );
-                
-                AbstractSimplification depInst = constrSimp( depClass );
-                buildDependencies( depInst, startSet, seenStartSet );
+
+                buildDependencies(constrSimp(depClass), startSet, seenStartSet);
             }
         }
         simplifications.add( base );
@@ -182,59 +176,12 @@ public class Simplifier
      */
     protected AbstractSimplification constrSimp( Class<? extends AbstractSimplification> simpClass )
     {
-        AbstractSimplification simpInst;
-        Constructor<? extends AbstractSimplification> constructor;
-        
-        try{
-            constructor = simpClass.getConstructor( ASTNode.class, 
-                                                    VFPreorderAnalysis.class );
-            simpInst = constructor.newInstance( tree,kind );  
-        }catch( Exception e ){
+        try {
+            return simpClass.getConstructor(ASTNode.class,
+                VFPreorderAnalysis.class ).newInstance(tree, kind);
+        } catch (Exception e) {
             //This REALLY should not happen.
             throw new UnsupportedOperationException( "Something very wrong happened.", e );
         }
-        
-        return simpInst;
-    }
-
-    //Some shortcuts for creating a simplifier
-
-    public static Simplifier newForSimplifier(ASTNode tree)
-    {
-        return newForSimplifier(tree, new VFPreorderAnalysis( tree ) );
-    }
-    public static Simplifier newForSimplifier(ASTNode tree, VFPreorderAnalysis kindAna)
-    {
-        HashSet<Class<? extends AbstractSimplification>> set = new HashSet();
-        set.add( ForSimplification.class );
-        return new Simplifier( tree, set, kindAna );
-    }
-
-    public static Simplifier newSimpleIfSimplifier(ASTNode tree)
-    {
-        return newSimpleIfSimplifier(tree, new VFPreorderAnalysis( tree ) );
-    }
-    public static Simplifier newSimpleIfSimplifier(ASTNode tree, VFPreorderAnalysis kindAna)
-    {
-        HashSet<Class<? extends AbstractSimplification>> set = new HashSet();
-        set.add( SimpleIfSimplification.class );
-        return new Simplifier( tree, set, kindAna );
-    }
-
-    /**
-     * Creates ShortCircuitArraySimplification simplifier. 
-     */
-    public static Simplifier newSCASimplifier(ASTNode tree)
-    {
-        return newSCASimplifier(tree, new VFPreorderAnalysis( tree ) );
-    }
-    /**
-     * Creates ShortCircuitArraySimplification simplifier. 
-     */
-    public static Simplifier newSCASimplifier(ASTNode tree, VFPreorderAnalysis kindAna)
-    {
-        HashSet<Class<? extends AbstractSimplification>> set = new HashSet();
-        set.add( ShortCircuitArraySimplification.class );
-        return new Simplifier( tree, set, kindAna );
     }
 }
