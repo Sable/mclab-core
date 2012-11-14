@@ -546,7 +546,7 @@ digraph builtins{
 
        abstractRandomFunction[shape=plaintext,color=none,label="RandomFn"];
        abstractImpureFunction -> abstractRandomFunction;
-       rand[shape=box,label="rand\nrandn\nrandi",rank="max"];
+       rand[shape=box,label="rand\nrandn\nrandi\nrandperm",rank="max"];
        abstractRandomFunction -> rand;
 
        abstractSystemFunction[shape=plaintext,color=none,label="SystemFn"];

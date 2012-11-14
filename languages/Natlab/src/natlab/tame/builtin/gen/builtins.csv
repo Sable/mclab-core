@@ -879,6 +879,7 @@ randomFunction; impureFunction
 rand
 randn
 randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))
+randperm;; Shape($,n=previousScalar()->[1,n])
 
 
 systemFunction; impureFunction

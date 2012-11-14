@@ -336,6 +336,7 @@ public abstract class Builtin {
         builtinMap.put("rand",Rand.getInstance());
         builtinMap.put("randn",Randn.getInstance());
         builtinMap.put("randi",Randi.getInstance());
+        builtinMap.put("randperm",Randperm.getInstance());
         builtinMap.put("computer",Computer.getInstance());
         builtinMap.put("beep",Beep.getInstance());
         builtinMap.put("dir",Dir.getInstance());
@@ -7075,6 +7076,32 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+    }
+    public static class Randperm extends AbstractRandomFunction implements HasShapePropagationInfo {
+        //returns the singleton instance of this class
+        private static Randperm singleton = null;
+        public static Randperm getInstance(){
+            if (singleton == null) singleton = new Randperm();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseRandperm(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "randperm";
+        }
+        
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$,n=previousScalar()->[1,n]");
+            }
+            return shapePropInfo;
         }
 
     }

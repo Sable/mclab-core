@@ -578,6 +578,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseRand(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
     public Ret caseRandn(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
     public Ret caseRandi(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
+    public Ret caseRandperm(Builtin builtin,Arg arg){ return caseAbstractRandomFunction(builtin,arg); }
 
     public Ret caseAbstractSystemFunction(Builtin builtin,Arg arg){ return caseAbstractImpureFunction(builtin,arg); }    
     //should there be a separated operating system category?
