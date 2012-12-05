@@ -5,15 +5,25 @@ import java.util.List;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 public class NodeFinder {
   public static <T extends ASTNode<?>> List<T> find(ASTNode<?> n, final Class<T> type) {
+    return find(n, type, Predicates.<T>alwaysTrue());
+  }
+
+  public static <T extends ASTNode<?>> List<T> find(ASTNode<?> n, final Class<T> type,
+      final Predicate<T> predicate) {
     final List<T> res = Lists.newLinkedList();
     new AbstractNodeCaseHandler() {
       public void caseASTNode(@SuppressWarnings("rawtypes") ASTNode n) {
         if (type.isInstance(n)) {
-          res.add(type.cast(n));
+          T cast = type.cast(n);
+          if (predicate.apply(cast)) {
+            res.add(cast);
+          }
         }
         for (int i = 0; i < n.getNumChild(); i++) {
           caseASTNode(n.getChild(i));
