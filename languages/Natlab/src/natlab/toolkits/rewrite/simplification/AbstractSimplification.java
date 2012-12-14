@@ -18,13 +18,16 @@
 
 package natlab.toolkits.rewrite.simplification;
 
+import java.util.Set;
 
-import java.lang.*;
-import java.util.*;
-
-import ast.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.AbstractLocalRewrite;
-import natlab.toolkits.analysis.varorfun.*;
+import ast.ASTNode;
+import ast.Expr;
+import ast.Name;
+import ast.NameExpr;
 
 /**
  * A simplification specific implementation of
@@ -35,7 +38,6 @@ import natlab.toolkits.analysis.varorfun.*;
  */
 public abstract class AbstractSimplification extends AbstractLocalRewrite
 {
-
     protected VFPreorderAnalysis kindAnalysis;
 
     public AbstractSimplification( ASTNode tree, 
@@ -46,9 +48,6 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     }
 
     public abstract Set<Class<? extends AbstractSimplification>> getDependencies();
-    
-    //public void setKindAnalysis(
-    
 
     public boolean isVar( Expr expr )
     {
@@ -64,21 +63,9 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
                       this was added because a simplification added calls to 'false'
                       which couldn't be found in the flow sets
                     */
-                    //System.err.println("abstract simplification attempted to access kind of uknown name expr "+expr.getPrettyPrinted());
                     kindAnalysis.analyze();
                 }
                 VFFlowset flowset = kindAnalysis.getFlowSets().get(name);
-                /*
-                System.out.println("\n\n=========expr: "+expr.getPrettyPrinted()
-                		+"  in "+expr.getParent().getPrettyPrinted()
-                		+"\nfunction:\n"+kindAnalysis.getTree().getPrettyPrinted()
-                		+"\nflowset:\n"+flowset
-                		+"\nall flowsets:\n"+kindAnalysis.getFlowSets());
-                System.out.println("ALL");
-                for (ASTNode<?> node : kindAnalysis.getFlowSets().keySet()){
-                	System.out.println(node.getPrettyPrinted().replace('\n', ';')+"::"+kindAnalysis.getFlowSets().get(node));
-                }
-                */
                 VFDatum kind = flowset.contains(nameExpr.getName().getID());
                 return (kind!=null) && kind.isVariable();
             }

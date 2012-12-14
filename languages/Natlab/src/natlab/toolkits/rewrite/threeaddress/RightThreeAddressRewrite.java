@@ -21,14 +21,20 @@
 
 package natlab.toolkits.rewrite.threeaddress;
 
-import java.util.*;
+import java.util.LinkedList;
 
-import ast.*;
-import nodecases.AbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.ForStmt;
+import ast.Program;
+
+import com.google.common.collect.Lists;
 
 /**
  * Transforms and simplifies RValue expressions. Results in such
@@ -39,7 +45,6 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
 {
 
     private VFPreorderAnalysis nameResolver;
-
 
     public RightThreeAddressRewrite( ASTNode tree )
     {
@@ -57,7 +62,7 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
     {
         rewriteChildren( node );
         
-        LinkedList<AssignStmt> newAssignments = new LinkedList();
+        LinkedList<AssignStmt> newAssignments = Lists.newLinkedList();
         newAssignments.add(node);
         newAssignments = processAssignmentList( newAssignments,
                                                 nameResolver.getFlowSets().get(node) );
@@ -69,11 +74,7 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
 
     public void caseExprStmt( ExprStmt node )
     {
-
         rewriteChildren( node );
-
-        // Expr lhs = node.getLHS();
-        // Expr rhs = node.getRHS();
         Expr expr = node.getExpr();
         ExpressionCollector ec;
         ec = new ExpressionCollector( expr, nameResolver.getFlowSets().get(node) );
@@ -96,22 +97,19 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
         AssignStmt loopAssign = node.getAssignStmt();
         Expr rhs = loopAssign.getRHS();
 
-
-        ExpressionCollector ec;
-        ec = new ExpressionCollector( rhs, nameResolver.getFlowSets().get(loopAssign) );
+        ExpressionCollector ec =
+            new ExpressionCollector( rhs, nameResolver.getFlowSets().get(loopAssign) );
 
         Expr newRHS = (Expr)ec.transform();
 
         if( ec.getNewAssignments().size() > 0 ){
-            LinkedList<AssignStmt> newAssignments;
-            newAssignments = processAssignmentList( ec.getNewAssignments(),
-                                                    nameResolver.getFlowSets().get(loopAssign) );
+            LinkedList<AssignStmt> newAssignments = processAssignmentList( ec.getNewAssignments(),
+                nameResolver.getFlowSets().get(loopAssign) );
             newNode = new TransformedNode( newAssignments );
             loopAssign.setRHS( newRHS );
             newNode.add( node );
         }
     }
-
 
     /**
      * Recursively processes a list of assignments. Removes
@@ -120,14 +118,11 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
                                                    VFFlowset resolvedNames )
     {
-
-        LinkedList<AssignStmt> newAssignList = new LinkedList();
-        Expr lhs;
+        LinkedList<AssignStmt> newAssignList = Lists.newLinkedList();
         Expr rhs;
         ExpressionCollector ec;
         while( assignList.size() > 0 ){
             AssignStmt node = assignList.remove(0);
-            lhs = node.getLHS();
             rhs = node.getRHS();
             ec = new ExpressionCollector( rhs, resolvedNames );
 
@@ -143,5 +138,4 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
         }
         return newAssignList;
     }
-                
 }

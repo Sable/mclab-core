@@ -21,17 +21,13 @@
 
 package natlab.toolkits.rewrite.threeaddress;
 
-import java.util.LinkedList;
-import java.lang.NullPointerException;
-
-import ast.*;
-import nodecases.AbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.*;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.analysis.varorfun.VFDatum;
-
-
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.Program;
 
 public class LeftThreeAddressRewrite extends AbstractLocalRewrite
 {
@@ -53,7 +49,6 @@ public class LeftThreeAddressRewrite extends AbstractLocalRewrite
     {
         rewriteChildren( node );
         Expr lhs = node.getLHS();
-        Expr rhs = node.getRHS();
         ExpressionCollector ec = null;
         try{
             ec = new ExpressionCollector( lhs, nameResolver.getFlowSets().get(node) );
