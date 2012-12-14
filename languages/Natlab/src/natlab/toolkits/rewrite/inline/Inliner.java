@@ -122,9 +122,9 @@ public class Inliner<ScriptOrFunction extends ASTNode,TargetScriptOrFunction ext
 	@SuppressWarnings("unchecked")
     private ScriptOrFunction copy(ScriptOrFunction origin){
 	    if (origin instanceof Function){
-	        return ((ScriptOrFunction)((Function)origin).copy());
+	        return ((ScriptOrFunction)((Function)origin).fullCopy());
 	    } else if (origin instanceof Script){
-	        return ((ScriptOrFunction)((Script)origin).copy());
+	        return ((ScriptOrFunction)((Script)origin).fullCopy());
 	    } else {
 	        throw new UnsupportedOperationException();
 	    }
