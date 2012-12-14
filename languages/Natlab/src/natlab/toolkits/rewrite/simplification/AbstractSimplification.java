@@ -21,12 +21,10 @@ package natlab.toolkits.rewrite.simplification;
 import java.util.Set;
 
 import natlab.toolkits.analysis.varorfun.VFDatum;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.AbstractLocalRewrite;
 import ast.ASTNode;
 import ast.Expr;
-import ast.Name;
 import ast.NameExpr;
 
 /**
@@ -48,43 +46,50 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     }
 
     public abstract Set<Class<? extends AbstractSimplification>> getDependencies();
+    
+    private VFDatum getKind(NameExpr expr) {
+      return kindAnalysis.getFlowSets().get(expr.getName()).contains(expr.getName().getID());
+    }
+
+    private boolean isVar(NameExpr expr) {
+      VFDatum kind = getKind(expr);
+      return kind != null && kind.isVariable();
+    }
+    
+    private boolean isFun(NameExpr expr) {
+      VFDatum kind= getKind(expr);
+      return kind != null && kind.isFunction();
+    }
 
     public boolean isVar( Expr expr )
     {
-        if( expr instanceof NameExpr ){
-            NameExpr nameExpr = (NameExpr)expr;
-            if( nameExpr.tmpVar )
-                return true;
-            else{
-                Name name = nameExpr.getName();
-                if (!kindAnalysis.getFlowSets().containsKey(name)){
-                    /*if we don't find the node in the kindAnalasys, re-analyze
-                      TODO -- is this correct?
-                      this was added because a simplification added calls to 'false'
-                      which couldn't be found in the flow sets
-                    */
-                    kindAnalysis.analyze();
-                }
-                VFFlowset flowset = kindAnalysis.getFlowSets().get(name);
-                VFDatum kind = flowset.contains(nameExpr.getName().getID());
-                return (kind!=null) && kind.isVariable();
-            }
-        }
+      if (!(expr instanceof NameExpr)) {
         return false;
-    }
-    public boolean isFun( Expr expr )
-    {
-        if( expr instanceof NameExpr ){
-            NameExpr nameExpr = (NameExpr)expr;
-            if( nameExpr.tmpVar )
-                return false;
-            else{
-                Name name = nameExpr.getName();
-                VFDatum kind = kindAnalysis.getFlowSets().get(name).contains(nameExpr.getName().getID());
-                return (kind!=null) && kind.isFunction();
-            }
-        }
-        return false;
+      }
+      NameExpr nameExpr = (NameExpr)expr;
+      if( nameExpr.tmpVar ) {
+        return true;
+      }
+      if (!kindAnalysis.getFlowSets().containsKey(nameExpr.getName())) {
+        /* if we don't find the node in the kindAnalysis, re-analyze
+           TODO -- is this correct?
+           this was added because a simplification added calls to 'false'
+           which couldn't be found in the flow sets
+         */
+        kindAnalysis.analyze();
+      }
+      return isVar(nameExpr);
     }
 
+    public boolean isFun( Expr expr )
+    {
+      if (!(expr instanceof NameExpr)) {
+        return false;
+      }
+      NameExpr nameExpr = (NameExpr)expr;
+      if( nameExpr.tmpVar ) {
+        return false;
+      }
+      return isFun(nameExpr);
+    }
 }
