@@ -195,7 +195,7 @@ public class TempFactory
     }
     public static void setSuffix( String s )
     {
-        suffix = suffix;
+        suffix = s;
     }
 
 }
