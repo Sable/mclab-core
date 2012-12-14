@@ -1523,21 +1523,6 @@ aspect GenerateFortran {
 		}
 	}
 
-	public ASTNode<T> ASTNode.copy2() {
-		try {
-			ASTNode node = (ASTNode)clone();
-			if(children != null) {
-				for(int i=0; i<children.length; ++i) {
-				children[i] = children[i].copy2();          			
-				}
-			}
-			return node;
-		} catch (CloneNotSupportedException e) {
-		}
-		System.err.println("Error: Could not clone node of type " + getClass().getName() + "!");
-		return null;
-	}
-
 	// Used to split the long lines into several lines according to FORTRAN standard
     public String ASTNode.splitLongLine(String str) {
 		StringBuffer buf = new StringBuffer();
