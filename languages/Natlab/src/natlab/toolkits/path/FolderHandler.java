@@ -12,133 +12,122 @@ Copyright 2011 Soroush Radpour and McGill University.
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/
+ */
 
 package natlab.toolkits.path;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import natlab.toolkits.filehandling.genericFile.*;
+import natlab.toolkits.filehandling.genericFile.FileFile;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 
 /* For a folder finds all the files that are accessible */
 public class FolderHandler{
-    private final Set<String> ACCEPTED_EXTENSIONS=new TreeSet<String>(Arrays.asList(new String[]{".m"}));
-//    private static HashMap<GenericFile, FolderHandler> cache=new HashMap<GenericFile, FolderHandler>(); //TODO only gets big over time. Garbage collect!
-    public Map<String, GenericFile> classes=new HashMap<String, GenericFile>(); //constructors?
-    public Map<String, GenericFile> packages=new HashMap<String, GenericFile>(); //overloaded methods besides constructors?
-    public Map<String, GenericFile> functions=new HashMap<String, GenericFile>();
-    public Map<String, Map<String, GenericFile>> specializedFunction=new HashMap<String, Map<String, GenericFile>>(); 
-    public Map<String, GenericFile> privateFunctions=new HashMap<String, GenericFile>();
-    
-    private Collection<GenericFile> getFilteredChildren(GenericFile dir){
-	List<GenericFile> res = new LinkedList<GenericFile>();
-	for (GenericFile f: dir.listChildren()){
-	    if (f.isDir()) 
-		continue;
-	    if (ACCEPTED_EXTENSIONS.contains(f.getExtensionComplete())){
-		res.add(f);
-	    }	
-	}
-	return res;
-    }
-    
-    public static String getFileName(GenericFile f){
-	String extension = f.getExtensionComplete();
-	String name=f.getName().substring(0, f.getName().length()-extension.length());
-	return name;
-    }
-    
-    private void addpath(GenericFile path){
-	for (GenericFile f: path.listChildren()){
-	    String fname = f.getName();	
-	    if (f.isDir()){
-		if (fname.charAt(0)=='@'){
-		    fname=fname.substring(1);
-		    for (GenericFile subfile:getFilteredChildren(f)){
-			if (getFileName(subfile).equals(fname)){
-			    classes.put(getFileName(subfile), subfile);
-			}
-			else{
-			    if (!specializedFunction.containsKey(subfile))
-				specializedFunction.put(getFileName(subfile), new HashMap<String, GenericFile>());
-			    specializedFunction.get(getFileName(subfile)).put(fname, subfile);
-			}
-		    }
-		}
-		if (fname.charAt(0)=='+'){
-		    fname=fname.substring(1);
-		    packages.put(fname, f);
-		}
-		if (fname.toLowerCase().equals("private")){
-		    for (GenericFile subfile:getFilteredChildren(f)){
-			privateFunctions.put(getFileName(subfile), subfile);
-		    }
-		}
-	    }
-	    if (ACCEPTED_EXTENSIONS.contains(f.getExtensionComplete()))
-		functions.put(getFileName(f), f);
-	}
-    }
-    public static FolderHandler getFolderHandler(GenericFile folder) {
-//	if (cache.containsKey(folder))
-//	    return cache.get(folder);
-	FolderHandler res = new FolderHandler();
-	res.addpath(folder);
-//	cache.put(folder,res);
-	return res;
-    }
-    
-    public GenericFile lookupPrivateFunctions(String name){
-	if (privateFunctions.containsKey(name))
-	    return privateFunctions.get(name);
-	return null;
-    }
-    
+  private final Set<String> ACCEPTED_EXTENSIONS= ImmutableSet.of(".m");
+  private Map<String, GenericFile> classes = Maps.newHashMap(); //constructors?
+  private Map<String, GenericFile> packages = Maps.newHashMap(); //overloaded methods besides constructors?
+  private Map<String, GenericFile> functions = Maps.newHashMap();
+  private Table<String, String, GenericFile> specializedFunction = HashBasedTable.create();
+  private Map<String, GenericFile> privateFunctions = Maps.newHashMap();
 
-    public GenericFile lookupPackage(String name){
-	if (packages.containsKey(name))
-	    return packages.get(name);
-	return null;
-    }
-    
-    public GenericFile lookupClasses(String name){
-	if (classes.containsKey(name))
-	    return classes.get(name);
-	return null;
-    }
-    
-    
-    public GenericFile lookupSpecialized(String name, String type){
-	if (specializedFunction.containsKey(name)){
-	    if (specializedFunction.get(name).containsKey(type))
-		return specializedFunction.get(name).get(type);
-	}
-	return null;
-    }
-    
-    public List<GenericFile> getAllSpecialized(String classname){
-    	ArrayList<GenericFile> list = new ArrayList<GenericFile>();
-    	for (Map<String,GenericFile> map : specializedFunction.values()){
-    		if (map.containsKey(classname)) list.add(map.get(classname));
-    	}
-    	return list;
-    }
+  private Collection<GenericFile> getFilteredChildren(GenericFile dir){
+    return Lists.newLinkedList(Iterables.filter(dir.listChildren(), new Predicate<GenericFile>() {
+      @Override public boolean apply(GenericFile file) {
+        return !file.isDir() && ACCEPTED_EXTENSIONS.contains(file.getExtensionComplete());
+      }
+    }));
+  }
 
-    public Map<String, GenericFile> lookupSpecializedAll(String name){
-	if (specializedFunction.containsKey(name)){
-	    return new HashMap<String, GenericFile>(specializedFunction.get(name));
-	}
-	return new HashMap<String, GenericFile>();
-    }
+  public static String getFileName(GenericFile f){
+    String extension = f.getExtensionComplete();
+    return f.getName().substring(0, f.getName().length() - extension.length());
+  }
 
-    public GenericFile lookupFunctions(String name){
-	if (functions.containsKey(name)){
-	    return functions.get(name);
-	}
-	return null;
+  private FolderHandler addPath(GenericFile path){
+    for (GenericFile f: path.listChildren()){
+      String fname = f.getName();	
+      if (f.isDir()){
+        if (fname.charAt(0)=='@'){
+          fname=fname.substring(1);
+          for (GenericFile subfile:getFilteredChildren(f)){
+            if (getFileName(subfile).equals(fname)){
+              classes.put(getFileName(subfile), subfile);
+            }
+            else {
+              specializedFunction.put(getFileName(subfile), fname, subfile);
+            }
+          }
+        }
+        if (fname.charAt(0)=='+'){
+          fname=fname.substring(1);
+          packages.put(fname, f);
+        }
+        if (fname.toLowerCase().equals("private")){
+          for (GenericFile subfile:getFilteredChildren(f)){
+            privateFunctions.put(getFileName(subfile), subfile);
+          }
+        }
+      }
+      if (ACCEPTED_EXTENSIONS.contains(f.getExtensionComplete()))
+        functions.put(getFileName(f), f);
     }
-    public static void main(String[] args){
-	FolderHandler self = FolderHandler.getFolderHandler(new FileFile("/home/soroush/Examples/PathEx"));	
-	System.out.println(""+self.classes+ self.packages+ self.functions+self.specializedFunction);
+    return this;
+  }
+
+  public static FolderHandler getFolderHandler(GenericFile folder) {
+    return new FolderHandler().addPath(folder);
+  }
+
+  public GenericFile lookupPrivateFunctions(String name){
+    return privateFunctions.get(name);
+  }
+
+  public GenericFile lookupPackage(String name){
+    return packages.get(name);
+  }
+
+  public GenericFile lookupClasses(String name){
+    return classes.get(name);
+  }
+
+  public GenericFile lookupSpecialized(String name, String type){
+    return specializedFunction.get(name, type);
+  }
+
+  public List<GenericFile> getAllSpecialized(String classname){
+    List<GenericFile> list = Lists.newArrayList();
+    for (Map<String,GenericFile> map : specializedFunction.rowMap().values()){
+      if (map.containsKey(classname)) {
+        list.add(map.get(classname));
+      }
     }
+    return list;
+  }
+
+  public Map<String, GenericFile> lookupSpecializedAll(String name){
+    if (specializedFunction.containsRow(name)) {
+      return Maps.newHashMap(specializedFunction.rowMap().get(name));
+    }
+    return Maps.newHashMap();
+  }
+
+  public GenericFile lookupFunctions(String name){
+    return functions.get(name);
+  }
+
+  public static void main(String[] args){
+    FolderHandler self = FolderHandler.getFolderHandler(new FileFile("/home/soroush/Examples/PathEx"));	
+    System.out.println(""+self.classes+ self.packages+ self.functions+self.specializedFunction);
+  }
 }
