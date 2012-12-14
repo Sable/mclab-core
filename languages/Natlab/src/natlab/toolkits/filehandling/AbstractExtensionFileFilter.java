@@ -21,24 +21,17 @@
 
 package natlab.toolkits.filehandling;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 
-/**
- *
- */
 public abstract class AbstractExtensionFileFilter implements FileFilter, FilenameFilter
 {
-
     public abstract String[] getOkFileExtensions();
 
     public boolean accept(File file)
     {
-        for (String extension : getOkFileExtensions()){
-            if (file.getName().toLowerCase().endsWith(extension)){
-                return true;
-            }
-        }
-        return false;
+        return accept(file.getParentFile(), file.getName());
     }
     
     public boolean accept(File dir, String name)
@@ -50,6 +43,4 @@ public abstract class AbstractExtensionFileFilter implements FileFilter, Filenam
         }
         return false;
     }
-
-
 }

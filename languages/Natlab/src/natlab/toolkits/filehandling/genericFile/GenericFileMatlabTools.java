@@ -18,13 +18,9 @@
 
 package natlab.toolkits.filehandling.genericFile;
 
-import java.io.File;
-
 /**
  * provides some matlab related helpers using Generic Files
  */
-
-
 public class GenericFileMatlabTools {
     /**
      * represents a file filter matching on matlab files
