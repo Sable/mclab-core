@@ -3,94 +3,107 @@ package natlab.refactoring;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 
-import static natlab.refactoring.Exceptions.*;
-
-import natlab.LookupFile;
-import natlab.toolkits.Context;
+import natlab.refactoring.Exceptions.IDConflictException;
+import natlab.refactoring.Exceptions.NameResolutionChangeException;
+import natlab.refactoring.Exceptions.RefactorException;
+import natlab.refactoring.Exceptions.RenameRequired;
+import natlab.refactoring.Exceptions.TargetNotAFunction;
+import natlab.refactoring.Exceptions.TargetNotFoundException;
+import natlab.refactoring.Exceptions.TooManyInputParams;
+import natlab.refactoring.Exceptions.TooManyOutputParams;
 import natlab.toolkits.ContextStack;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.*;
-import analysis.*;
-import analysis.natlab.*;
-import natlab.toolkits.analysis.defassigned.DefinitelyAssignedAnalysis;
+import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
 import natlab.toolkits.analysis.test.CopyAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
-import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FunctionReference;
-import natlab.toolkits.path.FunctionReference.ReferenceType;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
 import natlab.utils.NodeFinder;
-import ast.*;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CompilationUnits;
+import ast.Expr;
+import ast.Function;
+import ast.List;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Script;
+import ast.Stmt;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class FunctionInliner {
 	private CompilationUnits cu;
 	public int extra = 0;
 	public int removed = 0;
 
-	HashMap<String, Script> scripts = new HashMap<String, Script>();
+	HashMap<String, Script> scripts = Maps.newHashMap();
 	final ParsedCompilationUnitsContextStack context;
 	public FunctionInliner(CompilationUnits cu) {
-		context=new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu);
+		context=new ParsedCompilationUnitsContextStack(Lists.<GenericFile>newLinkedList(),
+		    cu.getRootFolder(), cu);
 		this.cu = cu;
 	};
-		
 	
 	private LinkedList<AssignStmt> functionCalls(Function f) {
-		final LinkedList<AssignStmt> functionCalls = new LinkedList<AssignStmt>();
-		for (AssignStmt stmt: NodeFinder.find(f.getStmtList(), AssignStmt.class)){
-			if (stmt.getRHS() instanceof ParameterizedExpr) // we have a call
-				functionCalls.add(stmt);
-		}
-		return functionCalls; 
+	    return Lists.newLinkedList(NodeFinder.find(f.getStmtList(), AssignStmt.class,
+	        new Predicate<AssignStmt>() {
+	      @Override public boolean apply(AssignStmt stmt) {
+	        return stmt.getRHS() instanceof ParameterizedExpr;
+	      }
+	    }));
+	}
+	
+	private Iterable<Function> nonNestedFunctions(ASTNode<?> tree) {
+	  return NodeFinder.find(tree, Function.class, new Predicate<Function>() {
+	    @Override public boolean apply(Function f) {
+	      return !(f.getParent().getParent() instanceof Function);
+	    }
+	  });
 	}
 	
 	public int countCalls(){
 		int res = 0;
-		int resolve_fail =0; 
 		
-		for (Function f: NodeFinder.find(cu, Function.class)){
-			if (! (f.getParent().getParent() instanceof Function)){
-				context.push(f);
-				VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
-				kind_analysis_caller.analyze();
-				VFFlowset kind = kind_analysis_caller.getFlowSets().get(f);
-				for (ParameterizedExpr p: NodeFinder.find(f.getStmts(), ParameterizedExpr.class)){
-					if (p.getTarget() instanceof NameExpr){
-						NameExpr ne = (NameExpr)p.getTarget();
-						if (!kind.getKind(ne.getName().getID()).isVariable()){
-							FunctionReference lookupreference = context.peek().resolve(ne.getName().getID());
-							
-							ASTNode lookupres = context.resolveFunctionReference(lookupreference);
-							if (context.peek().getAllOverloads(ne.getName().getID()).size()<2 && lookupres != null && lookupres instanceof Function){
-								res++;
-							}
-							else if (!LookupFile.builtinFunctions.containsKey(ne.getName().getID())){
-								resolve_fail++;
-							}
-						}
-					}
-				}
-			}
+		for (Function f : nonNestedFunctions(cu)) {
+		    context.push(f);
+		    VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
+		    kind_analysis_caller.analyze();
+		    VFFlowset kind = kind_analysis_caller.getFlowSets().get(f);
+		    for (ParameterizedExpr p: NodeFinder.find(f.getStmts(), ParameterizedExpr.class)){
+		      if (p.getTarget() instanceof NameExpr){
+		        String name = ((NameExpr)p.getTarget()).getName().getID();
+		        if (!kind.getKind(name).isVariable()){
+		          FunctionReference lookupreference = context.peek().resolve(name);
+
+		          ASTNode lookup = context.resolveFunctionReference(lookupreference);
+		          if (context.peek().getAllOverloads(name).size()<2 && lookup instanceof Function){
+		            res++;
+		          }
+		        }
+		      }
+		    }
 		}
 		return res;
 	}
 
-	
-	
 	public HashMap<AssignStmt, LinkedList<RefactorException>> inlineAll(){
-		HashMap<AssignStmt, LinkedList<RefactorException>>  res = new HashMap<AssignStmt, LinkedList<RefactorException>>();
-		for (Function f: NodeFinder.find(cu, Function.class)){
-			if (! (f.getParent().getParent() instanceof Function))
-				res.putAll(inlineAll(f));
+		HashMap<AssignStmt, LinkedList<RefactorException>>  res = Maps.newHashMap();
+		for (Function f: nonNestedFunctions(cu)) {
+			res.putAll(inlineAll(f));
 		}
 		return res;
 	}
@@ -101,17 +114,16 @@ public class FunctionInliner {
 		RightSimplification rs = new RightSimplification(f, new VFPreorderAnalysis(f));
         rs.transform();
 		int l=functionCalls(f).size();
-		HashMap<AssignStmt, LinkedList<RefactorException>> errors = new HashMap<AssignStmt, LinkedList<RefactorException>>();
+		HashMap<AssignStmt, LinkedList<RefactorException>> errors = Maps.newHashMap();
 		for (int i=0;i<l;i++){
 			AssignStmt s = functionCalls(f).get(i);
             errors.put(s, inline(s));
 		}
-		
 		return errors;
 	}
 
 	private Collection<NameExpr> getUses(AssignStmt s, Collection<NameExpr> all, ReachingDefs defAnalysis){
-		LinkedList<NameExpr> uses = new LinkedList<NameExpr>();
+		LinkedList<NameExpr> uses = Lists.newLinkedList();
 		for (NameExpr n: all){
 			Stmt aUse= NodeFinder.findParent(n, Stmt.class);
 			HashMapFlowMap<String, Set<AssignStmt>> output= defAnalysis.getOutFlowSets().get(aUse);
@@ -145,7 +157,6 @@ public class FunctionInliner {
 			AssignStmt copy = copies.getOutFlowSets().get(useStmt).get(left);
 			if (copy != s  || copy == null)
 				return false;
-//			if (defs.getOutFlowSets())
 		}
 		List<Stmt> parent=(List<Stmt>) s.getParent();
 		int k=0;
@@ -159,7 +170,7 @@ public class FunctionInliner {
 	}
 	
 	public LinkedList<RefactorException> inline(AssignStmt s){
-		LinkedList<RefactorException> errors = new LinkedList<RefactorException>();
+		LinkedList<RefactorException> errors = Lists.newLinkedList();
         Function f = NodeFinder.findParent(s, Function.class);
 		context.push(f);
 		VFFlowInsensitiveAnalysis kind_analysis_caller = 
@@ -181,7 +192,7 @@ public class FunctionInliner {
 		FunctionReference lookupreference = context.peek().resolve(ne.getName().getID());
 		ASTNode lookupres = context.resolveFunctionReference(lookupreference);
 		Function target = null;
-		if (context.peek().getAllOverloads(ne.getName().getID()).size()<2 && lookupres != null && lookupres instanceof Function)
+		if (context.peek().getAllOverloads(ne.getName().getID()).size()<2 && lookupres instanceof Function)
 			target = (Function)lookupres;
 		else{
 			errors.add(new TargetNotFoundException(ne.getName()));
@@ -197,10 +208,10 @@ public class FunctionInliner {
 		}
 		
 		
-		ContextStack calleeContext = new ContextStack(new LinkedList(), lookupreference.path.getParent());
+		ContextStack calleeContext = new ContextStack(Lists.<GenericFile>newLinkedList(),
+		    lookupreference.path.getParent());
 		calleeContext.push(target);
-		LinkedList<AssignStmt> toRemove = new LinkedList<AssignStmt>();
-		
+		LinkedList<AssignStmt> toRemove = Lists.newLinkedList();
 		VFFlowInsensitiveAnalysis kind_analysis_callee = new VFFlowInsensitiveAnalysis(target);
 		kind_analysis_callee.analyze();
 		
@@ -209,7 +220,7 @@ public class FunctionInliner {
 		for (;list.getChild(k)!=s;k++);
 		    //just go forward in list
 		list.removeChild(k);
-		LinkedList<Stmt> nlist = new LinkedList<Stmt>();
+		LinkedList<Stmt> nlist = Lists.newLinkedList();
 		
 		for (int i=0;i<rhs.getNumArg();i++){
 			AssignStmt newStmt = new AssignStmt(new NameExpr(target.getInputParam(i)), rhs.getArg(i));
