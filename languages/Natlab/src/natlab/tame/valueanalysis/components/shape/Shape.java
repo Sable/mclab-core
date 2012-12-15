@@ -272,6 +272,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>>{
     		if (!(valueOfDimension instanceof HasConstant) || (null == ((HasConstant)valueOfDimension).getConstant())) 
         		return false;
     	}*/
-        return true; //TODO
+        return false; //TODO
     }    
 }
