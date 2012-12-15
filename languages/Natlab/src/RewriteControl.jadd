@@ -29,11 +29,11 @@ aspect RewriteControl {
         }
     }
 
-    refine ASTNode public static ASTNode ASTNode.getChild(ASTNode that, int i) {
+   refine public static ASTNode ASTNode.getChild(ASTNode that, int i) {
         if (that.useRawAST()) {
             return that.getChildNoTransform(i);
         } else{
-            return ASTNode.ASTNode.getChild(that, i);
+            return refined(that, i);
         }
     }
 }
