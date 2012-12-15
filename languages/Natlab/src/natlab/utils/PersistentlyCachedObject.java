@@ -104,7 +104,7 @@ public abstract class PersistentlyCachedObject implements Serializable {
     }
     
     //registers a trhead that, upon vm exit, will store the object if needed
-    private void registerShutdownHook(){
+    protected void registerShutdownHook(){
         //set up shutdown hook that will store this object in the temp file
         final PersistentlyCachedObject aThis = this;
         Runtime.getRuntime().addShutdownHook(new Thread(){
