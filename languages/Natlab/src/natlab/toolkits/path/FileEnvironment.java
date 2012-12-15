@@ -1,12 +1,17 @@
 package natlab.toolkits.path;
 
-import java.util.*;
+import java.util.List;
 
 import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
 import natlab.toolkits.Context;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * This class represents the file path environment information needed
@@ -79,8 +84,7 @@ public class FileEnvironment {
 		if (options.main() != null && options.main().length() > 0){
 			main = options.main();
 		} else {
-			@SuppressWarnings("unchecked")
-			List<String> list = (List<String>)options.getFiles();
+			List<String> list = options.getFiles();
 			if (list != null && list.size() > 0){
 				main = list.get(0);
 			}
@@ -98,20 +102,13 @@ public class FileEnvironment {
 		@SuppressWarnings("unchecked")
 		List<String> paths = (List<String>)options.lp();
 		if (paths == null || paths.size() == 0){
-			StringBuilder builder = new StringBuilder();
-			String delim = "";
-			for (String element : paths){
-				builder.append(delim);builder.append(element);
-			}
-			this.natlabPath = new MatlabPath(builder.toString());
+          this.natlabPath = MatlabPath.getNatlabPath();
+          this.matlabPath = MatlabPath.getMatlabPath();
 		} else {
-			this.natlabPath = MatlabPath.getNatlabPath();
-			this.matlabPath = MatlabPath.getMatlabPath();
+		  this.natlabPath = new MatlabPath(Joiner.on("").join(paths));
 		}
-
 		this.folderHandlers = getFolderHandlers();
 	}
-	
 	
 	public GenericFile getMainFile(){
 		return main;
@@ -130,7 +127,7 @@ public class FileEnvironment {
 	 */
 	private List<FolderHandler> getFolderHandlers(){
 		//TODO - put this in the constructors, so that this list odesn't get recomputed
-		ArrayList<FolderHandler> list = new ArrayList<FolderHandler>();
+		List<FolderHandler> list = Lists.newArrayList();
 		if (natlabPath != null){
 			list.addAll(natlabPath.getAsFolderHandlerList());
 		}
@@ -149,37 +146,37 @@ public class FileEnvironment {
 				this.folderHandlers,
 				this.query);
 	}
-	
-	
+
 	/**
 	 * returns a functionOrScriptQuery relative to the given file
 	 */
 	public FunctionOrScriptQuery getFunctionOrScriptQuery(GenericFile programFile){
-		final FolderHandler fwd = FolderHandler.getFolderHandler(programFile.getParent());
-		final FolderHandler pwd = pwdHandler;
-		final List<FolderHandler> folders = this.folderHandlers;
-		
-		return new FunctionOrScriptQuery() {
-			public boolean isPackage(String name) {
-				//find packages among pwd/folders
-				if (pwd.lookupPackage(name) != null) return true;
-				for (FolderHandler f : folders){
-					if (f.lookupPackage(name) != null) return true;
-				}
-				return false;
-			}
-			public boolean isFunctionOrScript(String name) {
-				if (query.isBuiltin(name)) return true;
-				if (pwd.lookupFunctions(name) != null) return true;
-				if (pwd.lookupSpecializedAll(name).size() > 0) return true;
-				if (fwd.lookupPrivateFunctions(name) != null) return true;
-				for (FolderHandler f : folders){
-					if (f.lookupFunctions(name) != null) return true;
-					if (f.lookupSpecializedAll(name).size() > 0) return true;
-				}
-				return false;
-			}
-		};
+	  final FolderHandler fwd = FolderHandler.getFolderHandler(programFile.getParent());
+	  final FolderHandler pwd = pwdHandler;
+	  final List<FolderHandler> folders = this.folderHandlers;
+
+	  return new FunctionOrScriptQuery() {
+	    public boolean isPackage(final String name) {
+	      return pwd.lookupPackage(name) != null
+	          || Iterables.any(folders, new Predicate<FolderHandler>() {
+	            @Override public boolean apply(FolderHandler f) {
+	              return f.lookupPackage(name) != null;
+	            }
+	          });
+	    }
+	    public boolean isFunctionOrScript(final String name) {
+	      return query.isBuiltin(name)
+	          || pwd.lookupFunctions(name) != null
+	          || pwd.lookupSpecializedAll(name).size() > 0
+	          || fwd.lookupPrivateFunctions(name) != null
+	          || Iterables.any(folders, new Predicate<FolderHandler>() {
+	            @Override public boolean apply(FolderHandler f) {
+	              return f.lookupFunctions(name) != null
+	                  || f.lookupSpecializedAll(name).size() > 0;
+	            }
+	          });
+	    }
+	  };
 	}
 	
 	/**
@@ -188,8 +185,8 @@ public class FileEnvironment {
 	 * matlab path, which may not actually contain code, but just help files -- although that's unlikely
 	 */
 	public List<FunctionReference> getOverloadedMethods(String classname){
-		ArrayList<FunctionReference> list = new ArrayList<FunctionReference>();
-		ArrayList<FolderHandler> folders = new ArrayList<FolderHandler>(getFolderHandlers());
+		List<FunctionReference> list = Lists.newArrayList();
+		List<FolderHandler> folders = Lists.newArrayList(getFolderHandlers());
 		folders.add(pwdHandler);
 		for (FolderHandler handler : folders){
 			for (GenericFile f : handler.getAllSpecialized(classname)){
