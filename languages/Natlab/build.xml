@@ -219,6 +219,7 @@
 			<path location="${basedir}/${bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 			<path location="${basedir}/${annotations.bin.dir}" />
+      <path location="${basedir}/resources" />
 		</path>
 	</target>
 
