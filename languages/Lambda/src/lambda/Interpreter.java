@@ -27,7 +27,7 @@ public class Interpreter {
 				LambdaScanner scanner = new LambdaScanner(new StringReader(line));
 				LambdaParser parser = new LambdaParser();
 				Root original = (Root) parser.parse(scanner);
-				SPNode reduced = original.reduce();
+				Node reduced = original.reduce();
 
 				System.out.println("Before: " + original.getStructureString());
 				System.out.println("After:  " + reduced.getStructureString());
