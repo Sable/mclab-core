@@ -2,8 +2,8 @@
 	<!-- load properties -->
 	<property file="natlab.properties" />
 
-        <!-- setup a local basename -->
-        <dirname property="Natlab.basedir" file="${ant.file.Natlab}" />
+  <!-- setup a local basename -->
+  <dirname property="Natlab.basedir" file="${ant.file.Natlab}" />
 
 	<!-- useful paths -->
 	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
@@ -12,7 +12,7 @@
 	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
 	<path id="jastaddparser.jar.path" path="${lib.dir}/${jastaddparser.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
-    <path id="guava.jar.path" path="${lib.dir}/${guava.jar.path.prop}" />
+  <path id="guava.jar.path" path="${lib.dir}/${guava.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
 			<include name="${antlr.task.jar.path.prop}" />
@@ -27,20 +27,20 @@
 	<!-- Analysis related things                                             -->
 	<!--=====================================================================-->
         
-        <fileset id="natlab.analysis.jastadd.fileset" dir="${Natlab.basedir}">
-          <include name="${src.dir}/ASTAnalyze.jadd" />
-        </fileset>
+  <fileset id="natlab.analysis.jastadd.fileset" dir="${Natlab.basedir}">
+    <include name="${src.dir}/ASTAnalyze.jadd" />
+  </fileset>
         
 
-        <!--=====================================================================-->
+  <!--=====================================================================-->
 	<!-- Some usefull filesets and paths                                     -->
 	<!--=====================================================================-->
-        <fileset id="natlab.general.jastadd.fileset" dir="${Natlab.basedir}/${src.dir}">
+  <fileset id="natlab.general.jastadd.fileset" dir="${Natlab.basedir}/${src.dir}">
 	  <include name="Comments.jadd" />
 	  <include name="OutputSuppression.jadd" />
 	  <include name="PrettyPrint.jrag" />
 	  <include name="LValue.jrag" />
-        </fileset>
+  </fileset>
         
 	<!--=====================================================================-->
 	<!-- Private Targets                                                     -->
@@ -52,9 +52,9 @@
 	<import file="../shared/bindir.xml" />
 	<import file="../shared/options.xml" />
 	<import file="../shared/CodeGen.xml" />
-	<!-- Extend and override parts of gen.xml -->
 
-        <import optional="true" file="local.xml" />
+	<!-- Extend and override parts of gen.xml -->
+  <import optional="true" file="local.xml" />
 
 
 	<import file="../shared/CodeGen.xml" />
@@ -67,7 +67,6 @@
 	</target>
 
 	<target name="gen.scanner.tests" depends="set.bin.dir">
-		<echo message="Generating scanner tests" />
 		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${gen.dir}" />
@@ -75,7 +74,6 @@
 	</target>
 
 	<target name="gen.parser.pass.tests" depends="set.bin.dir">
-		<echo message="Generating parser pass tests" />
 		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.pass.test.list.file}" />
 			<arg value="${gen.dir}" />
@@ -83,37 +81,34 @@
 	</target>
 
 	<target name="gen.parser.fail.tests" depends="set.bin.dir">
-		<echo message="Generating parser fail tests" />
 		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.fail.test.list.file}" />
 			<arg value="${gen.dir}" />
 		</java>
 	</target>
 
-        <!--target name="gen.multireturn.pass.tests" depends="set.bin.dir">
-          <echo message="Generating multireturn pass tests" />
-          <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
-            <arg value="${multireturn.pass.test.list.file}" />
-            <arg value="${gen.dir}" />
-          </java>
-        </target>
-        <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
-          <echo message="Generating left three address pass tests" />
-          <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
-            <arg value="${leftthreeaddress.pass.test.list.file}" />
-            <arg value="${gen.dir}" />
-          </java>
-        </target-->
+  <target name="gen.multireturn.pass.tests" depends="set.bin.dir">
+    <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
+      <arg value="${multireturn.pass.test.list.file}" />
+      <arg value="${gen.dir}" />
+    </java>
+  </target>
 
-        <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
-          <echo message="generating simplifications pass tests" />
-          <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
-            <arg value="${simplifications.pass.test.master.file}" />
-            <arg value="${gen.dir}" />
-          </java>
-        </target>
+  <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
+    <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
+      <arg value="${leftthreeaddress.pass.test.list.file}" />
+      <arg value="${gen.dir}" />
+    </java>
+  </target>
 
-        <target name="gen.simplification.tests" depends="gen.simplifications.pass.tests" />
+  <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
+    <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
+      <arg value="${simplifications.pass.test.master.file}" />
+      <arg value="${gen.dir}" />
+    </java>
+  </target>
+
+  <target name="gen.simplification.tests" depends="gen.simplifications.pass.tests" />
 	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.simplification.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
@@ -121,7 +116,7 @@
 	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests, options" />
 
 	<!-- Special target for building MATLAB2Fortran Code-Gen -->
-        <!-- SAME AS gen EXCEPT FOR USING CodeGen.gen2-->
+  <!-- SAME AS gen EXCEPT FOR USING CodeGen.gen2-->
 	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
 
 	<!-- jflex from metalexer spec -->
@@ -168,15 +163,12 @@
 	<target name="set.annotations.bin.dir" depends="set.annotations.bin.dir.no.eclipse, set.annotations.bin.dir.eclipse" />
 
 
-
 	<!--=====================================================================-->
 	<!-- Matlab Targets                                                      -->
 	<!--=====================================================================-->
 
 	<target name="matlab.build" description="call build in the Matlab language">
-		<echo message="BLAH: ${matlab.dir}" />
 		<ant dir="${matlab.dir}" target="build" inheritall="false" />
-		<!--ant antfile="${matlab.dir}/build.xml" target="build" inheritall="false" /-->
 	</target>
 
 	<target name="matlab.clean" description="call clean in the Matlab language">
@@ -207,7 +199,7 @@
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
-            <path refid="guava.jar.path" />
+      <path refid="guava.jar.path" />
 			<path location="${basedir}/${annotations.bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 		</path>
@@ -215,7 +207,7 @@
 			<path refid="junit.jar.path" />
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
-            <path refid="guava.jar.path" />
+      <path refid="guava.jar.path" />
 			<path location="${basedir}/${bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 			<path location="${basedir}/${annotations.bin.dir}" />
@@ -223,12 +215,11 @@
 		</path>
 	</target>
 
-        <!-- setup a path for the ast files used in Natlab language -->
-          <fileset id="natlab.ast.fileset" dir="${Natlab.basedir}">
-		  <include name="${src.dir}/**/*.ast" />
-		  <exclude name="${src.dir}/**/backends/*.ast" />
-		 
-          </fileset>
+  <!-- setup a path for the ast files used in Natlab language -->
+  <fileset id="natlab.ast.fileset" dir="${Natlab.basedir}">
+		<include name="${src.dir}/**/*.ast" />
+		<exclude name="${src.dir}/**/backends/*.ast" />
+  </fileset>
              
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
@@ -242,56 +233,49 @@
 	</target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
-        <target name="jar" depends="annotations.build, matlab.build, clean, jar_noclean" description="creates an executable release jar" />
+  <target name="jar" depends="annotations.build, matlab.build, clean, jar_noclean" description="creates an executable release jar" />
 	<target name="jar_noclean" depends="gen, compile" description="creates an executable release jar without cleaning first">
 		<jar destfile="${entrypoint.jarname}">
 			<manifest>
 				<attribute name="Main-Class" value="${entrypoint.class}" />
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class"  />
-                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-                            <patternset>
-                                <exclude name="META-INF/**" />
-                            </patternset>
-                        </zipfileset>
-                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset-->
-                        <fileset dir="resources" />
-		</jar>
-                <echo file="${entrypoint.script.name}">${entrypoint.script.header}
-java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
-                <chmod file="${entrypoint.script.name}" perm="755" />
-
+      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <fileset dir="resources" />
+    </jar>
+    <echo file="${entrypoint.script.name}">${entrypoint.script.header}
+java -jar "${basedir}/${entrypoint.jarname}" $$*</echo>
+    <chmod file="${entrypoint.script.name}" perm="755" />
 	</target>
 
-
 	<!-- jar build without tame and backend-->
-        <target name="jar-frontend" depends="annotations.build, matlab.build,
+  <target name="jar-frontend" depends="annotations.build, matlab.build,
 		clean, jar_noclean_frontend" description="creates an executable
 		release jar" />
 	<target name="jar_noclean_frontend" depends="gen, compile" description="creates an executable release jar without cleaning first">
@@ -302,49 +286,42 @@ java -jar ${basedir}/${entrypoint.jarname} $$*</echo>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/tame/**, 
 			 **/backends/**" />
-                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                         <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-                            <patternset>
-                                <exclude name="META-INF/**" />
-                            </patternset>
-                        </zipfileset>
-                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset-->
-                        <fileset dir="resources" />
+      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <fileset dir="resources" />
 		</jar>
-                <echo file="${entrypoint.frontend.script.name}">${entrypoint.script.header}
-java -jar ${basedir}/${entrypoint.frontend.jarname} $$*</echo>
-                <chmod file="${entrypoint.frontend.script.name}" perm="755" />
-
+    <echo file="${entrypoint.frontend.script.name}">${entrypoint.script.header}
+java -jar "${basedir}/${entrypoint.frontend.jarname}" $$*</echo>
+    <chmod file="${entrypoint.frontend.script.name}" perm="755" />
 	</target>
 
-
 	<!-- jar build without backend-->
-        <target name="jar-with-tamer" depends="annotations.build, matlab.build,
+  <target name="jar-with-tamer" depends="annotations.build, matlab.build,
 		clean, jar_noclean_tame" description="creates an executable
 		release jar" />
 	<target name="jar_noclean_tame" depends="gen, compile" description="creates an executable release jar without cleaning first">
@@ -354,49 +331,43 @@ java -jar ${basedir}/${entrypoint.frontend.jarname} $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/backends/**" />
-                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-                            <patternset>
-                                <exclude name="META-INF/**" />
-                            </patternset>
-                        </zipfileset>
-                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset-->
-                        <fileset dir="resources" />
+      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+        <fileset dir="resources" />
 		</jar>
-                <echo file="${entrypoint.mcsaf_with_tamer.script.name}">${entrypoint.script.header}
-java -jar ${basedir}/${entrypoint.mcsaf_with_tamer.jarname} $$*</echo>
-                <chmod file="${entrypoint.mcsaf_with_tamer.script.name}" perm="755" />
-
+    <echo file="${entrypoint.mcsaf_with_tamer.script.name}">${entrypoint.script.header}
+java -jar "${basedir}/${entrypoint.mcsaf_with_tamer.jarname}" $$*</echo>
+    <chmod file="${entrypoint.mcsaf_with_tamer.script.name}" perm="755" />
 	</target>
 
  
 	<!-- jar build with x10  backend-->
-        <target name="jar-mix10" depends="annotations.build, matlab.build,
+ <target name="jar-mix10" depends="annotations.build, matlab.build,
 		clean, jar_noclean_mix10" description="creates an executable
 		release jar" />
 	<target name="jar_noclean_mix10" depends="gen, compile" description="creates an executable release jar without cleaning first">
@@ -406,49 +377,42 @@ java -jar ${basedir}/${entrypoint.mcsaf_with_tamer.jarname} $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/Fortran/**" />
-                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-                            <patternset>
-                                <exclude name="META-INF/**" />
-                            </patternset>
-                        </zipfileset>
-                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset-->
-                        <fileset dir="resources" />
+      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+        <patternset>
+          <exclude name="META-INF/**" />
+        </patternset>
+      </zipfileset>
+      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <fileset dir="resources" />
 		</jar>
 		<echo file="${entrypoint.x10_backend.script.name}">${entrypoint.script.header}
-java -jar ${basedir}/${entrypoint.x10_backend.jarname} $$*</echo>
-                <chmod file="${entrypoint.x10_backend.script.name}" perm="755" />
-
+java -jar "${basedir}/${entrypoint.x10_backend.jarname}" $$*</echo>
+    <chmod file="${entrypoint.x10_backend.script.name}" perm="755" />
 	</target>
-
  
 	<!-- jar build with fortran  backend-->
-        <target name="jar-fortran-backend" depends="annotations.build, matlab.build,
+  <target name="jar-fortran-backend" depends="annotations.build, matlab.build,
 		clean, jar_noclean_fb" description="creates an executable
 		release jar" />
 	<target name="jar_noclean_fb" depends="gen, compile" description="creates an executable release jar without cleaning first">
@@ -458,49 +422,39 @@ java -jar ${basedir}/${entrypoint.x10_backend.jarname} $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/x10/**" />
-                        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset>
-                        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-                            <patternset>
-                                <exclude name="META-INF/**" />
-                            </patternset>
-                        </zipfileset>
-                        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-                        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-                        <!--zipfileset src="${lib.dir}/${antlr3.jar.path.prop}">
-                          <patternset>
-                            <exclude name="META-INF/**" />
-                          </patternset>
-                        </zipfileset-->
-                        <fileset dir="resources" />
+        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+          <patternset>
+            <exclude name="META-INF/**" />
+          </patternset>
+        </zipfileset>
+        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+          <patternset>
+            <exclude name="META-INF/**" />
+          </patternset>
+        </zipfileset>
+        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+          <patternset>
+            <exclude name="META-INF/**" />
+          </patternset>
+        </zipfileset>
+        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+          <patternset>
+            <exclude name="META-INF/**" />
+          </patternset>
+        </zipfileset>
+        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+          <patternset>
+            <exclude name="META-INF/**" />
+          </patternset>
+        </zipfileset>
+        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+        <fileset dir="resources" />
 		</jar>
 		<echo file="${entrypoint.fortran_backend.script.name}">${entrypoint.script.header}
-java -jar ${basedir}/${entrypoint.fortran_backend.jarname} $$*</echo>
-                <chmod file="${entrypoint.fortran_backend.script.name}" perm="755" />
-
+java -jar "${basedir}/${entrypoint.fortran_backend.jarname}" $$*</echo>
+    <chmod file="${entrypoint.fortran_backend.script.name}" perm="755" />
 	</target>
-
-
-
-
 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="annotations.eclipse.build, matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including annotations and matlab), let Eclipse build" />
