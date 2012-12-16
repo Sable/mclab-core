@@ -65,17 +65,13 @@
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${ant.bin.dir}">
+		<javac includeantruntime="false" destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="**/*TestGenerator.java" />
 		</javac>
 	</target>
 
 	<target name="gen.scanner.tests" depends="set.bin.dir">
-          <echo message="${basedir}" />
-		<!--My additions-->
-		 <echo message="${bin.dir}" />
-		<echo message="Generating scanner tests" />
 		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${basedir}/${gen.dir}" />
@@ -83,7 +79,6 @@
 	</target>
 
 	<target name="gen.translator.tests" depends="set.bin.dir">
-		<echo message="Generating translator tests" />
 		<java classname="${translator.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${basedir}/${translator.test.list.file}" />
 			<arg value="${basedir}/${gen.dir}" />

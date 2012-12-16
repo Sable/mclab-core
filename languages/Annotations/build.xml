@@ -22,14 +22,13 @@
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${basedir}/${ant.bin.dir}">
+		<javac includeantruntime="false" destdir="${basedir}/${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="**/*TestGenerator.java" />
 		</javac>
 	</target>
 
 	<target name="gen.scanner.tests" depends="set.bin.dir">
-		<echo message="Generating scanner tests" />
 		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${lexer.test.list.file}" />
 			<arg value="${basedir}/${gen.dir}" />
@@ -37,7 +36,6 @@
 	</target>
 
 	<target name="gen.parser.pass.tests" depends="set.bin.dir">
-		<echo message="Generating parser pass tests" />
 		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.pass.test.list.file}" />
 			<arg value="${basedir}/${gen.dir}" />
@@ -45,14 +43,12 @@
 	</target>
 
 	<target name="gen.parser.fail.tests" depends="set.bin.dir">
-		<echo message="Generating parser fail tests" />
 		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
 			<arg value="${parser.fail.test.list.file}" />
 			<arg value="${basedir}/${gen.dir}" />
 		</java>
 	</target>
         <target name="gen.typequery.pass.tests" depends="set.bin.dir">
-          <echo message="Generating type query pass test" />
           <java classname="${typequery.pass.test.generator.class}"
                 classpath="${bin.dir}">
             <arg value="${basedir}/${typequery.pass.test.list.file}" />
