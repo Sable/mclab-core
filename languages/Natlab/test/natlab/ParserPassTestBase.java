@@ -47,6 +47,17 @@ class ParserPassTestBase extends TestCase {
 		return new Structure(structureBuf.toString(), startLine, startCol, endLine, endCol);
 	}
 
+  private static String readNonWhitespaceLine(BufferedReader reader) throws IOException {
+    String line;
+    do {
+      line = reader.readLine();
+    } while (line != null && line.trim().isEmpty());
+    if (line != null) {
+      line = line.trim();
+    }
+    return line;
+  }
+
 	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Program actual, Structure expected) {
 		try {
@@ -54,8 +65,8 @@ class ParserPassTestBase extends TestCase {
 			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString()));
 			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString()));
 			while(true) {
-				String expectedLine = expectedReader.readLine();
-				String actualLine = actualReader.readLine();
+        String expectedLine = readNonWhitespaceLine(expectedReader);
+				String actualLine = readNonWhitespaceLine(actualReader);
 
 				if(!equals(expectedLine, actualLine)) {
 					StringBuffer buf = new StringBuffer();

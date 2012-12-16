@@ -31,7 +31,6 @@ parserpass_matrixbinary
 parserpass_matrixcomments
 parserpass_matrixaccess
 parserpass_onelinefunction
-parserpass_functionlist
 parserpass_functioncompleteness1
 parserpass_functioncompleteness2
 parserpass_functioncompleteness3
