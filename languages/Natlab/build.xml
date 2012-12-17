@@ -213,6 +213,26 @@
 			<path location="${basedir}/${annotations.bin.dir}" />
       <path location="${basedir}/resources" />
 		</path>
+    <union id="runtime.classpath">
+      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
+        <patternset> <exclude name="META-INF/**" /> </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
+        <patternset> <exclude name="META-INF/**" /> </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
+        <patternset> <exclude name="META-INF/**" /> </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
+        <patternset> <exclude name="META-INF/**" /> </patternset>
+      </zipfileset>
+      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
+        <patternset> <exclude name="META-INF/**" /> </patternset>
+      </zipfileset>
+      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
+      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <fileset dir="${basedir}/resources" />
+    </union>
 	</target>
 
   <!-- setup a path for the ast files used in Natlab language -->
@@ -240,34 +260,7 @@
 				<attribute name="Main-Class" value="${entrypoint.class}" />
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class"  />
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-      <fileset dir="resources" />
+      <resources refid="runtime.classpath" />
     </jar>
     <echo file="${entrypoint.script.name}">${entrypoint.script.header}
 java -jar "${basedir}/${entrypoint.jarname}" $$*</echo>
@@ -286,34 +279,7 @@ java -jar "${basedir}/${entrypoint.jarname}" $$*</echo>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/tame/**, 
 			 **/backends/**" />
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-      <fileset dir="resources" />
+      <resources refid="runtime.classpath" />
 		</jar>
     <echo file="${entrypoint.frontend.script.name}">${entrypoint.script.header}
 java -jar "${basedir}/${entrypoint.frontend.jarname}" $$*</echo>
@@ -331,34 +297,7 @@ java -jar "${basedir}/${entrypoint.frontend.jarname}" $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/backends/**" />
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-        <fileset dir="resources" />
+      <resources refid="runtime.classpath" />
 		</jar>
     <echo file="${entrypoint.mcsaf_with_tamer.script.name}">${entrypoint.script.header}
 java -jar "${basedir}/${entrypoint.mcsaf_with_tamer.jarname}" $$*</echo>
@@ -377,34 +316,7 @@ java -jar "${basedir}/${entrypoint.mcsaf_with_tamer.jarname}" $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/Fortran/**" />
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset>
-          <exclude name="META-INF/**" />
-        </patternset>
-      </zipfileset>
-      <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-      <fileset dir="resources" />
+      <resources refid="runtime.classpath" />
 		</jar>
 		<echo file="${entrypoint.x10_backend.script.name}">${entrypoint.script.header}
 java -jar "${basedir}/${entrypoint.x10_backend.jarname}" $$*</echo>
@@ -422,34 +334,7 @@ java -jar "${basedir}/${entrypoint.x10_backend.jarname}" $$*</echo>
 			</manifest>
 			<fileset dir="${basedir}/${bin.dir}"
 				includes="**/*.class" excludes="**/x10/**" />
-        <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-          <patternset>
-            <exclude name="META-INF/**" />
-          </patternset>
-        </zipfileset>
-        <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-          <patternset>
-            <exclude name="META-INF/**" />
-          </patternset>
-        </zipfileset>
-        <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-          <patternset>
-            <exclude name="META-INF/**" />
-          </patternset>
-        </zipfileset>
-        <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-          <patternset>
-            <exclude name="META-INF/**" />
-          </patternset>
-        </zipfileset>
-        <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-          <patternset>
-            <exclude name="META-INF/**" />
-          </patternset>
-        </zipfileset>
-        <zipfileset dir="${annotations.bin.dir}/" includes="**/*.class" />
-        <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-        <fileset dir="resources" />
+      <resources refid="runtime.classpath" />
 		</jar>
 		<echo file="${entrypoint.fortran_backend.script.name}">${entrypoint.script.header}
 java -jar "${basedir}/${entrypoint.fortran_backend.jarname}" $$*</echo>
