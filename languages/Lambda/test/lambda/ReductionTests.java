@@ -25,7 +25,7 @@ public class ReductionTests extends TestCase {
 		LambdaParser parser = new LambdaParser();
 		Root original = (Root) parser.parse(scanner);
 		
-		SPNode reduced = original.reduce();
+		Node reduced = original.reduce();
 		assertEquals(originalAsString, expectedStructureString, reduced.getStructureString());
 	}
 }
