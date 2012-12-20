@@ -19,6 +19,9 @@
 package natlab.toolkits.path;
 
 import java.util.*;
+
+import com.google.common.base.Splitter;
+
 import natlab.NatlabPreferences;
 import natlab.toolkits.filehandling.genericFile.*;
 
@@ -62,7 +65,7 @@ public class MatlabPath extends AbstractPathEnvironment {
             return;
         }
         //put all directories in
-        for (String s : path.split(";")){
+        for (String s : Splitter.on(System.getProperty("path.separator")).split(path)) {
             GenericFile file = GenericFile.create(s);
             DirectoryCache.put(file,persistent);
             directories.add(DirectoryCache.get(file));

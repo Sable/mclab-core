@@ -105,7 +105,8 @@ public class FileEnvironment {
           this.natlabPath = MatlabPath.getNatlabPath();
           this.matlabPath = MatlabPath.getMatlabPath();
 		} else {
-		  this.natlabPath = new MatlabPath(Joiner.on("").join(paths));
+		  this.natlabPath =
+		      new MatlabPath(Joiner.on(System.getProperty("path.separator")).join(paths));
 		}
 		this.folderHandlers = getFolderHandlers();
 	}
