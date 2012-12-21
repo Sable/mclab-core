@@ -1,6 +1,0 @@
-Root ::= Node;
-abstract Node;
-Var : Node ::= <Name:String>;
-App : Node ::= Rator:Node Rand:Node;
-Abs : Node ::= Var:Var Body:Node;
-MultiAbs : Node ::= Vars:List Body:Node;

@@ -1,8 +1,0 @@
-aspect StructureString {
-    syn String Node.getStructureString() { throw new UnsupportedOperationException(); }
-    eq Var.getStructureString() = getName();
-    eq App.getStructureString() = "app(" + getRator().getStructureString() + ", " + getRand().getStructureString() + ")";
-    eq Abs.getStructureString() = "abs(" + getVar().getStructureString() + ", " + getBody().getStructureString() + ")";
-
-    syn String Root.getStructureString() = getNode().getStructureString();
-}

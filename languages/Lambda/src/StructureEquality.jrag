@@ -1,3 +1,0 @@
-aspect StructureEquality {
-    syn boolean Node.structureEquals(Node other) = getStructureString().equals(other.getStructureString());
-}
