@@ -22,26 +22,6 @@
 		</fileset>
 	</path>
 
-
-	<!--=====================================================================-->
-	<!-- Analysis related things                                             -->
-	<!--=====================================================================-->
-        
-  <fileset id="natlab.analysis.jastadd.fileset" dir="${Natlab.basedir}">
-    <include name="${src.dir}/ASTAnalyze.jadd" />
-  </fileset>
-        
-
-  <!--=====================================================================-->
-	<!-- Some usefull filesets and paths                                     -->
-	<!--=====================================================================-->
-  <fileset id="natlab.general.jastadd.fileset" dir="${Natlab.basedir}/${src.dir}">
-	  <include name="Comments.jadd" />
-	  <include name="OutputSuppression.jadd" />
-	  <include name="PrettyPrint.jrag" />
-	  <include name="LValue.jrag" />
-  </fileset>
-        
 	<!--=====================================================================-->
 	<!-- Private Targets                                                     -->
 	<!--=====================================================================-->
@@ -234,12 +214,6 @@
       <fileset dir="${basedir}/resources" />
     </union>
 	</target>
-
-  <!-- setup a path for the ast files used in Natlab language -->
-  <fileset id="natlab.ast.fileset" dir="${Natlab.basedir}">
-		<include name="${src.dir}/**/*.ast" />
-		<exclude name="${src.dir}/**/backends/*.ast" />
-  </fileset>
              
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
