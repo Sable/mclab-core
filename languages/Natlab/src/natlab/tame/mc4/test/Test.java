@@ -18,7 +18,6 @@ import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-import natlab.toolkits.path.FilePathEnvironment;
 
 public class Test {    
     static String testDir = "languages\\Natlab\\src\\natlab\\Static\\mc4\\test\\unit";

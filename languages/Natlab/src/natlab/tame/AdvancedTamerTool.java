@@ -4,22 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.SimpleFunctionCollection;
-import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-import natlab.toolkits.path.FilePathEnvironment;
 
 public class AdvancedTamerTool {
 

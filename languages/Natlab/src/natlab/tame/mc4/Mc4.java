@@ -38,7 +38,6 @@ import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.toolkits.path.FileEnvironment;
-import natlab.toolkits.path.FilePathEnvironment;
 import natlab.toolkits.path.FunctionReference;
 
 
