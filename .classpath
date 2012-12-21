@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/test"/>
-	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/src"/>
-	<classpathentry kind="src" output="languages/Lambda/bin-eclipse" path="languages/Lambda/gen"/>
 	<classpathentry excluding="metalexer/" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/gen"/>
 	<classpathentry excluding="metalexer/|natlab/AspectsEngine.java" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/src"/>
 	<classpathentry excluding="natlab/AspectsParserTestTool.java|natlab/AspectsScannerTestTool.java|natlab/AspectsTests.java" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/test"/>
