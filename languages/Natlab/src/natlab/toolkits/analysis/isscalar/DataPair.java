@@ -1,4 +1,4 @@
-package natlab.toolkits.analysis.varorfun;
+package natlab.toolkits.analysis.isscalar;
 
 public class DataPair< K, V >
 {

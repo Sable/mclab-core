@@ -26,8 +26,6 @@ import ast.Stmt;
 import ast.StringLiteralExpr;
 import ast.UnaryExpr;
 import analysis.AbstractSimpleStructuralForwardAnalysis;
-import natlab.toolkits.analysis.varorfun.DataCollectFlowSet;
-import natlab.toolkits.analysis.varorfun.DataPair;
 
 public class IsScalarSimpleAnalysis extends AbstractSimpleStructuralForwardAnalysis<DataCollectFlowSet<String, IsScalarType>> {
 	private Map<String, List<String>> globalInParamLists;

@@ -1,6 +1,5 @@
 package natlab.toolkits.analysis.isscalar;
 
-import natlab.toolkits.analysis.varorfun.DataCollectFlowSet;
 
 public class FunctionCall {
 	String calledName;

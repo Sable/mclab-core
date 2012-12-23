@@ -1,4 +1,4 @@
-package natlab.toolkits.analysis.varorfun;
+package natlab.toolkits.analysis.isscalar;
 
 import java.util.HashMap;
 import java.util.Iterator;

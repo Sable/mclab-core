@@ -6,8 +6,6 @@ import java.util.HashSet;
 import ast.Expr;
 import ast.NameExpr;
 
-import natlab.toolkits.analysis.varorfun.DataCollectFlowSet;
-import natlab.toolkits.analysis.varorfun.DataPair;
 
 public class IsScalarHelper {
 	
