@@ -215,7 +215,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     target.analyze( this );
 
     VFDatum d = currentSet.contains(targetName);
-    if (d.isID()) {
+    if (d == null || d.isID()) {
       endCandidates.add(res);
     } else if (d == VFDatum.VAR) {
       endCandidates = Lists.newArrayList();
