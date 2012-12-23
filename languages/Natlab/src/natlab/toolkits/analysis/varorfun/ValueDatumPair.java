@@ -10,7 +10,11 @@ public class ValueDatumPair< V, D >
     protected final V value;
     protected final D datum;
 
-    public ValueDatumPair( V v, D d )
+    public static <A, B> ValueDatumPair<A, B> create(A a, B b) {
+      return new ValueDatumPair<A, B>(a, b);
+    }
+    
+    private ValueDatumPair( V v, D d )
     {
         value = v;
         datum = d;
