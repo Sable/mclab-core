@@ -1,7 +1,13 @@
 package natlab.tame.classes;
 
-import java.util.*;
-import natlab.toolkits.path.*;
+import java.util.Collections;
+import java.util.Map;
+
+import natlab.toolkits.path.FileEnvironment;
+import natlab.toolkits.path.FunctionReference;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 /**
  * reperesents a matlab class that is defined using the 'old' way,
@@ -10,23 +16,19 @@ import natlab.toolkits.path.*;
 
 abstract public class OldMatlabClass implements MatlabClass{
 	private Map<String,FunctionReference> methods;
-	private String className;
 	
 	public OldMatlabClass(String className, FileEnvironment fileEnvironment){
-		this.className = className;
-		//System.out.println(className);
-		methods = new HashMap<String,FunctionReference>();
-		for (FunctionReference ref : fileEnvironment.getOverloadedMethods(className)){
-			//TODO check the ref for constructor? - deal with doubly defined methods?
-			methods.put(ref.getname(),ref);
-		}
+		this.methods = Maps.uniqueIndex(fileEnvironment.getOverloadedMethods(className),
+		    new Function<FunctionReference, String>() {
+		  @Override public String apply(FunctionReference ref) {
+	      //TODO check the ref for constructor? - deal with doubly defined methods?
+		    return ref.getname();
+		  }
+		});
 	}
 	
 	@Override
 	public Map<String, FunctionReference> getMethods() {
 		return Collections.unmodifiableMap(methods);
 	}
-	
 }
-
-

@@ -1,21 +1,34 @@
 package natlab.tame;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import natlab.options.Options;
-import natlab.tame.builtin.*;
+import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.classprop.ClassPropTool;
-import natlab.tame.builtin.classprop.ast.*;
-import natlab.tame.callgraph.*;
-import natlab.tame.classes.reference.*;
-import natlab.tame.valueanalysis.*;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
-import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.simplematrix.*;
-import natlab.tame.valueanalysis.value.*;
-import natlab.toolkits.filehandling.genericFile.*;
-import natlab.toolkits.path.*;
+import natlab.tame.builtin.classprop.ast.CP;
+import natlab.tame.builtin.classprop.ast.CPBuiltin;
+import natlab.tame.builtin.classprop.ast.CPChain;
+import natlab.tame.callgraph.Callgraph;
+import natlab.tame.callgraph.SimpleFunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
+import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
+import natlab.tame.valueanalysis.ValueAnalysis;
+import natlab.tame.valueanalysis.ValueAnalysisPrinter;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.aggrvalue.AggrValueFactory;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.ValueFactory;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.path.FileEnvironment;
+
+import com.google.common.collect.Lists;
 
 public class TamerTool {
 
@@ -51,7 +64,6 @@ public class TamerTool {
 		StaticFunction function = callgraph.getAsInlinedStaticFunction(); //inline all
 
 		//build intra-analysis
-		@SuppressWarnings("unchecked")
 		IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = 
 				new IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>(
 						null, function, new SimpleMatrixValueFactory(), 
@@ -68,16 +80,13 @@ public class TamerTool {
 	 */
 	public IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> 
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-		SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
-		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputValues.size());
+		List<AggrValue<SimpleMatrixValue>> list = Lists.newArrayListWithCapacity(inputValues.size());
 		for (PrimitiveClassReference ref : inputValues){
 			list.add(new SimpleMatrixValue(ref));
 		}
 		return tameMatlabToSingleFunction(mainFile, list);
 	}
-	
-	
-	
+
 	//TODO give more useful functions!
 	//TODO give usage example, like I showed Vineet
 	
@@ -192,10 +201,3 @@ public class TamerTool {
 	}
 	
 }
-
-
-
-
-
-
-

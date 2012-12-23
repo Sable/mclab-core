@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.toolkits.filehandling.genericFile.FileFile;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 
 import com.google.common.base.Predicate;
@@ -63,8 +62,7 @@ public class FolderHandler{
           for (GenericFile subfile:getFilteredChildren(f)){
             if (getFileName(subfile).equals(fname)){
               classes.put(getFileName(subfile), subfile);
-            }
-            else {
+            } else {
               specializedFunction.put(getFileName(subfile), fname, subfile);
             }
           }
@@ -124,10 +122,5 @@ public class FolderHandler{
 
   public GenericFile lookupFunctions(String name){
     return functions.get(name);
-  }
-
-  public static void main(String[] args){
-    FolderHandler self = FolderHandler.getFolderHandler(new FileFile("/home/soroush/Examples/PathEx"));	
-    System.out.println(""+self.classes+ self.packages+ self.functions+self.specializedFunction);
   }
 }

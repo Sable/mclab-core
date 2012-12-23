@@ -18,12 +18,18 @@
 
 package natlab.toolkits.path;
 
-import java.util.*;
-
-import com.google.common.base.Splitter;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import natlab.NatlabPreferences;
-import natlab.toolkits.filehandling.genericFile.*;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
+
+import com.google.common.base.Function;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -41,9 +47,8 @@ import natlab.toolkits.filehandling.genericFile.*;
  *
  */
 
-
 public class MatlabPath extends AbstractPathEnvironment {
-    ArrayList<CachedDirectory> directories = new ArrayList<CachedDirectory>();
+    List<CachedDirectory> directories = Lists.newArrayList();
     private boolean persistent;
     
     /**
@@ -59,7 +64,6 @@ public class MatlabPath extends AbstractPathEnvironment {
      */
     public MatlabPath(String path,boolean persistent){
         super(null);
-        //System.out.println(path);
         this.persistent = persistent;
         if (path == null || path.length() == 0){
             return;
@@ -108,7 +112,6 @@ public class MatlabPath extends AbstractPathEnvironment {
     public static MatlabPath getNatlabPath(){
         return new MatlabPath(NatlabPreferences.getNatlabPath(),true);
     }
-
     
     /**
      * returns the set of directories that are overloaded for the given class name
@@ -117,7 +120,7 @@ public class MatlabPath extends AbstractPathEnvironment {
      * The directories are returned as non-persistent cached directories
      */
     public Collection<CachedDirectory> getAllOverloadedDirs(String className){
-        ArrayList<CachedDirectory> odirs = new ArrayList<CachedDirectory>();
+        List<CachedDirectory> odirs = Lists.newArrayList();
         for (CachedDirectory dir : directories){
             for (String s : dir.getChildDirNames()){
                 if (s.equals("@"+className)){
@@ -135,25 +138,21 @@ public class MatlabPath extends AbstractPathEnvironment {
         return null;
     }
     
-    
     @Override
     public FunctionReference resolve(String name, GenericFile context) {
         return resolveInDirs(name,directories);
     }
-    
     
     @Override
     public FunctionReference resolve(String name, String className, GenericFile context) {
         return resolveInDirs(name,getAllOverloadedDirs(className));
     }
 
-    
     public FunctionReference resolveInDirs(String name, Collection<CachedDirectory> dirs){
-        //System.err.println(name+" "+dirs);
-        boolean b = true;
-        if (dirs == null) return null;
+        if (dirs == null) {
+          return null;
+        }
         for (String ext: codeFileExtensions){
-            Iterator<CachedDirectory> i = dirs.iterator();
             for (CachedDirectory dir : dirs){
                 if (dir.exists()){
                     if (dir.getChildFileNames().contains(name+"."+ext)){
@@ -174,10 +173,9 @@ public class MatlabPath extends AbstractPathEnvironment {
     }
     
     @Override
-    public Map<String, FunctionReference> getAllOverloaded(String className, GenericFile cotntext) {
+    public Map<String, FunctionReference> getAllOverloaded(String className, GenericFile context) {
         Collection<CachedDirectory> oDirs = getAllOverloadedDirs(className);
-        Collection<GenericFile> list = new ArrayList<GenericFile>();
-        Map<String, FunctionReference> map = new HashMap<String,FunctionReference>();
+        Map<String, FunctionReference> map = Maps.newHashMap();
         for (String ext : codeFileExtensions){
             for (CachedDirectory dir : oDirs){
                 for (String filename : dir.getChildFileNames()){
@@ -194,14 +192,11 @@ public class MatlabPath extends AbstractPathEnvironment {
     }
     
     public List<FolderHandler> getAsFolderHandlerList(){
-    	LinkedList<FolderHandler> list = new LinkedList<FolderHandler>();
-    	for (CachedDirectory dir : directories){
-    		list.add(FolderHandler.getFolderHandler(dir));
-    	}
-    	return list;
+      return ImmutableList.copyOf(Lists.transform(directories, 
+          new Function<CachedDirectory, FolderHandler>() {
+        @Override public FolderHandler apply(CachedDirectory dir) {
+          return FolderHandler.getFolderHandler(dir);
+        }
+      }));
     }
-    
 }
-
-
-
