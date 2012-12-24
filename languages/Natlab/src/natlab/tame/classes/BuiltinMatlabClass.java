@@ -48,7 +48,6 @@ public class BuiltinMatlabClass extends OldMatlabClass{
 		    .put(PrimitiveClassReference.UINT16, 3)
 		    .put(PrimitiveClassReference.UINT32, 3)
 		    .put(PrimitiveClassReference.UINT64, 3)
-		    .put(PrimitiveClassReference.UINT64, 3)
 		    .put(PrimitiveClassReference.DOUBLE, 2)
 		    .put(PrimitiveClassReference.CHAR, 2)
 		    .put(PrimitiveClassReference.LOGICAL, 1)
