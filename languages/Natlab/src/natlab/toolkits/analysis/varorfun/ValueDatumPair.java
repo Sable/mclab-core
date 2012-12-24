@@ -14,7 +14,7 @@ public class ValueDatumPair< V, D >
       return new ValueDatumPair<A, B>(a, b);
     }
     
-    private ValueDatumPair( V v, D d )
+    public ValueDatumPair( V v, D d )
     {
         value = v;
         datum = d;
