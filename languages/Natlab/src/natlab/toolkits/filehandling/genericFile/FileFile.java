@@ -31,12 +31,7 @@ public class FileFile extends GenericFile {
     public FileFile(File file){
         this.file = file.getAbsoluteFile();
     }
-    
-    @Deprecated
-    public java.io.File getFileObject(){
-        return file;
-    }
-    
+
     public FileFile(String name){
         file = new File(name);
     }

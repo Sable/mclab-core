@@ -197,7 +197,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
   public void caseMyLValue(LValueExpr node) {
     ASTNode target = getTarget(node);
     ASTNode args = getArgs(node);
-    NameExpr res = Iterables.getFirst(target.getNameExpressions(), null);
+    NameExpr res = Iterables.getFirst((Set<NameExpr>)target.getNameExpressions(), null);
     String targetName = res.getName().getID();
 
     List<NameExpr> candidatesBackup;
@@ -261,7 +261,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
       if (outerParameterizedExpr==null) {
         System.err.println("Cannot bind end to anything");
       } else {
-        NameExpr res = Iterables.getFirst(getTarget(outerParameterizedExpr).getNameExpressions(), null);
+        NameExpr res = Iterables.getFirst((Set<NameExpr>) getTarget(outerParameterizedExpr).getNameExpressions(), null);
         System.err.println("No candidates, making " +res.getName().getID() + " a TOP" );
         bindError(res, e);
       }
