@@ -74,7 +74,8 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     @Override
     public Constant caseFalse(Builtin builtin, Args<V> arg) {
     	if (arg.size() > 0) return null;
-        return Constant.get(true);
+        return Constant.get(false);
+        //Originaly, it's "true" inside the parenthesis, Xu corrected it to "false" @ 25,Dec,2012,6:23pm
     }
 
     @Override
