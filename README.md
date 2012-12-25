@@ -1,12 +1,13 @@
 McLab/Natlab
 ============
 
-This is Java-based "frontend" of the McLab project, which aims to provide
-compiler tools and infrastructure for MATLAB. Although we call it the
-frontend, it is starting to grow various backends, for example Fortran
-and X10. In practice it houses development for the "static" branch of the
-McLab project (as opposed to the "dynamic" branch's McVM project, which
-will be made available soon).
+This is the Java-based infrastructure of the McLab project, which aims to
+provide compiler tools and infrastructure for MATLAB (and potentially other
+scientific languages in the future). In practice this repository houses
+development for the project's "static" branch, which includes the frontend
+(parsing, static analysis, refactoring, etc.), and work towards static
+compilation. (The "dynamic" branch's McVM project will be made available
+soon.)
 
 Overview
 --------
@@ -19,8 +20,8 @@ Natlab (nice Matlab) is a simplified version of Matlab that is easier to
 parse. (There are only syntactic differences between the two.)
 * `natlab` includes the generated Natlab parser, as well as
 `natlab.Main`, the entry point. 
-* `natlab.rewrite` is a simple framework for AST transformations and
-simplifications. Some useful simplifications, such as conversion to
+* `natlab.toolkits.rewrite` is a simple framework for AST transformations
+and simplifications. Some useful simplifications, such as conversion to
 three-address code, are provided.
 * `natlab.toolkits.analysis` is an (intraprocedural) dataflow analysis
 framework, and subpackages provide various common analyses. Of particular
@@ -46,9 +47,10 @@ These can either build the projects on the command line, or in eclipse
 (import in the `ant-view`) using the `eclipse.*` targets. The ant targets
 generate necessary code (like the Natlab AST). The command line ant targets
 also compile everything, while the eclipse targets do not -- eclipse will
-compile the code. Matlab depends on the generated/compile Natlab files --
-but it seems that the Natlab build targets will automatically generate the
-Matlab targets.
+compile the code.
+
+(The build process contains a lot of cruft, duplication, some things are
+broken, etc. There is an ongoing effort to clean it up.)
 
 It is useful for analyses to have access to the library files of a Matlab
 installation. After `Natlab.jar` has been built with `ant jar`, you can run
@@ -57,4 +59,16 @@ Matlab `path` function and feeds its output to the jar.
 
 License
 -------
-Apache 2.0
+Apache 2.0                                                
+
+Disclaimer
+----------
+Some of this code is confusing, poorly documented, and not well understood,
+as the grad students who wrote much of it have moved on to bigger and
+better things.  (This is fairly typical of research software.) Most of the
+documentation can be found in the various 
+[McLab publications](http://www.sable.mcgill.ca/mclab/Publications.html),
+but in many cases there are discrepancies between terminology used in
+papers and what's in the code. There is an ongoing effort to clean up the
+code and the build process, and document everything, so please bear with
+us as we work through this.
