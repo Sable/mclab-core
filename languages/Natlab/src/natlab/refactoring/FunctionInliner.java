@@ -59,20 +59,24 @@ public class FunctionInliner {
 	};
 	
 	private LinkedList<AssignStmt> functionCalls(Function f) {
-	    return Lists.newLinkedList(NodeFinder.find(f.getStmtList(), AssignStmt.class,
-	        new Predicate<AssignStmt>() {
-	      @Override public boolean apply(AssignStmt stmt) {
-	        return stmt.getRHS() instanceof ParameterizedExpr;
-	      }
-	    }));
+	    return Lists.newLinkedList(
+	        NodeFinder.of(AssignStmt.class)
+	        .filter(new Predicate<AssignStmt>() {
+	          @Override public boolean apply(AssignStmt stmt) {
+	            return stmt.getRHS() instanceof ParameterizedExpr;
+	          }
+	        })
+	        .findIn(f.getStmtList()));
 	}
 	
 	private Iterable<Function> nonNestedFunctions(ASTNode<?> tree) {
-	  return NodeFinder.find(tree, Function.class, new Predicate<Function>() {
-	    @Override public boolean apply(Function f) {
-	      return !(f.getParent().getParent() instanceof Function);
-	    }
-	  });
+	  return NodeFinder.of(Function.class)
+	      .filter(new Predicate<Function>() {
+	        @Override public boolean apply(Function f) {
+	          return !(f.getParent().getParent() instanceof Function);
+	        }
+	      })
+	      .findIn(tree);
 	}
 	
 	public int countCalls(){

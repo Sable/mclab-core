@@ -1,8 +1,8 @@
 package natlab.refactoring;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
@@ -14,6 +14,7 @@ import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
+import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
@@ -29,9 +30,13 @@ import ast.NameExpr;
 import ast.Script;
 import ast.Stmt;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 public class MScriptInliner {	
 	private CompilationUnits cu;
-	HashMap<String, Script> scripts = new HashMap<String, Script>();
+	Map<String, Script> scripts = Maps.newHashMap();
 	
 	public MScriptInliner(CompilationUnits cu) {
 		this.cu = cu;
@@ -39,17 +44,13 @@ public class MScriptInliner {
 			if (cu.getChild(0).getChild(i) instanceof Script) {
 				Script s = (Script) cu.getChild(0).getChild(i);
 				scripts.put(FolderHandler.getFileName(s.getFile()), s);
-
 			}
 		}
-
-		this.cu = cu;
 	};
-	
 
 	public LinkedList<LinkedList<Exception>> inlineAll(){
-		LinkedList<LinkedList<Exception>>  res = new LinkedList<LinkedList<Exception>>();
-		for (Function f: NodeFinder.find(cu, Function.class)){
+		LinkedList<LinkedList<Exception>>  res = Lists.newLinkedList();
+		for (Function f: NodeFinder.of(Function.class).findIn(cu)) {
 			if (! (f.getParent().getParent() instanceof Function))
 				res.addAll(inlineAllScripts(f));
 		}
@@ -57,24 +58,17 @@ public class MScriptInliner {
 	}
 
 	private Set<Stmt> findScripts(Function f) {
-		final Set<Stmt> scriptCalls = new LinkedHashSet<Stmt>();
-		AbstractNodeCaseHandler n = new AbstractNodeCaseHandler() {
-			public void caseASTNode(ASTNode n) {
-				if (n instanceof ExprStmt) {
-					if (n.getNumChild() == 1
-							&& n.getChild(0) instanceof NameExpr) {
-						NameExpr child = (NameExpr) n.getChild(0);
-						if (scripts.containsKey(child.getName().getID())) {
-							scriptCalls.add((Stmt) n);
-						}
-					}
-				}
-				for (int i = 0; i < n.getNumChild(); i++) {
-					caseASTNode(n.getChild(i));
-				}
-			}
-		};
-		n.caseASTNode(f);
+		final Set<Stmt> scriptCalls = Sets.newLinkedHashSet();
+		NodeFinder.of(ExprStmt.class).applyIn(f, new AbstractNodeFunction<ExprStmt>() {
+		  @Override public void apply(ExprStmt n) {
+	      if (n.getNumChild() == 1 && n.getChild(0) instanceof NameExpr) {
+          NameExpr child = (NameExpr) n.getChild(0);
+          if (scripts.containsKey(child.getName().getID())) {
+            scriptCalls.add((Stmt) n);
+          }
+        }
+		  }
+		});
 		return scriptCalls; 
 	}
 	
@@ -117,27 +111,21 @@ public class MScriptInliner {
 	
 	
 	private Set<String> findSiblings(Function f) {
-		ASTNode p = f.getParent();
-		while (! (p instanceof FunctionList))
-			p=p.getParent();
-		FunctionList fl = (FunctionList)p;
-		final Set<String> res = new LinkedHashSet();
-		for (int i=0; i<fl.getFunctionList().getNumChild();i++){
-			res.add(fl.getFunction(i).getName());
+	  FunctionList fl = NodeFinder.findParent(f, FunctionList.class);
+		final Set<String> res = Sets.newLinkedHashSet();
+		for (Function function : fl.getFunctions()) {
+		  res.add(function.getName());
 		}
-		return res; 
+		return res;
 	}
 	
 	public LinkedList<LinkedList<Exception>> inlineAllScripts(Function f) {
-		
-		
 		Set<Stmt> scriptCalls = findScripts(f);
-		LinkedList<LinkedList<Exception>> res= new LinkedList<LinkedList<Exception>>();
+		LinkedList<LinkedList<Exception>> res = Lists.newLinkedList();
 		for (Stmt s: scriptCalls){
             res.add(inlineStmt(s));
 		}
 		return res;
-//		System.out.println("Result after inlining"+ f.getPrettyPrinted());
 	}
 
 	public java.util.LinkedList<Exception> inlineStmt(Stmt s) {
