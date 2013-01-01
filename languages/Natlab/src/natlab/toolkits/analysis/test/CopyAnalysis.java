@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import natlab.toolkits.analysis.HashMapFlowMap;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
 import analysis.AbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -18,11 +17,11 @@ import ast.ParameterizedExpr;
 import ast.Stmt;
 public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, AssignStmt>>{
 	
-	private LivelinessAnalysis live;
+	private LivenessAnalysis live;
 	
 	public CopyAnalysis(ASTNode<?> tree) {
 		super(tree);
-		live = new LivelinessAnalysis(tree);
+		live = new LivenessAnalysis(tree);
 		live.analyze();
 	}
 

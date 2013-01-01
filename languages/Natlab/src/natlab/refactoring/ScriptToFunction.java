@@ -11,7 +11,7 @@ import java.util.TreeSet;
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
@@ -66,7 +66,7 @@ public class ScriptToFunction {
 		fl.addFunction(f);
 		fl.setFullPath(script.getFullPath());
 		f.setParent(fl.getFunctionList());
-		LivelinessAnalysis live = new LivelinessAnalysis(script);
+		LivenessAnalysis live = new LivenessAnalysis(script);
 		VFFlowInsensitiveAnalysis scriptKind = new VFFlowInsensitiveAnalysis(script);
 		ReachingDefs scriptReaching = new ReachingDefs(script);
 		live.analyze(); 
@@ -114,7 +114,7 @@ public class ScriptToFunction {
 			TreeSet<String> inputArgsCurrent = new TreeSet<String>();
 			TreeSet<String> outputArgsCurrent = new TreeSet<String>();
 			ReachingDefs mayReach = new ReachingDefs(callFunc);
-			LivelinessAnalysis callLive = new LivelinessAnalysis(callFunc);
+			LivenessAnalysis callLive = new LivenessAnalysis(callFunc);
 			mayReach.analyze();
 			callLive.analyze();
 			Set<String> callLiveVars = callLive.getOutFlowSets().get(call).getSet();

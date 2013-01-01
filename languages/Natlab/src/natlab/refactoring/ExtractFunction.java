@@ -7,7 +7,7 @@ import java.util.Set;
 
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
@@ -50,10 +50,10 @@ public class ExtractFunction {
         ReachingDefs reachingAnalysisNew = new ReachingDefs(f);
         reachingAnalysisNew.analyze();
 
-        LivelinessAnalysis liveAnalysisOrig = new LivelinessAnalysis(orig);
+        LivenessAnalysis liveAnalysisOrig = new LivenessAnalysis(orig);
         liveAnalysisOrig.analyze();
 
-        LivelinessAnalysis liveAnalysisNew = new LivelinessAnalysis(f);
+        LivenessAnalysis liveAnalysisNew = new LivenessAnalysis(f);
         liveAnalysisNew.analyze();
 
         Stmt startStmt = stmtList.getChild(offset_start);

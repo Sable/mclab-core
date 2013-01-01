@@ -17,8 +17,8 @@ import natlab.refactoring.Exceptions.TooManyOutputParams;
 import natlab.toolkits.ContextStack;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.HashMapFlowMap;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
 import natlab.toolkits.analysis.test.CopyAnalysis;
+import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
@@ -144,7 +144,7 @@ public class FunctionInliner {
 	private boolean removeExtra(Function f, AssignStmt s){
 		String left = ((NameExpr)s.getLHS()).getName().getID();
 		String right = ((NameExpr)s.getRHS()).getName().getID();
-		LivelinessAnalysis l = new LivelinessAnalysis(f);
+		LivenessAnalysis l = new LivenessAnalysis(f);
 		ReachingDefs defs = new ReachingDefs(f);
 		CopyAnalysis copies = new CopyAnalysis(f);
 		java.util.List<NameExpr> exprs = NodeFinder.find(f.getStmts(), NameExpr.class);

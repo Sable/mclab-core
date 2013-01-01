@@ -1,6 +1,6 @@
 package mclint;
 
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.toolkits.analysis.test.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
@@ -11,11 +11,11 @@ public class AnalysisKit {
   private ASTNode<?> tree;
   private VFAnalysis varorfun;
   private ReachingDefs reachingDefs;
-  private LivelinessAnalysis liveVars;
+  private LivenessAnalysis liveVars;
 
   public static AnalysisKit forAST(ASTNode<?> tree) {
     return new AnalysisKit(tree, new VFPreorderAnalysis(tree), new ReachingDefs(tree),
-        new LivelinessAnalysis(tree));
+        new LivenessAnalysis(tree));
   }
 
   public ASTNode<?> getAST() {
@@ -36,11 +36,11 @@ public class AnalysisKit {
     return (ReachingDefs) ensureAnalyzed(reachingDefs);
   }
 
-  public LivelinessAnalysis getLiveVariablesAnalysis() {
-    return (LivelinessAnalysis) ensureAnalyzed(liveVars);
+  public LivenessAnalysis getLiveVariablesAnalysis() {
+    return (LivenessAnalysis) ensureAnalyzed(liveVars);
   }
 
-  private AnalysisKit(ASTNode<?> tree, VFAnalysis vf, ReachingDefs rd, LivelinessAnalysis la) {
+  private AnalysisKit(ASTNode<?> tree, VFAnalysis vf, ReachingDefs rd, LivenessAnalysis la) {
     this.tree = tree;
     this.varorfun = vf;
     this.reachingDefs = rd;

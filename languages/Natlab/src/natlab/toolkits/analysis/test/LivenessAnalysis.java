@@ -1,4 +1,4 @@
-package natlab.toolkits.analysis.liveliness;
+package natlab.toolkits.analysis.test;
 
 import java.util.List;
 import java.util.Set;
@@ -20,10 +20,10 @@ import ast.Stmt;
 
 import com.google.common.collect.Sets;
 
-public class LivelinessAnalysis extends
+public class LivenessAnalysis extends
 		AbstractSimpleStructuralBackwardAnalysis<HashSetFlowSet<String>> {
 
-	public LivelinessAnalysis(ASTNode<?> tree) {
+	public LivenessAnalysis(ASTNode<?> tree) {
 		super(tree);	
 	}	
 	

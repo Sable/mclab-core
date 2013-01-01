@@ -8,7 +8,7 @@ import mclint.LintAnalysis;
 import mclint.Message;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.HashSetFlowSet;
-import natlab.toolkits.analysis.liveliness.LivelinessAnalysis;
+import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.ForStmt;
@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   private static final String WARNING = "Unused variable %s.";
 
-  private LivelinessAnalysis liveVar;
+  private LivenessAnalysis liveVar;
 
   /* We shouldn't warn that output parameters aren't used. */
   private Set<String> outputParams = Sets.newHashSet();
