@@ -13,7 +13,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 /**
- * A utility for that finds nodes in an AST, optionally satisfying a given
+ * A utility that finds nodes in an AST, optionally satisfying a given
  * predicate, and optionally transforms them using a given function. For example, the
  * following snippet searches <tt>tree</tt> for all functions that aren't nested, and
  * returns a list of their names:
