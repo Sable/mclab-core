@@ -10,7 +10,6 @@ import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import natlab.toolkits.analysis.test.LivenessAnalysis;
 import natlab.utils.NodeFinder;
-import ast.ASTNode;
 import ast.ForStmt;
 import ast.Function;
 import ast.Name;
@@ -19,8 +18,6 @@ import ast.Stmt;
 import com.google.common.collect.Sets;
 
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
-  private static final String WARNING = "Unused variable %s.";
-
   private LivenessAnalysis liveVar;
 
   /* We shouldn't warn that output parameters aren't used. */
@@ -28,8 +25,9 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   protected Lint lint;
 
-  private Message unused(ASTNode<?> node, String name) {
-    return Message.regarding(node, "UNUSED_VAR", String.format(WARNING, name));
+  private void reportUnused(Name node) {
+    lint.report(Message.regarding(node, "UNUSED_VAR",
+        String.format("Unused variable %s.", node.getID())));
   }
 
   public UnusedVar(AnalysisKit kit) {
@@ -46,7 +44,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   }
 
   private boolean isLive(Name node) {
-    Stmt parentStmt = NodeFinder.findParent(node, Stmt.class);
+    Stmt parentStmt = NodeFinder.of(Stmt.class).findParent(node);
     HashSetFlowSet<String> setToCheck;
     if (parentStmt.getParent() instanceof ForStmt) {
       Stmt first = ((ForStmt) (parentStmt.getParent())).getStmt(0);
@@ -59,19 +57,17 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   @Override
   public void caseLHSName(Name node) {
-    if (outputParams.contains(node.getID())) {
-      return;
-    }
-    if (!isLive(node)) {
-      lint.report(unused(node, node.getID()));
+    if (!outputParams.contains(node.getID()) && !isLive(node)) {
+      reportUnused(node);
     }
   }
 
   @Override
   public void caseInParam(Name node) {
-    Stmt firstStatement = NodeFinder.findParent(node, Function.class).getStmt(0);
-    if (!liveVar.isLive(firstStatement, node.getID())) {
-      lint.report(unused(node, node.getID()));
+    Stmt firstStatement = NodeFinder.of(Function.class).findParent(node).getStmt(0);
+    if (!(liveVar.getInFlowSets().containsKey(firstStatement) &&
+          liveVar.getInFlowSets().get(firstStatement).contains(node.getID()))) {
+      reportUnused(node);
     }
   }
 

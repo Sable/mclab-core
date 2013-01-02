@@ -1,6 +1,8 @@
 package natlab.toolkits.analysis.test;
 
-import java.util.List;
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
+
 import java.util.Set;
 
 import natlab.toolkits.analysis.HashSetFlowSet;
@@ -11,13 +13,13 @@ import ast.AssignStmt;
 import ast.CellIndexExpr;
 import ast.DotExpr;
 import ast.Expr;
-import ast.Function;
 import ast.MatrixExpr;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
@@ -64,31 +66,35 @@ public class LivenessAnalysis extends
 	public void caseAssignStmt(AssignStmt s) {
 		outFlowSets.put(s, currentOutSet.copy());	
 		Set<NameExpr> lValues = Sets.newHashSet();
-		List<NameExpr> all = NodeFinder.find(s, NameExpr.class);
+
 		if (s.getLHS() instanceof MatrixExpr) {
-			for (Expr expr : ((MatrixExpr) s.getLHS()).getRow(0)
-					.getElementList()) {
+			for (Expr expr : ((MatrixExpr) s.getLHS()).getRow(0).getElementList()) {
 				NameExpr ne = getLValue(expr);
 				lValues.add(ne);
 				currentOutSet.remove(ne.getName().getID());
 			}
-		} else
+		} else {
 			lValues.add(getLValue(s.getLHS()));
+		}
 		
-		for (NameExpr n : lValues)
+		for (NameExpr n : lValues) {
 			currentOutSet.remove(n.getName().getID());
+		}
 		
 		caseASTNode(s.getRHS());
-		
-		for (NameExpr n : all)
-			if (!lValues.contains(n))
-				currentOutSet.add(n.getName().getID());
-
+		currentOutSet.addAll(NodeFinder.of(NameExpr.class)
+		    .filter(not(in(lValues)))
+		    .transform(new Function<NameExpr, String>() {
+		      @Override public String apply(NameExpr expr) {
+		        return expr.getName().getID();
+		      }
+		    })
+		    .findIn(s));
 		inFlowSets.put(s, currentInSet.copy());
 	}
 
 	@Override
-	public void caseFunction(Function node) {
+	public void caseFunction(ast.Function node) {
 		currentOutSet = newInitialFlow();
 		currentInSet = currentOutSet.copy();
 		outFlowSets.put(node, currentOutSet);
@@ -103,15 +109,6 @@ public class LivenessAnalysis extends
 		outFlowSets.put(node, currentOutSet);
 		node.getStmts().analyze(this);
 		inFlowSets.put(node, currentInSet);
-	}
-
-	public boolean isLive(ASTNode<?> n, String s) {
-		while (!(n instanceof Stmt)) {
-			n = n.getParent();
-		}
-		if (inFlowSets.containsKey(n))
-			return inFlowSets.get(n).contains(s);
-		throw new RuntimeException("NameExpr not inside an Stmt");
 	}
 
 	@Override

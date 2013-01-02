@@ -9,14 +9,11 @@ import mclint.Message;
 import mclint.util.DefinitionVisitor;
 import natlab.tame.builtin.Builtin;
 import natlab.toolkits.path.BuiltinQuery;
-import ast.ASTNode;
 import ast.Name;
 
 import com.google.common.collect.Sets;
 
 public class Shadowing extends DefinitionVisitor implements LintAnalysis {
-  private static final String WARNING = "Definition of %s shadows a builtin function or constant.";
-
   private BuiltinQuery query = Builtin.getBuiltinQuery();
   private Set<String> reported = Sets.newHashSet();
 
@@ -26,18 +23,18 @@ public class Shadowing extends DefinitionVisitor implements LintAnalysis {
     super(kit.getAST());
   }
 
-  private Message shadow(ASTNode<?> node, String name) {
-    return Message.regarding(node, "SHADOW_BUILTIN", String.format(WARNING, name));
+  private void reportShadowing(Name node) {
+    if (!reported.contains(node.getID())) {
+      lint.report(Message.regarding(node, "SHADOW_BUILTIN",
+          "Definition of " + node.getID() + " shadows a builtin function or constant."));
+      reported.add(node.getID());
+    }
   }
 
   @Override
   public void caseDefinition(Name node) {
-    if (reported.contains(node.getID())) {
-      return;
-    }
     if (query.isBuiltin(node.getID())) {
-      lint.report(shadow(node, node.getID()));
-      reported.add(node.getID());
+      reportShadowing(node);
     }
   }
 
