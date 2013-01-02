@@ -10,7 +10,6 @@ public class AstUtil {
   /**
    * Replaces a subtree with another, correctly updating parent/child links.
    */
-  @SuppressWarnings("unchecked")
   public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
   }
@@ -21,9 +20,8 @@ public class AstUtil {
    * Technically this will always work, but it really only makes sense if the replaced node is an
    * element of a list to begin with. 
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public static void replaceWithContents(ASTNode<?> node, ast.List<?> source) {
-    ASTNode parent = node.getParent();
+    ASTNode<?> parent = node.getParent();
     int index = parent.getIndexOfChild(node);
     node.getParent().removeChild(index);
     for (Object element : source) {
