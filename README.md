@@ -57,10 +57,6 @@ installation. After `Natlab.jar` has been built with `ant jar`, you can run
 the `registerMatlabPathWithNatlab.m` script in Matlab; it just calls the
 Matlab `path` function and feeds its output to the jar.
 
-License
--------
-Apache 2.0                                                
-
 Disclaimer
 ----------
 Some of this code is confusing, poorly documented, and not well understood,
@@ -72,3 +68,23 @@ but in many cases there are discrepancies between terminology used in
 papers and what's in the code. There is an ongoing effort to clean up the
 code and the build process, and document everything, so please bear with
 us as we work through this.
+
+Copyright and License
+---------------------
+Copyright 2008-2013 Amina Aslam, Toheed Aslam, Ismail Badawi, Andrew Bodzay,
+Andrew Casey, Maxime Chevalier-Boisvert, Jesse Doherty, Anton Dubrau,
+Rahul Garg, Vineet Kumar, Nurudeen Lameed, Jun Li, Xu Li, Soroush Radpour
+Olivier Savary Belanger, Laurie Hendren, Clark Verbrugge and McGill
+University.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this work except in compliance with the License. You may obtain a copy
+of the License in the LICENSE file, or at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the LICENSE.
