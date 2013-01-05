@@ -73,7 +73,7 @@ Copyright and License
 ---------------------
 Copyright 2008-2013 Amina Aslam, Toheed Aslam, Ismail Badawi, Andrew Bodzay,
 Andrew Casey, Maxime Chevalier-Boisvert, Jesse Doherty, Anton Dubrau,
-Rahul Garg, Vineet Kumar, Nurudeen Lameed, Jun Li, Xu Li, Soroush Radpour
+Rahul Garg, Vineet Kumar, Nurudeen Lameed, Jun Li, Xu Li, Soroush Radpour,
 Olivier Savary Belanger, Laurie Hendren, Clark Verbrugge and McGill
 University.
 
