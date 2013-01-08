@@ -1,4 +1,5 @@
 package natlab;
+import static natlab.NatlabParser.Terminals.*;
 %%
 import beaver.Symbol;
 import beaver.Scanner;

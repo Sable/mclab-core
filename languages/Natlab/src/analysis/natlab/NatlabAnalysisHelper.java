@@ -398,16 +398,6 @@ public class NatlabAnalysisHelper<A> implements nodecases.NodeCaseHandler //exte
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         callback.caseLambdaExpr( node );
     }
-    public void caseVariableDecl(VariableDecl node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseVariableDecl( node );
-    }
-    public void caseFunctionDecl(FunctionDecl node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseFunctionDecl( node );
-    }
     public void caseFunction(Function node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
@@ -577,16 +567,6 @@ public class NatlabAnalysisHelper<A> implements nodecases.NodeCaseHandler //exte
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         callback.caseKnownExtents( node );
-    }
-    public void caseExpandedAnnotation(ExpandedAnnotation node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseExpandedAnnotation( node );
-    }
-    public void caseAnnotation(Annotation node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseAnnotation( node );
     }
     public void caseEmptyStmt(EmptyStmt node)
     {

@@ -275,17 +275,9 @@ aspect ASTAnalyze
     {
         visitor.caseFunction(this);
     }
-    public void FunctionDecl.analyze(nodecases.NodeCaseHandler visitor)
-    {
-        visitor.caseFunctionDecl(this);
-    }
     public void Row.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseRow(this);
-    }
-    public void VariableDecl.analyze(nodecases.NodeCaseHandler visitor)
-    {
-        visitor.caseVariableDecl(this);
     }
 
     //Begin IR nodes
@@ -399,14 +391,6 @@ aspect ASTAnalyze
     public void BinaryExpr.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseBinaryExpr(this);
-    }
-    public void Annotation.analyze(nodecases.NodeCaseHandler visitor)
-    {
-        visitor.caseAnnotation(this);
-    }
-    public void ExpandedAnnotation.analyze(nodecases.NodeCaseHandler visitor)
-    {
-        visitor.caseExpandedAnnotation(this);
     }
     public void Expr.analyze(nodecases.NodeCaseHandler visitor)
     {

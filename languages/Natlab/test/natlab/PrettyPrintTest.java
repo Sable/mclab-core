@@ -33,7 +33,7 @@ public class PrettyPrintTest extends TestCase {
 				for(String error : parser.getErrors()) {
 					System.out.println(error);
 				}
-			} else if(!original.errorCheck()) {
+			} else {
 				outline = original.getPrettyPrinted();		
 			}
 			

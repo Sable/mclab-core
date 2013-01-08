@@ -120,10 +120,6 @@ public interface NatlabNodeCaseHandler
     public void caseNEExpr(NEExpr node);
     public void caseFunctionHandleExpr(FunctionHandleExpr node);
     public void caseLambdaExpr(LambdaExpr node);
-    public void caseAnnotation(Annotation node);
-    public void caseExpandedAnnotation(ExpandedAnnotation node);
-    public void caseVariableDecl(VariableDecl node);
-    public void caseFunctionDecl(FunctionDecl node);
     public void caseType(Type node);
     public void caseBaseType(BaseType node);
     public void casePrimitiveType(PrimitiveType node);

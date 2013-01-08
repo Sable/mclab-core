@@ -1,4 +1,0 @@
-[1, 11]  unexpected token ELEMENT_SEPARATOR
-[1, 11]  try replacing with INTERSECT
-[1, 15]  unexpected token STMT_TERMINATOR
-[1, 14]  try inserting UNION

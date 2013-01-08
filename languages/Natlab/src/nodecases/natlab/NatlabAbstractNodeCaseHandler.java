@@ -388,22 +388,6 @@ public abstract class NatlabAbstractNodeCaseHandler implements nodecases.NodeCas
     {
         caseExpr(node);
     }
-    public void caseAnnotation(Annotation node)
-    {
-        caseStmt(node);
-    }
-    public void caseExpandedAnnotation(ExpandedAnnotation node)
-    {
-        caseAnnotation(node);
-    }
-    public void caseVariableDecl(VariableDecl node)
-    {
-        caseStmt(node);
-    }
-    public void caseFunctionDecl(FunctionDecl node)
-    {
-        caseFunction(node);
-    }
     public void caseType(Type node)
     {
         caseASTNode(node);
