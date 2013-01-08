@@ -58,7 +58,7 @@
 	
 	<!-- remove files created by gen -->
 	<target name="clean.gen">
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${gen.dir}" includes="**/*" />
 		</delete>
 	</target>
