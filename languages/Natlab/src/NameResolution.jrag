@@ -19,7 +19,6 @@
 //                                                                             //
 // =========================================================================== //
 
-import natlab.SymbolTableEntry;
 import java.util.*;
 
 aspect NameResolution{
