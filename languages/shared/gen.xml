@@ -33,21 +33,32 @@
 	
 	<!-- generates Java files from JastAdd specs -->
 	<target name="jastadd" depends="def.jastadd.task">
-		<mkdir dir="${gen.dir}/${ast.pkg}" />
 		<jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
 			<fileset dir="${src.dir}">
-				<include name="**/*.ast" />
-				<include name="**/*.jadd" />
-				<include name="**/*.jrag" />
-				<exclude name="**/backends/**" />
+				<include name="*.ast" />
+				<include name="*.jadd" />
+				<include name="*.jrag" />
 			</fileset>
 			<fileset dir="${test.dir}">
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
-				<exclude name="**/backends/**" />
 			</fileset>
 		</jastadd>
+    <jastadd package="${x10.ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+      <fileset dir="${src.dir}/${x10.src.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset> 
+    </jastadd>
+    <jastadd package="${fortran.ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+      <fileset dir="${src.dir}/${fortran.src.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset> 
+    </jastadd> 
 	</target>
 
         <!-- Gen - beaver: jflex, beaver, jastadd, and options -->
