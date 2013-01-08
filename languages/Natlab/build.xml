@@ -31,13 +31,10 @@
 	<import file="../shared/compile.xml" />
 	<import file="../shared/bindir.xml" />
 	<import file="../shared/options.xml" />
-	<import file="../shared/CodeGen.xml" />
 
 	<!-- Extend and override parts of gen.xml -->
   <import optional="true" file="local.xml" />
 
-
-	<import file="../shared/CodeGen.xml" />
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac includeantruntime="false" destdir="${ant.bin.dir}">
@@ -48,43 +45,43 @@
 
 	<target name="gen.scanner.tests" depends="set.bin.dir">
 		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${lexer.test.list.file}" />
-			<arg value="${gen.dir}" />
+			<arg value="${basedir}/${lexer.test.list.file}" />
+			<arg value="${basedir}/${gen.dir}" />
 		</java>
 	</target>
 
 	<target name="gen.parser.pass.tests" depends="set.bin.dir">
 		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${parser.pass.test.list.file}" />
-			<arg value="${gen.dir}" />
+			<arg value="${basedir}/${parser.pass.test.list.file}" />
+			<arg value="${basedir}/${gen.dir}" />
 		</java>
 	</target>
 
 	<target name="gen.parser.fail.tests" depends="set.bin.dir">
 		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${parser.fail.test.list.file}" />
-			<arg value="${gen.dir}" />
+			<arg value="${basedir}/${parser.fail.test.list.file}" />
+			<arg value="${basedir}/${gen.dir}" />
 		</java>
 	</target>
 
   <target name="gen.multireturn.pass.tests" depends="set.bin.dir">
     <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${multireturn.pass.test.list.file}" />
-      <arg value="${gen.dir}" />
+      <arg value="${basedir}/${multireturn.pass.test.list.file}" />
+      <arg value="${basedir}/${gen.dir}" />
     </java>
   </target>
 
   <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
     <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${leftthreeaddress.pass.test.list.file}" />
-      <arg value="${gen.dir}" />
+      <arg value="${basedir}/${leftthreeaddress.pass.test.list.file}" />
+      <arg value="${basedir}/${gen.dir}" />
     </java>
   </target>
 
   <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
     <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${simplifications.pass.test.master.file}" />
-      <arg value="${gen.dir}" />
+      <arg value="${basedir}/${simplifications.pass.test.master.file}" />
+      <arg value="${basedir}/${gen.dir}" />
     </java>
   </target>
 
@@ -94,10 +91,6 @@
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
 	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests, options" />
-
-	<!-- Special target for building MATLAB2Fortran Code-Gen -->
-  <!-- SAME AS gen EXCEPT FOR USING CodeGen.gen2-->
-	<target name="codegen" depends="compile.test.generators, CodeGen.gen2, gen.tests, options" />
 
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">
@@ -287,7 +280,4 @@ java -jar "${basedir}/${entrypoint.fortran_backend.jarname}" $$*</echo>
 	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
 	<target name="Natlab.gen" depends="gen" description="Just generates the Natlab related code" />
 
-	
-	<!-- Special target for building MATLAB2Fortran Code-Gen -->
-	<target name="build_codegen" depends="codegen, compile2" description="CodeGen: generate and build all files" />
  </project>
