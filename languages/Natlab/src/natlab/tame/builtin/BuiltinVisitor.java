@@ -355,6 +355,8 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     public Ret caseAbstractNumericalByShapeAndTypeMatrixCreation(Builtin builtin,Arg arg){ return caseAbstractByShapeAndTypeMatrixCreation(builtin,arg); }
     public Ret caseOnes(Builtin builtin,Arg arg){ return caseAbstractNumericalByShapeAndTypeMatrixCreation(builtin,arg); }
     public Ret caseZeros(Builtin builtin,Arg arg){ return caseAbstractNumericalByShapeAndTypeMatrixCreation(builtin,arg); }    
+    //Xu add this magic @4:15pm 6th Jan 2013
+    public Ret caseMagic(Builtin builtin,Arg arg){ return caseAbstractNumericalByShapeAndTypeMatrixCreation(builtin,arg); }    
     //eye takes at most 2 dims
     public Ret caseEye(Builtin builtin,Arg arg){ return caseAbstractNumericalByShapeAndTypeMatrixCreation(builtin,arg); }
 

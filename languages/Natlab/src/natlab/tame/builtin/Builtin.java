@@ -219,6 +219,7 @@ public abstract class Builtin {
         builtinMap.put("colon",Colon.getInstance());
         builtinMap.put("ones",Ones.getInstance());
         builtinMap.put("zeros",Zeros.getInstance());
+        builtinMap.put("magic",Magic.getInstance());
         builtinMap.put("eye",Eye.getInstance());
         builtinMap.put("inf",Inf.getInstance());
         builtinMap.put("nan",Nan.getInstance());
@@ -3147,7 +3148,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Rank extends AbstractMatrixLibaryFunction implements HasClassPropagationInfo {
+    public static class Rank extends AbstractMatrixLibaryFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Rank singleton = null;
         public static Rank getInstance(){
@@ -3163,6 +3164,15 @@ public abstract class Builtin {
             return "rank";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,$?->$");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -4154,6 +4164,23 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "zeros";
+        }
+        
+    }
+    public static class Magic extends AbstractNumericalByShapeAndTypeMatrixCreation  {
+        //returns the singleton instance of this class
+        private static Magic singleton = null;
+        public static Magic getInstance(){
+            if (singleton == null) singleton = new Magic();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseMagic(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "magic";
         }
         
     }

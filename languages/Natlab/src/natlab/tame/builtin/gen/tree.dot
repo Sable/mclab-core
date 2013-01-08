@@ -361,7 +361,7 @@ digraph builtins{
 
        abstractNumericalByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="NumericalByShapeAndTypeMatrixCreation"];
        abstractByShapeAndTypeMatrixCreation -> abstractNumericalByShapeAndTypeMatrixCreation;
-       ones[shape=box,label="ones\nzeros\neye",rank="max"];
+       ones[shape=box,label="ones\nzeros\nmagic\neye",rank="max"];
        abstractNumericalByShapeAndTypeMatrixCreation -> ones;
 
        abstractFloatByShapeAndTypeMatrixCreation[shape=plaintext,color=none,label="FloatByShapeAndTypeMatrixCreation"];

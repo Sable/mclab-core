@@ -416,7 +416,7 @@ matrixLibaryFunction; improperFloatFunction
 eig;; Shape([n,n]->[n,1]||[n,n],'nobalance'?->[n,n],[n,n]||[n,n],[n,n],('chol'|'qz')?->[n,1]||[n,n],[n,n],('chol'|'qz')?->[n,n],[n,n])
 norm;; Class(float (float|logical|char)?->0);; Shape($|M,($|'fro')?->$)
 # query?
-rank;; Class(float matrix?->double)
+rank;; Class(float matrix?->double);; Shape(M,$?->$)
 
 # optional 2 args
 cond
@@ -546,6 +546,8 @@ numericalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
 -isComplex(A*->R)
 ones
 zeros
+# Xu add this magic @4:15pm 6th Jan 2013
+magic
 # eye takes at most 2 dims
 eye
 
