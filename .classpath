@@ -6,9 +6,6 @@
 	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/src"/>
 	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/gen"/>
 	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/test"/>
-	<classpathentry kind="src" output="languages/Annotations/bin-eclipse" path="languages/Annotations/gen"/>
-	<classpathentry kind="src" output="languages/Annotations/bin-eclipse" path="languages/Annotations/src"/>
-	<classpathentry kind="src" output="languages/Annotations/bin-eclipse" path="languages/Annotations/test"/>
 	<classpathentry kind="src" output="languages/AspectMatlab/bin-eclipse" path="languages/AspectMatlab/gen"/>
 	<classpathentry kind="src" output="languages/AspectMatlab/bin-eclipse" path="languages/AspectMatlab/src"/>
 	<classpathentry excluding="aspectMatlab/AspectsParserTestTool.java|aspectMatlab/AspectsScannerTestTool.java|aspectMatlab/AspectsTests.java" kind="src" path="languages/AspectMatlab/test"/>

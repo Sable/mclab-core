@@ -74,9 +74,6 @@ aspect AnalysisPrettyPrint {
         return "";
     }
       
-    // Variable Declaration
-    eq VariableDecl.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) = "%Declare " + getID();
-    
     
     // Script    
     eq Script.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
@@ -107,25 +104,6 @@ aspect AnalysisPrettyPrint {
         for(beaver.Symbol comment : getComments()) {
             buf.append(comment.value);
             buf.append("\n");
-        }
-        return buf.toString();
-    }
-    
-    eq FunctionDecl.getAnalysisPrettyPrinted( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments ) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getAnalysisPrettyPrintedLessComments( analysis, compact, hideComments));
-                
-        //collect all comments     
-        StringBuffer cbuf = new StringBuffer();
-         
-        for(beaver.Symbol comment : getComments()) {
-            cbuf.append(comment.value);
-            cbuf.append("\n");
-        }
-        if (cbuf.length() > 0) 
-        {
-          // insert the comments before "end"; length of end = 3
-          buf.insert(buf.length() - getIndent().length() - 3 , cbuf.toString() );
         }
         return buf.toString();
     }

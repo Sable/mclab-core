@@ -1,8 +1,0 @@
-%component annotation_start
-%helper
-
-%extern "Symbol symbol(short)"
-
-%%
-
-"(*" {: appendToStartDelim(""); /*update start pos*/ :} START_ANNOTATION

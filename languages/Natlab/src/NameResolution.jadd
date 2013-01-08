@@ -55,7 +55,4 @@ aspect NameResolutionAdditions
     public GenericFile Program.getFile(){
         return file;
     }
-
-    public boolean Program.canDoDeclRewrites = true;
-
 }

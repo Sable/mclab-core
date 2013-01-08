@@ -75,16 +75,6 @@ aspect ASTtoXML {
 
         //syn long ASTNode.nodeCounter() = getuID();
 
-	public void Annotation.setNodeCounter(long count){
-		ASTNode node = this;
-		while(node != null && !(node instanceof CompilationUnits))
-	    		node = node.getParent();
-
-	    if( node instanceof CompilationUnits ){
-			((CompilationUnits)node).nodeCounter = count;
-	    }
-	}
-
     public Document CompilationUnits.ASTtoXML(boolean includeKinds) {
         boolean oldIncludeKinds = include_kinds_in_xml;
         include_kinds_in_xml = includeKinds;
@@ -170,7 +160,6 @@ aspect ASTtoXML {
 
         Element e = doc.createElement("Script");
         e.setAttribute("id", Long.toString(id));
-        getSymbolTableXML(doc, e);
                        
         for(HelpComment comment : getHelpComments()) {
             comment.getXML(doc, e);
@@ -196,7 +185,6 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("FunctionList");
 		e.setAttribute("id", Long.toString(id));
-        getSymbolTableXML(doc, e);
 		e.setAttribute("fullpath", fullpath);
        
         for(Function func : getFunctions()) {
@@ -216,7 +204,6 @@ aspect ASTtoXML {
 		Element e = doc.createElement("Function");
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
-		getSymbolTableXML(doc, e);
 
 		Element e1 = doc.createElement("InputParamList");
         	for(Name param : getInputParams()) {
@@ -257,7 +244,6 @@ aspect ASTtoXML {
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
 
-        getSymbolTableXML(doc, e);
         
         for(Attribute attr : getAttributes()) {
             attr.getXML(doc, e);
@@ -1095,100 +1081,4 @@ parent.appendChild(e);
 parent.appendChild(e);
         return true;
     }
-
-    eq Annotation.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("Annotation");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("text", getText());
-
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq ExpandedAnnotation.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("ExpandedAnnotation");
-		e.setAttribute("id", Long.toString(id));
-                //TODO-JD: Should we even include the annotations in the XML?
-		//getanno().getXML(doc, e, nodeCounter());
-        setNodeCounter(getanno().getNodeCounter());
-
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
-parent.appendChild(e);
-        return true;
-    }
-
-    eq VariableDecl.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("VariableDecl");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("varId", getID());
-                if( getType() == null )
-                    System.err.println("UH OH " + getID() + " is null in xml printing");
-                else{
-                    e.setAttribute("type", getType().dumpString());
-                }
-
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
-parent.appendChild(e);
-        return true;
-    }
-
-    eq FunctionDecl.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-        
-        Element e = doc.createElement("FunctionDecl");
-        e.setAttribute("id", Long.toString(id));
-        e.setAttribute("name", getName());
-        
-        getSymbolTableXML(doc, e);
-        
-        Element e1 = doc.createElement("ParamDeclList");
-        for(VariableDecl vd : getParamDecls()) {
-            vd.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-        
-        Element e2 = doc.createElement("InputParamList");
-        for(Name param : getInputParams()) {
-            param.getXML(doc, e2);
-        }
-        e.appendChild(e2);
-        
-        Element e3 = doc.createElement("OutputParamList");
-        for(Name param : getOutputParams()) {
-            param.getXML(doc, e3);
-        }
-        e.appendChild(e3);
-        
-        for(HelpComment comment : getHelpComments()) {
-            comment.getXML(doc, e);
-        }
-
-        Element eNested = doc.createElement("NestedFunctionList");
-        for(Function func : getNestedFunctions()) {
-            func.getXML(doc, eNested);
-        }
-        e.appendChild(eNested);
-        
-        Element e4 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e4);
-        }
-        e.appendChild(e4);
-        
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
-parent.appendChild(e);
-        return true;
-    }
-
 }

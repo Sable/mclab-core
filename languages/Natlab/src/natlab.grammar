@@ -254,13 +254,6 @@
 %terminals STRING;
 %terminals PROPERTIES, METHODS, EVENTS;
 
-//// ANNOTATION EXTENSION - START //////////////////////////////////////////////
-
-%terminals ANNOTATION;
-%typeof ANNOTATION = "String";
-
-//// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
-
 %typeof program, program_before_comments = "Program";
 %typeof script = "Script";
 %typeof function_list = "FunctionList";
@@ -537,9 +530,6 @@ stmt_body_before_comments =
   |  RETURN   {: return new ReturnStmt(); :}
   |  WHILE expr.e stmt_separator stmt_list.l END {: return new WhileStmt(e, l); :}
   |  FOR for_assign.a stmt_separator stmt_list.l END {: return new ForStmt(a, l); :}
-//// ANNOTATION EXTENSION - START //////////////////////////////////////////////
-  |  ANNOTATION.a {: return new Annotation(a); :}
-//// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
   ;
 
 switch_statement = 

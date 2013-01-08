@@ -35,7 +35,6 @@ public class NatlabForwardingNodeCaseHandler implements NodeCaseHandler {
     
     public void caseASTNode(ASTNode node) { callback.caseASTNode(node); }
     public void caseAndExpr(AndExpr node) { callback.caseAndExpr(node); }
-    public void caseAnnotation(Annotation node) { callback.caseAnnotation(node); }
     public void caseArgTupleType(ArgTupleType node) { callback.caseArgTupleType(node); }
     public void caseArrayTransposeExpr(ArrayTransposeExpr node) { callback.caseArrayTransposeExpr(node); }
     public void caseArrowType(ArrowType node) { callback.caseArrowType(node); }
@@ -71,7 +70,6 @@ public class NatlabForwardingNodeCaseHandler implements NodeCaseHandler {
     public void caseEndCallExpr(EndCallExpr node) { callback.caseEndCallExpr(node); }
     public void caseEndExpr(EndExpr node) { callback.caseEndExpr(node); }
     public void caseEvent(Event node) { callback.caseEvent(node); }
-    public void caseExpandedAnnotation(ExpandedAnnotation node) { callback.caseExpandedAnnotation(node); }
     public void caseExpr(Expr node) { callback.caseExpr(node); }
     public void caseExprStmt(ExprStmt node) { callback.caseExprStmt(node); }
     public void caseExtents(Extents node) { callback.caseExtents(node); }
@@ -82,7 +80,6 @@ public class NatlabForwardingNodeCaseHandler implements NodeCaseHandler {
     public void caseFloatType(FloatType node) { callback.caseFloatType(node); }
     public void caseForStmt(ForStmt node) { callback.caseForStmt(node); }
     public void caseFunction(Function node) { callback.caseFunction(node); }
-    public void caseFunctionDecl(FunctionDecl node) { callback.caseFunctionDecl(node); }
     public void caseFunctionHandleExpr(FunctionHandleExpr node) { callback.caseFunctionHandleExpr(node); }
     public void caseFunctionList(FunctionList node) { callback.caseFunctionList(node); }
     public void caseFunctionOrSignatureOrPropertyAccessOrStmt(
@@ -163,6 +160,5 @@ public class NatlabForwardingNodeCaseHandler implements NodeCaseHandler {
     public void caseUnitType(UnitType node) { callback.caseUnitType(node); }
     public void caseUnknownType(UnknownType node) { callback.caseUnknownType(node); }
     public void caseVarArgType(VarArgType node) { callback.caseVarArgType(node); }
-    public void caseVariableDecl(VariableDecl node) { callback.caseVariableDecl(node); }
     public void caseWhileStmt(WhileStmt node) { callback.caseWhileStmt(node); }
 }

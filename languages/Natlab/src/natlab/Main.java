@@ -26,7 +26,6 @@ import java.util.List;
 
 import natlab.options.Options;
 import natlab.tame.TamerTool;
-import natlab.toolkits.DependenceAnalysis.DependenceAnalysisTool;
 import ast.CompilationUnits;
 import ast.Program;
 
@@ -95,13 +94,6 @@ public class Main {
 
     if (options.getFiles().isEmpty()) {
       System.err.println("No files provided, must have at least one file.");
-      return;
-    }
-
-    if(options.danalysis()) {
-      for (Object o : options.getFiles()) {
-        DependenceAnalysisTool.run(options, (String) o);
-      }
       return;
     }
 

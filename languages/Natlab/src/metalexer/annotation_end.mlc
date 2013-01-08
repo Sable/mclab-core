@@ -1,8 +1,0 @@
-%component annotation_end
-%helper
-
-%extern "Symbol symbol(short)"
-
-%%
-
-"*)" {: :} END_ANNOTATION

@@ -215,9 +215,6 @@ Stmt stmt_body_before_comments =
   |  RETURN   {: return new ReturnStmt(); :}
   |  WHILE expr.e stmt_separator stmt_seq.l END {: return new WhileStmt(e, l); :}
   |  FOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l); :}
-//// ANNOTATION EXTENSION - START //////////////////////////////////////////////
-  |  ANNOTATION.a {: return new Annotation(a); :}
-//// ANNOTATION EXTENSION - END ////////////////////////////////////////////////
   ;
 
 SwitchStmt switch_statement = 
