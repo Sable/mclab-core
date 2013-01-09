@@ -46,16 +46,10 @@ aspect NameResolution{
         }
         return table;
     }
-    //TODO-JD: This inh attribute should return Map<String,Function> but JastAdd
-    //does not currently support inh attributes with generics like that (it's a 
-    //bug). When this is fixed, need to change this and remove the syn wrapper
-    //below
-    inh Map Function.getSiblingsInh();    
-    eq FunctionList.getFunction(int i).getSiblingsInh() = getNested();
-    eq Function.getNestedFunction(int i).getSiblingsInh() = getNested();
-    eq ClassDef.getMethod(int i).getSiblingsInh() = new HashMap<String,Function>();
-
-    syn lazy Map<String,Function> Function.getSiblings() = (Map<String,Function>)getSiblingsInh();
+    inh Map<String, Function> Function.getSiblings();
+    eq FunctionList.getFunction(int i).getSiblings() = getNested();
+    eq Function.getNestedFunction(int i).getSiblings() = getNested();
+    eq ClassDef.getMethod(int i).getSiblings() = new HashMap<String,Function>();
 
     inh LocalFunctionLookupInterface Function.getParentFunction(); //TODO - fix this, it errors on functions without parents
     eq FunctionList.getFunction(int i).getParentFunction() = this;
