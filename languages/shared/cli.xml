@@ -10,7 +10,7 @@
 
 	<target name="clean" depends="clean.gen, clean.compile" />
 
-	<target name="test" depends="set.bin.dir, build">
+	<target name="test" depends="set.bin.dir, gen, gen.tests, compile.with.tests">
 		<junit fork="true" haltonerror="true">
 			<formatter type="plain" usefile="false" />
 			<classpath refid="test.classpath" />

@@ -90,7 +90,7 @@
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen-parser, gen.tests, options" />
+	<target name="gen" depends="compile.test.generators, Gen.gen-parser, options" />
 
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">
