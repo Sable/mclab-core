@@ -16,17 +16,8 @@ import natlab.options.Options;
 import ast.CompilationUnits;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class McLint {
-  private static final String usage = "mclint file1.m [file2.m ...]";
-
-  private static void abortIf(boolean condition, String message) {
-    if (condition) {
-      System.err.println(message);
-      System.exit(1);
-    }
-  }
   
   private static List<LintAnalysis> getBuiltinAnalyses(AnalysisKit kit) {
     return ImmutableList.<LintAnalysis>builder()
