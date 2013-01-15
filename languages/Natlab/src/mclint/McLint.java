@@ -48,6 +48,10 @@ public class McLint {
         .addAll(getPluginAnalyses(kit))
         .build();
   }
+  
+  private static void registerBuiltinListeners(Lint lint) {
+
+  }
 
   public static void main(Options options) {
     CompilationUnits AST = Parsing.files(options.getFiles());

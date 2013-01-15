@@ -37,7 +37,7 @@ public class Location implements Comparable<Location> {
     else if (node.getParent() instanceof CompilationUnits)
       program = (Program)(node.getChild(0));
     else
-      program = NodeFinder.findParent(node, Program.class);
+      program = NodeFinder.of(Program.class).findParent(node);
     return program.getFile().getPath();
   }
 
