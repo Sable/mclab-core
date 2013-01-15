@@ -7,7 +7,7 @@ import java.util.Set;
 
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.HashMapFlowMap;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;

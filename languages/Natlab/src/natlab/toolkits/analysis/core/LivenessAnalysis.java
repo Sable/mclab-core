@@ -1,4 +1,4 @@
-package natlab.toolkits.analysis.test;
+package natlab.toolkits.analysis.core;
 
 import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;

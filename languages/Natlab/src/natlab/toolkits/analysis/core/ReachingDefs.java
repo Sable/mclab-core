@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.analysis.test;
+package natlab.toolkits.analysis.core;
 
 import java.util.HashSet;
 import java.util.Set;

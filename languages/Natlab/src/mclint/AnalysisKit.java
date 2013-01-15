@@ -2,8 +2,8 @@ package mclint;
 
 import java.util.Set;
 
-import natlab.toolkits.analysis.test.LivenessAnalysis;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.LivenessAnalysis;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import analysis.Analysis;

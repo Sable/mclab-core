@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.analysis.test;
+package natlab.toolkits.analysis.example;
 
 import java.util.*;
 import ast.*;

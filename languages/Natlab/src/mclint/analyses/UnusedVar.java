@@ -8,7 +8,7 @@ import mclint.LintAnalysis;
 import mclint.Message;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.HashSetFlowSet;
-import natlab.toolkits.analysis.test.LivenessAnalysis;
+import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.utils.NodeFinder;
 import ast.ForStmt;
 import ast.Function;

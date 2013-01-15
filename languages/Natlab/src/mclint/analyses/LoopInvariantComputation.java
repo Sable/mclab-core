@@ -8,7 +8,7 @@ import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;

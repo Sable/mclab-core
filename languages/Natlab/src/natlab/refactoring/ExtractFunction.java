@@ -7,8 +7,8 @@ import java.util.Set;
 
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.test.LivenessAnalysis;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.LivenessAnalysis;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;

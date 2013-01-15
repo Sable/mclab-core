@@ -16,11 +16,12 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.analysis.test;
+package natlab.toolkits.analysis.example;
 
 import java.util.Set;
 
 import natlab.toolkits.analysis.HashSetFlowSet;
+import natlab.toolkits.analysis.core.NameCollector;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
