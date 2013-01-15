@@ -113,6 +113,20 @@
 	</boolopt>
   </section>
 
+  <section>
+    <name>McLint options</name>
+
+    <boolopt>
+    <name>Run McLint</name>
+    <alias>mclint</alias>
+    <short_desc>Run McLint</short_desc>
+    <long_desc>
+      Runs the McLint static analyzer and refactoring helper.
+    </long_desc>
+    </boolopt>
+
+  </section>
+
   <!-- static stuff ********************************************** -->
   <section>
   	<name>Tamer options</name>

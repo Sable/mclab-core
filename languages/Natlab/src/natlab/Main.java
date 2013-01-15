@@ -24,6 +24,7 @@ package natlab;
 import java.io.File;
 import java.util.List;
 
+import mclint.McLint;
 import natlab.options.Options;
 import natlab.tame.TamerTool;
 import ast.CompilationUnits;
@@ -84,6 +85,11 @@ public class Main {
     if (options.tame()){
       //TODO - the parsing of the options should probably not be done by the tamer tool
       TamerTool.main(options);
+      return;
+    }
+    
+    if (options.mclint()) {
+      McLint.main(options);
       return;
     }
 
