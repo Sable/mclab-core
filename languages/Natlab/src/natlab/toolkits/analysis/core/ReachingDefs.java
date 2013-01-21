@@ -39,7 +39,10 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**

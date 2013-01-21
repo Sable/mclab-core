@@ -58,8 +58,4 @@ public class Message implements Comparable<Message> {
     Message m = (Message) o;
     return code.equals(m.code) && description.equals(m.description) && location.equals(m.location);
   }
-  
-  public static interface Listener {
-    void messageReported(Message message);
-  }
 }

@@ -11,6 +11,7 @@ import mclint.analyses.Shadowing;
 import mclint.analyses.UnreachableCode;
 import mclint.analyses.UnusedVar;
 import mclint.refactoring.RemoveUnusedVar;
+import mclint.refactoring.RenameVariable;
 import mclint.reports.ReportGenerators;
 import mclint.util.Parsing;
 import natlab.options.Options;
@@ -26,9 +27,9 @@ public class McLint {
         .add(new ChangedLoopVar(kit))
         .add(new LoopInvariantComputation(kit))
         .add(new OutputSuppression(kit))
+        .add(new UnusedVar(kit))
         .add(new Shadowing(kit))
         .add(new UnreachableCode(kit))
-        .add(new UnusedVar(kit))
         .build();
   }
   
@@ -51,15 +52,29 @@ public class McLint {
         .build();
   }
   
+  private static boolean prompt(Message message, String prompt) {
+    String decision = System.console().readLine("%s: %s %s (Y/n) ",
+            message.getLocation(), message.getDescription(), prompt);
+    return decision.isEmpty() || decision.startsWith("y") || decision.startsWith("Y");
+  }
+  
   private static void registerBuiltinListeners(final Lint lint) {
     lint.registerListenerForMessageCode("UNUSED_VAR", new MessageListener() {
       @Override public boolean messageReported(Message message) {
+        if (prompt(message, "Remove definition?")) {
+          RemoveUnusedVar.exec((Name) message.getAstNode());
+          return true;
+        }
+        return false;
+      }
+    });
+    
+    lint.registerListenerForMessageCode("SHADOW_BUILTIN", new MessageListener() {
+      @Override public boolean messageReported(Message message) {
         Name node = (Name) message.getAstNode();
-        String decision = System.console()
-            .readLine("%s: Variable %s is not used. Remove definition? (Y/n) ",
-                message.getLocation(), node.getID());
-        if (decision.isEmpty() || decision.startsWith("y") || decision.startsWith("Y")) {
-          RemoveUnusedVar.exec(node);
+        if (prompt(message, "Rename?")) {
+          String newName = System.console().readLine("    rename %s to: ", node.getID());
+          RenameVariable.exec(node, newName, lint.getKit().getUseDefDefUseChain());
           return true;
         }
         return false;
