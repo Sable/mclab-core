@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import mclint.reports.ReportGenerator;
+import mclint.util.AstUtil;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -38,7 +39,7 @@ public class Lint {
     this.kit = kit;
     this.analyses = analyses;
   }
-
+  
   public AnalysisKit getKit() {
     return kit;
   }
@@ -52,16 +53,28 @@ public class Lint {
   }
 
   public void runAnalyses() {
-    for (LintAnalysis analysis : analyses) {
-      currentMessages.clear();
-      analysis.analyze(this);
-      for (final Message message : currentMessages) {
-        Collection<MessageListener> listeners = messageListeners.get(message.getCode());
-        if (!Iterables.any(listeners, addressesMessage(message))) {
-          messages.add(message);
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+      for (LintAnalysis analysis : analyses) {
+        currentMessages.clear();
+        analysis.analyze(this);
+        for (final Message message : currentMessages) {
+          Collection<MessageListener> listeners = messageListeners.get(message.getCode());
+          if (!Iterables.any(listeners, addressesMessage(message))) {
+            messages.add(message);
+          } else {
+            changed = true;
+            kit.notifyTreeChanged();
+          }
         }
       }
     }
+    messages = Lists.newArrayList(Iterables.filter(messages, new Predicate<Message>() {
+      @Override public boolean apply(Message message) {
+        return !AstUtil.removed(message.getAstNode());
+      }
+    }));
   }
 
   public void writeReport(ReportGenerator reporter, OutputStream out) {

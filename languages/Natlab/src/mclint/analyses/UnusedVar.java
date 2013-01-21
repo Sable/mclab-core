@@ -32,7 +32,6 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   public UnusedVar(AnalysisKit kit) {
     super(kit.getAST());
-    this.liveVar = kit.getLiveVariablesAnalysis();
   }
 
   @Override
@@ -74,6 +73,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   @Override
   public void analyze(Lint lint) {
     this.lint = lint;
+    this.liveVar = lint.getKit().getLiveVariablesAnalysis();
     tree.analyze(this);
   }
 }

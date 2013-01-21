@@ -60,7 +60,6 @@ public class McLint {
                 message.getLocation(), node.getID());
         if (decision.isEmpty() || decision.startsWith("y") || decision.startsWith("Y")) {
           RemoveUnusedVar.exec(node);
-          lint.getKit().notifyTreeChanged();
           return true;
         }
         return false;

@@ -1,6 +1,8 @@
 package mclint.util;
 
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
+import ast.Program;
 
 /**
  * Useful methods for manipulating ASTs.
@@ -35,5 +37,10 @@ public class AstUtil {
       parent.insertChild((ASTNode<?>) element, index++);
     }
   }
+  
+  public static boolean removed(ASTNode<?> node) {
+    return NodeFinder.of(Program.class).findParent(node) == null;
+  }
+
   private AstUtil() {}
 }

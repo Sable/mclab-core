@@ -39,7 +39,6 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
 
   public LoopInvariantComputation(AnalysisKit kit) {
     this.tree = kit.getAST();
-    this.reachingDefs = kit.getReachingDefinitionsAnalysis();
   }
 
   private Message loopInvariant(ASTNode<?> node) {
@@ -50,6 +49,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   @Override
   public void analyze(Lint lint) {
     this.lint = lint;
+    this.reachingDefs = lint.getKit().getReachingDefinitionsAnalysis();
     this.tree.analyze(this);
   }
 
