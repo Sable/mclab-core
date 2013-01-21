@@ -1,4 +1,4 @@
-package mclint.refactoring;
+package mclint.patterns.rewrite;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +17,15 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.LineProcessor;
 import com.google.common.io.Resources;
 
-public class Refactorings {
-  public static <T extends Reader> List<Refactoring>
+public class Rewrites {
+  public static <T extends Reader> List<Rewrite>
       fromInputSupplier(InputSupplier<T> supplier) throws IOException{
-    return CharStreams.readLines(supplier,  new LineProcessor<List<Refactoring>>() {
-      private List<Refactoring> refactorings = Lists.newArrayList();
+    return CharStreams.readLines(supplier,  new LineProcessor<List<Rewrite>>() {
+      private List<Rewrite> refactorings = Lists.newArrayList();
       private final Splitter SPLITTER = Splitter.on("->").trimResults().omitEmptyStrings();
 
       @Override
-      public List<Refactoring> getResult() {
+      public List<Rewrite> getResult() {
         return Collections.unmodifiableList(refactorings);
       }
 
@@ -34,21 +34,21 @@ public class Refactorings {
         Iterator<String> parts = SPLITTER.split(line).iterator();
         String from = parts.next();
         String to = parts.next();
-        refactorings.add(Refactoring.of(from, to, Refactoring.Visit.Expressions));
+        refactorings.add(Rewrite.of(from, to, Rewrite.Visit.Expressions));
         return true;
       }
     });
   }
 
-  public static List<Refactoring> fromFile(File file) throws IOException {
+  public static List<Rewrite> fromFile(File file) throws IOException {
     return fromInputSupplier(Files.newReaderSupplier(file, Charsets.UTF_8));
   }
   
-  public static List<Refactoring> fromString(String string) throws IOException {
+  public static List<Rewrite> fromString(String string) throws IOException {
     return fromInputSupplier(CharStreams.newReaderSupplier(string));
   }
   
-  public static List<Refactoring> fromResource(URL resource) throws IOException {
+  public static List<Rewrite> fromResource(URL resource) throws IOException {
     return fromInputSupplier(Resources.newReaderSupplier(resource, Charsets.UTF_8));
   }
 }

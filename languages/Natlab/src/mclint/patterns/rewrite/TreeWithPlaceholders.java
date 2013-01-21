@@ -1,4 +1,4 @@
-package mclint.refactoring;
+package mclint.patterns.rewrite;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +46,7 @@ public class TreeWithPlaceholders implements MatchHandler {
 
   @Override
   public void handle(final Match match) {
-    NodeFinder.apply(tree, NameExpr.class, new AbstractNodeFunction<NameExpr>() {
+    NodeFinder.of(NameExpr.class).applyIn(tree, new AbstractNodeFunction<NameExpr>() {
       @Override
       public void apply(NameExpr node) {
         if (isPlaceholder(node)) {

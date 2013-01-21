@@ -1,4 +1,4 @@
-package mclint.refactoring;
+package mclint.patterns.rewrite;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +10,7 @@ import mclint.util.AstUtil;
 import ast.ASTNode;
 import ast.ExprStmt;
 
-public class Refactoring {
+public class Rewrite {
   private String pattern;
   private MatchHandler handler;
   private Visit visit;
@@ -37,7 +37,7 @@ public class Refactoring {
     }
   }
 
-  public static Refactoring of(String fromPattern, String toPattern, final Visit visit) {
+  public static Rewrite of(String fromPattern, String toPattern, final Visit visit) {
     final TreeWithPlaceholders preprocessed = TreeWithPlaceholders.fromPattern(toPattern);
     return of(fromPattern, new MatchHandler() {
       public void handle(final Match match) {
@@ -51,12 +51,12 @@ public class Refactoring {
     }, visit);
   }
 
-  public static Refactoring of(String pattern, MatchHandler handler) {
+  public static Rewrite of(String pattern, MatchHandler handler) {
     return of(pattern, handler, Visit.All);
   }
 
-  public static Refactoring of(String pattern, MatchHandler handler, Visit visit) {
-    return new Refactoring(pattern, handler, visit);
+  public static Rewrite of(String pattern, MatchHandler handler, Visit visit) {
+    return new Rewrite(pattern, handler, visit);
   }
 
   public void apply(ASTNode<?> tree) {
@@ -65,7 +65,7 @@ public class Refactoring {
     }
   }
 
-  private Refactoring(String pattern, MatchHandler handler, Visit visit) {
+  private Rewrite(String pattern, MatchHandler handler, Visit visit) {
     this.pattern = pattern;
     this.handler = handler;
     this.visit = visit;
