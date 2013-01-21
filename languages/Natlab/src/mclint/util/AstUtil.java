@@ -13,6 +13,13 @@ public class AstUtil {
   public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
   }
+  
+  /**
+   * Removes the given subtree, i.e. disconnects it from its parent.
+   */
+  public static void remove(ASTNode<?> node) {
+    node.getParent().removeChild(node.getParent().getIndexOfChild(node));
+  }
 
   /**
    * Replace a node with the contents of a list. 

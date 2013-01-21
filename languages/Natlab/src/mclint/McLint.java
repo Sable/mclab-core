@@ -10,10 +10,12 @@ import mclint.analyses.OutputSuppression;
 import mclint.analyses.Shadowing;
 import mclint.analyses.UnreachableCode;
 import mclint.analyses.UnusedVar;
+import mclint.refactoring.RemoveUnusedVar;
 import mclint.reports.ReportGenerators;
 import mclint.util.Parsing;
 import natlab.options.Options;
 import ast.CompilationUnits;
+import ast.Name;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,16 +51,31 @@ public class McLint {
         .build();
   }
   
-  private static void registerBuiltinListeners(Lint lint) {
-
+  private static void registerBuiltinListeners(final Lint lint) {
+    lint.registerListenerForMessageCode("UNUSED_VAR", new MessageListener() {
+      @Override public boolean messageReported(Message message) {
+        Name node = (Name) message.getAstNode();
+        String decision = System.console()
+            .readLine("%s: Variable %s is not used. Remove definition? (Y/n) ",
+                message.getLocation(), node.getID());
+        if (decision.isEmpty() || decision.startsWith("y") || decision.startsWith("Y")) {
+          RemoveUnusedVar.exec(node);
+          lint.getKit().notifyTreeChanged();
+          return true;
+        }
+        return false;
+      }
+    });
   }
 
   public static void main(Options options) {
     CompilationUnits AST = Parsing.files(options.getFiles());
     AnalysisKit kit = AnalysisKit.forAST(AST);
     List<LintAnalysis> analyses = getAllAnalyses(kit);
-    Lint lint = new Lint(analyses);
+    Lint lint = Lint.create(kit, analyses);
+    registerBuiltinListeners(lint);
     lint.runAnalyses();
     lint.writeReport(ReportGenerators.plain(), System.out);
+    System.out.println(AST.getPrettyPrinted());
   }
 }
