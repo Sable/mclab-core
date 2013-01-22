@@ -1,0 +1,21 @@
+aspect VarName {
+  public String ASTNode.getVarName() {
+    return "";
+  }
+
+  public String AssignStmt.getVarName() {
+    return getLHS().getVarName();
+  }
+
+  public String NameExpr.getVarName() {
+    return getName().getVarName();
+  }
+
+  public String Name.getVarName() {
+    return getID();
+  }
+
+  public String ParameterizedExpr.getVarName() {
+    return getTarget().getVarName();
+  }
+}

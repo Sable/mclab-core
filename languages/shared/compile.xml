@@ -6,7 +6,17 @@
 -->
 <project name="Compile">
 	<!-- command-line compilation -->
-	<target name="compile" unless="inside.eclipse">
+	<target name="compile" depends="set.bin.dir" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac includeantruntime="false" destdir="${basedir}/${ant.bin.dir}">
+			<classpath refid="compile.classpath" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+ 	<target name="compile.with.tests" depends="set.bin.dir" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
 		<javac includeantruntime="false" destdir="${basedir}/${ant.bin.dir}">
 			<classpath refid="compile.classpath" />
@@ -14,9 +24,8 @@
 			<src path="${gen.dir}" />
 			<src path="${test.dir}" />
 			<include name="**/*.java" />
-			<exclude name="**/backends/**" />
 		</javac>
-	</target>
+	</target>     
 
 	<!-- remove files created by compile -->
 	<target name="clean.compile" unless="inside.eclipse">
