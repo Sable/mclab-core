@@ -7,8 +7,9 @@ import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.interproceduralAnalysis.*;
+import natlab.tame.interproceduralAnalysis.examples.reachingdefs.VariableNameCollector;
 import natlab.tame.valueanalysis.simplematrix.*;
-import natlab.toolkits.filehandling.GenericFile;
+import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 /**
@@ -36,7 +37,8 @@ import natlab.toolkits.path.FileEnvironment;
  * getPreviousAnalysisNode() method in the interproceduralLivaVariableAnalysis class.
  * 
  */
-public class LiveVariableAnalysis extends InterproceduralAnalysis<IntraproceduralLiveVariableAnalysis, LiveInput, List<LiveValue>>{
+public class LiveVariableAnalysis 
+extends InterproceduralAnalysis<IntraproceduralLiveVariableAnalysis, LiveInput, List<LiveValue>>{
 
 	// the factory that is used to created the intraprocedural nodes
 	private static class Factory implements InterproceduralAnalysisFactory<IntraproceduralLiveVariableAnalysis, LiveInput, List<LiveValue>>{
@@ -64,14 +66,15 @@ public class LiveVariableAnalysis extends InterproceduralAnalysis<Intraprocedura
 	 * the main function should have a single double input, and one output
 	 */
 	public static void main(String[] args) {
-		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/unit/simplest.m"; //put a default file for testing, this will work for nobody else ;)
+		String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/testback.m"; //put a default file for testing, this will work for nobody else ;)
 		if (args.length == 1){
 			file = args[0];
 		}
 		//build callgraph
 		Callgraph<SimpleMatrixValue> callgraph = TamerTool.getCallgraph(
 				new FileEnvironment(GenericFile.create(file)),
-				Collections.singletonList(new SimpleMatrixValue(null, PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
+				Collections.singletonList(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
+		
 		LiveVariableAnalysis analysis = new LiveVariableAnalysis(callgraph.getAnalysis(),Collections.singletonList(LiveValue.getLive()));
 		System.out.println(analysis);
 		for (int i = 0; i < analysis.getNodeList().size(); i++){
