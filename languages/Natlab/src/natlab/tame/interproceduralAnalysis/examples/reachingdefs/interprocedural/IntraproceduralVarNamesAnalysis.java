@@ -1,13 +1,6 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs;
+package natlab.tame.interproceduralAnalysis.examples.reachingdefs.interprocedural;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import ast.ASTNode;
-import ast.Function;
-import ast.Name;
-import ast.NameExpr;
 
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
@@ -23,7 +16,16 @@ import natlab.tame.tir.TIRCommaSeparatedList;
 import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
+import ast.ASTNode;
+import ast.Function;
+import ast.Name;
+import ast.NameExpr;
 
+/**
+ * 
+ * @author Amine Sahibi
+ *
+ */
 public class IntraproceduralVarNamesAnalysis
     extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<VarNamesValue>>
     implements FunctionAnalysis<VarNamesInput, HashSetFlowSet<VarNamesValue>>
@@ -32,8 +34,6 @@ public class IntraproceduralVarNamesAnalysis
     private HashSet<VarNamesValue> fResult;
     private HashSetFlowSet<VarNamesValue> fInputSet;
     private StaticFunction fFunction;
-    private InterproceduralAnalysisNode<IntraproceduralVarNamesAnalysis, VarNamesInput, HashSetFlowSet<VarNamesValue>> fInterProcNode;
-    
     protected IntraproceduralVarNamesAnalysis
     (
         InterproceduralAnalysisNode<IntraproceduralVarNamesAnalysis, VarNamesInput, HashSetFlowSet<VarNamesValue>> node,
@@ -43,11 +43,9 @@ public class IntraproceduralVarNamesAnalysis
         super(node.getFunction().getAst());
         fInput = input;
         fFunction = node.getFunction();
-        fInterProcNode = node;
         fInputSet = new HashSetFlowSet<VarNamesValue>();
     }
     
-    @SuppressWarnings("unchecked")
     @Override 
     public HashSetFlowSet<VarNamesValue> getResult() 
     {
@@ -56,7 +54,7 @@ public class IntraproceduralVarNamesAnalysis
         {
             fResult = (HashSet<VarNamesValue>) getOutFlowSets().get(fFunction.getAst()).getSet();
         }
-        return new HashSetFlowSet(fResult);
+        return new HashSetFlowSet<VarNamesValue>(fResult);
     }
     
     @Override

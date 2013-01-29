@@ -1,4 +1,4 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs;
+package natlab.tame.interproceduralAnalysis.examples.reachingdefs.interprocedural;
 
 import java.util.Collections;
 
@@ -49,6 +49,7 @@ extends InterproceduralAnalysis<IntraproceduralVarNamesAnalysis, VarNamesInput, 
             Collections.singletonList(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)),
             new SimpleMatrixValueFactory()
         );
+        
         
         VariableNameAnalysis analysis = new VariableNameAnalysis(callgraph.getAnalysis(), new HashSetFlowSet<VarNamesValue>());
         for (int i = 0; i < analysis.getNodeList().size(); i++){

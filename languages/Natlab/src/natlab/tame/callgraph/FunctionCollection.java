@@ -1,5 +1,7 @@
 package natlab.tame.callgraph;
 
+import java.util.List;
+
 import natlab.tame.classes.ClassRepository;
 import natlab.toolkits.path.FunctionReference;
 /**
@@ -27,6 +29,12 @@ public interface FunctionCollection {
 	 * does not allow adding more functions.
 	 */
 	public boolean collect(FunctionReference ref);
+	
+	/**
+	 * @author Amine Sahibi 
+	 * @return List of all functions
+	 */
+	public List<StaticFunction> getAllFunctions();
 	
 	//TODO - interface for inlining into one function?
 	//TODO - interface for pretty printing?

@@ -1,13 +1,19 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs;
+package natlab.tame.interproceduralAnalysis.examples.reachingdefs.interprocedural;
 
 import java.util.HashSet;
+
+/**
+ * This class is used as input for the interprocedural analysis nodes.
+ * It contains the complete set of the variables defined in a function,
+ * and an interprocedural analysis, which is used to get callsites.
+ * @author Amine Sahibi
+ */
 
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.toolkits.analysis.HashSetFlowSet;
 
 public class VarNamesInput extends HashSetFlowSet<VarNamesValue>
 {
-    private static final long serialVersionUID = 1L;
     private InterproceduralAnalysisNode<?, ?, ?> fNode;
     
     protected VarNamesInput(InterproceduralAnalysisNode<?, ?, ?> node)

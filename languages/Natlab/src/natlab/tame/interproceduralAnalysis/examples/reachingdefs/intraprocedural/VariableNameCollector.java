@@ -1,27 +1,47 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs;
+23package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import ast.*;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
-import natlab.tame.interproceduralAnalysis.examples.live.LiveValue;
-import natlab.tame.tir.*;
+import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
+import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
+import natlab.tame.tir.TIRAbstractAssignToVarStmt;
+import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRDotSetStmt;
+import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
+import ast.ASTNode;
+import ast.Function;
+import ast.Name;
+import ast.NameExpr;
 
 public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
-    protected boolean inLHS = false;
-    protected HashSetFlowSet<String> fullSet = new HashSetFlowSet<String>();
-    protected HashSetFlowSet<String> currentSet;
-    protected Map<TIRNode, HashSetFlowSet<String>> flowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    protected boolean fIsInLHS = false;
+    protected HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
+    protected HashSetFlowSet<String> fCurrentSet;
+    protected Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    protected StaticFunction fFunction;
     
     public VariableNameCollector(ASTNode<?> tree)
     {
         super(tree);
-        fullSet = new HashSetFlowSet<String>();
+        fFunction = null;
+        fFullSet = new HashSetFlowSet<String>();
+    }
+    
+    public VariableNameCollector(StaticFunction f)
+    {
+        super(f.getAst());
+        fFunction = f;
+        fFullSet = new HashSetFlowSet<String>();
     }
     
     public HashSetFlowSet<String> newInitialFlow()
@@ -33,16 +53,13 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     public HashSetFlowSet<String> getResult()
     {
         analyze();
-        return fullSet;
+        return fFullSet;
     }
     
-    /**
-     * return the result if wasn't computed yet - for recursive calls
-     */
     @Override
     public HashSetFlowSet<String> getDefaultResult() 
     {
-        throw new UnsupportedOperationException("live variable analysis example doesn't support recursive programs");
+        throw new UnsupportedOperationException("Variable name collector doesn't support recursive programs");
     }
     
     @Override
@@ -50,21 +67,19 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     {
         return (Function)super.getTree();
     }
-    
-    //******* case methods ***************************************************
    
     @Override
     public void caseTIRCallStmt(TIRCallStmt node)
     {
-       currentSet = newInitialFlow();
-       IRCommaSeparatedListToVaribaleNamesSet(((TIRAbstractAssignToListStmt)node).getTargets(), currentSet);
-       flowSets.put(node, currentSet);
-       fullSet.addAll(currentSet);
+       fCurrentSet = newInitialFlow();
+       IRCommaSeparatedListToVaribaleNamesSet(((TIRAbstractAssignToListStmt)node).getTargets(), fCurrentSet);
+       fFlowSets.put(node, fCurrentSet);
+       fFullSet.addAll(fCurrentSet);
     }
     
     @Override
     public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
-        currentSet = newInitialFlow();
+        fCurrentSet = newInitialFlow();
         TIRCommaSeparatedList declaredVariablesList = null;
         if (node instanceof TIRAbstractAssignFromVarStmt)
         {
@@ -99,9 +114,9 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
         {
             throw new UnsupportedOperationException("unknown assignment statement "+node);
         }
-        IRCommaSeparatedListToVaribaleNamesSet(declaredVariablesList, currentSet);
-        flowSets.put(node, currentSet);
-        fullSet.addAll(currentSet);
+        IRCommaSeparatedListToVaribaleNamesSet(declaredVariablesList, fCurrentSet);
+        fFlowSets.put(node, fCurrentSet);
+        fFullSet.addAll(fCurrentSet);
     }
     
     public void IRCommaSeparatedListToVaribaleNamesSet(TIRCommaSeparatedList csl, HashSetFlowSet<String> variableNames)
@@ -113,8 +128,7 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     }
 
     @Override
-    public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2,
-            HashSetFlowSet<String> out)
+    public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out)
     {
         out.addAll(in1);
         out.addAll(in2);
@@ -124,5 +138,11 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest)
     {
         dest = source.copy();
+    }
+    
+    // TODO Figure out how we handle the input and output variables!
+    public StaticFunction getFunction()
+    {
+        return fFunction;
     }
 }

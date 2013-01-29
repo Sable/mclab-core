@@ -1,7 +1,13 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs;
+package natlab.tame.interproceduralAnalysis.examples.reachingdefs.interprocedural;
 
 import natlab.toolkits.analysis.Mergable;
-
+/**
+ * Encapsulates the variable name which is a String.
+ * It implements Mergable, at first thought merging 
+ * would just return this
+ * @author Amine Sahibi
+ *
+ */
 public class VarNamesValue implements Mergable<VarNamesValue>
 {
     private String fVariableName;
