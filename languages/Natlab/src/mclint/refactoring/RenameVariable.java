@@ -31,15 +31,24 @@ public class RenameVariable {
     }
     return NodeFinder.of(Script.class).findParent(node);
   }
+  
+  private static Name getLHSTarget(AssignStmt stmt) {
+    ASTNode<?> leftChild = stmt;
+    while (leftChild != null && leftChild.getNumChild() > 0) {
+      leftChild = leftChild.getChild(0);
+    }
+    if (!(leftChild instanceof Name)) {
+      return null;
+    }
+    return (Name) leftChild;
+  }
 
   private static Iterable<AssignStmt> getAllDefs(final Name node) {
     Program program = NodeFinder.findParent(Program.class, node);
     return filter(NodeFinder.find(AssignStmt.class, program), new Predicate<AssignStmt>() {
           @Override public boolean apply(AssignStmt stmt) {
-            if (!(stmt.getLHS() instanceof NameExpr)) {
-              return false;
-            }
-            return ((NameExpr) stmt.getLHS()).getName().getID().equals(node.getID());
+            Name target = getLHSTarget(stmt);
+            return target != null && target.getID().equals(node.getID());
           }
         });
   }
@@ -60,7 +69,7 @@ public class RenameVariable {
       for (NameExpr use : udduChain.getUses(def)) {
         AstUtil.replace(use.getName(), new Name(newName)); 
       }
-      AstUtil.replace(def, new AssignStmt(new NameExpr(new Name(newName)), def.getRHS()));
+      AstUtil.replace(getLHSTarget(def), new Name(newName));
     }
   }
 }
