@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/hello.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/testback.m";
         if (args.length == 1)
         {
             file = args[0];
@@ -36,15 +36,23 @@ public class AnalysisRunner
          * and print the result
          */
         // TODO hashmap static Function to VariableNameCollector
-        for(StaticFunction f : functionList)
-        {
-            System.out.println("Function " + f.getName());
-            VariableNameCollector vnc = new VariableNameCollector(f);
-            for(String s : vnc.getResult())
-            {
-                System.out.println(s);
-            }
-            System.out.println();
-        } 
+//        for(StaticFunction f : functionList)
+//        {
+//            System.out.println("Function " + f.getName());
+//            System.out.println(f.getAst().getPrettyPrinted());
+//            VariableNameCollector vnc = new VariableNameCollector(f);
+//            for(String s : vnc.getResult())
+//            {
+//                System.out.println(s);
+//            }
+//            System.out.println();
+//        } 
+        
+      for(StaticFunction f : functionList)
+      {
+          System.out.println(f.getAst().getPrettyPrinted());
+          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
+          rda.analyze();
+      }
     }
 }

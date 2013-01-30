@@ -1,7 +1,8 @@
-23package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
+package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
@@ -24,11 +25,10 @@ import ast.NameExpr;
 
 public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
-    protected boolean fIsInLHS = false;
-    protected HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
-    protected HashSetFlowSet<String> fCurrentSet;
-    protected Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
-    protected StaticFunction fFunction;
+    private HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
+    private HashSetFlowSet<String> fCurrentSet;
+    private Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    private StaticFunction fFunction;
     
     public VariableNameCollector(ASTNode<?> tree)
     {
@@ -145,4 +145,23 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     {
         return fFunction;
     }
+    
+    public HashSetFlowSet<String> getFullSet()
+    {
+        return fFullSet;
+    }
+    
+    public Set<String> getNames(TIRAbstractAssignStmt node)
+    {
+        HashSetFlowSet<String> set = fFlowSets.get(node);
+        if (set == null)
+        {
+            return null;
+        }
+        else
+        {
+            return set.getSet();
+        }
+    }
+
 }
