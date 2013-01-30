@@ -1,17 +1,37 @@
 package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
+
+import mclint.Location;
 import mclint.util.AstUtil;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
+import ast.ASTNode;
 import ast.AssignStmt;
+import ast.Function;
 import ast.Name;
 import ast.NameExpr;
-import ast.Program;
+import ast.Script;
 
 import com.google.common.base.Predicate;
 
 public class RenameVariable {
+  public static class NameConflict extends RuntimeException {
+    private static final long serialVersionUID = 6581696075512377817L;
+
+    public NameConflict(Name name) {
+      super(String.format("The name %s is already used at %s.", name.getID(), Location.of(name)));
+    }
+  }
+  
+  private static ASTNode<?> getParentFunctionOrScript(ASTNode<?> node) {
+    Function f = NodeFinder.of(Function.class).findParent(node);
+    if (f != null) {
+      return f;
+    }
+    return NodeFinder.of(Script.class).findParent(node);
+  }
+
   private static Iterable<AssignStmt> getAllDefs(final Name node) {
     Program program = NodeFinder.findParent(Program.class, node);
     return filter(NodeFinder.find(AssignStmt.class, program), new Predicate<AssignStmt>() {
@@ -23,7 +43,19 @@ public class RenameVariable {
           }
         });
   }
+  
+  private static void checkSafeRename(Name node, String newName) {
+    ASTNode<?> parent = getParentFunctionOrScript(node);
+    for (Name name : NodeFinder.of(Name.class).findIn(parent)) {
+      if (name.getID().equals(newName)) {
+        throw new NameConflict(name);
+      }
+    }
+  }
+
   public static void exec(Name node, String newName, UseDefDefUseChain udduChain) {
+    checkSafeRename(node, newName);
+
     for (AssignStmt def : getAllDefs(node)) {
       for (NameExpr use : udduChain.getUses(def)) {
         AstUtil.replace(use.getName(), new Name(newName)); 
