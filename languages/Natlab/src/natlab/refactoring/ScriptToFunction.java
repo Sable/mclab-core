@@ -28,6 +28,8 @@ import ast.Name;
 import ast.NameExpr;
 import ast.Script;
 
+import com.google.common.collect.Sets;
+
 public class ScriptToFunction {
 	ParsedCompilationUnitsContextStack context;
 	Set<Script> scripts;
@@ -35,7 +37,7 @@ public class ScriptToFunction {
 	public Map<Script, Integer> outputCount = new HashMap<Script, Integer>();
 	public ScriptToFunction(CompilationUnits cu){
 		context = new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu);
-		scripts = new HashSet(NodeFinder.find(cu, Script.class));
+		scripts = Sets.newHashSet(NodeFinder.find(Script.class, cu));
 	}
 	
 	public Map<Script, List<RefactorException>> replaceAll(){
@@ -52,7 +54,7 @@ public class ScriptToFunction {
 	public List<RefactorException> replace(final Script script, Function f){
 		final List<ExprStmt> calls = new LinkedList<ExprStmt>();
 		System.out.println("Script Name: " + script.getName());
-		NodeFinder.apply(context.cu, ExprStmt.class, new AbstractNodeFunction<ExprStmt>() {
+		NodeFinder.apply(ExprStmt.class, context.cu, new AbstractNodeFunction<ExprStmt>() {
 
 			@Override
 			public void apply(ExprStmt node) {
@@ -90,7 +92,7 @@ public class ScriptToFunction {
         
 		for (ExprStmt call: calls) {
 			Name name = ((NameExpr)call.getExpr()).getName();
-			Function callFunc = NodeFinder.findParent(call, Function.class);
+			Function callFunc = NodeFinder.findParent(Function.class, call);
 			if (callFunc == null){ //called inside script
 				errors.add(new Exceptions.ScriptCalledFromScript(name));
 				return errors;

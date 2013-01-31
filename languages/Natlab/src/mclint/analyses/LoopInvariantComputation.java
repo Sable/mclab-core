@@ -22,6 +22,8 @@ import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 // TODO Nested invariants? Suggest moving expressions out of several loop levels?
@@ -61,13 +63,13 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private boolean allDefsOutsideLoop(Set<AssignStmt> defs, ASTNode<?> loop) {
-    List<AssignStmt> loopDefs = NodeFinder.find(loop, AssignStmt.class);
+    Iterable<AssignStmt> loopDefs = NodeFinder.find(AssignStmt.class, loop);
     for (AssignStmt def : defs) {
       if (def == ReachingDefs.UNDEF)
         continue;
       if (def == ReachingDefs.GLOBAL || def == ReachingDefs.PARAM)
         continue;
-      if (loopDefs.contains(def))
+      if (Iterables.contains(loopDefs, def))
         return false;
     }
     return true;
@@ -112,7 +114,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private static List<Expr> getChildren(Expr node) {
-    List<Expr> exprs = NodeFinder.find(node, Expr.class);
+    List<Expr> exprs = Lists.newArrayList(NodeFinder.find(Expr.class, node));
     exprs.remove(node);
     return exprs;
   }
@@ -148,7 +150,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
       }
       else if (node instanceof NameExpr) {
         String name = ((NameExpr)node).getName().getID();
-        Stmt parentStmt = NodeFinder.findParent(node, Stmt.class);
+        Stmt parentStmt = NodeFinder.findParent(Stmt.class, node);
         if (reachingDefs.getInFlowSets().containsKey(parentStmt)) {
           Set<AssignStmt> inSet = reachingDefs.getInFlowSets().get(parentStmt).get(name);
           if (allDefsOutsideLoop(inSet, loopStack.peek()))

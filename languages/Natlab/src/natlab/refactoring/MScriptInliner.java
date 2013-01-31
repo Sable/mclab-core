@@ -50,7 +50,7 @@ public class MScriptInliner {
 
 	public LinkedList<LinkedList<Exception>> inlineAll(){
 		LinkedList<LinkedList<Exception>>  res = Lists.newLinkedList();
-		for (Function f: NodeFinder.of(Function.class).findIn(cu)) {
+		for (Function f: NodeFinder.find(Function.class, cu)) {
 			if (! (f.getParent().getParent() instanceof Function))
 				res.addAll(inlineAllScripts(f));
 		}
@@ -59,7 +59,7 @@ public class MScriptInliner {
 
 	private Set<Stmt> findScripts(Function f) {
 		final Set<Stmt> scriptCalls = Sets.newLinkedHashSet();
-		NodeFinder.of(ExprStmt.class).applyIn(f, new AbstractNodeFunction<ExprStmt>() {
+		NodeFinder.apply(ExprStmt.class, f, new AbstractNodeFunction<ExprStmt>() {
 		  @Override public void apply(ExprStmt n) {
 	      if (n.getNumChild() == 1 && n.getChild(0) instanceof NameExpr) {
           NameExpr child = (NameExpr) n.getChild(0);
@@ -111,7 +111,7 @@ public class MScriptInliner {
 	
 	
 	private Set<String> findSiblings(Function f) {
-	  FunctionList fl = NodeFinder.findParent(f, FunctionList.class);
+	  FunctionList fl = NodeFinder.findParent(FunctionList.class, f);
 		final Set<String> res = Sets.newLinkedHashSet();
 		for (Function function : fl.getFunctions()) {
 		  res.add(function.getName());
@@ -130,7 +130,7 @@ public class MScriptInliner {
 
 	public java.util.LinkedList<Exception> inlineStmt(Stmt s) {
         LinkedList<Exception> e = new LinkedList<Exception>();
-        Function f = NodeFinder.findParent(s, Function.class);
+        Function f = NodeFinder.findParent(Function.class, s);
 		ParsedCompilationUnitsContextStack context = new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu); 
 		context.push(f);
 		VFFlowSensitiveAnalysis kind_analysis_f = new VFFlowSensitiveAnalysis(f);

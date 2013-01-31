@@ -46,7 +46,7 @@ public class TreeWithPlaceholders implements MatchHandler {
 
   @Override
   public void handle(final Match match) {
-    NodeFinder.of(NameExpr.class).applyIn(tree, new AbstractNodeFunction<NameExpr>() {
+    NodeFinder.apply(NameExpr.class, tree, new AbstractNodeFunction<NameExpr>() {
       @Override
       public void apply(NameExpr node) {
         if (isPlaceholder(node)) {

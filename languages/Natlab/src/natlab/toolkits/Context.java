@@ -151,7 +151,7 @@ public class Context{
     		inNested = false;
 
     	if (inNested){
-    		curProgram = NodeFinder.findParent(curFunction, Program.class);
+    		curProgram = NodeFinder.findParent(Program.class, curFunction);
     	}
     	else
     		if (inFunction)

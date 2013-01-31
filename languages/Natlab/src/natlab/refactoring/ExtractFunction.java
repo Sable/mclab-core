@@ -33,7 +33,7 @@ public class ExtractFunction {
     }
 
     public List<RefactorException> extract(ast.List<Stmt> stmtList, int offset_start, int offset_end, Function f){
-        Function orig = NodeFinder.findParent(stmtList, Function.class);
+        Function orig = NodeFinder.findParent(Function.class, stmtList);
         ast.List<Stmt> newStmtList = new ast.List<Stmt>();
         VFFlowInsensitiveAnalysis kindAnalysis = new VFFlowInsensitiveAnalysis(orig);
 

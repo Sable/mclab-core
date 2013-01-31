@@ -43,7 +43,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   }
 
   private boolean isLive(Name node) {
-    Stmt parentStmt = NodeFinder.of(Stmt.class).findParent(node);
+    Stmt parentStmt = NodeFinder.findParent(Stmt.class, node);
     HashSetFlowSet<String> setToCheck;
     if (parentStmt.getParent() instanceof ForStmt) {
       Stmt first = ((ForStmt) (parentStmt.getParent())).getStmt(0);
@@ -63,7 +63,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   @Override
   public void caseInParam(Name node) {
-    Stmt firstStatement = NodeFinder.of(Function.class).findParent(node).getStmt(0);
+    Stmt firstStatement = NodeFinder.findParent(Function.class, node).getStmt(0);
     if (!(liveVar.getInFlowSets().containsKey(firstStatement) &&
           liveVar.getInFlowSets().get(firstStatement).contains(node.getID()))) {
       reportUnused(node);

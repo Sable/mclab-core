@@ -39,7 +39,7 @@ public class AstUtil {
   }
   
   public static boolean removed(ASTNode<?> node) {
-    return NodeFinder.of(Program.class).findParent(node) == null;
+    return NodeFinder.findParent(Program.class, node) == null;
   }
 
   private AstUtil() {}

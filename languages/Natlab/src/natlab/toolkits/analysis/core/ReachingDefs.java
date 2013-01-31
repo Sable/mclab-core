@@ -39,10 +39,7 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
@@ -116,7 +113,7 @@ public class ReachingDefs extends
   public void caseFunction(Function f) {
     currentOutSet = newInitialFlow();
     currentInSet = currentOutSet;
-    for (Name n : NodeFinder.of(Name.class).findIn(f)) {
+    for (Name n : NodeFinder.find(Name.class, f)) {
       currentOutSet.put(n.getID(), Sets.<AssignStmt> newHashSet(UNDEF));
     }
     for (Name inputArg : f.getInputParamList()) {
@@ -130,7 +127,7 @@ public class ReachingDefs extends
   public void caseScript(Script f) {
     currentOutSet = newInitialFlow();
     currentInSet = currentOutSet;
-    for (Name n : NodeFinder.of(Name.class).findIn(f)) {
+    for (Name n : NodeFinder.find(Name.class, f)) {
       currentOutSet.put(n.getID(), Sets.<AssignStmt> newHashSet(UNDEF));
     }
     caseASTNode(f.getStmts());
@@ -160,7 +157,7 @@ public class ReachingDefs extends
   }
   
   private Set<AssignStmt> getReachingDefs(NameExpr node) {
-    Stmt parent = NodeFinder.of(Stmt.class).findParent(node);
+    Stmt parent = NodeFinder.findParent(Stmt.class, node);
     return getInFlowSets().get(parent).get(node.getName().getID());
   }
 

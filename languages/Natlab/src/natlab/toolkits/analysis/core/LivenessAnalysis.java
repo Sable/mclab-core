@@ -2,6 +2,8 @@ package natlab.toolkits.analysis.core;
 
 import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
 
 import java.util.Set;
 
@@ -20,6 +22,7 @@ import ast.Script;
 import ast.Stmt;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
@@ -82,14 +85,13 @@ public class LivenessAnalysis extends
 		}
 		
 		caseASTNode(s.getRHS());
-		currentOutSet.addAll(NodeFinder.of(NameExpr.class)
-		    .filter(not(in(lValues)))
-		    .transform(new Function<NameExpr, String>() {
+		currentOutSet.addAll(Lists.newArrayList(
+		     transform(filter(NodeFinder.find(NameExpr.class, s), not(in(lValues))),
+		    new Function<NameExpr, String>() {
 		      @Override public String apply(NameExpr expr) {
 		        return expr.getName().getID();
 		      }
-		    })
-		    .findIn(s));
+		    })));
 		inFlowSets.put(s, currentInSet.copy());
 	}
 

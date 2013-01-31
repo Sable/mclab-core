@@ -78,7 +78,7 @@ public class UnreachableCode extends AbstractNodeCaseHandler implements LintAnal
     }
     String name = ((NameExpr)(node.getTarget())).getName().getID();
     if (THROWS.contains(name)) {
-      caseAbruptControlFlow(NodeFinder.findParent(node, Stmt.class));
+      caseAbruptControlFlow(NodeFinder.findParent(Stmt.class, node));
     }
   }
 }

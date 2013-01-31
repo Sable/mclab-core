@@ -30,11 +30,11 @@ public class FevalToCall {
 	public Map<ParameterizedExpr, List<RefactorException>> replaceAll(){
 		final Map<ParameterizedExpr, List<RefactorException>> map =  Maps.newHashMap();
 
-		for (Function f: NodeFinder.find(context.cu, Function.class)){
+		for (Function f: NodeFinder.find(Function.class, context.cu)){
 			context.push(f);
 			final VFFlowInsensitiveAnalysis kind = new VFFlowInsensitiveAnalysis(context.cu);
 			kind.analyze();
-			NodeFinder.apply(f, ParameterizedExpr.class, new AbstractNodeFunction<ParameterizedExpr>() {
+			NodeFinder.apply(ParameterizedExpr.class, f, new AbstractNodeFunction<ParameterizedExpr>() {
 			@Override public void apply(ParameterizedExpr node) {
 				if (! (node.getTarget() instanceof NameExpr)) return ;
 		        NameExpr target = (NameExpr)node.getTarget();
