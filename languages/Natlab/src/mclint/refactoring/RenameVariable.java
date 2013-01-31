@@ -1,7 +1,6 @@
 package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
-
 import mclint.Location;
 import mclint.util.AstUtil;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
@@ -11,6 +10,7 @@ import ast.AssignStmt;
 import ast.Function;
 import ast.Name;
 import ast.NameExpr;
+import ast.Program;
 import ast.Script;
 
 import com.google.common.base.Predicate;
@@ -25,11 +25,11 @@ public class RenameVariable {
   }
   
   private static ASTNode<?> getParentFunctionOrScript(ASTNode<?> node) {
-    Function f = NodeFinder.of(Function.class).findParent(node);
+    Function f = NodeFinder.findParent(Function.class, node);
     if (f != null) {
       return f;
     }
-    return NodeFinder.of(Script.class).findParent(node);
+    return NodeFinder.findParent(Script.class, node);
   }
   
   private static Name getLHSTarget(AssignStmt stmt) {
@@ -55,7 +55,7 @@ public class RenameVariable {
   
   private static void checkSafeRename(Name node, String newName) {
     ASTNode<?> parent = getParentFunctionOrScript(node);
-    for (Name name : NodeFinder.of(Name.class).findIn(parent)) {
+    for (Name name : NodeFinder.find(Name.class, parent)) {
       if (name.getID().equals(newName)) {
         throw new NameConflict(name);
       }
