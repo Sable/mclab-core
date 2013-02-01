@@ -37,7 +37,7 @@
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${ant.bin.dir}">
+		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="**/*TestGenerator.java" />
 		</javac>
