@@ -1,6 +1,7 @@
 package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import natlab.tame.callgraph.StaticFunction;
@@ -18,14 +19,16 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
     private Merger<Set<TIRAbstractAssignStmt>> fMerger = Mergers.union();
     private VariableNameCollector fVariableNameCollector;
     private HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> fStartMap;
+    private LinkedList<TIRAbstractAssignStmt> fVisitedAssignStmts;
     
     public ReachingDefinitionsAnalysis(StaticFunction f)
     {
         super(f.getAst());
         fStartMap = new HashMapFlowMap<String, Set<TIRAbstractAssignStmt>>(fMerger);
         fVariableNameCollector = new VariableNameCollector(f);
+        fVisitedAssignStmts = new LinkedList<TIRAbstractAssignStmt>();
         fVariableNameCollector.analyze();
-        for(String variable : fVariableNameCollector.getFullSet())
+        for (String variable : fVariableNameCollector.getFullSet())
         {
             fStartMap.put( variable, new HashSet<TIRAbstractAssignStmt>());
         }
@@ -86,7 +89,7 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
     {
        currentOutSet = copy(currentInSet);
        Set<String> definedVariablesNames = fVariableNameCollector.getNames(node);
-       for(String s : definedVariablesNames)
+       for (String s : definedVariablesNames)
        {
            Set<TIRAbstractAssignStmt> newDefinitionSite = new HashSet<TIRAbstractAssignStmt>();
            newDefinitionSite.add(node);
@@ -94,6 +97,7 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
        }
        setInOutSet(node);
        printMapForNode(node);
+       fVisitedAssignStmts.add(node);
     }   
     
     @Override
@@ -101,7 +105,7 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
     {
         currentOutSet = copy(currentInSet);
         Set<String> definedVariablesNames = fVariableNameCollector.getNames(node);
-        for(String s : definedVariablesNames)
+        for (String s : definedVariablesNames)
         {
             Set<TIRAbstractAssignStmt> newDefinitionSite = new HashSet<TIRAbstractAssignStmt>();
             newDefinitionSite.add(node);
@@ -109,7 +113,7 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
         }
         setInOutSet(node);
         printMapForNode(node);
-
+        fVisitedAssignStmts.add(node);
     }
     
     private void setInOutSet(ASTNode<?> node)
@@ -118,19 +122,46 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
         associateOutSet(node, getCurrentOutSet());
     }
     
+    public LinkedList<TIRAbstractAssignStmt> getVisitedAssignStmtsLinkedList()
+    {
+        LinkedList<TIRAbstractAssignStmt> visitedAssignStmtsLinkedList = new LinkedList<TIRAbstractAssignStmt>();
+        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
+        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
+        {
+            if (!visitedAssignStmtsSet.contains(stmt))
+            {
+                visitedAssignStmtsSet.add(stmt);
+                visitedAssignStmtsLinkedList.add(stmt);
+            }
+        }
+        return visitedAssignStmtsLinkedList;
+    }
+    
+    public VariableNameCollector getVarNameCollector()
+    {
+        return fVariableNameCollector;
+    }
+    
+    @Override
+    public HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> newInitialFlow()
+    {
+        return copy(fStartMap);
+    }
+    
+    
     public void printMapForNode(TIRAbstractAssignStmt node)
     {
         StringBuffer sb = new StringBuffer();
-        sb.append("-------Stmt " + node.getStructureString() + "------------\n");
+        sb.append("------- " + node.getStructureString() + " ------------\n");
         HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> definitionSiteMap = outFlowSets.get(node);
         Set<String> variableNames = definitionSiteMap.keySet();
-        for(String s : variableNames)
+        for (String s : variableNames)
         {
             Set<TIRAbstractAssignStmt> assignStmts = definitionSiteMap.get(s);
-            if(!assignStmts.isEmpty())
+            if (!assignStmts.isEmpty())
             {
                 sb.append("Var "+ s + "\n");
-                for(TIRAbstractAssignStmt assignStmt : assignStmts)
+                for (TIRAbstractAssignStmt assignStmt : assignStmts)
                 {
                     sb.append("\t"+ assignStmt.getStructureString() + "\n");
                 }
@@ -139,10 +170,43 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
         System.out.println(sb.toString());
     }
     
-    @Override
-    public HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> newInitialFlow()
+    
+    public void printVisitedAssignmentStms()
     {
-        return copy(fStartMap);
+        StringBuffer sb = new StringBuffer();
+        sb.append("Visited Assignment Stmts\n");
+        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
+        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
+        {
+            if (!visitedAssignStmtsSet.contains(stmt))
+            {
+                visitedAssignStmtsSet.add(stmt);
+                sb.append(stmt.getStructureString() + "\n");
+            }
+        }
+        System.out.println(sb.toString());
     }
+    
+    public void printNodeVarsDeclared()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Visited Assignment Stmts\n");
+        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
+        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
+        {
+            if (!visitedAssignStmtsSet.contains(stmt))
+            {
+                visitedAssignStmtsSet.add(stmt);
+                sb.append(stmt.getStructureString() + " -> ");
+                for (String var : fVariableNameCollector.getNames(stmt))
+                {
+                    sb.append(var + " ");
+                }
+                sb.append("\n");
+            }
+        }
+        System.out.println(sb.toString());
+    }
+    
     
 }

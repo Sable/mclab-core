@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/testback.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/test2.m";
         if (args.length == 1)
         {
             file = args[0];
@@ -53,6 +53,12 @@ public class AnalysisRunner
           System.out.println(f.getAst().getPrettyPrinted());
           ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
           rda.analyze();
+          rda.printVisitedAssignmentStms();
+          rda.printNodeVarsDeclared();
+          UDChains ud = new UDChains(rda);
+          System.out.println("//////////////////////");
+          ud.constructUDChain();
+          ud.printUDChain();
       }
     }
 }
