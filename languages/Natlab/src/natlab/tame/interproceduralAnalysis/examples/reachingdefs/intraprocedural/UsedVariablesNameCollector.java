@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import ast.ASTNode;
+import ast.Function;
+import ast.Name;
+import ast.NameExpr;
+
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
 import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
@@ -18,30 +23,23 @@ import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
-import ast.ASTNode;
-import ast.Function;
-import ast.Name;
-import ast.NameExpr;
 
-public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
+public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
-    private HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
     private HashSetFlowSet<String> fCurrentSet;
-    private Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    public Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
     private StaticFunction fFunction;
     
-    public VariableNameCollector(ASTNode<?> tree)
+    public UsedVariablesNameCollector(ASTNode<?> tree)
     {
         super(tree);
         fFunction = null;
-        fFullSet = new HashSetFlowSet<String>();
     }
     
-    public VariableNameCollector(StaticFunction f)
+    public UsedVariablesNameCollector(StaticFunction f)
     {
         super(f.getAst());
         fFunction = f;
-        fFullSet = new HashSetFlowSet<String>();
     }
     
     public HashSetFlowSet<String> newInitialFlow()
@@ -50,78 +48,59 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     }
     
     @Override
-    public HashSetFlowSet<String> getResult()
-    {
-        analyze();
-        return fFullSet;
-    }
-    
-    @Override
-    public HashSetFlowSet<String> getDefaultResult() 
-    {
-        throw new UnsupportedOperationException("Variable name collector doesn't support recursive programs");
-    }
-    
-    @Override
-    public Function getTree() 
-    {
-        return (Function)super.getTree();
-    }
-   
-    @Override
     public void caseTIRCallStmt(TIRCallStmt node)
     {
        fCurrentSet = newInitialFlow();
-       IRCommaSeparatedListToVaribaleNamesSet(((TIRAbstractAssignToListStmt)node).getTargets(), fCurrentSet);
+       IRCommaSeparatedListToVaribaleNamesSet(node.getArguments(), fCurrentSet);
        fFlowSets.put(node, fCurrentSet);
-       fFullSet.addAll(fCurrentSet);
     }
     
     @Override
     public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
         fCurrentSet = newInitialFlow();
-        TIRCommaSeparatedList declaredVariablesList = null;
+        TIRCommaSeparatedList usedVariablesList = null;
         if (node instanceof TIRAbstractAssignFromVarStmt)
         {
-            Name target;
+            // Name target;
             if (node instanceof TIRArraySetStmt)
             {
-                target = ((TIRArraySetStmt)node).getArrayName();
+               // target = ((TIRArraySetStmt)node).getArrayName();
             }
             else if (node instanceof TIRCellArraySetStmt)
             {
-                target = ((TIRCellArraySetStmt)node).getCellArrayName();
+               // target = ((TIRCellArraySetStmt)node).getCellArrayName();
             }
             else if (node instanceof TIRDotSetStmt)
             {
-                target = ((TIRDotSetStmt)node).getDotName();
+               // ((TIRDotSetStmt)node).getDotName();
             }
             else 
             { 
                 throw new UnsupportedOperationException("unknown assign from var stmt " + node); 
             }
-            declaredVariablesList = new TIRCommaSeparatedList(new NameExpr(target));
+           // usedVariablesList = new TIRCommaSeparatedList(new NameExpr(target));
         }
         else if (node instanceof TIRAbstractAssignToListStmt)
         {
-            declaredVariablesList = ((TIRAbstractAssignToListStmt)node).getTargets();
+          //  usedVariablesList = ((TIRAbstractAssignToListStmt)node).getTargets();
         } 
         else if (node instanceof TIRAbstractAssignToVarStmt)
         {
-            declaredVariablesList = new TIRCommaSeparatedList(new NameExpr(((TIRAbstractAssignToVarStmt)node).getTargetName()));
+            Name usedVarName = new Name(node.getRHS().getVarName());
+            usedVariablesList = new TIRCommaSeparatedList(new NameExpr(usedVarName));
         }
         else 
         {
             throw new UnsupportedOperationException("unknown assignment statement "+node);
         }
-        IRCommaSeparatedListToVaribaleNamesSet(declaredVariablesList, fCurrentSet);
+        IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
         fFlowSets.put(node, fCurrentSet);
-        fFullSet.addAll(fCurrentSet);
     }
     
     public void IRCommaSeparatedListToVaribaleNamesSet(TIRCommaSeparatedList csl, HashSetFlowSet<String> variableNames)
     {
-        for(Name name : csl.asNameList())
+        if (csl == null) return;
+        for (Name name : csl.asNameList())
         {
             variableNames.add(name.getID());
         }
@@ -146,11 +125,6 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
         return fFunction;
     }
     
-    public HashSetFlowSet<String> getFullSet()
-    {
-        return fFullSet;
-    }
-    
     public Set<String> getNames(TIRAbstractAssignStmt node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);
@@ -161,4 +135,23 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
         }
     }
 
+    @Override
+    public HashSetFlowSet<String> getResult()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public HashSetFlowSet<String> getDefaultResult()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public Function getTree() 
+    {
+        return (Function)super.getTree();
+    }
 }

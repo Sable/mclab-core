@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/test2.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/ud.m";
         if (args.length == 1)
         {
             file = args[0];
@@ -38,27 +38,32 @@ public class AnalysisRunner
         // TODO hashmap static Function to VariableNameCollector
 //        for(StaticFunction f : functionList)
 //        {
-//            System.out.println("Function " + f.getName());
-//            System.out.println(f.getAst().getPrettyPrinted());
-//            VariableNameCollector vnc = new VariableNameCollector(f);
-//            for(String s : vnc.getResult())
-//            {
-//                System.out.println(s);
-//            }
-//            System.out.println();
+////            System.out.println("Function " + f.getName());
+////            VariableNameCollector vnc = new VariableNameCollector(f);
+////            for(String s : vnc.getResult())
+////            {
+////                System.out.println(s);
+////            }
+////            System.out.println();
 //        } 
         
       for(StaticFunction f : functionList)
       {
-          System.out.println(f.getAst().getPrettyPrinted());
-          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
-          rda.analyze();
-          rda.printVisitedAssignmentStms();
-          rda.printNodeVarsDeclared();
-          UDChains ud = new UDChains(rda);
-          System.out.println("//////////////////////");
-          ud.constructUDChain();
-          ud.printUDChain();
+//          VariableNameCollector vnc = new VariableNameCollector(f);
+//          vnc.analyze();
+//          System.out.println(f.getAst().getPrettyPrinted());
+////          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
+////          rda.analyze();
+////          rda.printVisitedAssignmentStms();
+////          rda.printNodeVarsDeclared();
+          UDWeb ud = new UDWeb(new ReachingDefinitionsAnalysis(f));
+          System.out.println("\n//////// UD Analysis starts here: //////////////\n");
+          ud.constructUDWeb();
+          ud.printUDWeb();
+          System.out.println("\n//////// DU Analysis starts here: //////////////\n");
+          DUWeb du = new DUWeb(ud);
+          du.constructDUWeb();
+          du.printDUWeb();
       }
     }
 }
