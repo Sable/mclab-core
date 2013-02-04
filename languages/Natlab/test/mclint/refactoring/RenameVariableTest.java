@@ -95,4 +95,14 @@ public class RenameVariableTest extends McLintTestCase {
     
     assertRenameFails(function, x, "out");
   }
+  
+  public void testRenameMultipleAssignment() {
+    parse("[y, x] = f(); y = x;");
+    Script script = (Script) kit.getAST();
+    Name x = ((NameExpr) ((AssignStmt) script.getStmt(1)).getRHS()).getName();
+    
+    rename(x, "z");
+    
+    assertEquivalent("[y, z] = f(); y = z;", script);
+  }
 }

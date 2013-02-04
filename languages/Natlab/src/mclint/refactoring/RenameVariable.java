@@ -1,19 +1,23 @@
 package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
+
+import java.util.Set;
+
 import mclint.Location;
 import mclint.util.AstUtil;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
-import ast.Function;
 import ast.Name;
 import ast.NameExpr;
 import ast.Program;
 import ast.Script;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public class RenameVariable {
   public static class NameConflict extends RuntimeException {
@@ -25,30 +29,28 @@ public class RenameVariable {
   }
   
   private static ASTNode<?> getParentFunctionOrScript(ASTNode<?> node) {
-    Function f = NodeFinder.findParent(Function.class, node);
+    ast.Function f = NodeFinder.findParent(ast.Function.class, node);
     if (f != null) {
       return f;
     }
     return NodeFinder.findParent(Script.class, node);
   }
   
-  private static Name getLHSTarget(AssignStmt stmt) {
-    ASTNode<?> leftChild = stmt;
-    while (leftChild != null && leftChild.getNumChild() > 0) {
-      leftChild = leftChild.getChild(0);
+  private static Set<Name> getLHSTargets(AssignStmt stmt, final String name) {
+    Set<Name> names = Sets.newHashSet();
+    for (NameExpr node : stmt.getLHS().getNameExpressions()) {
+      if (node.getName().getID().equals(name)) {
+        names.add(node.getName());
+      }
     }
-    if (!(leftChild instanceof Name)) {
-      return null;
-    }
-    return (Name) leftChild;
+    return names;
   }
 
   private static Iterable<AssignStmt> getAllDefs(final Name node) {
     Program program = NodeFinder.findParent(Program.class, node);
     return filter(NodeFinder.find(AssignStmt.class, program), new Predicate<AssignStmt>() {
           @Override public boolean apply(AssignStmt stmt) {
-            Name target = getLHSTarget(stmt);
-            return target != null && target.getID().equals(node.getID());
+            return !Iterables.isEmpty(getLHSTargets(stmt, node.getID()));
           }
         });
   }
@@ -69,7 +71,9 @@ public class RenameVariable {
       for (NameExpr use : udduChain.getUses(def)) {
         AstUtil.replace(use.getName(), new Name(newName)); 
       }
-      AstUtil.replace(getLHSTarget(def), new Name(newName));
+      for (Name name : getLHSTargets(def, node.getID())) {
+        AstUtil.replace(name, new Name(newName));
+      }
     }
   }
 }
