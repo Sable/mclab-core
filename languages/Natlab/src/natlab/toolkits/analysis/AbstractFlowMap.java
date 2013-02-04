@@ -305,7 +305,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
             union( m, other );
         else if( other == dest )
             for( K key : keySet() )
-                dest.mergePut(key, get(key));
+                dest.mergePut(m, key, get(key));
         else if( other == this ){
             dest.clear();
             copy(dest);
@@ -314,7 +314,7 @@ public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
             dest.clear();
             copy(dest);
             for( K key : keySet() )
-                dest.mergePut( key, get(key) );
+                dest.mergePut(m, key, get(key) );
         }
     }
 
