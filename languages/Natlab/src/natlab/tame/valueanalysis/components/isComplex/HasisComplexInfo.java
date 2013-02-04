@@ -9,7 +9,7 @@ import natlab.tame.valueanalysis.value.*;
 public interface HasisComplexInfo<V extends Value<V>> extends Value<V> {
 	
 	/**
-	 * returns the shape associated with this value
+	 * returns the isComplexinfo associated with this value
 	 */
 	public isComplexInfo<V> getisComplexInfo();	
 	

@@ -64,7 +64,7 @@ public class LiveVariableAnalysis extends InterproceduralAnalysis<Intraprocedura
 	 * the main function should have a single double input, and one output
 	 */
 	public static void main(String[] args) {
-		String file = "/home/adubra/mclab/tests/test.m"; //put a default file for testing, this will work for nobody else ;)
+		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/unit/simplest.m"; //put a default file for testing, this will work for nobody else ;)
 		if (args.length == 1){
 			file = args[0];
 		}
