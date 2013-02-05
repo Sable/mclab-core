@@ -77,14 +77,7 @@ public class ReachingDefs extends
   @Override
   public void merge(HashMapFlowMap<String, Set<AssignStmt>> in1,
           HashMapFlowMap<String, Set<AssignStmt>> in2, HashMapFlowMap<String, Set<AssignStmt>> out) {
-    Set<String> keys = Sets.newHashSet(in1.keySet());
-    keys.addAll(in2.keySet());
-    for (String s : keys) {
-      Set<AssignStmt> res = new HashSet<AssignStmt>();
-      res.addAll(in1.get(s));
-      res.addAll(in2.get(s));
-      out.put(s, res);
-    }
+    in1.union(merger, in2, out);
   }
 
   /**

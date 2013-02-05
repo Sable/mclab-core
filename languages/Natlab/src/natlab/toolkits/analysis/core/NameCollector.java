@@ -6,6 +6,8 @@ import natlab.toolkits.analysis.HashSetFlowSet;
 import analysis.AbstractDepthFirstAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.CellIndexExpr;
+import ast.DotExpr;
 import ast.Name;
 import ast.ParameterizedExpr;
 
@@ -56,9 +58,17 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
         fullSet.addAll( currentSet );
         inLHS = false;
     }
+
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
         analyze(node.getTarget());
     }
-    // Need other cases for completeness (dot, cell, ...)
+
+    public void caseCellIndexExpr(CellIndexExpr node) {
+      analyze(node.getTarget());
+    }
+
+    public void caseDotExpr(DotExpr node) {
+      analyze(node.getTarget());
+    }
 }

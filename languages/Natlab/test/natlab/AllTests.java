@@ -2,7 +2,11 @@ package natlab;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import natlab.refactoring.*;
+import mclint.AllMcLintTests;
+import natlab.refactoring.ExtractFunctionTest;
+import natlab.refactoring.FEvalToCallTest;
+import natlab.refactoring.FunctionInlinerTest;
+import natlab.refactoring.MScriptInlinerTest;
 
 /** Top-level test suite.  Contains all tests. */
 public class AllTests {
@@ -21,6 +25,8 @@ public class AllTests {
     suite.addTestSuite(FEvalToCallTest.class);
     suite.addTestSuite(FunctionInlinerTest.class);
     suite.addTestSuite(ExtractFunctionTest.class);
+    
+    suite.addTest(AllMcLintTests.suite());
 
     //$JUnit-END$
     return suite;
