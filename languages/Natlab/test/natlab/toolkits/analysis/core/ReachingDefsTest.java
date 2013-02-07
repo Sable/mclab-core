@@ -7,7 +7,11 @@ import junit.framework.TestCase;
 import mclint.util.Parsing;
 import natlab.toolkits.analysis.HashMapFlowMap;
 import ast.AssignStmt;
+import ast.Function;
+import ast.FunctionList;
+import ast.GlobalStmt;
 import ast.IfStmt;
+import ast.Name;
 import ast.Program;
 import ast.Script;
 import ast.Stmt;
@@ -25,24 +29,24 @@ public class ReachingDefsTest extends TestCase {
     analysis.analyze();
   }
   
-  private HashMapFlowMap<String, Set<AssignStmt>> inSet(Stmt node) {
+  private HashMapFlowMap<String, Set<Def>> inSet(Stmt node) {
     return analysis.getInFlowSets().get(node);
   }
   
-  private HashMapFlowMap<String, Set<AssignStmt>> outSet(Stmt node) {
+  private HashMapFlowMap<String, Set<Def>> outSet(Stmt node) {
     return analysis.getOutFlowSets().get(node);
   }
   
-  private HashMapFlowMap<String, Set<AssignStmt>> flow(Map<String, Set<AssignStmt>> flow) {
-    HashMapFlowMap<String, Set<AssignStmt>> map = new HashMapFlowMap<String, Set<AssignStmt>>();
-    for (Map.Entry<String, Set<AssignStmt>> entry : flow.entrySet()) {
+  private HashMapFlowMap<String, Set<Def>> flow(Map<String, Set<Def>> flow) {
+    HashMapFlowMap<String, Set<Def>> map = new HashMapFlowMap<String, Set<Def>>();
+    for (Map.Entry<String, Set<Def>> entry : flow.entrySet()) {
       map.put(entry.getKey(), entry.getValue());
     }
     return map;
   }
   
-  private Set<AssignStmt> set(AssignStmt... stmts) {
-    return Sets.newHashSet(stmts);
+  private Set<Def> set(Def... defs) {
+    return Sets.newHashSet(defs);
   }
 
   public void testSimpleTransfer() {
@@ -79,5 +83,27 @@ public class ReachingDefsTest extends TestCase {
     assertEquals(flow(ImmutableMap.of("x", set(x1))), outSet(x1));
     assertEquals(flow(ImmutableMap.of("x", set(x2))), outSet(x2));
     assertEquals(flow(ImmutableMap.of("x", set(x1, x2))), outSet(ifStmt));
+  }
+  
+  public void testInputParametersAsDefs() {
+    parse(new StringBuilder()
+        .append("function f(x)\n")
+        .append("  g(x);\n")
+        .append("end").toString());
+    
+    Function f = ((FunctionList) program).getFunction(0);
+    Name def = f.getInputParam(0);
+    assertTrue(inSet(f.getStmt(0)).get("x").size() == 1);
+    assertTrue(inSet(f.getStmt(0)).get("x").contains(def));
+  }
+  
+  public void testGlobalStmtsAsDefs() {
+    parse("global x; y = x;");
+    
+    Script script = (Script) program;
+    GlobalStmt decl = (GlobalStmt) script.getStmt(0);
+    
+    assertTrue(inSet(script.getStmt(1)).get("x").size() == 1);
+    assertTrue(inSet(script.getStmt(1)).get("x").contains(decl));
   }
 }

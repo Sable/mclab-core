@@ -8,6 +8,8 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
 import ast.DotExpr;
+import ast.Function;
+import ast.GlobalStmt;
 import ast.Name;
 import ast.ParameterizedExpr;
 
@@ -70,5 +72,21 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
 
     public void caseDotExpr(DotExpr node) {
       analyze(node.getTarget());
+    }
+    
+    public void caseFunction(Function f) {
+      for (Name name : f.getInputParams()) {
+        currentSet.add(name.getID());
+      }
+      fullSet.addAll(currentSet);
+      analyze(f.getStmts());
+      analyze(f.getNestedFunctions());
+    }
+    
+    public void caseGlobalStmt(GlobalStmt node) {
+      for (Name name : node.getNames()) {
+        currentSet.add(name.getID());
+      }
+      fullSet.addAll(currentSet);
     }
 }

@@ -59,7 +59,7 @@ public class NodeFinder {
    * Walks up the tree to find a parent of the specified type.
    * Returns null if no such parent exists.
    */
-  public static <T extends ASTNode<?>> T findParent(Class<T> clazz, ASTNode<?> node) {
+  public static <T> T findParent(Class<T> clazz, ASTNode<?> node) {
     Preconditions.checkNotNull(node);
     while (node != null && (!clazz.isInstance(node))) {
       node = node.getParent();
@@ -73,7 +73,7 @@ public class NodeFinder {
   /**
    * Applies <tt>func</tt> to each node of type <tt>type</tt> in <tt>n</tt>.
    */
-  public static <T extends ASTNode<?>> void apply(final Class<T> type, final ASTNode<?> n,
+  public static <T> void apply(final Class<T> type, final ASTNode<?> n,
       final AbstractNodeFunction<T> func) {
     for (T node : NodeFinder.find(type, n)) {
       func.apply(node);

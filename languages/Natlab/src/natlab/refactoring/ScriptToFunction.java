@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
@@ -77,7 +78,7 @@ public class ScriptToFunction {
 		
 		Set<String> scriptLiveVars = live.getOutFlowSets().get(script).getSet();
 		Set<String> assignedVars = new HashSet<String>();
-		for (Map.Entry<String, Set<AssignStmt>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
+		for (Map.Entry<String, Set<Def>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
 			if (entry.getValue().contains(ReachingDefs.UNDEF) || entry.getValue().isEmpty())
 				continue;
 			assignedVars.add(entry.getKey());
@@ -120,15 +121,15 @@ public class ScriptToFunction {
 			mayReach.analyze();
 			callLive.analyze();
 			Set<String> callLiveVars = callLive.getOutFlowSets().get(call).getSet();
-			Map<String, Set<AssignStmt>> reaching = mayReach.getInFlowSets().get(call).toMap();
+			Map<String, Set<Def>> reaching = mayReach.getInFlowSets().get(call).toMap();
             System.out.println("\ncallReaching:" + reaching + "\ncLive:" +callLiveVars); 
             if (inlined) {
                 System.out.println();
             }
 
-			for (Map.Entry<String, Set<AssignStmt>> entry: reaching.entrySet()){
+			for (Map.Entry<String, Set<Def>> entry: reaching.entrySet()){
 				if (entry.getValue() != null){
-                    Set<AssignStmt> reached = entry.getValue();
+                    Set<Def> reached = entry.getValue();
 					 if ((reached.size()>1 || (!reached.contains(ReachingDefs.UNDEF))) && scriptLiveVars.contains(entry.getKey()))
 						 inputArgsCurrent.add(entry.getKey());
 				}

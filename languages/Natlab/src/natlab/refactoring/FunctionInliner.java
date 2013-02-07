@@ -18,6 +18,7 @@ import natlab.toolkits.ContextStack;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.core.CopyAnalysis;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
@@ -128,11 +129,11 @@ public class FunctionInliner {
 		LinkedList<NameExpr> uses = Lists.newLinkedList();
 		for (NameExpr n: all){
 			Stmt aUse= NodeFinder.findParent(Stmt.class, n);
-			HashMapFlowMap<String, Set<AssignStmt>> output= defAnalysis.getOutFlowSets().get(aUse);
+			HashMapFlowMap<String, Set<Def>> output= defAnalysis.getOutFlowSets().get(aUse);
 			if (output == null){
                 continue;
 			}
- 			Set<AssignStmt> defs = defAnalysis.getOutFlowSets().get(aUse).get(n.getName().getID());
+ 			Set<Def> defs = defAnalysis.getOutFlowSets().get(aUse).get(n.getName().getID());
 			if (aUse != s && defs!=null && defs.contains(s))
 				uses.add(n);
 		}

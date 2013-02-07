@@ -7,19 +7,21 @@ import java.util.Set;
 
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.utils.NodeFinder;
-import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.Function;
 import ast.GlobalStmt;
 import ast.Name;
 import ast.Stmt;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -30,6 +32,10 @@ public class ExtractFunction {
     public ExtractFunction(CompilationUnits cu){
         context = new ParsedCompilationUnitsContextStack(Lists.<GenericFile>newLinkedList(),
             cu.getRootFolder(), cu);
+    }
+    
+    private boolean containsGlobal(Set<Def> defs) {
+      return Iterables.any(defs, Predicates.instanceOf(GlobalStmt.class));
     }
 
     public List<RefactorException> extract(ast.List<Stmt> stmtList, int offset_start, int offset_end, Function f){
@@ -59,8 +65,8 @@ public class ExtractFunction {
         Stmt startStmt = stmtList.getChild(offset_start);
         Stmt endStmt = stmtList.getChild(offset_end-1);
 
-        Map<String, Set<AssignStmt>> reachingBefore = reachingAnalysisOrig.getOutFlowSets().get(startStmt).toMap();
-        Map<String, Set<AssignStmt>> reachingAfter = reachingAnalysisNew.getOutFlowSets().get(f).toMap();
+        Map<String, Set<Def>> reachingBefore = reachingAnalysisOrig.getOutFlowSets().get(startStmt).toMap();
+        Map<String, Set<Def>> reachingAfter = reachingAnalysisNew.getOutFlowSets().get(f).toMap();
         Set<String> liveBefore = liveAnalysisNew.getInFlowSets().get(f).getSet();
         Set<String> liveAfter = liveAnalysisOrig.getOutFlowSets().get(endStmt).getSet();
         VFFlowset kinds = kindAnalysis.getFlowSets().get(orig);
@@ -76,7 +82,7 @@ public class ExtractFunction {
         Set<String> inputs = Sets.newHashSet();
         for (String id: liveBefore){
             if (kinds.getKind(id).isVariable()){
-                if (reachingBefore.get(id).contains(ReachingDefs.GLOBAL)){
+                if (containsGlobal(reachingBefore.get(id))) {
                     if (!addedGlobals.contains(id))
                         newStmtList.insertChild(new GlobalStmt(new ast.List<Name>().add(new Name(id))),0);
                 } else if ((!reachingBefore.get(id).contains(ReachingDefs.UNDEF)) && 
@@ -91,7 +97,7 @@ public class ExtractFunction {
 
         for (String id: liveAfter){
             if (kinds.getKind(id).isVariable() && reachingAfter.containsKey(id)) {
-                if (reachingAfter.get(id).contains(ReachingDefs.GLOBAL)) {
+                if (containsGlobal(reachingAfter.get(id))) {
                     if (!addedGlobals.contains(id))
                         newStmtList.insertChild(new GlobalStmt(new ast.List<Name>().add(new Name(id))),0);
                 } else if (reachingAfter.get(id).contains(ReachingDefs.UNDEF)) {

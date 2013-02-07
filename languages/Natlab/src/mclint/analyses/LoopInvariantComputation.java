@@ -8,6 +8,7 @@ import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
@@ -15,8 +16,10 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.ForStmt;
+import ast.GlobalStmt;
 import ast.LiteralExpr;
 import ast.MatrixExpr;
+import ast.Name;
 import ast.NameExpr;
 import ast.Row;
 import ast.Stmt;
@@ -62,12 +65,12 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
       node.getChild(i).analyze(this);
   }
 
-  private boolean allDefsOutsideLoop(Set<AssignStmt> defs, ASTNode<?> loop) {
-    Iterable<AssignStmt> loopDefs = NodeFinder.find(AssignStmt.class, loop);
-    for (AssignStmt def : defs) {
+  private boolean allDefsOutsideLoop(Set<Def> defs, ASTNode<?> loop) {
+    Iterable<Def> loopDefs = NodeFinder.find(Def.class, loop);
+    for (Def def : defs) {
       if (def == ReachingDefs.UNDEF)
         continue;
-      if (def == ReachingDefs.GLOBAL || def == ReachingDefs.PARAM)
+      if (def instanceof GlobalStmt || def instanceof Name)
         continue;
       if (Iterables.contains(loopDefs, def))
         return false;
@@ -152,7 +155,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
         String name = ((NameExpr)node).getName().getID();
         Stmt parentStmt = NodeFinder.findParent(Stmt.class, node);
         if (reachingDefs.getInFlowSets().containsKey(parentStmt)) {
-          Set<AssignStmt> inSet = reachingDefs.getInFlowSets().get(parentStmt).get(name);
+          Set<Def> inSet = reachingDefs.getInFlowSets().get(parentStmt).get(name);
           if (allDefsOutsideLoop(inSet, loopStack.peek()))
             invariantStack.peek().add(node);
         }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.HashMapFlowMap;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
@@ -18,7 +19,6 @@ import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
-import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.ExprStmt;
 import ast.Function;
@@ -151,7 +151,7 @@ public class MScriptInliner {
 		kind_analysis_s.analyze();
 		ReachingDefs reachingDefs = new ReachingDefs(f);
 		reachingDefs.analyze();
-		HashMapFlowMap<String, Set<AssignStmt>> assigned=reachingDefs.getOutFlowSets().get(callStmt);
+		HashMapFlowMap<String, Set<Def>> assigned=reachingDefs.getOutFlowSets().get(callStmt);
 		if(assigned==null )
 			System.out.println("NULL");
 		Set<String> sibs= findSiblings(f);

@@ -6,6 +6,6 @@ import ast.AssignStmt;
 import ast.NameExpr;
 
 public interface UseDefDefUseChain {
-  Set<AssignStmt> getDefs(NameExpr use);
-  Set<NameExpr> getUses(AssignStmt def);
+  Set<Def> getDefs(NameExpr use);
+  Set<NameExpr> getUses(Def def);
 }
