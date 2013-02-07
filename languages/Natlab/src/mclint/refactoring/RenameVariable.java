@@ -2,17 +2,20 @@ package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
 
+import java.util.Collections;
 import java.util.Set;
 
 import mclint.Location;
 import mclint.util.AstUtil;
+import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.Function;
+import ast.GlobalStmt;
 import ast.Name;
 import ast.NameExpr;
-import ast.Program;
 import ast.Script;
 
 import com.google.common.base.Predicate;
@@ -45,12 +48,39 @@ public class RenameVariable {
     }
     return names;
   }
+  
+  private static Iterable<Name> getNamesToReplace(Def def, final String name) {
+    if (def instanceof AssignStmt) {
+      return getLHSTargets((AssignStmt) def, name);
+    }
+    if (def instanceof GlobalStmt) {
+      return filter(((GlobalStmt) def).getNames(), new Predicate<Name>() {
+        @Override public boolean apply(Name n) {
+          return n.getID().equals(name);
+        }
+      });
+    }
+    if (def instanceof Name) {
+      if (((Name) def).getID().equals(name)) {
+        return Collections.singleton((Name) def);
+      }
+    }
+    return Collections.emptySet();
+    
+  }
 
-  private static Iterable<AssignStmt> getAllDefs(final Name node) {
-    Program program = NodeFinder.findParent(Program.class, node);
-    return filter(NodeFinder.find(AssignStmt.class, program), new Predicate<AssignStmt>() {
-          @Override public boolean apply(AssignStmt stmt) {
-            return !Iterables.isEmpty(getLHSTargets(stmt, node.getID()));
+  private static Iterable<Def> getAllDefs(final Name node) {
+    ASTNode<?> parent = getParentFunctionOrScript(node);
+    return filter(NodeFinder.find(Def.class, parent), new Predicate<Def>() {
+          @Override public boolean apply(Def def) {
+            if (def instanceof AssignStmt) {
+              AssignStmt stmt = (AssignStmt) def;
+              return !Iterables.isEmpty(getLHSTargets(stmt, node.getID()));
+            }
+            if (def instanceof Name) {
+              return ((Name) def).getParent().getParent() instanceof Function;
+            }
+            return true;
           }
         });
   }
@@ -67,11 +97,11 @@ public class RenameVariable {
   public static void exec(Name node, String newName, UseDefDefUseChain udduChain) {
     checkSafeRename(node, newName);
 
-    for (AssignStmt def : getAllDefs(node)) {
+    for (Def def : getAllDefs(node)) {
       for (NameExpr use : udduChain.getUses(def)) {
         AstUtil.replace(use.getName(), new Name(newName)); 
       }
-      for (Name name : getLHSTargets(def, node.getID())) {
+      for (Name name : getNamesToReplace(def, node.getID())) {
         AstUtil.replace(name, new Name(newName));
       }
     }

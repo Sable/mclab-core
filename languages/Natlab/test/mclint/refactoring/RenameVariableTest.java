@@ -105,4 +105,20 @@ public class RenameVariableTest extends McLintTestCase {
     
     assertEquivalent("[y, z] = f(); y = z;", script);
   }
+  
+  public void testRenameFunctionParameter() {
+    parse(new StringBuilder()
+        .append("function f(x)\n")
+        .append("  y = x;\n")
+        .append("end").toString());
+    
+    Name x = ((FunctionList) kit.getAST()).getFunction(0).getInputParam(0);
+    
+    rename(x, "z");
+    
+    assertEquivalent(new StringBuilder()
+    .append("function f(z)\n")
+    .append("  y = z;\n")
+    .append("end").toString(), kit.getAST());
+  }
 }
