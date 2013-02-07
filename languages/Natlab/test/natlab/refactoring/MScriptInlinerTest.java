@@ -32,7 +32,7 @@ public class MScriptInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x() \n f = 2; \n end");
         MScriptInliner scriptInliner = new MScriptInliner(cu);
         assertTrue(scriptInliner.inlineAll().isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function  [] = x()\n  f = 2;\nend\n");      
+        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  f = 2;\nend\n");      
     }
 
     public void testInlineNormal() {
@@ -46,7 +46,7 @@ public class MScriptInlinerTest extends TestCase {
         LinkedList<LinkedList<Exception>> errors = scriptInliner.inlineAll();
         assertEquals(errors.size(), 1);
         assertTrue(errors.get(0).isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function  [] = x()\n  f = 1;\nend\n");      
+        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  f = 1;\nend\n");      
     }
 
     public void testInlineFunctionVarConflict() {

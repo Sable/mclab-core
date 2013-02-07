@@ -39,7 +39,7 @@ public class ExtractFunctionTest extends TestCase {
         Function f = new Function();
         f.setName("xf");
         xf.extract(s.getFunction(0).getStmtList(), 1, 2, f);
-        assertEquals("function  [b] = xf(f)\n" +
+        assertEquals("function [b] = xf(f)\n" +
                      "  b = (f + 1);\n" +
                      "end", f.getPrettyPrinted());
     } 
@@ -82,7 +82,7 @@ public class ExtractFunctionTest extends TestCase {
         assertEquals(Exceptions.FunctionOutputCanBeUndefined.class, 
                      xf.extract(s.getFunction(0).getStmtList(), 2, 3, f).get(0).getClass());
 
-        assertEquals("function  [b] = (f, b)\n" +
+        assertEquals("function [b] = (f, b)\n" +
                      "  if 1\n" +
                      "    b = (f + 1);\n" +
                      "  end\n" +

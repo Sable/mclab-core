@@ -33,7 +33,7 @@ public class FunctionInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x() \n  TT();\n end");
         FunctionInliner inliner = new FunctionInliner(cu);
         assertTrue(inliner.inlineAll().isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function  [] = x()\n  TT();\nend\n");      
+        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  TT();\nend\n");      
     }
 
     public void testInlineSimple() {
@@ -45,7 +45,7 @@ public class FunctionInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x() \n  in=f2();\n disp(in);\n end");
         FunctionInliner inliner = new FunctionInliner(cu);
         inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function  [] = x()\n  out = 2;\n  disp(out);\nend\n"); 
+        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  out = 2;\n  disp(out);\nend\n"); 
     }
 
     public void testInlineWithExtraAssignments() {
@@ -57,7 +57,7 @@ public class FunctionInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x() \n  in=f2();\nend");
         FunctionInliner inliner = new FunctionInliner(cu);
         inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function  [] = x()\n  out = 2;\nend\n"); 
+        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  out = 2;\nend\n"); 
     }
 
     public void testInlineWithExtraAssignmentsAndInputs() {
@@ -69,7 +69,7 @@ public class FunctionInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x(y) \n  in=f2(y);\nend");
         FunctionInliner inliner = new FunctionInliner(cu);
         inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function  [] = x(y)\n  out = y;\nend\n"); 
+        assertEquals(p.getPrettyPrinted(), "function [] = x(y)\n  out = y;\nend\n"); 
     }
 
     public void testInlineWithNoExtraAssignments() {
@@ -81,7 +81,7 @@ public class FunctionInlinerTest extends TestCase {
         Program p = addFile("/f1.m", "function x(y) \n  in=f2(y);\nend");
         FunctionInliner inliner = new FunctionInliner(cu);
         inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function  [] = x(y)\n  j = y;\n  if 1\n    disp(j);\n  else \n    j = 1;\n  end\n  out = j;\nend\n"); 
+        assertEquals(p.getPrettyPrinted(), "function [] = x(y)\n  j = y;\n  if 1\n    disp(j);\n  else \n    j = 1;\n  end\n  out = j;\nend\n"); 
     }
 
 }
