@@ -12,12 +12,15 @@ import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.CompilationUnits;
 import ast.Function;
 import ast.GlobalStmt;
 import ast.Name;
 import ast.NameExpr;
+import ast.Program;
 import ast.Script;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -93,11 +96,36 @@ public class RenameVariable {
       }
     }
   }
+  
+  private static ASTNode<?> getRoot(Def node) {
+    Program program = NodeFinder.findParent(Program.class, (ASTNode<?>) node);
+    CompilationUnits cu = NodeFinder.findParent(CompilationUnits.class, program);
+    return Objects.firstNonNull(cu, program);
+  }
+  
+  private static Name findGlobalNamed(final String name, ASTNode<?> tree) {
+    return Iterables.getFirst(filter(NodeFinder.find(Name.class, tree),
+        new Predicate<Name>() {
+          @Override public boolean apply(Name node) {
+            return node.getParent().getParent() instanceof GlobalStmt
+                && node.getID().equals(name);
+          }
+        }), null);
+  }
 
-  public static void exec(Name node, String newName, UseDefDefUseChain udduChain) {
+  public static void exec(Name node, String newName, UseDefDefUseChain udduChain,
+      boolean renameGlobally) {
     checkSafeRename(node, newName);
 
     for (Def def : getAllDefs(node)) {
+      if (def instanceof GlobalStmt && renameGlobally) {
+        for (Function f : NodeFinder.find(Function.class, getRoot(def))) {
+          Name decl = findGlobalNamed(node.getID(), f);
+          if (decl != null) {
+            exec(decl, newName, udduChain, false);
+          }
+        }
+      }
       for (NameExpr use : udduChain.getUses(def)) {
         AstUtil.replace(use.getName(), new Name(newName)); 
       }
@@ -105,5 +133,9 @@ public class RenameVariable {
         AstUtil.replace(name, new Name(newName));
       }
     }
+  }
+  
+  public static void exec(Name node, String newName, UseDefDefUseChain udduChain) {
+    exec(node, newName, udduChain, true);
   }
 }

@@ -117,8 +117,46 @@ public class RenameVariableTest extends McLintTestCase {
     rename(x, "z");
     
     assertEquivalent(new StringBuilder()
-    .append("function f(z)\n")
-    .append("  y = z;\n")
-    .append("end").toString(), kit.getAST());
+        .append("function f(z)\n")
+        .append("  y = z;\n")
+        .append("end").toString(), kit.getAST());
+  }
+  
+  public void testRenameGlobalVariableAcrossFunctions() {
+    parse(new StringBuilder()
+        .append("function f1()\n")
+        .append("  global x; y = x;\n")
+        .append("end\n")
+        .append("function f2()\n")
+        .append("  global x; x = 4;\n")
+        .append("end").toString());
+    
+    Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
+    Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();
+    
+    rename(x, "z");
+
+    assertEquivalent(new StringBuilder()
+        .append("function f1()\n")
+        .append("  global z; y = z;\n")
+        .append("end\n")
+        .append("function f2()\n")
+        .append("  global z; z = 4;\n")
+        .append("end").toString(), kit.getAST());
+  }
+  
+  public void testRenameGlobalVariableWithNameConflict() {
+    parse(new StringBuilder()
+    .append("function f1()\n")
+    .append("  global x; y = x;\n")
+    .append("end\n")
+    .append("function f2()\n")
+    .append("  global x; x = z;\n")
+    .append("end").toString());
+
+    Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
+    Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();
+
+    assertRenameFails(kit.getAST(), x, "z");
   }
 }
