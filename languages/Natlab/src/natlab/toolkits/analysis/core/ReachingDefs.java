@@ -26,21 +26,15 @@ import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
 import natlab.utils.NodeFinder;
-import nodecases.AbstractNodeCaseHandler;
 import analysis.AbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
-import ast.CellIndexExpr;
-import ast.DotExpr;
 import ast.Function;
 import ast.GlobalStmt;
 import ast.Name;
-import ast.NameExpr;
-import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 
 /**
@@ -158,71 +152,12 @@ public class ReachingDefs extends
     }
     outFlowSets.put(node, currentOutSet);
   }
-  
-  private Set<Def> getReachingDefs(NameExpr node) {
-    Stmt parent = NodeFinder.findParent(Stmt.class, node);
-    return getInFlowSets().get(parent).get(node.getName().getID());
-  }
 
   private UseDefDefUseChain udduChainCached = null;
 
-  private void createUseDefDefUseChain() {
-    if (!isAnalyzed()) {
-      analyze();
-    }
-    final ImmutableSetMultimap.Builder<NameExpr, Def> useDefChainBuilder =
-        ImmutableSetMultimap.builder();
-    final ImmutableSetMultimap.Builder<Def, NameExpr> defUseChainBuilder =
-        ImmutableSetMultimap.builder();
-    tree.analyze(new AbstractNodeCaseHandler() {
-      @Override public void caseASTNode(ASTNode node) {
-        for (int i = 0; i < node.getNumChild(); i++) {
-          node.getChild(i).analyze(this);
-        }
-      }
-
-      @Override public void caseAssignStmt(AssignStmt node) {
-        if (node.getLHS() instanceof ParameterizedExpr) {
-          ((ParameterizedExpr) node.getLHS()).getArgs().analyze(this);
-        } else if (node.getLHS() instanceof CellIndexExpr) {
-          ((CellIndexExpr) node.getLHS()).getArgs().analyze(this);
-        } else if (node.getLHS() instanceof NameExpr) {
-        } else if (!(node.getLHS() instanceof DotExpr)) {
-          node.getLHS().analyze(this);
-        }
-        node.getRHS().analyze(this);
-      }
-      
-      @Override public void caseDotExpr(DotExpr node) {
-        node.getTarget().analyze(this);
-      }
-
-      @Override public void caseNameExpr(NameExpr use) {
-        Set<Def> defs = getReachingDefs(use);
-        useDefChainBuilder.putAll(use, defs);
-        for (Def def : defs) {
-          if (def != UNDEF) {
-            defUseChainBuilder.put(def, use);
-          }
-        }
-      }
-    });
-    final ImmutableSetMultimap<NameExpr, Def> useDefChain = useDefChainBuilder.build();
-    final ImmutableSetMultimap<Def, NameExpr> defUseChain = defUseChainBuilder.build();
-    udduChainCached = new UseDefDefUseChain() {
-      @Override public Set<NameExpr> getUses(Def def) {
-        return defUseChain.get(def);
-      }
-      
-      @Override public Set<Def> getDefs(NameExpr use) {
-        return useDefChain.get(use);
-      }
-    };
-  }
-  
   public UseDefDefUseChain getUseDefDefUseChain() {
     if (udduChainCached == null) {
-      createUseDefDefUseChain();
+      udduChainCached = UseDefDefUseChain.fromReachingDefs(this);
     }
     return udduChainCached;
   }
