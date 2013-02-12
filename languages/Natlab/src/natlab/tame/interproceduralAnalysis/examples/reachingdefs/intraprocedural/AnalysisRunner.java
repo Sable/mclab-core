@@ -36,34 +36,32 @@ public class AnalysisRunner
          * and print the result
          */
         // TODO hashmap static Function to VariableNameCollector
-//        for(StaticFunction f : functionList)
-//        {
-////            System.out.println("Function " + f.getName());
-////            VariableNameCollector vnc = new VariableNameCollector(f);
-////            for(String s : vnc.getResult())
-////            {
-////                System.out.println(s);
-////            }
-////            System.out.println();
-//        } 
+        for(StaticFunction f : functionList)
+        {
+//            System.out.println("Function " + f.getName());
+//            VariableNameCollector vnc = new VariableNameCollector(f);
+//            for(String s : vnc.getResult())
+//            {
+//                System.out.println(s);
+//            }
+//            System.out.println();
+        } 
         
       for(StaticFunction f : functionList)
       {
 //          VariableNameCollector vnc = new VariableNameCollector(f);
 //          vnc.analyze();
 //          System.out.println(f.getAst().getPrettyPrinted());
-////          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
-////          rda.analyze();
-////          rda.printVisitedAssignmentStms();
-////          rda.printNodeVarsDeclared();
-          UDWeb ud = new UDWeb(new ReachingDefinitionsAnalysis(f));
+//          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
+//          rda.analyze();
+          UDChain ud = new UDChain(new ReachingDefinitionsAnalysis(f));
           System.out.println("\n//////// UD Analysis starts here: //////////////\n");
-          ud.constructUDWeb();
-          ud.printUDWeb();
+          ud.constructUDChain();
+          ud.printUDChain();
           System.out.println("\n//////// DU Analysis starts here: //////////////\n");
-          DUWeb du = new DUWeb(ud);
-          du.constructDUWeb();
-          du.printDUWeb();
+          DUChain du = new DUChain(ud);
+          du.constructDUChain();
+          du.printDUChain();
       }
     }
 }

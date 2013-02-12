@@ -6,6 +6,8 @@ import java.util.Set;
 
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashMapFlowMap;
@@ -14,49 +16,54 @@ import natlab.toolkits.analysis.Mergers;
 import ast.ASTNode;
 import ast.Function;
 
-public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<TIRAbstractAssignStmt>>>
+public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<TIRNode>>>
 {
-    private Merger<Set<TIRAbstractAssignStmt>> fMerger = Mergers.union();
+    // Member variables
+    private final boolean DEBUG = false;
+    private Merger<Set<TIRNode>> fMerger = Mergers.union();
     private VariableNameCollector fVariableNameCollector;
-    private HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> fStartMap;
-    private LinkedList<TIRAbstractAssignStmt> fVisitedAssignStmts;
+    private HashMapFlowMap<String, Set<TIRNode>> fStartMap;
+    private LinkedList<TIRNode> fVisitedNodes;
     
+    // Constructor
     public ReachingDefinitionsAnalysis(StaticFunction f)
     {
         super(f.getAst());
-        fStartMap = new HashMapFlowMap<String, Set<TIRAbstractAssignStmt>>(fMerger);
+        fStartMap = new HashMapFlowMap<String, Set<TIRNode>>(fMerger);
         fVariableNameCollector = new VariableNameCollector(f);
-        fVisitedAssignStmts = new LinkedList<TIRAbstractAssignStmt>();
+        fVisitedNodes = new LinkedList<TIRNode>();
         fVariableNameCollector.analyze();
         for (String variable : fVariableNameCollector.getFullSet())
         {
-            fStartMap.put( variable, new HashSet<TIRAbstractAssignStmt>());
+            fStartMap.put( variable, new HashSet<TIRNode>());
         }
     }
     
+    /**
+     * Merge two in sets
+     */
     public void merge
     (
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> in1,
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> in2,
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> out
+        HashMapFlowMap<String, Set<TIRNode>> in1,
+        HashMapFlowMap<String, Set<TIRNode>> in2,
+        HashMapFlowMap<String, Set<TIRNode>> out
     )
     {
         Set<String> keys = new HashSet<String>(in1.keySet());
         keys.addAll(in2.keySet());
         for (String s : keys)
         {
-            Set<TIRAbstractAssignStmt> result = new HashSet<TIRAbstractAssignStmt>();
+            Set<TIRNode> result = new HashSet<TIRNode>();
             result.addAll(in1.get(s));
             result.addAll(in2.get(s));
             out.put(s, result);
         }
     }
     
-    public void copy
-    (
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> in,
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> out
-    )
+    /**
+     * Return copy of a flow set
+     */
+    public void copy(HashMapFlowMap<String, Set<TIRNode>> in, HashMapFlowMap<String, Set<TIRNode>> out)
     {
         if (in == out)  return;
         else
@@ -64,56 +71,68 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
             out.clear();
             for (String s : in.keySet())
             {
-                out.put(s, new HashSet<TIRAbstractAssignStmt>(in.get(s)));
+                out.put(s, new HashSet<TIRNode>(in.get(s)));
             }
         }
     }
     
-    public HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> copy(HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> in)
+    public HashMapFlowMap<String, Set<TIRNode>> copy(HashMapFlowMap<String, Set<TIRNode>> in)
     {
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> out = new HashMapFlowMap<String, Set<TIRAbstractAssignStmt>>();
+        HashMapFlowMap<String, Set<TIRNode>> out = new HashMapFlowMap<String, Set<TIRNode>>();
         copy(in, out);
         return out;
     }
 
+    // Case methods
     @Override
-    public void caseFunction(Function node)
+    public void caseTIRFunction(TIRFunction node)
     {
-        setCurrentOutSet(fStartMap);
-        caseASTNode(node);
+        //setCurrentOutSet(fStartMap);
+        currentOutSet = copy(currentInSet);
+        Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesUpToNode(node);
+        for (String s : definedVariablesNames)
+        {
+            Set<TIRNode> newDefinitionSite = new HashSet<TIRNode>();
+            newDefinitionSite.add(node);
+            currentOutSet.put(s, newDefinitionSite);
+        }
         setInOutSet(node);
+        currentInSet = copy(currentOutSet);
+        fVisitedNodes.add(node);
+        if (DEBUG) printMapForNode(node);
+        caseASTNode(node);
     }
     
     @Override
     public void caseTIRCallStmt(TIRCallStmt node)
     {
        currentOutSet = copy(currentInSet);
-       Set<String> definedVariablesNames = fVariableNameCollector.getNames(node);
+       Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesUpToNode(node);
        for (String s : definedVariablesNames)
        {
-           Set<TIRAbstractAssignStmt> newDefinitionSite = new HashSet<TIRAbstractAssignStmt>();
+           Set<TIRNode> newDefinitionSite = new HashSet<TIRNode>();
            newDefinitionSite.add(node);
            currentOutSet.put(s, newDefinitionSite);
        }
        setInOutSet(node);
-       printMapForNode(node);
-       fVisitedAssignStmts.add(node);
+       if (DEBUG) printMapForNode(node);
+       fVisitedNodes.add(node);
     }   
     
     @Override
     public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node)
     {
         currentOutSet = copy(currentInSet);
-        Set<String> definedVariablesNames = fVariableNameCollector.getNames(node);
+        Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesUpToNode(node);
         for (String s : definedVariablesNames)
         {
-            Set<TIRAbstractAssignStmt> newDefinitionSite = new HashSet<TIRAbstractAssignStmt>();
+            Set<TIRNode> newDefinitionSite = new HashSet<TIRNode>();
             newDefinitionSite.add(node);
             currentOutSet.put(s, newDefinitionSite);
         }
         setInOutSet(node);
-        printMapForNode(node);
-        fVisitedAssignStmts.add(node);
+        if (DEBUG) printMapForNode(node);
+        fVisitedNodes.add(node);
     }
     
     private void setInOutSet(ASTNode<?> node)
@@ -122,48 +141,45 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
         associateOutSet(node, getCurrentOutSet());
     }
     
-    public LinkedList<TIRAbstractAssignStmt> getVisitedAssignStmtsLinkedList()
+    public LinkedList<TIRNode> getVisitedStmtsLinkedList()
     {
-        LinkedList<TIRAbstractAssignStmt> visitedAssignStmtsLinkedList = new LinkedList<TIRAbstractAssignStmt>();
-        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
-        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
+        LinkedList<TIRNode> visitedNodesLinkedList = new LinkedList<TIRNode>();
+        HashSet<TIRNode> visitedNodesSet = new HashSet<TIRNode>();
+        for (TIRNode node : fVisitedNodes)
         {
-            if (!visitedAssignStmtsSet.contains(stmt))
+            if (!visitedNodesSet.contains(node))
             {
-                visitedAssignStmtsSet.add(stmt);
-                visitedAssignStmtsLinkedList.add(stmt);
+                visitedNodesSet.add(node);
+                visitedNodesLinkedList.add(node);
             }
         }
-        return visitedAssignStmtsLinkedList;
-    }
-    
-    public VariableNameCollector getVarNameCollector()
-    {
-        return fVariableNameCollector;
+        return visitedNodesLinkedList;
     }
     
     @Override
-    public HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> newInitialFlow()
+    public HashMapFlowMap<String, Set<TIRNode>> newInitialFlow()
     {
         return copy(fStartMap);
     }
     
     
-    public void printMapForNode(TIRAbstractAssignStmt node)
+    public VariableNameCollector getVarNameCollector() { return fVariableNameCollector; }
+    
+    public void printMapForNode(TIRNode node)
     {
         StringBuffer sb = new StringBuffer();
-        sb.append("------- " + node.getStructureString() + " ------------\n");
-        HashMapFlowMap<String, Set<TIRAbstractAssignStmt>> definitionSiteMap = outFlowSets.get(node);
+        sb.append("------- " + printNode(node) + " ------------\n");
+        HashMapFlowMap<String, Set<TIRNode>> definitionSiteMap = outFlowSets.get(node);
         Set<String> variableNames = definitionSiteMap.keySet();
         for (String s : variableNames)
         {
-            Set<TIRAbstractAssignStmt> assignStmts = definitionSiteMap.get(s);
-            if (!assignStmts.isEmpty())
+            Set<TIRNode> nodes = definitionSiteMap.get(s);
+            if (!nodes.isEmpty())
             {
                 sb.append("Var "+ s + "\n");
-                for (TIRAbstractAssignStmt assignStmt : assignStmts)
+                for (TIRNode n : nodes)
                 {
-                    sb.append("\t"+ assignStmt.getStructureString() + "\n");
+                    sb.append("\t"+ printNode(n) + "\n");
                 }
             }
         }
@@ -171,42 +187,27 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
     }
     
     
-    public void printVisitedAssignmentStms()
+    public void printVisitedStmts()
     {
         StringBuffer sb = new StringBuffer();
-        sb.append("Visited Assignment Stmts\n");
-        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
-        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
+        sb.append("Visited Stmts\n");
+        HashSet<TIRNode> visitedAssignStmtsSet = new HashSet<TIRNode>();
+        for (TIRNode visitedNode : fVisitedNodes)
         {
-            if (!visitedAssignStmtsSet.contains(stmt))
+            if (!visitedAssignStmtsSet.contains(visitedNode))
             {
-                visitedAssignStmtsSet.add(stmt);
-                sb.append(stmt.getStructureString() + "\n");
+                visitedAssignStmtsSet.add(visitedNode);
+                sb.append(printNode(visitedNode) + "\n");
             }
         }
         System.out.println(sb.toString());
     }
+
     
-    public void printNodeVarsDeclared()
+    private String printNode(TIRNode node)
     {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Visited Assignment Stmts\n");
-        HashSet<TIRAbstractAssignStmt> visitedAssignStmtsSet = new HashSet<TIRAbstractAssignStmt>();
-        for (TIRAbstractAssignStmt stmt : fVisitedAssignStmts)
-        {
-            if (!visitedAssignStmtsSet.contains(stmt))
-            {
-                visitedAssignStmtsSet.add(stmt);
-                sb.append(stmt.getStructureString() + " -> ");
-                for (String var : fVariableNameCollector.getNames(stmt))
-                {
-                    sb.append(var + " ");
-                }
-                sb.append("\n");
-            }
-        }
-        System.out.println(sb.toString());
+        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
+        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
+        else return null;
     }
-    
-    
 }
