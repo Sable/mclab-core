@@ -103,7 +103,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         else if( dest == this ){
             List<D> toRemove = Lists.newLinkedList();
             for( D i : this )
-                if( other.contains( i ) )
+                if( !other.contains( i ) )
                     toRemove.add(i);
             for( D i : toRemove )
                 dest.remove(i);
@@ -111,7 +111,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         else if( dest == other ){
             List<D> toRemove = Lists.newLinkedList();
             for( D i : other )
-                if( this.contains( i ) )
+                if( !this.contains( i ) )
                     toRemove.add(i);
             for( D i : toRemove )
                 dest.remove(i);
