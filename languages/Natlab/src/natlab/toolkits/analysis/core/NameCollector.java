@@ -16,29 +16,29 @@ import ast.ParameterizedExpr;
 /**
  * @author Jesse Doherty
  */
-public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<String>>
+public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Name>>
 {
-    protected HashSetFlowSet<String> fullSet;
+    protected HashSetFlowSet<Name> fullSet;
     protected boolean inLHS = false;
 
     public NameCollector(ASTNode<?> tree)
     {
         super(tree);
-        fullSet = new HashSetFlowSet<String>();
+        fullSet = new HashSetFlowSet<Name>();
     }
 
-    public HashSetFlowSet<String> newInitialFlow()
+    public HashSetFlowSet<Name> newInitialFlow()
     {
-        return new HashSetFlowSet<String>();
+        return new HashSetFlowSet<Name>();
     }
 
-    public Set<String> getAllNames()
+    public Set<Name> getAllNames()
     {
         return fullSet.getSet();
     }
-    public Set<String> getNames( AssignStmt node )
+    public Set<Name> getNames( AssignStmt node )
     {
-        HashSetFlowSet<String> set = flowSets.get(node);
+        HashSetFlowSet<Name> set = flowSets.get(node);
         if( set == null )
             return null;
         else
@@ -48,7 +48,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
     public void caseName( Name node )
     {
         if( inLHS )
-            currentSet.add( node.getID() );
+            currentSet.add(node);
     }
 
     public void caseAssignStmt( AssignStmt node )
@@ -76,7 +76,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
     
     public void caseFunction(Function f) {
       for (Name name : f.getInputParams()) {
-        currentSet.add(name.getID());
+        currentSet.add(name);
       }
       fullSet.addAll(currentSet);
       analyze(f.getStmts());
@@ -85,7 +85,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
     
     public void caseGlobalStmt(GlobalStmt node) {
       for (Name name : node.getNames()) {
-        currentSet.add(name.getID());
+        currentSet.add(name);
       }
       fullSet.addAll(currentSet);
     }

@@ -25,6 +25,7 @@ import natlab.toolkits.analysis.core.NameCollector;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.Name;
 import ast.Stmt;
 
 /**
@@ -105,11 +106,11 @@ public class MaybeLive
         //);
         currentInSet = copy( currentOutSet );
         
-        Set<String> defVars = nameCollector.getNames( node );
+        Set<Name> defVars = nameCollector.getNames( node );
         Set<String> useVars = useCollector.getUses( node );
 
-        for( String def : defVars )
-            currentInSet.remove( def );
+        for( Name def : defVars )
+            currentInSet.remove( def.getID() );
         for( String use : useVars )
             currentInSet.add( use );
 

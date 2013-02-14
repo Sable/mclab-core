@@ -21,7 +21,6 @@ package natlab.toolkits.analysis.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import natlab.toolkits.analysis.AbstractFlowMap;
 import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
@@ -31,10 +30,12 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
 import ast.GlobalStmt;
+import ast.MatrixExpr;
 import ast.Name;
 import ast.Script;
 import ast.Stmt;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 /**
@@ -46,36 +47,36 @@ public class ReachingDefs extends
         AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<Def>>> {
   public static Def UNDEF = new AssignStmt();
 
-  private final Merger<Set<Def>> merger = Mergers.union();
+  private Set<Name> defs = Sets.newHashSet();
+  private Merger<Set<Def>> merger = Mergers.union();
 
-  private final HashMapFlowMap<String, Set<Def>> startMap;
-  private final NameCollector nameCollector;
+  private HashMapFlowMap<String, Set<Def>> startMap;
+  private DefinitelyAssignedAnalysis definiteAssignment;
+  private NameCollector nameCollector;
 
   public ReachingDefs(ASTNode<?> tree) {
     super(tree);
+  }
+  
+  @Override
+  public void analyze() {
     startMap = new HashMapFlowMap<String, Set<Def>>(merger);
     nameCollector = new NameCollector(tree);
     nameCollector.analyze();
-    for (String var : nameCollector.getAllNames())
-      startMap.put(var, new HashSet<Def>());
+    definiteAssignment = new DefinitelyAssignedAnalysis(tree);
+    definiteAssignment.analyze();
+    for (Name var : nameCollector.getAllNames()) {
+      startMap.put(var.getID(), new HashSet<Def>());
+    }
+    super.analyze();
   }
 
-  /**
-   * Defines the merge operation for this analysis.
-   * 
-   * This implementation uses the union method defined by
-   * {@link AbstractFlowMap}. Note that the union method deals with the cases
-   * where {@literal in1==in2}, {@literal in1==out} or {@literal in2==out}.
-   */
   @Override
   public void merge(HashMapFlowMap<String, Set<Def>> in1,
           HashMapFlowMap<String, Set<Def>> in2, HashMapFlowMap<String, Set<Def>> out) {
     in1.union(merger, in2, out);
   }
 
-  /**
-   * Creates a copy of the FlowMap with copies of the contained set.
-   */
   @Override
   public void copy(HashMapFlowMap<String, Set<Def>> in,
           HashMapFlowMap<String, Set<Def>> out) {
@@ -86,9 +87,6 @@ public class ReachingDefs extends
       out.put(i, Sets.newHashSet(in.get(i)));
   }
 
-  /**
-   * Creates a copy of the given flow-map and returns it.
-   */
   public HashMapFlowMap<String, Set<Def>> copy(HashMapFlowMap<String, Set<Def>> in) {
     HashMapFlowMap<String, Set<Def>> out = new HashMapFlowMap<String, Set<Def>>();
     copy(in, out);
@@ -124,33 +122,66 @@ public class ReachingDefs extends
   public HashMapFlowMap<String, Set<Def>> newInitialFlow() {
     return copy(startMap);
   }
+  
+  private boolean isSimpleLValue(Name node) {
+    return node.getParent().getParent() instanceof AssignStmt
+        || node.getParent().getParent() instanceof MatrixExpr;
+  }
+
+  private Set<Name> getSimpleDefs(final AssignStmt node) {
+    return Sets.filter(nameCollector.getNames(node), new Predicate<Name>() {
+      @Override public boolean apply(Name name) {
+        return isSimpleLValue(name);
+      }
+    });
+  }
+  
+  private Set<Name> getImplicitDefs(final AssignStmt node) {
+    return Sets.filter(nameCollector.getNames(node), new Predicate<Name>() {
+      @Override public boolean apply(Name name) {
+        return !isSimpleLValue(name) 
+            && !definiteAssignment.isDefinitelyAssignedAtInputOf(node, name.getID());
+      }
+    });
+  }
 
   @Override
   public void caseAssignStmt(AssignStmt node) {
-    inFlowSets.put(node, currentInSet);
     currentOutSet = copy(currentInSet);
-    for (String n : nameCollector.getNames(node)) {
-      currentOutSet.put(n, Sets.<Def> newHashSet(node));
+    for (Name n : getSimpleDefs(node)) {
+      defs.add(n);
+      currentOutSet.put(n.getID(), Sets.<Def> newHashSet(node));
     }
+    for (Name n : getImplicitDefs(node)) {
+      defs.add(n);
+      currentInSet.get(n.getID()).remove(UNDEF);
+      currentInSet.get(n.getID()).add(node);
+      currentOutSet.get(n.getID()).remove(UNDEF);
+      currentOutSet.get(n.getID()).add(node);
+    }
+    inFlowSets.put(node, currentInSet);
     outFlowSets.put(node, currentOutSet);
   }
 
   @Override
   public void caseStmt(Stmt node) {
     inFlowSets.put(node, currentInSet);
-    currentOutSet = currentInSet;
+    currentOutSet = copy(currentInSet);
     outFlowSets.put(node, currentOutSet);
   }
   
   @Override
   public void caseGlobalStmt(GlobalStmt node) {
     inFlowSets.put(node, currentInSet);
-    currentOutSet = currentInSet;
-    
+    currentOutSet = copy(currentInSet);
     for (Name name : node.getNames()) {
       currentOutSet.put(name.getID(), Sets.<Def>newHashSet(node));
     }
     outFlowSets.put(node, currentOutSet);
+  }
+  
+  public boolean isDef(Name name) {
+    return defs.contains(name);
   }
 
   private UseDefDefUseChain udduChainCached = null;

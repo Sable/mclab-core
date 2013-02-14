@@ -60,23 +60,14 @@ public class UseDefDefUseChain {
       }
     }
 
-    @Override public void caseAssignStmt(AssignStmt node) {
-      if (node.getLHS() instanceof ParameterizedExpr) {
-        ((ParameterizedExpr) node.getLHS()).getArgs().analyze(this);
-      } else if (node.getLHS() instanceof CellIndexExpr) {
-        ((CellIndexExpr) node.getLHS()).getArgs().analyze(this);
-      } else if (node.getLHS() instanceof NameExpr) {
-      } else if (!(node.getLHS() instanceof DotExpr)) {
-        node.getLHS().analyze(this);
-      }
-      node.getRHS().analyze(this);
-    }
-
     @Override public void caseDotExpr(DotExpr node) {
       node.getTarget().analyze(this);
     }
 
     @Override public void caseNameExpr(NameExpr use) {
+      if (analysis.isDef(use.getName())) {
+        return;
+      }
       Set<Def> defs = getReachingDefs(use);
       useDefChainBuilder.putAll(use, defs);
       for (Def def : defs) {

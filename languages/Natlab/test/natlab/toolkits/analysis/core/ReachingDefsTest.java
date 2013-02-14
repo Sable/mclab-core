@@ -1,11 +1,13 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
 import mclint.util.Parsing;
 import natlab.toolkits.analysis.HashMapFlowMap;
+import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
 import ast.FunctionList;
@@ -17,6 +19,7 @@ import ast.Script;
 import ast.Stmt;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ReachingDefsTest extends TestCase {
@@ -52,9 +55,33 @@ public class ReachingDefsTest extends TestCase {
   public void testSimpleTransfer() {
     parse("x = 0");
     AssignStmt def = (AssignStmt) ((Script) program).getStmt(0);
+    
+    assertEquals(flow(ImmutableMap.of("x", set(ReachingDefs.UNDEF))), inSet(def));
+    assertEquals(flow(ImmutableMap.of("x", set(def))), outSet(def));
+  }
+  
+  public void testNoImplicitDefIfDefinitelyAssigned() {
+    parse("x = 0; x(1) = 4;");
+    AssignStmt def = (AssignStmt) ((Script) program).getStmt(0);
+    AssignStmt secondDef = (AssignStmt) ((Script) program).getStmt(1);
 
     assertEquals(flow(ImmutableMap.of("x", set(ReachingDefs.UNDEF))), inSet(def));
     assertEquals(flow(ImmutableMap.of("x", set(def))), outSet(def));
+    assertEquals(flow(ImmutableMap.of("x", set(def))), outSet(secondDef));
+  }
+  
+  public void testImplicitDefIfNotDefinitelyAssigned() {
+    parse(new StringBuilder()
+        .append("if 1 < 2\n")
+        .append("  x = 0;\n")
+        .append("end\n")
+        .append("x(2) = 4;").toString());
+    
+    AssignStmt def = (AssignStmt) 
+        ((IfStmt) ((Script) program).getStmt(0)).getIfBlock(0).getStmt(0);
+    AssignStmt arrayDef = (AssignStmt) ((Script) program).getStmt(1);
+
+    assertEquals(flow(ImmutableMap.of("x", set(def, arrayDef))), inSet(arrayDef));
   }
   
   public void testKill() {
