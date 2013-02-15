@@ -1,29 +1,22 @@
 package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
-
-import java.util.Collections;
-import java.util.Set;
-
 import mclint.Location;
 import mclint.util.AstUtil;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
-import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.Function;
 import ast.GlobalStmt;
 import ast.Name;
-import ast.NameExpr;
 import ast.Program;
 import ast.Script;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 public class RenameVariable {
   public static class NameConflict extends RuntimeException {
@@ -41,51 +34,14 @@ public class RenameVariable {
     }
     return NodeFinder.findParent(Script.class, node);
   }
-  
-  private static Set<Name> getLHSTargets(AssignStmt stmt, final String name) {
-    Set<Name> names = Sets.newHashSet();
-    for (NameExpr node : stmt.getLHS().getNameExpressions()) {
-      if (node.getName().getID().equals(name)) {
-        names.add(node.getName());
-      }
-    }
-    return names;
-  }
-  
-  private static Iterable<Name> getNamesToReplace(Def def, final String name) {
-    if (def instanceof AssignStmt) {
-      return getLHSTargets((AssignStmt) def, name);
-    }
-    if (def instanceof GlobalStmt) {
-      return filter(((GlobalStmt) def).getNames(), new Predicate<Name>() {
-        @Override public boolean apply(Name n) {
-          return n.getID().equals(name);
-        }
-      });
-    }
-    if (def instanceof Name) {
-      if (((Name) def).getID().equals(name)) {
-        return Collections.singleton((Name) def);
-      }
-    }
-    return Collections.emptySet();
-    
-  }
 
-  private static Iterable<Def> getAllDefs(final Name node) {
+  private static Iterable<Def> getAllDefs(final Name node, final UseDefDefUseChain uddu) {
     ASTNode<?> parent = getParentFunctionOrScript(node);
     return filter(NodeFinder.find(Def.class, parent), new Predicate<Def>() {
-          @Override public boolean apply(Def def) {
-            if (def instanceof AssignStmt) {
-              AssignStmt stmt = (AssignStmt) def;
-              return !Iterables.isEmpty(getLHSTargets(stmt, node.getID()));
-            }
-            if (def instanceof Name) {
-              return ((Name) def).getParent().getParent() instanceof Function;
-            }
-            return true;
-          }
-        });
+      @Override public boolean apply(Def def) {
+        return !uddu.getDefinedNamesOf(node.getID(), def).isEmpty();
+      }
+    });
   }
   
   private static void checkSafeRename(Name node, String newName) {
@@ -117,19 +73,23 @@ public class RenameVariable {
       boolean renameGlobally) {
     checkSafeRename(node, newName);
 
-    for (Def def : getAllDefs(node)) {
+    for (Def def : getAllDefs(node, udduChain)) {
       if (def instanceof GlobalStmt && renameGlobally) {
+        ASTNode<?> parent = getParentFunctionOrScript(node);
         for (Function f : NodeFinder.find(Function.class, getRoot(def))) {
+          if (parent == f) {
+            continue;
+          }
           Name decl = findGlobalNamed(node.getID(), f);
           if (decl != null) {
             exec(decl, newName, udduChain, false);
           }
         }
       }
-      for (NameExpr use : udduChain.getUses(def)) {
-        AstUtil.replace(use.getName(), new Name(newName)); 
+      for (Name use : udduChain.getUsesOf(node.getID(), def)) {
+        AstUtil.replace(use, new Name(newName)); 
       }
-      for (Name name : getNamesToReplace(def, node.getID())) {
+      for (Name name : udduChain.getDefinedNamesOf(node.getID(), def)) {
         AstUtil.replace(name, new Name(newName));
       }
     }
