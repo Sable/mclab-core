@@ -2,6 +2,8 @@ package mclint.patterns;
 
 import java.util.Map;
 
+import natlab.utils.AstFunctions;
+
 import ast.ASTNode;
 import ast.Expr;
 import ast.List;
@@ -51,14 +53,6 @@ public class Match {
     return pattern;
   }
   
-  private static Function<ASTNode<?>, String> prettyPrintFunction() {
-    return new Function<ASTNode<?>, String>() {
-      @Override public String apply(ASTNode<?> node) {
-        return node.getPrettyPrinted();
-      }
-    };
-  }
-  
   private String getBindingsAsString() {
     return String.format("{%s}", Joiner.on(", ").withKeyValueSeparator(": ")
         .join(Maps.transformValues(bindings, new Function<ASTNode<?>, String>() {
@@ -68,7 +62,7 @@ public class Match {
             }
             @SuppressWarnings("unchecked")
             ast.List<? extends ASTNode<?>> list = (ast.List<? extends ASTNode<?>>) node;
-            return Joiner.on(", ").join(Iterables.transform(list, prettyPrintFunction()));
+            return Joiner.on(", ").join(Iterables.transform(list, AstFunctions.prettyPrint()));
           }
         })));
   }

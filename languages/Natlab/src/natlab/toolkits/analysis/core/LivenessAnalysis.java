@@ -8,6 +8,7 @@ import static com.google.common.collect.Iterables.transform;
 import java.util.Set;
 
 import natlab.toolkits.analysis.HashSetFlowSet;
+import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import ast.ASTNode;
@@ -21,7 +22,6 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -85,13 +85,9 @@ public class LivenessAnalysis extends
 		}
 		
 		caseASTNode(s.getRHS());
-		currentOutSet.addAll(Lists.newArrayList(
-		     transform(filter(NodeFinder.find(NameExpr.class, s), not(in(lValues))),
-		    new Function<NameExpr, String>() {
-		      @Override public String apply(NameExpr expr) {
-		        return expr.getName().getID();
-		      }
-		    })));
+		currentOutSet.addAll(Lists.newArrayList(transform(
+		    filter(NodeFinder.find(NameExpr.class, s), not(in(lValues))),
+		     AstFunctions.nameExprToID())));
 		inFlowSets.put(s, currentInSet.copy());
 	}
 

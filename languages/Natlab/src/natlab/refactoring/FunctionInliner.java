@@ -28,6 +28,7 @@ import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
+import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -43,6 +44,7 @@ import ast.Script;
 import ast.Stmt;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -71,11 +73,8 @@ public class FunctionInliner {
 	}
 	
 	private Iterable<Function> nonNestedFunctions(ASTNode<?> tree) {
-	  return Iterables.filter(NodeFinder.find(Function.class, tree), new Predicate<Function>() {
-	        @Override public boolean apply(Function f) {
-	          return !(f.getParent().getParent() instanceof Function);
-	        }
-	      });
+	  return Iterables.filter(NodeFinder.find(Function.class, tree),
+	      Predicates.not(AstPredicates.nestedFunction()));
 	}
 	
 	public int countCalls(){
