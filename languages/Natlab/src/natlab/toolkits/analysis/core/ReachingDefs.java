@@ -166,7 +166,7 @@ public class ReachingDefs extends
   @Override
   public void caseStmt(Stmt node) {
     inFlowSets.put(node, currentInSet);
-    currentOutSet = copy(currentInSet);
+    currentOutSet = currentInSet;
     outFlowSets.put(node, currentOutSet);
   }
   

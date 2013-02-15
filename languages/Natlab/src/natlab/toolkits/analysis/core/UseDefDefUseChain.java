@@ -5,11 +5,8 @@ import java.util.Set;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
-import ast.AssignStmt;
-import ast.CellIndexExpr;
 import ast.DotExpr;
 import ast.NameExpr;
-import ast.ParameterizedExpr;
 import ast.Stmt;
 
 import com.google.common.collect.ImmutableSetMultimap;

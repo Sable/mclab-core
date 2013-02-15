@@ -1,13 +1,11 @@
 package natlab.toolkits.analysis.core;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
 import mclint.util.Parsing;
 import natlab.toolkits.analysis.HashMapFlowMap;
-import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
 import ast.FunctionList;
@@ -19,7 +17,6 @@ import ast.Script;
 import ast.Stmt;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ReachingDefsTest extends TestCase {

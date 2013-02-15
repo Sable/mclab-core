@@ -61,7 +61,7 @@ public class DefinitelyAssignedAnalysis extends
   @Override
   public void caseStmt(Stmt node){
     inFlowSets.put(node, currentInSet);
-    currentOutSet = currentInSet.copy();
+    currentOutSet = currentInSet;
     outFlowSets.put(node, currentOutSet);
   }
 
