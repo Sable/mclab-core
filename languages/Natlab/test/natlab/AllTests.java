@@ -9,6 +9,7 @@ import natlab.refactoring.FunctionInlinerTest;
 import natlab.refactoring.MScriptInlinerTest;
 import natlab.refactoring.ScriptToFunctionTest;
 import natlab.toolkits.analysis.core.ReachingDefsTest;
+import natlab.toolkits.path.FolderHandlerTest;
 
 /** Top-level test suite.  Contains all tests. */
 public class AllTests {
@@ -30,6 +31,8 @@ public class AllTests {
     suite.addTestSuite(ScriptToFunctionTest.class);
     
     suite.addTestSuite(ReachingDefsTest.class);
+    
+    suite.addTestSuite(FolderHandlerTest.class);
     
     suite.addTest(AllMcLintTests.suite());
 

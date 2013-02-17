@@ -38,7 +38,7 @@ public class FolderHandler{
   private FolderHandler addPath(GenericFile path){
     for (GenericFile f : path.listChildren()) {
       if (GenericFileFilters.CLASS_DIRECTORY.accept(f)) {
-        String className = f.getName();
+        String className = f.getName().substring(1);
         for (GenericFile subfile : f.listChildren(GenericFileFilters.MATLAB)) {
           String name = subfile.getNameWithoutExtension();
           if (name.equals(className)){
