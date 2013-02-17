@@ -19,7 +19,7 @@
 package natlab.toolkits.path;
 import java.util.*;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 
 /**
  * Represents a matlab path environment.

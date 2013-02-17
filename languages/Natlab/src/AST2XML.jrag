@@ -171,8 +171,8 @@ aspect ASTtoXML {
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-        e.setAttribute("fullpath", fullpath);
-        e.setAttribute("name", name);
+        e.setAttribute("fullpath", getFile().getPath());
+        e.setAttribute("name", getFile().getNameWithoutExtension());
         e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
         parent.appendChild(e);
         parentProgram=null;
@@ -185,7 +185,7 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("FunctionList");
 		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("fullpath", fullpath);
+		e.setAttribute("fullpath", getFile().getPath());
        
         for(Function func : getFunctions()) {
             func.getXML(doc, e);

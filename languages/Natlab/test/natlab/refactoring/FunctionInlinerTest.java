@@ -1,13 +1,14 @@
 package natlab.refactoring;
 
-import ast.*;
-import natlab.*;
-import natlab.toolkits.filehandling.genericFile.*;
+import java.io.StringReader;
+import java.util.ArrayList;
 
-import junit.framework.*;
-
-import java.io.*;
-import java.util.*;
+import junit.framework.TestCase;
+import natlab.CompilationProblem;
+import natlab.Parse;
+import natlab.toolkits.filehandling.BuiltinFile;
+import ast.CompilationUnits;
+import ast.Program;
 
 
 public class FunctionInlinerTest extends TestCase {

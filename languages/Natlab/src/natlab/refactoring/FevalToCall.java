@@ -7,7 +7,7 @@ import natlab.refactoring.Exceptions.RefactorException;
 import natlab.refactoring.Exceptions.RenameRequired;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.CompilationUnits;

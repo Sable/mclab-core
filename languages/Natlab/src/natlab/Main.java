@@ -130,7 +130,7 @@ public class Main {
       } else {
         File outputDir = new File(options.od());
         for (Program program : cu.getPrograms()) {
-          File outputFile = new File(outputDir, new File(program.getFullPath()).getName());
+          File outputFile = new File(outputDir, program.getFile().getName());
           Files.createParentDirs(outputFile);
           Files.write(program.getPrettyPrinted(), outputFile, Charsets.UTF_8);
         }

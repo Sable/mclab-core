@@ -9,7 +9,8 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+
+import natlab.toolkits.filehandling.GenericFile;
 
 /**
  * represents a result value as read by the unit test xml

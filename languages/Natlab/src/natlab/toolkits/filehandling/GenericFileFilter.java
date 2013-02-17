@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.filehandling.genericFile;
+package natlab.toolkits.filehandling;
 /**
  * a filter for files, analaguous to java.io.FileFilter
  */

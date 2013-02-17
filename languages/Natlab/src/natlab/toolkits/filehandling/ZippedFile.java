@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.filehandling.genericFile;
+package natlab.toolkits.filehandling;
 
 import java.io.*;
 import java.util.*;

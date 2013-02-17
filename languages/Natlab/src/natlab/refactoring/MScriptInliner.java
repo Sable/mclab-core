@@ -11,7 +11,7 @@ import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
 import natlab.utils.AbstractNodeFunction;
@@ -45,7 +45,7 @@ public class MScriptInliner {
 		for (int i = 0; i < cu.getChild(0).getNumChild(); i++) {
 			if (cu.getChild(0).getChild(i) instanceof Script) {
 				Script s = (Script) cu.getChild(0).getChild(i);
-				scripts.put(FolderHandler.getFileName(s.getFile()), s);
+				scripts.put(s.getFile().getNameWithoutExtension(), s);
 			}
 		}
 	};

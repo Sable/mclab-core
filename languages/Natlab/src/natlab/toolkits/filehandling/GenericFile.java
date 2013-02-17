@@ -16,7 +16,7 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.filehandling.genericFile;
+package natlab.toolkits.filehandling;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,20 +82,21 @@ public abstract class GenericFile implements Serializable {
      */
     public Collection<GenericFile> listChildren(GenericFileFilter filter){
         ArrayList<GenericFile> list = new ArrayList<GenericFile>();
-        if (list == null) return null;
         for (GenericFile file : listChildren()){
             if (filter.accept(file)) list.add(file);
         }
         return list;
     }
-    
-    
-    
+
     /**
      * returns the name of this file
      * @return
      */
     abstract public String getName();
+    
+    public String getNameWithoutExtension() {
+      return getName().substring(0, getName().length() - getExtensionComplete().length());
+    }
     
     /**
      * returns the file extension of this file.

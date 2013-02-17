@@ -231,7 +231,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 		callsite = this.node.createCallsiteObject(node);
                 	}
                     results.add(call(
-                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getname(),false));
+                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getName(),false));
                     //TODO - we assume overloading is no possible for a function handle value - is that Matlab semantics?
                 }
             } else {
@@ -599,11 +599,11 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
-                if (function.getname().equals("nargin") && argsObj.size() == 0){
+                if (function.getName().equals("nargin") && argsObj.size() == 0){
                     results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
                 } else {
                 	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);
-                	results.add(valuePropagator.call(function.getname(), argsObj));
+                	results.add(valuePropagator.call(function.getName(), argsObj));
                 }
             }else{
                 //simplify args

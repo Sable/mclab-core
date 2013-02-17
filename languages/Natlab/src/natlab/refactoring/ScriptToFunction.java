@@ -17,7 +17,7 @@ import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.AssignStmt;
@@ -67,7 +67,7 @@ public class ScriptToFunction {
 		f.setStmtList(script.getStmtList().copy());
 		FunctionList fl = new FunctionList();
 		fl.addFunction(f);
-		fl.setFullPath(script.getFullPath());
+		fl.setFile(script.getFile());
 		f.setParent(fl.getFunctionList());
 		LivenessAnalysis live = new LivenessAnalysis(script);
 		VFFlowInsensitiveAnalysis scriptKind = new VFFlowInsensitiveAnalysis(script);
@@ -112,7 +112,7 @@ public class ScriptToFunction {
             //                }
             //}
             if (inlined) {
-                System.out.println(context.cu.getName()+ " " + name+ "\n"+ callFunc.getPrettyPrinted());
+                System.out.println(name+ "\n"+ callFunc.getPrettyPrinted());
             }
 			TreeSet<String> inputArgsCurrent = new TreeSet<String>();
 			TreeSet<String> outputArgsCurrent = new TreeSet<String>();

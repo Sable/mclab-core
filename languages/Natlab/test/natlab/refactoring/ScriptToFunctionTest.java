@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 import natlab.CompilationProblem;
 import natlab.Parse;
-import natlab.toolkits.filehandling.genericFile.BuiltinFile;
+import natlab.toolkits.filehandling.BuiltinFile;
 import ast.CompilationUnits;
 import ast.Function;
 import ast.Program;

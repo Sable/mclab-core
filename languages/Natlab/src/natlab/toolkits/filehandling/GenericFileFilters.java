@@ -16,43 +16,43 @@
 //                                                                             //
 // =========================================================================== //
 
-package natlab.toolkits.filehandling.genericFile;
+package natlab.toolkits.filehandling;
 
 /**
  * provides some matlab related helpers using Generic Files
  */
-public class GenericFileMatlabTools {
+public class GenericFileFilters {
     /**
      * represents a file filter matching on matlab files
      */
-    static final public GenericFileFilter MATLAB_FILE_FILTER = new GenericFileFilter() {
+    static final public GenericFileFilter MATLAB = new GenericFileFilter() {
         public boolean accept(GenericFile file) {
             return file.getExtension().equalsIgnoreCase("m");
         }
     };
     
-    static final public GenericFileFilter PRIVATE_DIRECTORY_FILTER = new GenericFileFilter() {
+    static final public GenericFileFilter PRIVATE_DIRECTORY= new GenericFileFilter() {
         public boolean accept(GenericFile file)
         {
             return file.isDir() && file.getName().toLowerCase().equals("private");
         }
     };
     
-    static final public GenericFileFilter NON_PRIVATE_DIRECTORY_FILTER = new GenericFileFilter() {
+    static final public GenericFileFilter NON_PRIVATE_DIRECTORY = new GenericFileFilter() {
         public boolean accept(GenericFile file)
         {
             return file.isDir() && !file.getName().toLowerCase().equals("private");
         }
     };
     
-    static final public GenericFileFilter PACKAGE_FILTER = new GenericFileFilter() {
+    static final public GenericFileFilter PACKAGE_DIRECTORY = new GenericFileFilter() {
         public boolean accept(GenericFile file)
         {
             return file.isDir() && (file.getName().charAt(0) == '+');
         }
     };
 
-    static final public GenericFileFilter OBJECT_DIRECTORY_FILTER = new GenericFileFilter() {
+    static final public GenericFileFilter CLASS_DIRECTORY = new GenericFileFilter() {
         public boolean accept(GenericFile file)
         {
             return file.isDir() && (file.getName().charAt(0) == '@');

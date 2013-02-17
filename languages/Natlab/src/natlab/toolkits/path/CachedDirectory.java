@@ -20,7 +20,8 @@ package natlab.toolkits.path;
 
 import java.io.*;
 import java.util.*;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+
+import natlab.toolkits.filehandling.GenericFile;
 
 /**
  * represents a directory as stored in the directory cache

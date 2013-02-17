@@ -1,7 +1,7 @@
 package natlab.toolkits;
 import java.util.LinkedList;
 
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import ast.Function;
 
