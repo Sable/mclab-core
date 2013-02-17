@@ -1,13 +1,16 @@
 package natlab.refactoring;
 
-import ast.*;
-import natlab.*;
-import natlab.toolkits.filehandling.genericFile.*;
+import java.io.StringReader;
+import java.util.ArrayList;
 
-import junit.framework.*;
-
-import java.io.*;
-import java.util.*;
+import junit.framework.TestCase;
+import natlab.CompilationProblem;
+import natlab.Parse;
+import natlab.toolkits.filehandling.genericFile.BuiltinFile;
+import ast.CompilationUnits;
+import ast.Function;
+import ast.Program;
+import ast.Script;
 
 
 public class ScriptToFunctionTest extends TestCase {
@@ -26,7 +29,7 @@ public class ScriptToFunctionTest extends TestCase {
 
     public void testNoCallsError() {
         cu = new CompilationUnits();
-        files = new String[]{"/s1.m"};
+        files = new String[]{"/s1.m", "/f1.m"};
         root = new BuiltinFile(files);
         cu.setRootFolder(root);
         Script s = (Script) addFile("/s1.m", "f = 1;");
@@ -47,7 +50,7 @@ public class ScriptToFunctionTest extends TestCase {
         Function f = new Function();
         f.setName("s1f");
         assertEquals(s2f.replace(s, f).size(), 0);
-        assertEquals(f.getPrettyPrinted(), "function  [] = s1f()\nf = 1;\nend");
+        assertEquals(f.getPrettyPrinted(), "function [] = s1f()\nf = 1;\nend");
     }
 
    public void testOneCallWithOutput() {
@@ -61,7 +64,7 @@ public class ScriptToFunctionTest extends TestCase {
         Function f = new Function();
         f.setName("s1f");
         assertEquals(s2f.replace(s, f).size(), 0);
-        assertEquals(f.getPrettyPrinted(), "function  [f] = s1f()\nf = 1;\nend");
+        assertEquals(f.getPrettyPrinted(), "function [f] = s1f()\nf = 1;\nend");
     }
 
    public void testOneCallWithInput() {
@@ -74,9 +77,8 @@ public class ScriptToFunctionTest extends TestCase {
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
-        System.out.println(s2f.replace(s, f));
-        //assertEquals(s2f.replace(s, f).size(), 0);
-        assertEquals(f.getPrettyPrinted(), "function  [] = s1f(f)\nb = f;\nf = 1;\nend");
+        assertEquals(s2f.replace(s, f).size(), 0);
+        assertEquals(f.getPrettyPrinted(), "function [] = s1f(f)\nb = f;\nf = 1;\nend");
     }
 
    public void testOneCallWarnIDToFunction() {
@@ -89,9 +91,8 @@ public class ScriptToFunctionTest extends TestCase {
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
-        System.out.println(s2f.replace(s, f));
-        //assertEquals(s2f.replace(s, f).size(), 0);
-        assertEquals(f.getPrettyPrinted(), "function  [] = s1f(f)\ndisp(f);\nend");
+        assertTrue(s2f.replace(s, f).get(0) instanceof Exceptions.WarnIDToFunException);
+        assertEquals(f.getPrettyPrinted(), "function [] = s1f(f)\ndisp(f);\nend");
     }
         
     public void testScriptWithMismatchingInputs() {
@@ -106,6 +107,6 @@ public class ScriptToFunctionTest extends TestCase {
        Function f = new Function();
        f.setName("s1f");
        System.out.println(s2f.replace(s, f));
-       assertEquals(s2f.replace(s, f).get(0).getClass(), Exceptions.ScriptInputsNotMatching.class);
+       assertTrue(s2f.replace(s, f).get(0) instanceof Exceptions.ScriptInputsNotMatching);
    }
 }

@@ -7,6 +7,7 @@ import natlab.refactoring.ExtractFunctionTest;
 import natlab.refactoring.FEvalToCallTest;
 import natlab.refactoring.FunctionInlinerTest;
 import natlab.refactoring.MScriptInlinerTest;
+import natlab.refactoring.ScriptToFunctionTest;
 import natlab.toolkits.analysis.core.ReachingDefsTest;
 
 /** Top-level test suite.  Contains all tests. */
@@ -26,6 +27,7 @@ public class AllTests {
     suite.addTestSuite(FEvalToCallTest.class);
     suite.addTestSuite(FunctionInlinerTest.class);
     suite.addTestSuite(ExtractFunctionTest.class);
+    suite.addTestSuite(ScriptToFunctionTest.class);
     
     suite.addTestSuite(ReachingDefsTest.class);
     
