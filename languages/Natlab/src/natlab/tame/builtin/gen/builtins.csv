@@ -666,6 +666,7 @@ size;; Class(any (numeric|logical)? -> double double double double double double
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
 length
+-isComplex(A -> R)
 ndims
 numel;; Class(any matrix* -> double)
 end;; Class(any numeric numeric -> double)
