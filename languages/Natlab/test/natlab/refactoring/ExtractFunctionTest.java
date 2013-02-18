@@ -1,38 +1,12 @@
 package natlab.refactoring;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-
-import junit.framework.TestCase;
-import natlab.CompilationProblem;
-import natlab.Parse;
-import natlab.toolkits.filehandling.BuiltinFile;
-import ast.CompilationUnits;
 import ast.Function;
 import ast.FunctionList;
-import ast.Program;
 
 
-public class ExtractFunctionTest extends TestCase {
-    CompilationUnits cu = null;
-    String[] files = null;
-    BuiltinFile root = null;
-
-    private Program addFile(String filename, String content) {
-        ArrayList<CompilationProblem> errorList = new ArrayList<CompilationProblem>();
-        Program p = Parse.parseNatlabFile(filename, new StringReader(content), errorList);
-        assertTrue(errorList.isEmpty());
-        p.setFile(root.getBuiltin(filename));
-        cu.addProgram(p);
-        return p;
-    }
-
+public class ExtractFunctionTest extends RefactoringTestCase {
     public void testExtractFunction() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "f = 1;\n" +
                                                 "b = f+1;\n" +
@@ -48,11 +22,7 @@ public class ExtractFunctionTest extends TestCase {
     } 
 
     public void testExtractFunctionMaybeUndefInput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "if (1)\n" + 
                                                 "  f = 1;\n" +
@@ -67,11 +37,7 @@ public class ExtractFunctionTest extends TestCase {
     }
 
     public void testExtractFunctionMaybeUndefOutput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "f = 1;\n" +
                                                 "b = 1;\n" +

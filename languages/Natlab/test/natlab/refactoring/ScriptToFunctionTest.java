@@ -1,51 +1,21 @@
 package natlab.refactoring;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-
-import junit.framework.TestCase;
-import natlab.CompilationProblem;
-import natlab.Parse;
-import natlab.toolkits.filehandling.BuiltinFile;
-import ast.CompilationUnits;
 import ast.Function;
-import ast.Program;
 import ast.Script;
 
-
-public class ScriptToFunctionTest extends TestCase {
-    CompilationUnits cu = null;
-    String[] files = null;
-    BuiltinFile root = null;
-
-    private Program addFile(String filename, String content) {
-        ArrayList<CompilationProblem> errorList = new ArrayList<CompilationProblem>();
-        Program p = Parse.parseNatlabFile(filename, new StringReader(content), errorList);
-        assertTrue(errorList.isEmpty());
-        p.setFile(root.getBuiltin(filename));
-        cu.addProgram(p);
-        return p;
-    }
+public class ScriptToFunctionTest extends RefactoringTestCase {
 
     public void testNoCallsError() {
-        cu = new CompilationUnits();
-        files = new String[]{"/s1.m", "/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        Script s = (Script) addFile("/s1.m", "f = 1;");
-        addFile("/f1.m", "function x() \n  TT();\n end");
+        Script s = (Script) addFile("s1.m", "f = 1;");
+        addFile("f1.m", "function x() \n  TT();\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         assertEquals(s2f.replace(s, f).get(0).getClass(), Exceptions.NoCallsToScript.class);
     }
 
     public void testOneCallNoOutput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/s1.m", "/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        Script s = (Script) addFile("/s1.m", "f = 1;\n");
-        addFile("/f1.m", "function x() \n  s1;\n end");
+        Script s = (Script) addFile("s1.m", "f = 1;\n");
+        addFile("f1.m", "function x() \n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
@@ -54,12 +24,8 @@ public class ScriptToFunctionTest extends TestCase {
     }
 
    public void testOneCallWithOutput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/s1.m", "/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        Script s = (Script) addFile("/s1.m", "f = 1;\n");
-        addFile("/f1.m", "function x() \n  s1;\n disp(f);\n end");
+        Script s = (Script) addFile("s1.m", "f = 1;\n");
+        addFile("f1.m", "function x() \n  s1;\n disp(f);\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
@@ -68,12 +34,8 @@ public class ScriptToFunctionTest extends TestCase {
     }
 
    public void testOneCallWithInput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/s1.m", "/f1.m", "/f2.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        Script s = (Script) addFile("/s1.m", " b = f;\n f = 1;\n");
-        addFile("/f1.m", "function x1() \n f = 2;\n  s1;\n end");
+        Script s = (Script) addFile("s1.m", " b = f;\n f = 1;\n");
+        addFile("f1.m", "function x1() \n f = 2;\n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
@@ -82,12 +44,8 @@ public class ScriptToFunctionTest extends TestCase {
     }
 
    public void testOneCallWarnIDToFunction() {
-        cu = new CompilationUnits();
-        files = new String[]{"/s1.m", "/f1.m", "/f2.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        Script s = (Script) addFile("/s1.m", "disp(f);\n");
-        addFile("/f1.m", "function x1() \n f = 2;\n  s1;\n end");
+        Script s = (Script) addFile("s1.m", "disp(f);\n");
+        addFile("f1.m", "function x1() \n f = 2;\n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
         f.setName("s1f");
@@ -96,13 +54,9 @@ public class ScriptToFunctionTest extends TestCase {
     }
         
     public void testScriptWithMismatchingInputs() {
-       cu = new CompilationUnits();
-       files = new String[]{"/s1.m", "/f1.m", "/f2.m"};
-       root = new BuiltinFile(files);
-       cu.setRootFolder(root);
-       Script s = (Script) addFile("/s1.m", "disp(f);\n");
-       addFile("/f1.m", "function x1() \n f = 2;\n  s1;\n end");
-       addFile("/f2.m", "function x1() \n s1;\n end");
+       Script s = (Script) addFile("s1.m", "disp(f);\n");
+       addFile("f1.m", "function x1() \n f = 2;\n  s1;\n end");
+       addFile("f2.m", "function x1() \n s1;\n end");
        ScriptToFunction s2f = new ScriptToFunction(cu);
        Function f = new Function();
        f.setName("s1f");

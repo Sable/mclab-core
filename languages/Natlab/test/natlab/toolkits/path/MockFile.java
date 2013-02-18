@@ -86,14 +86,19 @@ public class MockFile extends GenericFile {
     }
     return getName();
   }
-  
-  //// Don't care about these:
 
   @Override
   public GenericFile getChild(String name) {
+    for (GenericFile file : children) {
+      if (file.getName().equals(name)) {
+        return file;
+      }
+    }
     return null;
   }
 
+  //// Don't care about these:
+  
   @Override
   public long lastModifiedDate() {
     return 0;

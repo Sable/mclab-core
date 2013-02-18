@@ -17,7 +17,6 @@
 // =========================================================================== //
 
 package natlab.toolkits.path;
-import natlab.toolkits.filehandling.BuiltinFile;
 import natlab.toolkits.filehandling.GenericFile;
 
 /**
@@ -55,7 +54,7 @@ public class FunctionReference {
   }
 
   public FunctionReference(GenericFile path, ReferenceType type) {
-    this(path.getNameWithoutExtension(), path, path instanceof BuiltinFile, type);
+    this(path.getNameWithoutExtension(), path, false, type);
   }
 
   /**
@@ -64,7 +63,7 @@ public class FunctionReference {
    * @param path the path of the function (as an absolute File)
    */
   public FunctionReference(String name, GenericFile path) {
-    this(name, path, path instanceof BuiltinFile, ReferenceType.UNKNOWN);
+    this(name, path, false, ReferenceType.UNKNOWN);
   }
 
   public FunctionReference(GenericFile path, ast.Function f, ReferenceType type) {
