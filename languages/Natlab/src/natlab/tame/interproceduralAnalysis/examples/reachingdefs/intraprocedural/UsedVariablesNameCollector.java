@@ -10,6 +10,7 @@ import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
@@ -50,7 +51,8 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     }
     
     @Override
-    public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node) {
+    public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node)
+    {
         fCurrentSet = newInitialFlow();
         TIRCommaSeparatedList usedVariablesList = null;
         if (node instanceof TIRAbstractAssignToVarStmt)
@@ -58,6 +60,15 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
             Name usedVarName = new Name(node.getRHS().getVarName());
             usedVariablesList = new TIRCommaSeparatedList(new NameExpr(usedVarName));
         }
+        IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
+        fFlowSets.put(node, fCurrentSet);
+    }
+    
+    @Override
+    public void caseTIRIfStmt(TIRIfStmt node)
+    {
+        fCurrentSet = newInitialFlow();
+        TIRCommaSeparatedList usedVariablesList = new TIRCommaSeparatedList(new NameExpr(node.getConditionVarName()));
         IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
         fFlowSets.put(node, fCurrentSet);
     }

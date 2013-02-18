@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/ud.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/web.m";
         if (args.length == 1)
         {
             file = args[0];
@@ -51,7 +51,7 @@ public class AnalysisRunner
       {
 //          VariableNameCollector vnc = new VariableNameCollector(f);
 //          vnc.analyze();
-//          System.out.println(f.getAst().getPrettyPrinted());
+          System.out.println(f.getAst().getPrettyPrinted());
 //          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
 //          rda.analyze();
           UDChain ud = new UDChain(new ReachingDefinitionsAnalysis(f));
@@ -62,6 +62,9 @@ public class AnalysisRunner
           DUChain du = new DUChain(ud);
           du.constructDUChain();
           du.printDUChain();
+          
+          UDDUWeb udduWeb = new UDDUWeb(ud, du);
+          udduWeb.constructUDDUWeb();
       }
     }
 }

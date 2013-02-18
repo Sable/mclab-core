@@ -2,6 +2,7 @@ package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedura
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import java.util.Set;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.toolkits.analysis.HashMapFlowMap;
 
@@ -42,10 +44,11 @@ public class UDChain
     
     public void constructUDChain()
     {
-        for (TIRNode visitedNode : fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList())
+        LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList();
+        for (TIRNode visitedStmt : visitedStmts)
         {
-           HashMapFlowMap<String, Set<TIRNode>> varToDefUsedMap = fReachingDefinitionsAnalysis.getOutFlowSets().get(visitedNode);
-           Set<String> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedNode);
+           HashMapFlowMap<String, Set<TIRNode>> varToDefUsedMap = fReachingDefinitionsAnalysis.getOutFlowSets().get(visitedStmt);
+           Set<String> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedStmt);
            if (usedVariables == null) continue;
            HashMapFlowMap<String, HashSet<TIRNode>> varToUsedMap = new HashMapFlowMap<String, HashSet<TIRNode>>();
            for (String key : varToDefUsedMap.keySet())
@@ -56,20 +59,23 @@ public class UDChain
                    varToUsedMap.put(key, (HashSet<TIRNode>) varToDefUsedMap.get(key));
                }
            }
-           fUDMap.put(visitedNode, varToUsedMap);
+           fUDMap.put(visitedStmt, varToUsedMap);
         }
     }
     
-    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getUDMap() { return fUDMap; }
+    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getChain() { return fUDMap; }
     
-    public ReachingDefinitionsAnalysis getReachingDefinitionsAnalysis() { return fReachingDefinitionsAnalysis; }
+    public HashMapFlowMap<String, HashSet<TIRNode>> getDefinitionsMap(TIRNode node) { return fUDMap.get(node); }
+        
+    public LinkedList<TIRNode> getVisitedStmtsLinkedList() { return fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList(); } 
     
     public void printUDChain()
     {
         StringBuffer sb = new StringBuffer();
-        for (TIRNode visitedStmt : fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList())
+        LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList();
+        for (TIRNode visitedStmt : visitedStmts)
         {
-            sb.append("------- " + printNode(visitedStmt) + " ------------\n");
+            sb.append("------- " + printNode(visitedStmt) + " -------\n");
             HashMapFlowMap<String, HashSet<TIRNode>> definitionSiteMap = fUDMap.get(visitedStmt);
             if (definitionSiteMap == null) continue;
             Set<String> variableNames = definitionSiteMap.keySet();
@@ -93,6 +99,7 @@ public class UDChain
     {
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
         else return null;
     }
 }

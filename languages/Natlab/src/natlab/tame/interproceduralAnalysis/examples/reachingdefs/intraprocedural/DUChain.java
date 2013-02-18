@@ -2,11 +2,13 @@ package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedura
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.toolkits.analysis.HashMapFlowMap;
 
@@ -24,7 +26,7 @@ public class DUChain
     
     public void constructDUChain()
     {
-        Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> resultUDMap = fUDChains.getUDMap();
+        Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> resultUDMap = fUDChains.getChain();
         Set<TIRNode> useAssignmentStmts = resultUDMap.keySet();
         for (TIRNode useAssignmentStmt : useAssignmentStmts)
         {
@@ -50,14 +52,17 @@ public class DUChain
         }
     }
     
-    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getDUMap() { return fDUMap; }
+    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getChain() { return fDUMap; }
+    
+    public HashMapFlowMap<String, HashSet<TIRNode>> getUsesMap(TIRNode node) { return fDUMap.get(node); }
     
     public void printDUChain()
     {
         StringBuffer sb = new StringBuffer();
-        for (TIRNode visitedStmt : fUDChains.getReachingDefinitionsAnalysis().getVisitedStmtsLinkedList())
+        LinkedList<TIRNode> visitedStmts = fUDChains.getVisitedStmtsLinkedList();
+        for (TIRNode visitedStmt : visitedStmts)
         {
-            sb.append("------- " + printNode(visitedStmt) + " ------------\n");
+            sb.append("------- " + printNode(visitedStmt) + " -------\n");
             HashMapFlowMap<String, HashSet<TIRNode>> useSiteMap = fDUMap.get(visitedStmt);
             if (useSiteMap == null) continue;
             Set<String> variableNames = useSiteMap.keySet();
@@ -81,6 +86,7 @@ public class DUChain
     {
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
         else return null;
     }
 }

@@ -166,11 +166,11 @@ public class VariableNameCollector extends TIRAbstractSimpleStructuralForwardAna
     }
     
     /**
-     * Returns the set of names of variables defined up to point P in the program
+     * Returns the set of names of variables defined for point P in the program
      * @param node
      * @return set of defined names of variables for the input node or null if entry does not exist in flow set
      */
-    public Set<String> getDefinedVariablesNamesUpToNode(TIRNode node)
+    public Set<String> getDefinedVariablesNamesForNode(TIRNode node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);
         if (set == null)    return null;
