@@ -141,6 +141,7 @@ public class ReachingDefinitionsAnalysis extends TIRAbstractSimpleStructuralForw
         setInOutSet(node);
         if (DEBUG) printMapForNode(node);
         fVisitedStmts.add(node);
+        caseIfStmt(node);
     }
     
     

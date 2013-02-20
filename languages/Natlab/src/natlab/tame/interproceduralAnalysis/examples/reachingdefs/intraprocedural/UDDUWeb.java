@@ -14,8 +14,8 @@ public class UDDUWeb
     private final boolean DEBUG = true;
     private UDChain fUDChain;
     private DUChain fDUChain;
-    private HashMapFlowMap<String, HashMapFlowMap<TIRNode, Integer>> fUDWeb;
-    private HashMapFlowMap<String, HashMapFlowMap<TIRNode, Integer>> fDUWeb;
+    private HashMap<String, HashMap<TIRNode, Integer>> fUDWeb;
+    private HashMap<String, HashMap<TIRNode, Integer>> fDUWeb;
     
     public UDDUWeb(UDChain udChain, DUChain duChain)
     {
@@ -30,8 +30,8 @@ public class UDDUWeb
         fDUChain.constructDUChain();
         
         // Initialize UDDU web
-        fUDWeb = new HashMapFlowMap<String, HashMapFlowMap<TIRNode,Integer>>();
-        fDUWeb = new HashMapFlowMap<String, HashMapFlowMap<TIRNode,Integer>>();
+        fUDWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
+        fDUWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
         
         // Initialize the statement color 
         int color = 0;
@@ -57,7 +57,7 @@ public class UDDUWeb
     {
         if (fDUWeb.get(variableName) == null)
         {
-            fDUWeb.put(variableName, new HashMapFlowMap<TIRNode, Integer>());
+            fDUWeb.put(variableName, new HashMap<TIRNode, Integer>());
         }
         fDUWeb.get(variableName).put(visitedStmt, color);
         if (DEBUG) System.out.println("Def of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
@@ -76,7 +76,7 @@ public class UDDUWeb
     {
         if (fUDWeb.get(variableName) == null)
         {
-            fUDWeb.put(variableName, new HashMapFlowMap<TIRNode, Integer>());
+            fUDWeb.put(variableName, new HashMap<TIRNode, Integer>());
         }
         fUDWeb.get(variableName).put(visitedStmt, color);
         if(DEBUG) System.out.println("Use of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));  
@@ -95,7 +95,7 @@ public class UDDUWeb
     {
         if (fDUWeb.containsKey(variableName))
         {
-            HashMapFlowMap<TIRNode, Integer> webEntry = fDUWeb.get(variableName);
+            HashMap<TIRNode, Integer> webEntry = fDUWeb.get(variableName);
             if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
         }
         return false;
@@ -105,7 +105,7 @@ public class UDDUWeb
     {
         if (fUDWeb.containsKey(variableName))
         {
-            HashMapFlowMap<TIRNode, Integer> webEntry = fUDWeb.get(variableName);
+            HashMap<TIRNode, Integer> webEntry = fUDWeb.get(variableName);
             if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
         }
         return false;

@@ -68,9 +68,9 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     public void caseTIRIfStmt(TIRIfStmt node)
     {
         fCurrentSet = newInitialFlow();
-        TIRCommaSeparatedList usedVariablesList = new TIRCommaSeparatedList(new NameExpr(node.getConditionVarName()));
-        IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
+        fCurrentSet.add(node.getConditionVarName().getID());
         fFlowSets.put(node, fCurrentSet);
+        caseIfStmt(node);
     }
     
     @Override
@@ -83,7 +83,7 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     @Override
     public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest)
     {
-        dest = source.copy();
+        source.copy(dest);
     }
     
     public HashSetFlowSet<String> newInitialFlow()
