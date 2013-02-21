@@ -1,7 +1,5 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
-import java.util.*;
-
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
@@ -16,174 +14,158 @@ import natlab.tame.valueanalysis.value.*;
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		HasConstant, HasShape<AggrValue<BasicMatrixValue>> {
+	
 	static boolean Debug = false;
-	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
-	Constant constant;
-	Shape<AggrValue<BasicMatrixValue>> shape;
-
+	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
+	protected Constant constant;
+	protected Shape<AggrValue<BasicMatrixValue>> shape;
 	// TODO -- also need complex
-
-	public BasicMatrixValue(PrimitiveClassReference aClass,
-			Shape<AggrValue<BasicMatrixValue>> shape) {
-		super(aClass);
-		this.shape = shape;
-	}
-
-	public BasicMatrixValue(PrimitiveClassReference aClass) {
-		super(aClass);
-	}
+	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
+	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator
+			.getInstance();
 
 	/**
-	 * return a BasicMatrixValue object by taking in a user typed input argument
-	 * add this method @25th,Jul,2012
-	 * 
-	 * @param onlyClassInfo
-	 * @param shapeInfo
-	 */
-	public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo) {
-		super(aClass);
-		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)
-				.newShapeFromInputString(shapeInfo));
-	}
-
-	/*
-	 * @Deprecated public BasicMatrixValue(BasicMatrixValue onlyClassInfo,
-	 * Shape<AggrValue<BasicMatrixValue>> shape) {
-	 * super(onlyClassInfo.classRef); this.shape = shape;
-	 * 
-	 * }
-	 */
-
-	/**
-	 * how to deal with a constant
+	 * Construct a BasicMatrixValue based on a Constant.
+	 * Whenever we need to construct a BasicMatrixValue based on a Constant,
+	 * we need to call corresponding factory method in BasicMatrixValueFactory,
+	 * which is newMatrixValue.
+	 * TODO, actually, we should rename newMatrixValue to newMatrixValueFromConstant.
 	 */
 	public BasicMatrixValue(Constant constant) {
 		super(constant.getMatlabClass());
-		if (Debug)
-			System.out.println("inside basicmatrixvalue constant");
-		if (Debug)
-			System.out.println(constant.getShape());
-		shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory))
-				.newShapeFromIntegers(constant.getShape());// XU study this
-															// line!!! infinite
-															// loop!!!
 		this.constant = constant;
+		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory))
+				.newShapeFromIntegers(constant.getShape());
+		//TODO, this line may cause infinite loop.
+	}
+
+	/**
+	 * Construct a BasicMatrixValue based on a PrimitiveClassReference and a Shape,
+	 * for the situation, a variable which doesn't have a constant value.
+	 * Whenever we need to construct a BasicMatrixValue based on a 
+	 * PrimitiveClassReference and a Shape,
+	 * we need to call corresponding factory method in BasicMatrixValueFactory,
+	 * which is newMatrixValueFromClassAndShape.
+	 */
+	public BasicMatrixValue(
+			PrimitiveClassReference aClass,
+			Shape<AggrValue<BasicMatrixValue>> shape) {
+		super(aClass);
+		this.constant = null;
+		this.shape = shape;
+	}
+
+	/**
+	 * Construct a BasicMatrixValue based on user input Shape information.
+	 * Whenever we need to construct a BasicMatrixValue based on a user input 
+	 * Shape informaiton, we need to call corresponding factory method in 
+	 * BasicMatrixValueFactory, which is newMatrixValueFromInputShape.
+	 */
+	public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo) {
+		super(aClass);
+		this.constant = null;
+		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)
+				.newShapeFromInputString(shapeInfo));
 	}
 
 	/**
 	 * returns true if the represented data is a constant
 	 */
 	public boolean isConstant() {
-		return constant != null;
+		return this.constant!=null;
 	}
 
 	@Override
 	/**
+	 * Override the getConstant method in HasConstant Interface, which 
 	 * returns the constant represented by this data, or null if it is not constant
 	 */
 	public Constant getConstant() {
 		return constant;
 	}
 
+	/**
+	 * Always has shape information? Based on current three constructor,
+	 * yes, BasicMatrixValue object always has shape infor.
+	 */
 	public Shape<AggrValue<BasicMatrixValue>> getShape() {
 		return this.shape;
 	}
 
+	/**
+	 * what's this used for?
+	 */
 	public void setConstantNull() {
 		this.constant = null;
 	}
 
 	@Override
+	/**
+	 * Override the merge method in super class MatrixValue.
+	 */
 	public BasicMatrixValue merge(AggrValue<BasicMatrixValue> other) {
 		if (!(other instanceof BasicMatrixValue))
 			throw new UnsupportedOperationException(
-					"can only merge a Matrix Value with another Matrix Value");
-		if (!other.getMatlabClass().equals(classRef))
+					"can only merge a Basic Matrix Value with another Basic Matrix Value");
+		/**
+		 * TODO, currently, we cannot merge two matrix value with different class 
+		 * information. i.e. 
+		 * 		if
+		 *			c='a';
+		 *		else
+		 *			c=12;
+		 *		end
+		 * what we have at the merge point is a c=[(double,12.0,[1, 1]), (char,a,[1, 1])]
+		 */
+		if (!other.getMatlabClass().equals(this.getMatlabClass()))
 			throw new UnsupportedOperationException(
 					"only Values with the same class can be merged, trying to merge :"
-							+ this + ", " + other);
-		if (Debug)
-			System.out.println("this constant is " + constant);
-		if (constant == null) {
-			if (Debug)
-				System.out.println("this constant is null!");
-			if (((BasicMatrixValue) other).constant == null) {
-				if (Debug)
-					System.out.println("inside both constant null!");
-				if (shape == null) {
-					return this;
-				}
-				if (shape.equals(((BasicMatrixValue) other).getShape()) != true) {
-					return new BasicMatrixValue(this.classRef,
-							this.shape.merge(((BasicMatrixValue) other)
-									.getShape()));
-				}
-			}
-			return this;
+							+ this + ", " + other + " has failed");
+		if(this.getConstant()!=null&&((BasicMatrixValue)other).getConstant()!=null) {
+			Constant result = this.getConstant().merge(((BasicMatrixValue)other).getConstant());
+			if(result!=null) return factory.newMatrixValue(result);
 		}
-		if (constant.equals(((BasicMatrixValue) other).constant)) {
-			if (Debug)
-				System.out.println("this constant is equal to that one!");
-			return this;
-		}
-		BasicMatrixValue newMatrix = new BasicMatrixValue(this.classRef,
-				this.shape.merge(((BasicMatrixValue) other).getShape()));
-		if (Debug)
-			System.out.println(newMatrix);
+		BasicMatrixValue newMatrix = factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
+				this.getShape().merge(((BasicMatrixValue)other).getShape()));
 		return newMatrix;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (!(obj instanceof BasicMatrixValue))
-			return false;
-		BasicMatrixValue m = (BasicMatrixValue) obj;
-		if (isConstant())
-			return constant.equals(m.constant);
-		if (Debug)
-			System.out.println(m.getMatlabClass());
-		if (Debug)
-			System.out
-					.println(((HasShape<AggrValue<BasicMatrixValue>>) ((BasicMatrixValue) obj))
-							.getShape());
-		if ((shape == null)
-				&& (((HasShape<AggrValue<BasicMatrixValue>>) ((BasicMatrixValue) obj))
-						.getShape() == null)) {
-			return (classRef.equals(m.getMatlabClass())) && true;
+		if (obj == null) return false;
+		if (!(obj instanceof BasicMatrixValue)) return false;
+		BasicMatrixValue m = (BasicMatrixValue)obj;
+		if (this.isConstant()) return this.getConstant().equals(m.getConstant());
+		if ((this.getShape()==null)&&(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape()==null)) {
+			return this.getMatlabClass().equals(m.getMatlabClass());
 		}
-		return (classRef.equals(m.getMatlabClass()) && shape
-				.equals(((HasShape<AggrValue<BasicMatrixValue>>) ((BasicMatrixValue) obj))
-						.getShape()));
+		return this.getMatlabClass().equals(m.getMatlabClass())
+				&&this.getShape().equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape());
 	}
 
 	@Override
+	/**
+	 * always has class infor and shape infor.
+	 */
 	public String toString() {
-		return "(" + classRef + (isConstant() ? ("," + constant) : "") + ","
-				+ shape + ")";// XU added shape
+		return "(" + this.getMatlabClass() 
+				+ (isConstant() ? ("," + this.getConstant()) : "") 
+				+ "," + this.getShape() + ")";
 	}
-
-	public static final BasicMatrixValueFactory FACTORY = new BasicMatrixValueFactory();
-
-	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator
-			.getInstance();
 
 	@Override
 	public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(
 			Args<AggrValue<BasicMatrixValue>> indizes) {
-
-		return ValueSet
-				.<AggrValue<BasicMatrixValue>> newInstance(new BasicMatrixValue(
-						this.getMatlabClass(), shapePropagator.arraySubsref(
-								this.getShape(), indizes)));
+		return ValueSet.<AggrValue<BasicMatrixValue>> newInstance(
+				factory.newMatrixValueFromClassAndShape(this.getMatlabClass(), 
+						shapePropagator.arraySubsref(this.getShape(), indizes)));
 	}
 
 	@Override
 	public AggrValue<BasicMatrixValue> arraySubsasgn(
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			AggrValue<BasicMatrixValue> value) {
-		return new BasicMatrixValue(this.getMatlabClass(),
+		return factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
 				shapePropagator.arraySubsasgn(this.getShape(), indizes, value));
 	}
 
