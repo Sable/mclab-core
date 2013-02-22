@@ -58,7 +58,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	/**
 	 * Construct a BasicMatrixValue based on user input Shape information.
 	 * Whenever we need to construct a BasicMatrixValue based on a user input 
-	 * Shape informaiton, we need to call corresponding factory method in 
+	 * Shape information, we need to call corresponding factory method in 
 	 * BasicMatrixValueFactory, which is newMatrixValueFromInputShape.
 	 */
 	public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo) {
@@ -81,12 +81,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * returns the constant represented by this data, or null if it is not constant
 	 */
 	public Constant getConstant() {
-		return constant;
+		return this.constant;
 	}
 
 	/**
 	 * Always has shape information? Based on current three constructor,
-	 * yes, BasicMatrixValue object always has shape infor.
+	 * yes, BasicMatrixValue object always has shape info.
 	 */
 	public Shape<AggrValue<BasicMatrixValue>> getShape() {
 		return this.shape;
@@ -121,12 +121,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			throw new UnsupportedOperationException(
 					"only Values with the same class can be merged, trying to merge :"
 							+ this + ", " + other + " has failed");
-		if(this.getConstant()!=null&&((BasicMatrixValue)other).getConstant()!=null) {
-			Constant result = this.getConstant().merge(((BasicMatrixValue)other).getConstant());
-			if(result!=null) return factory.newMatrixValue(result);
+		if (this.constant!=null&&((BasicMatrixValue)other).getConstant()!=null) {
+			Constant result = this.constant.merge(((BasicMatrixValue)other).getConstant());
+			if (result!=null) return factory.newMatrixValue(result);
 		}
 		BasicMatrixValue newMatrix = factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
-				this.getShape().merge(((BasicMatrixValue)other).getShape()));
+				this.shape.merge(((BasicMatrixValue)other).getShape()));
 		return newMatrix;
 	}
 
@@ -135,22 +135,22 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		if (obj == null) return false;
 		if (!(obj instanceof BasicMatrixValue)) return false;
 		BasicMatrixValue m = (BasicMatrixValue)obj;
-		if (this.isConstant()) return this.getConstant().equals(m.getConstant());
-		if ((this.getShape()==null)&&(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape()==null)) {
+		if (this.isConstant()) return this.constant.equals(m.getConstant());
+		if ((this.shape==null)&&(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape()==null)) {
 			return this.getMatlabClass().equals(m.getMatlabClass());
 		}
 		return this.getMatlabClass().equals(m.getMatlabClass())
-				&&this.getShape().equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape());
+				&&this.shape.equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape());
 	}
 
 	@Override
 	/**
-	 * always has class infor and shape infor.
+	 * always has class info and shape info.
 	 */
 	public String toString() {
 		return "(" + this.getMatlabClass() 
-				+ (isConstant() ? ("," + this.getConstant()) : "") 
-				+ "," + this.getShape() + ")";
+				+ (isConstant() ? ("," + this.constant) : "") 
+				+ "," + this.shape + ")";
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			Args<AggrValue<BasicMatrixValue>> indizes) {
 		return ValueSet.<AggrValue<BasicMatrixValue>> newInstance(
 				factory.newMatrixValueFromClassAndShape(this.getMatlabClass(), 
-						shapePropagator.arraySubsref(this.getShape(), indizes)));
+						shapePropagator.arraySubsref(this.shape, indizes)));
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			AggrValue<BasicMatrixValue> value) {
 		return factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
-				shapePropagator.arraySubsasgn(this.getShape(), indizes, value));
+				shapePropagator.arraySubsasgn(this.shape, indizes, value));
 	}
 
 	@Override

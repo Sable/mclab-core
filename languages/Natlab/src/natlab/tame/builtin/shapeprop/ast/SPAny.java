@@ -48,16 +48,16 @@ public class SPAny extends SPAbstractVectorExpr
 			if(previousMatchResult.getShapeOfVariable(s)==null){
 				if(previousMatchResult.getOutputVertcatExpr().size()==1){
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
-					previousMatchResult.copyVertcatToOutput(s);
+					previousMatchResult.copyVertcatToOutput();
 					return previousMatchResult;
 				}
 				else{
-					previousMatchResult.copyVertcatToOutput(s);
+					previousMatchResult.copyVertcatToOutput();
 					return previousMatchResult;
 				}
 			}
 			else
-				previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable(s));
+				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
 				return previousMatchResult;
 				
 		}

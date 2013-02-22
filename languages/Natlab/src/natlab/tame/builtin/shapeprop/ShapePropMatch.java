@@ -24,7 +24,7 @@ public class ShapePropMatch{
 	String previousMatchedLowercase = null;
 	String previousMatchedUppercase = null;
 	ArrayList<Integer> needForVertcat = new ArrayList<Integer>();
-	HashMap<String, Shape<?>> output = new HashMap<String, Shape<?>>();  //used for output results 
+	List<Shape<?>> output = new ArrayList<Shape<?>>();  //used for output results 
 	
 	
 	public ShapePropMatch(){}
@@ -220,14 +220,8 @@ public class ShapePropMatch{
     	return shape;
     }
     
-    public List<Shape<?>> getAllResults(){//FIXME better!
-    	LinkedList<Shape<?>> results = new LinkedList<Shape<?>>();
-    	if (Debug) System.out.println(output);
-    	if (Debug) System.out.println(needForVertcat);
-    	for(Shape<?> value: output.values()){
-    		results.add(value);    		
-    	}
-    	return results;
+    public List<Shape<?>> getAllResults(){
+    	return this.output;
     }
     
     public HashMap<String, Integer> getAllLowercase(){
@@ -246,23 +240,13 @@ public class ShapePropMatch{
     	return needForVertcat;
     }
     
-    public void addToOutput(String s,Shape<?> value){
-    	this.output.put(s, value);
+    public void addToOutput(Shape<?> value){
+    	this.output.add(value);
     }
     
-    public Shape<?> getOutput(String key){
-    	return output.get(key);
-    }
-    
-    public void copyVertcatToOutput(String defaultM){
+    public void copyVertcatToOutput(){
     	Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(this.getOutputVertcatExpr());
     	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
-    	this.addToOutput(defaultM, shape);
+    	this.addToOutput(shape);
     }
-    
-/*    @Override
-    public String toString() {
-        return "machresult-"+numMatched+"-"+getAllResults();
-    }*/
-
 }

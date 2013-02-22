@@ -102,24 +102,24 @@ public class SPUppercase extends SPAbstractVectorExpr{
 			if(previousMatchResult.getShapeOfVariable(s)==null){
 				if(previousMatchResult.getOutputVertcatExpr().size()==0){
 					if(previousMatchResult.getLatestMatchedUppercase().equals("$")){
-						previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable("$"));
+						previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable("$"));
 						return previousMatchResult;
 					}
-					previousMatchResult.addToOutput(s, null);
+					previousMatchResult.addToOutput(null);
 					return previousMatchResult;
 				}
 				else if(previousMatchResult.getOutputVertcatExpr().size()==1){
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
-					previousMatchResult.copyVertcatToOutput(s);
+					previousMatchResult.copyVertcatToOutput();
 					return previousMatchResult;
 				}
 				else {
-					previousMatchResult.copyVertcatToOutput(s);
+					previousMatchResult.copyVertcatToOutput();
 					return previousMatchResult;
 				}
 			}
 			else{
-				previousMatchResult.addToOutput(s, previousMatchResult.getShapeOfVariable(s));
+				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
 				return previousMatchResult;
 			}	
 		}

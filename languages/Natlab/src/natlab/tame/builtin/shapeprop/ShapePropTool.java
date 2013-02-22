@@ -12,7 +12,7 @@ import natlab.tame.valueanalysis.value.*;
 
 public class ShapePropTool{
 	
-	static boolean Debug = false;
+	static boolean Debug = true;
 	
     public static SPNode parse(String source){
     	//System.err.println("parsing: "+source);
@@ -27,11 +27,11 @@ public class ShapePropTool{
     	}
     }
     
-    public static List<Shape<?>> matchByValues(SPNode tree, Args<?> argValues){
+    public static List<Shape<?>> matchByValues(SPNode tree, Args<? extends Value<?>> argValues){
     	if(argValues!=null){
     		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
-    		for(Value<?> arg:argValues){
-    			if(((HasShape)arg).getShape()==null){
+    		for(Value<? extends Value<?>> arg:argValues){
+    			if(((HasShape<? extends Value<?>>)arg).getShape()==null){
     				if (Debug) System.out.println(arg+"'s shape is undefined");
     			    /*ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
     				emptyList.add(null);

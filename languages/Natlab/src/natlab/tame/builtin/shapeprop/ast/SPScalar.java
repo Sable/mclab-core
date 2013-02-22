@@ -89,7 +89,7 @@ public class SPScalar extends SPAbstractVectorExpr{
 				return previousMatchResult;
 		}
 		else{
-			previousMatchResult.addToOutput(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
+			previousMatchResult.addToOutput((new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 			return previousMatchResult;
 		}
 	}
