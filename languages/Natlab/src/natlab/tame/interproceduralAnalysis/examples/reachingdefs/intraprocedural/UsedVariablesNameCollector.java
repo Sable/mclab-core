@@ -10,8 +10,10 @@ import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
@@ -74,6 +76,27 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     }
     
     @Override
+    public void caseTIRWhileStmt(TIRWhileStmt node)
+    {
+        fCurrentSet = newInitialFlow();
+        fCurrentSet.add(node.getCondition().getName().getNodeString());
+        fFlowSets.put(node, fCurrentSet);
+        caseWhileStmt(node);
+    }
+    
+    @Override
+    public void caseTIRForStmt(TIRForStmt node)
+    {
+        fCurrentSet = newInitialFlow();
+        fCurrentSet.add(node.getLowerName().getNodeString());
+        Name increment = node.getIncName();
+        if (increment != null) fCurrentSet.add(increment.getNodeString());
+        fCurrentSet.add(node.getUpperName().getNodeString());
+        fFlowSets.put(node, fCurrentSet);
+        caseForStmt(node);
+    }
+    
+    @Override
     public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out)
     {
         out.addAll(in1);
@@ -116,7 +139,7 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
         if (set == null)    return null;
         return set.getSet();
     }
-
+    
     @Override
     public HashSetFlowSet<String> getResult() { return null; }
 

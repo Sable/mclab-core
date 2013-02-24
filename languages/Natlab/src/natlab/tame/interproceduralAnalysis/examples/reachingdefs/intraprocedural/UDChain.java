@@ -9,20 +9,26 @@ import java.util.Set;
 
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRWhileStmt;
 import natlab.toolkits.analysis.HashMapFlowMap;
 
-
+/**
+ * Construct a UD chain for a given AST
+ * @author Amine Sahibi
+ *
+ */
 public class UDChain
 {
-    private ReachingDefinitionsAnalysis fReachingDefinitionsAnalysis;
+    private ReachingDefinitions fReachingDefinitionsAnalysis;
     private Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> fUDMap;
-    private VariableNameCollector fVariableNameCollector;
+    private DefinedVariablesNameCollector fVariableNameCollector;
     private UsedVariablesNameCollector fUsedVariablesNameCollector;
     
-    public UDChain(ReachingDefinitionsAnalysis reachingDefintionsAnalysis)
+    public UDChain(ReachingDefinitions reachingDefintionsAnalysis)
     {
         fReachingDefinitionsAnalysis = reachingDefintionsAnalysis;
         fUDMap = new HashMap<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> ();
@@ -34,7 +40,7 @@ public class UDChain
     
     public UDChain(StaticFunction f)
     {
-        fReachingDefinitionsAnalysis = new ReachingDefinitionsAnalysis(f);
+        fReachingDefinitionsAnalysis = new ReachingDefinitions(f);
         fUsedVariablesNameCollector = new UsedVariablesNameCollector(f);
         fUDMap = new HashMap<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> ();
         fReachingDefinitionsAnalysis.analyze();
@@ -100,6 +106,8 @@ public class UDChain
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
         else return null;
     }
 }

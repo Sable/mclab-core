@@ -7,11 +7,18 @@ import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRWhileStmt;
 import natlab.toolkits.analysis.HashMapFlowMap;
 
+/**
+ * Constructs a DU chain for a given AST
+ * @author Amine Sahibi
+ *
+ */
 public class DUChain
 {
     private Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> fDUMap;
@@ -87,6 +94,8 @@ public class DUChain
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
         else return null;
     }
 }

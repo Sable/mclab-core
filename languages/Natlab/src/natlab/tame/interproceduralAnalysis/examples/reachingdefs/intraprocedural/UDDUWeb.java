@@ -2,16 +2,24 @@ package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedura
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRWhileStmt;
 import natlab.toolkits.analysis.HashMapFlowMap;
 
+/**
+ * Construct a UDDU web for a given AST using the AST's UD and DU chains
+ * @author Amine Sahibi
+ *
+ */
 public class UDDUWeb
 {
-    private final boolean DEBUG = true;
+    private final boolean DEBUG = false;
     private UDChain fUDChain;
     private DUChain fDUChain;
     private HashMap<String, HashMap<TIRNode, Integer>> fUDWeb;
@@ -111,16 +119,19 @@ public class UDDUWeb
         return false;
     }
     
-    public HashMap<String, HashMap<TIRNode, Integer>> getUDDUWeb()
-    {
-        return null;
-    }
+    public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) { return fUDWeb.get(variableName); }
+    
+    public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) { return fDUWeb.get(variableName); }
+    
+    public LinkedList<TIRNode> getVisitedStmtsLinkedList() { return fUDChain.getVisitedStmtsLinkedList(); }
     
     private String printNode(TIRNode node)
     {
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
         else return null;
     }
 }

@@ -7,7 +7,7 @@ import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.interproceduralAnalysis.*;
-import natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural.VariableNameCollector;
+import natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural.DefinedVariablesNameCollector;
 import natlab.tame.valueanalysis.simplematrix.*;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;

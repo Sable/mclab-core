@@ -18,6 +18,7 @@ public class AnalysisRunner
     public static void main(String args[])
     {
         String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/web.m";
+//        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
             file = args[0];
@@ -55,18 +56,22 @@ public class AnalysisRunner
           System.out.println(f.getAst().getPrettyPrinted());
 //          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
 //          rda.analyze();
-          UDChain ud = new UDChain(new ReachingDefinitionsAnalysis(f));
-          System.out.println("\n//////// UD Analysis starts here: //////////////\n");
+          UDChain ud = new UDChain(new ReachingDefinitions(f));
+          System.out.println("\n//////// UD Analysis: //////////////\n");
           ud.constructUDChain();
           ud.printUDChain();
-          System.out.println("\n//////// DU Analysis starts here: //////////////\n");
+          System.out.println("\n//////// DU Analysis: //////////////\n");
           DUChain du = new DUChain(ud);
           du.constructDUChain();
           du.printDUChain();
           
           UDDUWeb udduWeb = new UDDUWeb(ud, du);
-          udduWeb.constructUDDUWeb();
+          //udduWeb.constructUDDUWeb();
+          
+          RenameVariables rv = new RenameVariables(udduWeb);
+          rv.analyze();
+          System.out.println(f.getAst().getPrettyPrinted());
       }
-      
+
     }
 }
