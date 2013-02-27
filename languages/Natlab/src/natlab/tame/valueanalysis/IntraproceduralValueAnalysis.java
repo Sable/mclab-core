@@ -33,7 +33,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ValuePropagator<V> valuePropagator;
     ValueFlowMap<V> argMap;
     Args<V> args;
-    static boolean Debug = false;  //button of debug
+    static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
     
@@ -164,7 +164,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                     node.getLowerName(),node.getUpperName())){
                 results.add(Res.newInstance(
                 		factory.forRange(list.getFirst(),list.getLast(),null)));
-                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);//XU added to debug
+                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);
             }
         }
         //put results
@@ -328,7 +328,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
 
         //assign result
         setCurrentOutSet(assign(flow,targetName, 
-                Res.newInstance(factory.newValueSet(constant))));   //XU study this line!!!4.26.2.14am, after this line, we get class information, which means, type information is got here!!!
+                Res.newInstance(factory.newValueSet(constant))));
 
         //set in/out set
         associateInAndOut(node);
@@ -561,7 +561,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     	//get number of requested results
     	int numOfOutputVariables = 1;
     	if (callsite.getASTNode() instanceof TIRAbstractAssignToListStmt){                	
-    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
+    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets();
+    		//XU added here, to pass number of output variables to the equation propagator/analysis
     	}
 
     	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
@@ -646,7 +647,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             String target, Res<V> values){
-    	if (Debug) System.out.println(values);//XU comment, at this point, the values are already combination of class and value, for me, U need to add shape into it.
         return assign(flow,new TIRCommaSeparatedList(new NameExpr(new Name(target))),values);
     }
     
@@ -662,7 +662,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             TIRCommaSeparatedList targets, Res<V> values){
-       if (Debug) System.out.println("assign: "+targets+" = "+values);  //XU commented, at this point, values are already combination of class and value.
+       if (Debug) System.out.println("assign: "+targets+" = "+values);
        ValueFlowMap<V> result = flow.copy();
        if (!values.isViable()){
            return ValueFlowMap.newInstance(false);

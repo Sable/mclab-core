@@ -6,6 +6,7 @@ import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.rangeValue.*;
 import natlab.tame.valueanalysis.value.*;
 
 /**
@@ -13,12 +14,13 @@ import natlab.tame.valueanalysis.value.*;
  * of the matlab class
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
-		HasConstant, HasShape<AggrValue<BasicMatrixValue>> {
+		HasConstant, HasShape<AggrValue<BasicMatrixValue>>, HasRangeValue<AggrValue<BasicMatrixValue>> {
 	
 	static boolean Debug = false;
 	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
 	protected Constant constant;
 	protected Shape<AggrValue<BasicMatrixValue>> shape;
+	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator
@@ -37,6 +39,10 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory))
 				.newShapeFromIntegers(constant.getShape());
 		//TODO, this line may cause infinite loop.
+		if (constant instanceof DoubleConstant) {
+			this.rangeValue = (new RangeValueFactory<AggrValue<BasicMatrixValue>>(factory))
+					.newRangeValueFromDouble(((DoubleConstant)constant).getValue());			
+		}
 	}
 
 	/**
@@ -49,10 +55,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 */
 	public BasicMatrixValue(
 			PrimitiveClassReference aClass,
-			Shape<AggrValue<BasicMatrixValue>> shape) {
+			Shape<AggrValue<BasicMatrixValue>> shape,
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
 		super(aClass);
 		this.constant = null;
 		this.shape = shape;
+		this.rangeValue = rangeValue;
 	}
 
 	/**
@@ -91,7 +99,15 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public Shape<AggrValue<BasicMatrixValue>> getShape() {
 		return this.shape;
 	}
+	
+	public boolean hasRangeValue() {
+		return this.rangeValue!=null;
+	}
 
+	public RangeValue<AggrValue<BasicMatrixValue>> getRangeValue() {
+		return this.rangeValue;
+	}
+	
 	/**
 	 * what's this used for?
 	 */
@@ -125,8 +141,16 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			Constant result = this.constant.merge(((BasicMatrixValue)other).getConstant());
 			if (result!=null) return factory.newMatrixValue(result);
 		}
-		BasicMatrixValue newMatrix = factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
-				this.shape.merge(((BasicMatrixValue)other).getShape()));
+		BasicMatrixValue newMatrix;
+		if (this.hasRangeValue()) {
+			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+					this.shape.merge(((BasicMatrixValue)other).getShape())
+					,this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
+		}
+		else {
+			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+					this.shape.merge(((BasicMatrixValue)other).getShape()), null);
+		}
 		return newMatrix;
 	}
 
@@ -140,33 +164,35 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			return this.getMatlabClass().equals(m.getMatlabClass());
 		}
 		return this.getMatlabClass().equals(m.getMatlabClass())
-				&&this.shape.equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape());
+				&&this.shape.equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape())
+				&&this.rangeValue.equals(((HasRangeValue<AggrValue<BasicMatrixValue>>)m).getRangeValue());
 	}
 
 	@Override
 	/**
-	 * always has class info and shape info.
+	 * always has class info, shape info and range value info.
 	 */
 	public String toString() {
 		return "(" + this.getMatlabClass() 
 				+ (isConstant() ? ("," + this.constant) : "") 
-				+ "," + this.shape + ")";
+				+ "," + this.shape
+				+ (hasRangeValue() ? ("," + this.rangeValue) : "")+")";
 	}
 
 	@Override
 	public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(
 			Args<AggrValue<BasicMatrixValue>> indizes) {
 		return ValueSet.<AggrValue<BasicMatrixValue>> newInstance(
-				factory.newMatrixValueFromClassAndShape(this.getMatlabClass(), 
-						shapePropagator.arraySubsref(this.shape, indizes)));
+				factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(), 
+						shapePropagator.arraySubsref(this.shape, indizes), null));
 	}
 
 	@Override
 	public AggrValue<BasicMatrixValue> arraySubsasgn(
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			AggrValue<BasicMatrixValue> value) {
-		return factory.newMatrixValueFromClassAndShape(this.getMatlabClass(),
-				shapePropagator.arraySubsasgn(this.shape, indizes, value));
+		return factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+				shapePropagator.arraySubsasgn(this.shape, indizes, value), null);
 	}
 
 	@Override

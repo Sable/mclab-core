@@ -5,6 +5,7 @@ import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.rangeValue.*;
 
 /**
  * A factory of BasicMatrixValue,
@@ -18,10 +19,11 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
         return new BasicMatrixValue(constant);
     }
     //factory method 2.
-	public BasicMatrixValue newMatrixValueFromClassAndShape(
+	public BasicMatrixValue newMatrixValueFromClassShapeRange(
 			PrimitiveClassReference aClass,
-			Shape<AggrValue<BasicMatrixValue>> shape) {
-		return new BasicMatrixValue(aClass, shape);
+			Shape<AggrValue<BasicMatrixValue>> shape,
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
+		return new BasicMatrixValue(aClass, shape, rangeValue);
 	}
 	//factory method 3.
 	public BasicMatrixValue newMatrixValueFromInputShape(
@@ -35,6 +37,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 	@SuppressWarnings("unchecked")
 	static ClassPropagator<AggrValue<BasicMatrixValue>> classPropagator = ClassPropagator.getInstance();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator.getInstance();
+	static RangeValuePropagator<AggrValue<BasicMatrixValue>> rangeValuePropagator = RangeValuePropagator.getInstance();
     
     @Override
     public AggrValuePropagator<BasicMatrixValue> getValuePropagator() {
@@ -47,7 +50,8 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 			AggrValue<BasicMatrixValue> upper,
 			AggrValue<BasicMatrixValue> inc) {
 		//FIXME do something proper here
-		return new BasicMatrixValue(classPropagator.forRange(lower, upper, inc),shapePropagator.forRange(lower, upper, inc));
+		return new BasicMatrixValue(classPropagator.forRange(lower, upper, inc)
+				,shapePropagator.forRange(lower, upper, inc), rangeValuePropagator.forRange(lower, upper, inc));
 	}
 }
 

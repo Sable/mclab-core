@@ -12,7 +12,7 @@ import natlab.tame.valueanalysis.value.*;
 
 public class ShapePropTool{
 	
-	static boolean Debug = true;
+	static boolean Debug = false;
 	
     public static SPNode parse(String source){
     	//System.err.println("parsing: "+source);

@@ -7,6 +7,7 @@ import natlab.tame.valueanalysis.*;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
+import natlab.tame.valueanalysis.components.rangeValue.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
@@ -19,6 +20,8 @@ public class BasicMatrixValuePropagator extends
 	static ClassPropagator<AggrValue<BasicMatrixValue>> classProp = ClassPropagator
 			.getInstance();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapeProp = ShapePropagator
+			.getInstance();
+	static RangeValuePropagator<AggrValue<BasicMatrixValue>> rangeValueProp = RangeValuePropagator
 			.getInstance();
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	
@@ -54,13 +57,16 @@ public class BasicMatrixValuePropagator extends
 		// TODO deal with complex info propagation
 		// TODO deal with range value propagation
 		
-		return matchResultToRes(matchClassResult, matchShapeResult);
+		RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
+		
+		return matchResultToRes(matchClassResult, matchShapeResult, rangeValueResult);
 
 	}
 
 	private Res<AggrValue<BasicMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
-			List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult) {
+			List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult,
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult) {
 		/**
 		 * currently, class propagation equation doesn't take the number of output arguments 
 		 * into consideration, i.e. for the built-in function size(), there can be one output 
@@ -72,6 +78,9 @@ public class BasicMatrixValuePropagator extends
 		 * based on the number of output arguments. That's the reason why I implement this 
 		 * method like this.
 		 * TODO maybe modify class propagation language later.
+		 * TODO need to think about the rangeValue propagation on built-ins,
+		 * currently, we only consider a very few subset of built-ins for rangeValue propagation,
+		 * like +, -, * and /, and all of them won't return multiple results.
 		 */
 		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
 		for (int counter=0; counter<matchShapeResult.size(); counter++) {
@@ -79,8 +88,8 @@ public class BasicMatrixValuePropagator extends
 					new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
 			Set<ClassReference> values = matchClassResult.get(counter);
 			for (ClassReference classRef : values) {
-				map.put(classRef, factory.newMatrixValueFromClassAndShape(
-						(PrimitiveClassReference)classRef, matchShapeResult.get(counter)));
+				map.put(classRef, factory.newMatrixValueFromClassShapeRange(
+						(PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
 			}
 			result.add(ValueSet.newInstance(map));
 		}
@@ -92,8 +101,8 @@ public class BasicMatrixValuePropagator extends
     public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> arg) {
         return Res.<AggrValue<BasicMatrixValue>>newInstance(
-                factory.newMatrixValueFromClassAndShape(
-                        (PrimitiveClassReference)getDominantCatArgClass(arg),null));
+                factory.newMatrixValueFromClassShapeRange(
+                        (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
     }
     
     //TODO - move to aggr value prop
