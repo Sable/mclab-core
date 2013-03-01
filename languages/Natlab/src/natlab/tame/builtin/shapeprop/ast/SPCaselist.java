@@ -1,16 +1,14 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPCaselist extends SPNode{
+public class SPCaselist<V extends Value<V>> extends SPNode<V>{
 	static boolean Debug = false;
-	SPCase first;
-	SPCaselist next;
+	SPCase<V> first;
+	SPCaselist<V> next;
 	
-	public SPCaselist(SPCase first, SPCaselist next){
+	public SPCaselist(SPCase<V> first, SPCaselist<V> next){
 		this.first = first;
 		this.next = next;
 		/*if (next!=null)
@@ -19,8 +17,8 @@ public class SPCaselist extends SPNode{
 		}*/
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
+		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
 		//first case match successfully!
 		if((match.outputIsDone()==true)&&(match.getIsError()==false)) {
 			if (Debug) System.out.println("matching and results emmitting successfully!\n");
@@ -28,7 +26,7 @@ public class SPCaselist extends SPNode{
 		}
 		//first case matching part doesn't match, new a new one, start matching again.
 		else if((match.getIsError()==true)&&(next!=null)){
-			ShapePropMatch newMatch = new ShapePropMatch();
+			ShapePropMatch<V> newMatch = new ShapePropMatch<V>();
 			newMatch = next.match(isPatternSide, newMatch, argValues, num);
 			return newMatch;
 		}

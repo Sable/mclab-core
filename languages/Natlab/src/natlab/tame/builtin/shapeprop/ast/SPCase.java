@@ -1,23 +1,21 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPCase extends SPNode{
+public class SPCase<V extends Value<V>> extends SPNode<V>{
 	static boolean Debug = false;
-	SPAbstractPattern first;
-	SPOutput next;
+	SPAbstractPattern<V> first;
+	SPOutput<V> next;
 	
-	public SPCase(SPAbstractPattern p, SPOutput o){
+	public SPCase(SPAbstractPattern<V> p, SPOutput<V> o){
 		this.first = p;
 		//System.out.println("->");
 		this.next = o;
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
+		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
 		if(match.getIsError()==true){
 			isPatternSide = false;
 			if(match.getNumMatched()!=argValues.size()){
@@ -29,7 +27,7 @@ public class SPCase extends SPNode{
 		if((match.getNumMatched()==1)&&(argValues.isEmpty()==true)){  //for matching an empty argument list
 			isPatternSide = false;
 			if (Debug) System.out.println("matching an empty argument list is done!");
-			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues, num);
+			ShapePropMatch<V> outputMatch = next.match(isPatternSide, match, argValues, num);
 			return outputMatch;
 		}
 		if(match.getNumMatched()!=argValues.size()){ //match unsuccessful
@@ -40,7 +38,7 @@ public class SPCase extends SPNode{
 		if(match.getNumMatched()==argValues.size()){  //if pattern part is done with successful matching
 			isPatternSide = false;
 			if (Debug) System.out.println("matching part is done!");
-			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues, num); //I sense that maybe we don't need argValues in output
+			ShapePropMatch<V> outputMatch = next.match(isPatternSide, match, argValues, num); //I sense that maybe we don't need argValues in output
 			return outputMatch;
 		}
 		else

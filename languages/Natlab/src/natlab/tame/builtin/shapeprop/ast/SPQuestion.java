@@ -1,21 +1,19 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPQuestion extends SPAbstractMatchExpr{
-	SPAbstractMatchExpr spm;
-	public SPQuestion (SPAbstractMatchExpr spm){
+public class SPQuestion<V extends Value<V>> extends SPAbstractMatchExpr<V>{
+	SPAbstractMatchExpr<V> spm;
+	public SPQuestion (SPAbstractMatchExpr<V> spm){
 		this.spm = spm;
 		//System.out.println("?");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(argValues.size()>previousMatchResult.getNumMatched()){
 			//System.out.println("inside ? expression");
-			ShapePropMatch match = spm.match(isPatternSide, previousMatchResult, argValues, num);
+			ShapePropMatch<V> match = spm.match(isPatternSide, previousMatchResult, argValues, num);
 			return match;
 		}
 		return previousMatchResult;

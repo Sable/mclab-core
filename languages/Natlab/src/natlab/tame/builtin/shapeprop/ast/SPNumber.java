@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPNumber extends SPAbstractScalarExpr{
+public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	static boolean Debug = false;
 	Number n;
 	public SPNumber (Number n){
@@ -16,7 +16,7 @@ public class SPNumber extends SPAbstractScalarExpr{
 		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
 			if(previousMatchResult.isArrayIndexAssignRight()==true){
 				//FIXME
@@ -49,11 +49,11 @@ public class SPNumber extends SPAbstractScalarExpr{
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);
 				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromIntegers(dimensions));
 				if (Debug) System.out.println(uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+match.getAllUppercase());
 				match.setArrayIndexAssignRight(false);
 				return match;

@@ -2,17 +2,19 @@ package natlab.tame.builtin.shapeprop;
 
 import java.util.*;
 import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.value.*;
 
-public class ShapePropMatch{
+
+public class ShapePropMatch<V extends Value<V>>{
 	static boolean Debug = false;
-	public ShapeFactory factory = new ShapeFactory();
+	public ShapeFactory<V> factory = new ShapeFactory<V>();
 	int numMatched = 0;             //number of matched arguments, act as the index of arguments 
 	int numEmittedResults = 0;      //number of emitted results, I cannot say its index of shape equation,
 	                                //because there is also non-matching expression in the language.
 	int numInVertcat = 0;           //index in vertcat;
 	int previousMatchedNumber = 0;
 	HashMap<String, Integer> lowercase = new HashMap<String, Integer>();  //lowercase is used like m=prevScalar()
-	HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();  //mostly, uppercase is used for matching a shape
+	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();  //mostly, uppercase is used for matching a shape
 	boolean whetherLatestMatchedIsNum = false;
 	boolean ArrayIndexAssignLeft = false;
 	boolean ArrayIndexAssignRight = false;
@@ -24,7 +26,7 @@ public class ShapePropMatch{
 	String previousMatchedLowercase = null;
 	String previousMatchedUppercase = null;
 	ArrayList<Integer> needForVertcat = new ArrayList<Integer>();
-	List<Shape<?>> output = new ArrayList<Shape<?>>();  //used for output results 
+	List<Shape<V>> output = new ArrayList<Shape<V>>();  //used for output results 
 	
 	
 	public ShapePropMatch(){}
@@ -33,7 +35,7 @@ public class ShapePropMatch{
 	 * constructor referring to parent
 	 * @param parent
 	 */
-	public ShapePropMatch(ShapePropMatch parent){
+	public ShapePropMatch(ShapePropMatch<V> parent){
 		this.factory = parent.factory;
         this.numMatched = parent.numMatched;
         this.numEmittedResults = parent.numEmittedResults;
@@ -58,7 +60,7 @@ public class ShapePropMatch{
 	/**
 	 * add new lower case or upper case into current result
 	 */
-	public ShapePropMatch(ShapePropMatch parent, HashMap<String, Integer> lowercase, HashMap<String, Shape<?>> uppercase){
+	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, Integer> lowercase, HashMap<String, Shape<V>> uppercase){
 		this.factory = parent.factory;
 		this.numMatched = parent.numMatched;
 		this.numEmittedResults = parent.numEmittedResults;
@@ -215,12 +217,12 @@ public class ShapePropMatch{
     	return value;
     }
     
-    public Shape<?> getShapeOfVariable(String key){
-    	Shape<?> shape = this.uppercase.get(key);
+    public Shape<V> getShapeOfVariable(String key){
+    	Shape<V> shape = this.uppercase.get(key);
     	return shape;
     }
     
-    public List<Shape<?>> getAllResults(){
+    public List<Shape<V>> getAllResults(){
     	return this.output;
     }
     
@@ -228,7 +230,7 @@ public class ShapePropMatch{
     	return lowercase;
     }
     
-    public HashMap<String, Shape<?>> getAllUppercase(){
+    public HashMap<String, Shape<V>> getAllUppercase(){
     	return uppercase;
     }
     
@@ -240,12 +242,12 @@ public class ShapePropMatch{
     	return needForVertcat;
     }
     
-    public void addToOutput(Shape<?> value){
+    public void addToOutput(Shape<V> value){
     	this.output.add(value);
     }
     
     public void copyVertcatToOutput(){
-    	Shape<?> shape = (new ShapeFactory()).newShapeFromIntegers(this.getOutputVertcatExpr());
+    	Shape<V> shape = (new ShapeFactory<V>()).newShapeFromIntegers(this.getOutputVertcatExpr());
     	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
     	this.addToOutput(shape);
     }

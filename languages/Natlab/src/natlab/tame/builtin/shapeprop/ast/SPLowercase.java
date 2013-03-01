@@ -5,9 +5,9 @@ import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPLowercase extends SPAbstractScalarExpr{
+public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	static boolean Debug = false;
 	String s;
 	public SPLowercase(String s){
@@ -15,15 +15,15 @@ public class SPLowercase extends SPAbstractScalarExpr{
 		//System.out.println(s);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){
 			//for matching a vertcat expression, this step should be similar to Uppercase matching, to exam whether equals!
 			if(previousMatchResult.isInsideVertcat()==true){
 				if (Debug) System.out.println("a lowercase inside vertcat!");
 				if (Debug) System.out.println(previousMatchResult.getNumInVertcat());
-				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
+				Value<V> argument = argValues.get(previousMatchResult.getNumMatched());
 				//get its shape information
-				Shape<?> argumentShape = ((HasShape)argument).getShape();
+				Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 				if (Debug) System.out.println("argument shape is "+argumentShape);
 				if(previousMatchResult.getAllLowercase().containsKey(s)){
 					try{
@@ -33,13 +33,13 @@ public class SPLowercase extends SPAbstractScalarExpr{
 							previousMatchResult.setIsError();
 							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 							lowercase.put(s, null);
-							ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+							ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 							match.saveLatestMatchedLowercase(s);
 							return match;
 						}
 						HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 						lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-						ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 						if (Debug) System.out.println(match.getAllLowercase());
 						match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 						return match;
@@ -52,14 +52,14 @@ public class SPLowercase extends SPAbstractScalarExpr{
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				if(argumentShape.getCertainDimensionSize(previousMatchResult.getNumInVertcat())==null){
 					lowercase.put(s, null);
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(match.getAllLowercase());
 					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 					return match;
 				}
 				else{
 					lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(match.getAllLowercase());
 					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 					return match;
@@ -101,10 +101,10 @@ public class SPLowercase extends SPAbstractScalarExpr{
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);
 				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromIntegers(dimensions));
 				if (Debug) System.out.println(uppercase);
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				match.setArrayIndexAssignRight(false);
 				return match;
 			}
@@ -116,7 +116,7 @@ public class SPLowercase extends SPAbstractScalarExpr{
 			//for store some information in a lowercase
 			HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 			lowercase.put(s, null);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+			ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 			match.saveLatestMatchedLowercase(s);
 			if (Debug) System.out.println("inside SPLowercase "+match.getLatestMatchedLowercase()+", vertcat expression now: "+match.getOutputVertcatExpr());
 			return match;

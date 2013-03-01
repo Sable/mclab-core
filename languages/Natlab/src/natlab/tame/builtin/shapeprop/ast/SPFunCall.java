@@ -5,19 +5,19 @@ import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPFunCall extends SPAbstractVertcatExprArg{
+public class SPFunCall<V extends Value<V>> extends SPAbstractVertcatExprArg<V>{
 	static boolean Debug = false;
 	String i;
-	SPAbstractVertcatExprArg ls;
-	public SPFunCall(String i, SPAbstractVertcatExprArg ls){
+	SPAbstractVertcatExprArg<V> ls;
+	public SPFunCall(String i, SPAbstractVertcatExprArg<V> ls){
 		this.i = i;
 		this.ls = ls;
 		//System.out.println("functionCall:"+i);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		//System.out.println("function: "+i);
 		if((i.indexOf("previousScalar")==0)&(ls==null)){
 			if (Debug) System.out.println("inside previousScalar");
@@ -27,14 +27,14 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(
 						previousMatchResult.getLatestMatchedUppercase()));
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				//System.out.println(matchResult.getAllLowercase());
 	            return matchResult;	
 			}
 			else{
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				//System.out.println(matchResult.getAllLowercase());
 	            return matchResult;	
 			}	
@@ -61,7 +61,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					int minus = previousMatchResult.getValueOfVariable(arg[0])-previousMatchResult.getValueOfVariable(arg[1])+1;
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), minus);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -69,7 +69,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					if (Debug) System.out.println("one of the arguments is null!");
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -84,7 +84,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					int div = previousMatchResult.getValueOfVariable(arg[0])/previousMatchResult.getValueOfVariable(arg[1]);
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), div);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -92,7 +92,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					if (Debug) System.out.println("one of the arguments is null!");
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -102,16 +102,13 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 		else if(i.indexOf("previousShapeDim")==0){
 			if(ls==null){
 				if (Debug) System.out.println("inside previousShapeDim()");
-				Shape<?> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
+				Shape<V> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
 				List<Integer> dimensions = previousMatched.getDimensions();
-				int numberOfDimensions = 0;
-				for(Integer i: dimensions){
-					numberOfDimensions = numberOfDimensions+1;
-				}
+				int numberOfDimensions = dimensions.size();
 				if (Debug) System.out.println("this matched shape has "+numberOfDimensions+" dimensions");
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), numberOfDimensions);
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 	            return matchResult;
 			}
 			else{
@@ -120,7 +117,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 				if(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions().get(previousMatchResult.getLatestMatchedNumber()-1)==null){
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -128,7 +125,7 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					int dimNum = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions().get(previousMatchResult.getLatestMatchedNumber()-1);
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), dimNum);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
@@ -139,8 +136,8 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 			String[] arg = ls.toString().split(",");
 			if(arg.length==2){
 				if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" compare with "+previousMatchResult.getShapeOfVariable(arg[1]));
-				Shape<?> first = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[0]);
-				Shape<?> second = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[1]);
+				Shape<V> first = (Shape<V>)previousMatchResult.getShapeOfVariable(arg[0]);
+				Shape<V> second = (Shape<V>)previousMatchResult.getShapeOfVariable(arg[1]);
 				//actually, I don't know what happened here, need more consideration later.
 				if(first.getSize()==second.getSize()){
 		    		int j=0;
@@ -172,14 +169,14 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 				int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())+previousMatchResult.getValueOfVariable(ls.toString());
 				if (Debug) System.out.println(sum);
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), sum);
-				previousMatchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				previousMatchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				if (Debug) System.out.println(previousMatchResult.getAllLowercase());
 				return previousMatchResult;
 			}
 			else{
 				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-				previousMatchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				previousMatchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				if (Debug) System.out.println(previousMatchResult.getAllLowercase());
 				return previousMatchResult;
 			}
@@ -187,10 +184,10 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 		else if(i.indexOf("copy")==0){
 			if (Debug) System.out.println("inside copy("+ls.toString()+")");
 			if (Debug) System.out.println(previousMatchResult.getLatestMatchedUppercase());
-			HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-			Shape<?> newShape = (new ShapeFactory()).newShapeFromIntegers(previousMatchResult.getShapeOfVariable(ls.toString()).getDimensions());
+			HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+			Shape<V> newShape = (new ShapeFactory<V>()).newShapeFromIntegers(previousMatchResult.getShapeOfVariable(ls.toString()).getDimensions());
 			uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+			ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 			if (Debug) System.out.println(match.getAllUppercase());
 			return match;
 		}
@@ -205,14 +202,14 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					String result = (f<s)?arg[0]:arg[1];
 					if (Debug) System.out.println("the minimum one is "+result);
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(result));
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					return match;
 				}
 				else{
 					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
 					if (Debug) System.out.println("one of the arguments of minimum is null!");
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					return match;
 				}
 			}
@@ -228,11 +225,11 @@ public class SPFunCall extends SPAbstractVertcatExprArg{
 					return previousMatchResult;
 				}
 			}
-			Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
+			Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
 			errorShape.FlagItsError();
-			HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
+			HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 			uppercase.put(previousMatchResult.getLatestMatchedUppercase(), errorShape);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+			ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 			return match;
 			
 		}

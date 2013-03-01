@@ -13,7 +13,7 @@ import natlab.tame.valueanalysis.value.*;
 
 
 public class ShapePropagator<V extends Value<V>> 
-	extends BuiltinVisitor<Args<V>, List<Shape<V>>>{//XU modified at 4.28.12.55pm, very important!!!
+	extends BuiltinVisitor<Args<V>, List<Shape<V>>> {
 	//this is a singleton class -- make it singleton, ignore all the generic stuff
     @SuppressWarnings("rawtypes")
 	static ShapePropagator instance = null;
@@ -35,12 +35,10 @@ public class ShapePropagator<V extends Value<V>>
 		if (Debug) System.out.println("the number of output variables is "+arg.getNargout());
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
-			List<Shape<?>> result = ShapePropTool.matchByValues(((HasShapePropagationInfo)builtin).getShapePropagationInfo(),arg);
-			List<Shape<V>> vResult = new ArrayList<Shape<V>>();
-			for(Shape<?> res: result){
-				vResult.add((Shape<V>)res);
-			}
-			return vResult;
+			ShapePropTool<V> shapePropTool = new ShapePropTool<V>();
+		    @SuppressWarnings({ "unchecked" })
+			List<Shape<V>> result = shapePropTool.matchByValues(((HasShapePropagationInfo<V>)builtin).getShapePropagationInfo(),arg);
+			return result;
 		}
 		throw new UnsupportedOperationException();
 	}
@@ -57,6 +55,7 @@ public class ShapePropagator<V extends Value<V>>
 		}
     }
     
+    //FIXME rewrite the shape analysis for array get and array set statements!
     public Shape<V> arraySubsref(Shape<V> arrayShape, Args<V> indizes){
     	/**
     	 * Consider array get, like b=a(1,2), index are 1 and 2.
