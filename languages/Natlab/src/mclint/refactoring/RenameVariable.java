@@ -2,7 +2,7 @@ package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
 import mclint.Location;
-import mclint.util.AstUtil;
+import mclint.transform.Transformer;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.NodeFinder;
@@ -18,7 +18,18 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class RenameVariable {
+class RenameVariable extends Refactoring {
+  private Name node;
+  private String newName;
+  private UseDefDefUseChain udduChain;
+  public RenameVariable(Transformer transformer, Name node, String newName,
+      UseDefDefUseChain udduChain) {
+    super(transformer);
+    this.node = node;
+    this.newName = newName;
+    this.udduChain = udduChain;
+  }
+
   public static class NameConflict extends RuntimeException {
     private static final long serialVersionUID = 6581696075512377817L;
 
@@ -35,16 +46,16 @@ public class RenameVariable {
     return NodeFinder.findParent(Script.class, node);
   }
 
-  private static Iterable<Def> getAllDefs(final Name node, final UseDefDefUseChain uddu) {
+  private Iterable<Def> getAllDefsOfTargetName() {
     ASTNode<?> parent = getParentFunctionOrScript(node);
     return filter(NodeFinder.find(Def.class, parent), new Predicate<Def>() {
       @Override public boolean apply(Def def) {
-        return !uddu.getDefinedNamesOf(node.getID(), def).isEmpty();
+        return !udduChain.getDefinedNamesOf(node.getID(), def).isEmpty();
       }
     });
   }
   
-  private static void checkSafeRename(Name node, String newName) {
+  private void checkSafeRename() {
     ASTNode<?> parent = getParentFunctionOrScript(node);
     for (Name name : NodeFinder.find(Name.class, parent)) {
       if (name.getID().equals(newName)) {
@@ -53,7 +64,7 @@ public class RenameVariable {
     }
   }
   
-  private static ASTNode<?> getRoot(Def node) {
+  private ASTNode<?> getRoot(Def node) {
     Program program = NodeFinder.findParent(Program.class, (ASTNode<?>) node);
     CompilationUnits cu = NodeFinder.findParent(CompilationUnits.class, program);
     return Objects.firstNonNull(cu, program);
@@ -69,11 +80,10 @@ public class RenameVariable {
         }), null);
   }
 
-  public static void exec(Name node, String newName, UseDefDefUseChain udduChain,
-      boolean renameGlobally) {
-    checkSafeRename(node, newName);
+  public void apply(boolean renameGlobally) {
+    checkSafeRename();
 
-    for (Def def : getAllDefs(node, udduChain)) {
+    for (Def def : getAllDefsOfTargetName()) {
       if (def instanceof GlobalStmt && renameGlobally) {
         ASTNode<?> parent = getParentFunctionOrScript(node);
         for (Function f : NodeFinder.find(Function.class, getRoot(def))) {
@@ -82,20 +92,21 @@ public class RenameVariable {
           }
           Name decl = findGlobalNamed(node.getID(), f);
           if (decl != null) {
-            exec(decl, newName, udduChain, false);
+            new RenameVariable(transformer, decl, newName, udduChain).apply(false);
           }
         }
       }
       for (Name use : udduChain.getUsesOf(node.getID(), def)) {
-        AstUtil.replace(use, new Name(newName)); 
+        transformer.replace(use, new Name(newName)); 
       }
       for (Name name : udduChain.getDefinedNamesOf(node.getID(), def)) {
-        AstUtil.replace(name, new Name(newName));
+        transformer.replace(name, new Name(newName));
       }
     }
   }
-  
-  public static void exec(Name node, String newName, UseDefDefUseChain udduChain) {
-    exec(node, newName, udduChain, true);
+
+  @Override
+  public void apply() {
+    apply(true);
   }
 }

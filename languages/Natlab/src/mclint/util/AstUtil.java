@@ -14,6 +14,8 @@ public class AstUtil {
    */
   public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
+    newNode.setStartPosition(oldNode.getStartLine(), oldNode.getStartColumn());
+    newNode.setEndPosition(oldNode.getEndLine(), oldNode.getEndColumn());
   }
   
   /**

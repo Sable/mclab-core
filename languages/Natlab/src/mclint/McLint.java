@@ -10,13 +10,18 @@ import mclint.analyses.OutputSuppression;
 import mclint.analyses.Shadowing;
 import mclint.analyses.UnreachableCode;
 import mclint.analyses.UnusedVar;
+import mclint.refactoring.Refactoring;
+import mclint.refactoring.Refactorings;
 import mclint.refactoring.RemoveUnusedVar;
-import mclint.refactoring.RenameVariable;
 import mclint.reports.ReportGenerators;
+import mclint.transform.Transformer;
+import mclint.transform.Transformers;
 import mclint.util.Parsing;
 import natlab.options.Options;
+import natlab.utils.NodeFinder;
 import ast.CompilationUnits;
 import ast.Name;
+import ast.Program;
 
 import com.google.common.collect.ImmutableList;
 
@@ -74,7 +79,11 @@ public class McLint {
         Name node = (Name) message.getAstNode();
         if (prompt(message, "Rename?")) {
           String newName = System.console().readLine("    rename %s to: ", node.getID());
-          RenameVariable.exec(node, newName, lint.getKit().getUseDefDefUseChain());
+          Program parent = NodeFinder.findParent(Program.class, node);
+          Transformer transformer = Transformers.basic(parent);
+          Refactoring rename = Refactorings.renameVariable(transformer, node, newName,
+              lint.getKit().getUseDefDefUseChain());
+          rename.apply();
           return true;
         }
         return false;
