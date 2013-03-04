@@ -40,7 +40,13 @@ import natlab.tame.valueanalysis.value.Value;
  * @author adubra
  */
 public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D> {
+	protected String symbolic;
     protected PrimitiveClassReference classRef;
+    
+    @Override
+    public String getSymbolic() {
+    	return symbolic;
+    }
     
     @Override
     public PrimitiveClassReference getMatlabClass() {

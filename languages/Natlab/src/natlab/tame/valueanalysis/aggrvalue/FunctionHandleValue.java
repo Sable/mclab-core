@@ -63,6 +63,13 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
         super(factory);
         functions.add(FunctionHandle.newInstance(f,partialValues));        
     }
+    
+    @Override
+    public String getSymbolic() {
+    	//TODO later
+    	return null;
+    }
+    
     @Override
     public FunctionHandleClassReference getMatlabClass() {
         return FunctionHandleClassReference.getInstance();
