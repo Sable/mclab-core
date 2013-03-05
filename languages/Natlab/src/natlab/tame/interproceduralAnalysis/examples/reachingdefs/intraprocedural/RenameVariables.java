@@ -55,14 +55,14 @@ public class RenameVariables extends TIRAbstractNodeCaseHandler
     }
     
     @Override
-    public void caseASTNode(ASTNode node)
-    {
-        for (int i = 0; i < node.getNumChild(); i++)
-        {
-            if (node.getChild(i) != null)
-            {
-               (node.getChild(i)).analyze(this);
+    public void caseASTNode(ASTNode node) {
+        for (int i = 0; i < node.getNumChild(); i++) {
+            if (node.getChild(i) instanceof TIRNode) {
+              ((TIRNode) node.getChild(i)).tirAnalyze(this);
+            } else {
+                node.getChild(i).analyze(this);
             }
+            
         }
     }
 

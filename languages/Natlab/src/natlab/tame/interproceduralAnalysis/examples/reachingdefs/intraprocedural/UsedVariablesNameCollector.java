@@ -17,6 +17,7 @@ import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
+import ast.ForStmt;
 import ast.Function;
 import ast.Name;
 import ast.NameExpr;
@@ -44,6 +45,23 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     }
     
     // Case Methods
+    @Override
+    public void caseASTNode(ASTNode node)
+    {
+        currentOutSet = currentInSet;
+        for (int i = 0; i < node.getNumChild(); i++)
+        {
+            if (node.getChild(i) instanceof TIRNode) 
+            {
+              ((TIRNode) node.getChild(i)).tirAnalyze(this);
+            }
+            else
+            {
+                node.getChild(i).analyze(this);
+            }
+        }
+    }
+    
     @Override
     public void caseTIRCallStmt(TIRCallStmt node)
     {
@@ -83,10 +101,25 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
         fFlowSets.put(node, fCurrentSet);
         caseWhileStmt(node);
     }
+ 
+//    @Override
+//    public void caseForStmt(ForStmt node) 
+//    {
+//        if (!(node instanceof TIRForStmt)) return;
+//        TIRForStmt irForStmt = (TIRForStmt) node;
+//        fCurrentSet = newInitialFlow();
+//        fCurrentSet.add(irForStmt.getLowerName().getNodeString());
+//        Name increment = irForStmt.getIncName();
+//        if (increment != null) fCurrentSet.add(increment.getNodeString());
+//        fCurrentSet.add(irForStmt.getUpperName().getNodeString());
+//        fFlowSets.put(irForStmt, fCurrentSet);       
+//        super.caseForStmt(irForStmt);
+//    }
     
     @Override
     public void caseTIRForStmt(TIRForStmt node)
     {
+        System.err.println("In for statement");
         fCurrentSet = newInitialFlow();
         fCurrentSet.add(node.getLowerName().getNodeString());
         Name increment = node.getIncName();

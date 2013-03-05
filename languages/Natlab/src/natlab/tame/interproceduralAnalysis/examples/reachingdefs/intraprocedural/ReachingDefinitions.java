@@ -17,6 +17,7 @@ import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
 import ast.ASTNode;
+import ast.ForStmt;
 
 /**
  * Perform reaching definitions analysis on a given AST
@@ -26,7 +27,7 @@ import ast.ASTNode;
 public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<TIRNode>>>
 {
     // Member variables
-    private final boolean DEBUG = false;
+    private final boolean DEBUG = true;
     private Merger<Set<TIRNode>> fMerger = Mergers.union();
     private DefinedVariablesNameCollector fVariableNameCollector;
     private HashMapFlowMap<String, Set<TIRNode>> fStartMap;
@@ -91,6 +92,23 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     }
 
     // Case methods
+//    @Override
+//    public void caseASTNode(ASTNode node)
+//    {
+//        currentOutSet = currentInSet;
+//        for (int i = 0; i < node.getNumChild(); i++)
+//        {
+//            if (node.getChild(i) instanceof TIRNode) 
+//            {
+//              ((TIRNode) node.getChild(i)).tirAnalyze(this);
+//            }
+//            else
+//            {
+//                node.getChild(i).analyze(this);
+//            }
+//        }
+//    }
+    
     @Override
     public void caseTIRFunction(TIRFunction node)
     {
@@ -160,15 +178,45 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         fVisitedStmts.add(node);
         caseWhileStmt(node);
     }
+  
+    @Override
+    public void caseForStmt(ForStmt node) 
+    {
+        if (!(node instanceof TIRForStmt)) return;
+        TIRForStmt irForStmt = (TIRForStmt) node;
+        currentOutSet = copy(currentInSet);
+        // Must add the definition site for the loop variable name at the end of the fixed point analysis 
+        Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(irForStmt);
+        for (String variableName : definedVariablesNames)
+        {
+            Set<TIRNode> newDefinitionSite = new HashSet<TIRNode>();
+            newDefinitionSite.add(irForStmt);
+            currentOutSet.put(variableName, newDefinitionSite);
+        }
+        setInOutSet(irForStmt);
+        if (DEBUG) printMapForNode(irForStmt);
+        fVisitedStmts.add(irForStmt);
+        
+        //TODO ensure this is reasonable
+        super.caseForStmt(irForStmt);
+    }
     
     @Override
     public void caseTIRForStmt(TIRForStmt node)
     {
+        System.err.println("In for statement RD");
         currentOutSet = copy(currentInSet);
+        Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
+        for (String variableName : definedVariablesNames)
+        {
+          Set<TIRNode> newDefinitionSite = new HashSet<TIRNode>();
+          newDefinitionSite.add(node);
+          currentOutSet.put(variableName, newDefinitionSite);
+        }       
         setInOutSet(node);
         if (DEBUG) printMapForNode(node);
         fVisitedStmts.add(node);
-        caseForStmt(node);
+        super.caseForStmt(node);
     }
     
     

@@ -1,6 +1,7 @@
 package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
+import ast.ForStmt;
 import ast.Function;
 import ast.Name;
 import ast.NameExpr;
@@ -73,18 +75,49 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     }
    
     @Override
+    public void caseASTNode(ASTNode node)
+    {
+        currentOutSet = currentInSet;
+        for (int i = 0; i < node.getNumChild(); i++)
+        {
+            if (node.getChild(i) instanceof TIRNode) 
+            {
+              ((TIRNode) node.getChild(i)).tirAnalyze(this);
+            }
+            else
+            {
+                node.getChild(i).analyze(this);
+            }
+        }
+    }
+    
+    @Override
     public void caseTIRFunction(TIRFunction node)
     {
         fCurrentSet = newInitialFlow();
         fCurrentSet.addAll(node.getInParamSet());
         fFlowSets.put(node, fCurrentSet);
         fFullSet.addAll(fCurrentSet);
-        caseASTNode(node.getStmts());
+        caseASTNode(node);
     }
+    
+//    @Override
+//    public void caseForStmt(ForStmt node) 
+//    {
+//        if (!(node instanceof TIRForStmt)) return;
+//        TIRForStmt irForStmt = (TIRForStmt) node;
+//        fCurrentSet = newInitialFlow();
+//        fCurrentSet.add(irForStmt.getLoopVarName().getNodeString());
+//        fFlowSets.put(irForStmt, fCurrentSet);
+//        fFullSet.addAll(fCurrentSet);
+//        super.caseForStmt(irForStmt);
+//    }
+    
     
     @Override
     public void caseTIRForStmt(TIRForStmt node)
     {
+        System.err.println("In for statement");
         fCurrentSet = newInitialFlow();
         fCurrentSet.add(node.getLoopVarName().getNodeString());
         fFlowSets.put(node, fCurrentSet);
@@ -157,7 +190,6 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         dest = source.copy();
     }
     
-    
     public HashSetFlowSet<String> newInitialFlow()
     {
         return new HashSetFlowSet<String>();
@@ -185,7 +217,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     public Set<String> getDefinedVariablesNamesForNode(TIRNode node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);
-        if (set == null)    return null;
+        if (set == null)    return new HashSet<String>();
         return set.getSet();
     }
     

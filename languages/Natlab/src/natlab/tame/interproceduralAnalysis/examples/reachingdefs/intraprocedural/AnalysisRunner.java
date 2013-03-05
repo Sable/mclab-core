@@ -7,17 +7,21 @@ import natlab.tame.TamerTool;
 import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tir.TIRForStmt;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-import natlab.toolkits.rewrite.RenameSymbols;
+import ast.ASTNode;
 
 public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/web.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/forTest.m";
 //        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
@@ -38,24 +42,20 @@ public class AnalysisRunner
          * and print the result
          */
         // TODO hashmap static Function to VariableNameCollector
-        for(StaticFunction f : functionList)
-        {
+//        for(StaticFunction f : functionList)
+//        {
 //            System.out.println("Function " + f.getName());
-//            VariableNameCollector vnc = new VariableNameCollector(f);
+//            DefinedVariablesNameCollector vnc = new DefinedVariablesNameCollector(f);
 //            for(String s : vnc.getResult())
 //            {
 //                System.out.println(s);
 //            }
 //            System.out.println();
-        } 
+//        } 
         
       for(StaticFunction f : functionList)
       {
-//          VariableNameCollector vnc = new VariableNameCollector(f);
-//          vnc.analyze();
           System.out.println(f.getAst().getPrettyPrinted());
-//          ReachingDefinitionsAnalysis rda = new ReachingDefinitionsAnalysis(f);
-//          rda.analyze();
           UDChain ud = new UDChain(new ReachingDefinitions(f));
           System.out.println("\n//////// UD Analysis: //////////////\n");
           ud.constructUDChain();
@@ -66,7 +66,7 @@ public class AnalysisRunner
           du.printDUChain();
           
           UDDUWeb udduWeb = new UDDUWeb(ud, du);
-          //udduWeb.constructUDDUWeb();
+          udduWeb.constructUDDUWeb();
           
           RenameVariables rv = new RenameVariables(udduWeb);
           rv.analyze();
@@ -75,3 +75,4 @@ public class AnalysisRunner
 
     }
 }
+
