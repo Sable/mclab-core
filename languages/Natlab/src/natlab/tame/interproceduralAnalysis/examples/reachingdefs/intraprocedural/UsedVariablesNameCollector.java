@@ -10,28 +10,28 @@ import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
-import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRIfStmt;
-import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
-import ast.ForStmt;
+import ast.AssignStmt;
 import ast.Function;
 import ast.Name;
 import ast.NameExpr;
+import ast.RangeExpr;
 
 /**
  * Intraprocedural analysis that collects the names of variables used in statements in a function
  * @author Amine Sahibi
  *
  */
+@SuppressWarnings("rawtypes")
 public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
     // Member variables
     private HashSetFlowSet<String> fCurrentSet;
-    public Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    public Map<ASTNode, HashSetFlowSet<String>> fFlowSets = new HashMap<ASTNode, HashSetFlowSet<String>>();
     
     // Constructors
     public UsedVariablesNameCollector(ASTNode<?> tree)
@@ -42,24 +42,6 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
     public UsedVariablesNameCollector(StaticFunction f)
     {
         super(f.getAst());
-    }
-    
-    // Case Methods
-    @Override
-    public void caseASTNode(ASTNode node)
-    {
-        currentOutSet = currentInSet;
-        for (int i = 0; i < node.getNumChild(); i++)
-        {
-            if (node.getChild(i) instanceof TIRNode) 
-            {
-              ((TIRNode) node.getChild(i)).tirAnalyze(this);
-            }
-            else
-            {
-                node.getChild(i).analyze(this);
-            }
-        }
     }
     
     @Override
@@ -102,33 +84,20 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
         caseWhileStmt(node);
     }
  
-//    @Override
-//    public void caseForStmt(ForStmt node) 
-//    {
-//        if (!(node instanceof TIRForStmt)) return;
-//        TIRForStmt irForStmt = (TIRForStmt) node;
-//        fCurrentSet = newInitialFlow();
-//        fCurrentSet.add(irForStmt.getLowerName().getNodeString());
-//        Name increment = irForStmt.getIncName();
-//        if (increment != null) fCurrentSet.add(increment.getNodeString());
-//        fCurrentSet.add(irForStmt.getUpperName().getNodeString());
-//        fFlowSets.put(irForStmt, fCurrentSet);       
-//        super.caseForStmt(irForStmt);
-//    }
-    
     @Override
-    public void caseTIRForStmt(TIRForStmt node)
+    public void caseLoopVar(AssignStmt node)
     {
-        System.err.println("In for statement");
         fCurrentSet = newInitialFlow();
-        fCurrentSet.add(node.getLowerName().getNodeString());
-        Name increment = node.getIncName();
-        if (increment != null) fCurrentSet.add(increment.getNodeString());
-        fCurrentSet.add(node.getUpperName().getNodeString());
+        RangeExpr range = (RangeExpr) node.getRHS();
+        String lower = range.getLower().getNodeString();
+        String increment = range.hasIncr() ? range.getIncr().getNodeString() : null;
+        String upper = range.getUpper().getNodeString();
+        fCurrentSet.add(lower);
+        if (increment != null) fCurrentSet.add(increment);
+        fCurrentSet.add(upper);
         fFlowSets.put(node, fCurrentSet);
-        caseForStmt(node);
     }
-    
+        
     @Override
     public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out)
     {
@@ -166,7 +135,7 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
      * @param node
      * @return set of used names of variables for the input node or null if entry does not exist in flow set
      */
-    public Set<String> getUsedVariablesForNode(TIRNode node)
+    public Set<String> getUsedVariablesForNode(ASTNode node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);
         if (set == null)    return null;

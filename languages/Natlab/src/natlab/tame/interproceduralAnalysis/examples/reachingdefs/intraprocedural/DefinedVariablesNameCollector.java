@@ -16,13 +16,11 @@ import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCellArraySetStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
 import natlab.tame.tir.TIRDotSetStmt;
-import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
-import ast.ForStmt;
+import ast.AssignStmt;
 import ast.Function;
 import ast.Name;
 import ast.NameExpr;
@@ -32,13 +30,13 @@ import ast.NameExpr;
  * @author Amine Sahibi
  *
  */
-
+@SuppressWarnings("rawtypes")
 public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
     // Member Variables
     private HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
     private HashSetFlowSet<String> fCurrentSet;
-    private Map<TIRNode, HashSetFlowSet<String>> fFlowSets = new HashMap<TIRNode, HashSetFlowSet<String>>();
+    private Map<ASTNode, HashSetFlowSet<String>> fFlowSets = new HashMap<ASTNode, HashSetFlowSet<String>>();
     private StaticFunction fFunction;
     
     // Constructors
@@ -75,23 +73,6 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     }
    
     @Override
-    public void caseASTNode(ASTNode node)
-    {
-        currentOutSet = currentInSet;
-        for (int i = 0; i < node.getNumChild(); i++)
-        {
-            if (node.getChild(i) instanceof TIRNode) 
-            {
-              ((TIRNode) node.getChild(i)).tirAnalyze(this);
-            }
-            else
-            {
-                node.getChild(i).analyze(this);
-            }
-        }
-    }
-    
-    @Override
     public void caseTIRFunction(TIRFunction node)
     {
         fCurrentSet = newInitialFlow();
@@ -100,29 +81,14 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         fFullSet.addAll(fCurrentSet);
         caseASTNode(node);
     }
-    
-//    @Override
-//    public void caseForStmt(ForStmt node) 
-//    {
-//        if (!(node instanceof TIRForStmt)) return;
-//        TIRForStmt irForStmt = (TIRForStmt) node;
-//        fCurrentSet = newInitialFlow();
-//        fCurrentSet.add(irForStmt.getLoopVarName().getNodeString());
-//        fFlowSets.put(irForStmt, fCurrentSet);
-//        fFullSet.addAll(fCurrentSet);
-//        super.caseForStmt(irForStmt);
-//    }
-    
-    
+
     @Override
-    public void caseTIRForStmt(TIRForStmt node)
+    public void caseLoopVar(AssignStmt node)
     {
-        System.err.println("In for statement");
         fCurrentSet = newInitialFlow();
-        fCurrentSet.add(node.getLoopVarName().getNodeString());
+        fCurrentSet.add(node.getLHS().getVarName());
         fFlowSets.put(node, fCurrentSet);
         fFullSet.addAll(fCurrentSet);
-        caseForStmt(node);
     }
     
     @Override
@@ -214,7 +180,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
      * @param node
      * @return set of defined names of variables for the input node or null if entry does not exist in flow set
      */
-    public Set<String> getDefinedVariablesNamesForNode(TIRNode node)
+    public Set<String> getDefinedVariablesNamesForNode(ASTNode node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);
         if (set == null)    return new HashSet<String>();

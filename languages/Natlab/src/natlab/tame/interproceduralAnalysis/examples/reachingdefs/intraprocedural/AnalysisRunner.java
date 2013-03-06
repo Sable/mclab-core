@@ -7,21 +7,16 @@ import natlab.tame.TamerTool;
 import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRNode;
-import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.toolkits.filehandling.genericFile.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-import ast.ASTNode;
 
 public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/forTest.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/web.m";
 //        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
@@ -68,7 +63,7 @@ public class AnalysisRunner
           UDDUWeb udduWeb = new UDDUWeb(ud, du);
           udduWeb.constructUDDUWeb();
           
-          RenameVariables rv = new RenameVariables(udduWeb);
+          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
           rv.analyze();
           System.out.println(f.getAst().getPrettyPrinted());
       }

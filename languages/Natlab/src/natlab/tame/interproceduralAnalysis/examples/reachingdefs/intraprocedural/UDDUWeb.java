@@ -8,22 +8,24 @@ import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
-import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.toolkits.analysis.HashMapFlowMap;
+import ast.ASTNode;
+import ast.AssignStmt;
 
 /**
  * Construct a UDDU web for a given AST using the AST's UD and DU chains
  * @author Amine Sahibi
  *
  */
+@SuppressWarnings("rawtypes")
 public class UDDUWeb
 {
     private final boolean DEBUG = false;
     private UDChain fUDChain;
     private DUChain fDUChain;
-    private HashMap<String, HashMap<TIRNode, Integer>> fUDWeb;
-    private HashMap<String, HashMap<TIRNode, Integer>> fDUWeb;
+    private HashMap<String, HashMap<ASTNode, Integer>> fUDWeb;
+    private HashMap<String, HashMap<ASTNode, Integer>> fDUWeb;
     
     public UDDUWeb(UDChain udChain, DUChain duChain)
     {
@@ -38,15 +40,15 @@ public class UDDUWeb
         fDUChain.constructDUChain();
         
         // Initialize UDDU web
-        fUDWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
-        fDUWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
+        fUDWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
+        fDUWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
         
         // Initialize the statement color 
         int color = 0;
         
-        for (TIRNode visitedStmt : fUDChain.getVisitedStmtsLinkedList())
+        for (ASTNode visitedStmt : fUDChain.getVisitedStmtsLinkedList())
         {
-            HashMapFlowMap<String, HashSet<TIRNode>> duMap = fDUChain.getUsesMap(visitedStmt);
+            HashMapFlowMap<String, HashSet<ASTNode>> duMap = fDUChain.getUsesMap(visitedStmt);
             if (duMap != null && !duMap.isEmpty())
             {
                 for (String variableName : duMap.keySet())
@@ -61,17 +63,17 @@ public class UDDUWeb
         }
     }
     
-    private void markDefinition(TIRNode visitedStmt, String variableName, Integer color)
+    private void markDefinition(ASTNode visitedStmt, String variableName, Integer color)
     {
         if (fDUWeb.get(variableName) == null)
         {
-            fDUWeb.put(variableName, new HashMap<TIRNode, Integer>());
+            fDUWeb.put(variableName, new HashMap<ASTNode, Integer>());
         }
         fDUWeb.get(variableName).put(visitedStmt, color);
         if (DEBUG) System.out.println("Def of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
-        HashSet<TIRNode> useSet = fDUChain.getUsesMap(visitedStmt).get(variableName);
+        HashSet<ASTNode> useSet = fDUChain.getUsesMap(visitedStmt).get(variableName);
         if (useSet == null) return;
-        for (TIRNode use : useSet)
+        for (ASTNode use : useSet)
         {
             if (!isMarkedInUDWeb(use, variableName))
             {
@@ -80,17 +82,17 @@ public class UDDUWeb
         }
     }
     
-    private void markUse(TIRNode visitedStmt, String variableName, Integer color)
+    private void markUse(ASTNode visitedStmt, String variableName, Integer color)
     {
         if (fUDWeb.get(variableName) == null)
         {
-            fUDWeb.put(variableName, new HashMap<TIRNode, Integer>());
+            fUDWeb.put(variableName, new HashMap<ASTNode, Integer>());
         }
         fUDWeb.get(variableName).put(visitedStmt, color);
         if(DEBUG) System.out.println("Use of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));  
-        HashSet<TIRNode> definitionSet = fUDChain.getDefinitionsMap(visitedStmt).get(variableName);
+        HashSet<ASTNode> definitionSet = fUDChain.getDefinitionsMap(visitedStmt).get(variableName);
         if (definitionSet == null) return;
-        for (TIRNode definition : definitionSet)
+        for (ASTNode definition : definitionSet)
         {
             if (!isMarkedInDUWeb(definition, variableName))
             {
@@ -99,39 +101,40 @@ public class UDDUWeb
         }
     }
     
-    private boolean isMarkedInDUWeb(TIRNode visitedStmt, String variableName)
+    private boolean isMarkedInDUWeb(ASTNode visitedStmt, String variableName)
     {
         if (fDUWeb.containsKey(variableName))
         {
-            HashMap<TIRNode, Integer> webEntry = fDUWeb.get(variableName);
+            HashMap<ASTNode, Integer> webEntry = fDUWeb.get(variableName);
             if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
         }
         return false;
     }
     
-    private boolean isMarkedInUDWeb(TIRNode visitedStmt, String variableName)
+    private boolean isMarkedInUDWeb(ASTNode visitedStmt, String variableName)
     {
         if (fUDWeb.containsKey(variableName))
         {
-            HashMap<TIRNode, Integer> webEntry = fUDWeb.get(variableName);
+            HashMap<ASTNode, Integer> webEntry = fUDWeb.get(variableName);
             if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
         }
         return false;
     }
     
-    public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) { return fUDWeb.get(variableName); }
+    public HashMap<ASTNode, Integer> getNodeAndColorForUse(String variableName) { return fUDWeb.get(variableName); }
     
-    public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) { return fDUWeb.get(variableName); }
+    public HashMap<ASTNode, Integer> getNodeAndColorForDefinition(String variableName) { return fDUWeb.get(variableName); }
     
-    public LinkedList<TIRNode> getVisitedStmtsLinkedList() { return fUDChain.getVisitedStmtsLinkedList(); }
+    public LinkedList<ASTNode> getVisitedStmtsLinkedList() { return fUDChain.getVisitedStmtsLinkedList(); }
     
-    private String printNode(TIRNode node)
+    private String printNode(ASTNode node)
     {
         if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
         else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
         else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof AssignStmt) return node.getStructureString();
         else return null;
     }
 }
