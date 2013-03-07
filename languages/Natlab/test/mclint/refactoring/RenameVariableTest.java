@@ -1,6 +1,8 @@
 package mclint.refactoring;
 
 import mclint.McLintTestCase;
+import mclint.transform.Transformer;
+import mclint.transform.Transformers;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
@@ -8,11 +10,15 @@ import ast.FunctionList;
 import ast.Name;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
+import ast.Program;
 import ast.Script;
 
 public class RenameVariableTest extends McLintTestCase {
   private void rename(Name node, String newName) {
-    RenameVariable.exec(node, newName, kit.getUseDefDefUseChain());
+    Transformer transformer = Transformers.basic((Program) kit.getAST());
+    Refactoring rename = Refactorings.renameVariable(transformer, node, newName,
+        kit.getUseDefDefUseChain());
+    rename.apply();
   }
   
   private void assertRenameFails(ASTNode<?> tree, Name name, String newName) {

@@ -19,6 +19,8 @@ public class AllTests {
     suite.addTestSuite(NatlabScannerTests.class);
     suite.addTestSuite(NatlabParserPassTests.class);
     suite.addTestSuite(NatlabParserFailTests.class);
+    
+    suite.addTestSuite(LocationTest.class);
 
     suite.addTestSuite(TransformedNodeTests.class);
 
