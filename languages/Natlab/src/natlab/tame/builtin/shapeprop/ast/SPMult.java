@@ -3,10 +3,10 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPStar<V extends Value<V>> extends SPAbstractMatchExpr<V>{
+public class SPMult<V extends Value<V>> extends SPAbstractMatchExpr<V>{
 	static boolean Debug = false;
 	SPAbstractMatchExpr<V> sp;
-	public SPStar (SPAbstractMatchExpr<V> sp){
+	public SPMult (SPAbstractMatchExpr<V> sp){
 		this.sp = sp;
 		//System.out.println("*");
 	}

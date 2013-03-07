@@ -160,7 +160,7 @@ public class ShapePropParser extends Parser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_m = _symbols[offset + 1];
 					final SPAbstractMatchExpr m = (SPAbstractMatchExpr) _symbol_m.value;
-					 return new SPStar(m);
+					 return new SPMult(m);
 				}
 			},
 			new Action() {	// [15] matchExpr = matchExpr.m PLUS

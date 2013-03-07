@@ -36,7 +36,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public BasicMatrixValue(Constant constant) {
 		super(constant.getMatlabClass());
 		this.constant = constant;
-		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory))
+		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>())
 				.newShapeFromIntegers(constant.getShape());
 		//TODO, this line may cause infinite loop.
 		if (constant instanceof DoubleConstant) {
@@ -72,7 +72,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo) {
 		super(aClass);
 		this.constant = null;
-		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(factory)
+		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
 				.newShapeFromInputString(shapeInfo));
 	}
 
@@ -149,7 +149,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		}
 		else {
 			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
-					this.shape.merge(((BasicMatrixValue)other).getShape()), null);
+					this.shape.merge(((HasShape<AggrValue<BasicMatrixValue>>)other).getShape()), null);
 		}
 		return newMatrix;
 	}

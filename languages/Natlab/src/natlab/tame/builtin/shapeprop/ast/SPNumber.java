@@ -22,7 +22,8 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 				//FIXME
 				if (Debug) System.out.println("trying to assign "+n.toString()+" to an array!");
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				List<Integer> dimensions = new ArrayList<Integer>(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions());
+				List<DimValue> dimensions = new ArrayList<DimValue>(previousMatchResult.getShapeOfVariable(previousMatchResult
+						.getLatestMatchedUppercase()).getDimensions());
 				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
 					if (Debug) System.out.println("inside assigning a num to array with num index!");//i.e. M(2)=2;
 					//deal with the case that index overflow
@@ -33,24 +34,27 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 						return previousMatchResult;
 					}
 					dimensions.remove(previousMatchResult.getLatestMatchedNumber()-1);
-					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), n.intValue());
+					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), new DimValue(n.intValue(), null));
 				}
 				else{
 					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
 					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
+					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1)){
+						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult
+								.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
 						if (Debug) System.out.println("dimension should not be changed!");
 						previousMatchResult.setArrayIndexAssignRight(false);
 						return previousMatchResult;
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1, n.intValue());
+					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1);
+					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1
+							, new DimValue(n.intValue(), null));
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);
-				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult
+						.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
 				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromIntegers(dimensions));
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromDimValues(dimensions));
 				if (Debug) System.out.println(uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
 				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);

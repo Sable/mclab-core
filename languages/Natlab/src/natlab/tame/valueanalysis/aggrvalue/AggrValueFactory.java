@@ -13,7 +13,7 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
 	 */
 	ShapeFactory<AggrValue<D>> shapeFactory;
 	public AggrValueFactory(){
-		this.shapeFactory = new ShapeFactory<AggrValue<D>>(this);
+		this.shapeFactory = new ShapeFactory<AggrValue<D>>();
 	}
 	
 	

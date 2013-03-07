@@ -28,8 +28,8 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 				Value<V> argument = argValues.get(previousMatchResult.getNumMatched());
 				if (Debug) System.out.println(argument);
 				if((((HasConstant)argument).getConstant()==null)&&((((HasShape<V>)argument).getShape())==null)){
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put(s, null);
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(s, new DimValue());
 					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 					uppercase.put(s, (new ShapeFactory<V>()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
@@ -47,8 +47,8 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 						previousMatchResult.setIsError();
 						return previousMatchResult;
 					}
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put(s, null);
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(s, new DimValue());
 					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 					Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 					uppercase.put(s, argumentShape);
@@ -67,8 +67,8 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 					Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 					if (Debug) System.out.println("argument shape is "+argumentShape);
 					
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put(s, argumentIntValue);
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(s, new DimValue(argumentIntValue, null));
 					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 					uppercase.put(s, argumentShape);
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);

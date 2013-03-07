@@ -13,7 +13,7 @@ public class ShapePropMatch<V extends Value<V>>{
 	                                //because there is also non-matching expression in the language.
 	int numInVertcat = 0;           //index in vertcat;
 	int previousMatchedNumber = 0;
-	HashMap<String, Integer> lowercase = new HashMap<String, Integer>();  //lowercase is used like m=prevScalar()
+	HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();  //lowercase is used like m=previousScalar()
 	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();  //mostly, uppercase is used for matching a shape
 	boolean whetherLatestMatchedIsNum = false;
 	boolean ArrayIndexAssignLeft = false;
@@ -25,7 +25,7 @@ public class ShapePropMatch<V extends Value<V>>{
 	boolean isInsideAssign = false;
 	String previousMatchedLowercase = null;
 	String previousMatchedUppercase = null;
-	ArrayList<Integer> needForVertcat = new ArrayList<Integer>();
+	ArrayList<DimValue> needForVertcat = new ArrayList<DimValue>();
 	List<Shape<V>> output = new ArrayList<Shape<V>>();  //used for output results 
 	
 	
@@ -60,7 +60,7 @@ public class ShapePropMatch<V extends Value<V>>{
 	/**
 	 * add new lower case or upper case into current result
 	 */
-	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, Integer> lowercase, HashMap<String, Shape<V>> uppercase){
+	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, DimValue> lowercase, HashMap<String, Shape<V>> uppercase){
 		this.factory = parent.factory;
 		this.numMatched = parent.numMatched;
 		this.numEmittedResults = parent.numEmittedResults;
@@ -204,7 +204,7 @@ public class ShapePropMatch<V extends Value<V>>{
     }
     
     public boolean hasValue(String key){
-    	if(this.lowercase.get(key)==null){
+    	if(this.lowercase.get(key).getValue()==null){
     		return false;
     	}
     	else{
@@ -212,8 +212,8 @@ public class ShapePropMatch<V extends Value<V>>{
     	}
     }
     
-    public int getValueOfVariable(String key){
-    	int value = this.lowercase.get(key);
+    public DimValue getValueOfVariable(String key){
+    	DimValue value = this.lowercase.get(key);
     	return value;
     }
     
@@ -226,7 +226,7 @@ public class ShapePropMatch<V extends Value<V>>{
     	return this.output;
     }
     
-    public HashMap<String, Integer> getAllLowercase(){
+    public HashMap<String, DimValue> getAllLowercase(){
     	return lowercase;
     }
     
@@ -234,11 +234,11 @@ public class ShapePropMatch<V extends Value<V>>{
     	return uppercase;
     }
     
-    public void addToVertcatExpr(Integer i){
+    public void addToVertcatExpr(DimValue i){
     	this.needForVertcat.add(i);
     }
     
-    public ArrayList<Integer> getOutputVertcatExpr(){
+    public ArrayList<DimValue> getOutputVertcatExpr(){
     	return needForVertcat;
     }
     
@@ -247,7 +247,7 @@ public class ShapePropMatch<V extends Value<V>>{
     }
     
     public void copyVertcatToOutput(){
-    	Shape<V> shape = (new ShapeFactory<V>()).newShapeFromIntegers(this.getOutputVertcatExpr());
+    	Shape<V> shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
     	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
     	this.addToOutput(shape);
     }

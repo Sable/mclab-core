@@ -37,19 +37,20 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 				try{
 					if(previousMatchResult.getLatestMatchedUppercase().equals(s)){
 						//cases like (M,M->M), those M should be definitely the same!!! if not, return error information, interesting!
-						List<Integer> l = new ArrayList<Integer>();
+						List<DimValue> l = new ArrayList<DimValue>();
 						l = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
-						Shape<V> oldShape = (new ShapeFactory<V>()).newShapeFromIntegers(l);
+						Shape<V> oldShape = new ShapeFactory<V>().newShapeFromDimValues(l);
 						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
 						if(argumentShape.getDimensions().equals(oldShape.getDimensions())==false){
 							//FIXME really weird, cannot call equals method in Shape class, the problem is still generic problem,
 							//cannot cast from Shape<V> to Shape<V>
 							if (Debug) System.out.println("MATLAB syntax error!");
-							//Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>(previousMatchResult.factory)).newShapeFromIntegers(null);
+							//Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>
+							//(previousMatchResult.factory)).newShapeFromIntegers(null);
 							Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
-							errorShape.FlagItsError();
-							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-							lowercase.put(s, null);
+							errorShape.flagHasError();
+							HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+							lowercase.put(s, new DimValue());
 							HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 							uppercase.put(s, errorShape);
 							ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
@@ -62,8 +63,8 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 							return match;
 						}
 						//if new shape and old shape are equals, just return this shape!
-						HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-						lowercase.put(s, null);
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						lowercase.put(s, new DimValue());
 						HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 						uppercase.put(s, argumentShape);
 						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
@@ -76,8 +77,8 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 					}
 					
 				}catch (Exception e){}
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(s, null);
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(s, new DimValue());
 				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 				uppercase.put(s, argumentShape);
 				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
