@@ -3,11 +3,11 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPPatternList<V extends Value<V>> extends SPAbstractPattern<V>{
+public class SPPatternlist<V extends Value<V>> extends SPNode<V>{
 	SPAbstractPattern<V> first;
-	SPAbstractPattern<V> next;
+	SPPatternlist<V> next;
 	
-	public SPPatternList (SPAbstractPattern<V> first, SPAbstractPattern<V> next){
+	public SPPatternlist (SPAbstractPattern<V> first, SPPatternlist<V> next){
 		this.first = first;
 		this.next = next;
 		/*if (next!=null)

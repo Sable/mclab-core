@@ -14,24 +14,24 @@ public class ShapePropTool<V extends Value<V>> {
 	
 	static boolean Debug = false;
 	
-    public static SPNode parse(String source){
+    public static SPNode parse(String source) {
     	//System.err.println("parsing: "+source);
     	ShapePropParser parser = new ShapePropParser();
     	ShapePropScanner input = new ShapePropScanner(new StringReader(source));
-    	try{
+    	try {
     		SPNode sp = (SPNode) parser.parse(input);
         	return sp;
-    	}catch(Exception e){
+    	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
     	}
     }
     
-    public List<Shape<V>> matchByValues(SPNode<V> tree, Args<V> argValues){
-    	if(argValues!=null){
+    public List<Shape<V>> matchByValues(SPNode<V> tree, Args<V> argValues) {
+    	if (argValues!=null) {
     		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
-    		for(Value<V> arg:argValues){
-    			if(((HasShape<V>)arg).getShape()==null){
+    		for (Value<V> arg:argValues) {
+    			if (((HasShape<V>)arg).getShape()==null) {
     				if (Debug) System.out.println(arg+"'s shape is undefined");
     				//FIXME what if arg's shape info is null, if continue like this, the program will throw null pointer exception.
     			}
@@ -46,10 +46,10 @@ public class ShapePropTool<V extends Value<V>> {
         return spmatch.getAllResults();
     }
     
-	public static void main(String[] args) throws IOException, Parser.Exception{
+	public static void main(String[] args) throws IOException, Parser.Exception {
 				
-		System.out.println("print:   "+parse("#->[]"));
-		String s0 = parse("#->[]").toString();
+		System.out.println("print:   "+parse("$,'a2'->M||#->[]"));
+		String s0 = parse("$,'a2'->M||#->[]").toString();
 		System.out.println("reparsed "+parse(s0));
 		
 		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));

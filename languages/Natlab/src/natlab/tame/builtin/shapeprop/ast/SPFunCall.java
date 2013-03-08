@@ -7,11 +7,11 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPFunCall<V extends Value<V>> extends SPAbstractVertcatExprArg<V>{
+public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V>{
 	static boolean Debug = false;
 	String i;
-	SPAbstractVertcatExprArg<V> ls;
-	public SPFunCall(String i, SPAbstractVertcatExprArg<V> ls){
+	SPArglist<V> ls;
+	public SPFunCall(String i, SPArglist<V> ls){
 		this.i = i;
 		this.ls = ls;
 		//System.out.println("functionCall:"+i);

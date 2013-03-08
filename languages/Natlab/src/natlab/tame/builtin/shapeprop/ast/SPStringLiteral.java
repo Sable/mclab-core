@@ -5,7 +5,7 @@ import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPStringLiteral<V extends Value<V>> extends SPAbstractVertcatExprArg<V>{
+public class SPStringLiteral<V extends Value<V>> extends SPAbstractMatchElement<V>{
 	static boolean Debug = false;
 	String id;
 	public SPStringLiteral(String id){
