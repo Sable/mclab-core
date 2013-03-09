@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/web.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/hello.m";
 //        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
@@ -48,26 +48,32 @@ public class AnalysisRunner
 //            System.out.println();
 //        } 
         
+        int counter = 0;
       for(StaticFunction f : functionList)
       {
-          System.out.println(f.getAst().getPrettyPrinted());
-          UDChain ud = new UDChain(new ReachingDefinitions(f));
-          System.out.println("\n//////// UD Analysis: //////////////\n");
-          ud.constructUDChain();
-          ud.printUDChain();
-          System.out.println("\n//////// DU Analysis: //////////////\n");
-          DUChain du = new DUChain(ud);
-          du.constructDUChain();
-          du.printDUChain();
-          
-          UDDUWeb udduWeb = new UDDUWeb(ud, du);
-          udduWeb.constructUDDUWeb();
-          
-          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
-          rv.analyze();
-          System.out.println(f.getAst().getPrettyPrinted());
-      }
+          if (counter == 0)
+          {
+              System.out.println(f.getAst().getPrettyPrintedLessComments());
+              UDChain ud = new UDChain(new ReachingDefinitions(f));
+              ud.constructUDChain();
+              DUChain du = new DUChain(ud);
+              du.constructDUChain();
+              
+              System.out.println("\n//////// UD Analysis: //////////////\n");
+              ud.printUDChain();
+              System.out.println("\n//////// DU Analysis: //////////////\n");
+              du.printDUChain();
+              
+              UDDUWeb udduWeb = new UDDUWeb(ud, du);
+              udduWeb.constructUDDUWeb();
+              
+              RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
+              rv.analyze();
+              if (counter == 0) System.out.println(f.getAst().getPrettyPrintedLessComments());
+//              counter++;
+          }
 
+    }
     }
 }
 

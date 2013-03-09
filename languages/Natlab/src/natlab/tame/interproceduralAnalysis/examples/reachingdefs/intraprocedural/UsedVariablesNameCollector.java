@@ -6,10 +6,18 @@ import java.util.Set;
 
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
+import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
 import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
+import natlab.tame.tir.TIRArrayGetStmt;
+import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRCellArrayGetStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRDotGetStmt;
+import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
@@ -62,6 +70,98 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
             Name usedVarName = new Name(node.getRHS().getVarName());
             usedVariablesList = new TIRCommaSeparatedList(new NameExpr(usedVarName));
         }
+        else if (node instanceof TIRAbstractAssignFromVarStmt)
+        {
+            if (node instanceof TIRArraySetStmt)
+            {
+                TIRArraySetStmt arraySetStmt = (TIRArraySetStmt) node;
+                usedVariablesList = new TIRCommaSeparatedList(new NameExpr(arraySetStmt.getValueName()));
+                usedVariablesList.add(new NameExpr(arraySetStmt.getArrayName()));
+                TIRCommaSeparatedList indeces = arraySetStmt.getIndizes();
+                for (int i = 0; i < indeces.size(); i++)
+                {
+                    NameExpr indexNameExpr = indeces.getNameExpresion(i);
+                    if (indexNameExpr != null)
+                    {
+                        usedVariablesList.add(indexNameExpr);
+                    }
+                }
+            }
+            else if (node instanceof TIRCellArraySetStmt)
+            {
+                TIRCellArraySetStmt cellArraySetStmt = (TIRCellArraySetStmt) node;
+                usedVariablesList = new TIRCommaSeparatedList(new NameExpr(cellArraySetStmt.getValueName()));
+                usedVariablesList.add(new NameExpr(cellArraySetStmt.getCellArrayName()));
+                TIRCommaSeparatedList indeces = cellArraySetStmt.getIndizes();
+                for (int i = 0; i < indeces.size(); i++)
+                {
+                    NameExpr indexNameExpr = indeces.getNameExpresion(i);
+                    if (indexNameExpr != null)
+                    {
+                        usedVariablesList.add(indexNameExpr);
+                    }
+                }
+            }
+            else if (node instanceof TIRDotSetStmt)
+            {
+                TIRDotSetStmt dotSetStmt = (TIRDotSetStmt) node;
+                usedVariablesList = new TIRCommaSeparatedList(new NameExpr(dotSetStmt.getValueName()));
+                usedVariablesList.add(new NameExpr(dotSetStmt.getDotName()));
+            }
+            else 
+            { 
+                throw new UnsupportedOperationException("unknown assign from var stmt " + node); 
+            }
+
+        }
+        IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
+        fFlowSets.put(node, fCurrentSet);
+    }
+    
+    @Override
+    public void caseTIRAbstractAssignToListStmt(TIRAbstractAssignToListStmt node)
+    {
+        fCurrentSet = newInitialFlow();
+        TIRCommaSeparatedList usedVariablesList = null;
+        if (node instanceof TIRArrayGetStmt)
+        {
+            TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
+            Name arrayName = arrayGetStmt.getArrayName();
+            usedVariablesList = new TIRCommaSeparatedList(new NameExpr((arrayName)));
+            TIRCommaSeparatedList indeces = arrayGetStmt.getIndizes();
+            for (int i = 0; i < indeces.size(); i++)
+            {
+                NameExpr indexNameExpr = indeces.getNameExpresion(i);
+                if (indexNameExpr != null)
+                {
+                    usedVariablesList.add(indexNameExpr);
+                }
+            }
+        }
+        else if (node instanceof TIRDotGetStmt)
+        {
+            TIRDotGetStmt dotGetStmt = (TIRDotGetStmt) node;
+            Name dotName = dotGetStmt.getDotName();
+            Name fieldName = dotGetStmt.getFieldName();
+            usedVariablesList = new TIRCommaSeparatedList(new NameExpr(dotName));
+            usedVariablesList.add(new NameExpr(fieldName));
+        }
+        else if (node instanceof TIRCellArrayGetStmt)
+        {
+            TIRCellArrayGetStmt cellArrayGetStmt = (TIRCellArrayGetStmt) node;
+            Name cellArrayName = cellArrayGetStmt.getCellArrayName();
+            usedVariablesList = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
+            TIRCommaSeparatedList indeces = cellArrayGetStmt.getIndices();
+            for (int i = 0; i < indeces.size(); i++)
+            {
+                NameExpr indexNameExpr = indeces.getNameExpresion(i);
+                if (indexNameExpr != null)
+                {
+                    usedVariablesList.add(indexNameExpr);
+                }
+            }
+        }
+        if (usedVariablesList == null) System.out.println("PROBLEM");
         IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
         fFlowSets.put(node, fCurrentSet);
     }

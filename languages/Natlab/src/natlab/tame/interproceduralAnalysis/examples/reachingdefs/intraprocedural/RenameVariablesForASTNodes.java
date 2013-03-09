@@ -108,7 +108,7 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
      */
     public void renameVariable(Name variableName, Integer color)
     {
-        String updatedVariableName = variableName.getNodeString() + "_" + color;
+        String updatedVariableName = variableName.getNodeString() + "#" + color;
         variableName.setID(updatedVariableName);
     }
     
