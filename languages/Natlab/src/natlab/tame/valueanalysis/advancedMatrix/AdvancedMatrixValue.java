@@ -167,7 +167,8 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 				if (iscomplex.equals(((AdvancedMatrixValue) other)
 						.getisComplexInfo()) != true) {
 					return new AdvancedMatrixValue(new AdvancedMatrixValue(
-							this.classRef),
+							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+									.getShape()),
 							this.iscomplex.merge(((AdvancedMatrixValue) other)
 									.getisComplexInfo()));
 				}
@@ -181,7 +182,8 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 			return this;
 		}
 		AdvancedMatrixValue newMatrix = new AdvancedMatrixValue(
-				new AdvancedMatrixValue(this.classRef),
+				new AdvancedMatrixValue(this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+						.getShape()),
 				this.iscomplex.merge(((AdvancedMatrixValue) other)
 						.getisComplexInfo()));
 
