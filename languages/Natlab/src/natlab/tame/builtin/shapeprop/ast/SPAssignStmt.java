@@ -4,9 +4,9 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
 public class SPAssignStmt<V extends Value<V>> extends SPAbstractPattern<V>{
-	SPAbstractVertcatExprArg<V> lhs;
-	SPAbstractVertcatExprArg<V> rhs;
-	public SPAssignStmt(SPAbstractVertcatExprArg<V> lhs, SPAbstractVertcatExprArg<V> rhs){
+	SPAbstractMatchElement<V> lhs;
+	SPAbstractMatchElement<V> rhs;
+	public SPAssignStmt(SPAbstractMatchElement<V> lhs, SPAbstractMatchElement<V> rhs){
 		this.lhs = lhs;
 		this.rhs = rhs;
 		//System.out.println("=");

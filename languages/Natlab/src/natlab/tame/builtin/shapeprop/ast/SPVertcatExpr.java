@@ -9,8 +9,13 @@ import natlab.tame.valueanalysis.value.*;
 
 public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 	static boolean Debug = false;
-	SPVertExprArglist<V> vl;
-	public SPVertcatExpr(SPVertExprArglist<V> vl){
+	SPArglist<V> vl;
+	
+	public SPVertcatExpr() {
+		
+	}
+	
+	public SPVertcatExpr(SPArglist<V> vl) {
 		this.vl = vl;
 		//System.out.println("[]");
 	}
@@ -20,6 +25,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 			if (Debug) System.out.println("just get into SPVertcatExpr, setIsInsideVertcat is true!");
 			previousMatchResult.setIsInsideVertcat(true);
 			previousMatchResult.setNumInVertcat(0);//reset it
+			//TODO what if vl is null?
 			ShapePropMatch<V> match = vl.match(isPatternSide, previousMatchResult, argValues, num);
 			if(match.getIsError()==true){
 				Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
@@ -103,6 +109,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 	}
 	
 	public String toString(){
+		if (vl==null) return "[]";
 		return "["+vl.toString()+"]";
 	}
 }

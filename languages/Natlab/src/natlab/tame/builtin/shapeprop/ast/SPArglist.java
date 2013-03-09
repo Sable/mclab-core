@@ -3,11 +3,11 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPArglist<V extends Value<V>> extends SPAbstractVertcatExprArg<V>{
-	SPAbstractVertcatExprArg<V> first;
-	SPAbstractVertcatExprArg<V> next;
+public class SPArglist<V extends Value<V>> extends SPNode<V>{
+	SPAbstractMatchElement<V> first;
+	SPArglist<V> next;
 	
-	public SPArglist(SPAbstractVertcatExprArg<V> first, SPAbstractVertcatExprArg<V> next){
+	public SPArglist(SPAbstractMatchElement<V> first, SPArglist<V> next){
 		this.first = first;
 		this.next = next;
 		//System.out.println(",");

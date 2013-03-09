@@ -4,8 +4,8 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
 public class SPRParen<V extends Value<V>> extends SPAbstractMatchExpr<V>{
-	SPAbstractPattern<V> p;
-	public SPRParen (SPAbstractPattern<V> p){
+	SPPatternlist<V> p;
+	public SPRParen (SPPatternlist<V> p){
 		this.p = p;
 		//System.out.println("()");
 	}

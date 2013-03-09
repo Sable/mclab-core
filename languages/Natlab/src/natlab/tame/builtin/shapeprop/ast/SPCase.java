@@ -5,10 +5,10 @@ import natlab.tame.valueanalysis.value.*;
 
 public class SPCase<V extends Value<V>> extends SPNode<V>{
 	static boolean Debug = false;
-	SPAbstractPattern<V> first;
-	SPOutput<V> next;
+	SPPatternlist<V> first;
+	SPOutputlist<V> next;
 	
-	public SPCase(SPAbstractPattern<V> p, SPOutput<V> o){
+	public SPCase(SPPatternlist<V> p, SPOutputlist<V> o){
 		this.first = p;
 		//System.out.println("->");
 		this.next = o;

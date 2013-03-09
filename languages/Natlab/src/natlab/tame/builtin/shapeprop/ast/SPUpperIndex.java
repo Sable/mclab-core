@@ -3,7 +3,7 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPUpperIndex<V extends Value<V>> extends SPAbstractVertcatExprArg<V>{
+public class SPUpperIndex<V extends Value<V>> extends SPAbstractMatchElement<V>{
 	String s;
 	SPAbstractScalarExpr<V> n;
 	public SPUpperIndex(String s, SPAbstractScalarExpr<V> n){

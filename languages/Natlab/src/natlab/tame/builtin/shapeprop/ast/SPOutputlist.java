@@ -3,17 +3,17 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPOutput<V extends Value<V>> extends SPNode<V>{
+public class SPOutputlist<V extends Value<V>> extends SPNode<V>{
 	static boolean Debug = false;
 	SPAbstractVectorExpr<V> first;
-	SPOutput<V> next;
+	SPOutputlist<V> next;
 	
-	public SPOutput(SPAbstractVectorExpr<V> first, SPOutput<V> next){
+	public SPOutputlist(SPAbstractVectorExpr<V> first, SPOutputlist<V> next){
 		this.first = first;
 		this.next = next;
 	}
 	
-	public SPOutput() {}
+	public SPOutputlist() {}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
