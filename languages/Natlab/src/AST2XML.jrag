@@ -992,7 +992,6 @@ parent.appendChild(e);
     }
 
     eq LambdaExpr.getXML(Document doc, Element parent) {
-        /*
         long id = nodeCounter();
         setuID(id);
 		
@@ -1006,7 +1005,7 @@ parent.appendChild(e);
         getBody().getXML(doc, e);
 
         e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);*/
+        parent.appendChild(e);
         return true;
     }
     
