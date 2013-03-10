@@ -52,52 +52,39 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			String[] arg = arglist.toString().split(",");
 			if(arg.length==2){
 				if (Debug) System.out.println("compute " + arg[0] + " - " + arg[1]);
-				if (previousMatchResult.getValueOfVariable(arg[0]).hasValue() 
-						&& previousMatchResult.getValueOfVariable(arg[1]).hasValue()) {
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					int minus = previousMatchResult.getValueOfVariable(arg[0]).getValue() 
-							- previousMatchResult.getValueOfVariable(arg[1]).getValue() + 1;
+					int minus = previousMatchResult.getValueOfVariable(arg[0]).getIntValue() 
+							- previousMatchResult.getValueOfVariable(arg[1]).getIntValue() + 1;
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(minus, null));
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-				else{
-					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					if (Debug) System.out.println("one of the arguments is null!");
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
-					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
 			}
+			if (Debug) System.out.println("cannot compute minus function in shape propagation!");
 			return previousMatchResult;
 		}
-		else if(funName.equals("div")){
-			if (Debug) System.out.println("inside div("+arglist.toString()+")");
+		else if (funName.equals("div")) {
 			String[] arg = arglist.toString().split(",");
 			if(arg.length==2){
-				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
+				if (Debug) System.out.println("compute " + arg[0] + "/" + arg[1]);
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					int div = previousMatchResult.getValueOfVariable(arg[0]).getValue()/previousMatchResult.getValueOfVariable(arg[1]).getValue();
+					int div = previousMatchResult.getValueOfVariable(arg[0]).getIntValue() 
+							/ previousMatchResult.getValueOfVariable(arg[1]).getIntValue();
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(div, null));
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-				else{
-					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					if (Debug) System.out.println("one of the arguments is null!");
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
-					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
 		            return matchResult;
 				}
 			}
+			if (Debug) System.out.println("cannot compute div function in shape propagation!");
 			return previousMatchResult;
 		}
-		else if(funName.equals("previousShapeDim")){
-			if(arglist==null){
+		else if(funName.equals("previousShapeDim")) {
+			// if arglist is empty, this function is trying to get how many dimensions of previous matched shape. i.e. for size.
+			if (arglist==null) {
 				if (Debug) System.out.println("inside previousShapeDim()");
 				Shape<V> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
 				List<DimValue> dimensions = previousMatched.getDimensions();
@@ -108,29 +95,34 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 	            return matchResult;
 			}
-			else{
+			/*
+			 *  if arglist is not empty, in this language, which means there is a number in the arglist, 
+			 *  this function is trying to get the size of that specific dimension of previous matched shape. i.e. for vertcat and horzcat.
+			 */
+			else {
 				if (Debug) System.out.println("inside previousShapeDim("+arglist.toString()+")");
-				previousMatchResult = arglist.match(isPatternSide, previousMatchResult, argValues, Nargout);//try to get argument information
-				if(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions()
-						.get(previousMatchResult.getLatestMatchedNumber()-1)==null){
-					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
-					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
+				ShapePropMatch<V> arglistMatch = arglist.match(isPatternSide, previousMatchResult, argValues, Nargout);
+				if (arglistMatch.getShapeOfVariable(arglistMatch.getLatestMatchedUppercase())
+						.getDimensions().get(arglistMatch.getLatestMatchedNumber()-1)==null) {
+		            return arglistMatch;
 				}
-				else{
-					DimValue dimNum = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase())
-							.getDimensions().get(previousMatchResult.getLatestMatchedNumber()-1);
+				else {
+					DimValue dimNum = arglistMatch.getShapeOfVariable(arglistMatch.getLatestMatchedUppercase())
+							.getDimensions().get(arglistMatch.getLatestMatchedNumber()-1);
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(dimNum.getValue(), null));
-					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
+					lowercase.put(arglistMatch.getLatestMatchedLowercase(), new DimValue(dimNum.getIntValue(), dimNum.getSymbolic()));
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(arglistMatch, lowercase, null);
 		            return matchResult;
 				}
 			}
 		}
-		else if(funName.equals("isequal")){
+		/*
+		 *  this is an assert statement, may set matching process has error. TODO divided functions into two categories: 
+		 *  1. functions in assignment statements;
+		 *  2. functions as an assert statement itself.
+		 *  P.S. assert statement functions have the ability to set matching process has error.
+		 */
+		else if (funName.equals("isequal")) {
 			if (Debug) System.out.println("inside isequal("+arglist.toString()+")");
 			String[] arg = arglist.toString().split(",");
 			if(arg.length==2){
@@ -156,10 +148,10 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 		    				.getShapeOfVariable(arg[1]));
 					return previousMatchResult;
 		    	}
-				else{
-					previousMatchResult.setIsError(true);
-					return previousMatchResult;
-				}
+			}
+			else {
+				previousMatchResult.setIsError(true);
+				return previousMatchResult;				
 			}
 		}
 		else if(funName.equals("increment")){
@@ -167,8 +159,8 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			if (Debug) System.out.println(previousMatchResult.getAllLowercase());
 			if(previousMatchResult.hasValue(previousMatchResult.getLatestMatchedLowercase())&&previousMatchResult.hasValue(arglist.toString())){
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()+previousMatchResult
-						.getValueOfVariable(arglist.toString()).getValue();
+				int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()+previousMatchResult
+						.getValueOfVariable(arglist.toString()).getIntValue();
 				if (Debug) System.out.println(sum);
 				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(sum, null));
 				previousMatchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
@@ -199,8 +191,8 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			if(arg.length==2){
 				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					int f = previousMatchResult.getValueOfVariable(arg[0]).getValue();
-					int s = previousMatchResult.getValueOfVariable(arg[1]).getValue();
+					int f = previousMatchResult.getValueOfVariable(arg[0]).getIntValue();
+					int s = previousMatchResult.getValueOfVariable(arg[1]).getIntValue();
 					String result = (f<s)?arg[0]:arg[1];
 					if (Debug) System.out.println("the minimum one is "+result);
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(result));
@@ -223,7 +215,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			int latestMatchedNum = previousMatchResult.getLatestMatchedNumber();
 			List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
 			for(DimValue d : dimensions){
-				if(d.getValue()>=latestMatchedNum){
+				if(d.getIntValue()>=latestMatchedNum){
 					return previousMatchResult;
 				}
 			}

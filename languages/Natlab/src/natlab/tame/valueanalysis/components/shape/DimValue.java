@@ -11,26 +11,26 @@ package natlab.tame.valueanalysis.components.shape;
  *
  */
 public class DimValue {
-	Integer value;
+	Integer intValue;
 	String symbolic = "?";
 	
 	public DimValue() {}
 	
 	public DimValue(Integer value, String symbolic) {
-		this.value = value;
+		this.intValue = value;
 		this.symbolic = symbolic;
 	}
 	
-	public boolean hasValue() {
-		return this.value!=null;
+	public boolean hasIntValue() {
+		return this.intValue!=null;
 	}
 	
 	public boolean hasSymbolic() {
 		return this.symbolic!=null;
 	}
 	
-	public Integer getValue() {
-		return this.value;
+	public Integer getIntValue() {
+		return this.intValue;
 	}
 	
 	public String getSymbolic() {
@@ -42,16 +42,16 @@ public class DimValue {
 	 * @return
 	 */
 	public boolean equalsOne() {
-		if (value!=null&&value==1) return true;
+		if (intValue!=null&&intValue==1) return true;
 		return false;
 	}
 	
 	public boolean equals(DimValue o) {
-		if (value!=null&&o.hasValue()) {
-			if (value==o.getValue()) return true;
+		if (intValue!=null&&o.hasIntValue()) {
+			if (intValue==o.getIntValue()) return true;
 			return false;
 		}
-		else if (value==null&&!o.hasValue()) {
+		else if (intValue==null&&!o.hasIntValue()) {
 			if (symbolic==o.getSymbolic()) return true;
 			return false;
 		}
@@ -59,6 +59,6 @@ public class DimValue {
 	}
 	@Override
 	public String toString() {
-		return hasValue() ? value.toString() : symbolic;
+		return hasIntValue() ? intValue.toString() : symbolic;
 	}
 }
