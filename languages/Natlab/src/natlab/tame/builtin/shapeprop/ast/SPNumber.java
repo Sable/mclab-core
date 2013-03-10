@@ -18,7 +18,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
-			if(previousMatchResult.isArrayIndexAssignRight()==true){
+			if(previousMatchResult.getIsArrayIndexAssignRight()==true){
 				//FIXME
 				if (Debug) System.out.println("trying to assign "+n.toString()+" to an array!");
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());

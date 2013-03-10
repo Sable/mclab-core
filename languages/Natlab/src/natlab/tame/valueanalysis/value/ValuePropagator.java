@@ -27,9 +27,6 @@ public abstract class ValuePropagator<V extends Value<V>>
      * produces the abstract interpretation result of calling the given builtin
      * This is the public interface that users of this class should use
      * @return
-     */    
-    /*
-     * XU add this function to support the number of output variables
      */
     public Res<V> call(String builtin,Args<V> args){
     	Builtin b = Builtin.getInstance(builtin);
@@ -40,9 +37,6 @@ public abstract class ValuePropagator<V extends Value<V>>
     }
     /**
      * same as the other call, but with the first argument a builtin
-     */
-    /*
-     * XU add this function to support the number of output variables
      */
     public Res<V> call(Builtin b,Args<V> args){
         return b.visit(this, args);        

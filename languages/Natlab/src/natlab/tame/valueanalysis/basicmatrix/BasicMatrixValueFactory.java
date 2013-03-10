@@ -15,20 +15,21 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 	
 	@Override
 	//factory method 1.
-    public BasicMatrixValue newMatrixValue(Constant constant) {
-        return new BasicMatrixValue(constant);
+    public BasicMatrixValue newMatrixValue(String symbolic, Constant constant) {
+        return new BasicMatrixValue(symbolic, constant);
     }
     //factory method 2.
 	public BasicMatrixValue newMatrixValueFromClassShapeRange(
+			String symbolic,
 			PrimitiveClassReference aClass,
 			Shape<AggrValue<BasicMatrixValue>> shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
-		return new BasicMatrixValue(aClass, shape, rangeValue);
+		return new BasicMatrixValue(symbolic, aClass, shape, rangeValue);
 	}
 	//factory method 3.
 	public BasicMatrixValue newMatrixValueFromInputShape(
-			PrimitiveClassReference aClass, String shapeInfo) {
-		return new BasicMatrixValue(aClass, shapeInfo);
+			String symbolic, PrimitiveClassReference aClass, String shapeInfo) {
+		return new BasicMatrixValue(symbolic, aClass, shapeInfo);
 	}
 	
     static AggrValuePropagator<BasicMatrixValue> propagator = 
@@ -50,7 +51,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 			AggrValue<BasicMatrixValue> upper,
 			AggrValue<BasicMatrixValue> inc) {
 		//FIXME do something proper here
-		return new BasicMatrixValue(classPropagator.forRange(lower, upper, inc)
+		return new BasicMatrixValue(null, classPropagator.forRange(lower, upper, inc)
 				,shapePropagator.forRange(lower, upper, inc), rangeValuePropagator.forRange(lower, upper, inc));
 	}
 }

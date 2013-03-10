@@ -57,8 +57,9 @@ public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D>
      * creates a non constant matrix value with the given matlab class
      * @param class reference
      */
-    public MatrixValue(PrimitiveClassReference classRef){
-        this.classRef = classRef;
+    public MatrixValue(String symbolic, PrimitiveClassReference classRef){
+        this.symbolic = symbolic;
+    	this.classRef = classRef;
     }
 
     

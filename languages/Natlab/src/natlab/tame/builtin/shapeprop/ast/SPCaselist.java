@@ -3,43 +3,37 @@ package natlab.tame.builtin.shapeprop.ast;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.*;
 
-public class SPCaselist<V extends Value<V>> extends SPNode<V>{
+public class SPCaselist<V extends Value<V>> extends SPNode<V> {
+	
 	static boolean Debug = false;
 	SPCase<V> first;
 	SPCaselist<V> next;
 	
-	public SPCaselist(SPCase<V> first, SPCaselist<V> next){
+	public SPCaselist(SPCase<V> first, SPCaselist<V> next) {
 		this.first = first;
 		this.next = next;
-		/*if (next!=null)
-		{
-			System.out.println("||");
-		}*/
 	}
 	
-	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
-		//first case match successfully!
-		if((match.outputIsDone()==true)&&(match.getIsError()==false)) {
-			if (Debug) System.out.println("matching and results emmitting successfully!\n");
-			return match;
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		// the first case's shape matching is successful.
+		if (matchResult.getIsoutputDone()==true) {
+			if (Debug) System.out.println("matching and results emmitting successfully!");
+			return matchResult;
 		}
-		//first case matching part doesn't match, new a new one, start matching again.
-		else if((match.getIsError()==true)&&(next!=null)){
-			ShapePropMatch<V> newMatch = new ShapePropMatch<V>();
-			newMatch = next.match(isPatternSide, newMatch, argValues, num);
-			return newMatch;
+		// the first case's shape matching doesn't succeed, go to next case if there is one.
+		else if (matchResult.getIsoutputDone()==false && next!=null) {
+			isPatternSide = true;
+			ShapePropMatch<V> newMatchResult = next.match(isPatternSide, new ShapePropMatch<V>(), argValues, Nargout);
+			return newMatchResult;
 		}
-		//first case output parting doesn't match, new a new one, start matching again.
-		else if((match.outputIsDone()==false)&&(next!=null)){
-			return null;//FIXME
+		// all the cases' shape matching don't succeed, return null; ShapePropTool will handle this null.
+		else {
+			return null;
 		}
-		//only one case and doesn't match successfully.
-		else
-			return match;		
 	}
 	
 	public String toString(){
-		return first.toString()+(next==null?"":"||"+next);
+		return first.toString() + (next==null? "" : "||"+next);
 	}
 }

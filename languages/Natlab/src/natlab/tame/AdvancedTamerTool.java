@@ -91,7 +91,7 @@ public class AdvancedTamerTool {
 			 * argument specs
 			 */
 			/* TODO also add code to read INT, FLOAT, etc. */
-			list.add(new AdvancedMatrixValue(PrimitiveClassReference.DOUBLE,
+			list.add(new AdvancedMatrixValue(null, PrimitiveClassReference.DOUBLE,
 					specs[1], specs[2]));
 			// XU changed here to support initial input shape info.
 			// @25th,Jul,2012

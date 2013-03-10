@@ -19,6 +19,8 @@ import natlab.toolkits.path.FunctionReference;
  * @author ant6n
  *
  * TODO - should some of the methods be in different internal factories?
+ * 
+ * extended by XU to support symbolic info. @ 6:26pm March 9th 2013 
  */
 
 public abstract class ValueFactory<V extends Value<V>> {
@@ -29,29 +31,29 @@ public abstract class ValueFactory<V extends Value<V>> {
     
     
 	/**
-     * constructs a new Primitive Value from a constant
+     * constructs a new Primitive Value from a constant, extended to support symbolic.
      * @param constant
      */
-    abstract public V newMatrixValue(Constant constant);
+    abstract public V newMatrixValue(String symbolic, Constant constant);
         
     
     /**
      * Creates a primitive scalar constant value
      */
-    public V newMatrixValue(double value){
-        return newMatrixValue(Constant.get(value));
+    public V newMatrixValue(String symbolic, double value){
+        return newMatrixValue(symbolic, Constant.get(value));
     }
     /**
      * Creates a primitive scalar constant value
      */
-    public V newMatrixValue(boolean value){
-        return newMatrixValue(Constant.get(value));
+    public V newMatrixValue(String symbolic, boolean value){
+        return newMatrixValue(symbolic, Constant.get(value));
     }
     /**
      * Creates a primitive constant value
      */
-    public V newMatrixValue(String value){
-        return newMatrixValue(Constant.get(value));
+    public V newMatrixValue(String symbolic, String value){
+        return newMatrixValue(symbolic, Constant.get(value));
     }
 
     /**
@@ -68,26 +70,26 @@ public abstract class ValueFactory<V extends Value<V>> {
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<V> newValueSet(Constant constant){
-        return ValueSet.newInstance(newMatrixValue(constant));
+    public ValueSet<V> newValueSet(String symbolic, Constant constant){
+        return ValueSet.newInstance(newMatrixValue(symbolic, constant));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<V> newValueSet(double value){
-        return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
+    public ValueSet<V> newValueSet(String symbolic, double value){
+        return ValueSet.newInstance((newMatrixValue(symbolic, Constant.get(value))));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<V> newValueSet(boolean value){
-        return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
+    public ValueSet<V> newValueSet(String symbolic, boolean value){
+        return ValueSet.newInstance((newMatrixValue(symbolic, Constant.get(value))));
     }
     /**
      * creates a value set with one constant primitive value
      */
-    public ValueSet<V> newValueSet(String value){
-        return ValueSet.newInstance((newMatrixValue(Constant.get(value))));
+    public ValueSet<V> newValueSet(String symbolic, String value){
+        return ValueSet.newInstance((newMatrixValue(symbolic, Constant.get(value))));
     }
         
     public V newColonValue(){

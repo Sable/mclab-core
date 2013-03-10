@@ -14,12 +14,17 @@ public class ShapePropTool<V extends Value<V>> {
 	
 	static boolean Debug = false;
 	
-    public static SPNode parse(String source) {
-    	//System.err.println("parsing: "+source);
+	/**
+	 * this static method is called by Builtin class.
+	 * @param equation
+	 * @return
+	 */
+    public static SPNode parse(String equation) {
+    	if (Debug) System.out.println("parsing: "+equation);
     	ShapePropParser parser = new ShapePropParser();
-    	ShapePropScanner input = new ShapePropScanner(new StringReader(source));
+    	ShapePropScanner scanner = new ShapePropScanner(new StringReader(equation));
     	try {
-    		SPNode sp = (SPNode) parser.parse(input);
+    		SPNode sp = (SPNode) parser.parse(scanner);
         	return sp;
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -27,25 +32,51 @@ public class ShapePropTool<V extends Value<V>> {
     	}
     }
     
+    /**
+     * this method is called by ShapePropagator class, the input arguments are the AST tree which is 
+     * the result of parse method, and a list of V extends Value<V> which is input arguments of the built-in.
+     * @param tree
+     * @param argValues
+     * @return
+     */
     public List<Shape<V>> matchByValues(SPNode<V> tree, Args<V> argValues) {
-    	if (argValues!=null) {
-    		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
-    		for (Value<V> arg:argValues) {
+		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
+		/*
+		 * first, test whether the Args is empty, if not, every element value should has a shape; 
+		 * if the Args is empty, we can still do shape info propagation, i.e. a=ones().
+		 */
+    	if (argValues.size()!=0) {
+        	if (Debug) System.out.println(tree+" with arguments "+argValues);
+    		for (Value<V> arg : argValues) {
     			if (((HasShape<V>)arg).getShape()==null) {
-    				if (Debug) System.out.println(arg+"'s shape is undefined");
+    				System.err.println(arg+"'s shape info is unavailable.");
     				//FIXME what if arg's shape info is null, if continue like this, the program will throw null pointer exception.
+    				return null;
     			}
     		}
     	}
-    	if (Debug) System.out.println(tree+" with arguments "+argValues);
-    	ShapePropMatch<V> spmatch = tree.match(true, new ShapePropMatch<V>(), argValues, argValues.getNargout());//FIXME make it better
-        /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
+    	// do shape info matching.
+    	ShapePropMatch<V> spmatch = tree.match(true, new ShapePropMatch<V>(), argValues, argValues.getNargout());
+    	/*
+    	 * if shape info propagation fails, return null.
+    	 */
+        if (spmatch == null || spmatch.isError || spmatch.howManyMatched != argValues.size()) {
+        	System.err.println("shape info propagation fails, since argument(s) "+argValues+" cannot match "+tree);
         	return null;
-        }*/
-    	if (Debug) System.out.println("inside shapeproptool matchByValue method, all the results are "+spmatch.getAllResults());
-        return spmatch.getAllResults();
+        }
+        else {
+            List<Shape<V>> results = spmatch.getAllResults();
+            if (Debug) System.out.println("all the results are "+results);
+            return results;        	
+        }
     }
     
+    /**
+     * This main entry point is used for testing the scanner and parser of shape equation language.
+     * @param args
+     * @throws IOException
+     * @throws Parser.Exception
+     */
 	public static void main(String[] args) throws IOException, Parser.Exception {
 				
 		System.out.println("print:   "+parse("$,'a2'->M||#->[]"));

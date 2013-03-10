@@ -14,12 +14,12 @@ public class SPOr<V extends Value<V>> extends SPAbstractMatchExpr<V>{
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		int indexBeforeOr = previousMatchResult.getNumMatched();
+		int indexBeforeOr = previousMatchResult.getHowManyMatched();
 		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
-		int indexAfterOr = match.getNumMatched();
+		int indexAfterOr = match.getHowManyMatched();
 		if(indexBeforeOr==indexAfterOr){
 			if(match.getIsError()==true){
-				match.resetIsError();
+				match.setIsError(false);
 			}
 			ShapePropMatch<V> continueMatch = next.match(isPatternSide, match, argValues, num);//actually, here, match is the same to previousMatchResult
 			return continueMatch;

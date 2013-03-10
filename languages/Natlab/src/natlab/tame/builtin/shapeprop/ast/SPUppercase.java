@@ -19,18 +19,18 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){
-			if(previousMatchResult.isInsideAssign()==true){
+			if(previousMatchResult.getIsInsideAssign()==true){
 				previousMatchResult.saveLatestMatchedUppercase(s);
 				return previousMatchResult;
 			}
-			if(argValues.get(previousMatchResult.getNumMatched())!=null){
+			if(argValues.get(previousMatchResult.getHowManyMatched())!=null){
 				//get indexing current Matrix Value from args
 				//get shape info from current Matrix Value
-				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getNumMatched())).getShape();
-				Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getNumMatched())).getConstant();
+				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+				Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
 				if(argumentConstant!=null){
 					if (Debug) System.out.println("it's a constant!");
-					previousMatchResult.setIsError();
+					previousMatchResult.setIsError(true);
 					return previousMatchResult;
 				}
 				//check whether or not current uppercase already in the previousMatchResult
@@ -56,7 +56,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 							ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 							match.comsumeArg();
 							match.saveLatestMatchedUppercase(s);
-							match.setIsError();//this is important!! break from matching algorithm.
+							match.setIsError(true);//this is important!! break from matching algorithm.
 							//System.out.println(match.getValueOfVariable(s));
 							if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
 							if (Debug) System.out.println("matched matrix expression "+match.getLatestMatchedUppercase());
@@ -94,28 +94,33 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 		}
 		else{
 			if (Debug) System.out.println("inside output uppercase "+s);
-			//default, which means in the pattern match side, there is no Uppercase matched.
+			// default, which means in the pattern match side, there is no Uppercase matched.
 			if(previousMatchResult.getShapeOfVariable(s)==null){
 				if(previousMatchResult.getOutputVertcatExpr().size()==0){
 					if(previousMatchResult.getLatestMatchedUppercase().equals("$")){
 						previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable("$"));
+						previousMatchResult.emitOneResult();
 						return previousMatchResult;
 					}
 					previousMatchResult.addToOutput(null);
+					previousMatchResult.emitOneResult();
 					return previousMatchResult;
 				}
 				else if(previousMatchResult.getOutputVertcatExpr().size()==1){
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
 					previousMatchResult.copyVertcatToOutput();
+					previousMatchResult.emitOneResult();
 					return previousMatchResult;
 				}
 				else {
 					previousMatchResult.copyVertcatToOutput();
+					previousMatchResult.emitOneResult();
 					return previousMatchResult;
 				}
 			}
 			else{
 				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
+				previousMatchResult.emitOneResult();
 				return previousMatchResult;
 			}	
 		}

@@ -11,7 +11,7 @@ public class SPQuestion<V extends Value<V>> extends SPAbstractMatchExpr<V>{
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		if(argValues.size()>previousMatchResult.getNumMatched()){
+		if(argValues.size()>previousMatchResult.getHowManyMatched()){
 			//System.out.println("inside ? expression");
 			ShapePropMatch<V> match = spm.match(isPatternSide, previousMatchResult, argValues, num);
 			return match;

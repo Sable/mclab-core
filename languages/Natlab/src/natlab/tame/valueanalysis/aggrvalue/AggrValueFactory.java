@@ -6,7 +6,14 @@ import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.path.FunctionReference;
 
-
+/**
+ * @author ant6n
+ * 
+ * extended by XU to support symbolic info. @ 6:26pm March 9th 2013 
+ * TODO why we have abstract method newMatrixValue and getValuePropagator here, 
+ * since we already have these two abstract methods in ValueFactory class. 
+ * remove them?
+ */
 public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFactory<AggrValue<D>> {
 	/**
 	 * constructor builds shape factor
@@ -18,10 +25,10 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
 	
 	
     /**
-     * constructs a new Primitive Value from a constant
+     * constructs a new Primitive Value from a constant, extended to support symbolic.
      * @param constant
      */
-    abstract public D newMatrixValue(Constant constant);
+    abstract public D newMatrixValue(String symbolic, Constant constant);
     
     
     /**

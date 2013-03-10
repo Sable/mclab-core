@@ -25,7 +25,7 @@ public class BasicTamerTool {
 		 * which means you can pass the type info of the input argument to the program, 
 		 * currently, the type info is composed like double&3*3&REAL.
 		 */
-		GenericFile gFile = GenericFile.create("YOUR_FILE_NAME_AND_PATH"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/home/xu/for_test/testBuiltin.m"); //file -> generic file
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args); //get input argument type info
@@ -69,7 +69,7 @@ public class BasicTamerTool {
 			 * TODO Below is just to test. Add actual code to make sense of the
 			 * argument specs
 			 */
-			list.add(new BasicMatrixValue(PrimitiveClassReference.DOUBLE,specs[1]));
+			list.add(new BasicMatrixValue("n", PrimitiveClassReference.DOUBLE, specs[1]));
 		}
 		return list;
 	}

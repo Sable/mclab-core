@@ -10,6 +10,12 @@ import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
+/**
+ * 
+ * @author ant6n
+ *
+ * extended by XU to support symbolic @ 8:40pm March 9th 2013.
+ */
 public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixValue>{
     public static boolean DEBUG = false;
     ConstantPropagator<AggrValue<SimpleMatrixValue>> constantProp = ConstantPropagator.getInstance();
@@ -29,7 +35,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
         //ceal with constants
     	Constant cResult = builtin.visit(constantProp, arg);
     	if (cResult != null){
-    		return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(cResult));
+    		return Res.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(null, cResult));
     	}
     	
     	//if the result is not a constant, just do mclass propagation
@@ -50,7 +56,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
         for (Set<ClassReference> values: matchResult){
             HashMap<ClassReference,AggrValue<SimpleMatrixValue>> map = new HashMap<ClassReference,AggrValue<SimpleMatrixValue>>();
             for (ClassReference classRef : values){
-                map.put(classRef,new SimpleMatrixValue((PrimitiveClassReference)classRef));
+                map.put(classRef,new SimpleMatrixValue(null, (PrimitiveClassReference)classRef));
             }
             result.add(ValueSet.newInstance(map));
         }
@@ -64,7 +70,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
             Args<AggrValue<SimpleMatrixValue>> arg) {
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(
                 new SimpleMatrixValue(
-                        (PrimitiveClassReference)getDominantCatArgClass(arg)));
+                        null, (PrimitiveClassReference)getDominantCatArgClass(arg)));
     }
     
     
@@ -74,7 +80,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
-                Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
+                Args.newInstance(factory.newMatrixValue(null, 1),factory.newMatrixValue(null, elements.size())));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
     @Override
@@ -82,7 +88,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
-                Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
+                Args.newInstance(factory.newMatrixValue(null, elements.size()),factory.newMatrixValue(null, 1)));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
     

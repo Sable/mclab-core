@@ -12,10 +12,10 @@ public class SPMult<V extends Value<V>> extends SPAbstractMatchExpr<V>{
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		while((argValues.size()>previousMatchResult.getNumMatched())&&(previousMatchResult.getIsError()==false))
+		while((argValues.size()>previousMatchResult.getHowManyMatched())&&(previousMatchResult.getIsError()==false))
 		{
-			if (Debug) System.out.println("inside star loop "+previousMatchResult.getNumMatched());
-			if (Debug) System.out.println(previousMatchResult.getNumMatched());
+			if (Debug) System.out.println("inside star loop "+previousMatchResult.getHowManyMatched());
+			if (Debug) System.out.println(previousMatchResult.getHowManyMatched());
 			if (Debug) System.out.println("index doesn't point null, keep matching!");
 			previousMatchResult = sp.match(isPatternSide, previousMatchResult, argValues, num);
 		}

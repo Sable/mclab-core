@@ -71,7 +71,7 @@ public class LiveVariableAnalysis extends InterproceduralAnalysis<Intraprocedura
 		//build callgraph
 		Callgraph<SimpleMatrixValue> callgraph = TamerTool.getCallgraph(
 				new FileEnvironment(GenericFile.create(file)),
-				Collections.singletonList(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
+				Collections.singletonList(new SimpleMatrixValue(null, PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
 		LiveVariableAnalysis analysis = new LiveVariableAnalysis(callgraph.getAnalysis(),Collections.singletonList(LiveValue.getLive()));
 		System.out.println(analysis);
 		for (int i = 0; i < analysis.getNodeList().size(); i++){
