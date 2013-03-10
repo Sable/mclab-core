@@ -35,62 +35,15 @@
 	<!-- Extend and override parts of gen.xml -->
   <import optional="true" file="local.xml" />
 
-	<target name="compile.test.generators" unless="inside.eclipse">
-		<mkdir dir="${ant.bin.dir}" />
-		<javac destdir="${ant.bin.dir}">
-			<src path="${test.dir}" />
-			<include name="**/*TestGenerator.java" />
-		</javac>
-	</target>
-
-	<target name="gen.scanner.tests" depends="set.bin.dir">
-		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${lexer.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="gen.parser.pass.tests" depends="set.bin.dir">
-		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${parser.pass.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="gen.parser.fail.tests" depends="set.bin.dir">
-		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${parser.fail.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-  <target name="gen.multireturn.pass.tests" depends="set.bin.dir">
-    <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${multireturn.pass.test.list.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
+	<target name="gen.tests" depends="set.bin.dir">
+    <exec dir="${basedir}" executable="./gen_tests.sh">
+      <arg line="${basedir}/${test.dir} ${basedir}/${bin.dir} ${basedir}/${gen.dir}" />
+    </exec>
   </target>
-
-  <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
-    <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${leftthreeaddress.pass.test.list.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
-  </target>
-
-  <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
-    <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${simplifications.pass.test.master.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
-  </target>
-
-  <target name="gen.simplification.tests" depends="gen.simplifications.pass.tests" />
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.simplification.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen-parser, options" />
+	<target name="gen" depends="Gen.gen-parser, options" />
 
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">

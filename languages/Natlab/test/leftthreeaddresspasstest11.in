@@ -1,7 +1,0 @@
-
-a = 3;
-b(a) = 4;
-c(foo(bar(b))) = foo();
-for( i = 1:3 )
-  d(foo(a)).e(bar(b)).f(foo()) = bar();
-end
