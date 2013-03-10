@@ -7,6 +7,7 @@ import ast.ASTNode;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.AbstractSequentialIterator;
 import com.google.common.collect.FluentIterable;
 
 /**
@@ -57,14 +58,9 @@ public class NodeFinder {
     Preconditions.checkNotNull(tree);
     return new Iterable<ASTNode<?>>() {
       @Override public Iterator<ASTNode<?>> iterator() {
-        return new AbstractIterator<ASTNode<?>>() {
-          ASTNode<?> node = tree;
-          @Override protected ASTNode<?> computeNext() {
-            if (node.getParent() != null) {
-              node = node.getParent();
-              return node;
-            }
-            return endOfData();
+        return new AbstractSequentialIterator<ASTNode<?>>(tree.getParent()) {
+          @Override protected ASTNode<?> computeNext(ASTNode<?> previous) {
+            return previous.getParent();
           }
         };
       }
