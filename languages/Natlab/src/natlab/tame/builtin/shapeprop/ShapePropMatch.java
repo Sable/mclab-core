@@ -4,41 +4,49 @@ import java.util.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
-
 public class ShapePropMatch<V extends Value<V>> {
+	
 	static boolean Debug = false;
 	public ShapeFactory<V> factory = new ShapeFactory<V>();
-	int numMatched = 0;             //number of matched arguments, act as the index of arguments 
-	int numEmittedResults = 0;      //number of emitted results, I cannot say its index of shape equation,
-	                                //because there is also non-matching expression in the language.
-	int numInVertcat = 0;           //index in vertcat;
+	// numMatched counts how many arguments are matched.
+	int howManyMatched = 0;
+	// howManyEmitted counts how many results are emitted.
+	int howManyEmitted = 0;
+	// index in vertcat;
+	int numInVertcat = 0;
 	int previousMatchedNumber = 0;
-	HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();  //lowercase is used like m=previousScalar()
-	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();  //mostly, uppercase is used for matching a shape
+	// lowercase is used like m=previousScalar()
+	HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+	// mostly, uppercase is used for matching a shape
+	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 	boolean whetherLatestMatchedIsNum = false;
 	boolean ArrayIndexAssignLeft = false;
 	boolean ArrayIndexAssignRight = false;
 	boolean isError = false;
-	boolean matchingIsDone = false;
-	boolean outputIsDone = false;
-	boolean isInsideVertcat = false;//this boolean is used for distinguish the lowercase in vertcat or not, like n=previousScalar() and [m,n]
+	boolean isMatchingDone = false;
+	boolean isOutputDone = false;
+	// isInsideVertcat is used for distinguish the lowercase in vertcat or not, like n=previousScalar() and [m,n]
+	boolean isInsideVertcat = false;
 	boolean isInsideAssign = false;
-	String previousMatchedLowercase = null;
-	String previousMatchedUppercase = null;
+	String previousMatchedLowercase = "";
+	String previousMatchedUppercase = "";
 	ArrayList<DimValue> needForVertcat = new ArrayList<DimValue>();
-	List<Shape<V>> output = new ArrayList<Shape<V>>();  //used for output results 
+	// used to store results
+	List<Shape<V>> output = new ArrayList<Shape<V>>(); 
 	
-	
+	/**
+	 * default constructor.
+	 */
 	public ShapePropMatch() {}
 	
 	/**
-	 * constructor referring to parent
+	 * constructor for taking in another ShapePropMatch object.
 	 * @param parent
 	 */
 	public ShapePropMatch(ShapePropMatch<V> parent) {
 		this.factory = parent.factory;
-        this.numMatched = parent.numMatched;
-        this.numEmittedResults = parent.numEmittedResults;
+        this.howManyMatched = parent.howManyMatched;
+        this.howManyEmitted = parent.howManyEmitted;
         this.numInVertcat = parent.numInVertcat;
         this.previousMatchedNumber = parent.previousMatchedNumber;
         this.lowercase = parent.lowercase;
@@ -47,8 +55,8 @@ public class ShapePropMatch<V extends Value<V>> {
         this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
         this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
         this.isError = parent.isError;
-        this.matchingIsDone = parent.matchingIsDone;
-        this.outputIsDone = parent.outputIsDone;
+        this.isMatchingDone = parent.isMatchingDone;
+        this.isOutputDone = parent.isOutputDone;
         this.isInsideVertcat = parent.isInsideVertcat;
         this.isInsideAssign = parent.isInsideAssign;
         this.previousMatchedLowercase = parent.previousMatchedLowercase;
@@ -62,24 +70,20 @@ public class ShapePropMatch<V extends Value<V>> {
 	 */
 	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, DimValue> lowercase, HashMap<String, Shape<V>> uppercase) {
 		this.factory = parent.factory;
-		this.numMatched = parent.numMatched;
-		this.numEmittedResults = parent.numEmittedResults;
+		this.howManyMatched = parent.howManyMatched;
+		this.howManyEmitted = parent.howManyEmitted;
 		this.numInVertcat = parent.numInVertcat;
 		this.previousMatchedNumber = parent.previousMatchedNumber;
 		this.lowercase = parent.lowercase;
 		this.uppercase = parent.uppercase;
-		if (lowercase!=null) {
-			this.lowercase.putAll(lowercase);  //using HashMap putAll
-		}
-		if (uppercase!=null) {
-			this.uppercase.putAll(uppercase);
-		}
+		if (lowercase!=null) this.lowercase.putAll(lowercase);  //using HashMap putAll
+		if (uppercase!=null) this.uppercase.putAll(uppercase);
 		this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
 		this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
 		this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
 	    this.isError = parent.isError;
-	    this.matchingIsDone = parent.matchingIsDone;
-	    this.outputIsDone = parent.outputIsDone;
+	    this.isMatchingDone = parent.isMatchingDone;
+	    this.isOutputDone = parent.isOutputDone;
 	    this.isInsideVertcat = parent.isInsideVertcat;
 	    this.isInsideAssign = parent.isInsideAssign;
         this.previousMatchedLowercase = parent.previousMatchedLowercase;
@@ -89,18 +93,26 @@ public class ShapePropMatch<V extends Value<V>> {
 	}
 
     /**
-     * returns a ShapePropMatch which advances argIndex by one, and refers back to this
+     * matching successfully, increment the index pointing to the input arguments.
      */
     public void comsumeArg() {
-    	this.numMatched = this.numMatched+1;
+    	howManyMatched += 1;
     }
     
-    public void setIsError() {
-    	this.isError = true;
+    public int getHowManyMatched() {
+    	return howManyMatched;
     }
-    //resetIsError is for OR case
-    public void resetIsError() {
-    	this.isError = false;
+    
+    public void emitOneResult() {
+    	howManyEmitted += 1;
+    }
+    
+    public int getHowManyEmitted() {
+    	return howManyEmitted;
+    }
+    
+    public void setIsError(boolean condition) {
+    	this.isError = condition;
     }
     
     public boolean getIsError() {
@@ -119,7 +131,7 @@ public class ShapePropMatch<V extends Value<V>> {
     	this.ArrayIndexAssignLeft = condition;
     }
     
-    public boolean isArrayIndexAssignLeft() {
+    public boolean getIsArrayIndexAssignLeft() {
     	return this.ArrayIndexAssignLeft;
     }
     
@@ -127,7 +139,7 @@ public class ShapePropMatch<V extends Value<V>> {
     	this.ArrayIndexAssignRight = condition;
     }
     
-    public boolean isArrayIndexAssignRight(){
+    public boolean getIsArrayIndexAssignRight(){
     	return this.ArrayIndexAssignRight;
     }
     
@@ -155,12 +167,8 @@ public class ShapePropMatch<V extends Value<V>> {
     	return this.previousMatchedUppercase;
     }
     
-    public int getNumMatched() {
-    	return numMatched;
-    }
-    
-    public int getNumEmittedResults() {
-    	return numEmittedResults;
+    public int gethowManyEmitted() {
+    	return howManyEmitted;
     }
     
     public void setNumInVertcat(int index) {
@@ -171,27 +179,27 @@ public class ShapePropMatch<V extends Value<V>> {
     	return this.numInVertcat;
     }
     
-    public void setMatchingIsDone() {
-    	this.matchingIsDone = true;
+    public void setIsMatchingDone() {
+    	this.isMatchingDone = true;
     }
     
-    public void setOutputIsDone() {
-    	this.outputIsDone = true;
+    public boolean getIsMatchingDone() {
+    	return isMatchingDone;
+    }
+    
+    public void setIsOutputDone() {
+    	this.isOutputDone = true;
+    }
+    
+    public boolean getIsoutputDone() {
+    	return isOutputDone;
     }
     
     public void setIsInsideVertcat(boolean condition) {
     	this.isInsideVertcat = condition;
     }
     
-    public boolean matchingIsDone() {
-    	return matchingIsDone;
-    }
-    
-    public boolean outputIsDone() {
-    	return outputIsDone;
-    }
-    
-    public boolean isInsideVertcat() {
+    public boolean getIsInsideVertcat() {
     	return isInsideVertcat;
     }
     
@@ -199,17 +207,14 @@ public class ShapePropMatch<V extends Value<V>> {
     	this.isInsideAssign = condition;
     }
     
-    public boolean isInsideAssign() {
+    public boolean getIsInsideAssign() {
     	return isInsideAssign;
     }
     
     public boolean hasValue(String key) {
-    	if (this.lowercase.get(key).getValue()==null) {
-    		return false;
-    	}
-    	else {
-    		return true;
-    	}
+    	DimValue value = getValueOfVariable(key);
+    	if (value.hasValue()||value.hasSymbolic()) return true;
+    	return false;
     }
     
     public DimValue getValueOfVariable(String key) {
@@ -220,10 +225,6 @@ public class ShapePropMatch<V extends Value<V>> {
     public Shape<V> getShapeOfVariable(String key) {
     	Shape<V> shape = this.uppercase.get(key);
     	return shape;
-    }
-    
-    public List<Shape<V>> getAllResults() {
-    	return this.output;
     }
     
     public HashMap<String, DimValue> getAllLowercase() {
@@ -242,13 +243,17 @@ public class ShapePropMatch<V extends Value<V>> {
     	return needForVertcat;
     }
     
+    public void copyVertcatToOutput() {
+    	Shape<V> shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
+    	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
+    	addToOutput(shape);
+    }
+    
     public void addToOutput(Shape<V> value) {
     	this.output.add(value);
     }
     
-    public void copyVertcatToOutput() {
-    	Shape<V> shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
-    	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
-    	this.addToOutput(shape);
+    public List<Shape<V>> getAllResults() {
+    	return this.output;
     }
 }

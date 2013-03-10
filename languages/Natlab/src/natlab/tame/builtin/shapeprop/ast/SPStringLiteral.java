@@ -15,10 +15,10 @@ public class SPStringLiteral<V extends Value<V>> extends SPAbstractMatchElement<
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		//a string literal used to match a constant string argument
-		if(argValues.get(previousMatchResult.getNumMatched())!=null){
+		if(argValues.get(previousMatchResult.getHowManyMatched())!=null){
 			if (Debug) System.out.println(argValues.size());
 			//get indexing current Matrix Value from args
-			Value<V> argument = argValues.get(previousMatchResult.getNumMatched());
+			Value<V> argument = argValues.get(previousMatchResult.getHowManyMatched());
 			//get shape info from current Matrix Value
 			Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 			Constant argumentConstant =((HasConstant)argument).getConstant();
@@ -28,7 +28,7 @@ public class SPStringLiteral<V extends Value<V>> extends SPAbstractMatchElement<
 				previousMatchResult.comsumeArg();
 				return previousMatchResult;
 			}
-			previousMatchResult.setIsError();
+			previousMatchResult.setIsError(true);
 			return previousMatchResult;
 		}
 		//FIXME if index pointing empty, means not match, do something

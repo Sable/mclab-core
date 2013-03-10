@@ -18,10 +18,10 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){
 			//for matching a vertcat expression, this step should be similar to Uppercase matching, to exam whether equals!
-			if(previousMatchResult.isInsideVertcat()==true){
+			if(previousMatchResult.getIsInsideVertcat()==true){
 				if (Debug) System.out.println("a lowercase inside vertcat!");
 				if (Debug) System.out.println(previousMatchResult.getNumInVertcat());
-				Value<V> argument = argValues.get(previousMatchResult.getNumMatched());
+				Value<V> argument = argValues.get(previousMatchResult.getHowManyMatched());
 				//get its shape information
 				Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 				if (Debug) System.out.println("argument shape is "+argumentShape);
@@ -31,7 +31,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 								.get(previousMatchResult.getNumInVertcat()).getValue())==false){
 							if (Debug) System.out.println("two lowercase value not equal, throw error shape!");
 							if (Debug) System.out.println("MATLAB syntax error!");
-							previousMatchResult.setIsError();
+							previousMatchResult.setIsError(true);
 							HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 							lowercase.put(s, new DimValue());
 							ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
@@ -47,7 +47,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 					}catch (Exception e){}
 					//means one of them, the previous matched lowercase or current number in the argument, is null
 					if (Debug) System.out.println("there is null information in dimensions!");
-					previousMatchResult.setIsError();
+					previousMatchResult.setIsError(true);
 					return previousMatchResult;
 				}
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
@@ -67,7 +67,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 				}
 			}
 			//for assign a lowercase's value to an ArrayIndex
-			if(previousMatchResult.isArrayIndexAssignRight()==true){
+			if(previousMatchResult.getIsArrayIndexAssignRight()==true){
 				if (Debug) System.out.println("trying to assign the value of "+s.toString()+" to an array!");
 				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
 				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){

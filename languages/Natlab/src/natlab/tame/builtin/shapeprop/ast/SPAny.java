@@ -6,61 +6,58 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
-/*
- * matching expression ANY # is different from the matching expression uppercase,
- * because the same uppercase in shape equation should be equal, if not there will be error,
- * while, for ANY #, just used for matching a shape, and don't care whether or not it's equal to previous matched one.
+/**
+ * matching expression "ANY, #" is used to match a non-scalar, in another word, an array. 
+ * it's different from the matching expression Uppercase, because the same Uppercase in 
+ * shape equation should be equal, if not, there will mark as an error. while, "ANY, #" 
+ * is just used for matching a shape and we don't care whether it's equal to the previous 
+ * matched Uppercase.
  */
-public class SPAny<V extends Value<V>> extends SPAbstractVectorExpr<V>{
+public class SPAny<V extends Value<V>> extends SPAbstractVectorExpr<V> {
+	
 	static boolean Debug = false;
-	String s;
-	public SPAny(String a){
+	String s; // actually, this s is always "#".
+	
+	public SPAny(String a) {
 		this.s = a;
-		//System.out.println(a);
 	}
 	
-	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		if (Debug) System.out.println("inside ANY!");
-		if(isPatternSide==true){
-			if(argValues.get(previousMatchResult.getNumMatched())!=null){
-				//get indexing current Matrix Value from args
-				//get shape info from current Matrix Value
-				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getNumMatched())).getShape();
-				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				lowercase.put(s, new DimValue());
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		if (Debug) System.out.println("inside matching any shape variable!");
+		if (isPatternSide==true) {
+			if (argValues.get(previousMatchResult.getHowManyMatched())!=null) {
+				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 				uppercase.put(s, argumentShape);
-				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
+				// do we need to new a new ShapePropMatch?
+				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				match.comsumeArg();
 				match.saveLatestMatchedUppercase(s);
-				//System.out.println(match.getValueOfVariable(s));
-				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
 				return match;
 			}
-			return previousMatchResult;
-		}
-		else{
-			if (Debug) System.out.println("inside output uppercase "+s);
-			//default
-			if(previousMatchResult.getShapeOfVariable(s)==null){
-				if(previousMatchResult.getOutputVertcatExpr().size()==1){
-					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
-					previousMatchResult.copyVertcatToOutput();
-					return previousMatchResult;
-				}
-				else{
-					previousMatchResult.copyVertcatToOutput();
-					return previousMatchResult;
-				}
+			else {
+				previousMatchResult.setIsError(true);
+				return previousMatchResult;
 			}
-			else
+		}
+		else {
+			if (Debug) System.out.println("inside output uppercase " + s);
+			if (previousMatchResult.getShapeOfVariable(s)==null) {
+				// I forget why implement like this...TODO
+				if (previousMatchResult.getOutputVertcatExpr().size()==1) {
+					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
+				}
+				previousMatchResult.copyVertcatToOutput();
+				return previousMatchResult;
+			}
+			else {
 				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
 				return previousMatchResult;
-				
+			}
 		}
 	}
 	
-	public String toString(){
+	public String toString() {
 		return s.toString();
 	}
 }

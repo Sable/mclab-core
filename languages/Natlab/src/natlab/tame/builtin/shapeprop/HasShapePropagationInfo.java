@@ -2,6 +2,7 @@ package natlab.tame.builtin.shapeprop;
 
 import natlab.tame.builtin.shapeprop.ast.SPNode;
 import natlab.tame.valueanalysis.value.*;
+
 /**
  * This interface is for builtins for which shape propagation is defined.
  * This is analoguous to classprop.ClassPropagation Defined
