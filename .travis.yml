@@ -1,7 +1,4 @@
 language: java
-branches:
-  only:
-    - develop
 script: "cd languages/Natlab; ant test"
 notifications:
   email:
