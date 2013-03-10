@@ -59,14 +59,14 @@ List input_params =
 List output_params =
      LSQUARE RSQUARE {: return new List<Name>(); :}
   |  LSQUARE param_list.l RSQUARE {: return l; :}
-  |  IDENTIFIER.p {: return new List<Name>().add(new Name(p)); :}
+  |  name.p {: return new List<Name>().add(p); :}
   ;
 
 //Non-empty, comma-separated list of parameters (note: no trailing comma)
 //shared by input and output parameters
 List param_list =
-     IDENTIFIER.p {: return new List<Name>().add(new Name(p)); :}
-  |  param_list.l COMMA IDENTIFIER.p {: return l.add(new Name(p)); :}
+     name.p {: return new List<Name>().add(p); :}
+  |  param_list.l COMMA name.p {: return l.add(p); :}
   ;
 
 //used to mix stmts and nested functions in a containing function

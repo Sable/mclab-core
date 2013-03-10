@@ -37,7 +37,7 @@
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${ant.bin.dir}">
+		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="**/*TestGenerator.java" />
 		</javac>
@@ -199,7 +199,7 @@
 	<target name="build" depends="matlab.build, CommandLineInterface.build" description="generate and build all files (including matlab)">
 	</target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+	<target name="test" depends="build, CommandLineInterface.test" description="runs all JUnit tests" />
 
   <target name="jar" depends="matlab.build, clean, jar_noclean" description="creates an executable release jar" />
 	<target name="jar_noclean" depends="gen, compile" 

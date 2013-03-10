@@ -106,6 +106,11 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         }
     }
     
+    @Override
+    public String getSymbolic() {
+    	//TODO later.
+    	return null;
+    }
 
     @Override
     public ClassReference getMatlabClass() {

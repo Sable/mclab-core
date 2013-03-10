@@ -59,11 +59,17 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     public Res<AggrValue<D>> cellSubsref(Args<AggrValue<D>> indizes) {
         throw new UnsupportedOperationException();
     }
+    
     @Override
     public AggrValue<D> cellSubsasgn(Args<AggrValue<D>> indizes, Args<AggrValue<D>> values) {
         throw new UnsupportedOperationException();
     }
     
+    @Override
+    public String getSymbolic() {
+    	//TODO later
+    	return null;
+    }
 
     @Override
     public ClassReference getMatlabClass() {

@@ -1,35 +1,12 @@
 package natlab.refactoring;
 
-import ast.*;
-import natlab.*;
-import natlab.toolkits.filehandling.genericFile.*;
-
-import junit.framework.*;
-
-import java.io.*;
-import java.util.*;
+import ast.Function;
+import ast.FunctionList;
 
 
-public class ExtractFunctionTest extends TestCase {
-    CompilationUnits cu = null;
-    String[] files = null;
-    BuiltinFile root = null;
-
-    private Program addFile(String filename, String content) {
-        ArrayList<CompilationProblem> errorList = new ArrayList<CompilationProblem>();
-        Program p = Parse.parseNatlabFile(filename, new StringReader(content), errorList);
-        assertTrue(errorList.isEmpty());
-        p.setFile(root.getBuiltin(filename));
-        cu.addProgram(p);
-        return p;
-    }
-
+public class ExtractFunctionTest extends RefactoringTestCase {
     public void testExtractFunction() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "f = 1;\n" +
                                                 "b = f+1;\n" +
@@ -39,17 +16,13 @@ public class ExtractFunctionTest extends TestCase {
         Function f = new Function();
         f.setName("xf");
         xf.extract(s.getFunction(0).getStmtList(), 1, 2, f);
-        assertEquals("function  [b] = xf(f)\n" +
+        assertEquals("function [b] = xf(f)\n" +
                      "  b = (f + 1);\n" +
                      "end", f.getPrettyPrinted());
     } 
 
     public void testExtractFunctionMaybeUndefInput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "if (1)\n" + 
                                                 "  f = 1;\n" +
@@ -64,11 +37,7 @@ public class ExtractFunctionTest extends TestCase {
     }
 
     public void testExtractFunctionMaybeUndefOutput() {
-        cu = new CompilationUnits();
-        files = new String[]{"/f1.m"};
-        root = new BuiltinFile(files);
-        cu.setRootFolder(root);
-        FunctionList s = (FunctionList) addFile("/f1.m", 
+        FunctionList s = (FunctionList) addFile("f1.m", 
                                                 "function f()\n" +
                                                 "f = 1;\n" +
                                                 "b = 1;\n" +
@@ -82,7 +51,7 @@ public class ExtractFunctionTest extends TestCase {
         assertEquals(Exceptions.FunctionOutputCanBeUndefined.class, 
                      xf.extract(s.getFunction(0).getStmtList(), 2, 3, f).get(0).getClass());
 
-        assertEquals("function  [b] = (f, b)\n" +
+        assertEquals("function [b] = (f, b)\n" +
                      "  if 1\n" +
                      "    b = (f + 1);\n" +
                      "  end\n" +

@@ -4,7 +4,6 @@ import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
 import ast.Program;
-import beaver.Symbol;
 
 import com.google.common.collect.ComparisonChain;
 
@@ -21,9 +20,8 @@ public class Location implements Comparable<Location> {
   private String path;
 
   public static Location of(ASTNode<?> node) {
-    int position = node.getStart();
-    int line = Symbol.getLine(position);
-    int col = Symbol.getColumn(position);
+    int line = node.getStartLine();
+    int col = node.getStartColumn();
     // Some ASTNodes don't have position information...
     if (line == 0 && col == 0)
       return Location.of(node.getParent());
@@ -37,7 +35,7 @@ public class Location implements Comparable<Location> {
     else if (node.getParent() instanceof CompilationUnits)
       program = (Program)(node.getChild(0));
     else
-      program = NodeFinder.findParent(node, Program.class);
+      program = NodeFinder.findParent(Program.class, node);
     return program.getFile().getPath();
   }
 

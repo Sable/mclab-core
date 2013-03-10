@@ -19,14 +19,17 @@
 %typeof ID, UPPERCASE, LOWERCASE, SCALAR, ANY = "String";
 %typeof caselist = "SPCaselist";
 %typeof case = "SPCase";
-%typeof pattern, patternElement, assignStmt, fnCall, assertStmt = "SPAbstractPattern";
-%typeof output = "SPOutput";
+%typeof outputlist = "SPOutputlist";
+%typeof patternlist = "SPPatternlist";
+%typeof pattern, assertStmt = "SPAbstractPattern";
 %typeof matchExpr = "SPAbstractMatchExpr";
 %typeof vectorExpr = "SPAbstractVectorExpr";
-%typeof scalarExpr = "SPAbstractScalarExpr";
 %typeof vertcatExpr = "SPVertcatExpr";
-%typeof vertcatExprArglist = "SPVertExprArglist";
-%typeof AssignmentLhs, AssignmentRhs, arg, arglist, vertcatExprArg = "SPAbstractVertcatExprArg";
+%typeof arglist = "SPArglist";
+%typeof scalarExpr = "SPAbstractScalarExpr";
+%typeof assignStmt = "SPAssignStmt";
+%typeof arg, assignmentLHS, assignmentRHS = "SPAbstractMatchElement";
+%typeof funCall = "SPFunCall";
 
 
 %goal caselist;
@@ -37,20 +40,20 @@ caselist
     ;
 
 case
-    = pattern.p ARROW output.o                {: return new SPCase(p, o); :}
+    = patternlist.p ARROW outputlist.o        {: return new SPCase(p, o); :}
     ;
 
-output
-    = vectorExpr.v                            {: return new SPOutput(v, null); :}
-    | vectorExpr.v COMMA output.o             {: return new SPOutput(v, o); :}
+outputlist
+    = vectorExpr.v                            {: return new SPOutputlist(v, null); :}
+    | vectorExpr.v COMMA outputlist.o         {: return new SPOutputlist(v, o); :}
     ;
     
-pattern 
-	= patternElement.e                        {: return new SPPatternList(e, null); :}
-	| patternElement.e COMMA pattern.p        {: return new SPPatternList(e, p); :}
+patternlist 
+	= pattern.e                               {: return new SPPatternlist(e, null); :}
+	| pattern.e COMMA patternlist.p           {: return new SPPatternlist(e, p); :}
 	;
     
-patternElement
+pattern
     = matchExpr.m                             {: return m; :}
     | assignStmt.a                            {: return a; :}
     | assertStmt.a                            {: return a; :}
@@ -58,34 +61,33 @@ patternElement
     
 matchExpr
     = matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
-    | LRPAREN pattern.p RRPAREN               {: return new SPRParen(p); :}
+    | LRPAREN patternlist.p RRPAREN           {: return new SPRParen(p); :}
     | matchExpr.m QUESTION                    {: return new SPQuestion(m); :}
     | matchExpr.m MULT                        {: return new SPMult(m); :}
     | matchExpr.m PLUS                        {: return new SPPlus(m); :}
     | vectorExpr.v                            {: return v; :}
     | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
     | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
-    |
     ;
     
 vectorExpr
-    = SCALAR.d                                {: return new SPScalar(d); :}
+    = SCALAR.d                                {: return new SPScalar(d); :}  /* used to match a scalar input argument, whose shape is [1,1]. */
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
     | ANY.a                                   {: return new SPAny(a); :}
-    | LSPAREN RSPAREN                         {: return new SPEmptySetMatching(); :}
-    | vertcatExpr.v                           {: return v; :}
+    | vertcatExpr.v                           {: return v; :}  /* used to match a vertcat vector, something like [m,n], [1,k] or even []. */
     ;
     
 vertcatExpr
-    = LSPAREN vertcatExprArglist.vl RSPAREN   {: return new SPVertcatExpr(vl); :}
+    = LSPAREN RSPAREN                         {: return new SPVertcatExpr(); :}
+    | LSPAREN arglist.al RSPAREN              {: return new SPVertcatExpr(al); :}
     ;
     
-vertcatExprArglist
-    = vertcatExprArg.vt                       {: return new SPVertExprArglist(vt, null); :}
-    | vertcatExprArg.vt COMMA vertcatExprArglist.vtl {: return new SPVertExprArglist(vt, vtl); :}
+arglist
+    = arg.a                                   {: return new SPArglist(a, null); :}
+    | arg.a COMMA arglist.al                  {: return new SPArglist(a, al); :}
     ;
 
-vertcatExprArg
+arg
     = scalarExpr.s                            {: return s; :}
     | vectorExpr.v                            {: return v; :}
     ;
@@ -96,37 +98,27 @@ scalarExpr
     ;
 
 assignStmt
-    = AssignmentLhs.l EQUAL AssignmentRhs.r   {: return new SPAssignStmt(l, r); :}
+    = assignmentLHS.l EQUAL assignmentRHS.r   {: return new SPAssignStmt(l, r); :}
     ;
     
-AssignmentLhs
+assignmentLHS
     = LOWERCASE.l                             {: return new SPLowercase(l); :}
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
     | UPPERCASE.u LRPAREN scalarExpr.s RRPAREN{: return new SPUpperIndex(u, s); :}
     | ANY.a LRPAREN scalarExpr.s RRPAREN      {: return new SPUpperIndex(a, s); :}
     ;
     
-AssignmentRhs
+assignmentRHS
     = scalarExpr.s                            {: return s; :}
     | vectorExpr.v                            {: return v; :}
-    | fnCall.f                                {: return f; :}
+    | funCall.f                               {: return f; :}
     ;
 
-fnCall
+funCall
     = ID.i LRPAREN RRPAREN                    {: return new SPFunCall(i, null); :}
     | ID.i LRPAREN arglist.al RRPAREN         {: return new SPFunCall(i, al); :}
     ;
-    
-arglist
-    = arg.a                                   {: return new SPArglist(a, null); :}
-    | arg.a COMMA arglist.al                  {: return new SPArglist(a, al); :}
-    ;
-
-arg
-    = scalarExpr.s                            {: return s; :}                          
-    | vectorExpr.v                            {: return v; :}
-    ;
 
 assertStmt
-    = fnCall.f                                {: return f; :}
+    = funCall.f                                {: return f; :}
     ;

@@ -27,7 +27,7 @@ public class Call<Arg> {
     
     @Override
     public String toString() {
-        return functionRef.getname()+"("+(argument!=null?argument:"")+")";
+        return functionRef.getName()+"("+(argument!=null?argument:"")+")";
     }
     
     @Override

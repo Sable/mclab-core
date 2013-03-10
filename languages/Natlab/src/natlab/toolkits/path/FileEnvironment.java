@@ -6,7 +6,7 @@ import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
 import natlab.toolkits.Context;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;

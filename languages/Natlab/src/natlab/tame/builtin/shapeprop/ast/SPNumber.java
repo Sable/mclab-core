@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPNumber extends SPAbstractScalarExpr{
+public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	static boolean Debug = false;
 	Number n;
 	public SPNumber (Number n){
@@ -16,13 +16,14 @@ public class SPNumber extends SPAbstractScalarExpr{
 		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
-			if(previousMatchResult.isArrayIndexAssignRight()==true){
+			if(previousMatchResult.getIsArrayIndexAssignRight()==true){
 				//FIXME
 				if (Debug) System.out.println("trying to assign "+n.toString()+" to an array!");
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				List<Integer> dimensions = new ArrayList<Integer>(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions());
+				List<DimValue> dimensions = new ArrayList<DimValue>(previousMatchResult.getShapeOfVariable(previousMatchResult
+						.getLatestMatchedUppercase()).getDimensions());
 				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
 					if (Debug) System.out.println("inside assigning a num to array with num index!");//i.e. M(2)=2;
 					//deal with the case that index overflow
@@ -33,27 +34,30 @@ public class SPNumber extends SPAbstractScalarExpr{
 						return previousMatchResult;
 					}
 					dimensions.remove(previousMatchResult.getLatestMatchedNumber()-1);
-					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), n.intValue());
+					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), new DimValue(n.intValue(), null));
 				}
 				else{
 					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
 					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
+					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1)){
+						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult
+								.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
 						if (Debug) System.out.println("dimension should not be changed!");
 						previousMatchResult.setArrayIndexAssignRight(false);
 						return previousMatchResult;
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1, n.intValue());
+					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1);
+					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1
+							, new DimValue(n.intValue(), null));
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);
-				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
+				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult
+						.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromDimValues(dimensions));
 				if (Debug) System.out.println(uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
+				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+match.getAllUppercase());
 				match.setArrayIndexAssignRight(false);
 				return match;

@@ -46,7 +46,7 @@ public class AdvancedMatrixValuePropagator extends
 		if (cResult != null) {
 			return Res
 					.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
-							cResult));
+							null, cResult));
 		}
 
 		// if the result is not a constant, just do mclass propagation
@@ -93,8 +93,8 @@ public class AdvancedMatrixValuePropagator extends
 
 				
 
-					map.put(classRef, new AdvancedMatrixValue(
-							new AdvancedMatrixValue(
+					map.put(classRef, new AdvancedMatrixValue(null, 
+							new AdvancedMatrixValue(null, 
 									(PrimitiveClassReference) classRef),
 							matchShapeResult.get(0), // FIXME - commented to
 														// stop
@@ -133,8 +133,8 @@ public class AdvancedMatrixValuePropagator extends
 		}
 		// this block ends
 		return Res
-				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(
-						new AdvancedMatrixValue(
+				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(null, 
+						new AdvancedMatrixValue(null, 
 								(PrimitiveClassReference) getDominantCatArgClass(arg)),
 						matchShapeResult.get(0), matchisComplexInfoResult
 								.get(0)));// FIXME a little bit

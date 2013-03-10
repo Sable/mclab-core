@@ -22,7 +22,7 @@ abstract public class OldMatlabClass implements MatlabClass{
 		    new Function<FunctionReference, String>() {
 		  @Override public String apply(FunctionReference ref) {
 	      //TODO check the ref for constructor? - deal with doubly defined methods?
-		    return ref.getname();
+		    return ref.getName();
 		  }
 		});
 	}

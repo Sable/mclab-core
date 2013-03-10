@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import natlab.NatlabPreferences;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;

@@ -188,7 +188,7 @@ public class Mc4 {
 	    try{
 	    ValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = new ValueAnalysis<AggrValue<SimpleMatrixValue>>(
 	            functions,
-	            Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)),
+	            Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(null, PrimitiveClassReference.DOUBLE)),
 	            new SimpleMatrixValueFactory());
         System.out.println(analysis);
         //System.out.println(analysis.getPrettyPrinted());

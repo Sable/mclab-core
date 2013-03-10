@@ -23,7 +23,6 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-import beaver.Symbol;
 import natlab.toolkits.analysis.varorfun.*;
 
 aspect ASTtoXML {
@@ -171,9 +170,9 @@ aspect ASTtoXML {
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-        e.setAttribute("fullpath", fullpath);
-        e.setAttribute("name", name);
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("fullpath", getFile().getPath());
+        e.setAttribute("name", getFile().getNameWithoutExtension());
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         parentProgram=null;
         return true;
@@ -185,12 +184,12 @@ aspect ASTtoXML {
 
 		Element e = doc.createElement("FunctionList");
 		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("fullpath", fullpath);
+		e.setAttribute("fullpath", getFile().getPath());
        
         for(Function func : getFunctions()) {
             func.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -230,7 +229,7 @@ aspect ASTtoXML {
         for(Function func : getNestedFunctions()) {
             func.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));       
+        e.setAttribute("line", "" + getStartLine());
 	    parent.appendChild(e);      
 	    parentProgram=previous;
         return true;
@@ -265,7 +264,7 @@ aspect ASTtoXML {
         for(ClassEvents events : getClassEvents()) {
             events.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -283,7 +282,7 @@ aspect ASTtoXML {
         for(Property prop : getPropertys()) {
             prop.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     } 
@@ -307,7 +306,7 @@ aspect ASTtoXML {
         for(Function func : getFunctions()) {
             func.getXML(doc, e);
         }
-       e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+       e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -332,7 +331,7 @@ parent.appendChild(e);
         	}
 		e.appendChild(e2);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -372,7 +371,7 @@ parent.appendChild(e);
             func.getXML(doc, e);
         }
            
-		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+		e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);   
         return true;
     }
@@ -392,7 +391,7 @@ parent.appendChild(e);
             eve.getXML(doc, e);
         }
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -407,7 +406,7 @@ parent.appendChild(e);
 		
         getExpr().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -420,7 +419,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -435,7 +434,7 @@ parent.appendChild(e);
 		
         getExpr().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -448,7 +447,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("name", getName());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -463,7 +462,7 @@ parent.appendChild(e);
         getFuncName().getXML(doc, e);
         getClassName().getXML(doc, e);
 
-            e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+            e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
 		return true;
     }
@@ -477,7 +476,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("text", getText());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -495,7 +494,7 @@ parent.appendChild(e);
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
         getExpr().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -507,11 +506,11 @@ parent.appendChild(e);
         	Element e = doc.createElement("AssignStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         getLHS().getXML(doc, e);
         getRHS().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -527,7 +526,7 @@ parent.appendChild(e);
         for(Name name : getNames()) {
             name.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -543,7 +542,7 @@ parent.appendChild(e);
         for(Name name : getNames()) {
             name.getXML(doc, e);
         }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -556,7 +555,7 @@ parent.appendChild(e);
         e.setAttribute("id", Long.toString(id));
         e.setAttribute("command", getCommand());
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -568,7 +567,7 @@ parent.appendChild(e);
 		Element e = doc.createElement("BreakStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -580,7 +579,7 @@ parent.appendChild(e);
 		Element e = doc.createElement("ContinueStmt");
 		e.setAttribute("id", Long.toString(id));
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -591,7 +590,7 @@ parent.appendChild(e);
 
 		Element e = doc.createElement("ReturnStmt");
 		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
 
         parent.appendChild(e);
@@ -612,7 +611,7 @@ parent.appendChild(e);
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -631,7 +630,7 @@ parent.appendChild(e);
             stmt.getXML(doc, e1);
         }
         e.appendChild(e1);
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -649,7 +648,7 @@ parent.appendChild(e);
         if(hasElseBlock()) {
             getElseBlock().getXML(doc, e);
         } 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -669,7 +668,7 @@ parent.appendChild(e);
         }
         e.appendChild(e1);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -687,7 +686,7 @@ parent.appendChild(e);
         }
         e.appendChild(e1);
        	
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e); 
         return true;
     }
@@ -708,7 +707,7 @@ parent.appendChild(e);
             getDefaultCaseBlock().getXML(doc, e);
         } 
     
-		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+		e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -728,7 +727,7 @@ parent.appendChild(e);
         }
         e.appendChild(e1);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -746,7 +745,7 @@ parent.appendChild(e);
         }
         e.appendChild(e1); 
      
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -772,7 +771,7 @@ parent.appendChild(e);
 	        }
 	        e.appendChild(e2);
 	    }
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         return true;
     }
@@ -791,7 +790,7 @@ parent.appendChild(e);
         
        getUpper().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -803,7 +802,7 @@ parent.appendChild(e);
 		Element e = doc.createElement("ColonExpr");
 		e.setAttribute("id", Long.toString(id));
 	
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -815,7 +814,7 @@ parent.appendChild(e);
 		Element e = doc.createElement("EndExpr");
 		e.setAttribute("id", Long.toString(id));	
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -828,7 +827,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));	
 		e.setAttribute("nameId", getID());	
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -855,7 +854,7 @@ parent.appendChild(e);
 		Element e = doc.createElement("NameExpr");
 		e.setAttribute("id", Long.toString(id));
         getName().getXML(doc, e);
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
         parent.appendChild(e);
         if (include_kinds_in_xml) {
             VFFlowset out_sensitive=null;
@@ -889,7 +888,7 @@ parent.appendChild(e);
       getTarget().getXML(doc, e);
 	getField().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -907,7 +906,7 @@ parent.appendChild(e);
             arg.getXML(doc, e);
         }    
 
-		e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+		e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -925,7 +924,7 @@ parent.appendChild(e);
             arg.getXML(doc, e);
         }
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -941,7 +940,7 @@ parent.appendChild(e);
             row.getXML(doc, e);
         }
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -957,7 +956,7 @@ parent.appendChild(e);
             row.getXML(doc, e);
         }
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -973,7 +972,7 @@ parent.appendChild(e);
             element.getXML(doc, e);
         }
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -987,13 +986,12 @@ parent.appendChild(e);
 
         getName().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
 
     eq LambdaExpr.getXML(Document doc, Element parent) {
-        /*
         long id = nodeCounter();
         setuID(id);
 		
@@ -1006,8 +1004,8 @@ parent.appendChild(e);
 
         getBody().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
-        parent.appendChild(e);*/
+        e.setAttribute("line", "" + getStartLine());
+        parent.appendChild(e);
         return true;
     }
     
@@ -1019,7 +1017,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue().getText());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -1032,7 +1030,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue().getText());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -1045,7 +1043,7 @@ parent.appendChild(e);
 		e.setAttribute("id", Long.toString(id));
 		e.setAttribute("value", getValue());
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -1061,7 +1059,7 @@ parent.appendChild(e);
 
         getOperand().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }
@@ -1077,7 +1075,7 @@ parent.appendChild(e);
         getLHS().getXML(doc, e);
         getRHS().getXML(doc, e);
 
-        e.setAttribute("line", ""+beaver.Symbol.getLine(getStart()));
+        e.setAttribute("line", "" + getStartLine());
 parent.appendChild(e);
         return true;
     }

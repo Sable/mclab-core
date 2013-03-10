@@ -1,41 +1,58 @@
-/**
- * 
- */
 package natlab.tame.valueanalysis.basicmatrix;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.aggrvalue.*;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.rangeValue.*;
 
-public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue>{
+/**
+ * A factory of BasicMatrixValue,
+ * which generate all kinds of BasicMatrixValue based on different input argument.
+ */
+public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> {
+	
 	@Override
-    public BasicMatrixValue newMatrixValue(Constant constant) {
-        return new BasicMatrixValue(constant);
+	//factory method 1.
+    public BasicMatrixValue newMatrixValue(String symbolic, Constant constant) {
+        return new BasicMatrixValue(symbolic, constant);
     }
-    
+    //factory method 2.
+	public BasicMatrixValue newMatrixValueFromClassShapeRange(
+			String symbolic,
+			PrimitiveClassReference aClass,
+			Shape<AggrValue<BasicMatrixValue>> shape,
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
+		return new BasicMatrixValue(symbolic, aClass, shape, rangeValue);
+	}
+	//factory method 3.
+	public BasicMatrixValue newMatrixValueFromInputShape(
+			String symbolic, PrimitiveClassReference aClass, String shapeInfo) {
+		return new BasicMatrixValue(symbolic, aClass, shapeInfo);
+	}
+	
     static AggrValuePropagator<BasicMatrixValue> propagator = 
     		new AggrValuePropagator<BasicMatrixValue>(new BasicMatrixValuePropagator());
-    @Override
-    public AggrValuePropagator<BasicMatrixValue> getValuePropagator() {
-        return propagator;
-    }
     
 	@SuppressWarnings("unchecked")
 	static ClassPropagator<AggrValue<BasicMatrixValue>> classPropagator = ClassPropagator.getInstance();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator.getInstance();
+	static RangeValuePropagator<AggrValue<BasicMatrixValue>> rangeValuePropagator = RangeValuePropagator.getInstance();
+    
+    @Override
+    public AggrValuePropagator<BasicMatrixValue> getValuePropagator() {
+        return propagator;
+    }
 	
 	@Override
 	public AggrValue<BasicMatrixValue> forRange(
 			AggrValue<BasicMatrixValue> lower,
-			AggrValue<BasicMatrixValue> upper, AggrValue<BasicMatrixValue> inc) {
+			AggrValue<BasicMatrixValue> upper,
+			AggrValue<BasicMatrixValue> inc) {
 		//FIXME do something proper here
-		return new BasicMatrixValue(classPropagator.forRange(lower, upper, inc),shapePropagator.forRange(lower, upper, inc));
+		return new BasicMatrixValue(null, classPropagator.forRange(lower, upper, inc)
+				,shapePropagator.forRange(lower, upper, inc), rangeValuePropagator.forRange(lower, upper, inc));
 	}
 }
 

@@ -1,29 +1,27 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPOr extends SPAbstractMatchExpr{
-	SPAbstractMatchExpr first;
-	SPAbstractMatchExpr next;
+public class SPOr<V extends Value<V>> extends SPAbstractMatchExpr<V>{
+	SPAbstractMatchExpr<V> first;
+	SPAbstractMatchExpr<V> next;
 	
-	public SPOr (SPAbstractMatchExpr first,SPAbstractMatchExpr next){
+	public SPOr (SPAbstractMatchExpr<V> first,SPAbstractMatchExpr<V> next){
 		this.first = first;
 		this.next = next;
 		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		int indexBeforeOr = previousMatchResult.getNumMatched();
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
-		int indexAfterOr = match.getNumMatched();
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
+		int indexBeforeOr = previousMatchResult.getHowManyMatched();
+		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, num);
+		int indexAfterOr = match.getHowManyMatched();
 		if(indexBeforeOr==indexAfterOr){
 			if(match.getIsError()==true){
-				match.resetIsError();
+				match.setIsError(false);
 			}
-			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues, num);//actually, here, match is the same to previousMatchResult
+			ShapePropMatch<V> continueMatch = next.match(isPatternSide, match, argValues, num);//actually, here, match is the same to previousMatchResult
 			return continueMatch;
 		}
 		return match;

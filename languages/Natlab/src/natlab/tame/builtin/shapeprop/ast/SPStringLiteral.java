@@ -1,15 +1,11 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.constant.HasConstant;
-import natlab.tame.valueanalysis.components.shape.HasShape;
-import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPStringLiteral extends SPAbstractVertcatExprArg{
+public class SPStringLiteral<V extends Value<V>> extends SPAbstractMatchElement<V>{
 	static boolean Debug = false;
 	String id;
 	public SPStringLiteral(String id){
@@ -17,14 +13,14 @@ public class SPStringLiteral extends SPAbstractVertcatExprArg{
 		//System.out.println(id);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		//a string literal used to match a constant string argument
-		if(argValues.get(previousMatchResult.getNumMatched())!=null){
+		if(argValues.get(previousMatchResult.getHowManyMatched())!=null){
 			if (Debug) System.out.println(argValues.size());
 			//get indexing current Matrix Value from args
-			Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
+			Value<V> argument = argValues.get(previousMatchResult.getHowManyMatched());
 			//get shape info from current Matrix Value
-			Shape<?> argumentShape = ((HasShape)argument).getShape();
+			Shape<V> argumentShape = ((HasShape<V>)argument).getShape();
 			Constant argumentConstant =((HasConstant)argument).getConstant();
 			if (Debug) System.out.println("current pointed string argument is "+argumentConstant+", and its shape is "+argumentShape);
 			if(argumentConstant.toString().equals(id)){
@@ -32,7 +28,7 @@ public class SPStringLiteral extends SPAbstractVertcatExprArg{
 				previousMatchResult.comsumeArg();
 				return previousMatchResult;
 			}
-			previousMatchResult.setIsError();
+			previousMatchResult.setIsError(true);
 			return previousMatchResult;
 		}
 		//FIXME if index pointing empty, means not match, do something

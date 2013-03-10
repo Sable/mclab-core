@@ -8,7 +8,7 @@ import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.interproceduralAnalysis.*;
 import natlab.tame.valueanalysis.simplematrix.*;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 /**
@@ -64,14 +64,14 @@ public class LiveVariableAnalysis extends InterproceduralAnalysis<Intraprocedura
 	 * the main function should have a single double input, and one output
 	 */
 	public static void main(String[] args) {
-		String file = "/home/adubra/mclab/tests/test.m"; //put a default file for testing, this will work for nobody else ;)
+		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/unit/simplest.m"; //put a default file for testing, this will work for nobody else ;)
 		if (args.length == 1){
 			file = args[0];
 		}
 		//build callgraph
 		Callgraph<SimpleMatrixValue> callgraph = TamerTool.getCallgraph(
 				new FileEnvironment(GenericFile.create(file)),
-				Collections.singletonList(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
+				Collections.singletonList(new SimpleMatrixValue(null, PrimitiveClassReference.DOUBLE)), new SimpleMatrixValueFactory());
 		LiveVariableAnalysis analysis = new LiveVariableAnalysis(callgraph.getAnalysis(),Collections.singletonList(LiveValue.getLive()));
 		System.out.println(analysis);
 		for (int i = 0; i < analysis.getNodeList().size(); i++){

@@ -5338,7 +5338,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Length extends AbstractScalarDoubleResultVersatileQuery  {
+    public static class Length extends AbstractScalarDoubleResultVersatileQuery implements HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Length singleton = null;
         public static Length getInstance(){
@@ -5354,6 +5354,15 @@ public abstract class Builtin {
             return "length";
         }
         
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A -> R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Ndims extends AbstractScalarDoubleResultVersatileQuery  {
         //returns the singleton instance of this class
