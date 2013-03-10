@@ -1,6 +1,8 @@
 McLab/Natlab
 ============
 
+![Build status](https://travis-ci.org/Sable/mclab.png)
+
 This is the Java-based infrastructure of the McLab project, which aims to
 provide compiler tools and infrastructure for MATLAB (and potentially other
 scientific languages in the future). In practice this repository houses
