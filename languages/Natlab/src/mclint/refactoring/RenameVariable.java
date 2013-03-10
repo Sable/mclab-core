@@ -16,7 +16,7 @@ import ast.Script;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.FluentIterable;
 
 class RenameVariable extends Refactoring {
   private Name node;
@@ -71,13 +71,14 @@ class RenameVariable extends Refactoring {
   }
   
   private static Name findGlobalNamed(final String name, ASTNode<?> tree) {
-    return Iterables.getFirst(filter(NodeFinder.find(Name.class, tree),
-        new Predicate<Name>() {
+    return FluentIterable.from(NodeFinder.find(Name.class, tree))
+        .firstMatch(new Predicate<Name>() {
           @Override public boolean apply(Name node) {
             return node.getParent().getParent() instanceof GlobalStmt
                 && node.getID().equals(name);
           }
-        }), null);
+        })
+        .orNull();
   }
 
   public void apply(boolean renameGlobally) {

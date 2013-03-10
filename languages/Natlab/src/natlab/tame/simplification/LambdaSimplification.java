@@ -25,6 +25,7 @@ import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Stmt;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
 /**
@@ -91,7 +92,7 @@ public class LambdaSimplification extends AbstractSimplification{
         if (node.getBody() instanceof ParameterizedExpr){
             ParameterizedExpr paramExpr = (ParameterizedExpr)node.getBody();
             if (!isVar(paramExpr) && 
-                    Iterables.size(NodeFinder.find(NameExpr.class, paramExpr.getArgList())) == paramExpr.getArgList().getNumChild()){
+                Iterables.all(paramExpr.getArgList(), Predicates.instanceOf(NameExpr.class))) {
                 return;
             }
         }
