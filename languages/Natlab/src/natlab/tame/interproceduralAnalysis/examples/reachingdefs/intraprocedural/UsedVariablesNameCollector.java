@@ -37,11 +37,9 @@ import ast.RangeExpr;
 @SuppressWarnings("rawtypes")
 public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
-    // Member variables
     private HashSetFlowSet<String> fCurrentSet;
     public Map<ASTNode, HashSetFlowSet<String>> fFlowSets = new HashMap<ASTNode, HashSetFlowSet<String>>();
     
-    // Constructors
     public UsedVariablesNameCollector(ASTNode<?> tree)
     {
         super(tree);
@@ -77,30 +75,16 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
                 TIRArraySetStmt arraySetStmt = (TIRArraySetStmt) node;
                 usedVariablesList = new TIRCommaSeparatedList(new NameExpr(arraySetStmt.getValueName()));
                 usedVariablesList.add(new NameExpr(arraySetStmt.getArrayName()));
-                TIRCommaSeparatedList indeces = arraySetStmt.getIndizes();
-                for (int i = 0; i < indeces.size(); i++)
-                {
-                    NameExpr indexNameExpr = indeces.getNameExpresion(i);
-                    if (indexNameExpr != null)
-                    {
-                        usedVariablesList.add(indexNameExpr);
-                    }
-                }
+                TIRCommaSeparatedList indices = arraySetStmt.getIndizes();
+                addIndicesToUsedVariablesNames(indices, usedVariablesList);
             }
             else if (node instanceof TIRCellArraySetStmt)
             {
                 TIRCellArraySetStmt cellArraySetStmt = (TIRCellArraySetStmt) node;
                 usedVariablesList = new TIRCommaSeparatedList(new NameExpr(cellArraySetStmt.getValueName()));
                 usedVariablesList.add(new NameExpr(cellArraySetStmt.getCellArrayName()));
-                TIRCommaSeparatedList indeces = cellArraySetStmt.getIndizes();
-                for (int i = 0; i < indeces.size(); i++)
-                {
-                    NameExpr indexNameExpr = indeces.getNameExpresion(i);
-                    if (indexNameExpr != null)
-                    {
-                        usedVariablesList.add(indexNameExpr);
-                    }
-                }
+                TIRCommaSeparatedList indices = cellArraySetStmt.getIndizes();
+                addIndicesToUsedVariablesNames(indices, usedVariablesList);
             }
             else if (node instanceof TIRDotSetStmt)
             {
@@ -128,15 +112,8 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
             TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
             Name arrayName = arrayGetStmt.getArrayName();
             usedVariablesList = new TIRCommaSeparatedList(new NameExpr((arrayName)));
-            TIRCommaSeparatedList indeces = arrayGetStmt.getIndizes();
-            for (int i = 0; i < indeces.size(); i++)
-            {
-                NameExpr indexNameExpr = indeces.getNameExpresion(i);
-                if (indexNameExpr != null)
-                {
-                    usedVariablesList.add(indexNameExpr);
-                }
-            }
+            TIRCommaSeparatedList indices = arrayGetStmt.getIndizes();
+            addIndicesToUsedVariablesNames(indices, usedVariablesList);
         }
         else if (node instanceof TIRDotGetStmt)
         {
@@ -151,15 +128,8 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
             TIRCellArrayGetStmt cellArrayGetStmt = (TIRCellArrayGetStmt) node;
             Name cellArrayName = cellArrayGetStmt.getCellArrayName();
             usedVariablesList = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
-            TIRCommaSeparatedList indeces = cellArrayGetStmt.getIndices();
-            for (int i = 0; i < indeces.size(); i++)
-            {
-                NameExpr indexNameExpr = indeces.getNameExpresion(i);
-                if (indexNameExpr != null)
-                {
-                    usedVariablesList.add(indexNameExpr);
-                }
-            }
+            TIRCommaSeparatedList indices = cellArrayGetStmt.getIndices();
+            addIndicesToUsedVariablesNames(indices, usedVariablesList);
         }
         if (usedVariablesList == null) System.out.println("PROBLEM");
         IRCommaSeparatedListToVaribaleNamesSet(usedVariablesList, fCurrentSet);
@@ -216,11 +186,19 @@ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwa
         return new HashSetFlowSet<String>();
     }
 
-    /**
-     * Turns a TIRCommaSeparatedList of Names into a set of Strings that represent variables names
-     * @param csl
-     * @param variableNames
-     */
+
+    public void addIndicesToUsedVariablesNames(TIRCommaSeparatedList indices, TIRCommaSeparatedList usedVariablesNames)
+    {
+        for (int i = 0; i < indices.size(); i++)
+        {
+            NameExpr indexNameExpr = indices.getNameExpresion(i);
+            if (indexNameExpr != null)
+            {
+                usedVariablesNames.add(indexNameExpr);
+            }
+        }
+    }
+    
     public void IRCommaSeparatedListToVaribaleNamesSet(TIRCommaSeparatedList csl, HashSetFlowSet<String> variableNames)
     {
         if (csl == null) return;

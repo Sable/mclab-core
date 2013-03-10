@@ -11,15 +11,12 @@ import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
-import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRCallStmt;
-import natlab.tame.tir.TIRCellArrayGetStmt;
 import natlab.tame.tir.TIRCellArraySetStmt;
 import natlab.tame.tir.TIRCommaSeparatedList;
 import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
@@ -36,13 +33,11 @@ import ast.NameExpr;
 @SuppressWarnings("rawtypes")
 public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>> implements FunctionAnalysis<StaticFunction, HashSetFlowSet<String>>
 {
-    // Member Variables
     private HashSetFlowSet<String> fFullSet = new HashSetFlowSet<String>();
     private HashSetFlowSet<String> fCurrentSet;
     private Map<ASTNode, HashSetFlowSet<String>> fFlowSets = new HashMap<ASTNode, HashSetFlowSet<String>>();
     private StaticFunction fFunction;
     
-    // Constructors
     public DefinedVariablesNameCollector(ASTNode<?> tree)
     {
         super(tree);
@@ -68,7 +63,6 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         throw new UnsupportedOperationException("Variable name collector doesn't support recursive programs");
     }
     
-    // Case methods
     @Override
     public Function getTree() 
     {
@@ -176,11 +170,6 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         return new HashSetFlowSet<String>();
     }
     
-    /**
-     * Turns a TIRCommaSeparatedList of Names into a set of Strings that represent variables names
-     * @param csl
-     * @param variableNames
-     */
     private void IRCommaSeparatedListToVaribaleNamesSet(TIRCommaSeparatedList csl, HashSetFlowSet<String> variableNames)
     {
         if (csl == null) return;
@@ -189,12 +178,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
             variableNames.add(name.getID());
         }
     }
-    
-    /**
-     * Returns the set of names of variables defined for point P in the program
-     * @param node
-     * @return set of defined names of variables for the input node or null if entry does not exist in flow set
-     */
+
     public Set<String> getDefinedVariablesNamesForNode(ASTNode node)
     {
         HashSetFlowSet<String> set = fFlowSets.get(node);

@@ -29,7 +29,6 @@ import ast.ForStmt;
 @SuppressWarnings("rawtypes")
 public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<ASTNode>>>
 {
-    // Member variables
     private final boolean DEBUG = false;
     private Merger<Set<ASTNode>> fMerger = Mergers.union();
     private DefinedVariablesNameCollector fVariableNameCollector;
@@ -37,19 +36,34 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     private HashMapFlowMap<String, Set<ASTNode>> fStartMap;
     private LinkedList<ASTNode> fVisitedStmts;
     
-    // Constructor
     public ReachingDefinitions(StaticFunction f)
     {
         super(f.getAst());
-        fStartMap = new HashMapFlowMap<String, Set<ASTNode>>(fMerger);
+
         fVisitedStmts = new LinkedList<ASTNode>();
         
+        initializeDefinedVariablesNameCollector(f);
+        
+        initializeDefiniteAssignmentAnalysis(f);
+        
+        initializeStartMap();
+    }
+    
+    public void initializeDefinedVariablesNameCollector(StaticFunction f)
+    {
         fVariableNameCollector = new DefinedVariablesNameCollector(f);
         fVariableNameCollector.analyze();
-        
+    }
+    
+    public void initializeDefiniteAssignmentAnalysis(StaticFunction f)
+    {
+        fStartMap = new HashMapFlowMap<String, Set<ASTNode>>(fMerger);
         fDefiniteAssignmentAnalysis = new DefiniteAssignmentAnalysis(f, fVariableNameCollector);
         fDefiniteAssignmentAnalysis.analyze();
-        
+    }
+    
+    public void initializeStartMap()
+    {
         for (String variable : fVariableNameCollector.getFullSet())
         {
             fStartMap.put( variable, new HashSet<ASTNode>());
@@ -61,12 +75,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     {
         currentOutSet = copy(currentInSet);
         Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
-        for (String s : definedVariablesNames)
-        {
-            Set<ASTNode> newDefinitionSite = new HashSet<ASTNode>();
-            newDefinitionSite.add(node);
-            currentOutSet.put(s, newDefinitionSite);
-        }
+        populateOutSetWithDefinitionSitesForNode(definedVariablesNames, currentOutSet, node);
         setInOutSet(node);
         currentInSet = copy(currentOutSet);
         fVisitedStmts.add(node);
@@ -79,12 +88,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     {
        currentOutSet = copy(currentInSet);
        Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
-       for (String variableName : definedVariablesNames)
-       {
-           Set<ASTNode> newDefinitionSite = new HashSet<ASTNode>();
-           newDefinitionSite.add(node);
-           currentOutSet.put(variableName, newDefinitionSite);
-       }
+       populateOutSetWithDefinitionSitesForNode(definedVariablesNames, currentOutSet, node);
        setInOutSet(node);
        if (DEBUG) printMapForNode(node);
        fVisitedStmts.add(node);
@@ -97,6 +101,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
         for (String variableName : definedVariablesNames)
         {
+            // Arrays maybe implicitly defined
             if (node instanceof TIRAbstractAssignFromVarStmt && fDefiniteAssignmentAnalysis.isDefinitelyAssignedAtInputOf(node, variableName))
             {
                 continue;
@@ -115,12 +120,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     {
         currentOutSet = copy(currentInSet);
         Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
-        for (String variableName : definedVariablesNames)
-        {
-            Set<ASTNode> newDefinitionSite = new HashSet<ASTNode>();
-            newDefinitionSite.add(node);
-            currentOutSet.put(variableName, newDefinitionSite);
-        }
+        populateOutSetWithDefinitionSitesForNode(definedVariablesNames, currentOutSet, node);
         setInOutSet(node);
         if (DEBUG) printMapForNode(node);
         fVisitedStmts.add(node);
@@ -151,12 +151,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     {
         currentOutSet = copy(currentInSet);
         Set<String> definedVariablesNames = fVariableNameCollector.getDefinedVariablesNamesForNode(node);
-        for (String variableName : definedVariablesNames)
-        {
-            Set<ASTNode> newDefinitionSite = new HashSet<ASTNode>();
-            newDefinitionSite.add(node);
-            currentOutSet.put(variableName, newDefinitionSite);
-        }
+        populateOutSetWithDefinitionSitesForNode(definedVariablesNames, currentOutSet, node);
         setInOutSet(node);
         if (DEBUG) printMapForNode(node);
         fVisitedStmts.add(node);
@@ -170,6 +165,16 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         if (DEBUG) printMapForNode(node);
         fVisitedStmts.add(node);
         super.caseForStmt(node);
+    }
+    
+    public void populateOutSetWithDefinitionSitesForNode(Set<String> definedVariablesNames, HashMapFlowMap<String, Set<ASTNode>> outSet, ASTNode node)
+    {
+        for (String variableName : definedVariablesNames)
+        {
+            Set<ASTNode> newDefinitionSite = new HashSet<ASTNode>();
+            newDefinitionSite.add(node);
+            currentOutSet.put(variableName, newDefinitionSite);
+        }
     }
     
     public void merge

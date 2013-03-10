@@ -35,15 +35,10 @@ public class UDDUWeb
     
     public void constructUDDUWeb()
     {
-        // Construct UD and DU chains
-        fUDChain.constructUDChain();
-        fDUChain.constructDUChain();
+        initializeUDDUChains();
         
-        // Initialize UDDU web
-        fUDWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
-        fDUWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
+        initializeUDAndDUWeb();
         
-        // Initialize the statement color 
         int color = 0;
         
         for (ASTNode visitedStmt : fUDChain.getVisitedStmtsLinkedList())
@@ -63,16 +58,36 @@ public class UDDUWeb
         }
     }
     
+    public void initializeUDDUChains()
+    {
+        fUDChain.constructUDChain();
+        fDUChain.constructDUChain();
+    }
+    
+    public void initializeUDAndDUWeb()
+    {
+        fUDWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
+        fDUWeb = new HashMap<String, HashMap<ASTNode,Integer>>();
+    }
+    
     private void markDefinition(ASTNode visitedStmt, String variableName, Integer color)
     {
         if (fDUWeb.get(variableName) == null)
         {
             fDUWeb.put(variableName, new HashMap<ASTNode, Integer>());
         }
+        
         fDUWeb.get(variableName).put(visitedStmt, color);
+        
         if (DEBUG) System.out.println("Def of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
+        
         HashSet<ASTNode> useSet = fDUChain.getUsesMap(visitedStmt).get(variableName);
-        if (useSet == null) return;
+        
+        if (useSet == null)
+        {
+            return;
+        }
+        
         for (ASTNode use : useSet)
         {
             if (!isMarkedInUDWeb(use, variableName))
@@ -88,10 +103,18 @@ public class UDDUWeb
         {
             fUDWeb.put(variableName, new HashMap<ASTNode, Integer>());
         }
+        
         fUDWeb.get(variableName).put(visitedStmt, color);
-        if(DEBUG) System.out.println("Use of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));  
+        
+        if(DEBUG) System.out.println("Use of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
+        
         HashSet<ASTNode> definitionSet = fUDChain.getDefinitionsMap(visitedStmt).get(variableName);
-        if (definitionSet == null) return;
+        
+        if (definitionSet == null)
+        {
+            return;
+        }
+        
         for (ASTNode definition : definitionSet)
         {
             if (!isMarkedInDUWeb(definition, variableName))
@@ -106,7 +129,10 @@ public class UDDUWeb
         if (fDUWeb.containsKey(variableName))
         {
             HashMap<ASTNode, Integer> webEntry = fDUWeb.get(variableName);
-            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
+            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -116,7 +142,10 @@ public class UDDUWeb
         if (fUDWeb.containsKey(variableName))
         {
             HashMap<ASTNode, Integer> webEntry = fUDWeb.get(variableName);
-            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null) { return true; }
+            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null)
+            {
+                return true; 
+            }
         }
         return false;
     }

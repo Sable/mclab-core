@@ -14,7 +14,6 @@ import ast.RangeExpr;
 @SuppressWarnings("rawtypes")
 public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis<Object>
 {
-    // Member variables
     UDDUWeb fUDDUWeb;
     
     public RenameVariablesForASTNodes(ASTNode tree, UDDUWeb udduWeb)
@@ -37,7 +36,7 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
     {
         for (ASTNode node : fUDDUWeb.getVisitedStmtsLinkedList())
         {
-            // TODO caseLoopVar should be called with intervention
+            // TODO caseLoopVar should be called without intervention
             if (node instanceof AssignStmt && node.getParent() instanceof ForStmt)
             {
                 caseLoopVar((AssignStmt) node);
@@ -51,6 +50,7 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
     {
         TIRCommaSeparatedList definedVariablesNames = null;
         TIRCommaSeparatedList usedVariablesNames = null;
+        
         definedVariablesNames = new TIRCommaSeparatedList((NameExpr) node.getLHS());
 
         RangeExpr range = (RangeExpr) node.getRHS();
@@ -61,75 +61,59 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
         }
         usedVariablesNames.add((NameExpr) range.getUpper());
 
-        renameDefinedVariables(definedVariablesNames, node);
-        renameUsedVariables(usedVariablesNames, node);
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
     }
 
-    /**
-     * Renames used variables names for a particular node using the UDDU web
-     * @param usedVariablesNames
-     * @param parentNode
-     */
-    public void renameUsedVariables(TIRCommaSeparatedList usedVariablesNames, ASTNode parentNode)
+    public void renameUsedVariablesForNode(TIRCommaSeparatedList usedVariablesNames, ASTNode parentNode)
     {
+        if (usedVariablesNames == null)
+        {
+            return;
+        }
         for (int i = 0; i < usedVariablesNames.getNumChild(); i++)
         {
             Name usedVariableName = usedVariablesNames.getName(i);
             HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getNodeString());
             if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
             {
-                renameVariable(usedVariableName, nodeAndColor.get(parentNode));
+                renameVariableWithColor(usedVariableName, nodeAndColor.get(parentNode));
             }
         }
     }
     
-    /**
-     * Renames defined variables names for a particular node using the UDDU web
-     * @param definedVariablesNames
-     * @param parentNode
-     */
-    public void renameDefinedVariables(TIRCommaSeparatedList definedVariablesNames, ASTNode parentNode)
+    public void renameDefinedVariablesForNode(TIRCommaSeparatedList definedVariablesNames, ASTNode parentNode)
     {
+        if (definedVariablesNames == null)
+        {
+            return;
+        }
         for (int i = 0; i < definedVariablesNames.getNumChild(); i++)
         {
             Name usedVariableName = definedVariablesNames.getName(i);
             HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForDefinition(usedVariableName.getNodeString());
             if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
             {
-                renameVariable(usedVariableName, nodeAndColor.get(parentNode));
+                renameVariableWithColor(usedVariableName, nodeAndColor.get(parentNode));
             }
         }
     }
     
-    /**
-     * Rename a variable using the UDDUWeb variable colors
-     * @param variableName
-     * @param color
-     */
-    public void renameVariable(Name variableName, Integer color)
+    public void renameVariableWithColor(Name variableName, Integer color)
     {
         String updatedVariableName = variableName.getNodeString() + "#" + color;
         variableName.setID(updatedVariableName);
     }
     
     @Override
-    public void merge(Object in1, Object in2, Object out)
-    {
-        // TODO Auto-generated method stub
-        
-    }
+    public void merge(Object in1, Object in2, Object out) {}
 
     @Override
-    public void copy(Object source, Object dest)
-    {
-        // TODO Auto-generated method stub
-        
-    }
+    public void copy(Object source, Object dest) {}
 
     @Override
     public Object newInitialFlow()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 }

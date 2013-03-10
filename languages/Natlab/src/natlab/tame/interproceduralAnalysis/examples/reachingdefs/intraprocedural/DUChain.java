@@ -51,11 +51,13 @@ public class DUChain
                         HashMapFlowMap<String, HashSet<ASTNode>> useSiteMap = new HashMapFlowMap<String, HashSet<ASTNode>>();
                         fDUMap.put(defAssignStmt, useSiteMap);
                     }
+                    
                     if (fDUMap.get(defAssignStmt).get(varName) == null)
                     {
                         HashSet<ASTNode> useAssignStmtsSet = new HashSet<ASTNode>();
                         fDUMap.get(defAssignStmt).put(varName, useAssignStmtsSet);
                     }
+                    
                     fDUMap.get(defAssignStmt).get(varName).add((ASTNode) useAssignmentStmt);
                 }
             }
