@@ -27,8 +27,8 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 				if (Debug) System.out.println("argument shape is "+argumentShape);
 				if(previousMatchResult.getAllLowercase().containsKey(s)){
 					try{
-						if((previousMatchResult.getValueOfVariable(s).getValue()==argumentShape.getDimensions()
-								.get(previousMatchResult.getNumInVertcat()).getValue())==false){
+						if((previousMatchResult.getValueOfVariable(s).getIntValue()==argumentShape.getDimensions()
+								.get(previousMatchResult.getNumInVertcat()).getIntValue())==false){
 							if (Debug) System.out.println("two lowercase value not equal, throw error shape!");
 							if (Debug) System.out.println("MATLAB syntax error!");
 							previousMatchResult.setIsError(true);
@@ -39,7 +39,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 							return match;
 						}
 						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-						lowercase.put(s, new DimValue(argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()).getValue(), null));
+						lowercase.put(s, new DimValue(argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()).getIntValue(), null));
 						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 						if (Debug) System.out.println(match.getAllLowercase());
 						match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
@@ -59,7 +59,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 					return match;
 				}
 				else{
-					lowercase.put(s, new DimValue(argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()).getValue(), null));
+					lowercase.put(s, new DimValue(argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()).getIntValue(), null));
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(match.getAllLowercase());
 					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
@@ -91,15 +91,15 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 					if (Debug) System.out.println("inside assigning a lowercase's value to array with lowercase index!");//i.e. M(n)=m;
 					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
 					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1)){
+					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1)){
 						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult
 								.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
 						if (Debug) System.out.println("dimension should not be changed!");
 						previousMatchResult.setArrayIndexAssignRight(false);
 						return previousMatchResult;
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1
+					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1);
+					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1
 							, previousMatchResult.getValueOfVariable(s));
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);

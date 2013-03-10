@@ -52,7 +52,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     public boolean isConstant() {
     	int size = this.dimensions.size();
     	for (int i=0; i<size; i++) {
-    		if (!this.dimensions.get(i).hasValue()) {
+    		if (!this.dimensions.get(i).hasIntValue()) {
     			return false;
     		}
     	}

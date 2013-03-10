@@ -6,43 +6,43 @@ import natlab.tame.valueanalysis.value.*;
 public class SPCase<V extends Value<V>> extends SPNode<V> {
 	
 	static boolean Debug = false;
-	SPPatternlist<V> first;
-	SPOutputlist<V> next;
+	SPPatternlist<V> patternlist;
+	SPOutputlist<V> outputlist;
 	
 	public SPCase(SPPatternlist<V> p, SPOutputlist<V> o) {
-		this.first = p;
-		this.next = o;
+		this.patternlist = p;
+		this.outputlist = o;
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
-		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		ShapePropMatch<V> patternMatch = patternlist.match(isPatternSide, previousMatchResult, argValues, Nargout);
 		/*
-		 * testing whether there is error when do shape matching.
+		 * test whether there is any error when do shape matching.
 		 */
-		if (matchResult.getIsError()==true) {
+		if (patternMatch.getIsError()==true) {
 			isPatternSide = false;
-			return matchResult;
+			return patternMatch;
 		}
 		/*
 		 * if there is no error when do shape matching.
 		 */
 		else {
-			if (matchResult.getHowManyMatched()==argValues.size()) {
+			if (patternMatch.getHowManyMatched()==argValues.size()) {
 				isPatternSide = false;
 				if (Debug) System.out.println("matching part is done successfully!");
-				ShapePropMatch<V> matchOutput = next.match(isPatternSide, matchResult, argValues, Nargout);
+				ShapePropMatch<V> outputMatch = outputlist.match(isPatternSide, patternMatch, argValues, Nargout);
 				// we may don't need argValues in output side.
-				return matchOutput;
+				return outputMatch;
 			}
 			else {
 				isPatternSide = false;
-				matchResult.setIsError(true);
-				return matchResult;
+				patternMatch.setIsError(true);
+				return patternMatch;
 			}			
 		}
 	}
 	
 	public String toString(){
-		return first.toString() + "->" + next.toString();
+		return patternlist.toString() + "->" + outputlist.toString();
 	}
 }

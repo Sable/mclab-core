@@ -39,15 +39,15 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 				else{
 					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
 					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1)){
+					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1)){
 						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult
 								.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
 						if (Debug) System.out.println("dimension should not be changed!");
 						previousMatchResult.setArrayIndexAssignRight(false);
 						return previousMatchResult;
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getValue()-1
+					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1);
+					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1
 							, new DimValue(n.intValue(), null));
 				}
 				if (Debug) System.out.println("new dimension is "+dimensions);
