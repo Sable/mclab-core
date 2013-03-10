@@ -9,6 +9,7 @@ import ast.Program;
 public interface Transformer {
   void replace(ASTNode<?> oldNode, ASTNode<?> newNode);
   void remove(ASTNode<?> node);
+  void insert(ASTNode<?> node, ASTNode<?> newNode, int i);
   Program getProgram();
   String reconstructText();
 }
