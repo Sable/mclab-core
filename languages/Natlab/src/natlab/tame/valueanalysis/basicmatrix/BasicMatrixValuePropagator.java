@@ -38,7 +38,7 @@ public class BasicMatrixValuePropagator extends
 		Constant cResult = builtin.visit(constantProp, arg);
 		if (Debug) System.out.println("constantProp result: " + cResult);
 		if (cResult != null) {
-			return Res.<AggrValue<BasicMatrixValue>>newInstance(factory.newMatrixValue(cResult));
+			return Res.<AggrValue<BasicMatrixValue>>newInstance(factory.newMatrixValue(null, cResult));
 		}
 
 		// if the result is not a constant, just do mclass propagation
@@ -89,7 +89,7 @@ public class BasicMatrixValuePropagator extends
 			Set<ClassReference> values = matchClassResult.get(counter);
 			for (ClassReference classRef : values) {
 				map.put(classRef, factory.newMatrixValueFromClassShapeRange(
-						(PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
+						null, (PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
 			}
 			result.add(ValueSet.newInstance(map));
 		}
@@ -102,7 +102,7 @@ public class BasicMatrixValuePropagator extends
             Args<AggrValue<BasicMatrixValue>> arg) {
         return Res.<AggrValue<BasicMatrixValue>>newInstance(
                 factory.newMatrixValueFromClassShapeRange(
-                        (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
+                        null, (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
     }
     
     //TODO - move to aggr value prop
@@ -111,7 +111,7 @@ public class BasicMatrixValuePropagator extends
             Args<AggrValue<BasicMatrixValue>> elements) {
         ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
-                Args.newInstance(factory.newMatrixValue(1),factory.newMatrixValue(elements.size())));
+                Args.newInstance(factory.newMatrixValue(null, 1),factory.newMatrixValue(null, elements.size())));
         return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(factory, shape, values));
     }
     @Override
@@ -119,7 +119,7 @@ public class BasicMatrixValuePropagator extends
             Args<AggrValue<BasicMatrixValue>> elements) {
         ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
         Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
-                Args.newInstance(factory.newMatrixValue(elements.size()),factory.newMatrixValue(1)));
+                Args.newInstance(factory.newMatrixValue(null, elements.size()),factory.newMatrixValue(null, 1)));
         return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(factory, shape, values));
     }
     

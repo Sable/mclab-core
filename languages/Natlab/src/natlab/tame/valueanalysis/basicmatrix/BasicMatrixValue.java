@@ -33,8 +33,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * which is newMatrixValue.
 	 * TODO, actually, we should rename newMatrixValue to newMatrixValueFromConstant.
 	 */
-	public BasicMatrixValue(Constant constant) {
-		super(constant.getMatlabClass());
+	public BasicMatrixValue(String name, Constant constant) {
+		super(name, constant.getMatlabClass());
 		this.constant = constant;
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>())
 				.newShapeFromIntegers(constant.getShape());
@@ -54,10 +54,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * which is newMatrixValueFromClassAndShape.
 	 */
 	public BasicMatrixValue(
+			String name,
 			PrimitiveClassReference aClass,
 			Shape<AggrValue<BasicMatrixValue>> shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
-		super(aClass);
+		super(name, aClass);
 		this.constant = null;
 		this.shape = shape;
 		this.rangeValue = rangeValue;
@@ -69,8 +70,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * Shape information, we need to call corresponding factory method in 
 	 * BasicMatrixValueFactory, which is newMatrixValueFromInputShape.
 	 */
-	public BasicMatrixValue(PrimitiveClassReference aClass, String shapeInfo) {
-		super(aClass);
+	public BasicMatrixValue(String name, PrimitiveClassReference aClass, String shapeInfo) {
+		super(name, aClass);
 		this.constant = null;
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
 				.newShapeFromInputString(shapeInfo));
@@ -139,16 +140,16 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 							+ this + ", " + other + " has failed");
 		if (this.constant!=null&&((BasicMatrixValue)other).getConstant()!=null) {
 			Constant result = this.constant.merge(((BasicMatrixValue)other).getConstant());
-			if (result!=null) return factory.newMatrixValue(result);
+			if (result!=null) return factory.newMatrixValue(this.getSymbolic(), result);
 		}
 		BasicMatrixValue newMatrix;
 		if (this.hasRangeValue()) {
-			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
 					this.shape.merge(((BasicMatrixValue)other).getShape())
 					,this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
 		}
 		else {
-			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
 					this.shape.merge(((HasShape<AggrValue<BasicMatrixValue>>)other).getShape()), null);
 		}
 		return newMatrix;
@@ -183,7 +184,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(
 			Args<AggrValue<BasicMatrixValue>> indizes) {
 		return ValueSet.<AggrValue<BasicMatrixValue>> newInstance(
-				factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(), 
+				factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
 						shapePropagator.arraySubsref(this.shape, indizes), null));
 	}
 
@@ -191,7 +192,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public AggrValue<BasicMatrixValue> arraySubsasgn(
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			AggrValue<BasicMatrixValue> value) {
-		return factory.newMatrixValueFromClassShapeRange(this.getMatlabClass(),
+		return factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
 				shapePropagator.arraySubsasgn(this.shape, indizes, value), null);
 	}
 

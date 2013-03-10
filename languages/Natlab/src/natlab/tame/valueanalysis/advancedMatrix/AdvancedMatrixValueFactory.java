@@ -12,8 +12,8 @@ import natlab.tame.valueanalysis.value.*;
 public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixValue>{
     static boolean Debug = false;
 	@Override
-    public AdvancedMatrixValue newMatrixValue(Constant constant) {
-        return new AdvancedMatrixValue(constant);
+    public AdvancedMatrixValue newMatrixValue(String symbolic, Constant constant) {
+        return new AdvancedMatrixValue(symbolic, constant);
     }
     
     static AggrValuePropagator<AdvancedMatrixValue> propagator = 
@@ -33,7 +33,7 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
 	public AggrValue<AdvancedMatrixValue> forRange(
 			AggrValue<AdvancedMatrixValue> lower,
 			AggrValue<AdvancedMatrixValue> upper, AggrValue<AdvancedMatrixValue> inc) { 
-		return new AdvancedMatrixValue(
+		return new AdvancedMatrixValue(null,
 				classPropagator.forRange(lower, upper, inc),shapePropagator.forRange(lower, upper, inc),
 				iscomplexinfoPropagator.forRange(lower, upper, inc));
 	}

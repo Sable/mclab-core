@@ -193,16 +193,16 @@ public class ClassPropTool {
         System.out.println(parse("typeString(double|logical)"));
         printMatch(f5,PrimitiveClassReference.DOUBLE);
         printMatch(f5,PrimitiveClassReference.CHAR);
-        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue("double"));
-        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue("int16"));
+        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue(null, "double"));
+        printMatchByValue(f5,new SimpleMatrixValueFactory().newMatrixValue(null, "int16"));
         
         
         CP f6 = new CPMap(new CPChain(new CPScalar(),new CPBuiltin("char")),new CPBuiltin("logical"));
         System.out.println();
         System.out.println(f6);
         System.out.println(parse("scalar char->logical"));
-        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("aaaa"));
-        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue("a"));
+        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue(null, "aaaa"));
+        printMatchByValue(f6,new SimpleMatrixValueFactory().newMatrixValue(null, "a"));
         
         CP f7 = new CPMap(new CPBuiltin("logical"),new CPError());
         System.out.println();
@@ -232,7 +232,7 @@ public class ClassPropTool {
         System.out.println();
         System.out.println(Builtin.Ones.getInstance().getMatlabClassPropagationInfo());
         printMatchByValue(Builtin.Ones.getInstance().getMatlabClassPropagationInfo(),
-                new SimpleMatrixValueFactory().newMatrixValue("double"));
+                new SimpleMatrixValueFactory().newMatrixValue(null, "double"));
 
         System.out.println();
         System.out.println(Builtin.Complex.getInstance().getMatlabClassPropagationInfo());

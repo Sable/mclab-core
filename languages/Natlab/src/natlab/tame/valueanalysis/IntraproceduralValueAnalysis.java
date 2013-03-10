@@ -325,10 +325,16 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //put in flow map
         ValueFlowMap<V> flow = getCurrentInSet();
         String targetName = node.getTargetName().getID();
+        
+        /*
+         * this comment and code below modified added by XU @ 6:36pm March 9th 2013
+         * this targetName can be used as a symbolic value of this target variable, 
+         * so I passed this symbolic info to newValueSet method below.
+         */
 
         //assign result
         setCurrentOutSet(assign(flow,targetName, 
-                Res.newInstance(factory.newValueSet(constant))));
+                Res.newInstance(factory.newValueSet(targetName, constant))));
 
         //set in/out set
         associateInAndOut(node);
@@ -601,7 +607,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
                 if (function.getName().equals("nargin") && argsObj.size() == 0){
-                    results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
+                	// changed by XU @ 6:41pm March 9th 2013, TODO unchecked!
+                    results.add(Res.newInstance(factory.newMatrixValue(null, argMap.size())));
                 } else {
                 	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);
                 	results.add(valuePropagator.call(function.getName(), argsObj));

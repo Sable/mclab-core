@@ -69,7 +69,7 @@ public class Test {
         IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> classAnalysis =
             new IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>>(null,
                 aFunction,SimpleMatrixValue.FACTORY,
-                Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(PrimitiveClassReference.DOUBLE)));
+                Args.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(null, PrimitiveClassReference.DOUBLE)));
         try{
             FlowAnalysisTestTool test = new FlowAnalysisTestTool(classAnalysis);
             String s = test.run(true,true);
