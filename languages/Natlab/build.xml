@@ -168,22 +168,9 @@
   <sequential>
     <jar destfile="@{basename}.jar">
       <manifest><attribute name="Main-Class" value="${entrypoint.class}" /></manifest>
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <zipgroupfileset dir="${lib.dir}"
+        includes="${beaver.rt.jar.path.prop},${antlr3.rt.jar.path.prop},${string.template.jar.path.prop},${antlr2.jar.path.prop},${guava.jar.path.prop}" />
+      <fileset dir="${matlab.bin.dir}/" includes="**/*.class" />
       <fileset dir="${basedir}/resources" />  
       <fileset dir="${basedir}/${bin.dir}" includes="**/*.class" excludes="@{excludes}" />
     </jar>
