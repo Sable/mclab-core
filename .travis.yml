@@ -1,5 +1,5 @@
 language: java
 branches:
-	only:
-		- develop
+  only:
+    - develop
 script: "cd languages/Natlab; ant test"
