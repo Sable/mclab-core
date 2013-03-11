@@ -100,9 +100,19 @@ public class BasicMatrixValuePropagator extends
 	@Override
     public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> arg) {
-        return Res.<AggrValue<BasicMatrixValue>>newInstance(
-                factory.newMatrixValueFromClassShapeRange(
-                        null, (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
+		if (Debug) System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation.");
+		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
+		if (Debug) System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
+		if (matchShapeResult == null) if (Debug) System.out.println("somehow, shape results from caseAbstractConcatenation are null");
+		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
+		for (int counter=0; counter<matchShapeResult.size(); counter++) {
+			HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
+					new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
+			map.put((PrimitiveClassReference)getDominantCatArgClass(arg), factory.newMatrixValueFromClassShapeRange(
+					null, (PrimitiveClassReference)getDominantCatArgClass(arg), matchShapeResult.get(counter), null));
+			result.add(ValueSet.newInstance(map));
+		}
+        return result;
     }
     
     //TODO - move to aggr value prop
