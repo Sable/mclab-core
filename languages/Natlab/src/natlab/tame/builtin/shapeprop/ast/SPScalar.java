@@ -24,7 +24,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				return previousMatchResult;
 			}
 			// if the argument is not empty, but the current index pointing to no argument, not matched.
-			else if (argValues.get(previousMatchResult.getHowManyMatched())==null) {
+			else if (argValues.size() <= previousMatchResult.getHowManyMatched()) {
 				previousMatchResult.setIsError(true);
 				return previousMatchResult;
 			}

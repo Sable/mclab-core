@@ -76,6 +76,10 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
 				.newShapeFromInputString(shapeInfo));
 	}
+	
+	public boolean hasMatlabClass() {
+		return this.classRef!=null;
+	}
 
 	/**
 	 * returns true if the represented data is a constant
@@ -92,10 +96,14 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public Constant getConstant() {
 		return this.constant;
 	}
+	
+	public boolean hasShape() {
+		return this.shape!=null;
+	}
 
 	/**
-	 * Always has shape information? Based on current three constructor,
-	 * yes, BasicMatrixValue object always has shape info.
+	 * Always has shape information? No, if shape propagation fails or not match, 
+	 * there will be no shape info from result.
 	 */
 	public Shape<AggrValue<BasicMatrixValue>> getShape() {
 		return this.shape;
@@ -171,13 +179,17 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 
 	@Override
 	/**
-	 * always has class info, shape info and range value info.
+	 * although there should always be mclass and shape info for each variable 
+	 * after value propagation, since we need them to declare variable in back end, 
+	 * actually, any component info can be null, since mclass, shape or rangeValue 
+	 * propagation may not match for some reason.
+	 * we should always be careful about null value!
 	 */
 	public String toString() {
-		return "(" + this.getMatlabClass() 
-				+ (isConstant() ? ("," + this.constant) : "") 
-				+ "," + this.shape
-				+ (hasRangeValue() ? ("," + this.rangeValue) : "")+")";
+		return "(" + (hasMatlabClass()? this.classRef : ",[mclass propagation fails]") 
+				+ (isConstant()? ("," + this.constant) : "") 
+				+ (hasShape()? ("," + this.shape) : ",[shape propagation fails]")
+				+ (hasRangeValue()? ("," + this.rangeValue) : "")+")";
 	}
 
 	@Override

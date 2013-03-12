@@ -24,6 +24,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 		 *  1. functions in assignment statements;
 		 *  2. functions as an assert statement itself.
 		 *  P.S. assert statement functions have the ability to set matching process has error.
+		 *  but, actually, has error and not matched both return null shape at last.
 		 *  currently, previousScalar, previousShapeDim, add, minus, div, minimum and copy are functions in assignment;
 		 *  numOutput and isequal are assert functions.
 		 */
@@ -38,10 +39,8 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 	            return matchResult;	
 			}
 			else{
-				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				lowercase.put(latestMatchedLowercase, new DimValue());
-				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-	            return matchResult;	
+				System.err.println("cannot get the value of previous matched Scalar in shape equation.");
+	            return previousMatchResult;	
 			}	
 		}
 		else if(funName.equals("previousShapeDim")) {
@@ -79,7 +78,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			            return matchResult;
 					}
 				}
-				System.err.println("check your shape equation for using previousShapeDim() function.");
+				System.err.println("cannot get the size of a certain dimension of a shape in shape equation.");
 				return previousMatchResult;
 			}
 		}
@@ -113,6 +112,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 						return matchResult;
 					}					
 				}
+				System.err.println("cannot compute add function in shape equation!");
 				return previousMatchResult;
 			}
 		}
@@ -171,17 +171,16 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 		else if (funName.equals("copy") && arglist!=null) {
 			String[] arg = arglist.toString().split(",");
 			if (arg.length==1) {
-				if (Debug) System.out.println("try to copy the shape of " + arg[0] + " to the temporary variable " + previousMatchResult.getLatestMatchedUppercase());
+				if (Debug) System.out.println("try to copy the shape of " + arg[0] + " to the temporary variable " 
+			+ previousMatchResult.getLatestMatchedUppercase());
 				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 				Shape<V> newShape = new ShapeFactory<V>().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
 				uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				return matchResult;
 			}
-			else {
-				System.err.println("check your shape equation language for using copy() function.");
-				return previousMatchResult;
-			}
+			System.err.println("check your shape equation language for using copy() function.");
+			return previousMatchResult;
 		}
 		else if (funName.equals("numOutput") && arglist!=null) {
 			String[] arg = arglist.toString().split(",");
@@ -189,10 +188,9 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				if (Debug) System.out.println("checking whether the number of output arguments equals to " + arg[0]);
 				if (Integer.parseInt(arg[0])==Nargout) return previousMatchResult;
 			}
-			else{
-				previousMatchResult.setIsError(true);
-				return previousMatchResult;
-			}
+			previousMatchResult.setIsError(true);
+			System.err.println("the number of output arguments is not matched.");
+			return previousMatchResult;
 		}
 		else if (funName.equals("isequal") && arglist!=null) {
 			String[] arg = arglist.toString().split(",");
@@ -203,13 +201,44 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				Shape<V> second = previousMatchResult.getShapeOfVariable(arg[1]);
 				if (first.equals(second)) return previousMatchResult;
 			}
-			else {
-				previousMatchResult.setIsError(true);
-				return previousMatchResult;				
-			}
+			previousMatchResult.setIsError(true);
+			System.err.println("two shapes are not equal.");
+			return previousMatchResult;
 		}
-		System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) + "), check your shape equation in builtins.csv file!");
-		return previousMatchResult;
+		else if (funName.equals("atLeastOneDimNLT") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				if (Debug) System.out.println("testing whether there is at least one dimension of matched array shape not less than "+arg[0]);
+				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+				for (DimValue dim : dimensions) {
+					if (dim.hasIntValue()) {
+						if (dim.getIntValue() >= Integer.parseInt(arg[0])) {
+							return previousMatchResult;
+						}
+					}
+				}
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("cannot confirm whether the size of at least one dimension is not less than " + arg[0]);
+			return previousMatchResult;
+		}
+		else if (funName.equals("latestMatchedLowercaseNLT") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				DimValue lowercase = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase());
+				if (lowercase.hasIntValue()) {
+					if (lowercase.getIntValue() >= Integer.parseInt(arg[0])) return previousMatchResult;
+				}
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("cannot confirm whether latest matched not less than " + arg[0]);
+			return previousMatchResult;
+		}
+		else {
+			System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) 
+					+ "), check your shape equation in builtins.csv file!");
+			return previousMatchResult;
+		}
 	}
 	
 	public String toString() {

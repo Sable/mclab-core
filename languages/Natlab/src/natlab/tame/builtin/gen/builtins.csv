@@ -234,7 +234,7 @@ rem
 
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
--Shape(M,M,anyDimensionLT(3)->M)
+-Shape(M,M,atLeastOneDimNLT(3)->M||M,M,$,n=previousScalar(),k=previousShapeDim(n),latestMatchedLowercaseNLT(3)->M)
 -isComplex(A,A,R?->R)
 #TODO@Vineet confirm if the output has to be real ?
 cross

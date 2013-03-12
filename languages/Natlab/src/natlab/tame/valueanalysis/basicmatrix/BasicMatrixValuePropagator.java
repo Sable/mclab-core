@@ -83,17 +83,31 @@ public class BasicMatrixValuePropagator extends
 		 * like +, -, * and /, and all of them won't return multiple results.
 		 */
 		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
-		for (int counter=0; counter<matchShapeResult.size(); counter++) {
-			HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
-					new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
-			Set<ClassReference> values = matchClassResult.get(counter);
-			for (ClassReference classRef : values) {
-				map.put(classRef, factory.newMatrixValueFromClassShapeRange(
-						null, (PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
+		if (matchShapeResult!=null) {
+			for (int counter=0; counter<matchShapeResult.size(); counter++) {
+				HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
+						new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
+				Set<ClassReference> values = matchClassResult.get(counter);
+				for (ClassReference classRef : values) {
+					map.put(classRef, factory.newMatrixValueFromClassShapeRange(
+							null, (PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
+				}
+				result.add(ValueSet.newInstance(map));
 			}
-			result.add(ValueSet.newInstance(map));
+			return result;			
 		}
-		return result;
+		else {
+			for (Set<ClassReference> values : matchClassResult) {
+				HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
+						new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
+				for (ClassReference classRef : values) {
+					map.put(classRef, factory.newMatrixValueFromClassShapeRange(
+							null, (PrimitiveClassReference)classRef, null, rangeValueResult));
+				}
+				result.add(ValueSet.newInstance(map));
+			}
+			return result;	
+		}
 	}
 
 	//TODO figure out shape propagation for following cases.
