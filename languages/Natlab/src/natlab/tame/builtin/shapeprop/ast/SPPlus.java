@@ -13,7 +13,7 @@ public class SPPlus<V extends Value<V>> extends SPAbstractMatchExpr<V>{
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
 		ShapePropMatch<V> keepMatch = sp.match(isPatternSide, previousMatchResult, argValues, num);
-		while((argValues.size()>keepMatch.getHowManyMatched())&&(keepMatch.getIsError()==false)){
+		while((argValues.size()>keepMatch.getHowManyMatched())&&(!keepMatch.getIsError())){
 			if (Debug) System.out.println("inside plus loop "+keepMatch.getHowManyMatched());
 			if (Debug) System.out.println(keepMatch.getHowManyMatched());
 			if (Debug) System.out.println("index doesn't point null, keep matching!");

@@ -17,20 +17,20 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
-			if(previousMatchResult.getIsArrayIndexAssignRight()==true){
+		if(isPatternSide){//because number can pop up everywhere, so just store it in latestMatchedNumber!
+			if(previousMatchResult.getIsAssignLiteralToLHS()){
 				//FIXME
 				if (Debug) System.out.println("trying to assign "+n.toString()+" to an array!");
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
 				List<DimValue> dimensions = new ArrayList<DimValue>(previousMatchResult.getShapeOfVariable(previousMatchResult
 						.getLatestMatchedUppercase()).getDimensions());
-				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
+				if(previousMatchResult.getWhetherLatestMatchedIsNum()){
 					if (Debug) System.out.println("inside assigning a num to array with num index!");//i.e. M(2)=2;
 					//deal with the case that index overflow
 					if((dimensions.size()-1)<(previousMatchResult.getLatestMatchedNumber()-1)){
 						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getLatestMatchedNumber());
 						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
+						previousMatchResult.setIsAssignLiteralToLHS(false);
 						return previousMatchResult;
 					}
 					dimensions.remove(previousMatchResult.getLatestMatchedNumber()-1);
@@ -43,7 +43,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult
 								.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
 						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
+						previousMatchResult.setIsAssignLiteralToLHS(false);
 						return previousMatchResult;
 					}
 					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue()-1);
@@ -59,7 +59,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V>{
 				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
 				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				if (Debug) System.out.println("currently, all the matched matrix are "+match.getAllUppercase());
-				match.setArrayIndexAssignRight(false);
+				match.setIsAssignLiteralToLHS(false);
 				return match;
 			}
 			if (Debug) System.out.println("inside match a number!");

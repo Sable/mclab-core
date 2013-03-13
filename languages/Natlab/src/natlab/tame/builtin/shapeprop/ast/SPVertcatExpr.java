@@ -26,7 +26,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
-		if (isPatternSide==true) {
+		if (isPatternSide) {
 			if (Debug) System.out.println("just get into SPVertcatExpr, setIsInsideVertcat is true!");
 			previousMatchResult.setIsInsideVertcat(true);
 			previousMatchResult.setNumInVertcat(0);//reset it
@@ -36,7 +36,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			if (!previousMatchResult.getIsInsideAssign()&&vl==null) {
 				if (argValues.size()==0) {
 					// matching empty shape successfully.
-					previousMatchResult.setIsMatchingDone();
+					previousMatchResult.setIsMatchDone();
 					return previousMatchResult;
 				}
 				previousMatchResult.setIsError(true);
@@ -48,7 +48,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			}
 			else {
 				ShapePropMatch<V> match = vl.match(isPatternSide, previousMatchResult, argValues, Nargout);
-				if (match.getIsError()==true) {
+				if (match.getIsError()) {
 					Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
 					errorShape.flagHasError();
 					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();

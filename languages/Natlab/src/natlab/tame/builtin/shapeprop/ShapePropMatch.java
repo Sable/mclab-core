@@ -15,21 +15,27 @@ public class ShapePropMatch<V extends Value<V>> {
 	// index in vertcat;
 	int numInVertcat = 0;
 	int previousMatchedNumber = 0;
-	// lowercase is used like m=previousScalar()
+	String previousMatchedLowercase = "";
+	String previousMatchedUppercase = "";
+	// lowercase is used in assignment, like m=previousScalar(), or in vertcat, like [1,k].
 	HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 	// mostly, uppercase is used for matching a shape
 	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+	/*
+	 *  whetherLatestMatchedIsNum is used for the case like M(2)=2, 
+	 *  which means assign 2 to the second dimension of M.
+	 */
+	boolean isAssignLiteralToLHS = false;
 	boolean whetherLatestMatchedIsNum = false;
-	boolean ArrayIndexAssignLeft = false;
-	boolean ArrayIndexAssignRight = false;
 	boolean isError = false;
-	boolean isMatchingDone = false;
+	boolean isMatchDone = false;
 	boolean isOutputDone = false;
-	// isInsideVertcat is used for distinguish the lowercase in vertcat or not, like n=previousScalar() and [m,n]
+	/* 
+	 * isInsideVertcat is used for distinguish the lowercase in vertcat or not, 
+	 * like n=previousScalar() and [m,n]
+	 */
 	boolean isInsideVertcat = false;
 	boolean isInsideAssign = false;
-	String previousMatchedLowercase = "";
-	String previousMatchedUppercase = "";
 	ArrayList<DimValue> needForVertcat = new ArrayList<DimValue>();
 	// used to store results
 	List<Shape<V>> output = new ArrayList<Shape<V>>(); 
@@ -49,18 +55,17 @@ public class ShapePropMatch<V extends Value<V>> {
         this.howManyEmitted = parent.howManyEmitted;
         this.numInVertcat = parent.numInVertcat;
         this.previousMatchedNumber = parent.previousMatchedNumber;
+        this.previousMatchedLowercase = parent.previousMatchedLowercase;
+        this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.lowercase = parent.lowercase;
         this.uppercase = parent.uppercase;
+        this.isAssignLiteralToLHS = parent.isAssignLiteralToLHS;
         this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
-        this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
-        this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
         this.isError = parent.isError;
-        this.isMatchingDone = parent.isMatchingDone;
+        this.isMatchDone = parent.isMatchDone;
         this.isOutputDone = parent.isOutputDone;
         this.isInsideVertcat = parent.isInsideVertcat;
         this.isInsideAssign = parent.isInsideAssign;
-        this.previousMatchedLowercase = parent.previousMatchedLowercase;
-        this.previousMatchedUppercase = parent.previousMatchedUppercase;
         this.needForVertcat = parent.needForVertcat;
         this.output = parent.output;
 	}
@@ -68,7 +73,8 @@ public class ShapePropMatch<V extends Value<V>> {
 	/**
 	 * add new lower case or upper case into current result
 	 */
-	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, DimValue> lowercase, HashMap<String, Shape<V>> uppercase) {
+	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, DimValue> lowercase
+			, HashMap<String, Shape<V>> uppercase) {
 		this.factory = parent.factory;
 		this.howManyMatched = parent.howManyMatched;
 		this.howManyEmitted = parent.howManyEmitted;
@@ -78,11 +84,10 @@ public class ShapePropMatch<V extends Value<V>> {
 		this.uppercase = parent.uppercase;
 		if (lowercase!=null) this.lowercase.putAll(lowercase);  //using HashMap putAll
 		if (uppercase!=null) this.uppercase.putAll(uppercase);
+		this.isAssignLiteralToLHS = parent.isAssignLiteralToLHS;
 		this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
-		this.ArrayIndexAssignLeft = parent.ArrayIndexAssignLeft;
-		this.ArrayIndexAssignRight = parent.ArrayIndexAssignRight;
 	    this.isError = parent.isError;
-	    this.isMatchingDone = parent.isMatchingDone;
+	    this.isMatchDone = parent.isMatchDone;
 	    this.isOutputDone = parent.isOutputDone;
 	    this.isInsideVertcat = parent.isInsideVertcat;
 	    this.isInsideAssign = parent.isInsideAssign;
@@ -119,28 +124,20 @@ public class ShapePropMatch<V extends Value<V>> {
     	return this.isError;
     }
     
+    public void setIsAssignLiteralToLHS(boolean condition) {
+    	this.isAssignLiteralToLHS = condition;
+    }
+    
+    public boolean getIsAssignLiteralToLHS(){
+    	return this.isAssignLiteralToLHS;
+    }
+    
     public void setWhetherLatestMatchedIsNum(boolean condition) {
     	this.whetherLatestMatchedIsNum = condition;
     }
     
     public boolean getWhetherLatestMatchedIsNum() {
     	return this.whetherLatestMatchedIsNum;
-    }
-    
-    public void setArrayIndexAssignLeft(boolean condition) {
-    	this.ArrayIndexAssignLeft = condition;
-    }
-    
-    public boolean getIsArrayIndexAssignLeft() {
-    	return this.ArrayIndexAssignLeft;
-    }
-    
-    public void setArrayIndexAssignRight(boolean condition) {
-    	this.ArrayIndexAssignRight = condition;
-    }
-    
-    public boolean getIsArrayIndexAssignRight(){
-    	return this.ArrayIndexAssignRight;
     }
     
     public void saveLatestMatchedNumber(int latestMatchedNumber) {
@@ -179,12 +176,12 @@ public class ShapePropMatch<V extends Value<V>> {
     	return this.numInVertcat;
     }
     
-    public void setIsMatchingDone() {
-    	this.isMatchingDone = true;
+    public void setIsMatchDone() {
+    	this.isMatchDone = true;
     }
     
-    public boolean getIsMatchingDone() {
-    	return isMatchingDone;
+    public boolean getIsMatchDone() {
+    	return isMatchDone;
     }
     
     public void setIsOutputDone() {

@@ -18,8 +18,8 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		if(isPatternSide==true){
-			if(previousMatchResult.getIsInsideAssign()==true){
+		if(isPatternSide){
+			if(previousMatchResult.getIsInsideAssign()){
 				previousMatchResult.saveLatestMatchedUppercase(s);
 				return previousMatchResult;
 			}

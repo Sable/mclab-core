@@ -17,12 +17,12 @@ public class SPCaselist<V extends Value<V>> extends SPNode<V> {
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
 		// the first case's shape matching is successful.
-		if (matchResult.getIsoutputDone()==true) {
+		if (matchResult.getIsoutputDone()) {
 			if (Debug) System.out.println("matching and results emmitting successfully!");
 			return matchResult;
 		}
 		// the first case's shape matching doesn't succeed, go to next case if there is one.
-		else if (matchResult.getIsoutputDone()==false && next!=null) {
+		else if (!matchResult.getIsoutputDone() && next!=null) {
 			isPatternSide = true;
 			ShapePropMatch<V> newMatchResult = next.match(isPatternSide, new ShapePropMatch<V>(), argValues, Nargout);
 			return newMatchResult;

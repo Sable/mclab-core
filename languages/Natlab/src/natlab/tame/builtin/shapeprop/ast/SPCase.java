@@ -19,7 +19,7 @@ public class SPCase<V extends Value<V>> extends SPNode<V> {
 		/*
 		 * test whether there is any error when do shape matching.
 		 */
-		if (patternMatch.getIsError()==true) {
+		if (patternMatch.getIsError()) {
 			isPatternSide = false;
 			return patternMatch;
 		}

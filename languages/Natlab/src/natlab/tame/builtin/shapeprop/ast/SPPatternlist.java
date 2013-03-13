@@ -15,7 +15,7 @@ public class SPPatternlist<V extends Value<V>> extends SPNode<V> {
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
-		if (match.getIsError()==true) return match;
+		if (match.getIsError()) return match;
 		if (next!=null) {
 			ShapePropMatch<V> continueMatch = next.match(isPatternSide, match, argValues, Nargout);
 			return continueMatch;

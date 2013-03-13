@@ -17,7 +17,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
-		if (isPatternSide==true) {
+		if (isPatternSide) {
 			// if the argument is empty, not matched.
 			if (argValues.isEmpty()) {
 				previousMatchResult.setIsError(true);

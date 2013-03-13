@@ -24,7 +24,7 @@ public class SPAny<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		if (Debug) System.out.println("inside matching any shape variable!");
-		if (isPatternSide==true) {
+		if (isPatternSide) {
 			if (argValues.get(previousMatchResult.getHowManyMatched())!=null) {
 				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
