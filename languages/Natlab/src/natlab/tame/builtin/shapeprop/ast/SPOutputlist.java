@@ -14,26 +14,24 @@ public class SPOutputlist<V extends Value<V>> extends SPNode<V> {
 		this.next = next;
 	}
 	
-	public SPOutputlist() {}
-	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
-		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
-		if (match.gethowManyEmitted()==Nargout && next == null) {
-			if (Debug) System.out.println("output emitted done!");
-			match.setIsOutputDone();
-			return match;
+		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		if (matchResult.gethowManyEmitted()==Nargout && next == null) {
+			if (Debug) System.out.println("output emitting done!");
+			matchResult.setIsOutputDone();
+			return matchResult;
 		}
-		else if (match.gethowManyEmitted()!=Nargout && next!=null) {
-			return next.match(isPatternSide, match, argValues, Nargout);
+		else if (matchResult.gethowManyEmitted()!=Nargout && next!=null) {
+			return next.match(isPatternSide, matchResult, argValues, Nargout);
 		}
 		else {
-			//shape matching fails.
-			return match;
+			// shape matching fails.
+			return matchResult;
 		}
 		
 	}
 	
-	public String toString(){
+	public String toString() {
 		return first.toString() + (next==null? "" : ","+next);
 	}
 }

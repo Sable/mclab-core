@@ -14,13 +14,13 @@ public class SPPatternlist<V extends Value<V>> extends SPNode<V> {
 	}
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
-		ShapePropMatch<V> match = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
-		if (match.getIsError()) return match;
+		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		if (matchResult.getIsError()) return matchResult;
 		if (next!=null) {
-			ShapePropMatch<V> continueMatch = next.match(isPatternSide, match, argValues, Nargout);
+			ShapePropMatch<V> continueMatch = next.match(isPatternSide, matchResult, argValues, Nargout);
 			return continueMatch;
 		}
-		else return match;
+		else return matchResult;
 	}
 	
 	public String toString() {

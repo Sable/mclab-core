@@ -33,7 +33,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			/*
 			 * test whether it is an empty shape.
 			 */
-			if (!previousMatchResult.getIsInsideAssign()&&vl==null) {
+			if (!previousMatchResult.getIsInsideAssign() && vl==null) {
 				if (argValues.size()==0) {
 					// matching empty shape successfully.
 					previousMatchResult.setIsMatchDone();
@@ -42,7 +42,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				previousMatchResult.setIsError(true);
 				return previousMatchResult;
 			}
-			else if (previousMatchResult.getIsInsideAssign()&&vl==null) {
+			else if (previousMatchResult.getIsInsideAssign() && vl==null) {
 				// TODO this is used for generating an empty shape, and later to store shape info propagation result.
 				return previousMatchResult;
 			}

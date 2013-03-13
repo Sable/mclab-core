@@ -9,95 +9,89 @@ import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.components.constant.*;
 
-public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
+public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
+	
 	static boolean Debug = false;
 	String s;
-	public SPUppercase (String s){
+	
+	public SPUppercase (String s) {
 		this.s = s;
-		//System.out.println(s);
 	}
 	
-	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int num){
-		if(isPatternSide){
-			if(previousMatchResult.getIsInsideAssign()){
-				previousMatchResult.saveLatestMatchedUppercase(s);
+	/**
+	 * uppercase can appear at both pattern matching side and output emitting side, 
+	 * on the pattern matching side, it can appear to match an array shape pattern 
+	 * or appear in an indexed array expression, like M(2);
+	 * on the output emitting side, it is just to represent an array shape.
+	 */
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		if (isPatternSide) {
+			// if the argument is empty, not matched.
+			if (argValues.isEmpty()) {
+				previousMatchResult.setIsError(true);
 				return previousMatchResult;
 			}
-			if(argValues.get(previousMatchResult.getHowManyMatched())!=null){
-				//get indexing current Matrix Value from args
-				//get shape info from current Matrix Value
-				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
-				Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
-				if(argumentConstant!=null){
-					if (Debug) System.out.println("it's a constant!");
-					previousMatchResult.setIsError(true);
+			// if the argument is not empty, but the current index pointing to no argument, not matched.
+			else if (argValues.size() <= previousMatchResult.getHowManyMatched()) {
+				previousMatchResult.setIsError(true);
+				return previousMatchResult;
+			}
+			// if the argument is not empty, and the current index pointing to an argument, try to match.
+			else {
+				if (previousMatchResult.getIsInsideAssign()) {
+					previousMatchResult.saveLatestMatchedUppercase(s);
 					return previousMatchResult;
 				}
-				//check whether or not current uppercase already in the previousMatchResult
-				try{
-					if(previousMatchResult.getLatestMatchedUppercase().equals(s)){
-						//cases like (M,M->M), those M should be definitely the same!!! if not, return error information, interesting!
-						List<DimValue> l = new ArrayList<DimValue>();
-						l = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
-						Shape<V> oldShape = new ShapeFactory<V>().newShapeFromDimValues(l);
-						//Shape<AggrValue<BasicMatrixValue>> newShape = argumentShape.merge(oldShape); this is wrong at all! see last comment!
-						if(argumentShape.getDimensions().equals(oldShape.getDimensions())==false){
-							//FIXME really weird, cannot call equals method in Shape class, the problem is still generic problem,
-							//cannot cast from Shape<V> to Shape<V>
-							if (Debug) System.out.println("MATLAB syntax error!");
-							//Shape<AggrValue<BasicMatrixValue>> errorShape = (new ShapeFactory<AggrValue<BasicMatrixValue>>
-							//(previousMatchResult.factory)).newShapeFromIntegers(null);
-							Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
-							errorShape.flagHasError();
-							HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-							lowercase.put(s, new DimValue());
-							HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
-							uppercase.put(s, errorShape);
-							ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
-							match.comsumeArg();
-							match.saveLatestMatchedUppercase(s);
-							match.setIsError(true);//this is important!! break from matching algorithm.
-							//System.out.println(match.getValueOfVariable(s));
-							if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-							if (Debug) System.out.println("matched matrix expression "+match.getLatestMatchedUppercase());
-							return match;
+				else {
+					/*
+					 * similar to lowercase matching in vertcat, if this uppercase has been matched before, 
+					 * we should do shape checking to make sure these two shape are equal.
+					 */
+					Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+					Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
+					if (argumentConstant!=null) {
+						if (Debug) System.out.println("it's a constant!");
+						previousMatchResult.setIsError(true);
+						return previousMatchResult;
+					}
+					/*
+					 * check whether or not current uppercase already in the previousMatchResult, 
+					 * cases like (M,M->M), those M on the pattern matching side should be the same. if not, return error.
+					 */
+					if (previousMatchResult.getAllUppercase().containsKey(s)) {
+						Shape<V> previousShape = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
+						if (!argumentShape.equals(previousShape)) {
+							System.err.println("MATLAB syntax error, then arguments should have the same shape (size).");
+							previousMatchResult.setIsError(true);
+							return previousMatchResult;
 						}
-						//if new shape and old shape are equals, just return this shape!
-						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-						lowercase.put(s, new DimValue());
+						/*
+						 * if new shape and old shape are equals, just consume one argument, 
+						 * and then keep on matching.
+						 */
+						previousMatchResult.comsumeArg();
+						previousMatchResult.saveLatestMatchedUppercase(s);
+						return previousMatchResult;
+					}
+					/*
+					 * first time encounter this uppercase.
+					 */
+					else {
 						HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
 						uppercase.put(s, argumentShape);
-						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
-						match.comsumeArg();
-						match.saveLatestMatchedUppercase(s);
-						//System.out.println(match.getValueOfVariable(s));
-						if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-						if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
-						return match;
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
+						matchResult.comsumeArg();
+						matchResult.saveLatestMatchedUppercase(s);
+						return matchResult;						
 					}
-					
-				}catch (Exception e){}
-				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				lowercase.put(s, new DimValue());
-				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
-				uppercase.put(s, argumentShape);
-				ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
-				match.comsumeArg();
-				match.saveLatestMatchedUppercase(s);
-				//System.out.println(match.getValueOfVariable(s));
-				if (Debug) System.out.println("the shape of "+s+" is "+match.getShapeOfVariable(s));
-				if (Debug) System.out.println("mathcing "+match.getLatestMatchedUppercase());
-				return match;
+				}
 			}
-			//FIXME if index pointing empty, means not match, do something
-			return previousMatchResult;
 		}
-		else{
-			if (Debug) System.out.println("inside output uppercase "+s);
-			// default, which means in the pattern match side, there is no Uppercase matched.
-			if(previousMatchResult.getShapeOfVariable(s)==null){
-				if(previousMatchResult.getOutputVertcatExpr().size()==0){
-					if(previousMatchResult.getLatestMatchedUppercase().equals("$")){
+		else {
+			// uppercase not matched in the pattern matching side, try to find vertcat output or scalar output.
+			if (previousMatchResult.getShapeOfVariable(s)==null) {
+				if (previousMatchResult.getOutputVertcatExpr().size()==0) {
+					if (previousMatchResult.getLatestMatchedUppercase().equals("$")) {
 						previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable("$"));
 						previousMatchResult.emitOneResult();
 						return previousMatchResult;
@@ -106,7 +100,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 					previousMatchResult.emitOneResult();
 					return previousMatchResult;
 				}
-				else if(previousMatchResult.getOutputVertcatExpr().size()==1){
+				else if (previousMatchResult.getOutputVertcatExpr().size()==1) {
 					previousMatchResult.addToVertcatExpr(previousMatchResult.getOutputVertcatExpr().get(0));
 					previousMatchResult.copyVertcatToOutput();
 					previousMatchResult.emitOneResult();
@@ -118,7 +112,11 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 					return previousMatchResult;
 				}
 			}
-			else{
+			/* 
+			 * upeprcase matched in pattern matching side, 
+			 * add the corresponding shape of this matched uppercase to output list.
+			 */
+			else {
 				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
 				previousMatchResult.emitOneResult();
 				return previousMatchResult;
@@ -126,7 +124,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V>{
 		}
 	}
 	
-	public String toString(){
+	public String toString() {
 		return s.toString();
 	}
 }

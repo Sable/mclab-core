@@ -146,6 +146,11 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 							dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult
 									.getLatestMatchedLowercase()).getIntValue()-1, new DimValue());
 					}
+					else {
+						System.err.println("the index of uppercase shape dimension cannot be determined.");
+						previousMatchResult.setIsError(true);
+						return previousMatchResult;						
+					}
 				}
 				/*
 				 * both if and else branch, if matching successfully, will generate a new dimensions.
