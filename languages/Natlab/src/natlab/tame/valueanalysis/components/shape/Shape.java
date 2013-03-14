@@ -36,7 +36,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	static boolean Debug = false;
 	List<DimValue> dimensions;
 	boolean isTop = false;
-	boolean isError = false;
 	
 	public Shape(List<DimValue> dimensions) {
 		this.dimensions = dimensions;
@@ -50,23 +49,35 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * returns true if each dimension of the shape has exact integer value.
      */
     public boolean isConstant() {
-    	int size = this.dimensions.size();
-    	for (int i=0; i<size; i++) {
-    		if (!this.dimensions.get(i).hasIntValue()) {
-    			return false;
-    		}
+    	for (int i=0; i<dimensions.size(); i++) {
+    		if (!dimensions.get(i).hasIntValue()) return false;
     	}
     	return true;
-    }    
+    }
+    
+    /**
+     * return true if each remaining dimension of the shape has exact integer 
+     * value.
+     * @param besidesDim
+     * @return
+     */
+    public boolean isConstant(int besidesDim) {
+    	for (int i=besidesDim; i<dimensions.size(); i++) {
+    		if (!dimensions.get(i).hasIntValue()) return false;
+    	}
+    	return true;
+    }
     
     /**
      * returns true if this shape is scalar or may be scalar
      * returns false if this shape is known to be non-scalar
      */
     public boolean maybeScalar() {
-    	if (this.dimensions.size()!=2) return false;
-    	else if (this.dimensions.get(0).equalsOne()&&(!this.dimensions.get(1).equalsOne())) return true;
-    	else if (this.dimensions.get(1).equalsOne()&&(!this.dimensions.get(0).equalsOne())) return true;
+    	if (dimensions.size()!=2) return false;
+    	else if (dimensions.get(0).equalsOne()&&(!dimensions.get(1).equalsOne())) 
+    		return true;
+    	else if (dimensions.get(1).equalsOne()&&(!dimensions.get(0).equalsOne())) 
+    		return true;
     	else return false;
     }
     
@@ -75,17 +86,14 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * returns false if this shape may or may not be scalar.
      */
     public boolean isScalar() {
-    	if (this.dimensions.size()!=2) return false;
-    	else if (this.dimensions.get(0).equalsOne()&&this.dimensions.get(1).equalsOne()) return true;
+    	if (dimensions.size()!=2) return false;
+    	else if (dimensions.get(0).equalsOne()&&dimensions.get(1).equalsOne()) 
+    		return true;
     	else return false;
     }
     
     public void flagIsTop(){
     	this.isTop=true;
-    }
-    
-    public void flagHasError(){
-    	this.isError=true;
     }
     
     @Override
@@ -129,28 +137,45 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	return true;
     }
     
+    /**
+     * return how many elements in the remaining dimensions of this array. 
+     * besidesDim means starting from besidesDim+1 dimension.
+     * @param besidesDim
+     * @return
+     */
+    public int getHowManyElements(int besidesDim) {
+    	if (!isConstant(besidesDim)) return -1;
+    	else {
+    		int sum = 1;
+    		for (int i=besidesDim; i<dimensions.size(); i++) {
+    			sum *= dimensions.get(i).getIntValue();
+    		}
+    		return sum;
+    	}
+    }
+    
+    /**
+     * this toString is only for there is a shape, in another word, the dimensions 
+     * of this shape is not null, maybe some dimension's is unknown. if the 
+     * shape is null, i.e. the shape propagation failed, when we call toString of 
+     * BasicMatrixValue, it will return "[shape propagation fails]" there, so don't 
+     * worry about dimensions may be null in this toString. 
+     */
     public String toString() {
-    	if(this.isTop==true){
-    		return "[is top]";
-    	}
-    	else if(this.isError==true){
-    		return "[MATLAB syntax error, check your code]";
-    	}
-    	else if(isConstant()==false){
+    	if (this.isTop==true) return "[is top]";
+    	else if (isConstant()==false) {
     		List<String> dimension = new ArrayList<String>();
-    		for(int i=0; i<this.dimensions.size(); i++){
-    			if(this.dimensions.get(i)==null){
-    				dimension.add("?");
-    			}
-    			else{
-    				dimension.add(this.dimensions.get(i).toString());
-    			}
+    		for (int i=0; i<dimensions.size(); i++) {
+    			if (dimensions.get(i)==null) dimension.add("?");
+				/*
+				 *  since we extend dimension value to symbolic, this may return 
+				 *  either integer value or symbolic value of this dimension.
+				 */
+    			else dimension.add(dimensions.get(i).toString());
     		}
     		return dimension.toString();
     	}
-    	else{
-    		return this.dimensions.toString();
-    	}
+    	else return dimensions.toString();
     }
 
     /**

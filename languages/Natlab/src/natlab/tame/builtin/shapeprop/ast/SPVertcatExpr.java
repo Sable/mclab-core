@@ -1,7 +1,6 @@
 package natlab.tame.builtin.shapeprop.ast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
@@ -48,16 +47,6 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			}
 			else {
 				ShapePropMatch<V> match = vl.match(isPatternSide, previousMatchResult, argValues, Nargout);
-				if (match.getIsError()) {
-					Shape<V> errorShape = (new ShapeFactory<V>()).newShapeFromIntegers(null);
-					errorShape.flagHasError();
-					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
-					uppercase.put("vertcat", errorShape);
-					ShapePropMatch<V> errorMatch = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
-					match.setIsInsideVertcat(false);
-					match.comsumeArg();
-					return errorMatch;
-				}
 				match.setIsInsideVertcat(false);
 				match.comsumeArg();
 				return match;				

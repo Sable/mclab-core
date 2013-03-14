@@ -28,13 +28,17 @@ public class ShapePropagator<V extends Value<V>>
 
     @Override
 	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
-		if (Debug) System.out.println("inside ShapePropgator, builtin fn is "+builtin);
-		if (Debug) System.out.println("the number of output variables is "+arg.getNargout());
+		if (Debug) System.out.println("inside ShapePropgator, builtin fn is " 
+	+ builtin);
+		if (Debug) System.out.println("the number of output variables is " 
+	+ arg.getNargout());
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
 			ShapePropTool<V> shapePropTool = new ShapePropTool<V>();
 		    @SuppressWarnings({ "unchecked" })
-			List<Shape<V>> result = shapePropTool.matchByValues(((HasShapePropagationInfo<V>)builtin).getShapePropagationInfo(),arg);
+			List<Shape<V>> result = shapePropTool.matchByValues(
+					((HasShapePropagationInfo<V>)builtin).getShapePropagationInfo()
+					, arg);
 			return result;
 		}
 		throw new UnsupportedOperationException();
@@ -51,11 +55,87 @@ public class ShapePropagator<V extends Value<V>>
     }
     
     //FIXME rewrite the shape analysis for array get and array set statements!
-    public Shape<V> arraySubsref(Shape<V> arrayShape, Args<V> indizes) {
-    	return null;
+    
+    /**
+     * shape analysis for array get statement:
+     * first, the indices of array in our IR can be divided into three categories:
+     * 1. scalar;
+     * 2. vector, which should have a range value;
+     * 3. colon value, which is ":".
+     * second, in MATLAB syntax, we don't need the same number of indices as the 
+     * number of array's dimensions, i.e. shape(a)=[2,3,4], which is a three 
+     * dimensions array, in MATLAB, we can use only one, two or three indices 
+     * to index this array, i.e. b=a(5), which is a linear indexing, b=a(2,:) or 
+     * b=a(2,:,2).
+     * @param arrayShape
+     * @param indices
+     * @return
+     */
+    public Shape<V> arraySubsref(Shape<V> arrayShape, Args<V> indices) {
+    	List<DimValue> newDimensions = new ArrayList<DimValue>(indices.size());
+    	List<DimValue> arrayDimensions = arrayShape.getDimensions();
+    	if (indices.size() > arrayDimensions.size()) {
+    		System.err.println("index exceed the array bound, check you code.");
+    		return null;
+    	}
+    	for (int i=0; i<indices.size(); i++) {
+    		/*
+    		 * ColonValue extends from SpecialValue which extends from Value, 
+    		 * but BasicMatrixValue extends from MatrixValue which extends from 
+    		 * Value, so ColonValue is totally different from MatrixValue, and 
+    		 * of course, we cannot convert ColonValue to HasShape. as a result, 
+    		 * we should deal with ColonValue first.
+    		 */
+    		if (indices.get(i) instanceof ColonValue) {
+    			if (indices.size()==i+1 && arrayDimensions.size()>i+1) {
+    				if (Debug) System.out.println("need to collapse the remaining dimensions");
+					int howManyElementsRemain = arrayShape.getHowManyElements(i);
+    				if (indices.size()==1) newDimensions.add(new DimValue(1, null));
+    				if (howManyElementsRemain==-1) newDimensions.add(new DimValue());
+    				else newDimensions.add(new DimValue(howManyElementsRemain, null));
+    			}
+    			else newDimensions.add(arrayDimensions.get(i));
+    		}
+    		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    			if (indices.size()==i+1 && arrayDimensions.size()>i+1) {
+    				if (Debug) System.out.println("need to collapse the remaining dimensions");
+    				if (indices.size()==1) newDimensions.add(new DimValue(1, null));
+    				newDimensions.add(new DimValue(1, null));
+    			}
+    			else newDimensions.add(new DimValue(1, null));
+    		}
+    		else if (!((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    			if (indices.size()==i+1 && arrayDimensions.size()>i+1) {
+    				if (Debug) System.out.println("need to collapse the remaining dimensions");
+    				if (indices.size()==1) newDimensions.add(new DimValue(1, null));
+    			}
+    			if (((HasShape<V>)indices.get(i)).getShape().isConstant()) 
+    				newDimensions.add(((HasShape<V>)indices.get(i)).getShape()
+    						.getDimensions().get(1));
+    			else
+    				newDimensions.add(new DimValue());
+    		}
+    		else {
+    			System.err.println("this may not happen...");
+    		}
+    	}
+    	return new ShapeFactory<V>().newShapeFromDimValues(newDimensions);
     }
 
-    public Shape<V> arraySubsasgn(Shape<V> arrayShape, Args<V> indizes, V value) {
+    /**
+     * shape analysis for array set statement:
+     * the only problem for this shape analysis is that we need to determine 
+     * whether the indices may grow the original array. when we do bound check, 
+     * we may need the range value analysis result, i.e. if shape(a)=[2,b,5] 
+     * and range(b)=<3,5>, then a(2,4,4)=rhs will not grow array a, because 
+     * range(b)=<3,5>, by the way, do we need to say range(b)=<4,5> after this?
+     * TODO think about this range value analysis problem.
+     * @param arrayShape
+     * @param indices
+     * @param value
+     * @return
+     */
+    public Shape<V> arraySubsasgn(Shape<V> arrayShape, Args<V> indices, V value) {
     	return null;
     }
 }
