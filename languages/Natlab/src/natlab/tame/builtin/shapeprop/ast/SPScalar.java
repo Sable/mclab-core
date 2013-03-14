@@ -16,6 +16,9 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 		this.s = s;
 	}
 	
+	/**
+	 * only used to match a scalar input argument, so cannot be indexed as uppercase.
+	 */
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		if (isPatternSide) {
 			// if the argument is empty, not matched.

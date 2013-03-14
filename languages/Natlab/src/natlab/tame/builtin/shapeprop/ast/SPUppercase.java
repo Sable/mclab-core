@@ -26,27 +26,26 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	 */
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		if (isPatternSide) {
-			// if the argument is empty, not matched.
-			if (argValues.isEmpty()) {
-				previousMatchResult.setIsError(true);
+			if (previousMatchResult.getIsInsideAssign()) {
+				previousMatchResult.saveLatestMatchedUppercase(s);
 				return previousMatchResult;
 			}
-			// if the argument is not empty, but the current index pointing to no argument, not matched.
-			else if (argValues.size() <= previousMatchResult.getHowManyMatched()) {
-				previousMatchResult.setIsError(true);
-				return previousMatchResult;
-			}
-			// if the argument is not empty, and the current index pointing to an argument, try to match.
 			else {
-				if (previousMatchResult.getIsInsideAssign()) {
-					previousMatchResult.saveLatestMatchedUppercase(s);
+				/*
+				 * similar to lowercase matching in vertcat, if this uppercase has been matched before, 
+				 * we should do shape checking to make sure these two shape are equal.
+				 */
+				// if the argument is empty, not matched.
+				if (argValues.isEmpty()) {
+					previousMatchResult.setIsError(true);
+					return previousMatchResult;
+				}
+				// if the argument is not empty, but the current index pointing to no argument, not matched.
+				else if (argValues.size() <= previousMatchResult.getHowManyMatched()) {
+					previousMatchResult.setIsError(true);
 					return previousMatchResult;
 				}
 				else {
-					/*
-					 * similar to lowercase matching in vertcat, if this uppercase has been matched before, 
-					 * we should do shape checking to make sure these two shape are equal.
-					 */
 					Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 					Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
 					if (argumentConstant!=null) {
@@ -83,7 +82,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 						matchResult.comsumeArg();
 						matchResult.saveLatestMatchedUppercase(s);
 						return matchResult;						
-					}
+					}						
 				}
 			}
 		}
@@ -120,7 +119,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				previousMatchResult.addToOutput(previousMatchResult.getShapeOfVariable(s));
 				previousMatchResult.emitOneResult();
 				return previousMatchResult;
-			}	
+			}
 		}
 	}
 	

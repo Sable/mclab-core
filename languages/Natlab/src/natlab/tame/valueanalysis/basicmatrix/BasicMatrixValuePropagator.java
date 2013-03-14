@@ -111,22 +111,33 @@ public class BasicMatrixValuePropagator extends
 	}
 
 	//TODO figure out shape propagation for following cases.
+	
 	@Override
     public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> arg) {
 		if (Debug) System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation.");
 		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
-		if (Debug) System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
-		if (matchShapeResult == null) if (Debug) System.out.println("somehow, shape results from caseAbstractConcatenation are null");
+		if (matchShapeResult == null) System.err.println("somehow, shape results from caseAbstractConcatenation are null");
+		else if (Debug) System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
 		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
-		for (int counter=0; counter<matchShapeResult.size(); counter++) {
+		if (matchShapeResult!=null) {
+			for (int counter=0; counter<matchShapeResult.size(); counter++) {
+				HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
+						new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
+				map.put((PrimitiveClassReference)getDominantCatArgClass(arg), factory.newMatrixValueFromClassShapeRange(
+						null, (PrimitiveClassReference)getDominantCatArgClass(arg), matchShapeResult.get(counter), null));
+				result.add(ValueSet.newInstance(map));
+			}
+	        return result;
+		}
+		else {
 			HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
 					new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
 			map.put((PrimitiveClassReference)getDominantCatArgClass(arg), factory.newMatrixValueFromClassShapeRange(
-					null, (PrimitiveClassReference)getDominantCatArgClass(arg), matchShapeResult.get(counter), null));
+					null, (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
 			result.add(ValueSet.newInstance(map));
+			return result;
 		}
-        return result;
     }
     
     //TODO - move to aggr value prop
