@@ -130,13 +130,26 @@ public class ShapePropagator<V extends Value<V>>
      * and range(b)=<3,5>, then a(2,4,4)=rhs will not grow array a, because 
      * range(b)=<3,5>, by the way, do we need to say range(b)=<4,5> after this?
      * TODO think about this range value analysis problem.
+     * TODO is the input argument V value useful for this analysis, if the 
+     * value's shape doesn't conform with the lhs indexed array, MATLAB will 
+     * throw exception, should we also throw exception, in another word, 
+     * can we assume the input MATLAB code's syntax is always correct?
      * @param arrayShape
      * @param indices
      * @param value
      * @return
+     * 
+     * TODO add array bound check.
+     * 
      */
     public Shape<V> arraySubsasgn(Shape<V> arrayShape, Args<V> indices, V value) {
-    	return null;
+    	List<DimValue> newDimensions = new ArrayList<DimValue>();
+    	List<DimValue> arrayDimensions = arrayShape.getDimensions();
+    	if (indices.size() > arrayDimensions.size()) {
+    		System.err.println("index exceed the array bound, check you code.");
+    		return null;
+    	}
+    	return arrayShape;
     }
 }
 

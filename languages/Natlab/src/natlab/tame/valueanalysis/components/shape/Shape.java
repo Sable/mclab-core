@@ -30,6 +30,9 @@ import natlab.toolkits.analysis.Mergable;
  * of course, there is always some solution to resolve this problem, but 
  * based on other reasons above, I don't want to use List of V extends 
  * Value<V> to represent shape's dimensions.
+ * 
+ * @author XU
+ * 
  */
 public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	
