@@ -21,7 +21,7 @@ import ast.AssignStmt;
 @SuppressWarnings("rawtypes")
 public class UDDUWeb
 {
-    private final boolean DEBUG = false;
+    public static boolean DEBUG = false;
     private UDChain fUDChain;
     private DUChain fDUChain;
     private HashMap<String, HashMap<ASTNode, Integer>> fUDWeb;

@@ -36,7 +36,7 @@ import ast.ParameterizedExpr;
 public class TIRArraySetStmt extends TIRAbstractAssignFromVarStmt {
     private static final long serialVersionUID = 1L;
 
-    public TIRArraySetStmt(Name array, TIRCommaSeparatedList indizes,Name rhs){
+    public TIRArraySetStmt(Name array, TIRCommaSeparatedList indizes, Name rhs){
         super(rhs);
         setLHS(new ParameterizedExpr(new NameExpr(array),indizes));
     }

@@ -29,7 +29,7 @@ import ast.ForStmt;
 @SuppressWarnings("rawtypes")
 public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<ASTNode>>>
 {
-    private final boolean DEBUG = false;
+    public static boolean DEBUG = false;
     private Merger<Set<ASTNode>> fMerger = Mergers.union();
     private DefinedVariablesNameCollector fVariableNameCollector;
     private DefiniteAssignmentAnalysis fDefiniteAssignmentAnalysis;
