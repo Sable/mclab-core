@@ -9,6 +9,24 @@
     <javac includeantruntime="false" debug="true" debuglevel="lines,source"/>
   </presetdef>
 
+  <!-- Useful for some tasks (like jflex) that don't let you suppress
+       their output -->
+  <target name="def.setloglevel.task" unless="setloglevel.available">
+    <scriptdef name="setloglevel" language="javascript">
+      <attribute name="loglevel" />
+      var level = {
+        'error': 0,
+        'warn': 1,
+        'info': 2,
+        'verbose': 3,
+        'debug': 4
+      }[attributes.get('loglevel')];
+      var logger = project.getBuildListeners().firstElement();
+      logger.setMessageOutputLevel(level);
+    </scriptdef>
+    <property name="setloglevel.available" value="yes" />
+  </target>
+
 	<!-- creates JFlex Ant task -->
 	<target name="def.jflex.task" unless="jflex.available">
 		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />

@@ -56,8 +56,10 @@
 
 	<!-- generates Java files from JFlex scanner spec -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="jflex" depends="def.jflex.task, metalexer">
+	<target name="jflex" depends="def.setloglevel.task, def.jflex.task, metalexer">
+    <setloglevel loglevel="error" />
 		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
+    <setloglevel loglevel="info" />
 	</target>
 
 	<!--=====================================================================-->
