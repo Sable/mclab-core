@@ -35,6 +35,10 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound();
 			Double upperBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound();
 			return new RangeValue<V>(lowerBound, upperBound);
@@ -50,6 +54,11 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					+((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
 			Double upperBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
@@ -67,6 +76,10 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double lowerBound = -((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound();
 			Double upperBound = -((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound();
 			return new RangeValue<V>(lowerBound, upperBound);
@@ -82,6 +95,11 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					-((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
 			Double upperBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
@@ -99,6 +117,11 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
 			Double result2 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
@@ -121,6 +144,11 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
 			Double result2 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
@@ -145,9 +173,14 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 		}
 		else {
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
+				// TODO push to top.
+				return null;
+			}
 			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound();
 			Double upperBound = ((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			if (lowerBound>upperBound) {
+			if (lowerBound > upperBound) {
 				return null;
 			}
 			else {
@@ -164,6 +197,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * @return
 	 */
 	public RangeValue<V> forRange(V lower, V upper, V inc) {
+		if (((DoubleConstant)((HasConstant)lower).getConstant())==null 
+				|| ((DoubleConstant)((HasConstant)upper).getConstant())==null)
+			return null;
 		Double lowerBound = ((DoubleConstant)((HasConstant)lower).getConstant()).getValue();
 		Double upperBound = ((DoubleConstant)((HasConstant)upper).getConstant()).getValue();
 		return new RangeValue<V>(lowerBound, upperBound);

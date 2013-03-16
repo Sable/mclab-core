@@ -6,7 +6,10 @@ import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
 public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
+	
+	static boolean Debug = false;
 	private ArrayList<Double> rangeValue = new ArrayList<Double>(2);
+	boolean isTop = false; // TODO should be two tops for each of upper bound and lower bound.
 	static RangeValueFactory factory = new RangeValueFactory();
 	
 	public RangeValue() {
@@ -37,6 +40,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	}
 	
 	public boolean hasLowerBound() {
+		if (this.rangeValue.size()!=2) return false;
 		if (this.rangeValue.get(0)!=null) return true;
 		else return false;
 	}
@@ -62,8 +66,14 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		}
 	}
 	
+	public void flagIsTop() {
+		isTop = true;
+	}
+	
 	@Override
 	public RangeValue<V> merge(RangeValue<V> o) {
+		if (Debug) System.out.println("inside range value merge!");
+		if (this.equals(o)) return this;
 		Double newLowerBound;
 		Double newUpperBound;
 		int lowerResult = this.getLowerBound().compareTo(o.getLowerBound());
@@ -83,19 +93,27 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		return factory.newRangeValueFromBounds(newLowerBound, newUpperBound);
 	}
 	
-	public boolean equals(RangeValue<V> o) {
+	@Override
+	public boolean equals(Object obj) {
 		/**
 		 * When both lower and upper bound are equal,
 		 * return true.
 		 * TODO handle more situations!
 		 */
-		if (this.getLowerBound().equals(o.getLowerBound())
-				&&this.getUpperBound().equals(o.getUpperBound())) {
-			return true;
+		if (obj == null) return false;
+		if (obj instanceof RangeValue) {
+			if (Debug) System.out.println("inside check whether range value equals!");
+			RangeValue o = (RangeValue)obj;
+			if (isTop==true && o.isTop==true) return true;
+			if (this.getLowerBound().equals(o.getLowerBound())
+					&&this.getUpperBound().equals(o.getUpperBound())) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	@Override

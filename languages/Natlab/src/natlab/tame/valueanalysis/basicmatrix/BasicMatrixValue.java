@@ -84,7 +84,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	/**
 	 * returns true if the represented data is a constant
 	 */
-	public boolean isConstant() {
+	public boolean hasConstant() {
 		return this.constant!=null;
 	}
 
@@ -129,6 +129,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * Override the merge method in super class MatrixValue.
 	 */
 	public BasicMatrixValue merge(AggrValue<BasicMatrixValue> other) {
+		if (Debug) System.out.println("inside BasicMatrixValue merge!");
 		if (!(other instanceof BasicMatrixValue))
 			throw new UnsupportedOperationException(
 					"can only merge a Basic Matrix Value with another Basic Matrix Value");
@@ -142,11 +143,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		 *		end
 		 * what we have at the merge point is a c=[(double,12.0,[1, 1]), (char,a,[1, 1])]
 		 */
-		if (!other.getMatlabClass().equals(this.getMatlabClass()))
+		else if (!other.getMatlabClass().equals(this.getMatlabClass()))
 			throw new UnsupportedOperationException(
 					"only Values with the same class can be merged, trying to merge :"
 							+ this + ", " + other + " has failed");
-		if (this.constant!=null&&((BasicMatrixValue)other).getConstant()!=null) {
+		else if (this.constant!=null&&((BasicMatrixValue)other).getConstant()!=null) {
 			Constant result = this.constant.merge(((BasicMatrixValue)other).getConstant());
 			if (result!=null) return factory.newMatrixValue(this.getSymbolic(), result);
 		}
@@ -163,18 +164,35 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		return newMatrix;
 	}
 
+	/**
+	 * this method is very important, since it will be used in loop statements 
+	 * fix point check. And this equals method is an override method, the input 
+	 * argument must be Object class, not BasicMatrixValue or something else. 
+	 * Because we use generic (not too few), it's not easy to decide the class 
+	 * statically every time, so, we have to use override methods.
+	 * 
+	 * The BasicMatrixValue class is kind of wrapper of all component values, 
+	 * like mclass, shape and rangeValue, so only all component values equals, 
+	 * the BasicMatrixValue will return true.
+	 * 
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
-		if (!(obj instanceof BasicMatrixValue)) return false;
-		BasicMatrixValue m = (BasicMatrixValue)obj;
-		if (this.isConstant()) return this.constant.equals(m.getConstant());
-		if ((this.shape==null)&&(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape()==null)) {
-			return this.getMatlabClass().equals(m.getMatlabClass());
+		if (obj instanceof BasicMatrixValue) {
+			if (Debug) System.out.println("inside check whether BasicMatrixValue equals!");
+			BasicMatrixValue o = (BasicMatrixValue)obj;
+			if (this.hasConstant()) return this.constant.equals(o.getConstant());
+			boolean shapeResult, rangeResult;
+			shapeResult = this.shape.equals(o.getShape());
+			if (this.rangeValue==null && o.getRangeValue()==null) return shapeResult;
+			else if (this.rangeValue==null || o.getRangeValue()==null) return false;
+			else {
+				rangeResult = this.rangeValue.equals(o.getRangeValue());
+				return shapeResult && rangeResult;
+			}
 		}
-		return this.getMatlabClass().equals(m.getMatlabClass())
-				&&this.shape.equals(((HasShape<AggrValue<BasicMatrixValue>>)m).getShape())
-				&&this.rangeValue.equals(((HasRangeValue<AggrValue<BasicMatrixValue>>)m).getRangeValue());
+		return false;		
 	}
 
 	@Override
@@ -187,7 +205,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 */
 	public String toString() {
 		return "(" + (hasMatlabClass()? this.classRef : ",[mclass propagation fails]") 
-				+ (isConstant()? ("," + this.constant) : "") 
+				+ (hasConstant()? ("," + this.constant) : "") 
 				+ (hasShape()? ("," + this.shape) : ",[shape propagation fails]")
 				+ (hasRangeValue()? ("," + this.rangeValue) : "")+")";
 	}

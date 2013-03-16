@@ -95,7 +95,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	else return false;
     }
     
-    public void flagIsTop(){
+    public void flagIsTop() {
     	this.isTop=true;
     }
     
@@ -105,7 +105,10 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	if (this.equals(o)) return this;
     	else {
     		if (dimensions.size()!=o.getDimensions().size()) {
-    			//currently, just from toString to show it's a top shape
+    			/*
+    			 * currently, push to top.
+    			 * TODO, I kind of remember we decided to grow the shape, do it later.
+    			 */
     			if (Debug) System.out.println("return a top shape!");
     			Shape<V> topShape = new Shape<V>(null);
     			topShape.flagIsTop();
@@ -114,6 +117,10 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     		else {
     			ArrayList<DimValue> list = new ArrayList<DimValue>(dimensions.size());
     			for (int i=0; i<dimensions.size(); i++) {
+    				/* 
+    				 * this equals method is not an override method, it calls 
+    				 * the equals method in DimValue.
+    				 */
     				if (dimensions.get(i).equals(o.getDimensions().get(i))) {
     					list.add(dimensions.get(i));
     				}
@@ -126,18 +133,26 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	}
     }
     
+    @Override
     /**
      * this method is very important, since it will be used in loop 
      * fix point check.
      */
-    public boolean equals(Shape<V> o) {
-    	if (dimensions.size()!=o.getDimensions().size()) return false;
-    	for (int i=0; i<dimensions.size(); i++) {
-    		if (!dimensions.get(i).equals(o.getDimensions().get(i))) {
-    			return false;
-    		}
-    	}
-    	return true;
+    public boolean equals(Object obj) {
+    	if (obj == null) return false;
+		if (obj instanceof Shape) {
+	    	if (Debug) System.out.println("inside check whether shape equals!");
+	    	Shape<V> o = (Shape)obj;
+	    	if (isTop==true || o.isTop==true) return true;
+	    	if (dimensions.size()!=o.getDimensions().size()) return false;
+	    	for (int i=0; i<dimensions.size(); i++) {
+	    		if (!dimensions.get(i).equals(o.getDimensions().get(i))) {
+	    			return false;
+	    		}
+	    	}
+	    	return true;			
+		}
+		return false;
     }
     
     /**
