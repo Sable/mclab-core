@@ -18,11 +18,6 @@
 
 package analysis.natlab;
 
-/**
- * @author Jesse Doherty
- * 
- * extended by XU to add variable dependence analysis for inside loop.
- */
 import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import nodecases.*;
 import analysis.*;
@@ -252,7 +247,6 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
                 }
             }
             iterCount++;
-            IntraproceduralValueAnalysis.dependenceAnalyze(); // added by XU
         }while( !previousOut.equals( newOut ) );
 
         if(DEBUG)
@@ -382,7 +376,6 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
                 System.out.println(newOut);
                 System.err.println(" whilestmt: previousOut and newOut: ");
             }
-            IntraproceduralValueAnalysis.dependenceAnalyze(); // added by XU
         }while( !previousOut.equals( newOut ) );
 
 
