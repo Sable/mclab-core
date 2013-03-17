@@ -26,7 +26,9 @@ import ast.*;
  * 
  * @author ant6n
  * 
- * extended by XU to support variables dependence analysis in loop statements.
+ * extended by XU to support variables (also including arrays, 
+ * but how about function call?) dependence analysis in 
+ * loop statements.
  * 
  */
 public class IntraproceduralValueAnalysis<V extends Value<V>>
@@ -41,8 +43,9 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
     TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
-    static boolean isInWhile = false;
-    static boolean preprocess = false;
+    static boolean isInLoop = false;
+    static Map<String, Set<String>> dependenceMap = new HashMap<String, Set<String>>();
+    static Set<String> dependentVars = new HashSet<String>();
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -121,16 +124,44 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     /*********** statement cases *****************************************/
     @Override
     public void caseTIRWhileStmt(TIRWhileStmt node) {
-    	isInWhile=true;
-    	preprocess = true;
+    	isInLoop = true;
     	parentForwarder.caseTIRWhileStmt(node);
-    	preprocess = false;
-        parentForwarder.caseTIRWhileStmt(node);
-        isInWhile=false;
+        isInLoop = false;
+    }
+    
+    @Override
+    public void caseTIRForStmt(TIRForStmt node) {
+    	isInLoop = true;
+    	parentForwarder.caseTIRForStmt(node);
+    	isInLoop = false;
+    }
+    
+    /**
+     * helper method to analyze dependence in loop.
+     */
+    public static void dependenceAnalyze() {
+    	for (String lhs : dependenceMap.keySet()) {
+    		for (String rhsArg : dependenceMap.get(lhs)) {
+    			if (dependenceMap.keySet().contains(rhsArg) 
+    					&& dependenceMap.get(rhsArg).contains(lhs)) {
+    				dependentVars.add(rhsArg);
+    			}
+    		}
+    	}
     }
     
     @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
+    	if (isInLoop) {
+    		String targetName = node.getTargetName().getID();
+    		if (Debug) System.out.println(node.getTargetName().getID()+" : " + node.getArguments());
+			Set<String> value = new HashSet<String>();
+    		for (NameExpr arg : node.getArguments().getNameExpressions()) {
+    			value.add(arg.getName().getID());
+    		}
+    		dependenceMap.put(targetName, value);
+    		if (Debug) System.out.println(dependenceMap);
+    	}
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
         //set new callsite
@@ -334,8 +365,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     
     @Override
     public void caseTIRAssignLiteralStmt(TIRAssignLiteralStmt node) {
-    	if (preprocess && isInWhile) System.err.println(node.getTargetName().getID());
-    	else if (isInWhile) System.out.println(node.getTargetName().getID());
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case assign literal: "+node.getPrettyPrinted());
         //get literal and make constant
@@ -361,6 +390,15 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     
     @Override
     public void caseTIRCopyStmt(TIRCopyStmt node) {
+    	if (isInLoop) {
+    		String targetName = node.getTargetName().getID();
+    		String sourceName = node.getSourceName().getID();
+    		if (Debug) System.out.println(targetName+" : " + sourceName);
+			Set<String> value = new HashSet<String>();
+			value.add(sourceName);
+    		dependenceMap.put(targetName, value);
+    		if (Debug) System.out.println(dependenceMap);
+    	}
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case copy: "+node.getPrettyPrinted());
 
@@ -589,7 +627,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets();
     		//XU added here, to pass number of output variables to the equation propagator/analysis
     	}
-
+    	
     	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
@@ -622,7 +660,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         	//actually call
             //System.out.println("doFunctionCall result "+res);
             if (function.isBuiltin()){
-                Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
+                Args<V> argsObj = Args.newInstance(dependentVars,numOfOutputVariables,argumentList);
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
                 if (function.getName().equals("nargin") && argsObj.size() == 0){
