@@ -10,8 +10,11 @@ import natlab.tame.valueanalysis.components.constant.*;
 
 public class RangeValuePropagator<V extends Value<V>> 
 extends BuiltinVisitor<Args<V>, RangeValue<V>> {
+	
+	static boolean Debug = false;
 	@SuppressWarnings("rawtypes")
 	static RangeValuePropagator instance = null;
+	
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	static public <V extends Value<V>> RangeValuePropagator<V> getInstance() {
 		if (instance == null) instance = new RangeValuePropagator();
@@ -91,14 +94,23 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * binary minus.
 	 */
 	public RangeValue<V> caseMinus(Builtin builtin, Args<V> arg) {
+		if (Debug) System.out.println("inside rangeValue analysis for binary " +
+				"minus with dependent vars, "+arg.getDependentVars());
 		if (arg.size()!=2) {
 			return null;
 		}
 		else {
 			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
-				// TODO push to top.
-				return null;
+				RangeValue<V> topRange = new RangeValue<V>();
+				topRange.flagIsTop();
+				return topRange;
+			}
+			else if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
+					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
+				RangeValue<V> topRange = new RangeValue<V>();
+				topRange.flagIsTop();
+				return topRange;
 			}
 			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					-((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();

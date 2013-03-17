@@ -74,6 +74,11 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	public RangeValue<V> merge(RangeValue<V> o) {
 		if (Debug) System.out.println("inside range value merge!");
 		if (this.equals(o)) return this;
+		else if (this.isTop==true || o.isTop==true) {
+			RangeValue<V> topRange = new RangeValue<V>();
+			topRange.flagIsTop();
+			return topRange;
+		}
 		Double newLowerBound;
 		Double newUpperBound;
 		int lowerResult = this.getLowerBound().compareTo(o.getLowerBound());
@@ -105,6 +110,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 			if (Debug) System.out.println("inside check whether range value equals!");
 			RangeValue o = (RangeValue)obj;
 			if (isTop==true && o.isTop==true) return true;
+			else if (isTop==true || o.isTop==true) return false;
 			if (this.getLowerBound().equals(o.getLowerBound())
 					&&this.getUpperBound().equals(o.getUpperBound())) {
 				return true;
@@ -118,6 +124,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	
 	@Override
 	public String toString() {
+		if (this.isTop) return "<-inf,+inf>";
 		return "<"+this.rangeValue.get(0)+","+this.rangeValue.get(1)+">";
 	}
 }
