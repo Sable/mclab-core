@@ -18,10 +18,7 @@
 
 package analysis.natlab;
 
-import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
-import nodecases.*;
 import analysis.*;
-
 import ast.*;
 import java.util.*;
 
