@@ -24,6 +24,10 @@ import ast.*;
  * 
  * This class operates on the static IR.
  * 
+ * @author ant6n
+ * 
+ * extended by XU to support variables dependence analysis in loop statements.
+ * 
  */
 public class IntraproceduralValueAnalysis<V extends Value<V>>
 extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<V>>
@@ -36,6 +40,9 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
+    TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
+    static boolean isInWhile = false;
+    static boolean preprocess = false;
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -112,6 +119,16 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     }
 
     /*********** statement cases *****************************************/
+    @Override
+    public void caseTIRWhileStmt(TIRWhileStmt node) {
+    	isInWhile=true;
+    	preprocess = true;
+    	parentForwarder.caseTIRWhileStmt(node);
+    	preprocess = false;
+        parentForwarder.caseTIRWhileStmt(node);
+        isInWhile=false;
+    }
+    
     @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
         if (checkNonViable(node)) return;
@@ -317,6 +334,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     
     @Override
     public void caseTIRAssignLiteralStmt(TIRAssignLiteralStmt node) {
+    	if (preprocess && isInWhile) System.err.println(node.getTargetName().getID());
+    	else if (isInWhile) System.out.println(node.getTargetName().getID());
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case assign literal: "+node.getPrettyPrinted());
         //get literal and make constant

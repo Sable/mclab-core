@@ -77,6 +77,14 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 				.newShapeFromInputString(shapeInfo));
 	}
 	
+	public boolean hasSymbolic() {
+		return this.symbolic!=null;
+	}
+	
+	public String getSymbolic() {
+		return this.symbolic;
+	}
+	
 	public boolean hasMatlabClass() {
 		return this.classRef!=null;
 	}
@@ -204,7 +212,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * we should always be careful about null value!
 	 */
 	public String toString() {
-		return "(" + (hasMatlabClass()? this.classRef : ",[mclass propagation fails]") 
+		return "(" + (hasSymbolic()? (this.symbolic + ",") : "")
+				+ (hasMatlabClass()? this.classRef : ",[mclass propagation fails]") 
 				+ (hasConstant()? ("," + this.constant) : "") 
 				+ (hasShape()? ("," + this.shape) : ",[shape propagation fails]")
 				+ (hasRangeValue()? ("," + this.rangeValue) : "")+")";
