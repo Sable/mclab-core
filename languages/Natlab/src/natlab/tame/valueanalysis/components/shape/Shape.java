@@ -41,7 +41,12 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	boolean isTop = false;
 	
 	public Shape(List<DimValue> dimensions) {
-		this.dimensions = dimensions;
+		/* 
+		 * new a new list, keep modifications on old dimensions from 
+		 * affecting new shape. 
+		 */
+		List<DimValue> newDim = new ArrayList<DimValue>(dimensions);
+		this.dimensions = newDim;
 	}
 	
     public List<DimValue> getDimensions() {
