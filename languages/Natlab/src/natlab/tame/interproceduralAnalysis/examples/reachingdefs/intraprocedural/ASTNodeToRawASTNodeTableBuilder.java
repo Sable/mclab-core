@@ -48,9 +48,12 @@ public class ASTNodeToRawASTNodeTableBuilder extends NatlabAbstractStructuralAna
     @Override
     public void caseLoopVar(AssignStmt node)
     {
-        
+        AssignStmt forLoopAssignStmt = (AssignStmt) node;
+        AssignStmt assignStmt = new AssignStmt();
+        assignStmt.setLHS(forLoopAssignStmt.getLHS());
+        assignStmt.setRHS(forLoopAssignStmt.getRHS());
+        fIRToRawASTTable.put(node, assignStmt);
     }
-    
     
     @Override
     public void merge(Object in1, Object in2, Object out) {}

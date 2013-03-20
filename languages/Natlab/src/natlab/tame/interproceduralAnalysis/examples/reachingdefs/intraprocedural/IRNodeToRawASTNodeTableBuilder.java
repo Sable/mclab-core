@@ -43,12 +43,14 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
 {
     private LinkedList<ASTNode> fVisitedNodes;
     private HashMap<ASTNode, ASTNode> fIRToRawASTTable;
+    private ASTNodeToRawASTNodeTableBuilder fASTNodeToRawASTNodeTableBuilder;
     
     // Case loop var will require a specialized builder and also expander!
     public IRNodeToRawASTNodeTableBuilder(LinkedList<ASTNode> visitedNodes)
     {
         fVisitedNodes = visitedNodes;
         initializeIRToRawASTTable();
+        fASTNodeToRawASTNodeTableBuilder = new ASTNodeToRawASTNodeTableBuilder(null, fVisitedNodes, fIRToRawASTTable);
     }
     
     public void initializeIRToRawASTTable()
@@ -81,6 +83,7 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
             }
             (node).analyze(this);
         }
+        fASTNodeToRawASTNodeTableBuilder.analyze();
     }
     
     @Override
