@@ -6,7 +6,6 @@ import ast.ASTNode;
 import ast.Name;
 import ast.NameExpr;
 import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
-import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
