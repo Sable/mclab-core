@@ -160,14 +160,22 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			if (result!=null) return factory.newMatrixValue(this.getSymbolic(), result);
 		}
 		BasicMatrixValue newMatrix;
-		if (this.hasRangeValue()) {
-			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
-					this.shape.merge(((BasicMatrixValue)other).getShape())
-					,this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
+		if (this.hasShape()) {
+			if (this.hasRangeValue()) 
+				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
+						this.shape.merge(((BasicMatrixValue)other).getShape()), 
+						this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
+			else 
+				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
+						this.shape.merge(((BasicMatrixValue)other).getShape()), null);
 		}
 		else {
-			newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
-					this.shape.merge(((HasShape<AggrValue<BasicMatrixValue>>)other).getShape()), null);
+			if (this.hasRangeValue()) 
+				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
+						null, this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
+			else
+				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
+						null, null);
 		}
 		return newMatrix;
 	}
@@ -192,6 +200,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			BasicMatrixValue o = (BasicMatrixValue)obj;
 			if (this.hasConstant()) return this.constant.equals(o.getConstant());
 			boolean shapeResult, rangeResult;
+			if (this.shape==null && o.getShape()==null) return true;
 			shapeResult = this.shape.equals(o.getShape());
 			if (this.rangeValue==null && o.getRangeValue()==null) return shapeResult;
 			else if (this.rangeValue==null || o.getRangeValue()==null) return false;

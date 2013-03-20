@@ -104,38 +104,40 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	this.isTop=true;
     }
     
+    /**
+     * merge null with anything --> null
+     * merge shapes with different dimensions --> top
+     * should we replace top to growing the shape?
+     */
     @Override
     public Shape<V> merge(Shape<V> o) {
     	if (Debug) System.out.println("inside shape merge!");
     	if (this.equals(o)) return this;
-    	else {
-    		if (dimensions.size()!=o.getDimensions().size()) {
-    			/*
-    			 * currently, push to top.
-    			 * TODO, I kind of remember we decided to grow the shape, do it later.
-    			 */
-    			if (Debug) System.out.println("return a top shape!");
-    			Shape<V> topShape = new Shape<V>(null);
-    			topShape.flagIsTop();
-    			return topShape;
-    		}
-    		else {
-    			ArrayList<DimValue> list = new ArrayList<DimValue>(dimensions.size());
-    			for (int i=0; i<dimensions.size(); i++) {
-    				/* 
-    				 * this equals method is not an override method, it calls 
-    				 * the equals method in DimValue.
-    				 */
-    				if (dimensions.get(i).equals(o.getDimensions().get(i))) {
-    					list.add(dimensions.get(i));
-    				}
-    				else {
-    					list.add(new DimValue());
-    				}
-    			}
-    			return new Shape<V>(list);
-    		}
-    	}
+    	else if (o==null) return null;
+    	else if (dimensions.size()!=o.getDimensions().size()) {
+			/*
+			 * currently, push to top.
+			 * TODO, I kind of remember we decided to grow the shape, do it later.
+			 */
+			if (Debug) System.out.println("return a top shape!");
+			Shape<V> topShape = new Shape<V>(null);
+			topShape.flagIsTop();
+			return topShape;
+		}
+		ArrayList<DimValue> list = new ArrayList<DimValue>(dimensions.size());
+		for (int i=0; i<dimensions.size(); i++) {
+			/* 
+			 * this equals method is not an override method, it calls 
+			 * the equals method in DimValue.
+			 */
+			if (dimensions.get(i).equals(o.getDimensions().get(i))) {
+				list.add(dimensions.get(i));
+			}
+			else {
+				list.add(new DimValue());
+			}
+		}
+		return new Shape<V>(list);
     }
     
     @Override

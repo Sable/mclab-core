@@ -210,7 +210,8 @@ public class ShapePropMatch<V extends Value<V>> {
     
     public boolean hasValue(String key) {
     	DimValue value = getValueOfVariable(key);
-    	if (value.hasIntValue()||value.hasSymbolic()) return true;
+    	if (value==null) return false;
+    	else if (value.hasIntValue()||value.hasSymbolic()) return true;
     	return false;
     }
     

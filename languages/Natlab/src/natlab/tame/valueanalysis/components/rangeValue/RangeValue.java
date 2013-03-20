@@ -74,6 +74,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	public RangeValue<V> merge(RangeValue<V> o) {
 		if (Debug) System.out.println("inside range value merge!");
 		if (this.equals(o)) return this;
+		else if (o==null) return null;
 		else if (this.isTop==true || o.isTop==true) {
 			RangeValue<V> topRange = new RangeValue<V>();
 			topRange.flagIsTop();

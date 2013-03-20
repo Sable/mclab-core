@@ -72,6 +72,7 @@ public class ShapePropagator<V extends Value<V>>
      * @return
      */
     public Shape<V> arraySubsref(Shape<V> arrayShape, Args<V> indices) {
+    	if (arrayShape==null) return null;
     	List<DimValue> newDimensions = new ArrayList<DimValue>(indices.size());
     	List<DimValue> arrayDimensions = arrayShape.getDimensions();
     	if (indices.size() > arrayDimensions.size()) {
