@@ -58,6 +58,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
             }
             (node).analyze(this);  
         }
+//        fUDDUWeb.getVisitedStmtsLinkedList().get(0).analyze(this);
     }
     
     @Override

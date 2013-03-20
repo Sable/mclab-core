@@ -16,7 +16,7 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/collapse.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/hello.m";
 //        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
@@ -56,10 +56,13 @@ public class AnalysisRunner
           UDDUWeb udduWeb = new UDDUWeb(ud, du);
           udduWeb.constructUDDUWeb();
           
-//          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
-//          rv.analyze();
-//          System.out.println(f.getAst().getPrettyPrintedLessComments());
-
+          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
+          rv.analyze();
+          System.out.println(f.getAst().getPrettyPrintedLessComments());
+          
+          
+          IRNodeToRawASTNodeTableBuilder IRTtoASTtableBuilder = new IRNodeToRawASTNodeTableBuilder(udduWeb.getVisitedStmtsLinkedList());
+          IRTtoASTtableBuilder.build();
     }
     }
 }

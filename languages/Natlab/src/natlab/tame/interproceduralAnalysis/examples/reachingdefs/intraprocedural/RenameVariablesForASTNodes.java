@@ -22,16 +22,6 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
         fUDDUWeb = udduWeb;
     }
 
-    @Override
-    public void caseASTNode(ASTNode node)
-    {
-        int nodeChildrenCount = node.getNumChild();
-        for (int i = 0; i < nodeChildrenCount; i++)
-        {
-            node.getChild(i).analyze(this);
-        }
-    }
-    
     public void analyze()
     {
         for (ASTNode node : fUDDUWeb.getVisitedStmtsLinkedList())
@@ -42,6 +32,16 @@ public class RenameVariablesForASTNodes extends NatlabAbstractStructuralAnalysis
                 caseLoopVar((AssignStmt) node);
             }
             node.analyze(this);
+        }
+    }
+    
+    @Override
+    public void caseASTNode(ASTNode node)
+    {
+        int nodeChildrenCount = node.getNumChild();
+        for (int i = 0; i < nodeChildrenCount; i++)
+        {
+            node.getChild(i).analyze(this);
         }
     }
     
