@@ -54,12 +54,7 @@ aspect ASTAnalyze
     }
     public void ForStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
-        Expr loopRange = getAssignStmt().getRHS();
-        
-        if( loopRange instanceof RangeExpr )
-            visitor.caseRangeForStmt(this);
-        else
-            visitor.caseForStmt(this);
+        visitor.caseForStmt(this);
     }
     public void WhileStmt.analyze(nodecases.NodeCaseHandler visitor)
     {
