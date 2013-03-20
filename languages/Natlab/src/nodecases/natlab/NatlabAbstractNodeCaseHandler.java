@@ -208,10 +208,6 @@ public abstract class NatlabAbstractNodeCaseHandler implements nodecases.NodeCas
     {
         caseStmt(node);
     }
-    public void caseRangeForStmt(ForStmt node)
-    {
-        caseForStmt(node);
-    }
     public void caseWhileStmt(WhileStmt node)
     {
         caseStmt(node);

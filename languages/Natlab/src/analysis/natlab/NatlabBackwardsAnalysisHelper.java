@@ -97,11 +97,6 @@ public class NatlabBackwardsAnalysisHelper<A> extends analysis.AnalysisHelper<A>
         helpee.setCurrentOutSet( helpee.getCurrentInSet() );
         callback.caseForStmt( node );
     }
-    public void caseRangeForStmt(ForStmt node)
-    {
-        helpee.setCurrentOutSet( helpee.getCurrentInSet() );
-        callback.caseRangeForStmt( node );
-    }
     public void caseWhileStmt(WhileStmt node)
     {
         helpee.setCurrentOutSet( helpee.getCurrentInSet() );

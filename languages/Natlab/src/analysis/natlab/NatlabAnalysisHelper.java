@@ -113,11 +113,6 @@ public class NatlabAnalysisHelper<A> implements nodecases.NodeCaseHandler //exte
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         callback.caseForStmt( node );
     }
-    public void caseRangeForStmt(ForStmt node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseRangeForStmt( node );
-    }
     public void caseWhileStmt(WhileStmt node)
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );

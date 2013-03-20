@@ -150,7 +150,7 @@ public class TIRParentForwardingNodeCasehandler extends ForwardingNodeCaseHandle
 
     @Override
     public void caseTIRForStmt(TIRForStmt node) {
-        callback.caseRangeForStmt(node);
+        callback.caseForStmt(node);
     }
 
     @Override
