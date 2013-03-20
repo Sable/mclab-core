@@ -42,10 +42,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
-    
-    boolean isInLoop = false;
-    Map<String, Set<String>> dependenceMap = new HashMap<String, Set<String>>();
-    Set<String> dependentVars = new HashSet<String>();
+    TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
+    Set<String> dependentVars; // XU added it to store dependency analysis result.
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -125,257 +123,23 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     @Override
     public void caseTIRWhileStmt(TIRWhileStmt node)
     {
-    	isInLoop = true;
-    	if(DEBUG)
-            System.out.println( "caseTIRWhileStmt" );
-        //previousOut is used to track changes in the fixed point
-        //copmutation
-    	ValueFlowMap<V> previousOut;
-
-        Expr loopCond = node.getExpr();
-        ASTNode body = node.getStmts();
-
-        //saving the in set of the loop
-        ValueFlowMap<V> loopInSet = newInitialFlow();
-        copy( currentInSet, loopInSet );
-        setInFlow( node, loopInSet );
-        
-        //process loop conditional and store result
-        //note in will be the currentInSet == loopInSet
-        caseWhileCondition( loopCond );
-        
-        //setup loop sets for loopstack
-        LoopFlowsets loopFlowsets = new LoopFlowsets( node );
-        loopFlowsets.setLoopInSet( loopInSet );
-        loopStack.push( loopFlowsets );
-
-        ValueFlowMap<V> continueSet;
-        ValueFlowMap<V> breakSet;
-        ValueFlowMap<V> mergedOut;
-        ValueFlowMap<V> newOut;
-
-
-        int iterCount = 0;
-        int countBad = 100;
-
-        if(DEBUG)
-            System.out.println( "  whilestmt: starting fixed point");
-        //going into the loop the current out will be the out of the
-        //loop condition
-        do{
-            if(DEBUG){
-                System.out.println(" whilestmt: currentOutSet at start: ");
-                System.out.println(currentOutSet);
-            }
-            //store the current out in previousOut for later
-            //comparison
-            previousOut = newInitialFlow();
-            copy( currentOutSet, previousOut );
-
-            //initialize the continue and break lists
-            loopFlowsets.initLists();
-
-            //analyze the body and collect the continue sets, merge
-            //them into one out
-            analyze( body );
-            if(DEBUG){
-                System.out.println(" whilestmt: currentOutSet after body: ");
-                System.out.println(currentOutSet);
-            }
-            continueSet = processContinues();
-            if(DEBUG){
-                System.out.println(" whilestmt: continueSet: ");
-                System.out.println(continueSet);
-            }
-            mergedOut = newInitialFlow();
-            if( continueSet == null )
-                copy( currentOutSet, mergedOut );
-            else
-                merge( currentOutSet, continueSet, mergedOut );
-            if(DEBUG){
-                System.out.println(" whilestmt: merged current and continue: ");
-                System.out.println(mergedOut);
-            }
-
-
-            //setup the current out as the merged out
-            //this is the current out before processing the loop
-            //condition
-            currentOutSet = backupSet( mergedOut );
-
-            //setup in for loop condition case
-            //first merge the mergedout with the loop in
-            merge( loopInSet, mergedOut, mergedOut );
-            currentInSet = backupSet( mergedOut );
-            if(DEBUG){
-                System.out.println(" whilestmt: merged loopInSet and mergedOut: ");
-                System.out.println(mergedOut);
-            }
-
-
-            caseWhileCondition( loopCond );
-            
-
-            newOut = currentOutSet;
-            //merge the loop condition out and break sets
-            //use for new out
-
-            //loop until there is no change
-            if( DEBUG )
-                if(iterCount>=countBad){
-                    System.err.println("!!!!!!!!!!**********\nwoah too many iterations: " + iterCount);
-                    System.err.println( node.getPrettyPrinted() );
-                    System.err.println("!!!!!!!!!!: " + iterCount);
-                    countBad*=2;
-                }
-            iterCount++;
-            if(DEBUG){
-                System.out.println(" whilestmt: previousOut and newOut: ");
-                System.out.println(previousOut);
-                System.out.println(newOut);
-                System.err.println(" whilestmt: previousOut and newOut: ");
-            }
-            dependenceAnalyze();
-        }while( !previousOut.equals( newOut ) );
-
-
-        breakSet = processBreaks();
-        if(DEBUG){
-            System.out.println(" whilestmt: breakSet: ");
-            System.out.println(breakSet);
-        }
-        
-        mergedOut = mergeOuts( currentOutSet, breakSet );
-        if(DEBUG){
-            System.out.println(" whilestmt: merged out of condition, and breaks: ");
-            System.out.println(mergedOut);
-        }
-        
-        //set currentOut to the out of the FP computation and the
-        //result of processing breaks.
-        currentOutSet = mergedOut;
-        
-        setOutFlow( node, currentOutSet );
-        loopStack.pop();
-        isInLoop = false;
+    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
+    	dependentVars = analyzeDependency.getResult();
+        parentForwarder.caseTIRWhileStmt(node);
+        dependentVars.clear();
     }
     
     @Override
     public void caseTIRForStmt(TIRForStmt node)
     {
-    	isInLoop = true;
-        if(DEBUG)
-            System.out.println( "caseTIRForStmt" );
-        //previousOut is used to track changes in the fixed point computation
-        ValueFlowMap<V> previousOut;
-
-        AssignStmt loopVar = node.getAssignStmt();
-        ASTNode body = node.getStmts();
-
-        ValueFlowMap<V> loopInSet = saveInSet( node );
-
-        //note In for loopVar as init will be loopInSet
-        caseLoopVarAsInit( loopVar );
-        loopInSet = currentOutSet; //the in for the rest of the loop will be the out of init
-
-        currentInSet = currentOutSet;
-        caseLoopVarAsCondition( loopVar );
-
-        LoopFlowsets loopFlowsets = setupLoopStack( loopInSet, node );
-        
-        ValueFlowMap<V> continueSet;
-        ValueFlowMap<V> breakSet;
-        ValueFlowMap<V> mergedOut;
-        ValueFlowMap<V> newOut;
-        
-        //for debug
-        int iterCount = 0;
-        int countBad = 100;
-        
-        newOut = currentOutSet;
-        if(DEBUG)
-            System.out.println( "  forstmt: starting fixed point");
-        do{
-            previousOut = backupSet( newOut );
-            loopFlowsets.initLists();
-            
-            analyze( body );
-            continueSet = processContinues();
-            mergedOut = mergeOuts( currentOutSet, continueSet );
-
-            //this is the current out before processing the update
-            currentOutSet = mergedOut;
-
-            //setup in for loop var as update case
-            currentInSet = mergedOut;
-            
-            caseLoopVarAsUpdate( loopVar );
-
-            merge( loopInSet, currentOutSet, currentOutSet );
-            currentInSet = currentOutSet;
-            
-            caseLoopVarAsCondition( loopVar );
-
-            newOut = currentOutSet;
-
-            //loop until there is no change
-            if(DEBUG){
-                System.out.println("*****\ndone iteration");
-                System.out.println("prev: "+previousOut);
-                System.out.println("new: "+newOut);
-                System.out.println("*****");
-                if(iterCount>countBad){
-                    System.err.println("!!!!!!!!!!**********\nwoah too many iterations: "+ iterCount);
-                    System.err.println( node.getPrettyPrinted() );
-                    System.err.println("!!!!!!!!!!: " + iterCount);
-                    countBad *= 2;
-                }
-            }
-            iterCount++;
-            dependenceAnalyze();
-        }while( !previousOut.equals( newOut ) );
-
-        if(DEBUG)
-            System.out.println( "  forstmt: finished fixed point" );
-
-        breakSet = processBreaks();
-        mergedOut = mergeOuts( currentOutSet, breakSet );
-
-        //set currentOut to the out of the FP computation and the
-        //result of processing breaks.
-        currentOutSet = mergedOut;
-
-        setOutFlow( node, currentOutSet );
-        loopStack.pop();
-        isInLoop = false;
-    }
-    
-    /**
-     * helper method to analyze dependence in loop.
-     */
-    private void dependenceAnalyze() {
-    	for (String lhs : dependenceMap.keySet()) {
-    		for (String rhsArg : dependenceMap.get(lhs)) {
-    			if (dependenceMap.keySet().contains(rhsArg) 
-    					&& dependenceMap.get(rhsArg).contains(lhs)) {
-    				dependentVars.add(rhsArg);
-    			}
-    		}
-    	}
+    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
+    	dependentVars = analyzeDependency.getResult();
+        parentForwarder.caseTIRForStmt(node);
+        dependentVars.clear();
     }
     
     @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
-    	if (isInLoop) {
-    		String targetName = node.getTargetName().getID();
-    		if (Debug) System.out.println(node.getTargetName().getID()+" : " + node.getArguments());
-			Set<String> value = new HashSet<String>();
-    		for (NameExpr arg : node.getArguments().getNameExpressions()) {
-    			value.add(arg.getName().getID());
-    		}
-    		dependenceMap.put(targetName, value);
-    		if (Debug) System.out.println(dependenceMap);
-    	}
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
         //set new callsite
@@ -604,15 +368,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     
     @Override
     public void caseTIRCopyStmt(TIRCopyStmt node) {
-    	if (isInLoop) {
-    		String targetName = node.getTargetName().getID();
-    		String sourceName = node.getSourceName().getID();
-    		if (Debug) System.out.println(targetName+" : " + sourceName);
-			Set<String> value = new HashSet<String>();
-			value.add(sourceName);
-    		dependenceMap.put(targetName, value);
-    		if (Debug) System.out.println(dependenceMap);
-    	}
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("case copy: "+node.getPrettyPrinted());
 
