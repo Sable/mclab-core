@@ -45,8 +45,10 @@ List<isComplexInfo<V>>>{
 			 return res;
 		}
 		else {
-		
-			return null ; //comment
+			 List<isComplexInfo<V>> res= new ArrayList<isComplexInfo<V>>();
+			 res.add((new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL"));
+			return res;
+			 //			 return null ; //comment
 	}
 		
 
