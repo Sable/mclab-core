@@ -9,7 +9,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	
 	static boolean Debug = false;
 	private ArrayList<Double> rangeValue = new ArrayList<Double>(2);
-	boolean isTop = false; // TODO should be two tops for each of upper bound and lower bound.
+	private boolean isTop = false; // TODO should be two tops for each of upper bound and lower bound.
 	static RangeValueFactory factory = new RangeValueFactory();
 	
 	public RangeValue() {
@@ -68,6 +68,18 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	
 	public void flagIsTop() {
 		isTop = true;
+	}
+	
+	public boolean getIsTop() {
+		return isTop;
+	}
+	
+	public boolean isConstant() {
+		if (hasLowerBound() && hasUpperBound()) {
+			boolean result = getLowerBound().equals(getUpperBound());
+			return result;
+		}
+		return false;
 	}
 	
 	@Override

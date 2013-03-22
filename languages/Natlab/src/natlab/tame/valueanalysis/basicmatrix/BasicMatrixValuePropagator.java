@@ -57,9 +57,9 @@ public class BasicMatrixValuePropagator extends
 		// TODO deal with complex info propagation
 		// TODO deal with range value propagation
 		
-		//RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
+		RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
 		
-		return matchResultToRes(matchClassResult, matchShapeResult, null);
+		return matchResultToRes(matchClassResult, matchShapeResult, rangeValueResult);
 
 	}
 

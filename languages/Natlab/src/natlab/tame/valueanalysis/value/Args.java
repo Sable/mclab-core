@@ -145,6 +145,10 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
     	return nargout;
     }
     
+    public boolean hasDependency() {
+    	return dependentVars!=null;
+    }
+    
     public Set<String> getDependentVars() {
     	return dependentVars;
     }
