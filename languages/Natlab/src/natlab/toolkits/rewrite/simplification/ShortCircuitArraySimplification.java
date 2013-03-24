@@ -112,6 +112,10 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
 
     public void caseWhileStmt( WhileStmt node )
     {
+    	
+    	
+    	
+    	
         LinkedList<Stmt> newStmts = null;
         TempFactory condFact = null;
         ast.List<Stmt> body = node.getStmts();
@@ -119,7 +123,7 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
         //prepare new stmts if condition is an and or an or
         Expr cond = node.getExpr();
         if( cond instanceof AndExpr ){
-            condFact = TempFactory.genFreshTempFactory();
+        	condFact = TempFactory.genFreshTempFactory();
             newStmts = handleAnd( (AndExpr)cond, condFact );
         }
         else if( cond instanceof OrExpr ){
@@ -131,6 +135,14 @@ public class ShortCircuitArraySimplification extends AbstractSimplification
         rewrite( body );
         
         if( newStmts != null ){
+        	/*Bug fix by vkumar5
+        	 * Add newStmts at the end of the body 
+        	 * to reset the condition
+        	 */
+            for(Stmt s : newStmts)
+            {
+            	body.add(s);
+            }
             WhileStmt newWhileStmt;
             newWhileStmt = new WhileStmt( condFact.genNameExpr(), body );
             newStmts.add( newWhileStmt );
