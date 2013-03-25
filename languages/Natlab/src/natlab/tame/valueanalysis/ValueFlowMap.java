@@ -187,9 +187,19 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (obj instanceof ValueFlowMap<?>){
+        if (obj instanceof ValueFlowMap){
             ValueFlowMap<V> flowMap = (ValueFlowMap<V>)obj;
-            return flowMap.isViable==isViable && flowMap.map.equals(map);
+            boolean res1 = flowMap.isViable==isViable;
+            boolean res2 = this.toString().equals(flowMap.toString()); 
+            /*
+             *  it is so weird, for some benchmarks, if use 
+             *  "flowMap.map.equals(map);" instead of toString comparison, 
+             *  it will end up in infinite loop, because map comparison 
+             *  return false, while toString comparison return true, which 
+             *  apparently equals by our observation. TODO figure it out.
+             */
+            boolean result = res1 && res2;
+            return result;
         }
         return false;   
     }
