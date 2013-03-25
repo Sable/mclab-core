@@ -60,20 +60,40 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 			return null;
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+		if (arg.hasDependency()) {
+			/*
+			 * if two args are both positive, the lowerbound can be determined, 
+			 * but the upperbound will be +inf;
+			 * it's not that easy to determine the lower and upper bound if one 
+			 * of them is negative, this depends on which one varies in each 
+			 * iteration. so, currently, we push the result to two side top, 
+			 * <-inf,+inf>.
+			 * TODO, make it more precise.
+			 */
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
-				return topRange;					
+				if (((HasRangeValue<V>)arg.get(0)).getRangeValue().isRangeValuePositive() 
+						&& ((HasRangeValue<V>)arg.get(1)).getRangeValue().isRangeValuePositive()) {
+					topRange.flagUpperBoundIsTop();
+					Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
+							+((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
+					topRange.setLowerBound(lowerBound);
+					//topRange.flagLowerBoundIsTop();
+					return topRange;
+				}
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
+				return topRange;
 			}
-		}			
+		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop()
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
+		}
 		Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 				+((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
 		Double upperBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
@@ -103,24 +123,29 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 				"minus with dependent vars, "+arg.getDependentVars());
 		if (arg.size()!=2) return null;
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;
-		}
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
+			return null;
+		if (arg.hasDependency()) {
+			/*
+			 * binary minus is also not that easy, since it also need the info 
+			 * which operand or arg varies on each iteration, so, currently, 
+			 * push the result to two side top, <-inf,+inf>.
+			 * TODO, make it more precise.
+			 */
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
 				return topRange;					
 			}
+		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
 		}
 		Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 				-((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
@@ -138,19 +163,21 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 			return null;
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+		if (arg.hasDependency()) {
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
 				return topRange;
 			}
+		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
 		}
 		Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 				*((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
@@ -170,24 +197,28 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 */
 	public RangeValue<V> caseMtimes(Builtin builtin, Args<V> arg) {
 		if (arg.size()!=2) return null;
+		if (((HasShape<V>)arg.get(0)).getShape()==null 
+				|| ((HasShape<V>)arg.get(1)).getShape()==null) return null;
 		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
 				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
 			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 				return null;
-			else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
-				return topRange;				
-			}
-			else if (arg.hasDependency()) {
+			if (arg.hasDependency()) {
 				if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 						|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 					RangeValue<V> topRange = new RangeValue<V>();
-					topRange.flagIsTop();
+					topRange.flagLowerBoundIsTop();
+					topRange.flagUpperBoundIsTop();
 					return topRange;					
 				}
+			}
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+				RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+						((HasRangeValue<V>)arg.get(0)).getRangeValue()
+						, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+				return topRange;
 			}
 			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
@@ -200,7 +231,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return new RangeValue<V>(getMinimum(result1, result2, result3, result4)
 					, getMaximum(result1, result2, result3, result4));
 		}
-		else return null;
+		return null;
 	}
 	
 	@Override
@@ -212,19 +243,21 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 			return null;
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+		if (arg.hasDependency()) {
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
 				return topRange;					
 			}
+		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
 		}
 		Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 				/((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
@@ -250,19 +283,21 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 				return null;
-			else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
-				return topRange;				
-			}
-			else if (arg.hasDependency()) {
+			if (arg.hasDependency()) {
 				if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 						|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 					RangeValue<V> topRange = new RangeValue<V>();
-					topRange.flagIsTop();
+					topRange.flagLowerBoundIsTop();
+					topRange.flagUpperBoundIsTop();
 					return topRange;					
 				}
+			}
+			if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+				RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+						((HasRangeValue<V>)arg.get(0)).getRangeValue()
+						, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+				return topRange;
 			}
 			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
@@ -275,7 +310,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return new RangeValue<V>(getMinimum(result1, result2, result3, result4)
 					, getMaximum(result1, result2, result3, result4));
 		}
-		else return null;
+		return null;
 	}
 	
 	@Override
@@ -287,21 +322,23 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
 				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 			return null;
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+		if (arg.hasDependency()) {
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
 					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
 				return topRange;					
 			}
 		}
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().isConstant() 
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
+		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().isConstant() 
 				&& ((HasRangeValue<V>)arg.get(1)).getRangeValue().isConstant()) {
 			Double result = Math.pow(((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
 					, ((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound());
@@ -318,76 +355,81 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		if (arg.size()!=1) return null;
 		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null) 
 			return null;
-		else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop()) {
-			RangeValue<V> topRange = new RangeValue<V>();
-			topRange.flagIsTop();
-			return topRange;				
-		}
-		else if (arg.hasDependency()) {
+		if (arg.hasDependency()) {
 			if (arg.getDependentVars().contains(arg.get(0).getSymbolic())) {
 				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
 				return topRange;
 			}
 		}
-		Double result1 = Math.exp(((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound());
-		Double result2 = Math.exp(((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound());
-		return new RangeValue<V>(result1, result2);
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>();
+			topRange.flagLowerBoundIsTop();
+			topRange.flagUpperBoundIsTop();
+			return topRange;
+		}
+		Double result = Math.exp(((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound());
+		return new RangeValue<V>(result);
 	}
 	
 	
 	@Override
 	/**
 	 * colon case:
-	 * In MATLAB, if the first argument bigger than the second argument in colon built-in,
+	 * In MATLAB, if the lower bound bigger than the upper bound, 
 	 * MATLAB will return a 1-by-0 empty matrix.
 	 */
 	public RangeValue<V> caseColon(Builtin builtin, Args<V> arg) {
-		if (arg.size()!=2 || arg.size()!=3) return null;
-		else if (arg.size()==2) {
-			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) {
-				return null;
-			}
-			else if (((HasRangeValue<V>)arg.get(0)).getRangeValue().getIsTop() 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().getIsTop()) {
-				RangeValue<V> topRange = new RangeValue<V>();
-				topRange.flagIsTop();
-				return topRange;				
-			}
-			else if (arg.hasDependency()) {
-				if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
-						|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
-					RangeValue<V> topRange = new RangeValue<V>();
-					topRange.flagIsTop();
-					return topRange;					
-				}
-			}
-			Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound();
-			Double upperBound = ((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			if (lowerBound > upperBound) return null;
-			else return new RangeValue<V>(lowerBound, upperBound);
-		}
-		else {
-			//TODO with increment
+		if (arg.size()!=2) return null;
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
 			return null;
+		if (arg.hasDependency()) {
+			if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
+					|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
+				RangeValue<V> topRange = new RangeValue<V>();
+				topRange.flagLowerBoundIsTop();
+				topRange.flagUpperBoundIsTop();
+				return topRange;					
+			}
 		}
+		if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
+				|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
+			RangeValue<V> topRange = new RangeValue<V>().mergeTop(
+					((HasRangeValue<V>)arg.get(0)).getRangeValue()
+					, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
+			return topRange;
+		}
+		Double lowerBound = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound();
+		Double upperBound = ((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
+		if (lowerBound!=null && upperBound!=null) {
+			if (lowerBound > upperBound) return null; // TODO return a 1-by-0 matrix
+			return new RangeValue<V>(lowerBound, upperBound);
+		}
+		return new RangeValue<V>(lowerBound, upperBound);
 	}
 	
 	/**
 	 * for loop variable.
-	 * @param lower
-	 * @param upper
-	 * @param inc
-	 * @return
+	 * In MATLAB, the default increment is 1, and without increment input, 
+	 * if the lower bound bigger than the upper bound, MATLAB will return a 
+	 * 1-by-0 empty matrix. but if the increment is negative, the lower bound 
+	 * should be bigger than the upper bound.
 	 */
 	public RangeValue<V> forRange(V lower, V upper, V inc) {
-		if (((DoubleConstant)((HasConstant)lower).getConstant())==null 
-				|| ((DoubleConstant)((HasConstant)upper).getConstant())==null)
+		if (inc==null) {
+			if (((DoubleConstant)((HasConstant)lower).getConstant())==null 
+					|| ((DoubleConstant)((HasConstant)upper).getConstant())==null)
+				return null;
+			Double lowerBound = ((DoubleConstant)((HasConstant)lower).getConstant()).getValue();
+			Double upperBound = ((DoubleConstant)((HasConstant)upper).getConstant()).getValue();
+			return new RangeValue<V>(lowerBound, upperBound);			
+		}
+		else {
+			// System.err.println(lower.toString()+upper+inc); TODO
 			return null;
-		Double lowerBound = ((DoubleConstant)((HasConstant)lower).getConstant()).getValue();
-		Double upperBound = ((DoubleConstant)((HasConstant)upper).getConstant()).getValue();
-		return new RangeValue<V>(lowerBound, upperBound);
+		}
 	}
 	
 	//helper method

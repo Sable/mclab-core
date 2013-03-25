@@ -125,6 +125,18 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     	}
     	return null;
     }
+    
+    @Override
+    public Constant caseUminus(Builtin builtin, Args<V> arg) {
+    	if(arg.size()==1) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant) {
+    			Double res = -((DoubleConstant)((HasConstant)arg.get(0))
+    					.getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
 }
 
 
