@@ -55,6 +55,9 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 		else {
 			// a vertcat in output side, it should return a shape.
 			if (Debug) System.out.println("inside output vertcat expression!");
+			if (vl==null) {
+				return previousMatchResult;
+			}
 			String[] arg = vl.toString().split(",");
 			if (arg[0].equals("1")) {
 				ArrayList<DimValue> al = new ArrayList<DimValue>(2);

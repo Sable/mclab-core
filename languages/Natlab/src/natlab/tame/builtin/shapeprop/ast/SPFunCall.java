@@ -83,7 +83,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			}
 		}
 		/*
-		 * add function is used two places, one for adding the value of previous matched scalar to vertcat, 
+		 * add function is used in two situations, one for adding the value of previous matched scalar to vertcat, 
 		 * the other one for adding value of argument to previous matched lowercase, like n=add(k). 
 		 */
 		else if (funName.equals("add")) {
@@ -110,7 +110,17 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 						lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(sum, null));
 						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 						return matchResult;
-					}					
+					}
+					/*
+					 * add symbolic expression here.
+					 */
+					String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
+							+"+"+previousMatchResult.getValueOfVariable(arg[0]);
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+							new DimValue(null, symbolicExp));
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+					return matchResult;
 				}
 				System.err.println("cannot compute add function in shape equation!");
 				return previousMatchResult;
@@ -129,6 +139,16 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 		            return matchResult;
 				}
+				/*
+				 * add symbolic expression here.
+				 */
+				String symbolicExp = previousMatchResult.getValueOfVariable(arg[0])
+						+"-"+previousMatchResult.getValueOfVariable(arg[1])+"+1";
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+						new DimValue(null, symbolicExp));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+				return matchResult;
 			}
 			System.err.println("cannot compute minus function in shape equation!");
 			return previousMatchResult;
@@ -146,6 +166,16 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 		            return matchResult;
 				}
+				/*
+				 * add symbolic expression here.
+				 */
+				String symbolicExp = "("+previousMatchResult.getValueOfVariable(arg[0])+")"
+						+"/"+previousMatchResult.getValueOfVariable(arg[1]);
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+						new DimValue(null, symbolicExp));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+				return matchResult;
 			}
 			System.err.println("cannot compute div function in shape equation!");
 			return previousMatchResult;
