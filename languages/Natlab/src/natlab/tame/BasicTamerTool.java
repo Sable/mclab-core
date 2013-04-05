@@ -4,21 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.SimpleFunctionCollection;
-import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.IntraproceduralValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.*;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 
 public class BasicTamerTool {
 
@@ -114,7 +110,7 @@ public class BasicTamerTool {
 			 * TODO Below is just to test. Add actual code to make sense of the
 			 * argument specs
 			 */
-			list.add(new BasicMatrixValue(PrimitiveClassReference.DOUBLE,
+			list.add(new BasicMatrixValue("n", PrimitiveClassReference.DOUBLE,
 					specs[1]));
 
 		}

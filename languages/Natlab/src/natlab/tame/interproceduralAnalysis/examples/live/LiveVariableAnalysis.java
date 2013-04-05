@@ -1,15 +1,18 @@
 package natlab.tame.interproceduralAnalysis.examples.live;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import natlab.tame.TamerTool;
 import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.interproceduralAnalysis.*;
-import natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural.DefinedVariablesNameCollector;
-import natlab.tame.valueanalysis.simplematrix.*;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
+import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 /**

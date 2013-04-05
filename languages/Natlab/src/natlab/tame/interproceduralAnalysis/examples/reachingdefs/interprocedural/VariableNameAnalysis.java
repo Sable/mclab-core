@@ -12,7 +12,7 @@ import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.toolkits.analysis.HashSetFlowSet;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 public class VariableNameAnalysis 

@@ -25,6 +25,11 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
     static SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
     Constant constant;
     
+    // TODO(xu): Decide whether this is necessary / makes sense. This constructor was added to make code build
+    // after a merge.
+    public SimpleMatrixValue(PrimitiveClassReference aClass) {
+        this(null, aClass);
+    }
     
     public SimpleMatrixValue(String symbolic, PrimitiveClassReference aClass) {
         super(symbolic, aClass);
