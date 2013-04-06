@@ -16,6 +16,7 @@ import natlab.tame.tir.TIRCommaSeparatedList;
 import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRDotGetStmt;
 import natlab.tame.tir.TIRDotSetStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
@@ -30,35 +31,24 @@ import ast.NameExpr;
  * @author Amine Sahibi
  *
  */
-@SuppressWarnings("rawtypes")
 public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
 {
     UDDUWeb fUDDUWeb;
-    RenameVariablesForASTNodes fRenameVariablesForASTNodes;
+    public static final String PREFIX = "#";
     
     public RenameVariablesForTIRNodes(UDDUWeb udduWeb)
     {
         fUDDUWeb = udduWeb;
         fUDDUWeb.constructUDDUWeb();
-        fRenameVariablesForASTNodes = new RenameVariablesForASTNodes(null, fUDDUWeb);
-        fRenameVariablesForASTNodes.analyze();
     }
     
     public void analyze()
     {
-        for (ASTNode node : fUDDUWeb.getVisitedStmtsLinkedList())
-        {
-            // TODO I should not have to make this call explicit!!!
-            if (node instanceof TIRFunction)
-            {
-                caseTIRFunction((TIRFunction) node);
-            }
-            (node).analyze(this);  
-        }
-//        fUDDUWeb.getVisitedStmtsLinkedList().get(0).analyze(this);
+        getFunctionNode().tirAnalyze(this);
     }
     
     @Override
+    @SuppressWarnings("rawtypes")
     public void caseASTNode(ASTNode node) 
     {
         int nodeChildrenCount = node.getNumChild();
@@ -91,12 +81,23 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
     }
     
     @Override
+    public void caseTIRCallStmt(TIRCallStmt node)
+    {
+       TIRCommaSeparatedList definedVariablesNames = node.getTargets();
+       
+       TIRCommaSeparatedList usedVariablesNames = node.getArguments();
+       
+       renameDefinedVariablesForNode(definedVariablesNames, node);
+       renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
     public void caseTIRIfStmt(TIRIfStmt node)
     {
         Name conditionVariableName = node.getConditionVarName();
         if (conditionVariableName != null)
         {
-            HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
+            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
             if (nodeAndColor != null &&  nodeAndColor.containsKey(node))
             {
                 renameVariableWithColor(conditionVariableName, nodeAndColor.get(node));
@@ -111,7 +112,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
         Name conditionVariableName = node.getCondition().getName();
         if (conditionVariableName != null)
         {
-            HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
+            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
             if (nodeAndColor != null &&  nodeAndColor.containsKey(node))
             {
                 renameVariableWithColor(conditionVariableName, nodeAndColor.get(node));
@@ -121,14 +122,23 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
     }
     
     @Override
-    public void caseTIRCallStmt(TIRCallStmt node)
+    public void caseTIRForStmt(TIRForStmt node)
     {
-       TIRCommaSeparatedList definedVariablesNames = node.getTargets();
-       
-       TIRCommaSeparatedList usedVariablesNames = node.getArguments();
-       
-       renameDefinedVariablesForNode(definedVariablesNames, node);
-       renameUsedVariablesForNode(usedVariablesNames, node);
+        TIRCommaSeparatedList definedVariablesNames = null;
+        TIRCommaSeparatedList usedVariablesNames = null;
+        
+        definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getLoopVarName()));
+
+        usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getLowerName()));
+        if (node.hasIncr())
+        {
+            usedVariablesNames.add(new NameExpr(node.getIncName()));
+        }
+        usedVariablesNames.add(new NameExpr(node.getUpperName()));
+
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+        caseForStmt(node);
     }
     
     @Override
@@ -253,7 +263,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
         }
     }
     
-    public void renameUsedVariablesForNode(TIRCommaSeparatedList usedVariablesNames, ASTNode parentNode)
+    public void renameUsedVariablesForNode(TIRCommaSeparatedList usedVariablesNames, TIRNode parentNode)
     {
         if (usedVariablesNames == null)
         {
@@ -262,7 +272,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
         for (int i = 0; i < usedVariablesNames.getNumChild(); i++)
         {
             Name usedVariableName = usedVariablesNames.getName(i);
-            HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getNodeString());
+            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getNodeString());
             if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
             {
                 renameVariableWithColor(usedVariableName, nodeAndColor.get(parentNode));
@@ -270,7 +280,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
         }
     }
     
-    public void renameDefinedVariablesForNode(TIRCommaSeparatedList definedVariablesNames, ASTNode parentNode)
+    public void renameDefinedVariablesForNode(TIRCommaSeparatedList definedVariablesNames, TIRNode parentNode)
     {
         if (definedVariablesNames == null)
         {
@@ -278,19 +288,24 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
         }
         for (int i = 0; i < definedVariablesNames.getNumChild(); i++)
         {
-            Name usedVariableName = definedVariablesNames.getName(i);
-            HashMap<ASTNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForDefinition(usedVariableName.getNodeString());
+            Name definedVariableName = definedVariablesNames.getName(i);
+            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForDefinition(definedVariableName.getNodeString());
             if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
             {
-                renameVariableWithColor(usedVariableName, nodeAndColor.get(parentNode));
+                renameVariableWithColor(definedVariableName, nodeAndColor.get(parentNode));
             }
         }
     }
     
     public void renameVariableWithColor(Name variableName, Integer color)
     {
-        String updatedVariableName = variableName.getNodeString() + "#" + color;
+        String updatedVariableName = variableName.getNodeString() + PREFIX + color;
         variableName.setID(updatedVariableName);
     }
-
+    
+    private TIRNode getFunctionNode()
+    {
+        return fUDDUWeb.getVisitedStmtsLinkedList().get(0);
+    }
+    
 }

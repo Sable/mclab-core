@@ -4,11 +4,12 @@ import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
-import ast.AssignStmt;
 import ast.Function;
 
 /**
@@ -44,14 +45,6 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         setInOutSet(node);
         caseASTNode(node);
     }
-
-    @Override
-    public void caseLoopVar(AssignStmt node)
-    {
-        currentOutSet = copy(currentInSet);
-        addDefinedVariablesToCurrentOutSet(node);
-        setInOutSet(node);
-    }
     
     @Override
     public void caseTIRCallStmt(TIRCallStmt node)
@@ -59,6 +52,14 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
        currentOutSet = copy(currentInSet);
        addDefinedVariablesToCurrentOutSet(node);
        setInOutSet(node);
+    }
+    
+    @Override
+    public void caseTIRForStmt(TIRForStmt node)
+    {
+        currentOutSet = copy(currentInSet);
+        addDefinedVariablesToCurrentOutSet(node);
+        setInOutSet(node);
     }
     
     @Override
@@ -77,7 +78,7 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         setInOutSet(node);
     }
     
-    public void addDefinedVariablesToCurrentOutSet(ASTNode node)
+    public void addDefinedVariablesToCurrentOutSet(TIRNode node)
     {
         currentOutSet.addAll(fDefinedVariablesNameCollector.getDefinedVariablesNamesForNode(node));
     }
@@ -97,7 +98,6 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         return (Function) super.getTree();
     }
 
-    // TODO verify merge with ISMAIL
     @Override
     public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out)
     {
@@ -127,10 +127,10 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         return out;
     }
     
-    private void setInOutSet(ASTNode<?> node)
+    private void setInOutSet(TIRNode node)
     {
-        associateInSet(node, getCurrentInSet());
-        associateOutSet(node, getCurrentOutSet());
+        associateInSet((ASTNode) node, getCurrentInSet());
+        associateOutSet((ASTNode) node, getCurrentOutSet());
     }
 
     @Override

@@ -41,22 +41,21 @@ import ast.WhileStmt;
 @SuppressWarnings("rawtypes")
 public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
 {
-    private LinkedList<ASTNode> fVisitedNodes;
-    private HashMap<ASTNode, ASTNode> fIRToRawASTTable;
-    private ASTNodeToRawASTNodeTableBuilder fASTNodeToRawASTNodeTableBuilder;
+    public static boolean DEBUG = true;
+    private LinkedList<TIRNode> fVisitedNodes;
+    private HashMap<TIRNode, ASTNode> fIRToRawASTTable;
     
     // Case loop var will require a specialized builder and also expander!
-    public IRNodeToRawASTNodeTableBuilder(LinkedList<ASTNode> visitedNodes)
+    public IRNodeToRawASTNodeTableBuilder(LinkedList<TIRNode> visitedNodes)
     {
         fVisitedNodes = visitedNodes;
         initializeIRToRawASTTable();
-        fASTNodeToRawASTNodeTableBuilder = new ASTNodeToRawASTNodeTableBuilder(null, fVisitedNodes, fIRToRawASTTable);
     }
     
     public void initializeIRToRawASTTable()
     {
-        fIRToRawASTTable = new HashMap<ASTNode, ASTNode>();
-        for (ASTNode visitedNode : fVisitedNodes)
+        fIRToRawASTTable = new HashMap<TIRNode, ASTNode>();
+        for (TIRNode visitedNode : fVisitedNodes)
         {
             if (visitedNode instanceof Function)
             {
@@ -75,15 +74,7 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
 
     public void build()
     {
-        for (ASTNode node : fVisitedNodes)
-        {
-            if (node instanceof TIRFunction)
-            {
-                caseTIRFunction((TIRFunction) node);
-            }
-            (node).analyze(this);
-        }
-        fASTNodeToRawASTNodeTableBuilder.analyze();
+        getFunctionNode().tirAnalyze(this);
     }
     
     @Override
@@ -115,6 +106,8 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
         function.setNestedFunctionList(tameIRFunction.getNestedFunctionList());
         function.setStmtList(tameIRFunction.getStmts());
         fIRToRawASTTable.put(node, function);
+        if (DEBUG) printTableEntry(node, function);
+        caseASTNode(node);
     }
     
     @Override
@@ -124,7 +117,9 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
         ForStmt forStmt = new ForStmt();
         forStmt.setAssignStmt(tameIRForStmt.getAssignStmt());
         forStmt.setStmtList(tameIRForStmt.getStmtList());
-        fIRToRawASTTable.put(node,forStmt);
+        fIRToRawASTTable.put(node, forStmt);
+        if (DEBUG) printTableEntry(node, forStmt);
+        caseForStmt(node);
     }
     
     @Override
@@ -135,6 +130,8 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
         ifStmt.setIfBlockList(tameIRIfStmt.getIfBlockList());
         ifStmt.setElseBlock(tameIRIfStmt.getElseBlock());
         fIRToRawASTTable.put(node, ifStmt);
+        if (DEBUG) printTableEntry(node, ifStmt);
+        caseIfStmt(node);
     }
     
     @Override
@@ -145,21 +142,23 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
         whileStmt.setExpr(tameIRWhileStmt.getCondition());
         whileStmt.setStmtList(tameIRWhileStmt.getStmtList());
         fIRToRawASTTable.put(node, whileStmt);
+        if (DEBUG) printTableEntry(node, whileStmt);
+        caseWhileStmt(node);
     }
     
     @Override
     public void caseTIRCallStmt(TIRCallStmt node)
     {
-        AssignStmt assignStmt = new AssignStmt();
-        TIRCallStmt callStmt = (TIRCallStmt) node;
+        AssignStmt callStmt = new AssignStmt();
         ParameterizedExpr rhs = new ParameterizedExpr();
-        rhs.setTarget(new NameExpr(callStmt.getFunctionName()));
-        addIndicesToParametrizedExpr(callStmt.getArguments(), rhs);
+        rhs.setTarget(new NameExpr(node.getFunctionName()));
+        addIndicesToParametrizedExpr(node.getArguments(), rhs);
         MatrixExpr lhs = new MatrixExpr();
-        addTargetsToMatrixExpr(callStmt.getTargets(), lhs);
-        assignStmt.setLHS(lhs);
-        assignStmt.setRHS(rhs);
-        fIRToRawASTTable.put(node, assignStmt);
+        addTargetsToMatrixExpr(node.getTargets(), lhs);
+        callStmt.setLHS(lhs);
+        callStmt.setRHS(rhs);
+        fIRToRawASTTable.put(node, callStmt);
+        if (DEBUG) printTableEntry(node, callStmt);
     }
     
     @Override
@@ -173,6 +172,7 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
                 TIRCopyStmt copyStmt = (TIRCopyStmt) node;
                 assignStmt.setLHS(copyStmt.getLHS());
                 assignStmt.setRHS(copyStmt.getRHS());
+                System.err.println(copyStmt.getLHS().getParent() == node.getLHS().getParent());
             }
             // TIRLiteralAssignStmt is not affected
             // Does not handle TIRAbstractCreateFunctionHandleStmt
@@ -215,6 +215,7 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
             }
         }
         fIRToRawASTTable.put(node, assignStmt);
+        if (DEBUG) printTableEntry(node, assignStmt);
     }
     
     @Override
@@ -256,6 +257,7 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
             throw new UnsupportedOperationException("unknown assign from var stmt " + node);
         }
         fIRToRawASTTable.put(node, assignStmt);
+        if (DEBUG) printTableEntry(node, assignStmt);
     }
     
     public void addIndicesToParametrizedExpr(TIRCommaSeparatedList indices, ParameterizedExpr parameterizedExpr)
@@ -301,8 +303,38 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
        matrixExpr.setRow(row, 0);
     }
     
-    public HashMap<ASTNode,  ASTNode> getIRToRawASTTable()
+    public HashMap<TIRNode,  ASTNode> getIRToRawASTTable()
     {
         return fIRToRawASTTable;
+    }
+    
+    private TIRNode getFunctionNode()
+    {
+        return fVisitedNodes.get(0);
+    }
+    
+    private String printTIRNode(TIRNode node)
+    {
+        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
+        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
+        else return null;
+    }
+    
+    private String printASTNode(ASTNode node)
+    {
+        if (node instanceof AssignStmt) return ((AssignStmt) node).getStructureString();
+        else if (node instanceof Function) return ((Function) node).getStructureString().split("\n")[0];
+        else if (node instanceof IfStmt) return ((IfStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof WhileStmt) return ((WhileStmt) node).getStructureString().split("\n")[0];
+        else if (node instanceof ForStmt) return ((ForStmt) node).getStructureString().split("\n")[0];
+        else return null;
+    }
+    
+    private void printTableEntry(TIRNode key, ASTNode value)
+    {
+       System.out.println(printTIRNode(key) + " ---> " + value.getClass());//+ printASTNode(value));
     }
 }
