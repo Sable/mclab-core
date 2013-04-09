@@ -22,7 +22,7 @@ import ast.IfStmt;
 import ast.WhileStmt;
 
 @SuppressWarnings("rawtypes")
-public class TIRToAST extends AbstractTIRLocalRewrite
+public class TIRToAST extends AbstractTIRLocalRewrite implements TamerPlusAnalysis
 {
 
     public static boolean DEBUG = false;
@@ -119,7 +119,7 @@ public class TIRToAST extends AbstractTIRLocalRewrite
     
     public boolean nodeDefinesTmpVariables(TIRNode node)
     {
-        Set<String> definedVariablesNames = fDefinedVariablesNameCollector.getDefinedVariablesNamesForNode(node);
+        Set<String> definedVariablesNames = fDefinedVariablesNameCollector.getDefinedVariablesForNode(node);
         return isAnyVariableTemporary(definedVariablesNames);
     }
     

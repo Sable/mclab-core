@@ -6,46 +6,44 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.tame.tir.TIRAbstractAssignStmt;
-import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
-import natlab.tame.tir.TIRWhileStmt;
 import natlab.toolkits.analysis.HashMapFlowMap;
+import ast.Name;
+
+import com.google.common.collect.Maps;
 
 /**
  * Constructs a DU chain for a given AST
  * @author Amine Sahibi
  *
  */
-public class DUChain
+public class DUChain implements TamerPlusAnalysis
 {
-    private Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> fDUMap;
+    private Map<TIRNode, HashMap<Name, HashSet<TIRNode>>> fDUMap;
     private UDChain fUDChains;
     
     public DUChain(UDChain udChains)
     {
         fUDChains = udChains;
         fUDChains.constructUDChain();
-        fDUMap = new HashMap<TIRNode, HashMapFlowMap<String,HashSet<TIRNode>>>();
+        fDUMap = Maps.newHashMap();
     }
     
     public void constructDUChain()
     {
-        Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> resultUDMap = fUDChains.getChain();
+        Map<TIRNode, HashMap<Name, HashSet<TIRNode>>> resultUDMap = fUDChains.getChain();
         Set<TIRNode> useAssignmentStmts = resultUDMap.keySet();
         for (TIRNode useAssignmentStmt : useAssignmentStmts)
         {
-            Set<String> varNames = resultUDMap.get(useAssignmentStmt).keySet();
-            for (String varName : varNames)
+            Set<Name> varNames = resultUDMap.get(useAssignmentStmt).keySet();
+            for (Name varName : varNames)
             {
                 Set<TIRNode> defAssignmentStmts = resultUDMap.get(useAssignmentStmt).get(varName);
                 for (TIRNode defAssignStmt : defAssignmentStmts) 
                 {
                     if (fDUMap.get(defAssignStmt) == null)
                     {
-                        HashMapFlowMap<String, HashSet<TIRNode>> useSiteMap = new HashMapFlowMap<String, HashSet<TIRNode>>();
+                        HashMap<Name, HashSet<TIRNode>> useSiteMap = Maps.newHashMap();
                         fDUMap.put(defAssignStmt, useSiteMap);
                     }
                     
@@ -71,7 +69,7 @@ public class DUChain
         LinkedList<TIRNode> visitedStmts = fUDChains.getVisitedStmtsLinkedList();
         for (TIRNode visitedStmt : visitedStmts)
         {
-            sb.append("------- " + printNode(visitedStmt) + " -------\n");
+            sb.append("------- " + NodePrinter.printNode(visitedStmt) + " -------\n");
             HashMapFlowMap<String, HashSet<TIRNode>> useSiteMap = fDUMap.get(visitedStmt);
             if (useSiteMap == null) continue;
             Set<String> variableNames = useSiteMap.keySet();
@@ -83,21 +81,11 @@ public class DUChain
                     sb.append("Var "+ s + "\n");
                     for (TIRNode useStmt : useStmts)
                     {
-                        sb.append("\t"+ printNode(useStmt) + "\n");
+                        sb.append("\t"+ NodePrinter.printNode(useStmt) + "\n");
                     }
                 }
             }
         }
         System.out.println(sb.toString());
-    }
-    
-    private String printNode(TIRNode node)
-    {
-        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
-        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
-        else return null;
     }
 }

@@ -1,118 +1,106 @@
 package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.tame.callgraph.StaticFunction;
-import natlab.tame.tir.TIRAbstractAssignStmt;
-import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
-import natlab.tame.tir.TIRWhileStmt;
-import natlab.toolkits.analysis.HashMapFlowMap;
+import ast.Name;
 
-/**
- * Construct a UD chain for a given AST
- * @author Amine Sahibi
- *
- */
-public class UDChain
+import com.google.common.collect.Maps;
+
+public class UDChain implements TamerPlusAnalysis
 {
-    private ReachingDefinitions fReachingDefinitionsAnalysis;
-    private Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> fUDMap;
-    private DefinedVariablesNameCollector fVariableNameCollector;
+    private Map<TIRNode, Map<Name, Set<TIRNode>>> fUDMap;
     private UsedVariablesNameCollector fUsedVariablesNameCollector;
+    private ReachingDefinitions fReachingDefinitionsAnalysis;
     
-    public UDChain(ReachingDefinitions reachingDefintionsAnalysis)
+    public UDChain()
     {
-        fReachingDefinitionsAnalysis = reachingDefintionsAnalysis;
-        fUDMap = new HashMap<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> ();
-        fReachingDefinitionsAnalysis.analyze();
-        fVariableNameCollector = fReachingDefinitionsAnalysis.getVarNameCollector();
-        fUsedVariablesNameCollector = new UsedVariablesNameCollector(fVariableNameCollector.getFunction());
-        fUsedVariablesNameCollector.analyze();
+        fUDMap = Maps.newHashMap();
     }
     
-    public UDChain(StaticFunction f)
+    @Override
+    public void analyze(AnalysisEngine engine)
     {
-        fReachingDefinitionsAnalysis = new ReachingDefinitions(f);
-        fUsedVariablesNameCollector = new UsedVariablesNameCollector(f);
-        fUDMap = new HashMap<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> ();
-        fReachingDefinitionsAnalysis.analyze();
-        fVariableNameCollector = fReachingDefinitionsAnalysis.getVarNameCollector();
-        fUsedVariablesNameCollector.analyze();
+        fUsedVariablesNameCollector = engine.getUsedVariablesAnalysis();
+        fReachingDefinitionsAnalysis = engine.getReachingDefinitionsAnalysis();
+        this.constructUDChain();
     }
     
     public void constructUDChain()
     {
-        LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList();
-        for (TIRNode visitedStmt : visitedStmts)
+        for (TIRNode visitedStmt : fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList())
         {
-           HashMapFlowMap<String, Set<TIRNode>> varToDefUsedMap = fReachingDefinitionsAnalysis.getOutFlowSets().get(visitedStmt);
-           Set<String> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedStmt);
-           if (usedVariables == null) continue;
-           HashMapFlowMap<String, HashSet<TIRNode>> varToUsedMap = new HashMapFlowMap<String, HashSet<TIRNode>>();
-           for (String key : varToDefUsedMap.keySet())
+           Set<Name> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedStmt);
+           if (usedVariables == null)
            {
-               // If the variable is not declared in that stmt, add it to the map. We want to keep the used variables only.
-               if (usedVariables.contains(key))
-               {
-                   varToUsedMap.put(key, (HashSet<TIRNode>) varToDefUsedMap.get(key));
-               }
+               continue;
            }
-           fUDMap.put(visitedStmt, varToUsedMap);
+           fUDMap.put(visitedStmt, getUsedVariablesToDefinitionsMapForNode(visitedStmt, usedVariables));
         }
     }
     
-    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getChain() { return fUDMap; }
+    public Map<Name, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<Name> usedVariables)
+    {
+        Map<Name, Set<TIRNode>> usedVariablesToDefinitionsMap = Maps.newHashMap();
+        Map<Name, Set<TIRNode>> variableToReachingDefinitionsMap = fReachingDefinitionsAnalysis.getReachingDefinitionsForNode(node);
+        for (Name variableName : variableToReachingDefinitionsMap.keySet())
+        {
+            // If the variable is not declared in that stmt, add it to the map. We want to keep the used variables only.
+            if (usedVariables.contains(variableName))
+            {
+                usedVariablesToDefinitionsMap.put(variableName, variableToReachingDefinitionsMap.get(variableName));
+            }
+        }
+        return usedVariablesToDefinitionsMap;
+    }
     
-    public HashMapFlowMap<String, HashSet<TIRNode>> getDefinitionsMap(TIRNode node) { return fUDMap.get(node); }
+    public Map<TIRNode, Map<Name, Set<TIRNode>>> getChain() 
+    {
+        return fUDMap; 
+    }
+    
+    public Map<Name, Set<TIRNode>> getDefinitionsMap(TIRNode node)
+    {
+        return fUDMap.get(node);
+    }
         
-    public LinkedList<TIRNode> getVisitedStmtsLinkedList() { return fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList(); }
-    
     public void printUDChain()
     {
         StringBuffer sb = new StringBuffer();
         LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList();
         for (TIRNode visitedStmt : visitedStmts)
         {
-            sb.append("------- " + printNode(visitedStmt) + " -------\n");
-            HashMapFlowMap<String, HashSet<TIRNode>> definitionSiteMap = fUDMap.get(visitedStmt);
-            if (definitionSiteMap == null) continue;
-            Set<String> variableNames = definitionSiteMap.keySet();
-            for (String s : variableNames)
+            sb.append("------- ").append(NodePrinter.printNode(visitedStmt)).append(" -------\n");
+            Map<Name, Set<TIRNode>> definitionSiteMap = fUDMap.get(visitedStmt);
+            if (definitionSiteMap == null)
             {
-                Set<TIRNode> defStmts = definitionSiteMap.get(s);
-                if (!defStmts.isEmpty())
-                {
-                    sb.append("Var "+ s + "\n");
-                    for (TIRNode defStmt : defStmts)
-                    {
-                        sb.append("\t"+ printNode(defStmt) + "\n");
-                    }
-                }
+                continue;
             }
+            printVariableToReachingDefinitionsMap(definitionSiteMap, sb);
         }
         System.out.println(sb.toString());
     }
     
-    private String printNode(TIRNode node)
+    public void printVariableToReachingDefinitionsMap(Map<Name, Set<TIRNode>> definitionSiteMap, StringBuffer sb)
     {
-        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
-        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
-        else return null;
+        for (Map.Entry<Name, Set<TIRNode>> entry : definitionSiteMap.entrySet())
+        {
+            printVariableToReachingDefinitionsMapEntry(entry, sb);
+        }
     }
     
-    // TODO remove when refactoring
-    public DefinedVariablesNameCollector getDefinedVariableNameCollector()
+    public void printVariableToReachingDefinitionsMapEntry(Map.Entry<Name, Set<TIRNode>> entry, StringBuffer sb)
     {
-        return fVariableNameCollector;
+        Set<TIRNode> defStmts = entry.getValue();
+        if (!defStmts.isEmpty())
+        {
+            sb.append("Var ").append(NodePrinter.printNode(entry.getKey())).append("\n");
+            for (TIRNode defStmt : defStmts)
+            {
+                sb.append("\t").append(NodePrinter.printNode(defStmt)).append("\n");
+            }
+        }
     }
 }

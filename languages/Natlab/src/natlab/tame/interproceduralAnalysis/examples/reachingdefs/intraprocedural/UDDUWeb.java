@@ -17,7 +17,7 @@ import natlab.toolkits.analysis.HashMapFlowMap;
  * @author Amine Sahibi
  *
  */
-public class UDDUWeb
+public class UDDUWeb implements TamerPlusAnalysis
 {
     public static boolean DEBUG = false;
     private UDChain fUDChain;

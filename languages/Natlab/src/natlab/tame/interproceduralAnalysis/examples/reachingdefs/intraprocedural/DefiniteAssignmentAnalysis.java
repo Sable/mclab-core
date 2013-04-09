@@ -1,6 +1,7 @@
 package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
-import natlab.tame.callgraph.StaticFunction;
+import java.util.HashSet;
+
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRCallStmt;
@@ -8,20 +9,15 @@ import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
-import natlab.toolkits.analysis.HashSetFlowSet;
 import ast.ASTNode;
-import ast.Function;
+import ast.Name;
 
-/**
- * Intraprocedural analysis that determines whether a variable has been assigned before it was used.
- * @author Amine Sahibi
- *
- */
-@SuppressWarnings("rawtypes")
-public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashSetFlowSet<String>>
+import com.google.common.collect.Sets;
+
+
+public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<Name>> implements TamerPlusAnalysis
 {
 
-    private StaticFunction fFunction;
     private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
     
     public DefiniteAssignmentAnalysis(ASTNode<?> tree)
@@ -29,11 +25,12 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         super(tree);
     }
     
-    public DefiniteAssignmentAnalysis(StaticFunction f, DefinedVariablesNameCollector definedVariablesNameCollector)
+    @Override
+    public void analyze(AnalysisEngine engine)
     {
-        super(f.getAst());
-        fFunction = f;
-        fDefinedVariablesNameCollector = definedVariablesNameCollector;
+        fDefinedVariablesNameCollector = engine.getDefinedVariablesAnalysis();
+        fDefinedVariablesNameCollector.analyze(engine);
+        super.analyze();
     }
     
     @Override
@@ -80,10 +77,10 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
     
     public void addDefinedVariablesToCurrentOutSet(TIRNode node)
     {
-        currentOutSet.addAll(fDefinedVariablesNameCollector.getDefinedVariablesNamesForNode(node));
+        currentOutSet.addAll(fDefinedVariablesNameCollector.getDefinedVariablesForNode(node));
     }
     
-    public boolean isDefinitelyAssignedAtInputOf(ASTNode node, String variableName)
+    public boolean isDefinitelyAssignedAtInputOf(TIRNode node, Name variableName)
     {
         if (!inFlowSets.containsKey((node)))
         {
@@ -91,54 +88,39 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         }
         return inFlowSets.get(node).contains(variableName);
     }
-    
+
     @Override
-    public Function getTree()
+    public void merge(HashSet<Name> in1, HashSet<Name> in2, HashSet<Name> out)
     {
-        return (Function) super.getTree();
+        out.clear();
+        out.addAll(Sets.intersection(in1, in2));
     }
 
     @Override
-    public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out)
+    public void copy(HashSet<Name> source, HashSet<Name> dest)
     {
-        if (!out.isEmpty())
+        for (Name varName : source)
         {
-            out.clear();
+            dest.add(varName.copy());
         }
-        for (String variableName : in1)
-        {
-            if (in2.contains(variableName))
-            {
-                out.add(variableName);
-            }
-        }
-    }
-
-    @Override
-    public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest)
-    {
-        source.copy(dest);
     }
     
-    public HashSetFlowSet<String> copy(HashSetFlowSet<String> in)
+    public HashSet<Name> copy(HashSet<Name> in)
     {
-        HashSetFlowSet<String> out = new HashSetFlowSet<String>();
+        HashSet<Name> out = Sets.newHashSet();
         copy(in, out);
-        return out;
+        return out; 
     }
     
     private void setInOutSet(TIRNode node)
     {
-        associateInSet((ASTNode) node, getCurrentInSet());
-        associateOutSet((ASTNode) node, getCurrentOutSet());
+        associateInSet((ASTNode<?>) node, getCurrentInSet());
+        associateOutSet((ASTNode<?>) node, getCurrentOutSet());
     }
 
     @Override
-    public HashSetFlowSet<String> newInitialFlow()
+    public HashSet<Name> newInitialFlow()
     {
-        return new HashSetFlowSet<String>();
+        return Sets.newHashSet();
     }
-    
-    public StaticFunction getFunction() { return fFunction; }
-
 }

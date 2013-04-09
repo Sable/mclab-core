@@ -37,7 +37,7 @@ import ast.NameExpr;
 import ast.WhileStmt;
 
 @SuppressWarnings("rawtypes")
-public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler
+public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
 {
 
     UDDUWeb fUDDUWeb;

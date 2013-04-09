@@ -31,7 +31,7 @@ import ast.NameExpr;
  * @author Amine Sahibi
  *
  */
-public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler
+public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
 {
     UDDUWeb fUDDUWeb;
     public static final String PREFIX = "#";
