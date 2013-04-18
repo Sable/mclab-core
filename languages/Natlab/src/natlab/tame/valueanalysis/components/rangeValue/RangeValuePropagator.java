@@ -193,7 +193,8 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	
 	@Override
 	/**
-	 * matrix multiply
+	 * matrix multiplication, when the arguments are both scalars, 
+	 * it works the same as element-by-element multiplication.
 	 */
 	public RangeValue<V> caseMtimes(Builtin builtin, Args<V> arg) {
 		if (arg.size()!=2) return null;
@@ -201,35 +202,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 				|| ((HasShape<V>)arg.get(1)).getShape()==null) return null;
 		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
 				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
-			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
-				return null;
-			if (arg.hasDependency()) {
-				if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
-						|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
-					RangeValue<V> topRange = new RangeValue<V>();
-					topRange.flagLowerBoundIsTop();
-					topRange.flagUpperBoundIsTop();
-					return topRange;					
-				}
-			}
-			if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
-				RangeValue<V> topRange = new RangeValue<V>().mergeTop(
-						((HasRangeValue<V>)arg.get(0)).getRangeValue()
-						, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
-				return topRange;
-			}
-			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
-					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
-			Double result2 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
-					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			Double result3 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
-					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
-			Double result4 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
-					*((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			return new RangeValue<V>(getMinimum(result1, result2, result3, result4)
-					, getMaximum(result1, result2, result3, result4));
+			return caseTimes(builtin, arg);
 		}
 		return null;
 	}
@@ -273,49 +246,21 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	
 	@Override
 	/**
-	 * matrix rdivision, when the arguments are scalar, 
+	 * matrix rdivision, when the arguments are both scalars, 
 	 * it works the same as element-by-element rdivision.
 	 */
 	public RangeValue<V> caseMrdivide(Builtin builtin, Args<V> arg) {
 		if (arg.size()!=2) return null;
 		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
 				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
-			if (((HasRangeValue<V>)arg.get(0)).getRangeValue()==null 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue()==null) 
-				return null;
-			if (arg.hasDependency()) {
-				if (arg.getDependentVars().contains(arg.get(0).getSymbolic()) 
-						|| arg.getDependentVars().contains(arg.get(1).getSymbolic())) {
-					RangeValue<V> topRange = new RangeValue<V>();
-					topRange.flagLowerBoundIsTop();
-					topRange.flagUpperBoundIsTop();
-					return topRange;					
-				}
-			}
-			if (((HasRangeValue<V>)arg.get(0)).getRangeValue().hasTop() 
-					|| ((HasRangeValue<V>)arg.get(1)).getRangeValue().hasTop()) {
-				RangeValue<V> topRange = new RangeValue<V>().mergeTop(
-						((HasRangeValue<V>)arg.get(0)).getRangeValue()
-						, ((HasRangeValue<V>)arg.get(1)).getRangeValue());
-				return topRange;
-			}
-			Double result1 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
-					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
-			Double result2 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getLowerBound()
-					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			Double result3 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
-					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getLowerBound();
-			Double result4 = ((HasRangeValue<V>)arg.get(0)).getRangeValue().getUpperBound()
-					/((HasRangeValue<V>)arg.get(1)).getRangeValue().getUpperBound();
-			return new RangeValue<V>(getMinimum(result1, result2, result3, result4)
-					, getMaximum(result1, result2, result3, result4));
+			return caseRdivide(builtin, arg);
 		}
 		return null;
 	}
 	
 	@Override
 	/**
-	 * array power, which is element-by-element power.
+	 * element-by-element power.
 	 */
 	public RangeValue<V> casePower(Builtin builtin, Args<V> arg) {
 		if (arg.size()!=2) return null;
@@ -345,6 +290,20 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return new RangeValue<V>(result);
 		}
 		return null; // TODO extend to interval value power analysis
+	}
+	
+	@Override
+	/**
+	 * array power, when the arguments are both scalars, 
+	 * it works the same as element-by-element power.
+	 */
+	public RangeValue<V> caseMpower(Builtin builtin, Args<V> arg) {
+		if (arg.size()!=2) return null;
+		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
+				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
+			return casePower(builtin, arg);
+		}
+		return null;
 	}
 	
 	@Override
