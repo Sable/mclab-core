@@ -58,8 +58,12 @@ public class SPLowercase extends SPAbstractScalarExpr{
 					return match;
 				}
 				else{
-					lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					lowercase.put(
+							s,
+							argumentShape.getDimensions().get(
+									previousMatchResult.getNumInVertcat()));
+					ShapePropMatch match = new ShapePropMatch(
+							previousMatchResult, lowercase, null);
 					if (Debug) System.out.println(match.getAllLowercase());
 					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
 					return match;
