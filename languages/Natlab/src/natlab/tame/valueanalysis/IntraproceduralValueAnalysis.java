@@ -44,6 +44,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ClassRepository classRepository;
     TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
     Set<String> dependentVars; // XU added it to store dependency analysis result.
+    HashMap<String, LinkedList<V>> hookMap = new HashMap<String, LinkedList<V>>();
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -628,8 +629,23 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         	
         	//actually call
             //System.out.println("doFunctionCall result "+res);
-            if (function.isBuiltin()){
-                Args<V> argsObj = Args.newInstance(dependentVars,numOfOutputVariables,argumentList);
+        	if (function.isBuiltin()) {
+            	if (functionName.equals("horzcat")) {
+            		LinkedList<V> hookList = new LinkedList<V>();
+                	for (Name arg : args.asNameList()) {
+                		hookList.add(flow.get(arg.getID()).getSingleton());
+                	}
+            		hookMap.put(targets.getName(0).getID(), hookList);
+            	}
+            	Args<V> argsObj;
+            	if ((functionName.equals("ones") || functionName.equals("zeros") || functionName.equals("rand"))
+            			&& args.size()==1 && hookMap.containsKey(args.asNameList().get(0).getID())) {
+            		argsObj = Args.newInstance(dependentVars, numOfOutputVariables
+            				, hookMap.get(args.asNameList().get(0).getID()));
+            	}
+            	else {
+            		argsObj = Args.newInstance(dependentVars,numOfOutputVariables,argumentList);
+            	}
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
                 if (function.getName().equals("nargin") && argsObj.size() == 0){
