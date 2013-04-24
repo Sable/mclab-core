@@ -1,8 +1,12 @@
 package mclint;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import natlab.toolkits.filehandling.GenericFile;
+import ast.CompilationUnits;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -49,5 +53,25 @@ public class Project {
 
   public Iterable<MatlabProgram> getMatlabPrograms() {
     return Collections.unmodifiableList(programs);
+  }
+
+  public CompilationUnits asCompilationUnits() {
+    CompilationUnits units = new CompilationUnits();
+    // TODO do we want to use GenericFile at all
+    units.setRootFolder(GenericFile.create(projectRoot));
+    for (MatlabProgram program : programs) {
+      units.addProgram(program.parse());
+    }
+    return units;
+  }
+
+  public void write() throws IOException {
+    write(projectRoot);
+  }
+
+  public void write(File root) throws IOException {
+    for (MatlabProgram program : programs) {
+      program.write();
+    }
   }
 }

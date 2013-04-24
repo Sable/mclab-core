@@ -1,9 +1,9 @@
 package mclint.analyses;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -18,8 +18,8 @@ public class OutputSuppression extends AbstractNodeCaseHandler implements LintAn
         "Terminate this line with a semicolon to suppress output.");
   }
 
-  public OutputSuppression(AnalysisKit kit) {
-    this.tree = kit.getAST();
+  public OutputSuppression(Project project) {
+    this.tree = project.asCompilationUnits();
   }
 
   @Override

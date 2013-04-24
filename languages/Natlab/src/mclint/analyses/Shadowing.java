@@ -2,10 +2,10 @@ package mclint.analyses;
 
 import java.util.Set;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import natlab.tame.builtin.Builtin;
 import natlab.toolkits.path.BuiltinQuery;
@@ -19,8 +19,8 @@ public class Shadowing extends DefinitionVisitor implements LintAnalysis {
 
   protected Lint lint;
 
-  public Shadowing(AnalysisKit kit) {
-    super(kit.getAST());
+  public Shadowing(Project project) {
+    super(project.asCompilationUnits());
   }
 
   private void reportShadowing(Name node) {

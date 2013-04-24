@@ -2,10 +2,10 @@ package mclint.analyses;
 
 import java.util.Set;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.HashSetFlowSet;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
@@ -30,8 +30,8 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
         String.format("Unused variable %s.", node.getID())));
   }
 
-  public UnusedVar(AnalysisKit kit) {
-    super(kit.getAST());
+  public UnusedVar(Project project) {
+    super(project.asCompilationUnits());
   }
 
   @Override
@@ -65,7 +65,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   public void caseInParam(Name node) {
     Stmt firstStatement = NodeFinder.findParent(Function.class, node).getStmt(0);
     if (!(liveVar.getInFlowSets().containsKey(firstStatement) &&
-          liveVar.getInFlowSets().get(firstStatement).contains(node.getID()))) {
+        liveVar.getInFlowSets().get(firstStatement).contains(node.getID()))) {
       reportUnused(node);
     }
   }

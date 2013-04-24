@@ -28,6 +28,7 @@ public class Location implements Comparable<Location> {
     return new Location(getPathOf(node), line, col);
   }
 
+  // TODO change this use Project / MatlabProgram
   private static String getPathOf(ASTNode<?> node) {
     Program program = null;
     if (node instanceof CompilationUnits)

@@ -11,14 +11,19 @@ import mclint.util.Parsing;
 import natlab.utils.FileUtil;
 import ast.Program;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 public class MatlabProgram {
   private Project project;
   private File file;
   private File absoluteFile;
+
+  private String code;
+  private Program ast;
 
   public static MatlabProgram at(File file, Project project) {
     return new MatlabProgram(file, project);
@@ -57,15 +62,18 @@ public class MatlabProgram {
   }
 
   public Program parse() {
-    return Parsing.file(absoluteFile.getPath());
+    if (ast == null) {
+      ast = Parsing.file(absoluteFile.getPath());
+    }
+    return ast;
   }
 
   public AnalysisKit analyze() {
-    return AnalysisKit.forAST(parse());
+    return AnalysisKit.forAST(ast);
   }
 
   public Transformer getBasicTransformer() {
-    return Transformers.basic(parse());
+    return Transformers.basic(ast);
   }
 
   public Transformer getLayoutPreservingTransformer() {
@@ -74,5 +82,20 @@ public class MatlabProgram {
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  public void write() throws IOException {
+    write(project.getProjectRoot());
+  }
+
+  public void write(File root) throws IOException {
+    File outputFile = new File(root, file.getPath());
+    Files.createParentDirs(outputFile);
+    // TODO really what should happen is Project and MatlabPrograms get passed around everywhere,
+    // and changes are made to their code (e.g. by assigning transformer.reconstructText()).
+    if (code == null) {
+      code = ast.getPrettyPrinted();
+    }
+    Files.write(code, outputFile, Charsets.UTF_8);
   }
 }

@@ -3,7 +3,7 @@ package mclint;
 
 /**
  * All analyses should implement this interface. They should also provide
- * a constructor taking an ASTNode.
+ * a constructor taking a Project.
  * @author ismail
  *
  */
