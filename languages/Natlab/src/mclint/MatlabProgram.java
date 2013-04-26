@@ -64,6 +64,7 @@ public class MatlabProgram {
   public Program parse() {
     if (ast == null) {
       ast = Parsing.file(absoluteFile.getPath());
+      ast.setMatlabProgram(this);
     }
     return ast;
   }

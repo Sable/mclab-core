@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import natlab.toolkits.filehandling.GenericFile;
 import ast.CompilationUnits;
 
 import com.google.common.base.Preconditions;
@@ -57,8 +56,7 @@ public class Project {
 
   public CompilationUnits asCompilationUnits() {
     CompilationUnits units = new CompilationUnits();
-    // TODO do we want to use GenericFile at all
-    units.setRootFolder(GenericFile.create(projectRoot));
+    units.setProject(this);
     for (MatlabProgram program : programs) {
       units.addProgram(program.parse());
     }
