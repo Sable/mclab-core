@@ -39,7 +39,8 @@ public class Location implements Comparable<Location> {
 
   @Override
   public String toString() {
-    return String.format("%s [%d, %d]", program.getPath(), line, column);
+    return String.format("%s [%d, %d]",
+        program == null ? "<string>" : program.getPath(), line, column);
   }
 
   private Location(MatlabProgram program, int line, int column) {
