@@ -24,11 +24,11 @@ public class Project {
   private Project(File projectRoot) {
     this.projectRoot = projectRoot;
 
-    indexProject(new File("."));
+    collectFiles(new File("."));
   }
 
   // Note, the below is explicitly trying to work with paths relative to the project root.
-  private void indexProject(File directory) {
+  private void collectFiles(File directory) {
     File absoluteDir = new File(projectRoot, directory.getPath());
     for (String file : absoluteDir.list()) {
       File relativeFile = new File(directory, file);
@@ -37,7 +37,7 @@ public class Project {
         File normalizedRelativeFile = new File(Files.simplifyPath(relativeFile.getPath()));
         addMatlabProgram(MatlabProgram.at(normalizedRelativeFile, this));
       } else if (absoluteFile.isDirectory()) {
-        indexProject(relativeFile);
+        collectFiles(relativeFile);
       }
     }
   }
