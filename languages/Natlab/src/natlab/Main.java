@@ -87,7 +87,7 @@ public class Main {
       TamerTool.main(options);
       return;
     }
-    
+
     if (options.mclint()) {
       McLint.main(options);
       return;
@@ -107,7 +107,7 @@ public class Main {
     log("Parsing " + Joiner.on(", ").join(files));
     List<CompilationProblem> errors = Lists.newArrayList();
     CompilationUnits cu;
-    if (options.matlab()) {
+    if (!options.natlab()) {
       cu = Parse.parseMatlabFiles(files, errors);
     } else {
       cu = Parse.parseNatlabFiles(files, errors);

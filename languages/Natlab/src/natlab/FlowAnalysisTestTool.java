@@ -72,7 +72,7 @@ public class FlowAnalysisTestTool
         for( Object o : opt.getFiles() ){
             String fName = (String) o;
             ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
-            if( opt.matlab() ){
+            if( !opt.natlab() ){
                 //translate from matlab
                 Reader source = Parse.translateFile( fName, errList );
                 if( source == null )
