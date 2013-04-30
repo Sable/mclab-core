@@ -27,4 +27,9 @@ public class isComplexInfoFactory<V extends Value<V>> {
 		// TODO Auto-generated method stub
 		return new isComplexInfo<V>(factory,isComplexInfo);
 	}
+	
+	public isComplexInfo<V> getNullinfo() {
+		return null;
+	}
+	
 }

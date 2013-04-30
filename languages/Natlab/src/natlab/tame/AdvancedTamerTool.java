@@ -21,7 +21,7 @@ public class AdvancedTamerTool {
 	
 
 	public static void main(String[] args) {
-		String file = "/home/2011/vkumar5/mclab/Project/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/adpt/main";
+		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/unit/cellTest";
 		//String file = "/home/2011/vkumar5/for_test";
 		
 		String fileIn = file + ".m";

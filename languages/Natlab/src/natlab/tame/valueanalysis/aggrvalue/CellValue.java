@@ -13,11 +13,13 @@ import natlab.tame.classes.reference.BuiltinCompoundClassReference;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.isComplex.*;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     private Shape<AggrValue<D>> shape;
+    private isComplexInfo<AggrValue<D>> isComplex;
     private HashMap<Integer,ValueSet<AggrValue<D>>> cellMap = new HashMap<Integer, ValueSet<AggrValue<D>>>();
     private boolean usesMap = true; //uses the map, if false, just uses an overall ValueSet
     private ValueSet<AggrValue<D>> values = null;
@@ -28,6 +30,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     public CellValue(AggrValueFactory<D> factory){
         super(factory);
         shape = factory.getShapeFactory().getEmptyShape();
+        isComplex = factory.getIsComplexInfoFactory().getNullinfo();
         
     }
     
@@ -42,12 +45,22 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         this.shape = shape;
     }
     
+    
+    public CellValue(AggrValueFactory<D> factory, Shape<AggrValue<D>> shape, isComplexInfo<AggrValue<D>> isComplex, ValueSet<AggrValue<D>> values){
+        super(factory);
+        usesMap = false;
+        this.values = values;
+        this.shape = shape;
+        this.isComplex = isComplex;
+    }
+    
     /**
      * copy constructor
      */
     private CellValue(CellValue<D> other){
         super(other.factory);
         this.shape = other.shape;
+        this.isComplex = other.isComplex;
         this.cellMap = other.cellMap;
         this.usesMap = other.usesMap;
         this.values = other.values;
@@ -60,6 +73,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
             CellValue<D> cell = (CellValue<D>)value;
             CellValue<D> result = new CellValue<D>(this.factory);
             result.shape = this.shape.growByIndices(indizes);
+            result.isComplex = this.isComplex;
             result.usesMap = false;
             result.values = cell.values.merge(toSingleValues().values);
             return result;
@@ -101,6 +115,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
             CellValue<D> result = new CellValue<D>(this.factory);
             result.shape = this.shape.growByIndices(indizes);
             result.usesMap = false;
+            result.isComplex = this.isComplex;
             result.values = ValueSet.newInstance(values).merge(toSingleValues().values);
             return result;
         }
@@ -117,6 +132,15 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         return shape;
     }
 
+    @Override
+    public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+        return isComplex;
+    }
+    
+    public ValueSet<AggrValue<D>> getValues(){
+    	return values;
+    }
+    
     @Override
     public CellValue<D> toFunctionArgument(boolean recursive) {
         CellValue<D> result = new CellValue<D>(this);
