@@ -54,9 +54,17 @@
       <name>Matlab Input</name>
       <alias>m</alias>
       <alias>matlab</alias>
-      <short_desc>Use Matlab files as input</short_desc>
-      <long_desc>Use Matlab files as input rather than Natlab ones.</long_desc>
+      <short_desc>No-op</short_desc>
+      <long_desc>No-op, allowed for backwards compatibility</long_desc>
     </boolopt>
+    <boolopt>
+      <name>Natlab Input</name>
+      <alias>n</alias>
+      <alias>natlab</alias>
+      <short_desc>Use Natlab input</short_desc>
+      <long_desc>Assume input is already Natlab, skip translation step</long_desc>
+    </boolopt> 
+
     <boolopt>
       <name>Quiet mode</name>
       <alias>quiet</alias>

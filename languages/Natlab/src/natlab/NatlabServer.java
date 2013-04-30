@@ -15,11 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import natlab.options.Options;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import natlab.options.Options;
 import ast.CompilationUnits;
 import ast.Program;
 
@@ -32,7 +33,7 @@ public class NatlabServer {
 
   private int port;
   private boolean quiet;
-  private boolean matlab;
+  private boolean natlab;
   private boolean heartbeat;
 
   private PrintWriter out;
@@ -45,13 +46,13 @@ public class NatlabServer {
     if (options.sp().length() > 0) {
       port = Integer.parseInt(options.sp());
     }
-    return new NatlabServer(port, options.quiet(), options.matlab(), !options.noheart());
+    return new NatlabServer(port, options.quiet(), options.natlab(), !options.noheart());
   }
 
-  private NatlabServer(int port, boolean quiet, boolean matlab, boolean heartbeat) {
+  private NatlabServer(int port, boolean quiet, boolean natlab, boolean heartbeat) {
     this.port = port;
     this.quiet = quiet;
-    this.matlab = matlab;
+    this.natlab = natlab;
     this.heartbeat = heartbeat;
   }
 
@@ -112,12 +113,12 @@ public class NatlabServer {
     out.close();
     in.close();
   }
-  
+
   private static class Command {
     public String command;
     public String argument;
   }
-  
+
   private Command parseCommand(String cmd) {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -166,7 +167,7 @@ public class NatlabServer {
       log("Parsing");
       List<CompilationProblem> errors = Lists.newArrayList();
       Program program;
-      if (matlab) {
+      if (!natlab) {
         if (input != null) {
           program = Parse.parseMatlabFile(filename, input, errors);
         } else {
