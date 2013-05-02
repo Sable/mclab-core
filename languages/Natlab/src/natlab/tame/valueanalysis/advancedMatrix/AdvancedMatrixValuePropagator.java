@@ -148,8 +148,8 @@ public class AdvancedMatrixValuePropagator extends
 				.newInstance(elements);
 		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
 				.newShapeFromValues(
-						Args.newInstance(factory.newMatrixValue(1),
-								factory.newMatrixValue(elements.size())));
+						Args.newInstance(factory.newMatrixValue(null, 1),
+								factory.newMatrixValue(null, elements.size())));
 		return Res
 				.<AggrValue<AdvancedMatrixValue>> newInstance(new CellValue<AdvancedMatrixValue>(
 						this.factory, shape, values));
@@ -163,8 +163,8 @@ public class AdvancedMatrixValuePropagator extends
 		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
 				.newShapeFromValues(
 						Args.newInstance(
-								factory.newMatrixValue(elements.size()),
-								factory.newMatrixValue(1)));
+								factory.newMatrixValue(null, elements.size()),
+								factory.newMatrixValue(null, 1)));
 		return Res
 				.<AggrValue<AdvancedMatrixValue>> newInstance(new CellValue<AdvancedMatrixValue>(
 						this.factory, shape, values));
