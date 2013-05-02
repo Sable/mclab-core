@@ -66,7 +66,7 @@ public class BasicTamerTool {
 	
 	public static void main(String[] args){
 		
-		GenericFile gFile = GenericFile.create("/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/unit/cellTest.m"); //file -> generic file
+		GenericFile gFile = GenericFile.create("/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d.m"); //file -> generic file
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
