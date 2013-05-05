@@ -48,7 +48,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			else {
 				ShapePropMatch<V> match = vl.match(isPatternSide, previousMatchResult, argValues, Nargout);
 				match.setIsInsideVertcat(false);
-				match.comsumeArg();
+				if(!match.getIsError()) match.comsumeArg();
 				return match;				
 			}
 		}
