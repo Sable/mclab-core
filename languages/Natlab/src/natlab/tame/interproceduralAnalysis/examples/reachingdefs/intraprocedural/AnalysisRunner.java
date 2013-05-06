@@ -18,8 +18,8 @@ public class AnalysisRunner
 {
     public static void main(String args[])
     {
-//        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/collapse.m";
-        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/matlabBenchmarks/McFor/mcfor_test/nb3d/drv_nb3d.m";
+        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/test2.m";
+//        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/matlabBenchmarks/McFor/mcfor_test/nb3d/drv_nb3d.m";
 //        String file = "/Users/Pepe/Desktop/School/Thesis/myBenchmarks/mcfor_test/adpt/drv_adpt.m";
         if (args.length == 1)
         {
@@ -42,41 +42,66 @@ public class AnalysisRunner
         // TODO hashmap static Function to VariableNameCollector
 
         
-        int counter = 0;
+//        int counter = 0;
       for(StaticFunction f : functionList)
       {
-//          System.out.println(f.getAst().getPrettyPrintedLessComments());
-          UDChain ud = new UDChain(new ReachingDefinitions(f));
-          ud.constructUDChain();
-          DUChain du = new DUChain(ud);
-          du.constructDUChain();
+////          System.out.println(f.getAst().getPrettyPrintedLessComments());
+//          UDChain ud = new UDChain(new ReachingDefinitions(f));
+//          ud.constructUDChain();
+//          DUChain du = new DUChain(ud);
+//          du.constructDUChain();
+//          
+////          System.out.println("\n//////// UD Analysis: //////////////\n");
+////          ud.printUDChain();
+////          System.out.println("\n//////// DU Analysis: //////////////\n");
+////          du.printDUChain();
+//          
+//          UDDUWeb udduWeb = new UDDUWeb(ud, du);
+//          udduWeb.constructUDDUWeb();
+//          
+////          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
+////          rv.analyze();
+////          System.out.println(f.getAst().getPrettyPrintedLessComments());
+//          
+//          
+////          IRNodeToRawASTNodeTableBuilder IRTtoASTtableBuilder = new IRNodeToRawASTNodeTableBuilder(udduWeb.getVisitedStmtsLinkedList());
+////          IRTtoASTtableBuilder.build();
+//          
+//          TIRNodeToRawASTNodeTableBuilder TIRtoASTtableBuilder = new TIRNodeToRawASTNodeTableBuilder(udduWeb.getVisitedStmtsLinkedList());
+//          StmtCollapseByTmpVarRemoval tmpVarRemover = new StmtCollapseByTmpVarRemoval(udduWeb, TIRtoASTtableBuilder);
+//          tmpVarRemover.analyze();
+//          //tmpVarRemover.printTable();
+//          
+//          TIRToAST TIRToAST = new TIRToAST(f.getAst(), tmpVarRemover.getTIRToRawASTTable(), ud.getDefinedVariableNameCollector());
+//          ast.Function function  = (Function) TIRToAST.transform();
+////          System.err.println(function.dumpTree());
+//          System.err.println(function.getPrettyPrinted());
           
-//          System.out.println("\n//////// UD Analysis: //////////////\n");
-//          ud.printUDChain();
-//          System.out.println("\n//////// DU Analysis: //////////////\n");
-//          du.printDUChain();
+          System.out.println(f.getAst().getPrettyPrinted());
+          System.err.println(TransformationEngine.forAST(f.getAst()).getTIRToASTWithoutTemp().getTransformedTree().getPrettyPrinted());
           
-          UDDUWeb udduWeb = new UDDUWeb(ud, du);
-          udduWeb.constructUDDUWeb();
-          
-//          RenameVariablesForTIRNodes rv = new RenameVariablesForTIRNodes(udduWeb);
-//          rv.analyze();
-//          System.out.println(f.getAst().getPrettyPrintedLessComments());
+          TransformationEngine  engine = TransformationEngine.forAST(f.getAst());
+          System.out.println(engine.getVariableRenameTransformation().getTransformedTree().getPrettyPrinted());
           
           
-//          IRNodeToRawASTNodeTableBuilder IRTtoASTtableBuilder = new IRNodeToRawASTNodeTableBuilder(udduWeb.getVisitedStmtsLinkedList());
-//          IRTtoASTtableBuilder.build();
-          
-          TIRNodeToRawASTNodeTableBuilder TIRtoASTtableBuilder = new TIRNodeToRawASTNodeTableBuilder(udduWeb.getVisitedStmtsLinkedList());
-          StmtCollapseByTmpVarRemoval tmpVarRemover = new StmtCollapseByTmpVarRemoval(udduWeb, TIRtoASTtableBuilder);
-          tmpVarRemover.analyze();
-          //tmpVarRemover.printTable();
-          
-          TIRToAST TIRToAST = new TIRToAST(f.getAst(), tmpVarRemover.getTIRToRawASTTable(), ud.getDefinedVariableNameCollector());
-          ast.Function function  = (Function) TIRToAST.transform();
-//          System.err.println(function.dumpTree());
-          System.err.println(function.getPrettyPrinted());
-    }
+//          System.out.println();
+//          TransformationEngine engine  = TransformationEngine.forAST(f.getAst());
+//          engine.getAnalysisEngine().getDefinedVariablesAnalysis().printNodeToDefinedVariablesMapContent();
+//          System.out.println();
+//          engine.getAnalysisEngine().getUsedVariablesAnalysis().printNodeToUsedVariablesMapContent();
+//          System.out.println();
+//          engine.getAnalysisEngine().getReachingDefinitionsAnalysis();
+//          System.out.println();
+//          engine.getAnalysisEngine().getUDChainAnalysis().printUDChain();
+//          System.out.println();
+//          engine.getAnalysisEngine().getDUChainAnalysis().printDUChain();
+//          System.out.println();
+//          engine.getAnalysisEngine().getUDDUWebAnalysis();
+//          System.out.println();
+//          engine.getVariableRenameTransformation();
+//          System.out.println(f.getAst().getPrettyPrinted());
+//          TIRNodeToRawASTNodeTableBuilder TIRtoASTtableBuilder = engine.getAnalysisEngine().getTIRNodeToRawASTNodeTableBuilder();
+      }
     }
 }
 

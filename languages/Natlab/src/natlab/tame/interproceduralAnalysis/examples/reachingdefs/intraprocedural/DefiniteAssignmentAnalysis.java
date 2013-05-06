@@ -10,12 +10,11 @@ import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
-import ast.Name;
 
 import com.google.common.collect.Sets;
 
 
-public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<Name>> implements TamerPlusAnalysis
+public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<String>> implements TamerPlusAnalysis
 {
 
     private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
@@ -29,7 +28,6 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
     public void analyze(AnalysisEngine engine)
     {
         fDefinedVariablesNameCollector = engine.getDefinedVariablesAnalysis();
-        fDefinedVariablesNameCollector.analyze(engine);
         super.analyze();
     }
     
@@ -80,7 +78,7 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
         currentOutSet.addAll(fDefinedVariablesNameCollector.getDefinedVariablesForNode(node));
     }
     
-    public boolean isDefinitelyAssignedAtInputOf(TIRNode node, Name variableName)
+    public boolean isDefinitelyAssignedAtInputOf(TIRNode node, String variableName)
     {
         if (!inFlowSets.containsKey((node)))
         {
@@ -90,24 +88,24 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
     }
 
     @Override
-    public void merge(HashSet<Name> in1, HashSet<Name> in2, HashSet<Name> out)
+    public void merge(HashSet<String> in1, HashSet<String> in2, HashSet<String> out)
     {
         out.clear();
         out.addAll(Sets.intersection(in1, in2));
     }
 
     @Override
-    public void copy(HashSet<Name> source, HashSet<Name> dest)
+    public void copy(HashSet<String> source, HashSet<String> dest)
     {
-        for (Name varName : source)
+        for (String varName : source)
         {
-            dest.add(varName.copy());
+            dest.add(varName);
         }
     }
     
-    public HashSet<Name> copy(HashSet<Name> in)
+    public HashSet<String> copy(HashSet<String> in)
     {
-        HashSet<Name> out = Sets.newHashSet();
+        HashSet<String> out = Sets.newHashSet();
         copy(in, out);
         return out; 
     }
@@ -119,7 +117,7 @@ public class DefiniteAssignmentAnalysis extends TIRAbstractSimpleStructuralForwa
     }
 
     @Override
-    public HashSet<Name> newInitialFlow()
+    public HashSet<String> newInitialFlow()
     {
         return Sets.newHashSet();
     }

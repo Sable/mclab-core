@@ -1,15 +1,9 @@
 package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
-import natlab.tame.tir.TIRAbstractAssignStmt;
-import natlab.tame.tir.TIRAbstractAssignToListStmt;
-import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRCallStmt;
@@ -20,7 +14,6 @@ import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRDotGetStmt;
 import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
@@ -30,11 +23,12 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.ForStmt;
-import ast.Function;
-import ast.IfStmt;
 import ast.Name;
 import ast.NameExpr;
-import ast.WhileStmt;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 @SuppressWarnings("rawtypes")
 public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
@@ -44,30 +38,21 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
     TIRNodeToRawASTNodeTableBuilder fTameIRToRawASTNodeTableBuilder;
     private HashMap<TIRNode, ASTNode> fTIRToRawASTTable;
     private HashMap<Expr, Name> fExprToTempVarName;
+    private final Integer INVALID_INDEX = -1;
     
-    public StmtCollapseByTmpVarRemoval(UDDUWeb udduWeb, TIRNodeToRawASTNodeTableBuilder tameIRNodeToRawASTNodeTableBuilder)
+    public StmtCollapseByTmpVarRemoval(ASTNode<?> tree)
     {
-        fUDDUWeb = udduWeb;
-        fTameIRToRawASTNodeTableBuilder = tameIRNodeToRawASTNodeTableBuilder;
-        fExprToTempVarName = new HashMap<Expr, Name>();
+        fExprToTempVarName = Maps.newHashMap();
+    }
+    
+    @Override
+    public void analyze(AnalysisEngine engine)
+    {
+        fUDDUWeb = engine.getUDDUWebAnalysis();
         
-        initializeUDDUWeb();
-        initializeASTTable();
-    }
-    
-    public void initializeUDDUWeb()
-    {
-        fUDDUWeb.constructUDDUWeb();
-    }
-    
-    public void initializeASTTable()
-    {
-        fTameIRToRawASTNodeTableBuilder.build();
+        fTameIRToRawASTNodeTableBuilder = engine.getTIRNodeToRawASTNodeTableBuilder();
         fTIRToRawASTTable = fTameIRToRawASTNodeTableBuilder.getIRToRawASTTable();
-    }
-    
-    public void analyze()
-    {
+        
         getFunctionNode().tirAnalyze(this);
     }
     
@@ -102,12 +87,13 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
         if (conditionVariableName != null)
         {
             HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
-            boolean isNodeAValidKeyInNodeToColorMap = nodeAndColor != null &&  nodeAndColor.containsKey(node);
+            boolean isNodeAValidKeyInNodeToColorMap = (nodeAndColor != null &&  nodeAndColor.containsKey(node));
             if (isNodeAValidKeyInNodeToColorMap && isTemporaryVariable(conditionVariableName))
             {
                 replaceUsedTempVarByDefinition(conditionVariableName, node);
             }
         }
+        
         caseIfStmt(node);
     }
     
@@ -124,6 +110,7 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
                 replaceUsedTempVarByDefinition(conditionVariableName, node);
             }
         }
+        
         caseWhileStmt(node);
     }
     
@@ -140,106 +127,86 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
         usedVariablesNames.add(new NameExpr(node.getUpperName()));
 
         replaceUsedTempVarsByDefintions(usedVariablesNames, node);
+        
         caseForStmt(node);
     }
 
     @Override
-    public void caseTIRAbstractAssignFromVarStmt(TIRAbstractAssignFromVarStmt node)
+    public void caseTIRDotSetStmt(TIRDotSetStmt node)
     {
-        TIRCommaSeparatedList usedVariablesNames = null;
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getDotName()));
         
-        if (node instanceof TIRAbstractAssignFromVarStmt)
-        {
-            if (node instanceof TIRArraySetStmt)
-            {
-                TIRArraySetStmt arraySetStmt = (TIRArraySetStmt) node;
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(arraySetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(arraySetStmt.getArrayName()));
-                TIRCommaSeparatedList indices = arraySetStmt.getIndizes();
-                addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
-            }
-            else if (node instanceof TIRCellArraySetStmt)
-            {
-                TIRCellArraySetStmt cellArraySetStmt = (TIRCellArraySetStmt) node;
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(cellArraySetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(cellArraySetStmt.getCellArrayName()));
-                TIRCommaSeparatedList indices = cellArraySetStmt.getIndizes();
-                addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
-            }
-            else if (node instanceof TIRDotSetStmt)
-            {
-                TIRDotSetStmt dotSetStmt = (TIRDotSetStmt) node;
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotSetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(dotSetStmt.getDotName()));
-            }
-            else 
-            { 
-                throw new UnsupportedOperationException("unknown assign from var stmt " + node); 
-            }
-        }
-        else 
-        {
-            throw new UnsupportedOperationException("unknown assignment statement " + node);
-        }
         replaceUsedTempVarsByDefintions(usedVariablesNames, node);
     }
-
+    
     @Override
-    public void caseTIRAbstractAssignToVarStmt(TIRAbstractAssignToVarStmt node)
+    public void caseTIRCellArraySetStmt(TIRCellArraySetStmt node)
     {
-        Name usedVariableName = null;
-        if (node instanceof TIRCopyStmt)
-        {
-            TIRCopyStmt copySmtmt = (TIRCopyStmt) node;
-            usedVariableName = copySmtmt.getSourceName();
-        }
-        else if (node instanceof TIRAbstractAssignToVarStmt)
-        {
-            
-        }
-        else 
-        {
-            throw new UnsupportedOperationException("unknown assignment to var statement " + node);
-        }
+        TIRCommaSeparatedList usedVariablesNames  = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getCellArrayName()));
+        TIRCommaSeparatedList indices = node.getIndizes();
+        addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
+        replaceUsedTempVarsByDefintions(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRArraySetStmt(TIRArraySetStmt node)
+    {
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getArrayName()));
+        TIRCommaSeparatedList indices = node.getIndizes();
+        addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
+        replaceUsedTempVarsByDefintions(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRCopyStmt(TIRCopyStmt node)
+    {
+        TIRCopyStmt copySmtmt = (TIRCopyStmt) node;
+        Name usedVariableName = copySmtmt.getSourceName();
+        
         if(usedVariableName != null && isTemporaryVariable(usedVariableName))
         {
             replaceUsedTempVarByDefinition(usedVariableName, node);
         }
     }
-
+    
     @Override
-    public void caseTIRAbstractAssignToListStmt(TIRAbstractAssignToListStmt node)
+    public void caseTIRCellArrayGetStmt(TIRCellArrayGetStmt node)
     {
-        TIRCommaSeparatedList usedVariablesNames = null;
-        
-        if (node instanceof TIRArrayGetStmt)
-        {
-            TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
-            Name arrayName = arrayGetStmt.getArrayName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((arrayName)));
-            TIRCommaSeparatedList indices = arrayGetStmt.getIndizes();
-            addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
-        }
-        else if (node instanceof TIRDotGetStmt)
-        {
-            TIRDotGetStmt dotGetStmt = (TIRDotGetStmt) node;
-            Name dotName = dotGetStmt.getDotName();
-            Name fieldName = dotGetStmt.getFieldName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotName));
-            usedVariablesNames.add(new NameExpr(fieldName));
-        }
-        else if (node instanceof TIRCellArrayGetStmt)
-        {
-            TIRCellArrayGetStmt cellArrayGetStmt = (TIRCellArrayGetStmt) node;
-            Name cellArrayName = cellArrayGetStmt.getCellArrayName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
-            TIRCommaSeparatedList indices = cellArrayGetStmt.getIndices();
-            addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
-        }
+        Name cellArrayName = node.getCellArrayName();
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
+        TIRCommaSeparatedList indices = node.getIndices();
+        addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
         
         replaceUsedTempVarsByDefintions(usedVariablesNames, node);
     }
-
+    
+    @Override
+    public void caseTIRDotGetStmt(TIRDotGetStmt node)
+    {
+        Name dotName = node.getDotName();
+        Name fieldName = node.getFieldName();
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotName));
+        usedVariablesNames.add(new NameExpr(fieldName));
+        
+        replaceUsedTempVarsByDefintions(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRArrayGetStmt(TIRArrayGetStmt node)
+    {
+        Name arrayName = node.getArrayName();
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((arrayName)));
+        TIRCommaSeparatedList indices = node.getIndizes();
+        addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
+        replaceUsedTempVarsByDefintions(usedVariablesNames, node);
+    }
+    
     private void replaceUsedTempVarsByDefintions(TIRCommaSeparatedList usedVariablesNames, TIRNode useNode)
     {
         if (usedVariablesNames == null)
@@ -266,58 +233,67 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
     {
         Expr definition = getDefinitionForVariableAtNode(variable, useNode);
         
-        Queue<ASTNode> nodeQueue = new LinkedList<ASTNode>();
-        Set<ASTNode> markedNodes = new HashSet<ASTNode>();
+        Queue<ASTNode> nodeQueue = Lists.newLinkedList();
+        Set<ASTNode> markedNodes = Sets.newHashSet();
         ASTNode currentNode = null;
         
         ASTNode parentNode = null;
-        Integer childIndex = -1;
+        Integer childIndex = INVALID_INDEX;
         
-        ASTNode replacementNode = fTIRToRawASTTable.get(useNode);
+        initializeNodeQueueAndMarkedNodes(fTIRToRawASTTable.get(useNode), nodeQueue, markedNodes);
         
-        nodeQueue.add(replacementNode);
-        markedNodes.add(replacementNode);
         while (!nodeQueue.isEmpty())
         {
             currentNode = nodeQueue.remove();
+            
             if (currentNode instanceof ForStmt)
             {
                 currentNode = ((ForStmt) currentNode).getAssignStmt();
             }
+            
             if (isSeekedNode(currentNode, variable))
             {
                 parentNode = currentNode.getParent();
                 childIndex = getChildIndexForNode(parentNode, currentNode);
-                boolean isChildIndexAndParentValid = (parentNode != null) && (childIndex != -1);
+                
+                boolean isChildIndexAndParentValid = (parentNode != null) && (childIndex != INVALID_INDEX);
                 if (isChildIndexAndParentValid)
                 {
                     parentNode.setChild(definition, childIndex);
                     fExprToTempVarName.put(definition, variable);
-                    // TODO put this in a function
-//                    System.out.println(definition.getStructureString() + " ---> " + variable.getID());
                 }
             }
             else
             {
-                ASTNode currentNodeAsASTNode = currentNode;
-                int childrenCount = currentNodeAsASTNode.getNumChild();
-                for (int i = 0; i < childrenCount; i++)
-                {
-                    ASTNode currentChild = currentNodeAsASTNode.getChild(i);
-                    if (!markedNodes.contains(currentChild))
-                    {
-                        markedNodes.add(currentChild);
-                        nodeQueue.add(currentChild);
-                    }
-                }
+                addChildrenOfNodeToQueueAndMarkedSet(currentNode, nodeQueue, markedNodes);
+            }
+            
+        }
+    }
+    
+    private void initializeNodeQueueAndMarkedNodes(ASTNode replacementNode, Queue<ASTNode> nodeQueue, Set<ASTNode> markedNodes)
+    {
+        nodeQueue.add(replacementNode);
+        markedNodes.add(replacementNode);
+    }
+    
+    private void addChildrenOfNodeToQueueAndMarkedSet(ASTNode currentNode, Queue<ASTNode> nodeQueue, Set<ASTNode> markedNodes)
+    {
+        int childrenCount = currentNode.getNumChild();
+        for (int i = 0; i < childrenCount; i++)
+        {
+            ASTNode currentChild = currentNode.getChild(i);
+            if (!markedNodes.contains(currentChild))
+            {
+                markedNodes.add(currentChild);
+                nodeQueue.add(currentChild);
             }
         }
     }
     
-    
     private int getChildIndexForNode(ASTNode parentNode, ASTNode seekedChild)
     {
-        int seekedIndex = -1;
+        int seekedIndex = INVALID_INDEX;
         int childrenCount = parentNode.getNumChild();
         for (int i = 0; i < childrenCount; i++)
         {
@@ -433,29 +409,9 @@ public class StmtCollapseByTmpVarRemoval extends TIRAbstractNodeCaseHandler impl
         }
     }
     
-    private String printTIRNode(TIRNode node)
-    {
-        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
-        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
-        else return null;
-    }
-    
-    private String printASTNode(ASTNode node)
-    {
-        if (node instanceof AssignStmt) return ((AssignStmt) node).getStructureString();
-        else if (node instanceof Function) return ((Function) node).getStructureString().split("\n")[0];
-        else if (node instanceof IfStmt) return ((IfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof WhileStmt) return ((WhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof ForStmt) return ((ForStmt) node).getStructureString().split("\n")[0];
-        else return null;
-    }
-    
     private void printTableEntry(TIRNode key, ASTNode value)
     {
-       System.out.println(printTIRNode(key) + " ---> " + printASTNode(value));
+        System.out.println(NodePrinter.printNode(key) + " ---> " + NodePrinter.printASTNode(value));
     }
     
 }

@@ -39,9 +39,9 @@ import ast.Stmt;
 import ast.WhileStmt;
 
 @SuppressWarnings("rawtypes")
-public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
+public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler 
 {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
     private LinkedList<TIRNode> fVisitedNodes;
     private HashMap<TIRNode, ASTNode> fIRToRawASTTable;
     
@@ -313,28 +313,8 @@ public class IRNodeToRawASTNodeTableBuilder extends TIRAbstractNodeCaseHandler
         return fVisitedNodes.get(0);
     }
     
-    private String printTIRNode(TIRNode node)
-    {
-        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
-        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
-        else return null;
-    }
-    
-    private String printASTNode(ASTNode node)
-    {
-        if (node instanceof AssignStmt) return ((AssignStmt) node).getStructureString();
-        else if (node instanceof Function) return ((Function) node).getStructureString().split("\n")[0];
-        else if (node instanceof IfStmt) return ((IfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof WhileStmt) return ((WhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof ForStmt) return ((ForStmt) node).getStructureString().split("\n")[0];
-        else return null;
-    }
-    
     private void printTableEntry(TIRNode key, ASTNode value)
     {
-       System.out.println(printTIRNode(key) + " ---> " + value.getClass());//+ printASTNode(value));
+       System.out.println(NodePrinter.printNode(key) + " ---> " + NodePrinter.printASTNode(value));
     }
 }

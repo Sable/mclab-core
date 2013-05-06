@@ -3,20 +3,13 @@ package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedura
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
-import natlab.tame.tir.TIRAbstractAssignStmt;
-import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRFunction;
-import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
-import natlab.tame.tir.TIRWhileStmt;
-import natlab.toolkits.analysis.HashMapFlowMap;
+import ast.ASTNode;
 
-/**
- * Construct a UDDU web for a given AST using the AST's UD and DU chains
- * @author Amine Sahibi
- *
- */
+import com.google.common.collect.Maps;
+
 public class UDDUWeb implements TamerPlusAnalysis
 {
     public static boolean DEBUG = false;
@@ -25,23 +18,28 @@ public class UDDUWeb implements TamerPlusAnalysis
     private HashMap<String, HashMap<TIRNode, Integer>> fUDWeb;
     private HashMap<String, HashMap<TIRNode, Integer>> fDUWeb;
     
-    public UDDUWeb(UDChain udChain, DUChain duChain)
+    public UDDUWeb(ASTNode<?> tree)
     {
-        fUDChain = udChain;
-        fDUChain = duChain;
+        fUDWeb = Maps.newHashMap();
+        fDUWeb = Maps.newHashMap();
+    }
+
+    @Override
+    public void analyze(AnalysisEngine engine)
+    {
+        fUDChain = engine.getUDChainAnalysis();
+        fDUChain = engine.getDUChainAnalysis();
+        
+        constructUDDUWeb();
     }
     
-    public void constructUDDUWeb()
+    private void constructUDDUWeb()
     {
-        initializeUDDUChains();
-        
-        initializeUDAndDUWeb();
-        
         int color = 0;
         
-        for (TIRNode visitedStmt : fUDChain.getVisitedStmtsLinkedList())
+        for (TIRNode visitedStmt : fUDChain.getVisitedStmtsOrderedList())
         {
-            HashMapFlowMap<String, HashSet<TIRNode>> duMap = fDUChain.getUsesMap(visitedStmt);
+            HashMap<String, HashSet<TIRNode>> duMap = fDUChain.getUsesMapForDefinitionStmt(visitedStmt);
             if (duMap != null && !duMap.isEmpty())
             {
                 for (String variableName : duMap.keySet())
@@ -56,30 +54,16 @@ public class UDDUWeb implements TamerPlusAnalysis
         }
     }
     
-    public void initializeUDDUChains()
-    {
-        fUDChain.constructUDChain();
-        fDUChain.constructDUChain();
-    }
-    
-    public void initializeUDAndDUWeb()
-    {
-        fUDWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
-        fDUWeb = new HashMap<String, HashMap<TIRNode,Integer>>();
-    }
-    
     private void markDefinition(TIRNode visitedStmt, String variableName, Integer color)
     {
-        if (fDUWeb.get(variableName) == null)
-        {
-            fDUWeb.put(variableName, new HashMap<TIRNode, Integer>());
-        }
+        createNewEntryInDUWebForVariable(variableName);
         
         fDUWeb.get(variableName).put(visitedStmt, color);
         
-        if (DEBUG) System.out.println("Def of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
+        if(DEBUG) System.out.println((new StringBuilder("Def of ")).append(variableName)
+                .append(" colored with\t").append(color).append(" in \t").append(NodePrinter.printNode(visitedStmt))); 
         
-        HashSet<TIRNode> useSet = fDUChain.getUsesMap(visitedStmt).get(variableName);
+        HashSet<TIRNode> useSet = fDUChain.getUsesMapForDefinitionStmt(visitedStmt).get(variableName);
         
         if (useSet == null)
         {
@@ -97,16 +81,14 @@ public class UDDUWeb implements TamerPlusAnalysis
     
     private void markUse(TIRNode visitedStmt, String variableName, Integer color)
     {
-        if (fUDWeb.get(variableName) == null)
-        {
-            fUDWeb.put(variableName, new HashMap<TIRNode, Integer>());
-        }
+        createNewEntryInUDWebForVariable(variableName);
         
         fUDWeb.get(variableName).put(visitedStmt, color);
         
-        if(DEBUG) System.out.println("Use of " + variableName + " colored with\t" + color + " in \t" + printNode(visitedStmt));
+        if(DEBUG) System.out.println((new StringBuilder("Use of ")).append(variableName)
+                .append(" colored with\t").append(color).append(" in \t").append(NodePrinter.printNode(visitedStmt)));
         
-        HashSet<TIRNode> definitionSet = fUDChain.getDefinitionsMap(visitedStmt).get(variableName);
+        Set<TIRNode> definitionSet = fUDChain.getDefinitionsMapFoUseStmt(visitedStmt).get(variableName);
         
         if (definitionSet == null)
         {
@@ -119,6 +101,22 @@ public class UDDUWeb implements TamerPlusAnalysis
             {
                 markDefinition(definition, variableName, color);
             }
+        }
+    }
+    
+    private void createNewEntryInUDWebForVariable(String variableName)
+    {
+        if (fUDWeb.get(variableName) == null)
+        {
+            fUDWeb.put(variableName, new HashMap<TIRNode, Integer>());
+        }
+    }
+    
+    private void createNewEntryInDUWebForVariable(String variableName)
+    {
+        if (fDUWeb.get(variableName) == null)
+        {
+            fDUWeb.put(variableName, new HashMap<TIRNode, Integer>());
         }
     }
     
@@ -148,19 +146,19 @@ public class UDDUWeb implements TamerPlusAnalysis
         return false;
     }
     
-    public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) { return fUDWeb.get(variableName); }
-    
-    public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) { return fDUWeb.get(variableName); }
-    
-    public LinkedList<TIRNode> getVisitedStmtsLinkedList() { return fUDChain.getVisitedStmtsLinkedList(); }
-    
-    private String printNode(TIRNode node)
+    public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) 
     {
-        if (node instanceof TIRAbstractAssignStmt) return ((TIRAbstractAssignStmt) node).getStructureString();
-        else if (node instanceof TIRFunction) return ((TIRFunction) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRIfStmt) return ((TIRIfStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRWhileStmt) return ((TIRWhileStmt) node).getStructureString().split("\n")[0];
-        else if (node instanceof TIRForStmt) return ((TIRForStmt) node).getStructureString().split("\n")[0];
-        else return null;
+        return fUDWeb.get(variableName); 
     }
+    
+    public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) 
+    {
+        return fDUWeb.get(variableName); 
+    }
+    
+    public LinkedList<TIRNode> getVisitedStmtsLinkedList() 
+    {
+        return fUDChain.getVisitedStmtsOrderedList();
+    }
+    
 }

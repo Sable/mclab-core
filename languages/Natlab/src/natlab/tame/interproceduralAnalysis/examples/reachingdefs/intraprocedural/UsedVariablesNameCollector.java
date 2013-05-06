@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCellArrayGetStmt;
 import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRDotGetStmt;
 import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.TIRForStmt;
@@ -18,16 +18,14 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
-import ast.Name;
-import ast.NameExpr;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
- public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<Name>> implements TamerPlusAnalysis 
+ public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<String>> implements TamerPlusAnalysis 
 {
-    private HashSet<Name> fCurrentVariablesSet;
-    public Map<TIRNode, HashSet<Name>> fNodeToUsedVariablesMap;
+    private HashSet<String> fCurrentVariablesSet;
+    public Map<TIRNode, HashSet<String>> fNodeToUsedVariablesMap;
     
     public UsedVariablesNameCollector(ASTNode<?> tree)
     {
@@ -46,7 +44,7 @@ import com.google.common.collect.Sets;
     {
        fCurrentVariablesSet = newInitialFlow();
        // TODO, this might cause an error(asNameList)!
-       fCurrentVariablesSet.addAll(node.getArguments().asNameList());
+       fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getArguments().asNameList()));
        fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -54,7 +52,7 @@ import com.google.common.collect.Sets;
     public void caseTIRIfStmt(TIRIfStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getConditionVarName());
+        fCurrentVariablesSet.add(node.getConditionVarName().getID());
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
         caseIfStmt(node);
     }
@@ -63,7 +61,7 @@ import com.google.common.collect.Sets;
     public void caseTIRWhileStmt(TIRWhileStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getCondition().getName());
+        fCurrentVariablesSet.add(node.getCondition().getName().getID());
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
         caseWhileStmt(node);
     }
@@ -72,17 +70,20 @@ import com.google.common.collect.Sets;
     public void caseTIRForStmt(TIRForStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        if (node.hasIncr() ) fCurrentVariablesSet.add(node.getIncName());
-        fCurrentVariablesSet.add(node.getUpperName());
+        
+        fCurrentVariablesSet.add(node.getLowerName().getID());
+        if (node.hasIncr() ) fCurrentVariablesSet.add(node.getIncName().getID());
+        fCurrentVariablesSet.add(node.getUpperName().getID());
+
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
         caseForStmt(node);
     }
     
     @Override
-    public void caseTIRAbstractAssignToVarStmt(TIRAbstractAssignToVarStmt node)
+    public void caseTIRCopyStmt(TIRCopyStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(((NameExpr) node.getRHS()).getName());
+        fCurrentVariablesSet.add(node.getSourceName().getID());
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -90,8 +91,8 @@ import com.google.common.collect.Sets;
     public void caseTIRDotSetStmt(TIRDotSetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getValueName());
-        fCurrentVariablesSet.add(node.getDotName());
+        fCurrentVariablesSet.add(node.getValueName().getID());
+        fCurrentVariablesSet.add(node.getDotName().getID());
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -99,10 +100,10 @@ import com.google.common.collect.Sets;
     public void caseTIRCellArraySetStmt(TIRCellArraySetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getValueName());
-        fCurrentVariablesSet.add(node.getCellArrayName());
+        fCurrentVariablesSet.add(node.getValueName().getID());
+        fCurrentVariablesSet.add(node.getCellArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(node.getIndizes().asNameList());   
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));   
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -110,10 +111,10 @@ import com.google.common.collect.Sets;
     public void caseTIRArraySetStmt(TIRArraySetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getValueName());
-        fCurrentVariablesSet.add(node.getArrayName());
+        fCurrentVariablesSet.add(node.getValueName().getID());
+        fCurrentVariablesSet.add(node.getArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(node.getIndizes().asNameList());
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -121,9 +122,9 @@ import com.google.common.collect.Sets;
     public void caseTIRArrayGetStmt(TIRArrayGetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getArrayName());
+        fCurrentVariablesSet.add(node.getArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(node.getIndizes().asNameList());
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -131,9 +132,9 @@ import com.google.common.collect.Sets;
     public void caseTIRCellArrayGetStmt(TIRCellArrayGetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getCellArrayName());
+        fCurrentVariablesSet.add(node.getCellArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(node.getIndices().asNameList());
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndices().asNameList()));
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -141,39 +142,52 @@ import com.google.common.collect.Sets;
     public void caseTIRDotGetStmt(TIRDotGetStmt node)
     {
         fCurrentVariablesSet = newInitialFlow();
-        fCurrentVariablesSet.add(node.getDotName());
-        fCurrentVariablesSet.add(node.getFieldName());
+        fCurrentVariablesSet.add(node.getDotName().getID());
+        fCurrentVariablesSet.add(node.getFieldName().getID());
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
         
     @Override
-    public void merge(HashSet<Name> in1, HashSet<Name> in2, HashSet<Name> out)
+    public void merge(HashSet<String> in1, HashSet<String> in2, HashSet<String> out)
     {
         out.addAll(in1);
         out.addAll(in2);
     }
 
     @Override
-    public void copy(HashSet<Name> source, HashSet<Name> dest)
+    public void copy(HashSet<String> source, HashSet<String> dest)
     {
-        for (Name varName : source)
+        for (String varName : source)
         {
-            dest.add(varName.copy());
+            dest.add(varName);
         }
     }
     
-    public HashSet<Name> newInitialFlow()
+    public HashSet<String> newInitialFlow()
     {
         return Sets.newHashSet();
     }
 
-    public Set<Name> getUsedVariablesForNode(TIRNode node)
+    public Set<String> getUsedVariablesForNode(TIRNode node)
     {
-        Set<Name> set = fNodeToUsedVariablesMap.get(node);
+        Set<String> set = fNodeToUsedVariablesMap.get(node);
         if (set == null)
         {
             return Sets.newHashSet();
         }
         return set;
+    }
+    
+    public void printNodeToUsedVariablesMapContent()
+    {
+        for (Map.Entry<TIRNode, HashSet<String>> entry : fNodeToUsedVariablesMap.entrySet())
+        {
+           System.out.print(NodePrinter.printNode(entry.getKey()) + "\t");
+           for(String usedVariableName : entry.getValue())
+           {
+               System.out.print(usedVariableName + " ");
+           }
+           System.out.println();
+        }
     }
 }

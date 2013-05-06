@@ -7,85 +7,121 @@ import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tir.TIRNode;
-import natlab.toolkits.analysis.HashMapFlowMap;
-import ast.Name;
+import ast.ASTNode;
 
 import com.google.common.collect.Maps;
 
-/**
- * Constructs a DU chain for a given AST
- * @author Amine Sahibi
- *
- */
 public class DUChain implements TamerPlusAnalysis
 {
-    private Map<TIRNode, HashMap<Name, HashSet<TIRNode>>> fDUMap;
+    private Map<TIRNode, HashMap<String, HashSet<TIRNode>>> fDUMap;
     private UDChain fUDChains;
     
-    public DUChain(UDChain udChains)
+    public DUChain(ASTNode<?> tree)
     {
-        fUDChains = udChains;
-        fUDChains.constructUDChain();
         fDUMap = Maps.newHashMap();
     }
     
-    public void constructDUChain()
+    @Override
+    public void analyze(AnalysisEngine engine)
     {
-        Map<TIRNode, HashMap<Name, HashSet<TIRNode>>> resultUDMap = fUDChains.getChain();
-        Set<TIRNode> useAssignmentStmts = resultUDMap.keySet();
-        for (TIRNode useAssignmentStmt : useAssignmentStmts)
+        fUDChains = engine.getUDChainAnalysis();
+        fUDChains.analyze(engine);
+        this.constructDUChain();
+    }
+    
+    private void constructDUChain()
+    {
+        Map<TIRNode, Map<String, Set<TIRNode>>> resultUDMap = fUDChains.getChain();
+        for (TIRNode useStmt : resultUDMap.keySet())
         {
-            Set<Name> varNames = resultUDMap.get(useAssignmentStmt).keySet();
-            for (Name varName : varNames)
-            {
-                Set<TIRNode> defAssignmentStmts = resultUDMap.get(useAssignmentStmt).get(varName);
-                for (TIRNode defAssignStmt : defAssignmentStmts) 
-                {
-                    if (fDUMap.get(defAssignStmt) == null)
-                    {
-                        HashMap<Name, HashSet<TIRNode>> useSiteMap = Maps.newHashMap();
-                        fDUMap.put(defAssignStmt, useSiteMap);
-                    }
-                    
-                    if (fDUMap.get(defAssignStmt).get(varName) == null)
-                    {
-                        HashSet<TIRNode> useAssignStmtsSet = new HashSet<TIRNode>();
-                        fDUMap.get(defAssignStmt).put(varName, useAssignStmtsSet);
-                    }
-                    
-                    fDUMap.get(defAssignStmt).get(varName).add(useAssignmentStmt);
-                }
-            }
+            chainVariablesDefToUseForStmt(useStmt, resultUDMap);
         }
     }
     
-    public Map<TIRNode, HashMapFlowMap<String, HashSet<TIRNode>>> getChain() { return fDUMap; }
+    private void chainVariablesDefToUseForStmt(TIRNode useStmt, Map<TIRNode, Map<String, Set<TIRNode>>> resultUDMap)
+    {
+        Set<String> usedVariablesNames = resultUDMap.get(useStmt).keySet();
+        for (String usedVariableName : usedVariablesNames)
+        {
+            Set<TIRNode> definitionStmts = resultUDMap.get(useStmt).get(usedVariableName);
+            chainDefsToUseForVariable(definitionStmts, usedVariableName, useStmt);
+        }
+    }
     
-    public HashMapFlowMap<String, HashSet<TIRNode>> getUsesMap(TIRNode node) { return fDUMap.get(node); }
+    private void chainDefsToUseForVariable(Set<TIRNode> definitionStmts, String usedVariableName, TIRNode useStmt)
+    {
+        for (TIRNode defStmt : definitionStmts) 
+        {
+            createNewMapForDefinitionStmt(defStmt);
+            createUseStmtSetForDefStmtAndUsedVariable(defStmt, usedVariableName);
+            fDUMap.get(defStmt).get(usedVariableName).add(useStmt);
+        }
+    }
+    
+    private void createNewMapForDefinitionStmt(TIRNode defStmt)
+    {
+        if (!fDUMap.containsKey(defStmt))
+        {
+            HashMap<String, HashSet<TIRNode>> useSiteMap = Maps.newHashMap();
+            fDUMap.put(defStmt, useSiteMap);
+        }
+    }
+    
+    private void createUseStmtSetForDefStmtAndUsedVariable(TIRNode defStmt, String usedVariableName)
+    {
+        if (!fDUMap.get(defStmt).containsKey(usedVariableName))
+        {
+            HashSet<TIRNode> useAssignStmtsSet = new HashSet<TIRNode>();
+            fDUMap.get(defStmt).put(usedVariableName, useAssignStmtsSet);
+        }
+    }
+    
+    public Map<TIRNode, HashMap<String, HashSet<TIRNode>>> getChain() 
+    {
+        return fDUMap; 
+    }
+    
+    public HashMap<String, HashSet<TIRNode>> getUsesMapForDefinitionStmt(TIRNode defStmt) 
+    {
+        return fDUMap.get(defStmt); 
+    }
     
     public void printDUChain()
     {
-        StringBuffer sb = new StringBuffer();
-        LinkedList<TIRNode> visitedStmts = fUDChains.getVisitedStmtsLinkedList();
+        StringBuilder sb = new StringBuilder();
+        LinkedList<TIRNode> visitedStmts = fUDChains.getVisitedStmtsOrderedList();
         for (TIRNode visitedStmt : visitedStmts)
         {
             sb.append("------- " + NodePrinter.printNode(visitedStmt) + " -------\n");
-            HashMapFlowMap<String, HashSet<TIRNode>> useSiteMap = fDUMap.get(visitedStmt);
-            if (useSiteMap == null) continue;
-            Set<String> variableNames = useSiteMap.keySet();
-            for (String s : variableNames)
+            Map<String, HashSet<TIRNode>> useSiteMap = fDUMap.get(visitedStmt);
+            if (useSiteMap == null)
             {
-                Set<TIRNode> useStmts = useSiteMap.get(s);
-                if (!useStmts.isEmpty())
-                {
-                    sb.append("Var "+ s + "\n");
-                    for (TIRNode useStmt : useStmts)
-                    {
-                        sb.append("\t"+ NodePrinter.printNode(useStmt) + "\n");
-                    }
-                }
+                continue;
             }
+            printVariableToUsesMap(useSiteMap, sb);
         }
         System.out.println(sb.toString());
     }
+    
+    private void printVariableToUsesMap(Map<String, HashSet<TIRNode>> useSiteMap, StringBuilder sb)
+    {
+        for (Map.Entry<String, HashSet<TIRNode>> entry : useSiteMap.entrySet())
+        {
+            printVariableToUsesMapEntry(entry, sb);
+        }
+    }
+    
+    private void printVariableToUsesMapEntry(Map.Entry<String, HashSet<TIRNode>> entry, StringBuilder sb)
+    {
+        Set<TIRNode> useStmts = entry.getValue();
+        if (!useStmts.isEmpty())
+        {
+            sb.append("Var ").append(entry.getKey()).append("\n");
+            for (TIRNode useStmt : useStmts)
+            {
+                sb.append("\t").append(NodePrinter.printNode(useStmt)).append("\n");
+            }
+        }
+    }
+    
 }

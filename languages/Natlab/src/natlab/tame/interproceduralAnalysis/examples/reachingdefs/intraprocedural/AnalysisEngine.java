@@ -80,19 +80,14 @@ public class AnalysisEngine
         return getOrCreate(UDDUWeb.class);
     }
     
-    public RenameVariablesForTIRNodes getVariableRenameAnalysis()
+    public TIRNodeToRawASTNodeTableBuilder getTIRNodeToRawASTNodeTableBuilder()
     {
-        return getOrCreate(RenameVariablesForTIRNodes.class);
+        return getOrCreate(TIRNodeToRawASTNodeTableBuilder.class);
     }
     
-    public StmtCollapseByTmpVarRemoval getStmtCollapseByTmpVarRemovalAnalysis()
+    public StmtCollapseByTmpVarRemoval getStmtCollapseByTmpVarRemoval()
     {
         return getOrCreate(StmtCollapseByTmpVarRemoval.class);
-    }
-    
-    public TIRToAST getTIRToASTAnalysis()
-    {
-        return getOrCreate(TIRToAST.class);
     }
     
     public void notifyTreeChanged() 

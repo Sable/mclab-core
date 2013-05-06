@@ -3,12 +3,10 @@ package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedura
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
-import natlab.tame.tir.TIRAbstractAssignStmt;
-import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRAssignLiteralStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCellArrayGetStmt;
 import natlab.tame.tir.TIRCellArraySetStmt;
@@ -26,24 +24,22 @@ import ast.ASTNode;
 import ast.Name;
 import ast.NameExpr;
 
-/**
- * Rename variables using the UDDU web
- * @author Amine Sahibi
- *
- */
-public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
+public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler implements TamerPlusTransformation
 {
-    UDDUWeb fUDDUWeb;
-    public static final String PREFIX = "#";
+    private UDDUWeb fUDDUWeb;
+    public static final String COLOR_PREFIX = "#";
+    private ASTNode<?> fTransformedTree;
     
-    public RenameVariablesForTIRNodes(UDDUWeb udduWeb)
+    public RenameVariablesForTIRNodes(ASTNode<?> tree)
     {
-        fUDDUWeb = udduWeb;
-        fUDDUWeb.constructUDDUWeb();
+        fTransformedTree = tree;
     }
     
-    public void analyze()
+    @Override
+    public void transform(TransformationEngine transformationEngine)
     {
+        AnalysisEngine analysisEngine = transformationEngine.getAnalysisEngine();
+        fUDDUWeb = analysisEngine.getUDDUWebAnalysis();
         getFunctionNode().tirAnalyze(this);
     }
     
@@ -68,6 +64,12 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     @Override
     public void caseTIRFunction(TIRFunction node)
     {
+        renameDefinedVariablesForNode(getInputParamsForFunction(node), node);
+        caseASTNode(node);
+    }
+    
+    private TIRCommaSeparatedList getInputParamsForFunction(TIRFunction node)
+    {
         java.util.List<Name> inputParams = new ArrayList<Name>();
 
         for (Name inputParam : node.getInputParamList())
@@ -75,9 +77,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
             inputParams.add(inputParam);
         }
         
-        TIRCommaSeparatedList definedVariablesNames = TIRCommaSeparatedList.createFromNames(inputParams);
-        renameDefinedVariablesForNode(definedVariablesNames, node);
-        caseASTNode(node);
+        return TIRCommaSeparatedList.createFromNames(inputParams);
     }
     
     @Override
@@ -95,14 +95,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     public void caseTIRIfStmt(TIRIfStmt node)
     {
         Name conditionVariableName = node.getConditionVarName();
-        if (conditionVariableName != null)
-        {
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
-            if (nodeAndColor != null &&  nodeAndColor.containsKey(node))
-            {
-                renameVariableWithColor(conditionVariableName, nodeAndColor.get(node));
-            }
-        }
+        renameConditionVariableForNode(conditionVariableName, node);
         caseIfStmt(node);
     }
     
@@ -110,15 +103,17 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     public void caseTIRWhileStmt(TIRWhileStmt node)
     {
         Name conditionVariableName = node.getCondition().getName();
-        if (conditionVariableName != null)
-        {
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
-            if (nodeAndColor != null &&  nodeAndColor.containsKey(node))
-            {
-                renameVariableWithColor(conditionVariableName, nodeAndColor.get(node));
-            }
-        }
+        renameConditionVariableForNode(conditionVariableName, node);
         caseWhileStmt(node);
+    }
+    
+    private void renameConditionVariableForNode(Name conditionVariableName, TIRNode node)
+    {
+        HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getID());
+        if (nodeToColorMap != null &&  nodeToColorMap.containsKey(node))
+        {
+            renameVariableWithColor(conditionVariableName, nodeToColorMap.get(node));
+        }
     }
     
     @Override
@@ -142,113 +137,111 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     }
     
     @Override
-    public void caseTIRAbstractAssignStmt(TIRAbstractAssignStmt node)
+    public void caseTIRArraySetStmt(TIRArraySetStmt node)
     {
-        TIRCommaSeparatedList definedVariablesNames = null;
-        TIRCommaSeparatedList usedVariablesNames = null;
+        TIRCommaSeparatedList definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getArrayName()));
         
-        if (node instanceof TIRAbstractAssignFromVarStmt)
-        {
-            Name target;
-            Name targetField = null;
-            if (node instanceof TIRArraySetStmt)
-            {
-                TIRArraySetStmt arraySetStmt = (TIRArraySetStmt) node;
-                
-                target = arraySetStmt.getArrayName();
-                
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(arraySetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(arraySetStmt.getArrayName()));
-                TIRCommaSeparatedList indices = arraySetStmt.getIndizes();
-                addIndicesToUsedVariablesNames(indices, usedVariablesNames);
-                
-            }
-            else if (node instanceof TIRCellArraySetStmt)
-            {
-                TIRCellArraySetStmt cellArraySetStmt = (TIRCellArraySetStmt) node;
-                
-                target = cellArraySetStmt.getCellArrayName();
-
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(cellArraySetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(cellArraySetStmt.getCellArrayName()));
-                TIRCommaSeparatedList indices = cellArraySetStmt.getIndizes();
-                addIndicesToUsedVariablesNames(indices, usedVariablesNames);
-                
-            }
-            else if (node instanceof TIRDotSetStmt)
-            {
-                TIRDotSetStmt dotSetStmt = (TIRDotSetStmt) node;
-                
-                target = dotSetStmt.getDotName();
-                targetField = dotSetStmt.getFieldName();
-                
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotSetStmt.getValueName()));
-                usedVariablesNames.add(new NameExpr(dotSetStmt.getDotName()));
-            }
-            else 
-            { 
-                throw new UnsupportedOperationException("unknown assign from var stmt " + node); 
-            }
-            
-            definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(target));
-            if (targetField != null)
-            {
-                definedVariablesNames.add(new NameExpr(targetField));
-            }
-        }
-        else if (node instanceof TIRAbstractAssignToVarStmt)
-        {
-            if (node instanceof TIRCopyStmt)
-            {
-                TIRCopyStmt copySmtmt = (TIRCopyStmt) node;
-                Name usedVarName = copySmtmt.getSourceName();
-                usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(usedVarName));
-            }
-            definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(((TIRAbstractAssignToVarStmt)node).getTargetName()));
-        }
-        else 
-        {
-            throw new UnsupportedOperationException("unknown assignment statement " + node);
-        }
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getArrayName()));
+        TIRCommaSeparatedList indices = node.getIndizes();
+        addIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
         renameDefinedVariablesForNode(definedVariablesNames, node);
         renameUsedVariablesForNode(usedVariablesNames, node);
     }
     
     @Override
-    public void caseTIRAbstractAssignToListStmt(TIRAbstractAssignToListStmt node)
+    public void caseTIRCellArraySetStmt(TIRCellArraySetStmt node)
     {
-        TIRCommaSeparatedList definedVariablesNames = null;
-        TIRCommaSeparatedList usedVariablesNames = null;
+        TIRCommaSeparatedList definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getCellArrayName()));
         
-        definedVariablesNames = node.getTargets();
-        
-        if (node instanceof TIRArrayGetStmt)
-        {
-            TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
-            Name arrayName = arrayGetStmt.getArrayName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((arrayName)));
-            TIRCommaSeparatedList indices = arrayGetStmt.getIndizes();
-            addIndicesToUsedVariablesNames(indices, usedVariablesNames);
-        }
-        else if (node instanceof TIRDotGetStmt)
-        {
-            TIRDotGetStmt dotGetStmt = (TIRDotGetStmt) node;
-            Name dotName = dotGetStmt.getDotName();
-            Name fieldName = dotGetStmt.getFieldName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotName));
-            usedVariablesNames.add(new NameExpr(fieldName));
-        }
-        else if (node instanceof TIRCellArrayGetStmt)
-        {
-            TIRCellArrayGetStmt cellArrayGetStmt = (TIRCellArrayGetStmt) node;
-            Name cellArrayName = cellArrayGetStmt.getCellArrayName();
-            usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
-            TIRCommaSeparatedList indices = cellArrayGetStmt.getIndices();
-            addIndicesToUsedVariablesNames(indices, usedVariablesNames);
-        }
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getCellArrayName()));
+        TIRCommaSeparatedList indices = node.getIndizes();
+        addIndicesToUsedVariablesNames(indices, usedVariablesNames);
         
         renameDefinedVariablesForNode(definedVariablesNames, node);
         renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRDotSetStmt(TIRDotSetStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getDotName()));
+        definedVariablesNames.add(new NameExpr(node.getFieldName()));
+        
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
+        usedVariablesNames.add(new NameExpr(node.getDotName()));
+        
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRCopyStmt(TIRCopyStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(((TIRAbstractAssignToVarStmt)node).getTargetName()));
+        
+        Name usedVarName = node.getSourceName();
+        TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(usedVarName));
+        
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRCellArrayGetStmt(TIRCellArrayGetStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = node.getTargets();
+        TIRCommaSeparatedList usedVariablesNames = null;
+        
+        TIRCellArrayGetStmt cellArrayGetStmt = (TIRCellArrayGetStmt) node;
+        Name cellArrayName = cellArrayGetStmt.getCellArrayName();
+        usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((cellArrayName)));
+        TIRCommaSeparatedList indices = cellArrayGetStmt.getIndices();
+        addIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRDotGetStmt(TIRDotGetStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = node.getTargets();
+        TIRCommaSeparatedList usedVariablesNames = null;
+        
+        TIRDotGetStmt dotGetStmt = (TIRDotGetStmt) node;
+        Name dotName = dotGetStmt.getDotName();
+        Name fieldName = dotGetStmt.getFieldName();
+        usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(dotName));
+        usedVariablesNames.add(new NameExpr(fieldName));
+        
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRArrayGetStmt(TIRArrayGetStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = node.getTargets();
+        TIRCommaSeparatedList usedVariablesNames = null;
+        
+        TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
+        Name arrayName = arrayGetStmt.getArrayName();
+        usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((arrayName)));
+        TIRCommaSeparatedList indices = arrayGetStmt.getIndizes();
+        addIndicesToUsedVariablesNames(indices, usedVariablesNames);
+        
+        renameDefinedVariablesForNode(definedVariablesNames, node);
+        renameUsedVariablesForNode(usedVariablesNames, node);
+    }
+    
+    @Override
+    public void caseTIRAssignLiteralStmt(TIRAssignLiteralStmt node)
+    {
+        TIRCommaSeparatedList definedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getTargetName()));
+        renameDefinedVariablesForNode(definedVariablesNames, node);
     }
     
     public void addIndicesToUsedVariablesNames(TIRCommaSeparatedList indices, TIRCommaSeparatedList usedVariablesNames)
@@ -272,15 +265,15 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         for (int i = 0; i < usedVariablesNames.getNumChild(); i++)
         {
             Name usedVariableName = usedVariablesNames.getName(i);
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getNodeString());
-            if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
+            HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getID());
+            if (nodeToColorMap != null && nodeToColorMap.containsKey(parentNode))
             {
-                renameVariableWithColor(usedVariableName, nodeAndColor.get(parentNode));
+                renameVariableWithColor(usedVariableName, nodeToColorMap.get(parentNode));
             }
         }
     }
     
-    public void renameDefinedVariablesForNode(TIRCommaSeparatedList definedVariablesNames, TIRNode parentNode)
+    private void renameDefinedVariablesForNode(TIRCommaSeparatedList definedVariablesNames, TIRNode parentNode)
     {
         if (definedVariablesNames == null)
         {
@@ -289,17 +282,17 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         for (int i = 0; i < definedVariablesNames.getNumChild(); i++)
         {
             Name definedVariableName = definedVariablesNames.getName(i);
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForDefinition(definedVariableName.getNodeString());
-            if (nodeAndColor != null && nodeAndColor.containsKey(parentNode))
+            HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForDefinition(definedVariableName.getID());
+            if (nodeToColorMap != null && nodeToColorMap.containsKey(parentNode))
             {
-                renameVariableWithColor(definedVariableName, nodeAndColor.get(parentNode));
+                renameVariableWithColor(definedVariableName, nodeToColorMap.get(parentNode));
             }
         }
     }
     
-    public void renameVariableWithColor(Name variableName, Integer color)
+    private void renameVariableWithColor(Name variableName, Integer color)
     {
-        String updatedVariableName = variableName.getNodeString() + PREFIX + color;
+        String updatedVariableName = (new StringBuilder(variableName.getNodeString())).append(COLOR_PREFIX).append(color).toString();
         variableName.setID(updatedVariableName);
     }
     
@@ -308,4 +301,8 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         return fUDDUWeb.getVisitedStmtsLinkedList().get(0);
     }
     
+    public ASTNode<?> getTransformedTree()
+    {
+        return fTransformedTree;
+    }
 }

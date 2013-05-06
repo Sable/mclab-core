@@ -5,17 +5,16 @@ import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tir.TIRNode;
-import ast.Name;
-
+import ast.ASTNode;
 import com.google.common.collect.Maps;
 
 public class UDChain implements TamerPlusAnalysis
 {
-    private Map<TIRNode, Map<Name, Set<TIRNode>>> fUDMap;
+    private Map<TIRNode, Map<String, Set<TIRNode>>> fUDMap;
     private UsedVariablesNameCollector fUsedVariablesNameCollector;
     private ReachingDefinitions fReachingDefinitionsAnalysis;
     
-    public UDChain()
+    public UDChain(ASTNode<?> tree)
     {
         fUDMap = Maps.newHashMap();
     }
@@ -25,15 +24,15 @@ public class UDChain implements TamerPlusAnalysis
     {
         fUsedVariablesNameCollector = engine.getUsedVariablesAnalysis();
         fReachingDefinitionsAnalysis = engine.getReachingDefinitionsAnalysis();
-        this.constructUDChain();
+        constructUDChain();
     }
     
-    public void constructUDChain()
+    private void constructUDChain()
     {
-        for (TIRNode visitedStmt : fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList())
+        for (TIRNode visitedStmt : fReachingDefinitionsAnalysis.getVisitedStmtsOrderedList())
         {
-           Set<Name> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedStmt);
-           if (usedVariables == null)
+           Set<String> usedVariables = fUsedVariablesNameCollector.getUsedVariablesForNode(visitedStmt);
+           if (usedVariables.isEmpty())
            {
                continue;
            }
@@ -41,11 +40,11 @@ public class UDChain implements TamerPlusAnalysis
         }
     }
     
-    public Map<Name, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<Name> usedVariables)
+    public Map<String, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<String> usedVariables)
     {
-        Map<Name, Set<TIRNode>> usedVariablesToDefinitionsMap = Maps.newHashMap();
-        Map<Name, Set<TIRNode>> variableToReachingDefinitionsMap = fReachingDefinitionsAnalysis.getReachingDefinitionsForNode(node);
-        for (Name variableName : variableToReachingDefinitionsMap.keySet())
+        Map<String, Set<TIRNode>> usedVariablesToDefinitionsMap = Maps.newHashMap();
+        Map<String, Set<TIRNode>> variableToReachingDefinitionsMap = fReachingDefinitionsAnalysis.getReachingDefinitionsForNode(node);
+        for (String variableName : variableToReachingDefinitionsMap.keySet())
         {
             // If the variable is not declared in that stmt, add it to the map. We want to keep the used variables only.
             if (usedVariables.contains(variableName))
@@ -56,24 +55,24 @@ public class UDChain implements TamerPlusAnalysis
         return usedVariablesToDefinitionsMap;
     }
     
-    public Map<TIRNode, Map<Name, Set<TIRNode>>> getChain() 
+    public Map<TIRNode, Map<String, Set<TIRNode>>> getChain() 
     {
         return fUDMap; 
     }
     
-    public Map<Name, Set<TIRNode>> getDefinitionsMap(TIRNode node)
+    public Map<String, Set<TIRNode>> getDefinitionsMapFoUseStmt(TIRNode useStmt)
     {
-        return fUDMap.get(node);
+        return fUDMap.get(useStmt);
     }
         
     public void printUDChain()
     {
-        StringBuffer sb = new StringBuffer();
-        LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsLinkedList();
+        StringBuilder sb = new StringBuilder();
+        LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsOrderedList();
         for (TIRNode visitedStmt : visitedStmts)
         {
             sb.append("------- ").append(NodePrinter.printNode(visitedStmt)).append(" -------\n");
-            Map<Name, Set<TIRNode>> definitionSiteMap = fUDMap.get(visitedStmt);
+            Map<String, Set<TIRNode>> definitionSiteMap = fUDMap.get(visitedStmt);
             if (definitionSiteMap == null)
             {
                 continue;
@@ -83,24 +82,29 @@ public class UDChain implements TamerPlusAnalysis
         System.out.println(sb.toString());
     }
     
-    public void printVariableToReachingDefinitionsMap(Map<Name, Set<TIRNode>> definitionSiteMap, StringBuffer sb)
+    private void printVariableToReachingDefinitionsMap(Map<String, Set<TIRNode>> definitionSiteMap, StringBuilder sb)
     {
-        for (Map.Entry<Name, Set<TIRNode>> entry : definitionSiteMap.entrySet())
+        for (Map.Entry<String, Set<TIRNode>> entry : definitionSiteMap.entrySet())
         {
             printVariableToReachingDefinitionsMapEntry(entry, sb);
         }
     }
     
-    public void printVariableToReachingDefinitionsMapEntry(Map.Entry<Name, Set<TIRNode>> entry, StringBuffer sb)
+    private void printVariableToReachingDefinitionsMapEntry(Map.Entry<String, Set<TIRNode>> entry, StringBuilder sb)
     {
         Set<TIRNode> defStmts = entry.getValue();
         if (!defStmts.isEmpty())
         {
-            sb.append("Var ").append(NodePrinter.printNode(entry.getKey())).append("\n");
+            sb.append("Var ").append(entry.getKey()).append("\n");
             for (TIRNode defStmt : defStmts)
             {
                 sb.append("\t").append(NodePrinter.printNode(defStmt)).append("\n");
             }
         }
+    }
+    
+    public LinkedList<TIRNode> getVisitedStmtsOrderedList()
+    {
+        return fReachingDefinitionsAnalysis.getVisitedStmtsOrderedList();
     }
 }
