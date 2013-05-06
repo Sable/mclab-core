@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import mclint.refactoring.Refactoring;
+import mclint.refactoring.RefactoringContext;
 import mclint.transform.Transformer;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.analysis.core.Def;
@@ -38,28 +39,31 @@ public class ExtractFunction extends Refactoring {
   private int from;
   private int to;
   private String extractedFunctionName;
-  
+  private Transformer transformer;
+
   private Function extracted;
-  
+
   private Map<String, Set<Def>> reachingBefore;
   private Map<String, Set<Def>> reachingAfter;
   private Set<String> liveBefore;
   private Set<String> liveAfter;
   private VFFlowset kinds;
-  
+
   private LinkedList<RefactorException> errors = Lists.newLinkedList();
   private Set<String> addedGlobals = Sets.newHashSet();
   private Set<String> addedInputs = Sets.newHashSet();
 
-  public ExtractFunction(Transformer transformer,
+  public ExtractFunction(RefactoringContext context,
       Function original, int from, int to, String extractedFunctionName) {
-    super(transformer);
+    super(context);
     this.original = original;
     this.from = from;
     this.to = to;
     this.extractedFunctionName = extractedFunctionName;
+
+    this.transformer = context.getMatlabProgram().getBasicTransformer();
   }
-  
+
   private void extractStatements() {
     extracted = new Function();
     extracted.setName(extractedFunctionName);
@@ -67,7 +71,7 @@ public class ExtractFunction extends Refactoring {
       extracted.addStmt((Stmt) original.getStmt(i).fullCopy());
     }
   }
-  
+
   private <T extends Analysis> T analyze(T analysis) {
     analysis.analyze();
     return analysis;
@@ -78,17 +82,17 @@ public class ExtractFunction extends Refactoring {
     LivenessAnalysis liveAnalysisOrig = analyze(new LivenessAnalysis(original));
     LivenessAnalysis liveAnalysisNew = analyze(new LivenessAnalysis(extracted));
     VFPreorderAnalysis kindAnalysis = analyze(new VFPreorderAnalysis(original));
-    
+
     Stmt startStmt = original.getStmt(from);
     Stmt endStmt = original.getStmt(to - 1);
-    
+
     reachingBefore = reachingAnalysisOrig.getOutFlowSets().get(startStmt).toMap();
     reachingAfter = reachingAnalysisNew.getOutFlowSets().get(extracted).toMap();
     liveBefore = liveAnalysisNew.getInFlowSets().get(extracted).getSet();
     liveAfter = liveAnalysisOrig.getOutFlowSets().get(endStmt).getSet();
     kinds = kindAnalysis.getFlowSets().get(original);
   }
-  
+
   private Iterable<String> liveVariablesAtInputOfNewFunction() {
     return Iterables.filter(liveBefore, new Predicate<String>() {
       @Override public boolean apply(String id) {
@@ -96,7 +100,7 @@ public class ExtractFunction extends Refactoring {
       }
     });
   }
-  
+
   private Iterable<String> liveVariablesDefinedInNewFunction() {
     return Iterables.filter(liveAfter, new Predicate<String>() {
       @Override public boolean apply(String id) {
@@ -104,7 +108,7 @@ public class ExtractFunction extends Refactoring {
       }
     });
   }
-  
+
   private boolean containsGlobalStmt(Set<Def> defs) {
     return Iterables.any(defs, Predicates.instanceOf(GlobalStmt.class));
   }
@@ -112,7 +116,7 @@ public class ExtractFunction extends Refactoring {
   private boolean originallyGlobal(String id) {
     return containsGlobalStmt(reachingBefore.get(id));
   }
-  
+
   private boolean globalInNewFunction(String id) {
     return containsGlobalStmt(reachingAfter.get(id));
   }
@@ -126,12 +130,12 @@ public class ExtractFunction extends Refactoring {
     extracted.getStmts().insertChild(globalDecl, 0);
     addedGlobals.add(id);
   }
-  
+
   private boolean originallyDefined(String id) {
     return !(reachingBefore.get(id).isEmpty() ||
         reachingBefore.get(id).contains(ReachingDefs.UNDEF));
   }
-  
+
   private void makeInputParameter(String id) {
     if (addedInputs.contains(id)) {
       return;
@@ -139,25 +143,25 @@ public class ExtractFunction extends Refactoring {
     extracted.addInputParam(new Name(id));
     addedInputs.add(id);
   }
-  
+
   private void makeOutputParameter(String id) {
     extracted.addOutputParam(new Name(id));
   }
-  
+
   private void reportVariableMightBeUndefined(String id) {
     errors.add(new Exceptions.FunctionInputCanBeUndefined(new Name(id)));
   }
-  
+
   private void reportOutputMightBeUndefined(String id) {
     errors.add(new Exceptions.FunctionOutputCanBeUndefined(new Name(id)));
   }
-  
+
   private void makeExtractedFunctionSiblingOfOriginal() {
     ast.List<Function> list = 
         NodeFinder.findParent(FunctionList.class, original).getFunctions();
     transformer.insert(list, extracted, list.getIndexOfChild(original) + 1);
   }
-  
+
   private void replaceExtractedStatementsWithCallToExtractedFunction() {
     Stmt call = makeCallToExtractedFunction();
     for (int i = from; i < to; i++) {
@@ -165,7 +169,7 @@ public class ExtractFunction extends Refactoring {
     }
     transformer.insert(original.getStmts(), call, from);
   }
-  
+
   private Stmt makeCallToExtractedFunction() {
     ParameterizedExpr call = new ParameterizedExpr();
     call.setTarget(new NameExpr(new Name(extracted.getName())));
@@ -190,11 +194,12 @@ public class ExtractFunction extends Refactoring {
     }
     return assign;
   }
-  
+
   public Function getExtractedFunction() {
     return extracted;
   }
-  
+
+  @Override
   public List<RefactorException> getErrors() {
     return errors;
   }
@@ -232,5 +237,11 @@ public class ExtractFunction extends Refactoring {
 
     makeExtractedFunctionSiblingOfOriginal();
     replaceExtractedStatementsWithCallToExtractedFunction();
+  }
+
+  @Override
+  public boolean checkPreconditions() {
+    // TODO figure out real preconditions
+    return true;
   }
 }
