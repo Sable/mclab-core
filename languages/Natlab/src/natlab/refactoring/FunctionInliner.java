@@ -4,6 +4,7 @@ package natlab.refactoring;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import natlab.refactoring.Exceptions.IDConflictException;
@@ -16,7 +17,6 @@ import natlab.refactoring.Exceptions.TooManyInputParams;
 import natlab.refactoring.Exceptions.TooManyOutputParams;
 import natlab.toolkits.ContextStack;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.core.CopyAnalysis;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
@@ -128,7 +128,7 @@ public class FunctionInliner {
 		LinkedList<NameExpr> uses = Lists.newLinkedList();
 		for (NameExpr n: all){
 			Stmt aUse= NodeFinder.findParent(Stmt.class, n);
-			HashMapFlowMap<String, Set<Def>> output= defAnalysis.getOutFlowSets().get(aUse);
+			Map<String, Set<Def>> output= defAnalysis.getOutFlowSets().get(aUse);
 			if (output == null){
                 continue;
 			}

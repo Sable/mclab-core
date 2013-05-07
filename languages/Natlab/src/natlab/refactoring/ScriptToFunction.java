@@ -20,7 +20,6 @@ import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
-import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.ExprStmt;
 import ast.Function;
@@ -78,7 +77,7 @@ public class ScriptToFunction {
 		
 		Set<String> scriptLiveVars = live.getOutFlowSets().get(script).getSet();
 		Set<String> assignedVars = new HashSet<String>();
-		for (Map.Entry<String, Set<Def>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
+		for (Map.Entry<String, Set<Def>> entry: scriptReaching.getOutFlowSets().get(script).entrySet()){
 			if (entry.getValue().contains(ReachingDefs.UNDEF) || entry.getValue().isEmpty())
 				continue;
 			assignedVars.add(entry.getKey());
@@ -121,7 +120,7 @@ public class ScriptToFunction {
 			mayReach.analyze();
 			callLive.analyze();
 			Set<String> callLiveVars = callLive.getOutFlowSets().get(call).getSet();
-			Map<String, Set<Def>> reaching = mayReach.getInFlowSets().get(call).toMap();
+			Map<String, Set<Def>> reaching = mayReach.getInFlowSets().get(call);
             System.out.println("\ncallReaching:" + reaching + "\ncLive:" +callLiveVars); 
             if (inlined) {
                 System.out.println();

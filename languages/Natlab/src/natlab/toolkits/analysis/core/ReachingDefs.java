@@ -19,9 +19,10 @@
 package natlab.toolkits.analysis.core;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import natlab.toolkits.analysis.HashMapFlowMap;
+import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
 import natlab.utils.NodeFinder;
@@ -36,6 +37,7 @@ import ast.Script;
 import ast.Stmt;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -44,13 +46,13 @@ import com.google.common.collect.Sets;
  * @author Jesse Doherty
  */
 public class ReachingDefs extends
-        AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<Def>>> {
+        AbstractSimpleStructuralForwardAnalysis<Map<String, Set<Def>>> {
   public static Def UNDEF = new AssignStmt();
 
   private Set<Name> defs = Sets.newHashSet();
-  private Merger<Set<Def>> merger = Mergers.union();
+  private static final Merger<Set<Def>> UNION_MERGER = Mergers.union();
 
-  private HashMapFlowMap<String, Set<Def>> startMap;
+  private Map<String, Set<Def>> startMap;
   private DefinitelyAssignedAnalysis definiteAssignment;
   private NameCollector nameCollector;
 
@@ -60,7 +62,7 @@ public class ReachingDefs extends
   
   @Override
   public void analyze() {
-    startMap = new HashMapFlowMap<String, Set<Def>>(merger);
+    startMap = Maps.newHashMap();
     nameCollector = new NameCollector(tree);
     nameCollector.analyze();
     definiteAssignment = new DefinitelyAssignedAnalysis(tree);
@@ -72,14 +74,19 @@ public class ReachingDefs extends
   }
 
   @Override
-  public void merge(HashMapFlowMap<String, Set<Def>> in1,
-          HashMapFlowMap<String, Set<Def>> in2, HashMapFlowMap<String, Set<Def>> out) {
-    in1.union(merger, in2, out);
+  public void merge(Map<String, Set<Def>> in1,
+          Map<String, Set<Def>> in2, Map<String, Set<Def>> out) {
+    if (in1 == in2 && in2 == out) {
+      return;
+    }
+    if (in1 != out && in2 != out) {
+      out.clear();
+    }
+    out.putAll(MergeUtil.unionMerge(in1, in2, UNION_MERGER));
   }
 
   @Override
-  public void copy(HashMapFlowMap<String, Set<Def>> in,
-          HashMapFlowMap<String, Set<Def>> out) {
+  public void copy(Map<String, Set<Def>> in, Map<String, Set<Def>> out) {
     if (in == out)
       return;
     out.clear();
@@ -87,8 +94,8 @@ public class ReachingDefs extends
       out.put(i, Sets.newHashSet(in.get(i)));
   }
 
-  public HashMapFlowMap<String, Set<Def>> copy(HashMapFlowMap<String, Set<Def>> in) {
-    HashMapFlowMap<String, Set<Def>> out = new HashMapFlowMap<String, Set<Def>>();
+  public Map<String, Set<Def>> copy(Map<String, Set<Def>> in) {
+    Map<String, Set<Def>> out = Maps.newHashMap();
     copy(in, out);
     return out;
   }
@@ -119,7 +126,7 @@ public class ReachingDefs extends
   }
 
   @Override
-  public HashMapFlowMap<String, Set<Def>> newInitialFlow() {
+  public Map<String, Set<Def>> newInitialFlow() {
     return copy(startMap);
   }
   
