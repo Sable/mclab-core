@@ -75,7 +75,7 @@ public class ScriptToFunction {
 		scriptKind.analyze();
 		scriptReaching.analyze();
 		
-		Set<String> scriptLiveVars = live.getOutFlowSets().get(script).getSet();
+		Set<String> scriptLiveVars = live.getOutFlowSets().get(script);
 		Set<String> assignedVars = new HashSet<String>();
 		for (Map.Entry<String, Set<Def>> entry: scriptReaching.getOutFlowSets().get(script).entrySet()){
 			if (entry.getValue().contains(ReachingDefs.UNDEF) || entry.getValue().isEmpty())
@@ -119,7 +119,7 @@ public class ScriptToFunction {
 			LivenessAnalysis callLive = new LivenessAnalysis(callFunc);
 			mayReach.analyze();
 			callLive.analyze();
-			Set<String> callLiveVars = callLive.getOutFlowSets().get(call).getSet();
+			Set<String> callLiveVars = callLive.getOutFlowSets().get(call);
 			Map<String, Set<Def>> reaching = mayReach.getInFlowSets().get(call);
             System.out.println("\ncallReaching:" + reaching + "\ncLive:" +callLiveVars); 
             if (inlined) {

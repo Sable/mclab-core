@@ -88,8 +88,8 @@ public class ExtractFunction extends Refactoring {
 
     reachingBefore = reachingAnalysisOrig.getOutFlowSets().get(startStmt);
     reachingAfter = reachingAnalysisNew.getOutFlowSets().get(extracted);
-    liveBefore = liveAnalysisNew.getInFlowSets().get(extracted).getSet();
-    liveAfter = liveAnalysisOrig.getOutFlowSets().get(endStmt).getSet();
+    liveBefore = liveAnalysisNew.getInFlowSets().get(extracted);
+    liveAfter = liveAnalysisOrig.getOutFlowSets().get(endStmt);
     kinds = kindAnalysis.getFlowSets().get(original);
   }
 
