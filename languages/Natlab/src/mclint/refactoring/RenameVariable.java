@@ -12,8 +12,11 @@ import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
+import ast.Function;
+import ast.FunctionList;
 import ast.GlobalStmt;
 import ast.Name;
+import ast.Program;
 import ast.Script;
 
 import com.google.common.base.Optional;
@@ -48,18 +51,29 @@ class RenameVariable extends Refactoring {
     return Iterables.any(getAllDefsOfTargetName(), Predicates.instanceOf(GlobalStmt.class));
   }
 
+  private void checkPreconditionsForFunctionOrScript(ASTNode<?> ast, MatlabProgram program) {
+    Name decl = findGlobalNamed(node.getID(), ast);
+    if (decl != null) {
+      RefactoringContext newContext = RefactoringContext.create(program);
+      Refactoring rename = new RenameVariable(newContext, decl, newName, false);
+      if (!rename.checkPreconditions()) {
+        addErrors(rename.getErrors());
+      }
+      globalRenames.add(rename);
+    }
+  }
+
   @Override
   public boolean checkPreconditions() {
     if (renameGlobally && targetNameIsGlobal()) {
       for (MatlabProgram program : context.getProject().getMatlabPrograms()) {
-        Name decl = findGlobalNamed(node.getID(), program.parse());
-        if (decl != null) {
-          RefactoringContext newContext = RefactoringContext.create(program);
-          Refactoring rename = new RenameVariable(newContext, decl, newName, false);
-          if (!rename.checkPreconditions()) {
-            addErrors(rename.getErrors());
+        Program ast = program.parse();
+        if (ast instanceof Script) {
+          checkPreconditionsForFunctionOrScript(ast, program);
+        } else {
+          for (Function f : ((FunctionList) ast).getFunctions()) {
+            checkPreconditionsForFunctionOrScript(f, program);
           }
-          globalRenames.add(rename);
         }
       }
       return getErrors().isEmpty();
@@ -112,8 +126,8 @@ class RenameVariable extends Refactoring {
       return;
     }
 
+    Transformer transformer = context.getMatlabProgram().getBasicTransformer();
     for (Def def : getAllDefsOfTargetName()) {
-      Transformer transformer = context.getMatlabProgram().getBasicTransformer();
       for (Name use : udduChain.getUsesOf(node.getID(), def)) {
         transformer.replace(use, new Name(newName)); 
       }
