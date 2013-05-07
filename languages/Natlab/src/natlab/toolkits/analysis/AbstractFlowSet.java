@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
  * }
  * </pre>
  */
+@Deprecated
 public abstract class AbstractFlowSet<D> implements FlowSet<D>
 {
     @Override public AbstractFlowSet<D> copy()
@@ -32,6 +33,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     
     abstract public AbstractFlowSet<D> emptySet();
     
+    @Override
     public void copy(FlowSet<? super D> dest) {
     	if (this == dest) return;
         dest.clear();
@@ -43,6 +45,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
     /**
      * implemented, but *very* inefficient.
      */
+    @Override
     public void clear() {
         List<D> data = Lists.newArrayListWithCapacity(size());
         for( D i : this )
@@ -76,7 +79,7 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         if (dest != other) {
             Iterator<? extends D> otherIt = other.iterator();
             while (otherIt.hasNext()){
-                dest.add((D) otherIt.next());
+                dest.add(otherIt.next());
             }
         }
     }
@@ -165,20 +168,25 @@ public abstract class AbstractFlowSet<D> implements FlowSet<D>
         }
     }
     
+    @Override
     public boolean isEmpty()
     {
         return size() == 0;
     }
     
+    @Override
     public abstract int size();
     
+    @Override
     public abstract void add(D obj);
 
     @Override
     public abstract boolean remove(Object obj);
     
+    @Override
     public abstract boolean contains(Object obj);
     
+    @Override
     public abstract Iterator<D> iterator();
     
     /**

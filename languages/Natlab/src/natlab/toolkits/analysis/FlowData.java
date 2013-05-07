@@ -5,7 +5,9 @@ package natlab.toolkits.analysis;
  * intended to tag a class as representing flow data. 
  *
  * @author Jesse Doherty
+ * 
  */
+@Deprecated
 public interface FlowData
 {
 }
