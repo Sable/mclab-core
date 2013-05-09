@@ -16,22 +16,24 @@ import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
-import natlab.toolkits.analysis.HashMapFlowMap;
+import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
 import ast.ASTNode;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, Set<TIRNode>>> implements TamerPlusAnalysis
+public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<Map<String, Set<TIRNode>>> implements TamerPlusAnalysis
 {
     public static boolean DEBUG = false;
 
     private DefinedVariablesNameCollector fVariableNameCollector;
     private DefiniteAssignment fDefiniteAssignment;
-    private HashMapFlowMap<String, Set<TIRNode>> fStartMap;
+    private Map<String, Set<TIRNode>> fStartMap;
     private LinkedList<TIRNode> fVisitedStmts;
+    private static final Merger<Set<TIRNode>> UNION_MERGER = Mergers.union();
     
     public ReachingDefinitions(ASTNode<?> tree)
     {
@@ -53,8 +55,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     
     public void initializeStartMap()
     {
-        Merger<Set<TIRNode>> merger = Mergers.union();
-        fStartMap = new HashMapFlowMap<String, Set<TIRNode>>(merger);
+        fStartMap = Maps.newHashMap();
         for (String variableName : fVariableNameCollector.getDefinedVariablesFullSet())
         {
             fStartMap.put(variableName, new HashSet<TIRNode>());
@@ -161,7 +162,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         if (DEBUG) printMapForNode(node);
     }
     
-    public void populateOutSetWithDefinitionSitesForNode(Set<String> definedVariablesNames, HashMapFlowMap<String, Set<TIRNode>> outSet, TIRNode node)
+    public void populateOutSetWithDefinitionSitesForNode(Set<String> definedVariablesNames, Map<String, Set<TIRNode>> outSet, TIRNode node)
     {
         for (String variableName : definedVariablesNames)
         {
@@ -172,45 +173,25 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     }
     
     @Override
-    public void merge (HashMapFlowMap<String, Set<TIRNode>> in1, HashMapFlowMap<String, Set<TIRNode>> in2, HashMapFlowMap<String, Set<TIRNode>> out)
+    public Map<String, Set<TIRNode>> merge(Map<String, Set<TIRNode>> in1,
+        Map<String, Set<TIRNode>> in2)
     {
-        Set<String> keys = Sets.newHashSet(in1.keySet());
-        keys.addAll(in2.keySet());
-        for (String s : keys)
-        {
-            Set<TIRNode> result = Sets.newHashSet();
-            result.addAll(in1.get(s));
-            result.addAll(in2.get(s));
-            out.put(s, result);
-        }
+        return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
     }
 
     @Override
-    public void copy(HashMapFlowMap<String, Set<TIRNode>> in, HashMapFlowMap<String, Set<TIRNode>> out)
+    public Map<String, Set<TIRNode>> copy(Map<String, Set<TIRNode>> in)
     {
-        if (in == out)
+        Map<String, Set<TIRNode>> out = Maps.newHashMap();
+        for (String s : in.keySet())
         {
-            return;
+            out.put(s, Sets.newHashSet(in.get(s)));
         }
-        else
-        {
-            out.clear();
-            for (String s : in.keySet())
-            {
-                out.put(s, Sets.newHashSet(in.get(s)));
-            }
-        }
-    }
-    
-    private HashMapFlowMap<String, Set<TIRNode>> copy(HashMapFlowMap<String, Set<TIRNode>> in)
-    {
-        HashMapFlowMap<String, Set<TIRNode>> out = new HashMapFlowMap<String, Set<TIRNode>>();
-        copy(in, out);
         return out;
     }
     
     @Override
-    public HashMapFlowMap<String, Set<TIRNode>> newInitialFlow()
+    public Map<String, Set<TIRNode>> newInitialFlow()
     {
         return copy(fStartMap);
     }
@@ -223,7 +204,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     
     public Map<String, Set<TIRNode>> getReachingDefinitionsForNode(TIRNode node)
     {
-        return this.getOutFlowSets().get(node).toMap();
+        return this.getOutFlowSets().get(node);
     }
     
     public LinkedList<TIRNode> getVisitedStmtsOrderedList()
@@ -250,14 +231,14 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     
     private void printMapEntries(TIRNode node, StringBuffer sb)
     {
-        HashMapFlowMap<String, Set<TIRNode>> NameTodefinitionSiteMap = outFlowSets.get(node);
+        Map<String, Set<TIRNode>> NameTodefinitionSiteMap = outFlowSets.get(node);
         for (String variableName : NameTodefinitionSiteMap.keySet())
         {
             printMapEntry(variableName, NameTodefinitionSiteMap, sb);
         }
     }
     
-    private void printMapEntry(String variableName, HashMapFlowMap<String, Set<TIRNode>> NameTodefinitionSiteMap, StringBuffer sb)
+    private void printMapEntry(String variableName, Map<String, Set<TIRNode>> NameTodefinitionSiteMap, StringBuffer sb)
     {
         Set<TIRNode> reachingDefs = NameTodefinitionSiteMap.get(variableName);
         if (!reachingDefs.isEmpty())

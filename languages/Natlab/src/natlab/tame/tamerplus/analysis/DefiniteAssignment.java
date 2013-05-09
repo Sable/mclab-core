@@ -88,26 +88,15 @@ public class DefiniteAssignment extends TIRAbstractSimpleStructuralForwardAnalys
     }
 
     @Override
-    public void merge(HashSet<String> in1, HashSet<String> in2, HashSet<String> out)
+    public HashSet<String> merge(HashSet<String> in1, HashSet<String> in2)
     {
-        out.clear();
-        out.addAll(Sets.intersection(in1, in2));
+        return Sets.newHashSet(Sets.intersection(in1, in2));
     }
 
     @Override
-    public void copy(HashSet<String> source, HashSet<String> dest)
+    public HashSet<String> copy(HashSet<String> source)
     {
-        for (String varName : source)
-        {
-            dest.add(varName);
-        }
-    }
-    
-    public HashSet<String> copy(HashSet<String> in)
-    {
-        HashSet<String> out = Sets.newHashSet();
-        copy(in, out);
-        return out; 
+        return Sets.newHashSet(source);
     }
     
     private void setInOutSet(TIRNode node)

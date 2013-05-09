@@ -112,19 +112,18 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     }
     
     @Override
-    public void merge(HashSet<String> in1, HashSet<String> in2, HashSet<String> out)
+    public HashSet<String> merge(HashSet<String> in1, HashSet<String> in2)
     {
+        HashSet<String> out = Sets.newHashSet();
         out.addAll(in1);
         out.addAll(in2);
+        return out;
     }
 
     @Override
-    public void copy(HashSet<String> source, HashSet<String> dest)
+    public HashSet<String> copy(HashSet<String> source)
     {
-        for (String varName : source)
-        {
-            dest.add(varName);
-        }
+        return Sets.newHashSet(source);
     }
     
     public HashSet<String> newInitialFlow()
