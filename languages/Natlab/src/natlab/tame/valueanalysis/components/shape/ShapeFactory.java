@@ -99,7 +99,27 @@ public class ShapeFactory<V extends Value<V>> {
     }
     
     /**
-     * returns a 0x0 shape
+     * returns a out of bound shape
+     */
+    public Shape<V> getOutOfBoundShape() {
+    	List<DimValue> list = new ArrayList<DimValue>();
+    	Shape<V> outOfBoundShape = new Shape<V>(list);
+    	outOfBoundShape.flagOutOfBound();
+    	return outOfBoundShape;
+    }
+    
+    /**
+     * returns an mismatch shape
+     */
+    public Shape<V> getMismatchShape() {
+    	List<DimValue> list = new ArrayList<DimValue>();
+    	Shape<V> mismatchShape = new Shape<V>(list);
+    	mismatchShape.flagMismatch();
+    	return mismatchShape;
+    }
+    
+    /**
+     * returns an empty shape
      */
     public Shape<V> getEmptyShape() {
     	List<DimValue> list = new ArrayList<DimValue>();
