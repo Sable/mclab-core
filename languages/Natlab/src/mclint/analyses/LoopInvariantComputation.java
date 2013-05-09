@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.utils.NodeFinder;
@@ -34,6 +34,7 @@ import com.google.common.collect.Sets;
 public class LoopInvariantComputation extends AbstractNodeCaseHandler implements LintAnalysis {
   private static final String WARNING = "Consider computing %s outside the loop.";
 
+  private Project project;
   private ASTNode<?> tree;
   private Lint lint;
   private ReachingDefs reachingDefs;
@@ -42,8 +43,8 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   private Stack<Set<Expr>> invariantStack = new Stack<Set<Expr>>();
   private Set<Expr> reported = Sets.newHashSet();
 
-  public LoopInvariantComputation(AnalysisKit kit) {
-    this.tree = kit.getAST();
+  public LoopInvariantComputation(Project project) {
+    this.tree = project.asCompilationUnits();
   }
 
   private Message loopInvariant(ASTNode<?> node) {

@@ -10,6 +10,7 @@ import java.util.*;
  *
  * @see AbstractDepthFirstAnalysis
  */
+@Deprecated
 public abstract class AbstractPreorderAnalysis<A extends FlowSet> 
     extends AbstractDepthFirstAnalysis<A>
 {

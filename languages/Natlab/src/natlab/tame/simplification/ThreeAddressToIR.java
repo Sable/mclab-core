@@ -269,7 +269,6 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     @Override
     public void caseShellCommandStmt(ShellCommandStmt node) {
-        // TODO Auto-generated method stub
         super.caseShellCommandStmt(node);
     }
     

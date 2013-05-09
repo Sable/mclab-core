@@ -15,7 +15,7 @@ public class SPArglist<V extends Value<V>> extends SPNode<V> {
 	
 	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
 		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
-		if (next!=null) {
+		if (!matchResult.getIsError() && next!=null) {
 			ShapePropMatch<V> continueMatch = next.match(isPatternSide, matchResult, argValues, Nargout);
 			return continueMatch;
 		}

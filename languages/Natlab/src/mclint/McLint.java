@@ -1,6 +1,7 @@
 package mclint;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,34 +12,32 @@ import mclint.analyses.Shadowing;
 import mclint.analyses.UnreachableCode;
 import mclint.analyses.UnusedVar;
 import mclint.refactoring.Refactoring;
+import mclint.refactoring.RefactoringContext;
 import mclint.refactoring.Refactorings;
 import mclint.refactoring.RemoveUnusedVar;
 import mclint.reports.ReportGenerators;
-import mclint.transform.Transformer;
-import mclint.transform.Transformers;
-import mclint.util.Parsing;
 import natlab.options.Options;
+import natlab.refactoring.Exceptions.RefactorException;
 import natlab.utils.NodeFinder;
-import ast.CompilationUnits;
 import ast.Name;
 import ast.Program;
 
 import com.google.common.collect.ImmutableList;
 
 public class McLint {
-  
-  private static List<LintAnalysis> getBuiltinAnalyses(AnalysisKit kit) {
+
+  private static List<LintAnalysis> getBuiltinAnalyses(Project project) {
     return ImmutableList.<LintAnalysis>builder()
-        .add(new ChangedLoopVar(kit))
-        .add(new LoopInvariantComputation(kit))
-        .add(new OutputSuppression(kit))
-        .add(new UnusedVar(kit))
-        .add(new Shadowing(kit))
-        .add(new UnreachableCode(kit))
+        .add(new ChangedLoopVar(project))
+        .add(new LoopInvariantComputation(project))
+        .add(new OutputSuppression(project))
+        .add(new UnusedVar(project))
+        .add(new Shadowing(project))
+        .add(new UnreachableCode(project))
         .build();
   }
-  
-  private static List<LintAnalysis> getPluginAnalyses(AnalysisKit kit) {
+
+  private static List<LintAnalysis> getPluginAnalyses(Project project) {
     String pluginDirectoryName = System.getenv("MCLINT_PLUGIN_DIR");
     if (pluginDirectoryName == null) {
       return Collections.emptyList();
@@ -47,22 +46,22 @@ public class McLint {
     if (!pluginDirectory.exists()) {
       return Collections.emptyList();
     }
-    return AnalysisLoader.loadAnalyses(kit, pluginDirectory);
+    return AnalysisLoader.loadAnalyses(project, pluginDirectory);
   }
-  
-  private static List<LintAnalysis> getAllAnalyses(AnalysisKit kit) {
+
+  private static List<LintAnalysis> getAllAnalyses(Project project) {
     return ImmutableList.<LintAnalysis>builder()
-        .addAll(getBuiltinAnalyses(kit))
-        .addAll(getPluginAnalyses(kit))
+        .addAll(getBuiltinAnalyses(project))
+        .addAll(getPluginAnalyses(project))
         .build();
   }
-  
+
   private static boolean prompt(Message message, String prompt) {
     String decision = System.console().readLine("%s: %s %s (Y/n) ",
-            message.getLocation(), message.getDescription(), prompt);
+        message.getLocation(), message.getDescription(), prompt);
     return decision.isEmpty() || decision.startsWith("y") || decision.startsWith("Y");
   }
-  
+
   private static void registerBuiltinListeners(final Lint lint) {
     lint.registerListenerForMessageCode("UNUSED_VAR", new MessageListener() {
       @Override public boolean messageReported(Message message) {
@@ -73,32 +72,36 @@ public class McLint {
         return false;
       }
     });
-    
+
     lint.registerListenerForMessageCode("SHADOW_BUILTIN", new MessageListener() {
       @Override public boolean messageReported(Message message) {
         Name node = (Name) message.getAstNode();
-        if (prompt(message, "Rename?")) {
-          String newName = System.console().readLine("    rename %s to: ", node.getID());
-          Program parent = NodeFinder.findParent(Program.class, node);
-          Transformer transformer = Transformers.basic(parent);
-          Refactoring rename = Refactorings.renameVariable(transformer, node, newName,
-              lint.getKit().getUseDefDefUseChain());
-          rename.apply();
-          return true;
+        if (!prompt(message, "Rename?")) {
+          return false;
         }
-        return false;
+        String newName = System.console().readLine("    rename %s to: ", node.getID());
+        Program parent = NodeFinder.findParent(Program.class, node);
+        RefactoringContext context = RefactoringContext.create(parent.getMatlabProgram());
+        Refactoring rename = Refactorings.renameVariable(context, node, newName);
+        if (!rename.checkPreconditions()) {
+          for (RefactorException error : rename.getErrors()) {
+            System.err.println(error);
+          }
+          return false;
+        }
+        rename.apply();
+        return true;
       }
     });
   }
 
-  public static void main(Options options) {
-    CompilationUnits AST = Parsing.files(options.getFiles());
-    AnalysisKit kit = AnalysisKit.forAST(AST);
-    List<LintAnalysis> analyses = getAllAnalyses(kit);
-    Lint lint = Lint.create(kit, analyses);
+  public static void main(Options options) throws IOException {
+    Project project = Project.at(new File(options.getFiles().getFirst()));
+    List<LintAnalysis> analyses = getAllAnalyses(project);
+    Lint lint = Lint.create(project, analyses);
     registerBuiltinListeners(lint);
     lint.runAnalyses();
     lint.writeReport(ReportGenerators.plain(), System.out);
-    System.out.println(AST.getPrettyPrinted());
+    project.write();
   }
 }

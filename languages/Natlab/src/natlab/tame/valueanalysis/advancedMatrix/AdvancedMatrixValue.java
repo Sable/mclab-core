@@ -288,7 +288,6 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	@Override
 	public Shape<AggrValue<AdvancedMatrixValue>> getShape() {
-		// TODO Auto-generated method stub
 		return this.shape;
 	}
 }

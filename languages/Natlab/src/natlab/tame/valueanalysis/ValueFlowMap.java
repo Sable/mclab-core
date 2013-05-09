@@ -214,22 +214,4 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
     public boolean isViable(){
         return isViable;
     }
-    
-    /**
-     * fast merge does the same as merge, except it destroys the arguments or this.
-     * It's faster by returning a modified version of the argument - usually
-     * whichever ValueFlowMap had more elements in it
-     * TODO - remove this, probably
-    public ValueFlowMap<V> fastMerge(ValueFlowMap<V> other){
-        if (this.map.size() > other.map.size()){
-            this.union(other);
-            return this;
-        } else {
-            other.union(this);
-            return other;
-        }
-    }*/
-    
-   
-    
 }

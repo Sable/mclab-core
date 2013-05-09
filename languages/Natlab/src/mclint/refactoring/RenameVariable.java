@@ -1,43 +1,94 @@
 package mclint.refactoring;
 
 import static com.google.common.collect.Iterables.filter;
-import mclint.Location;
+
+import java.util.List;
+
+import mclint.MatlabProgram;
 import mclint.transform.Transformer;
+import natlab.refactoring.Exceptions.NameConflict;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
+import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
-import ast.CompilationUnits;
 import ast.Function;
+import ast.FunctionList;
 import ast.GlobalStmt;
 import ast.Name;
 import ast.Program;
 import ast.Script;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 class RenameVariable extends Refactoring {
   private Name node;
   private String newName;
   private UseDefDefUseChain udduChain;
-  public RenameVariable(Transformer transformer, Name node, String newName,
-      UseDefDefUseChain udduChain) {
-    super(transformer);
+  private boolean renameGlobally;
+
+  private List<Refactoring> globalRenames = Lists.newArrayList();
+
+  public RenameVariable(RefactoringContext context, Name node, String newName,
+      boolean renameGlobally) {
+    super(context);
     this.node = node;
     this.newName = newName;
-    this.udduChain = udduChain;
+    this.udduChain = context.getMatlabProgram().analyze().getUseDefDefUseChain();
+    this.renameGlobally = renameGlobally;
   }
 
-  public static class NameConflict extends RuntimeException {
-    private static final long serialVersionUID = 6581696075512377817L;
+  public RenameVariable(RefactoringContext context, Name node, String newName) {
+    this(context, node, newName, true);
+  }
 
-    public NameConflict(Name name) {
-      super(String.format("The name %s is already used at %s.", name.getID(), Location.of(name)));
+  private boolean targetNameIsGlobal() {
+    return Iterables.any(getAllDefsOfTargetName(), Predicates.instanceOf(GlobalStmt.class));
+  }
+
+  private void checkPreconditionsForFunctionOrScript(ASTNode<?> ast, MatlabProgram program) {
+    Name decl = findGlobalNamed(node.getID(), ast);
+    if (decl != null) {
+      RefactoringContext newContext = RefactoringContext.create(program);
+      Refactoring rename = new RenameVariable(newContext, decl, newName, false);
+      if (!rename.checkPreconditions()) {
+        addErrors(rename.getErrors());
+      }
+      globalRenames.add(rename);
     }
   }
-  
+
+  @Override
+  public boolean checkPreconditions() {
+    if (renameGlobally && targetNameIsGlobal()) {
+      for (MatlabProgram program : context.getProject().getMatlabPrograms()) {
+        Program ast = program.parse();
+        if (ast instanceof Script) {
+          checkPreconditionsForFunctionOrScript(ast, program);
+        } else {
+          for (Function f : ((FunctionList) ast).getFunctions()) {
+            checkPreconditionsForFunctionOrScript(f, program);
+          }
+        }
+      }
+      return getErrors().isEmpty();
+    }
+
+    ASTNode<?> parent = getParentFunctionOrScript(node);
+    Optional<Name> conflictingName = 
+        Iterables.tryFind(NodeFinder.find(Name.class, parent), AstPredicates.named(newName));
+    if (conflictingName.isPresent()) {
+      addError(new NameConflict(conflictingName.get()));
+      return false;
+    }
+    return true;
+  }
+
   private static ASTNode<?> getParentFunctionOrScript(ASTNode<?> node) {
     ast.Function f = NodeFinder.findParent(ast.Function.class, node);
     if (f != null) {
@@ -54,22 +105,7 @@ class RenameVariable extends Refactoring {
       }
     });
   }
-  
-  private void checkSafeRename() {
-    ASTNode<?> parent = getParentFunctionOrScript(node);
-    for (Name name : NodeFinder.find(Name.class, parent)) {
-      if (name.getID().equals(newName)) {
-        throw new NameConflict(name);
-      }
-    }
-  }
-  
-  private ASTNode<?> getRoot(Def node) {
-    Program program = NodeFinder.findParent(Program.class, (ASTNode<?>) node);
-    CompilationUnits cu = NodeFinder.findParent(CompilationUnits.class, program);
-    return Objects.firstNonNull(cu, program);
-  }
-  
+
   private static Name findGlobalNamed(final String name, ASTNode<?> tree) {
     return FluentIterable.from(NodeFinder.find(Name.class, tree))
         .firstMatch(new Predicate<Name>() {
@@ -81,22 +117,17 @@ class RenameVariable extends Refactoring {
         .orNull();
   }
 
-  public void apply(boolean renameGlobally) {
-    checkSafeRename();
-
-    for (Def def : getAllDefsOfTargetName()) {
-      if (def instanceof GlobalStmt && renameGlobally) {
-        ASTNode<?> parent = getParentFunctionOrScript(node);
-        for (Function f : NodeFinder.find(Function.class, getRoot(def))) {
-          if (parent == f) {
-            continue;
-          }
-          Name decl = findGlobalNamed(node.getID(), f);
-          if (decl != null) {
-            new RenameVariable(transformer, decl, newName, udduChain).apply(false);
-          }
-        }
+  @Override
+  public void apply() {
+    if (renameGlobally && !globalRenames.isEmpty()) {
+      for (Refactoring rename : globalRenames) {
+        rename.apply();
       }
+      return;
+    }
+
+    Transformer transformer = context.getMatlabProgram().getBasicTransformer();
+    for (Def def : getAllDefsOfTargetName()) {
       for (Name use : udduChain.getUsesOf(node.getID(), def)) {
         transformer.replace(use, new Name(newName)); 
       }
@@ -104,10 +135,5 @@ class RenameVariable extends Refactoring {
         transformer.replace(name, new Name(newName));
       }
     }
-  }
-
-  @Override
-  public void apply() {
-    apply(true);
   }
 }

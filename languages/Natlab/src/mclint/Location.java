@@ -1,9 +1,6 @@
 package mclint;
 
-import natlab.utils.NodeFinder;
 import ast.ASTNode;
-import ast.CompilationUnits;
-import ast.Program;
 
 import com.google.common.collect.ComparisonChain;
 
@@ -17,7 +14,7 @@ import com.google.common.collect.ComparisonChain;
 public class Location implements Comparable<Location> {
   private int line;
   private int column;
-  private String path;
+  private MatlabProgram program;
 
   public static Location of(ASTNode<?> node) {
     int line = node.getStartLine();
@@ -25,18 +22,7 @@ public class Location implements Comparable<Location> {
     // Some ASTNodes don't have position information...
     if (line == 0 && col == 0)
       return Location.of(node.getParent());
-    return new Location(getPathOf(node), line, col);
-  }
-
-  private static String getPathOf(ASTNode<?> node) {
-    Program program = null;
-    if (node instanceof CompilationUnits)
-      program = ((CompilationUnits)node).getProgram(0);
-    else if (node.getParent() instanceof CompilationUnits)
-      program = (Program)(node.getChild(0));
-    else
-      program = NodeFinder.findParent(Program.class, node);
-    return program.getFile().getPath();
+    return new Location(node.getMatlabProgram(), line, col);
   }
 
   public int getLine() {
@@ -47,25 +33,26 @@ public class Location implements Comparable<Location> {
     return column;
   }
 
-  public String getPath() {
-    return path;
+  public MatlabProgram getMatlabProgram() {
+    return program;
   }
 
   @Override
   public String toString() {
-    return String.format("%s [%d, %d]", path, line, column);
+    return String.format("%s [%d, %d]",
+        program == null ? "<string>" : program.getPath(), line, column);
   }
 
-  private Location(String path, int line, int column) {
+  private Location(MatlabProgram program, int line, int column) {
     this.line = line;
     this.column = column;
-    this.path = path;
+    this.program = program;
   }
 
   @Override
   public int compareTo(Location location) {
     return ComparisonChain.start()
-        .compare(getPath(), location.getPath())
+        .compare(getMatlabProgram().getPath(), location.getMatlabProgram().getPath())
         .compare(getLine(), location.getLine())
         .compare(getColumn(), location.getColumn())
         .result();

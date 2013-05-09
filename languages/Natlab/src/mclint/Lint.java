@@ -27,21 +27,22 @@ public class Lint {
   private List<Message> messages = Lists.newArrayList();
   private List<LintAnalysis> analyses;
   private Multimap<String, MessageListener> messageListeners = LinkedHashMultimap.create();
-  private AnalysisKit kit;
-  
+  private Project project;
+
   private List<Message> currentMessages = Lists.newArrayList();
 
-  public static Lint create(AnalysisKit kit, List<LintAnalysis> analyses) {
-    return new Lint(kit, analyses);
+  public static Lint create(Project project, List<LintAnalysis> analyses) {
+    return new Lint(project, analyses);
   }
 
-  private Lint(AnalysisKit kit, List<LintAnalysis> analyses) {
-    this.kit = kit;
+  private Lint(Project project, List<LintAnalysis> analyses) {
+    this.project = project;
     this.analyses = analyses;
   }
-  
+
   public AnalysisKit getKit() {
-    return kit;
+    // TODO fix this, this is just to make it compile
+    return AnalysisKit.forAST(project.asCompilationUnits());
   }
 
   public void registerListenerForMessageCode(String code, MessageListener listener) {
@@ -65,7 +66,8 @@ public class Lint {
             messages.add(message);
           } else {
             changed = true;
-            kit.notifyTreeChanged();
+            // TODO figure out what to do with this line
+            // kit.notifyTreeChanged();
           }
         }
       }
@@ -86,7 +88,7 @@ public class Lint {
       e.printStackTrace();
     }
   }
-  
+
   private static Predicate<MessageListener> addressesMessage(final Message message) {
     return new Predicate<MessageListener>() {
       @Override public boolean apply(MessageListener listener) {

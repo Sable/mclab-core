@@ -124,4 +124,10 @@ public class Exceptions {
 			sym=name;
 		}
 	};
+	
+	public static class NameConflict extends RefactorException{
+	  public NameConflict (Name name) {
+	    sym=name;
+	  }
+	};
 }

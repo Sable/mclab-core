@@ -2,6 +2,7 @@ package natlab.tame.valueanalysis.aggrvalue;
 
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.path.FunctionReference;
@@ -19,8 +20,10 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
 	 * constructor builds shape factor
 	 */
 	ShapeFactory<AggrValue<D>> shapeFactory;
+	isComplexInfoFactory<AggrValue<D>> isComplexFactory;
 	public AggrValueFactory(){
 		this.shapeFactory = new ShapeFactory<AggrValue<D>>();
+		this.isComplexFactory = new isComplexInfoFactory<AggrValue<D>>(this); //added by Vineet
 	}
 	
 	
@@ -73,5 +76,9 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
      */
     public ShapeFactory<AggrValue<D>> getShapeFactory(){
     	return shapeFactory;
+    }
+    
+    public isComplexInfoFactory<AggrValue<D>> getIsComplexInfoFactory(){
+    	return isComplexFactory;
     }
 }

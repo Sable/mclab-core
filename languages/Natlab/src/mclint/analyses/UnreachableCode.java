@@ -3,10 +3,10 @@ package mclint.analyses;
 import java.util.Arrays;
 import java.util.List;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
@@ -25,8 +25,8 @@ public class UnreachableCode extends AbstractNodeCaseHandler implements LintAnal
   private ASTNode<?> tree;
   private Lint lint;
 
-  public UnreachableCode(AnalysisKit kit) {
-    this.tree = kit.getAST();
+  public UnreachableCode(Project project) {
+    this.tree = project.asCompilationUnits();
   }
 
   private Message unreachableCode(ASTNode<?> node) {

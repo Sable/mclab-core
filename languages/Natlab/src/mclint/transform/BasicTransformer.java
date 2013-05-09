@@ -24,6 +24,11 @@ class BasicTransformer implements Transformer {
   public void remove(ASTNode<?> node) {
     AstUtil.remove(node);
   }
+  
+  @Override
+  public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
+    node.insertChild(newNode, i);
+  }
 
   @Override
   public Program getProgram() {

@@ -42,43 +42,11 @@ public class TIRFunction extends Function implements TIRNode {
         }
         return list;
     }
-    
-    // *** getter methods ********************************************************
+
     @Override
     public TIRStatementList getStmtList() {
-        // TODO Auto-generated method stub
         return (TIRStatementList)super.getStmtList();
     }
-    
-    
-     @Override
-    public Map<String, Function> getNested() {
-        // TODO Auto-generated method stub
-        return super.getNested();
-    }
-     
-    @Override
-    public Function getNestedFunction(int i) {
-        // TODO Auto-generated method stub
-        return super.getNestedFunction(i);
-    }
-    
-    @Override
-    public List<Function> getNestedFunctionList() {
-        // TODO Auto-generated method stub
-        return super.getNestedFunctionList();
-    }
-    
-    @Override
-    public List<Function> getNestedFunctions() {
-        // TODO Auto-generated method stub
-        return super.getNestedFunctions();
-    }
-    
-    //*** setter methods ***********************************************************
-    
-    
-    
     
     @Override
     public void tirAnalyze(TIRNodeCaseHandler irHandler) {

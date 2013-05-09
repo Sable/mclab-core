@@ -1453,7 +1453,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[m,n],[n,k]->[m,k]||$,[m,n]->[m,n]||[m,n],$->[m,n]");
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->M||[m,n],[n,k]->[m,k]");
             }
             return shapePropInfo;
         }

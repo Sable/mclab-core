@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
  *
  * @author Jesse Doherty
  */
+@Deprecated
 public class HashMapFlowMap<K,V> extends AbstractFlowMap<K,V>
 {
     Map<K,V> map = Maps.newHashMap();

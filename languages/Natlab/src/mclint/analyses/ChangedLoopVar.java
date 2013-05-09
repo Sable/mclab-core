@@ -3,10 +3,10 @@ package mclint.analyses;
 import java.util.HashSet;
 import java.util.Set;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
+import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import ast.ForStmt;
 import ast.Name;
@@ -25,8 +25,8 @@ public class ChangedLoopVar extends DefinitionVisitor implements LintAnalysis {
     return Message.regarding(node, "CHANGED_LOOP_VAR", String.format(WARNING, node.getID()));
   }
 
-  public ChangedLoopVar(AnalysisKit kit) {
-    super(kit.getAST());
+  public ChangedLoopVar(Project project) {
+    super(project.asCompilationUnits());
   }
 
   @Override

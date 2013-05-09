@@ -1,0 +1,29 @@
+import mclint.Project;
+import mclint.MatlabProgram;
+import natlab.utils.NodeFinder;
+
+aspect McLint {
+  private Project CompilationUnits.project;
+
+  public void CompilationUnits.setProject(Project project) {
+    this.project = project;
+  }
+
+  public Project CompilationUnits.getProject() {
+    return project;
+  }
+
+  private MatlabProgram Program.matlabProgram;
+
+  public void Program.setMatlabProgram(MatlabProgram program) {
+    this.matlabProgram = program;
+  }
+
+  public MatlabProgram Program.getMatlabProgram() {
+    return matlabProgram;
+  }
+
+  public MatlabProgram ASTNode.getMatlabProgram() {
+    return NodeFinder.findParent(Program.class, this).getMatlabProgram();
+  }
+}

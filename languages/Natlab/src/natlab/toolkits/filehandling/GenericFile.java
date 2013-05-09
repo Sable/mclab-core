@@ -147,7 +147,7 @@ public abstract class GenericFile implements Serializable {
     
         
     public static GenericFile create(String filename){
-        return new FileFile(filename); //TODO
+        return new FileFile(filename);
     }
     public static GenericFile create(File file){
         return new FileFile(file);

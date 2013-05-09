@@ -1,6 +1,12 @@
 package natlab.toolkits.analysis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -9,6 +15,7 @@ import java.util.*;
  * NOTE: union, intersection, difference probably don't behave as
  * expected. 
  */
+@Deprecated
 public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
 {
     protected HashMap<K,V> map;
@@ -31,6 +38,7 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     /**
      * Shallow copies the underlying HashMap
      */
+    @Override
     public HashMapFlowSet<K,V> copy()
     {
         HashMap<K,V> cloneMap = new HashMap<K,V>(map);
@@ -40,18 +48,22 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     /**
      * Clears the underlying HashSet
      */
+    @Override
     public void clear()
     {
         map.clear();
     }
+    @Override
     public boolean isEmpty()
     {
         return map.isEmpty();
     }
+    @Override
     public int size()
     {
         return map.size();
     }
+    @Override
     public void add(Map.Entry<K,V> entry)
     {
         map.put(entry.getKey(), entry.getValue());
@@ -62,6 +74,7 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     }
 
     //public boolean remove(Map.Entry<K,V> entry)
+    @Override
     public boolean remove(Object obj)
     {
         return map.entrySet().remove(obj);
@@ -70,6 +83,7 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     {
         return map.remove(key) == null;
     }
+    @Override
     public boolean contains( Object entry )
     {
         return map.entrySet().contains( entry );
@@ -91,11 +105,13 @@ public class HashMapFlowSet<K,V> extends AbstractFlowSet<Map.Entry<K,V>>
     {
         return map.values();
     }
+    @Override
     public Iterator<Map.Entry<K,V>> iterator()
     {
         return map.entrySet().iterator();
     }
 
+    @Override
     public HashMapFlowSet<K,V> emptySet()
     {
         return new HashMapFlowSet<K,V>( new HashMap<K,V>() );

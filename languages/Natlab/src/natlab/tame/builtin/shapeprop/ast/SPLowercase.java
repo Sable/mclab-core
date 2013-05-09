@@ -61,8 +61,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 						if (!previousMatchResult.getValueOfVariable(s).getIntValue()
 								.equals(argumentShape.getDimensions().get(index).getIntValue())) {
 							System.err.println("two same lowercase's values are not equal" +
-									", throw error shape!");
-							System.err.println("MATLAB syntax error!");
+									", go to next pattern matching!");
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;
 						}

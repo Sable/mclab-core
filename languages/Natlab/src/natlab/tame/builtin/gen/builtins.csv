@@ -245,7 +245,7 @@ arrayBinaryArithmetic; arrayBinaryNumericFunction
 -MatlabClass(logical 0->error, parent)
 -Shape([m,n],[n,k]->[m,k])
 -isComplex(X,X ->R || R,R ->R || A,A->NUMXARGS>0?X:A)
-mtimes;; MatlabClass(logical 0->double, parent);; Shape([m,n],[n,k]->[m,k]||$,[m,n]->[m,n]||[m,n],$->[m,n])
+mtimes;; MatlabClass(logical 0->double, parent);; Shape($|M,$|M->M||[m,n],[n,k]->[m,k])
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic

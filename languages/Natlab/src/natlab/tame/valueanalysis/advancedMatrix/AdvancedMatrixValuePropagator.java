@@ -140,4 +140,43 @@ public class AdvancedMatrixValuePropagator extends
 								.get(0)));// FIXME a little bit
 											// tricky
 	}
+	
+	@Override
+	public Res<AggrValue<AdvancedMatrixValue>> caseCellhorzcat(Builtin builtin,
+			Args<AggrValue<AdvancedMatrixValue>> elements) {
+		ValueSet<AggrValue<AdvancedMatrixValue>> values = ValueSet
+				.newInstance(elements);
+		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
+				.newShapeFromValues(
+						Args.newInstance(factory.newMatrixValue(null, 1),
+								factory.newMatrixValue(null, elements.size())));
+		return Res
+				.<AggrValue<AdvancedMatrixValue>> newInstance(new CellValue<AdvancedMatrixValue>(
+						this.factory, shape, values));
+	}
+
+	@Override
+	public Res<AggrValue<AdvancedMatrixValue>> caseCellvertcat(Builtin builtin,
+			Args<AggrValue<AdvancedMatrixValue>> elements) {
+		ValueSet<AggrValue<AdvancedMatrixValue>> values = ValueSet
+				.newInstance(elements);
+		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
+				.newShapeFromValues(
+						Args.newInstance(
+								factory.newMatrixValue(null, elements.size()),
+								factory.newMatrixValue(null, 1)));
+		return Res
+				.<AggrValue<AdvancedMatrixValue>> newInstance(new CellValue<AdvancedMatrixValue>(
+						this.factory, shape, values));
+	}
+
+	@Override
+	public Res<AggrValue<AdvancedMatrixValue>> caseCell(Builtin builtin,
+			Args<AggrValue<AdvancedMatrixValue>> arg) {
+		return Res
+				.<AggrValue<AdvancedMatrixValue>> newInstance(new CellValue<AdvancedMatrixValue>(
+						this.factory, factory.getShapeFactory()
+								.newShapeFromValues(arg), ValueSet
+								.<AggrValue<AdvancedMatrixValue>> newInstance()));
+	}
 }

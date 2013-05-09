@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
  * 
  * @author Jesse Doherty
  */
+@Deprecated
 public abstract class AbstractFlowMap<K,V> implements FlowMap<K,V>
 {
     protected Merger<V> merger;

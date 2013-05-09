@@ -10,6 +10,7 @@ import mclint.util.AstUtil;
 import mclint.util.Parsing;
 
 import org.antlr.runtime.ANTLRReaderStream;
+import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
 import ast.ASTNode;
@@ -41,11 +42,13 @@ class LayoutPreservingTransformer implements Transformer {
     return new LayoutPreservingTransformer(program, tokens, tokensByPosition);
   }
   
+  @Override
   public void remove(ASTNode<?> node) {
     tokensOf(node).clear();
     AstUtil.remove(node);
   }
   
+  @Override
   public void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     List<Token> tokens = tokensOf(oldNode);
     tokens.clear();
@@ -58,6 +61,22 @@ class LayoutPreservingTransformer implements Transformer {
     AstUtil.replace(oldNode, newNode);
   }
   
+  private Token newline() {
+    return new ClassicToken(1, "\n");
+  }
+  
+  @Override
+  public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
+    List<Token> tokens = null;
+    if (i >= node.getNumChild()) {
+      tokens = tokensOf(node.getChild(node.getNumChild() - 1));
+    } else {
+      tokens = tokensOf(node.getChild(i - 1));
+    }
+    tokens.addAll(getTokens(newNode));
+    tokens.add(newline());
+    node.insertChild(newNode, i);
+  }
 
   private List<Token> tokensOf(ASTNode<?> node) {
     return tokens.subList(startIndex(node), endIndex(node) + 1);
