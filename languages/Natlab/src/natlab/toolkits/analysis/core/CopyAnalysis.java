@@ -87,20 +87,13 @@ public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<Map<St
 	}
 	
 	@Override
-	public void copy(Map<String, AssignStmt> source, Map<String, AssignStmt> dest) {
-		if (source == dest) {
-		  return;
-		}
-		dest.clear();
-		dest.putAll(source);
+	public Map<String, AssignStmt> copy(Map<String, AssignStmt> source) {
+		return Maps.newHashMap(source);
 	}
 
 	@Override
-	public void merge(Map<String, AssignStmt> in1,
-			Map<String, AssignStmt> in2, Map<String, AssignStmt> out) {
-		Map<String, AssignStmt> res = Maps.difference(in1, in2).entriesInCommon();
-		out.clear();
-		out.putAll(res);
+	public Map<String, AssignStmt> merge(Map<String, AssignStmt> in1, Map<String, AssignStmt> in2) {
+	    return Maps.newHashMap(Maps.difference(in1, in2).entriesInCommon());
 	}
 
 	@Override

@@ -1,20 +1,59 @@
 package natlab.tame.valueanalysis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.interproceduralAnalysis.*;
-import natlab.tame.tir.*;
-import natlab.tame.tir.analysis.*;
-import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.interproceduralAnalysis.Call;
+import natlab.tame.interproceduralAnalysis.Callsite;
+import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
+import natlab.tame.tir.TIRAbstractCreateFunctionHandleStmt;
+import natlab.tame.tir.TIRArrayGetStmt;
+import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRAssignLiteralStmt;
+import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRCellArrayGetStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRCommentStmt;
+import natlab.tame.tir.TIRCopyStmt;
+import natlab.tame.tir.TIRCreateLambdaStmt;
+import natlab.tame.tir.TIRDotGetStmt;
+import natlab.tame.tir.TIRDotSetStmt;
+import natlab.tame.tir.TIRForStmt;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRWhileStmt;
+import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
+import natlab.tame.tir.analysis.TIRParentForwardingNodeCasehandler;
+import natlab.tame.valueanalysis.aggrvalue.FunctionHandleValue;
+import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
+import natlab.tame.valueanalysis.components.constant.LogicalConstant;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.ValueFactory;
+import natlab.tame.valueanalysis.value.ValuePropagator;
 import natlab.toolkits.path.FunctionReference;
-import ast.*;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ColonExpr;
+import ast.Expr;
+import ast.Function;
+import ast.Name;
+import ast.NameExpr;
+import ast.Stmt;
 
 /**
  * This analysis attempts to find the class of every variable.
@@ -98,13 +137,13 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
 
     /*********** inherited stuff **************************************/
     @Override
-    public void copy(ValueFlowMap<V> source, ValueFlowMap<V> dest) {
-        dest.copyOtherIntoThis(source);
+    public ValueFlowMap<V> copy(ValueFlowMap<V> source) {
+      return source.copy();
     }
 
     @Override
-    public void merge(ValueFlowMap<V> in1, ValueFlowMap<V> in2, ValueFlowMap<V> out) {
-        out.copyOtherIntoThis(in1.merge(in2));
+    public ValueFlowMap<V> merge(ValueFlowMap<V> in1, ValueFlowMap<V> in2) {
+      return in1.merge(in2);
     }
 
     @Override

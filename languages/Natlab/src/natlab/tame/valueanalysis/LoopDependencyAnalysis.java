@@ -24,17 +24,16 @@ extends TIRAbstractSimpleStructuralForwardAnalysis<Map<String, Set<String>>> {
 	}
 
 	@Override
-	public void merge(Map<String, Set<String>> in1,
-			Map<String, Set<String>> in2, Map<String, Set<String>> out) {
+	public Map<String, Set<String>> merge(Map<String, Set<String>> in1,
+			Map<String, Set<String>> in2) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	@Override
-	public void copy(Map<String, Set<String>> source,
-			Map<String, Set<String>> dest) {
+	public Map<String, Set<String>> copy(Map<String, Set<String>> source) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
     
     /**

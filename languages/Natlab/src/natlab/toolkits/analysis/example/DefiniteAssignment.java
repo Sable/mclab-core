@@ -1,9 +1,13 @@
 package natlab.toolkits.analysis.example;
 
-import ast.*;
-import java.util.*;
-import analysis.*;
-import natlab.toolkits.analysis.*;
+import natlab.toolkits.analysis.HashSetFlowSet;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Function;
+import ast.Name;
+import ast.Script;
+import ast.Stmt;
 
 public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis< HashSetFlowSet<String> >
 {
@@ -20,19 +24,15 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
     }
 
     public void caseFunction( Function node ){
-        HashSetFlowSet<String> mySet = newInitialFlow();
-        for( Name n: node.getInputParams() )
-            mySet.add( n.getID() );
         currentOutSet = newInitialFlow();
-        copy(mySet, currentOutSet);
+        for( Name n: node.getInputParams() )
+            currentOutSet.add( n.getID() );
         caseASTNode( node );
         outFlowSets.put(node, currentOutSet);
     }
 
     public void caseScript( Script node ){
-        HashSetFlowSet<String> mySet = newInitialFlow();
         currentOutSet = newInitialFlow();
-        copy(mySet, currentOutSet);
         caseASTNode( node );   
         outFlowSets.put(node, currentOutSet);
     }
@@ -42,8 +42,7 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
         inFlowSets.put(node, currentInSet.copy() );
         //This line was not in the slides, it is here to make sure that the assignStmt 
         //actually owns the outset it is modifying.
-        currentOutSet = newInitialFlow();
-        copy( currentInSet, currentOutSet);
+        currentOutSet = copy(currentInSet);
         for( String s: node.getLValues()){
             currentOutSet.add( s );
         }
@@ -59,13 +58,15 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
         outFlowSets.put( node, currentInSet );
     }
     
-    public void copy( HashSetFlowSet<String> source, HashSetFlowSet<String> dest )
+    public HashSetFlowSet<String> copy( HashSetFlowSet<String> source)
     {
-        source.copy(dest);
+      return source.copy();
     }
     
-    public void merge( HashSetFlowSet<String> in1, HashSetFlowSet<String> in2, HashSetFlowSet<String> out )
+    public HashSetFlowSet<String> merge( HashSetFlowSet<String> in1, HashSetFlowSet<String> in2)
     {
+        HashSetFlowSet<String> out = new HashSetFlowSet<String>();
         in1.intersection( in2, out );
+        return out;
     }
 }

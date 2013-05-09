@@ -124,8 +124,9 @@ public abstract class NatlabAbstractStructuralAnalysis<A > extends nodecases.Abs
     {
         node.analyze( helper );
     }
-    public abstract void merge(A in1, A in2, A out);
-    public abstract void copy(A source, A dest);
+
+    public abstract A merge(A in1, A in2);
+    public abstract A copy(A source);
 
     public A getCurrentOutSet()
     {

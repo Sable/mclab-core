@@ -69,27 +69,15 @@ public class DefinitelyAssignedAnalysis extends
   }
 
   @Override
-  public void copy(Set<String> source, Set<String> dest) {
-    if (source == dest) {
-      return;
-    }
-    dest.clear();
-    dest.addAll(source);
+  public Set<String> copy(Set<String> source) {
+    return Sets.newHashSet(source);
   }
 
   @Override
-  public void merge(Set<String> in1, Set<String> in2, Set<String> out) {
-    if (in1 == in2 && in2 == out) {
-      return;
-    }
-    if (in1 == out) {
-      out.retainAll(in2);
-    } else if (in2 == out) {
-      out.retainAll(in1);
-    }
-    out.clear();
-    out.addAll(in1);
+  public Set<String> merge(Set<String> in1, Set<String> in2) {
+    Set<String> out = Sets.newHashSet(in1);
     out.retainAll(in2);
+    return out;
   }
 
   @Override

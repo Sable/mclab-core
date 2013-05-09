@@ -74,29 +74,15 @@ public class ReachingDefs extends
   }
 
   @Override
-  public void merge(Map<String, Set<Def>> in1,
-          Map<String, Set<Def>> in2, Map<String, Set<Def>> out) {
-    if (in1 == in2 && in2 == out) {
-      return;
-    }
-    if (in1 != out && in2 != out) {
-      out.clear();
-    }
-    out.putAll(MergeUtil.unionMerge(in1, in2, UNION_MERGER));
+  public Map<String, Set<Def>> merge(Map<String, Set<Def>> in1, Map<String, Set<Def>> in2) {
+    return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
   }
 
   @Override
-  public void copy(Map<String, Set<Def>> in, Map<String, Set<Def>> out) {
-    if (in == out)
-      return;
-    out.clear();
-    for (String i : in.keySet())
-      out.put(i, Sets.newHashSet(in.get(i)));
-  }
-
   public Map<String, Set<Def>> copy(Map<String, Set<Def>> in) {
     Map<String, Set<Def>> out = Maps.newHashMap();
-    copy(in, out);
+    for (String i : in.keySet())
+      out.put(i, Sets.newHashSet(in.get(i)));
     return out;
   }
 

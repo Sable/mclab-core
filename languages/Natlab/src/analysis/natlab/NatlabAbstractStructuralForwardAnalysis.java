@@ -18,9 +18,18 @@
 
 package analysis.natlab;
 
-import analysis.*;
-import ast.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Stack;
+
+import analysis.AbstractStructuralBackwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.ForStmt;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.WhileStmt;
 
 public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysis.AbstractStructuralAnalysis<A>
 {
@@ -144,8 +153,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
 
     protected A saveInSet( ASTNode node )
     {
-        A inSet = newInitialFlow();
-        copy( currentInSet, inSet );
+        A inSet = copy(currentInSet);
         setInFlow( node, inSet );
         return inSet;
     }
@@ -160,18 +168,13 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
 
     protected A backupSet(A outSet)
     {
-        A backup = newInitialFlow();
-        copy( outSet, backup );
-        return backup;
+      return copy(outSet);
     }
     protected A mergeOuts( A outSet, A newSet )
     {
-        A merged = newInitialFlow();
         if( newSet == null )
-            copy( outSet, merged );
-        else
-            merge( outSet, newSet, outSet );
-        return outSet;
+            return copy(outSet);
+        return merge(outSet, newSet);
     }
 
     public void caseForStmt( ForStmt node)
@@ -223,7 +226,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
             
             caseLoopVarAsUpdate( loopVar );
 
-            merge( loopInSet, currentOutSet, currentOutSet );
+            currentOutSet = merge(loopInSet, currentOutSet);
             currentInSet = currentOutSet;
             
             caseLoopVarAsCondition( loopVar );
@@ -274,8 +277,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
         ASTNode body = node.getStmts();
 
         //saving the in set of the loop
-        A loopInSet = newInitialFlow();
-        copy( currentInSet, loopInSet );
+        A loopInSet = copy(currentInSet);
         setInFlow( node, loopInSet );
         
         //process loop conditional and store result
@@ -307,8 +309,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
             }
             //store the current out in previousOut for later
             //comparison
-            previousOut = newInitialFlow();
-            copy( currentOutSet, previousOut );
+            previousOut = copy(currentOutSet);
 
             //initialize the continue and break lists
             loopFlowsets.initLists();
@@ -325,11 +326,10 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
                 System.out.println(" whilestmt: continueSet: ");
                 System.out.println(continueSet);
             }
-            mergedOut = newInitialFlow();
             if( continueSet == null )
-                copy( currentOutSet, mergedOut );
+                mergedOut = copy(currentOutSet);
             else
-                merge( currentOutSet, continueSet, mergedOut );
+                mergedOut = merge(currentOutSet, continueSet);
             if(DEBUG){
                 System.out.println(" whilestmt: merged current and continue: ");
                 System.out.println(mergedOut);
@@ -343,7 +343,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
 
             //setup in for loop condition case
             //first merge the mergedout with the loop in
-            merge( loopInSet, mergedOut, mergedOut );
+            mergedOut = merge(loopInSet, mergedOut);
             currentInSet = backupSet( mergedOut );
             if(DEBUG){
                 System.out.println(" whilestmt: merged loopInSet and mergedOut: ");
@@ -440,7 +440,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
                 mergedOuts = backupSet( currentOutSet );
             }
             else{
-                merge( currentOutSet, mergedOuts, mergedOuts );
+              mergedOuts = merge(currentOutSet, mergedOuts);
             }
         }
         //if an elseBlock exists, process it, otherwise merge the
@@ -464,12 +464,12 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
             if(DEBUG)
                 System.out.println("merging " + currentOutSet.toString()+
                         "\n  and "+mergedOuts );
-            merge( currentOutSet, mergedOuts, mergedOuts );
+            mergedOuts = merge(currentOutSet, mergedOuts);
             if(DEBUG)
                 System.out.println("result " + mergedOuts.toString());
         }
         else{
-            merge( nextIn, mergedOuts, mergedOuts );
+          mergedOuts = merge(nextIn, mergedOuts);
         }
 
         //set and store the outset

@@ -110,25 +110,15 @@ public class LivenessAnalysis extends
 	}
 
 	@Override
-	public void copy(Set<String> source, Set<String> dest) {
-		if (source == dest) {
-		  return;
-		}
-		dest.clear();
-		dest.addAll(source);
+	public Set<String> copy(Set<String> source) {
+	  return Sets.newHashSet(source);
 	}
 
 	@Override
-	public void merge(Set<String> in1, Set<String> in2, Set<String> out) {
-	    if (out != in1 && out != in2) {
-	      out.clear();
-	    }
-	    if (out != in1) {
-	      out.addAll(in1);
-	    }
-	    if (out != in2) {
-	      out.addAll(in2);
-	    }
+	public Set<String> merge(Set<String> in1, Set<String> in2) {
+	  Set<String> out = Sets.newHashSet(in1);
+	  out.addAll(in2);
+	  return out;
 	}
 
 	@Override

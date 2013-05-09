@@ -18,11 +18,12 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
-
-import ast.*;
-import java.util.*;
+import analysis.AbstractStructuralBackwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BreakStmt;
+import ast.ContinueStmt;
+import ast.Expr;
 
 /**
  * A simple abstract implementation of a
@@ -47,14 +48,12 @@ public abstract class NatlabAbstractSimpleStructuralBackwardAnalysis<A> extends 
     public void caseBreakStmt( BreakStmt node )
     {
         LoopFlowsets loop = loopStack.peek();
-        currentOutSet = newInitialFlow();
-        copy( loop.getBreakInFlow(), currentOutSet );
+        currentOutSet = copy(loop.getBreakInFlow());
     }
     public void caseContinueStmt( ContinueStmt node )
     {
         LoopFlowsets loop = loopStack.peek();
-        currentOutSet = newInitialFlow();
-        copy( loop.getBreakInFlow(), currentOutSet );
+        currentOutSet = copy(loop.getBreakInFlow());
     }
     public void caseCondition( Expr condExpr )
     {

@@ -58,23 +58,14 @@ public class MaybeLive
      * Merges the two sets by using the union defined by {@link
      * HashSetFlowSet}. 
      */
-    public void merge( HashSetFlowSet<String> in1, 
-                       HashSetFlowSet<String> in2,
-                       HashSetFlowSet<String> out )
+    public HashSetFlowSet<String> merge( HashSetFlowSet<String> in1, 
+                       HashSetFlowSet<String> in2)
     {
+        HashSetFlowSet<String> out = new HashSetFlowSet<String>();
         in1.union( in2, out );
+        return out;
     }
 
-    /**
-     * Copies {@code in} into {@code out} by using {@code in}'s {@code
-     * copy(...)} method.
-     */
-    public void copy( HashSetFlowSet<String> in,
-                      HashSetFlowSet<String> out )
-    {
-        in.copy(out);
-    }
-    
     /**
      * Returns a copy of {@code in} by using it's {@code copy()}
      * method. 

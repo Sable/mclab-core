@@ -18,11 +18,17 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
+import java.util.Stack;
 
-import ast.*;
-import java.util.*;
+import analysis.AbstractStructuralForwardAnalysis;
+import analysis.BackwardsAnalysisHelper;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.ForStmt;
+import ast.IfStmt;
+import ast.WhileStmt;
 
 
 public abstract class NatlabAbstractStructuralBackwardAnalysis<A> extends analysis.AbstractStructuralAnalysis<A>
@@ -76,16 +82,13 @@ public abstract class NatlabAbstractStructuralBackwardAnalysis<A> extends analys
 
     protected A saveOutSet( ASTNode node )
     {
-        A outSet = newInitialFlow();
-        copy( currentOutSet, outSet );
+        A outSet = copy(currentOutSet);
         outFlowSets.put( node, outSet );
         return outSet;
     }
     protected A backupSet(A outSet)
     {
-        A backup = newInitialFlow();
-        copy( outSet, backup );
-        return backup;
+        return copy(outSet);
     }
     public void caseForStmt(ForStmt node)
     {
@@ -113,7 +116,7 @@ public abstract class NatlabAbstractStructuralBackwardAnalysis<A> extends analys
             setupContinues();
             analyze( body );
 
-            merge( loopOutSet, currentInSet, currentInSet );
+            currentInSet = merge(loopOutSet, currentInSet);
 
             currentOutSet = currentInSet;
             caseLoopVarAsCondition( loopVar );
@@ -150,7 +153,7 @@ public abstract class NatlabAbstractStructuralBackwardAnalysis<A> extends analys
             
             analyze( body );
         
-            merge( loopOutSet, currentInSet, currentInSet );
+            currentInSet = merge(loopOutSet, currentInSet);
 
             currentOutSet = currentInSet;
             
@@ -188,8 +191,7 @@ public abstract class NatlabAbstractStructuralBackwardAnalysis<A> extends analys
             currentInSet = backupSet( ifOutSet );
             body = node.getIfBlock(i).getStmts();
             analyze( body );
-            currentOutSet = newInitialFlow();
-            merge( previousIn, currentInSet, currentOutSet );
+            currentOutSet = merge(previousIn, currentInSet);
             condition = node.getIfBlock(i).getCondition();
             caseCondition( condition );
             previousIn = currentInSet;

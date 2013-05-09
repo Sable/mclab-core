@@ -135,17 +135,19 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         //DEBUG = true;
     }
     
-    public void copy( HandleFlowset source, HandleFlowset dest)
+    public HandleFlowset copy( HandleFlowset source)
     {
-        source.copy(dest);
+        return source.copy();
     }
 
     /**
      * Merge is union because computing all possible targets for handles.
      */
-    public void merge( HandleFlowset in1, HandleFlowset in2, HandleFlowset out)
+    public HandleFlowset merge( HandleFlowset in1, HandleFlowset in2)
     {
+        HandleFlowset out = new HandleFlowset();
         in1.union(in2, out);
+        return out;
     }
 
     //Begin cases
