@@ -37,14 +37,14 @@ public class NodeFinder {
         toVisit.push(tree);
         return new AbstractIterator<ASTNode<?>>() {
           @Override protected ASTNode<?> computeNext() {
-            while (!toVisit.empty()) {
-              ASTNode<?> next = toVisit.pop();
-              for (int i = 0; i < next.getNumChild(); i++) {
-                toVisit.push(next.getChild(i));
-              }
-              return next;
+            if (toVisit.empty()) {
+              return endOfData();
             }
-            return endOfData();
+            ASTNode<?> next = toVisit.pop();
+            for (ASTNode<?> child : next) {
+              toVisit.push(child);
+            }
+            return next;
           }
         };
       }
