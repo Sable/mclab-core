@@ -228,6 +228,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	 * since if a shape has trailing 1s which can be eliminated, 
     	 * its isTop, mismatch and outOfBound must be false. 
     	 */
+    	if (dimensions.size()==0) return this;
     	List<DimValue> newDim = new ArrayList<DimValue>();
     	int pos = 0; 
     	/*
@@ -250,6 +251,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     public Shape<V> eliminateLeadingOnes() {
+    	if (dimensions.size()==0) return this;
     	List<DimValue> newDim = new ArrayList<DimValue>();
     	int pos = 0; 
     	/*
