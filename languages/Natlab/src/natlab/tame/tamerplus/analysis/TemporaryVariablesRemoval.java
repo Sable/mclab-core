@@ -20,6 +20,7 @@ import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
+import natlab.toolkits.rewrite.TempFactory;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
@@ -265,7 +266,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
                 parentNode = currentNode.getParent();
                 childIndex = getChildIndexForNode(parentNode, currentNode);
                 
-                boolean isChildIndexAndParentValid = (parentNode != null) && (childIndex != INVALID_INDEX);
+                boolean isChildIndexAndParentValid = (parentNode != null) && (childIndex.intValue() != INVALID_INDEX.intValue());
                 if (isChildIndexAndParentValid)
                 {
                     parentNode.setChild(definition, childIndex);
@@ -364,7 +365,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         TIRNode seekedNode = null;
         for (TIRNode node : nodeToColorMap.keySet())
         {
-            if (nodeToColorMap.get(node) == color)
+            if (nodeToColorMap.get(node).intValue() == color.intValue())
             {
                 seekedNode = node;
                 break;
@@ -388,12 +389,14 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     
     private boolean isTemporaryVariable(NameExpr variable)
     {
-        return variable.tmpVar;
+        String variableNameAsString = variable.getName().getID();
+        return variableNameAsString.startsWith(TempFactory.getPrefix());
     }
     
     private boolean isTemporaryVariable(Name variableName)
     {
-        return variableName.tmpVar;
+        String variableNameAsString = variableName.getID();
+        return variableNameAsString.startsWith(TempFactory.getPrefix());
     }
     
     private TIRNode getFunctionNode()
