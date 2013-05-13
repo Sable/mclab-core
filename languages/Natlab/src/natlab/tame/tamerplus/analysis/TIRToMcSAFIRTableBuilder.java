@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import natlab.tame.tamerplus.utils.NodePrinter;
+import natlab.tame.tamerplus.utils.TamerPlusUtils;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRAssignLiteralStmt;
@@ -487,9 +488,14 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
        matrixExpr.setRow(row, 0);
     }
     
-    public HashMap<TIRNode,  ASTNode> getIRToRawASTTable()
+    public HashMap<TIRNode,  ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
+    }
+    
+    public HashMap<ASTNode, TIRNode> getMcSAFIRToTIRTable()
+    {
+        return TamerPlusUtils.reverse(fTIRToMcSAFIRTable);
     }
     
     private TIRNode getFunctionNode()

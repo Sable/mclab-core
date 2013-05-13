@@ -20,7 +20,6 @@ import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.TempFactory;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
@@ -54,7 +53,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         fUDDUWeb = engine.getUDDUWebAnalysis();
         
         fTIRToMcSAFIRTableBuilder = engine.getTIRToMcSAFTableBuilder();
-        fTIRToMcSAFIRTable = fTIRToMcSAFIRTableBuilder.getIRToRawASTTable();
+        fTIRToMcSAFIRTable = fTIRToMcSAFIRTableBuilder.getTIRToMcSAFIRTable();
         
         getFunctionNode().tirAnalyze(this);
         
@@ -389,14 +388,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     
     private boolean isTemporaryVariable(NameExpr variable)
     {
-        String variableNameAsString = variable.getName().getID();
-        return variableNameAsString.startsWith(TempFactory.getPrefix());
+        return variable.getName().tmpVar;
     }
     
     private boolean isTemporaryVariable(Name variableName)
     {
-        String variableNameAsString = variableName.getID();
-        return variableNameAsString.startsWith(TempFactory.getPrefix());
+        return variableName.tmpVar;
     }
     
     private TIRNode getFunctionNode()
