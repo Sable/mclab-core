@@ -2,6 +2,7 @@ package natlab.tame.tamerplus.analysis;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -35,12 +36,14 @@ import com.google.common.collect.Sets;
 public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
 {
     public static boolean DEBUG = false;
+    
+    private final Integer INVALID_INDEX = -1;
 
     UDDUWeb fUDDUWeb;
     TIRToMcSAFIRTableBuilder fTIRToMcSAFIRTableBuilder;
     private HashMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
     private HashMap<Expr, Name> fExprToTempVarName;
-    private final Integer INVALID_INDEX = -1;
+    private Set<String> fRemainingVariablesNames;
     
     public TemporaryVariablesRemoval(ASTNode<?> tree)
     {
@@ -55,14 +58,16 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         fTIRToMcSAFIRTableBuilder = engine.getTIRToMcSAFTableBuilder();
         fTIRToMcSAFIRTable = fTIRToMcSAFIRTableBuilder.getTIRToMcSAFIRTable();
         
+        fRemainingVariablesNames = engine.getDefinedVariablesAnalysis().getDefinedVariablesFullSet();
+        
         getFunctionNode().tirAnalyze(this);
         
         if (DEBUG) 
         {
             printTIRToMcSAFIRTable();
             printExprToTempVarNameTable();
+            printRemainingVariablesNames();
         }
-        
     }
     
     @Override
@@ -177,7 +182,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         TIRCopyStmt copySmtmt = (TIRCopyStmt) node;
         Name usedVariableName = copySmtmt.getSourceName();
         
-        if(usedVariableName != null && isTemporaryVariable(usedVariableName))
+        if (usedVariableName != null && isTemporaryVariable(usedVariableName))
         {
             replaceUsedTempVarByDefinition(usedVariableName, node);
         }
@@ -270,6 +275,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
                 {
                     parentNode.setChild(definition, childIndex);
                     fExprToTempVarName.put(definition, variable);
+                    updateRemainingVariablesNamesSet(variable.getID());
                 }
             }
             else
@@ -401,6 +407,18 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         return fUDDUWeb.getVisitedStmtsLinkedList().get(0);
     }
     
+    private void updateRemainingVariablesNamesSet(String tmpVariableName)
+    {
+        if (fRemainingVariablesNames.contains(tmpVariableName)) 
+        {
+            fRemainingVariablesNames.remove(tmpVariableName);
+        }
+        else
+        {
+            throw new NoSuchElementException("The variable: " + tmpVariableName + " is not defined.");
+        }
+    }
+    
     public HashMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
@@ -409,6 +427,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     public HashMap<Expr, Name> getExprToTempVarTable()
     {
         return fExprToTempVarName;
+    }
+    
+    public Set<String> getRemainingVariablesNames()
+    {
+        return fRemainingVariablesNames;
     }
     
     private void printTIRToMcSAFIRTable()
@@ -429,6 +452,16 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
            System.out.println(entry.getKey().getPrettyPrinted() + " ---> " + NodePrinter.printName(entry.getValue()));
         }
         System.out.println("\n");
+    }
+    
+    private void printRemainingVariablesNames()
+    {
+        System.err.println("Remaining Variables Set:");
+        for (String remainingVariable : fRemainingVariablesNames)
+        {
+            System.out.print(remainingVariable + ", ");
+        }
+        System.out.println();
     }
     
     private void printTableEntry(TIRNode key, ASTNode value)
