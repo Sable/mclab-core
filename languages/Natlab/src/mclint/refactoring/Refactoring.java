@@ -3,19 +3,30 @@ package mclint.refactoring;
 import java.util.Collections;
 import java.util.List;
 
-import mclint.transform.Transformer;
 import natlab.refactoring.Exceptions.RefactorException;
 
+import com.google.common.collect.Lists;
+
 public abstract class Refactoring {
-  protected Transformer transformer;
-  
-  protected Refactoring(Transformer transformer) {
-    this.transformer = transformer;
+  protected RefactoringContext context;
+  private List<RefactorException> errors = Lists.newArrayList();
+
+  protected Refactoring(RefactoringContext context) {
+    this.context = context;
   }
-  
+
+  public abstract boolean checkPreconditions();
   public abstract void apply();
-  
+
+  protected void addError(RefactorException error) {
+    errors.add(error);
+  }
+
+  protected void addErrors(List<RefactorException> otherErrors) {
+    errors.addAll(otherErrors);
+  }
+
   public List<RefactorException> getErrors() {
-    return Collections.emptyList();
+    return Collections.unmodifiableList(errors);
   }
 }

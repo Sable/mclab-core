@@ -1,9 +1,11 @@
-package natlab.tame.interproceduralAnalysis.examples.reachingdefs.intraprocedural;
+package natlab.tame.tamerplus.transformation;
 
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import natlab.tame.tamerplus.analysis.AnalysisEngine;
+import natlab.tame.tamerplus.analysis.DefinedVariablesNameCollector;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCommentStmt;
@@ -22,18 +24,25 @@ import ast.IfStmt;
 import ast.WhileStmt;
 
 @SuppressWarnings("rawtypes")
-public class TIRToAST extends AbstractTIRLocalRewrite
+public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements TamerPlusTransformation
 {
-
-    public static boolean DEBUG = false;
     private HashMap<TIRNode, ASTNode> fTIRToRawASTTable;
     private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
+    private ASTNode<?> fTransformedTree;
     
-    public TIRToAST(ASTNode tree, HashMap<TIRNode, ASTNode> TIRToRawASTTable, DefinedVariablesNameCollector definedVariablesNameCollector)
+    public TIRToMcSAFIRWithoutTemp(ASTNode tree)
     {
         super(tree);
-        fTIRToRawASTTable = TIRToRawASTTable;
-        fDefinedVariablesNameCollector = definedVariablesNameCollector;
+        fTransformedTree = null;
+    }
+    
+    @Override
+    public void transform(TransformationEngine engine)
+    {
+        AnalysisEngine analysisEngine = engine.getAnalysisEngine();
+        fTIRToRawASTTable = analysisEngine.getTemporaryVariablesRemovalAnalysis().getTIRToMcSAFIRTable();
+        fDefinedVariablesNameCollector = analysisEngine.getDefinedVariablesAnalysis();
+        fTransformedTree = super.transform();
     }
     
     @Override
@@ -119,7 +128,7 @@ public class TIRToAST extends AbstractTIRLocalRewrite
     
     public boolean nodeDefinesTmpVariables(TIRNode node)
     {
-        Set<String> definedVariablesNames = fDefinedVariablesNameCollector.getDefinedVariablesNamesForNode(node);
+        Set<String> definedVariablesNames = fDefinedVariablesNameCollector.getDefinedVariablesForNode(node);
         return isAnyVariableTemporary(definedVariablesNames);
     }
     
@@ -140,5 +149,8 @@ public class TIRToAST extends AbstractTIRLocalRewrite
         return variableName.startsWith(TempFactory.getPrefix());
     }
     
-
+    public ASTNode<?> getTransformedTree()
+    {
+        return fTransformedTree;
+    }
 }

@@ -2,7 +2,6 @@ package natlab.toolkits.analysis.core;
 
 import java.util.Set;
 
-import natlab.toolkits.analysis.HashSetFlowSet;
 import analysis.AbstractDepthFirstAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -13,44 +12,45 @@ import ast.GlobalStmt;
 import ast.Name;
 import ast.ParameterizedExpr;
 
+import com.google.common.collect.Sets;
+
 /**
  * @author Jesse Doherty
  */
-public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Name>>
+public class NameCollector extends AbstractDepthFirstAnalysis<Set<Name>>
 {
-    protected HashSetFlowSet<Name> fullSet;
+    protected Set<Name> fullSet;
     protected boolean inLHS = false;
 
     public NameCollector(ASTNode<?> tree)
     {
         super(tree);
-        fullSet = new HashSetFlowSet<Name>();
+        fullSet = newInitialFlow();
     }
 
-    public HashSetFlowSet<Name> newInitialFlow()
+    @Override
+    public Set<Name> newInitialFlow()
     {
-        return new HashSetFlowSet<Name>();
+        return Sets.newHashSet();
     }
 
     public Set<Name> getAllNames()
     {
-        return fullSet.getSet();
+        return fullSet;
     }
     public Set<Name> getNames( AssignStmt node )
     {
-        HashSetFlowSet<Name> set = flowSets.get(node);
-        if( set == null )
-            return null;
-        else
-            return set.getSet();
+      return flowSets.get(node);
     }
 
+    @Override
     public void caseName( Name node )
     {
         if( inLHS )
             currentSet.add(node);
     }
 
+    @Override
     public void caseAssignStmt( AssignStmt node )
     {
         inLHS = true;
@@ -61,19 +61,23 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Nam
         inLHS = false;
     }
 
+    @Override
     public void caseParameterizedExpr( ParameterizedExpr node )
     {
         analyze(node.getTarget());
     }
 
+    @Override
     public void caseCellIndexExpr(CellIndexExpr node) {
       analyze(node.getTarget());
     }
 
+    @Override
     public void caseDotExpr(DotExpr node) {
       analyze(node.getTarget());
     }
     
+    @Override
     public void caseFunction(Function f) {
       for (Name name : f.getInputParams()) {
         currentSet.add(name);
@@ -83,6 +87,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Nam
       analyze(f.getNestedFunctions());
     }
     
+    @Override
     public void caseGlobalStmt(GlobalStmt node) {
       for (Name name : node.getNames()) {
         currentSet.add(name);

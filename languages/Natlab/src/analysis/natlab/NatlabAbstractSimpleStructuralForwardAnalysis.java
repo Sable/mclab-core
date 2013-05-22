@@ -18,11 +18,11 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
-
-import ast.*;
-import java.util.*;
+import analysis.AbstractStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BreakStmt;
+import ast.ContinueStmt;
 
 /**
  * A simple abstract implementation of a
@@ -43,8 +43,7 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
      */
     public void caseBreakStmt( BreakStmt node )
     {
-        A copiedOutSet = newInitialFlow();
-        copy( currentInSet, copiedOutSet );
+        A copiedOutSet = copy(currentInSet);
         if ( !loopStack.isEmpty() )
             loopStack.peek().addBreakSet( copiedOutSet );
     }
@@ -55,8 +54,7 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
      */
     public void caseContinueStmt( ContinueStmt node )
     {
-        A copiedOutSet = newInitialFlow();
-        copy( currentInSet, copiedOutSet );
+        A copiedOutSet = copy(currentInSet);
         if ( !loopStack.isEmpty() )
             loopStack.peek().addContinueSet( copiedOutSet );
     }
@@ -78,11 +76,10 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
 
         for( A set : loopStack.peek().getBreakOutSets() ){
             if( mergedSets == null ){
-                mergedSets = newInitialFlow();
-                copy(set, mergedSets);
+              mergedSets = copy(set);
+            } else {
+              mergedSets = merge( set, mergedSets);
             }
-            else
-                merge( set, mergedSets, mergedSets );
         }
 
         return mergedSets;
@@ -98,11 +95,10 @@ public abstract class NatlabAbstractSimpleStructuralForwardAnalysis<A> extends a
 
         for( A set : loopStack.peek().getContinueOutSets() ){
             if( mergedSets == null ){
-                mergedSets = newInitialFlow();
-                copy(set, mergedSets);
+                mergedSets = copy(set);
+            } else {
+                mergedSets = merge(set, mergedSets);
             }
-            else
-                merge( set, mergedSets, mergedSets );
         }
         return mergedSets;
     }

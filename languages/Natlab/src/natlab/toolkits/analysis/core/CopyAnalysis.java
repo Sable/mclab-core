@@ -1,10 +1,9 @@
 package natlab.toolkits.analysis.core;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import natlab.toolkits.analysis.HashMapFlowMap;
 import analysis.AbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -15,7 +14,9 @@ import ast.MatrixExpr;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Stmt;
-public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMapFlowMap<String, AssignStmt>>{
+
+import com.google.common.collect.Maps;
+public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<Map<String, AssignStmt>>{
 	
 	private LivenessAnalysis live;
 	
@@ -53,7 +54,7 @@ public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMa
 
 	@Override
 	public void caseStmt(Stmt s){
-        outFlowSets.put( s, currentOutSet.copy() );
+        outFlowSets.put( s, Maps.newHashMap(currentOutSet));
 	}
 
 
@@ -82,32 +83,22 @@ public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<HashMa
 		if ((s.getRHS() instanceof NameExpr) && (s.getLHS() instanceof NameExpr)){
 			currentOutSet.put(((NameExpr)s.getLHS()).getName().getID(), s);
 		}
-        outFlowSets.put( s, currentOutSet.copy() );
+        outFlowSets.put( s, Maps.newHashMap(currentOutSet));
 	}
 	
 	@Override
-	public void copy(HashMapFlowMap<String, AssignStmt> source,
-			HashMapFlowMap<String, AssignStmt> dest) {
-		source.copy(dest);		
+	public Map<String, AssignStmt> copy(Map<String, AssignStmt> source) {
+		return Maps.newHashMap(source);
 	}
 
 	@Override
-	public void merge(HashMapFlowMap<String, AssignStmt> in1,
-			HashMapFlowMap<String, AssignStmt> in2, HashMapFlowMap<String, AssignStmt> out) {
-		HashMap<String, AssignStmt> res = new HashMap<String, AssignStmt>();
-		for (String s: in1.keySet()){
-			if (in1.get(s).equals(in2.get(s)))
-					res.put(s, in1.get(s));
-		}
-		out.clear();
-		for (String s: res.keySet())
-			out.put(s, res.get(s) );
-		
+	public Map<String, AssignStmt> merge(Map<String, AssignStmt> in1, Map<String, AssignStmt> in2) {
+	    return Maps.newHashMap(Maps.difference(in1, in2).entriesInCommon());
 	}
 
 	@Override
-	public HashMapFlowMap<String, AssignStmt> newInitialFlow() {
-		return new HashMapFlowMap<String, AssignStmt>();
+	public Map<String, AssignStmt> newInitialFlow() {
+		return Maps.newHashMap();
 	}
 
 }

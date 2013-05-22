@@ -26,6 +26,7 @@ import java.util.*;
  *
  * @author Jesse Doherty
  */
+@Deprecated
 public interface FlowMap<K,V> extends FlowData
 {
 

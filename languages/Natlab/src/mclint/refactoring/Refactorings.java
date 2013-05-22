@@ -1,19 +1,16 @@
 package mclint.refactoring;
 
-import mclint.transform.Transformer;
 import natlab.refactoring.ExtractFunction;
-import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import ast.Function;
 import ast.Name;
 
 public class Refactorings {
-  public static Refactoring renameVariable(Transformer transformer, Name name, String newName,
-      UseDefDefUseChain udduChain) {
-    return new RenameVariable(transformer, name, newName, udduChain);
+  public static Refactoring renameVariable(RefactoringContext context, Name name, String newName) {
+    return new RenameVariable(context, name, newName);
   }
-  
-  public static Refactoring extractFunction(Transformer transformer, Function f, int from, int to,
+
+  public static Refactoring extractFunction(RefactoringContext context, Function f, int from, int to,
       String extractedFunctionName) {
-    return new ExtractFunction(transformer, f, from, to, extractedFunctionName);
+    return new ExtractFunction(context, f, from, to, extractedFunctionName);
   }
 }

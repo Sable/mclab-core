@@ -39,6 +39,8 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	static boolean Debug = false;
 	List<DimValue> dimensions;
 	boolean isTop = false;
+	boolean outOfBound = false;
+	boolean mismatch = false;
 	
 	public Shape(List<DimValue> dimensions) {
 		/* 
@@ -101,7 +103,15 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     public void flagIsTop() {
-    	this.isTop=true;
+    	isTop = true;
+    }
+    
+    public void flagOutOfBound() {
+    	outOfBound = true;
+    }
+    
+    public void flagMismatch() {
+    	mismatch = true;
     }
     
     /**
@@ -187,7 +197,9 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * worry about dimensions may be null in this toString. 
      */
     public String toString() {
-    	if (this.isTop==true) return "[is top]";
+    	if (isTop==true) return "[is top]";
+    	else if (outOfBound==true) return "[index out of bound]";
+    	else if (mismatch==true) return "[mismatched shape]";
     	else if (isConstant()==false) {
     		List<String> dimension = new ArrayList<String>();
     		for (int i=0; i<dimensions.size(); i++) {
@@ -202,13 +214,63 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	}
     	else return dimensions.toString();
     }
-
+    
     /**
-     * returns the single linear index that refers to the same element as
-     * the given elements.
+     * In MATLAB, shape(a)=[3,3,1] -> shape(a)=[3,3], but 
+     * shape(a)=[1,1,3] -> shape(a)=[1,1,3]. So it only collapses 
+     * or eliminates the extra trailing 1s, not leading 1s. But 
+     * you can assign shape(b)=[1,3] to shape(a)=[1,1,3], so in 
+     * this case, we should eliminate the extra leading 1s, then 
+     * compare them.
      */
-    public DimValue getLinearIndex(Args<V> indizes) {
-        throw new UnsupportedOperationException(); //TODO
+    public Shape<V> eliminateTrailingOnes() {
+    	/* 
+    	 * since if a shape has trailing 1s which can be eliminated, 
+    	 * its isTop, mismatch and outOfBound must be false. 
+    	 */
+    	if (dimensions.size()==0) return this;
+    	List<DimValue> newDim = new ArrayList<DimValue>();
+    	int pos = 0; 
+    	/*
+    	 * used to know from which position there starts with trailing 1s, 
+    	 * and since every variable in MATLAB is at least 2 dimensions. 
+    	 * So pos is at least 2.
+    	 */
+    	for (int i=dimensions.size()-1; i>=0; i--) {
+    		if (dimensions.get(i).getIntValue()!=1) {
+    			pos = i+1;
+    			break;
+    		}
+    	}
+    	if (pos<2) pos = 2;
+    	for (int i=0; i<pos; i++) {
+    		newDim.add(dimensions.get(i));
+    	}
+    	Shape<V> newShape = new Shape<V>(newDim);
+    	return newShape;
+    }
+    
+    public Shape<V> eliminateLeadingOnes() {
+    	if (dimensions.size()==0) return this;
+    	List<DimValue> newDim = new ArrayList<DimValue>();
+    	int pos = 0; 
+    	/*
+    	 * used to know from which position there starts with non-extra 
+    	 * leading 1s, and since every variable in MATLAB is at least 2 
+    	 * dimensions. So pos is at least oldDim.size()-2.
+    	 */
+    	for (int i=0; i<dimensions.size(); i++) {
+    		if (dimensions.get(i).getIntValue()!=1) {
+    			pos = i+1;
+    			break;
+    		}
+    	}
+    	if (dimensions.size()-pos < 2) pos = dimensions.size()-2;
+    	for (int i=pos; i<dimensions.size(); i++) {
+    		newDim.add(dimensions.get(i));
+    	}
+    	Shape<V> newShape = new Shape<V>(newDim);
+    	return newShape;
     }
     
     /**
@@ -217,17 +279,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      */
     public DimValue getFirstNonSingletonDimension() {
     	throw new UnsupportedOperationException(); //TODO
-    }
-    
-    /**
-     * returns a shape that is the result of growing this to the given shape.
-     * This is different than a merge, for example
-     * [2x3] merge [3x2] = [2 or 3 x 2 or 3]
-     * whereas
-     * [2x3] grow [3x2] = [3x3]
-     */
-    public Shape<V> grow(Shape<V> o){
-        return new Shape<V>(null); //TODO
     }
     
     /**

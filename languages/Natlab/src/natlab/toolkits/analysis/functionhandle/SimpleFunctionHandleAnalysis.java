@@ -1,9 +1,12 @@
 package natlab.toolkits.analysis.functionhandle;
 
 import natlab.FlowAnalysisTestTool;
-import ast.*;
-import analysis.*;
-import natlab.toolkits.analysis.*;
+import analysis.AbstractSimpleStructuralForwardAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.FunctionHandleExpr;
+import ast.LambdaExpr;
 
 public class SimpleFunctionHandleAnalysis extends
 		AbstractSimpleStructuralForwardAnalysis<VariableEntryFlowSet> {
@@ -22,8 +25,7 @@ public class SimpleFunctionHandleAnalysis extends
     
     @Override
     public void caseAssignStmt(AssignStmt node) {
-    	currentOutSet = new VariableEntryFlowSet();
-		copy(currentInSet, currentOutSet);
+        currentOutSet = copy(currentInSet);
 		//find the new variable entry
 		String name = node.getLHS().getPrettyPrinted();
 		Expr expr = node.getRHS();
@@ -50,36 +52,34 @@ public class SimpleFunctionHandleAnalysis extends
     
 	@Override
 	public void caseCondition(Expr condExpr) {
-		copy(currentInSet, currentOutSet);
+	  currentOutSet = copy(currentInSet);
 	}
 
 	@Override
 	public void caseLoopVarAsCondition(AssignStmt loopVar) {
-		copy(currentInSet, currentOutSet);
+	  currentOutSet = copy(currentInSet);
 	}
 
 	@Override
 	public void caseLoopVarAsInit(AssignStmt loopVar) {
-		copy(currentInSet, currentOutSet);
+	  currentOutSet = copy(currentInSet);
 	}
 
 	@Override
 	public void caseLoopVarAsUpdate(AssignStmt loopVar) {
-		copy(currentInSet, currentOutSet);
+	  currentOutSet = copy(currentInSet);
 	}
 	
 	@Override
-	public void copy(VariableEntryFlowSet source, VariableEntryFlowSet dest) {
-		source.copy(dest);
+	public VariableEntryFlowSet copy(VariableEntryFlowSet source) {
+		return (VariableEntryFlowSet) source.copy();
 	}
 	
 	@Override
-	public void merge(VariableEntryFlowSet in1, VariableEntryFlowSet in2,
-			VariableEntryFlowSet out) {
-		VariableEntryFlowSet out2 = new VariableEntryFlowSet();
-		copy(in1,out2);
-		out2.union(in2);
-		copy(out2,out);
+	public VariableEntryFlowSet merge(VariableEntryFlowSet in1, VariableEntryFlowSet in2) {
+		VariableEntryFlowSet out = new VariableEntryFlowSet();
+		in1.union(in2, out);
+		return out;
 	}
 
 	@Override

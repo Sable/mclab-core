@@ -18,11 +18,11 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
+import java.util.Map;
 
-import ast.*;
-import java.util.*;
+import analysis.AnalysisHelper;
+import ast.ASTNode;
+import ast.AssignStmt;
 
 /**
  * Interface for structural analysis. Note: implementations should
@@ -50,17 +50,17 @@ public interface NatlabStructuralAnalysis<A > extends analysis.Analysis
      *
      * @param in1  The first input set.
      * @param in2  The second input set.
-     * @param out  The output set.
+     * @return the merged sets
      */
-    public void merge(A in1, A in2, A out); 
+    public A merge(A in1, A in2);
 
     /**
      * Copy a flow set into another.
      *
      * @param source  The set to be copied.
-     * @param dest    The set to be copied into.
+     * @return the copied set
      */
-    public void copy(A source, A dest);
+    public A copy(A source);
 
     /**
      * Get the out set for the current node being operated on. This

@@ -1,8 +1,13 @@
 package natlab.toolkits.analysis.varorfun;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import natlab.LookupFile;
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import analysis.AbstractStructuralForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
@@ -19,9 +24,6 @@ import ast.ParameterizedExpr;
 import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
-import natlab.LookupFile;
-import analysis.AbstractStructuralForwardAnalysis;
-import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 
 public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<VFFlowset> implements VFAnalysis{
   private Function currentFunction = null;
@@ -396,12 +398,14 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
 
   @Override
-  public void copy(VFFlowset source, VFFlowset dest) {
-    source.copy(dest);		
+  public VFFlowset copy(VFFlowset source) {
+    return source.copy();
   }
 
   @Override
-  public void merge(VFFlowset in1, VFFlowset in2, VFFlowset out) {
+  public VFFlowset merge(VFFlowset in1, VFFlowset in2) {
+    VFFlowset out = new VFFlowset();
     in1.union(in2,out);
+    return out;
   }
 }

@@ -12,12 +12,12 @@ import mclint.analyses.Shadowing;
 import mclint.analyses.UnreachableCode;
 import mclint.analyses.UnusedVar;
 import mclint.refactoring.Refactoring;
+import mclint.refactoring.RefactoringContext;
 import mclint.refactoring.Refactorings;
 import mclint.refactoring.RemoveUnusedVar;
 import mclint.reports.ReportGenerators;
-import mclint.transform.Transformer;
-import mclint.transform.Transformers;
 import natlab.options.Options;
+import natlab.refactoring.Exceptions.RefactorException;
 import natlab.utils.NodeFinder;
 import ast.Name;
 import ast.Program;
@@ -76,16 +76,21 @@ public class McLint {
     lint.registerListenerForMessageCode("SHADOW_BUILTIN", new MessageListener() {
       @Override public boolean messageReported(Message message) {
         Name node = (Name) message.getAstNode();
-        if (prompt(message, "Rename?")) {
-          String newName = System.console().readLine("    rename %s to: ", node.getID());
-          Program parent = NodeFinder.findParent(Program.class, node);
-          Transformer transformer = Transformers.basic(parent);
-          Refactoring rename = Refactorings.renameVariable(transformer, node, newName,
-              lint.getKit().getUseDefDefUseChain());
-          rename.apply();
-          return true;
+        if (!prompt(message, "Rename?")) {
+          return false;
         }
-        return false;
+        String newName = System.console().readLine("    rename %s to: ", node.getID());
+        Program parent = NodeFinder.findParent(Program.class, node);
+        RefactoringContext context = RefactoringContext.create(parent.getMatlabProgram());
+        Refactoring rename = Refactorings.renameVariable(context, node, newName);
+        if (!rename.checkPreconditions()) {
+          for (RefactorException error : rename.getErrors()) {
+            System.err.println(error);
+          }
+          return false;
+        }
+        rename.apply();
+        return true;
       }
     });
   }

@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
  *
  * @see java.util.HashSet
  */
+@Deprecated
 public class HashSetFlowSet<D> extends AbstractFlowSet<D>
 {
     protected HashSet<D> set;

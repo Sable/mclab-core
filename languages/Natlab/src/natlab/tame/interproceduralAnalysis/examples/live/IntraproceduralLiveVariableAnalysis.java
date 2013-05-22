@@ -1,13 +1,36 @@
 package natlab.tame.interproceduralAnalysis.examples.live;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
-import ast.*;
 import natlab.tame.callgraph.StaticFunction;
-import natlab.tame.interproceduralAnalysis.*;
-import natlab.tame.tir.*;
+import natlab.tame.interproceduralAnalysis.Call;
+import natlab.tame.interproceduralAnalysis.Callsite;
+import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
+import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
+import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
+import natlab.tame.tir.TIRAbstractAssignToVarStmt;
+import natlab.tame.tir.TIRArrayGetStmt;
+import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRCellArrayGetStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRCopyStmt;
+import natlab.tame.tir.TIRCreateLambdaStmt;
+import natlab.tame.tir.TIRDotGetStmt;
+import natlab.tame.tir.TIRDotSetStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralBackwardAnalysis;
+import ast.ASTNode;
+import ast.Function;
+import ast.Name;
+import ast.NameExpr;
+
+import com.google.common.collect.Maps;
 
 
 /**
@@ -76,20 +99,18 @@ public class IntraproceduralLiveVariableAnalysis
 	
 	//*** inherited mcsaf functions **************************************************
 	@Override
-	public void copy(Map<String, LiveValue> source, Map<String, LiveValue> dest) {
-		for (Map.Entry<String,LiveValue> entry : source.entrySet()){
-			dest.put(entry.getKey(), entry.getValue());
-		}
+	public Map<String, LiveValue> copy(Map<String, LiveValue> source) {
+	  return Maps.newHashMap(source);
 	}
 
 	@Override
 	public Map<String, LiveValue> newInitialFlow() {
-		return new HashMap<String, LiveValue>();
+		return Maps.newHashMap();
 	}
 
 	@Override
-	public void merge(Map<String, LiveValue> in1, Map<String, LiveValue> in2,
-			Map<String, LiveValue> out) {
+	public Map<String, LiveValue> merge(Map<String, LiveValue> in1, Map<String, LiveValue> in2) {
+	  Map<String, LiveValue> out = Maps.newHashMap();
 		//fill in everything from in1
 		for (String name : in1.keySet()){
 			if (in2.containsKey(name)){
@@ -104,6 +125,7 @@ public class IntraproceduralLiveVariableAnalysis
 				out.put(name, in2.get(name).merge(LiveValue.getDead()));
 			}
 		}
+		return out;
 	}
 	
 	//******* case methods ***************************************************

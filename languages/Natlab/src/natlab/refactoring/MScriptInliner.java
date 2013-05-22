@@ -5,14 +5,12 @@ import java.util.Map;
 import java.util.Set;
 
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.HashMapFlowMap;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.GenericFile;
-import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.AstFunctions;
@@ -66,7 +64,7 @@ public class MScriptInliner {
 	      if (n.getNumChild() == 1 && n.getChild(0) instanceof NameExpr) {
           NameExpr child = (NameExpr) n.getChild(0);
           if (scripts.containsKey(child.getName().getID())) {
-            scriptCalls.add((Stmt) n);
+            scriptCalls.add(n);
           }
         }
 		  }
@@ -126,7 +124,7 @@ public class MScriptInliner {
 		kind_analysis_s.analyze();
 		ReachingDefs reachingDefs = new ReachingDefs(f);
 		reachingDefs.analyze();
-		HashMapFlowMap<String, Set<Def>> assigned=reachingDefs.getOutFlowSets().get(callStmt);
+		Map<String, Set<Def>> assigned=reachingDefs.getOutFlowSets().get(callStmt);
 		if(assigned==null )
 			System.out.println("NULL");
 		Set<String> sibs= findSiblings(f);

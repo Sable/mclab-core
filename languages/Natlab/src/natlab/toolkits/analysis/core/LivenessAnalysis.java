@@ -5,7 +5,6 @@ import static com.google.common.base.Predicates.not;
 
 import java.util.Set;
 
-import natlab.toolkits.analysis.HashSetFlowSet;
 import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
@@ -24,7 +23,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
-		AbstractSimpleStructuralBackwardAnalysis<HashSetFlowSet<String>> {
+		AbstractSimpleStructuralBackwardAnalysis<Set<String>> {
 
 	public LivenessAnalysis(ASTNode<?> tree) {
 		super(tree);	
@@ -32,9 +31,9 @@ public class LivenessAnalysis extends
 	
 	@Override
 	public void caseStmt(Stmt s) {
-		outFlowSets.put(s, currentOutSet.copy());
+		outFlowSets.put(s, Sets.newHashSet(currentOutSet));
 		caseASTNode(s);
-		inFlowSets.put(s, currentInSet.copy());
+		inFlowSets.put(s, Sets.newHashSet(currentInSet));
 	}
 	
 	private NameExpr getLValue(Expr lv) {
@@ -59,13 +58,14 @@ public class LivenessAnalysis extends
 		return ne;
 	}
 	
-	public void caseNameExpr(NameExpr ne){
+	@Override
+  public void caseNameExpr(NameExpr ne){
 		currentInSet.add(ne.getName().getID());
 	}
 	
 	@Override
 	public void caseAssignStmt(AssignStmt s) {
-		outFlowSets.put(s, currentOutSet.copy());	
+		outFlowSets.put(s, Sets.newHashSet(currentOutSet));	
 		Set<NameExpr> lValues = Sets.newHashSet();
 
 		if (s.getLHS() instanceof MatrixExpr) {
@@ -88,13 +88,13 @@ public class LivenessAnalysis extends
 		    .transform(AstFunctions.nameExprToID())
 		    .toImmutableList());
 
-		inFlowSets.put(s, currentInSet.copy());
+		inFlowSets.put(s, Sets.newHashSet(currentInSet));
 	}
 
 	@Override
 	public void caseFunction(ast.Function node) {
 		currentOutSet = newInitialFlow();
-		currentInSet = currentOutSet.copy();
+		currentInSet = Sets.newHashSet(currentOutSet);
 		outFlowSets.put(node, currentOutSet);
 		node.getStmts().analyze(this);
 		inFlowSets.put(node, currentInSet);
@@ -103,25 +103,26 @@ public class LivenessAnalysis extends
 	@Override
 	public void caseScript(Script node) {
 		currentOutSet = newInitialFlow();
-		currentInSet = currentOutSet.copy();
+		currentInSet = Sets.newHashSet(currentOutSet);
 		outFlowSets.put(node, currentOutSet);
 		node.getStmts().analyze(this);
 		inFlowSets.put(node, currentInSet);
 	}
 
 	@Override
-	public void copy(HashSetFlowSet<String> source, HashSetFlowSet<String> dest) {
-		source.copy(dest);
+	public Set<String> copy(Set<String> source) {
+	  return Sets.newHashSet(source);
 	}
 
 	@Override
-	public void merge(HashSetFlowSet<String> in1, HashSetFlowSet<String> in2,
-			HashSetFlowSet<String> out) {
-		in1.union(in2, out);
+	public Set<String> merge(Set<String> in1, Set<String> in2) {
+	  Set<String> out = Sets.newHashSet(in1);
+	  out.addAll(in2);
+	  return out;
 	}
 
 	@Override
-	public HashSetFlowSet<String> newInitialFlow() {
-		return new HashSetFlowSet<String>();
+	public Set<String> newInitialFlow() {
+		return Sets.newHashSet();
 	}
 }
