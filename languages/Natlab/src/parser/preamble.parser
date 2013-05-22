@@ -47,24 +47,6 @@
     //tell handler to use subclass defined above
     { report = new Events(); }
     
-    //// AST helpers ///////////////////////////////////////////////////////////
-
-    //add all elements of a util list to an ast list
-    private static <T extends ASTNode<?>> List<T> addAll(List<T> node, java.util.List<T> children) {
-        for(T child : children) {
-            node.add(child);
-        }
-        return node;
-    }
-
-    //make a new ast list for a given util list
-    private static <T extends ASTNode<?>> List<T> makeListNode(java.util.List<T> children) {
-        if(children == null) {
-            return null;
-        }
-        return addAll(new List<T>(), children);
-    }
-
     //// Stmt terminators //////////////////////////////////////////////////////
 
     //return type of statement terminators

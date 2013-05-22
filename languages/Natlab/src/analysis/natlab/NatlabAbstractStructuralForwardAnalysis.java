@@ -18,9 +18,7 @@
 
 package analysis.natlab;
 
-import nodecases.*;
 import analysis.*;
-
 import ast.*;
 import java.util.*;
 
@@ -48,7 +46,7 @@ public abstract class NatlabAbstractStructuralForwardAnalysis<A> extends analysi
         //visit each child node in forward order
         for( int i = 0; i<node.getNumChild(); i++ ){
             if( node.getChild(i) != null )
-                analyze( node.getChild(i) );
+            	analyze( node.getChild(i) );
         }
     }
 

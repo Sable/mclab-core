@@ -8,7 +8,7 @@ import java.util.List;
 
 import natlab.CompilationProblem;
 import natlab.Parse;
-import natlab.toolkits.filehandling.genericFile.FileFile;
+import natlab.toolkits.filehandling.FileFile;
 import ast.CompilationUnits;
 import ast.Program;
 

@@ -16,69 +16,50 @@ Copyright 2011 Soroush Radpour and McGill University.
 
 package natlab.toolkits.path;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
+import natlab.toolkits.filehandling.GenericFileFilters;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
 /* For a folder finds all the files that are accessible */
 public class FolderHandler{
-  private final Set<String> ACCEPTED_EXTENSIONS= ImmutableSet.of(".m");
   private Map<String, GenericFile> classes = Maps.newHashMap(); //constructors?
   private Map<String, GenericFile> packages = Maps.newHashMap(); //overloaded methods besides constructors?
   private Map<String, GenericFile> functions = Maps.newHashMap();
   private Table<String, String, GenericFile> specializedFunction = HashBasedTable.create();
   private Map<String, GenericFile> privateFunctions = Maps.newHashMap();
 
-  private Collection<GenericFile> getFilteredChildren(GenericFile dir){
-    return Lists.newLinkedList(Iterables.filter(dir.listChildren(), new Predicate<GenericFile>() {
-      @Override public boolean apply(GenericFile file) {
-        return !file.isDir() && ACCEPTED_EXTENSIONS.contains(file.getExtensionComplete());
-      }
-    }));
-  }
-
-  public static String getFileName(GenericFile f){
-    String extension = f.getExtensionComplete();
-    return f.getName().substring(0, f.getName().length() - extension.length());
-  }
-
   private FolderHandler addPath(GenericFile path){
-    for (GenericFile f: path.listChildren()){
-      String fname = f.getName();	
-      if (f.isDir()){
-        if (fname.charAt(0)=='@'){
-          fname=fname.substring(1);
-          for (GenericFile subfile:getFilteredChildren(f)){
-            if (getFileName(subfile).equals(fname)){
-              classes.put(getFileName(subfile), subfile);
-            } else {
-              specializedFunction.put(getFileName(subfile), fname, subfile);
-            }
-          }
-        }
-        if (fname.charAt(0)=='+'){
-          fname=fname.substring(1);
-          packages.put(fname, f);
-        }
-        if (fname.toLowerCase().equals("private")){
-          for (GenericFile subfile:getFilteredChildren(f)){
-            privateFunctions.put(getFileName(subfile), subfile);
+    for (GenericFile f : path.listChildren()) {
+      if (GenericFileFilters.CLASS_DIRECTORY.accept(f)) {
+        String className = f.getName().substring(1);
+        for (GenericFile subfile : f.listChildren(GenericFileFilters.MATLAB)) {
+          String name = subfile.getNameWithoutExtension();
+          if (name.equals(className)){
+            classes.put(name, subfile);
+          } else {
+            specializedFunction.put(name, className, subfile);
           }
         }
       }
-      if (ACCEPTED_EXTENSIONS.contains(f.getExtensionComplete()))
-        functions.put(getFileName(f), f);
+      if (GenericFileFilters.PACKAGE_DIRECTORY.accept(f)) {
+        String packageName = f.getName().substring(1);
+        packages.put(packageName, f);
+      }
+      if (GenericFileFilters.PRIVATE_DIRECTORY.accept(f)) {
+        for (GenericFile subfile: f.listChildren(GenericFileFilters.MATLAB)) {
+          privateFunctions.put(subfile.getNameWithoutExtension(), subfile);
+        }
+      }
+      if (GenericFileFilters.MATLAB.accept(f)) {
+        functions.put(f.getNameWithoutExtension(), f);
+      }
     }
     return this;
   }
@@ -105,7 +86,7 @@ public class FolderHandler{
 
   public List<GenericFile> getAllSpecialized(String classname){
     List<GenericFile> list = Lists.newArrayList();
-    for (Map<String,GenericFile> map : specializedFunction.rowMap().values()){
+    for (Map<String,GenericFile> map : specializedFunction.rowMap().values()) {
       if (map.containsKey(classname)) {
         list.add(map.get(classname));
       }

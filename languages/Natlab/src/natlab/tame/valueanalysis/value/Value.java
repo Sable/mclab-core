@@ -32,6 +32,7 @@ import natlab.toolkits.analysis.Mergable;
  */
 
 public interface Value<V extends Value<V>> extends Mergable<V>{
+	public String getSymbolic();
     public ClassReference getMatlabClass();
     
     /**

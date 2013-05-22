@@ -25,7 +25,7 @@ import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 import com.google.common.collect.Lists;
@@ -82,7 +82,7 @@ public class TamerTool {
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
 		List<AggrValue<SimpleMatrixValue>> list = Lists.newArrayListWithCapacity(inputValues.size());
 		for (PrimitiveClassReference ref : inputValues){
-			list.add(new SimpleMatrixValue(ref));
+			list.add(new SimpleMatrixValue(null, ref));
 		}
 		return tameMatlabToSingleFunction(mainFile, list);
 	}
@@ -121,7 +121,7 @@ public class TamerTool {
 	public static Callgraph<SimpleMatrixValue> getSimpleCallgraphFromClassReferences(FileEnvironment env,List<PrimitiveClassReference> inputClasses){
 		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputClasses.size());
 		for (PrimitiveClassReference ref : inputClasses){
-			list.add(new SimpleMatrixValue(ref));
+			list.add(new SimpleMatrixValue(null, ref));
 		}
 		return new Callgraph<SimpleMatrixValue>(
 				env,
@@ -185,7 +185,7 @@ public class TamerTool {
 		//** build callgraph *******		
 		ArrayList<AggrValue<SimpleMatrixValue>> list = new ArrayList<AggrValue<SimpleMatrixValue>>(inputClasses.size());
 		for (PrimitiveClassReference ref : inputClasses){
-			list.add(new SimpleMatrixValue(ref));
+			list.add(new SimpleMatrixValue(null, ref));
 		}
 		
 		

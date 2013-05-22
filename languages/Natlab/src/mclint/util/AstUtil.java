@@ -1,6 +1,8 @@
 package mclint.util;
 
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
+import ast.Program;
 
 /**
  * Useful methods for manipulating ASTs.
@@ -12,6 +14,15 @@ public class AstUtil {
    */
   public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
     oldNode.getParent().setChild(newNode, oldNode.getParent().getIndexOfChild(oldNode));
+    newNode.setStartPosition(oldNode.getStartLine(), oldNode.getStartColumn());
+    newNode.setEndPosition(oldNode.getEndLine(), oldNode.getEndColumn());
+  }
+  
+  /**
+   * Removes the given subtree, i.e. disconnects it from its parent.
+   */
+  public static void remove(ASTNode<?> node) {
+    node.getParent().removeChild(node.getParent().getIndexOfChild(node));
   }
 
   /**
@@ -28,5 +39,10 @@ public class AstUtil {
       parent.insertChild((ASTNode<?>) element, index++);
     }
   }
+  
+  public static boolean removed(ASTNode<?> node) {
+    return NodeFinder.findParent(Program.class, node) == null;
+  }
+
   private AstUtil() {}
 }

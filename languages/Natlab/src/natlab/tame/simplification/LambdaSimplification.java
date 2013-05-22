@@ -25,6 +25,9 @@ import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Stmt;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+
 /**
  * This seeks through functions, and finds lambda expressions.
  * 
@@ -89,18 +92,18 @@ public class LambdaSimplification extends AbstractSimplification{
         if (node.getBody() instanceof ParameterizedExpr){
             ParameterizedExpr paramExpr = (ParameterizedExpr)node.getBody();
             if (!isVar(paramExpr) && 
-                    NodeFinder.find(paramExpr.getArgList(), NameExpr.class).size() == paramExpr.getArgList().getNumChild()){
+                Iterables.all(paramExpr.getArgList(), Predicates.instanceOf(NameExpr.class))) {
                 return;
             }
         }
         
         //rewrite children recursively if there's a nested lambda expression inside
-        java.util.List<LambdaExpr> nestedLambdas = 
-            NodeFinder.find(node.getBody(),LambdaExpr.class);
-        if (nestedLambdas.size()>0){
+        Iterable<LambdaExpr> nestedLambdas = 
+            NodeFinder.find(LambdaExpr.class, node.getBody());
+        if (!Iterables.isEmpty(nestedLambdas)){
             rewriteChildren(node);
             //force params of nested lambda to be ignored
-            for (Name param : nestedLambdas.get(0).getInputParamList()){
+            for (Name param : Iterables.getFirst(nestedLambdas, null).getInputParamList()){
                 ignoreNames.add(param.getID());
             }
         }

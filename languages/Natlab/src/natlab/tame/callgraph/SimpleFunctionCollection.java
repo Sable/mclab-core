@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import natlab.CompilationProblem;
@@ -29,7 +30,7 @@ import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.Simplifier;
@@ -290,6 +291,17 @@ public class SimpleFunctionCollection extends HashMap<FunctionReference,StaticFu
 	@Override
 	public ClassRepository getClassRepository() {
 		return this.classRepository;
+	}
+	
+	@Override
+	public List<StaticFunction> getAllFunctions()
+	{
+	    List<StaticFunction> functionList = new ArrayList<StaticFunction>();
+	    for (FunctionReference ref : this.keySet())
+	    {
+	        functionList.add(this.get(ref));
+	    }
+	    return functionList;
 	}
 
 }

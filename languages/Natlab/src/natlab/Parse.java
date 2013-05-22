@@ -39,7 +39,7 @@ import matlab.TranslationProblem;
 import matlab.FunctionEndScanner.NoChangeResult;
 import matlab.FunctionEndScanner.ProblemResult;
 import matlab.FunctionEndScanner.TranslationResult;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 
 import org.antlr.runtime.ANTLRReaderStream;
 

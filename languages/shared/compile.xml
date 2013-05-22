@@ -8,7 +8,7 @@
 	<!-- command-line compilation -->
 	<target name="compile" depends="set.bin.dir" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${basedir}/${ant.bin.dir}">
+		<javac destdir="${basedir}/${ant.bin.dir}">
 			<classpath refid="compile.classpath" />
 			<src path="${src.dir}" />
 			<src path="${gen.dir}" />
@@ -18,7 +18,7 @@
 
  	<target name="compile.with.tests" depends="set.bin.dir" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${basedir}/${ant.bin.dir}">
+		<javac destdir="${basedir}/${ant.bin.dir}">
 			<classpath refid="compile.classpath" />
 			<src path="${src.dir}" />
 			<src path="${gen.dir}" />

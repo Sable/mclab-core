@@ -1,27 +1,27 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPQuestion extends SPAbstractMatchExpr{
-	SPAbstractMatchExpr spm;
-	public SPQuestion (SPAbstractMatchExpr spm){
+public class SPQuestion<V extends Value<V>> extends SPAbstractMatchExpr<V> {
+	
+	static boolean Debug = false;
+	SPAbstractMatchExpr<V> spm;
+	
+	public SPQuestion (SPAbstractMatchExpr<V> spm) {
 		this.spm = spm;
-		//System.out.println("?");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		if(argValues.size()>previousMatchResult.getNumMatched()){
-			//System.out.println("inside ? expression");
-			ShapePropMatch match = spm.match(isPatternSide, previousMatchResult, argValues, num);
-			return match;
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		if (argValues.size() > previousMatchResult.getHowManyMatched()) {
+			System.out.println("inside may-have shape pattern matching.");
+			ShapePropMatch<V> matchResult = spm.match(isPatternSide, previousMatchResult, argValues, Nargout);
+			return matchResult;
 		}
 		return previousMatchResult;
 	}
 	
-	public String toString(){
-		return spm.toString()+"?";
+	public String toString() {
+		return spm.toString() + "?";
 	}
 }

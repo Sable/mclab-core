@@ -5,255 +5,273 @@ import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPFunCall extends SPAbstractVertcatExprArg{
+public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
+	
 	static boolean Debug = false;
-	String i;
-	SPAbstractVertcatExprArg ls;
-	public SPFunCall(String i, SPAbstractVertcatExprArg ls){
-		this.i = i;
-		this.ls = ls;
-		//System.out.println("functionCall:"+i);
+	String funName;
+	SPArglist<V> arglist;
+	
+	public SPFunCall(String funName, SPArglist<V> arglist) {
+		this.funName = funName;
+		this.arglist = arglist;
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		//System.out.println("function: "+i);
-		if((i.indexOf("previousScalar")==0)&(ls==null)){
-			if (Debug) System.out.println("inside previousScalar");
-			previousMatchResult.getLatestMatchedLowercase();
-			if (Debug) System.out.println(previousMatchResult.getLatestMatchedLowercase());
-			if(previousMatchResult.hasValue(previousMatchResult.getLatestMatchedUppercase())){
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(
-						previousMatchResult.getLatestMatchedUppercase()));
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-				//System.out.println(matchResult.getAllLowercase());
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		/*
+		 *  these function calls can be divided into two categories: 
+		 *  1. functions in assignment statements;
+		 *  2. functions as an assert statement itself.
+		 *  P.S. assert statement functions have the ability to set matching process has error.
+		 *  but, actually, has error and not matched both return null shape at last.
+		 *  currently, previousScalar, previousShapeDim, add, minus, div, minimum and copy are functions in assignment;
+		 *  numOutput and isequal are assert functions.
+		 */
+		if (funName.equals("previousScalar") && arglist==null) {
+			if (Debug) System.out.println("try to get previous matched scalar's value.");
+			String latestMatchedUppercase = previousMatchResult.getLatestMatchedUppercase();
+			String latestMatchedLowercase = previousMatchResult.getLatestMatchedLowercase();
+			if (latestMatchedUppercase.equals("$") && previousMatchResult.hasValue("$")) {
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(latestMatchedLowercase, previousMatchResult.getValueOfVariable("$"));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 	            return matchResult;	
 			}
 			else{
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-				//System.out.println(matchResult.getAllLowercase());
-	            return matchResult;	
+				System.err.println("cannot get the value of previous matched Scalar in shape equation.");
+	            return previousMatchResult;	
 			}	
 		}
-		else if(i.indexOf("add")==0){
-			if (Debug) System.out.println("inside add");
-			if(previousMatchResult.hasValue(previousMatchResult.getLatestMatchedLowercase())){
-				previousMatchResult.addToVertcatExpr(previousMatchResult.getValueOfVariable(
-						(previousMatchResult.getLatestMatchedLowercase())));
-				if (Debug) System.out.println(previousMatchResult.getOutputVertcatExpr());
-				return previousMatchResult;
-			}
-			else{
-				previousMatchResult.addToVertcatExpr(null);
-				if (Debug) System.out.println(previousMatchResult.getOutputVertcatExpr());
-				return previousMatchResult;
-			}
-		}
-		else if(i.indexOf("minus")==0){
-			if (Debug) System.out.println("inside minus("+ls.toString()+")");
-			String[] arg = ls.toString().split(",");
-			if(arg.length==2){
-				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					int minus = previousMatchResult.getValueOfVariable(arg[0])-previousMatchResult.getValueOfVariable(arg[1])+1;
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), minus);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-				else{
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					if (Debug) System.out.println("one of the arguments is null!");
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-			}
-			return previousMatchResult;
-		}
-		else if(i.indexOf("div")==0){
-			if (Debug) System.out.println("inside div("+ls.toString()+")");
-			String[] arg = ls.toString().split(",");
-			if(arg.length==2){
-				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					int div = previousMatchResult.getValueOfVariable(arg[0])/previousMatchResult.getValueOfVariable(arg[1]);
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), div);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-				else{
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					if (Debug) System.out.println("one of the arguments is null!");
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-			}
-			return previousMatchResult;
-		}
-		else if(i.indexOf("previousShapeDim")==0){
-			if(ls==null){
-				if (Debug) System.out.println("inside previousShapeDim()");
-				Shape<?> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
-				List<Integer> dimensions = previousMatched.getDimensions();
-				int numberOfDimensions = 0;
-				for(Integer i: dimensions){
-					numberOfDimensions = numberOfDimensions+1;
-				}
+		else if(funName.equals("previousShapeDim")) {
+			if (arglist==null) {
+				if (Debug) System.out.println("try to get how many dimensions of previous matched shape has.");
+				Shape<V> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
+				List<DimValue> dimensions = previousMatched.getDimensions();
+				int numberOfDimensions = dimensions.size();
 				if (Debug) System.out.println("this matched shape has "+numberOfDimensions+" dimensions");
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), numberOfDimensions);
-				ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(numberOfDimensions, null));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 	            return matchResult;
 			}
-			else{
-				if (Debug) System.out.println("inside previousShapeDim("+ls.toString()+")");
-				previousMatchResult = ls.match(isPatternSide, previousMatchResult, argValues, num);//try to get argument information
-				if(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions().get(previousMatchResult.getLatestMatchedNumber()-1)==null){
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
+			/*
+			 *  if arglist is not empty, in this language, which means there is a number in the arglist, 
+			 *  this function is trying to get the size of that specific dimension of previous matched shape. i.e. for vertcat and horzcat.
+			 */
+			else {
+				String[] arg = arglist.toString().split(",");
+				if (arg.length==1) {
+					ShapePropMatch<V> arglistMatch = arglist.match(isPatternSide, previousMatchResult, argValues, Nargout);
+					if (Debug) System.out.println("try to get the size of the " +arglistMatch.getLatestMatchedNumber() 
+							+ " dimension of latest matched shape");
+					if (arglistMatch.getShapeOfVariable(arglistMatch.getLatestMatchedUppercase())
+							.getDimensions().get(arglistMatch.getLatestMatchedNumber()-1)==null) {
+			            return arglistMatch;
+					}
+					else {
+						DimValue dimNum = arglistMatch.getShapeOfVariable(arglistMatch.getLatestMatchedUppercase())
+								.getDimensions().get(arglistMatch.getLatestMatchedNumber()-1);
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						lowercase.put(arglistMatch.getLatestMatchedLowercase(), new DimValue(dimNum.getIntValue(), dimNum.getSymbolic()));
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(arglistMatch, lowercase, null);
+			            return matchResult;
+					}
 				}
-				else{
-					int dimNum = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions().get(previousMatchResult.getLatestMatchedNumber()-1);
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), dimNum);
-					ShapePropMatch matchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(matchResult.getAllLowercase());
-		            return matchResult;
-				}
-			}
-		}
-		else if(i.indexOf("isequal")==0){
-			if (Debug) System.out.println("inside isequal("+ls.toString()+")");
-			String[] arg = ls.toString().split(",");
-			if(arg.length==2){
-				if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" compare with "+previousMatchResult.getShapeOfVariable(arg[1]));
-				Shape<?> first = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[0]);
-				Shape<?> second = (Shape<?>)previousMatchResult.getShapeOfVariable(arg[1]);
-				//actually, I don't know what happened here, need more consideration later.
-				if(first.getSize()==second.getSize()){
-		    		int j=0;
-		    		for(Integer i : first.getDimensions()){
-		    			if (Debug) System.out.println("testing weather or not shape equals!");
-		    			//System.out.println("i is "+i+", j is "+o.getCertainDimensionSize(j));
-		    			if(i==second.getCertainDimensionSize(j)){
-		    				j=j+1;
-		    			}
-		    			else{
-		    				if (Debug) System.out.println("inside shape equals false!");
-		    				return null;//FIXME
-		    			}
-		    		}
-		    		if (Debug) System.out.println(previousMatchResult.getShapeOfVariable(arg[0])+" is equal to "+previousMatchResult.getShapeOfVariable(arg[1]));
-					return previousMatchResult;
-		    	}
-				else{
-					previousMatchResult.setIsError();
-					return previousMatchResult;
-				}
-			}
-		}
-		else if(i.indexOf("increment")==0){
-			if (Debug) System.out.println("inside increment("+ls.toString()+")");
-			if (Debug) System.out.println(previousMatchResult.getAllLowercase());
-			if(previousMatchResult.hasValue(previousMatchResult.getLatestMatchedLowercase())&&previousMatchResult.hasValue(ls.toString())){
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())+previousMatchResult.getValueOfVariable(ls.toString());
-				if (Debug) System.out.println(sum);
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), sum);
-				previousMatchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-				if (Debug) System.out.println(previousMatchResult.getAllLowercase());
-				return previousMatchResult;
-			}
-			else{
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-				previousMatchResult = new ShapePropMatch(previousMatchResult, lowercase, null);
-				if (Debug) System.out.println(previousMatchResult.getAllLowercase());
+				System.err.println("cannot get the size of a certain dimension of a shape in shape equation.");
 				return previousMatchResult;
 			}
 		}
-		else if(i.indexOf("copy")==0){
-			if (Debug) System.out.println("inside copy("+ls.toString()+")");
-			if (Debug) System.out.println(previousMatchResult.getLatestMatchedUppercase());
-			HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-			Shape<?> newShape = (new ShapeFactory()).newShapeFromIntegers(previousMatchResult.getShapeOfVariable(ls.toString()).getDimensions());
-			uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-			if (Debug) System.out.println(match.getAllUppercase());
-			return match;
+		/*
+		 * add function is used in two situations, one for adding the value of previous matched scalar to vertcat, 
+		 * the other one for adding value of argument to previous matched lowercase, like n=add(k). 
+		 */
+		else if (funName.equals("add")) {
+			if (arglist==null) {
+				if (Debug) System.out.println("try to add latest matched lowercase to vertcat.");
+				String latestMatchedLowercase = previousMatchResult.getLatestMatchedLowercase();
+				if (previousMatchResult.hasValue(latestMatchedLowercase)) {
+					previousMatchResult.addToVertcatExpr(previousMatchResult.getValueOfVariable(latestMatchedLowercase));
+					return previousMatchResult;
+				}
+				else {
+					previousMatchResult.addToVertcatExpr(new DimValue());
+					return previousMatchResult;
+				}				
+			}
+			else {
+				String[] arg = arglist.toString().split("'");
+				if (arg.length==1) {
+					if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasIntValue() 
+							&& previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue() 
+								+ previousMatchResult.getValueOfVariable(arg[0]).getIntValue();
+						lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(sum, null));
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+						return matchResult;
+					}
+					/*
+					 * add symbolic expression here.
+					 */
+					String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
+							+"+"+previousMatchResult.getValueOfVariable(arg[0]);
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+							new DimValue(null, symbolicExp));
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+					return matchResult;
+				}
+				System.err.println("cannot compute add function in shape equation!");
+				return previousMatchResult;
+			}
 		}
-		else if(i.indexOf("minimum")==0){
-			if (Debug) System.out.println("inside minimum("+ls.toString()+")");
-			String[] arg = ls.toString().split(",");
+		else if (funName.equals("minus") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
 			if(arg.length==2){
-				if(previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					int f = previousMatchResult.getValueOfVariable(arg[0]);
-					int s = previousMatchResult.getValueOfVariable(arg[1]);
+				if (Debug) System.out.println("try to compute " + arg[0] + " - " + arg[1]);
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					int minus = previousMatchResult.getValueOfVariable(arg[0]).getIntValue() 
+							- previousMatchResult.getValueOfVariable(arg[1]).getIntValue() + 1;
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(minus, null));
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+		            return matchResult;
+				}
+				/*
+				 * add symbolic expression here.
+				 */
+				String symbolicExp = previousMatchResult.getValueOfVariable(arg[0])
+						+"-"+previousMatchResult.getValueOfVariable(arg[1])+"+1";
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+						new DimValue(null, symbolicExp));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+				return matchResult;
+			}
+			System.err.println("cannot compute minus function in shape equation!");
+			return previousMatchResult;
+		}
+		else if (funName.equals("div") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if(arg.length==2){
+				if (Debug) System.out.println("try to compute " + arg[0] + "/" + arg[1]);
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					int div = previousMatchResult.getValueOfVariable(arg[0]).getIntValue() 
+							/ previousMatchResult.getValueOfVariable(arg[1]).getIntValue();
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(div, null));
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+		            return matchResult;
+				}
+				/*
+				 * add symbolic expression here.
+				 */
+				String symbolicExp = "("+previousMatchResult.getValueOfVariable(arg[0])+")"
+						+"/"+previousMatchResult.getValueOfVariable(arg[1]);
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+						new DimValue(null, symbolicExp));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+				return matchResult;
+			}
+			System.err.println("cannot compute div function in shape equation!");
+			return previousMatchResult;
+		}
+		else if (funName.equals("minimum") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==2) {
+				if (previousMatchResult.hasValue(arg[0])&&previousMatchResult.hasValue(arg[1])){
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					int f = previousMatchResult.getValueOfVariable(arg[0]).getIntValue();
+					int s = previousMatchResult.getValueOfVariable(arg[1]).getIntValue();
 					String result = (f<s)?arg[0]:arg[1];
 					if (Debug) System.out.println("the minimum one is "+result);
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), previousMatchResult.getValueOfVariable(result));
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-					return match;
-				}
-				else{
-					HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-					if (Debug) System.out.println("one of the arguments of minimum is null!");
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), null);
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
+					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					return match;
 				}
 			}
-			//return error shape, FIXME
-		}
-		else if(i.indexOf("anyDimensionBigger")==0){
-			if (Debug) System.out.println("inside anyDimensionBigger than "+ls.toString());
-			previousMatchResult = ls.match(isPatternSide, previousMatchResult, argValues, num);
-			int latestMatchedNum = previousMatchResult.getLatestMatchedNumber();
-			List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
-			for(Integer d : dimensions){
-				if(d>=latestMatchedNum){
-					return previousMatchResult;
-				}
-			}
-			Shape<?> errorShape = (new ShapeFactory()).newShapeFromIntegers(null);
-			errorShape.FlagItsError();
-			HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-			uppercase.put(previousMatchResult.getLatestMatchedUppercase(), errorShape);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-			return match;
+			System.err.println("cannot compute minimum function in shape equation!");
+			return previousMatchResult;
 			
 		}
-		else if(i.indexOf("numOutput")==0){
-			if (Debug) System.out.println("inside numOutput("+ls.toString()+")");
-			if (Debug) System.out.println("currentlly, the number of output variables is "+num);
-			previousMatchResult = ls.match(isPatternSide, previousMatchResult, argValues, num);
-			int latestMatchedNum = previousMatchResult.getLatestMatchedNumber();
-			if(latestMatchedNum==num){
-				return previousMatchResult;
+		else if (funName.equals("copy") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				if (Debug) System.out.println("try to copy the shape of " + arg[0] + " to the temporary variable " 
+			+ previousMatchResult.getLatestMatchedUppercase());
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				Shape<V> newShape = new ShapeFactory<V>().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
+				return matchResult;
 			}
-			else{
-				previousMatchResult.setIsError();
-				return previousMatchResult;
-			}
+			System.err.println("check your shape equation language for using copy() function.");
+			return previousMatchResult;
 		}
-		if (Debug) System.out.println("not find function, return null!");
-		return null;
+		else if (funName.equals("numOutput") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				if (Debug) System.out.println("checking whether the number of output arguments equals to " + arg[0]);
+				if (Integer.parseInt(arg[0])==Nargout) return previousMatchResult;
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("the number of output arguments is not matched.");
+			return previousMatchResult;
+		}
+		else if (funName.equals("isequal") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==2) {
+				if (Debug) System.out.println("comparing " + previousMatchResult.getShapeOfVariable(arg[0])+" with "+previousMatchResult
+						.getShapeOfVariable(arg[1]));
+				Shape<V> first = previousMatchResult.getShapeOfVariable(arg[0]);
+				Shape<V> second = previousMatchResult.getShapeOfVariable(arg[1]);
+				if (first.equals(second)) return previousMatchResult;
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("two shapes are not equal.");
+			return previousMatchResult;
+		}
+		else if (funName.equals("atLeastOneDimNLT") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				if (Debug) System.out.println("testing whether there is at least one dimension of matched array shape not less than "+arg[0]);
+				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
+				for (DimValue dim : dimensions) {
+					if (dim.hasIntValue()) {
+						if (dim.getIntValue() >= Integer.parseInt(arg[0])) {
+							return previousMatchResult;
+						}
+					}
+				}
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("cannot confirm whether the size of at least one dimension is not less than " + arg[0]);
+			return previousMatchResult;
+		}
+		else if (funName.equals("latestMatchedLowercaseNLT") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==1) {
+				DimValue lowercase = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase());
+				if (lowercase.hasIntValue()) {
+					if (lowercase.getIntValue() >= Integer.parseInt(arg[0])) return previousMatchResult;
+				}
+			}
+			previousMatchResult.setIsError(true);
+			System.err.println("cannot confirm whether latest matched not less than " + arg[0]);
+			return previousMatchResult;
+		}
+		else {
+			System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) 
+					+ "), check your shape equation in builtins.csv file!");
+			return previousMatchResult;
+		}
 	}
 	
-	public String toString(){
-		return i.toString()+"("+(ls==null?"":ls.toString())+")";
+	public String toString() {
+		return funName.toString() + "(" + (arglist==null? "" : arglist.toString()) + ")";
 	}
 }

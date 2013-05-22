@@ -11,12 +11,13 @@ import java.util.TreeSet;
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
-import natlab.toolkits.analysis.test.LivenessAnalysis;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.Def;
+import natlab.toolkits.analysis.core.LivenessAnalysis;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowset;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.AssignStmt;
@@ -28,6 +29,8 @@ import ast.Name;
 import ast.NameExpr;
 import ast.Script;
 
+import com.google.common.collect.Sets;
+
 public class ScriptToFunction {
 	ParsedCompilationUnitsContextStack context;
 	Set<Script> scripts;
@@ -35,7 +38,7 @@ public class ScriptToFunction {
 	public Map<Script, Integer> outputCount = new HashMap<Script, Integer>();
 	public ScriptToFunction(CompilationUnits cu){
 		context = new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu);
-		scripts = new HashSet(NodeFinder.find(cu, Script.class));
+		scripts = Sets.newHashSet(NodeFinder.find(Script.class, cu));
 	}
 	
 	public Map<Script, List<RefactorException>> replaceAll(){
@@ -52,7 +55,7 @@ public class ScriptToFunction {
 	public List<RefactorException> replace(final Script script, Function f){
 		final List<ExprStmt> calls = new LinkedList<ExprStmt>();
 		System.out.println("Script Name: " + script.getName());
-		NodeFinder.apply(context.cu, ExprStmt.class, new AbstractNodeFunction<ExprStmt>() {
+		NodeFinder.apply(ExprStmt.class, context.cu, new AbstractNodeFunction<ExprStmt>() {
 
 			@Override
 			public void apply(ExprStmt node) {
@@ -64,7 +67,7 @@ public class ScriptToFunction {
 		f.setStmtList(script.getStmtList().copy());
 		FunctionList fl = new FunctionList();
 		fl.addFunction(f);
-		fl.setFullPath(script.getFullPath());
+		fl.setFile(script.getFile());
 		f.setParent(fl.getFunctionList());
 		LivenessAnalysis live = new LivenessAnalysis(script);
 		VFFlowInsensitiveAnalysis scriptKind = new VFFlowInsensitiveAnalysis(script);
@@ -75,7 +78,7 @@ public class ScriptToFunction {
 		
 		Set<String> scriptLiveVars = live.getOutFlowSets().get(script).getSet();
 		Set<String> assignedVars = new HashSet<String>();
-		for (Map.Entry<String, Set<AssignStmt>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
+		for (Map.Entry<String, Set<Def>> entry: scriptReaching.getOutFlowSets().get(script).toMap().entrySet()){
 			if (entry.getValue().contains(ReachingDefs.UNDEF) || entry.getValue().isEmpty())
 				continue;
 			assignedVars.add(entry.getKey());
@@ -90,7 +93,7 @@ public class ScriptToFunction {
         
 		for (ExprStmt call: calls) {
 			Name name = ((NameExpr)call.getExpr()).getName();
-			Function callFunc = NodeFinder.findParent(call, Function.class);
+			Function callFunc = NodeFinder.findParent(Function.class, call);
 			if (callFunc == null){ //called inside script
 				errors.add(new Exceptions.ScriptCalledFromScript(name));
 				return errors;
@@ -109,7 +112,7 @@ public class ScriptToFunction {
             //                }
             //}
             if (inlined) {
-                System.out.println(context.cu.getName()+ " " + name+ "\n"+ callFunc.getPrettyPrinted());
+                System.out.println(name+ "\n"+ callFunc.getPrettyPrinted());
             }
 			TreeSet<String> inputArgsCurrent = new TreeSet<String>();
 			TreeSet<String> outputArgsCurrent = new TreeSet<String>();
@@ -118,15 +121,15 @@ public class ScriptToFunction {
 			mayReach.analyze();
 			callLive.analyze();
 			Set<String> callLiveVars = callLive.getOutFlowSets().get(call).getSet();
-			Map<String, Set<AssignStmt>> reaching = mayReach.getInFlowSets().get(call).toMap();
+			Map<String, Set<Def>> reaching = mayReach.getInFlowSets().get(call).toMap();
             System.out.println("\ncallReaching:" + reaching + "\ncLive:" +callLiveVars); 
             if (inlined) {
                 System.out.println();
             }
 
-			for (Map.Entry<String, Set<AssignStmt>> entry: reaching.entrySet()){
+			for (Map.Entry<String, Set<Def>> entry: reaching.entrySet()){
 				if (entry.getValue() != null){
-                    Set<AssignStmt> reached = entry.getValue();
+                    Set<Def> reached = entry.getValue();
 					 if ((reached.size()>1 || (!reached.contains(ReachingDefs.UNDEF))) && scriptLiveVars.contains(entry.getKey()))
 						 inputArgsCurrent.add(entry.getKey());
 				}

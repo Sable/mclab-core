@@ -35,62 +35,15 @@
 	<!-- Extend and override parts of gen.xml -->
   <import optional="true" file="local.xml" />
 
-	<target name="compile.test.generators" unless="inside.eclipse">
-		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${ant.bin.dir}">
-			<src path="${test.dir}" />
-			<include name="**/*TestGenerator.java" />
-		</javac>
-	</target>
-
-	<target name="gen.scanner.tests" depends="set.bin.dir">
-		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${lexer.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="gen.parser.pass.tests" depends="set.bin.dir">
-		<java classname="${parser.pass.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${parser.pass.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-	<target name="gen.parser.fail.tests" depends="set.bin.dir">
-		<java classname="${parser.fail.test.generator.class}" classpath="${bin.dir}">
-			<arg value="${basedir}/${parser.fail.test.list.file}" />
-			<arg value="${basedir}/${gen.dir}" />
-		</java>
-	</target>
-
-  <target name="gen.multireturn.pass.tests" depends="set.bin.dir">
-    <java classname="${multireturn.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${multireturn.pass.test.list.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
+	<target name="gen.tests" depends="set.bin.dir">
+    <exec dir="${basedir}" executable="./gen_tests.sh">
+      <arg line="${basedir}/${test.dir} ${basedir}/${bin.dir} ${basedir}/${gen.dir}" />
+    </exec>
   </target>
-
-  <target name="gen.leftthreeaddress.pass.tests" depends="set.bin.dir">
-    <java classname="${leftthreeaddress.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${leftthreeaddress.pass.test.list.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
-  </target>
-
-  <target name="gen.simplifications.pass.tests" depends="set.bin.dir">
-    <java classname="${simplifications.pass.test.generator.class}" classpath="${bin.dir}">
-      <arg value="${basedir}/${simplifications.pass.test.master.file}" />
-      <arg value="${basedir}/${gen.dir}" />
-    </java>
-  </target>
-
-  <target name="gen.simplification.tests" depends="gen.simplifications.pass.tests" />
-	<target name="gen.tests" depends="gen.scanner.tests, gen.parser.pass.tests, gen.parser.fail.tests, gen.simplification.tests" />
 
 	<!-- jflex, beaver, jastadd, and tests -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="gen" depends="compile.test.generators, Gen.gen-parser, options" />
+	<target name="gen" depends="Gen.gen-parser, options" />
 
 	<!-- jflex from metalexer spec -->
 	<target name="metalexer">
@@ -103,8 +56,10 @@
 
 	<!-- generates Java files from JFlex scanner spec -->
 	<!-- NB: overrides target from gen.xml -->
-	<target name="jflex" depends="def.jflex.task, metalexer">
+	<target name="jflex" depends="def.setloglevel.task, def.jflex.task, metalexer">
+    <setloglevel loglevel="error" />
 		<jflex file="${gen.dir}/${lexer.dir}/${layout.name}.flex" destdir="${gen.dir}" nobak="yes" />
+    <setloglevel loglevel="info" />
 	</target>
 
 	<!--=====================================================================-->
@@ -153,27 +108,8 @@
 			<path location="${basedir}/${matlab.bin.dir}" />
       <path location="${basedir}/resources" />
 		</path>
-    <union id="runtime.classpath">
-      <zipfileset src="${lib.dir}/${beaver.rt.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr3.rt.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${string.template.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${antlr2.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset src="${lib.dir}/${guava.jar.path.prop}">
-        <patternset> <exclude name="META-INF/**" /> </patternset>
-      </zipfileset>
-      <zipfileset dir="${matlab.bin.dir}/" includes="**/*.class" />
-      <fileset dir="${basedir}/resources" />
-    </union>
 	</target>
-             
+
 	<!--=====================================================================-->
 	<!-- Public Targets                                                      -->
 	<!--=====================================================================-->
@@ -181,97 +117,67 @@
 	<import file="../shared/cli.xml" />
 	<import file="../shared/eclipse.xml" />
 
+  <macrodef name="natlab-jar">
+  <attribute name="excludes" default="" />
+  <attribute name="basename" />
+  <sequential>
+    <jar destfile="@{basename}.jar">
+      <manifest><attribute name="Main-Class" value="${entrypoint.class}" /></manifest>
+      <zipgroupfileset dir="${lib.dir}"
+        includes="${beaver.rt.jar.path.prop},${antlr3.rt.jar.path.prop},${string.template.jar.path.prop},${antlr2.jar.path.prop},${guava.jar.path.prop}" />
+      <fileset dir="${matlab.bin.dir}/" includes="**/*.class" />
+      <fileset dir="${basedir}/resources" />  
+      <fileset dir="${basedir}/${bin.dir}" includes="**/*.class" excludes="@{excludes}" />
+    </jar>
+    <echo file="@{basename}.sh">
+      ${entrypoint.script.header}
+      java -jar "${basedir}/@{basename}.jar" $$*
+    </echo>
+    <chmod file="@{basename}.sh" perm="755" />  
+  </sequential>
+  </macrodef>
+
 	<!-- public versions of cli.xml targets -->
 	<target name="build" depends="matlab.build, CommandLineInterface.build" description="generate and build all files (including matlab)">
 	</target>
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
-	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+	<target name="test" depends="build, CommandLineInterface.test" description="runs all JUnit tests" />
+
   <target name="jar" depends="matlab.build, clean, jar_noclean" description="creates an executable release jar" />
-	<target name="jar_noclean" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<jar destfile="${entrypoint.jarname}">
-			<manifest>
-				<attribute name="Main-Class" value="${entrypoint.class}" />
-			</manifest>
-			<fileset dir="${basedir}/${bin.dir}" includes="**/*.class"  />
-      <resources refid="runtime.classpath" />
-    </jar>
-    <echo file="${entrypoint.script.name}">${entrypoint.script.header}
-java -jar "${basedir}/${entrypoint.jarname}" $$*</echo>
-    <chmod file="${entrypoint.script.name}" perm="755" />
+	<target name="jar_noclean" depends="gen, compile" 
+          description="creates an executable release jar without cleaning first">
+    <natlab-jar basename="${entrypoint.name}" />
 	</target>
 
 	<!-- jar build without tame and backend-->
-  <target name="jar-frontend" depends="matlab.build,
-		clean, jar_noclean_frontend" description="creates an executable
-		release jar" />
-	<target name="jar_noclean_frontend" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<jar destfile="${entrypoint.frontend.jarname}">
-			<manifest>
-				<attribute name="Main-Class" value="${entrypoint.class}" />
-			</manifest>
-			<fileset dir="${basedir}/${bin.dir}"
-				includes="**/*.class" excludes="**/tame/**, 
-			 **/backends/**" />
-      <resources refid="runtime.classpath" />
-		</jar>
-    <echo file="${entrypoint.frontend.script.name}">${entrypoint.script.header}
-java -jar "${basedir}/${entrypoint.frontend.jarname}" $$*</echo>
-    <chmod file="${entrypoint.frontend.script.name}" perm="755" />
+  <target name="jar-frontend" depends="matlab.build, clean, jar_noclean_frontend" 
+          description="creates an executable release jar" />
+	<target name="jar_noclean_frontend" depends="gen, compile" 
+          description="creates an executable release jar without cleaning first">
+		<natlab-jar basename="${entrypoint.frontend.name}" excludes="**/tame/**,**/backends/**" />
 	</target>
 
 	<!-- jar build without backend-->
-  <target name="jar-with-tamer" depends="matlab.build,
-		clean, jar_noclean_tame" description="creates an executable
-		release jar" />
-	<target name="jar_noclean_tame" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<jar destfile="${entrypoint.mcsaf_with_tamer.jarname}">
-			<manifest>
-				<attribute name="Main-Class" value="${entrypoint.class}" />
-			</manifest>
-			<fileset dir="${basedir}/${bin.dir}"
-				includes="**/*.class" excludes="**/backends/**" />
-      <resources refid="runtime.classpath" />
-		</jar>
-    <echo file="${entrypoint.mcsaf_with_tamer.script.name}">${entrypoint.script.header}
-java -jar "${basedir}/${entrypoint.mcsaf_with_tamer.jarname}" $$*</echo>
-    <chmod file="${entrypoint.mcsaf_with_tamer.script.name}" perm="755" />
+  <target name="jar-with-tamer" depends="matlab.build, clean, jar_noclean_tame" 
+          description="creates an executable release jar" />
+	<target name="jar_noclean_tame" depends="gen, compile" 
+          description="creates an executable release jar without cleaning first">
+		<natlab-jar basename="${entrypoint.mcsaf_with_tamer.name}" excludes="**/backends/**" />
 	</target>
-
  
-	<!-- jar build with x10  backend-->
- <target name="jar-mix10" depends="matlab.build,
-		clean, jar_noclean_mix10" description="creates an executable
-		release jar" />
+	<!-- jar build with x10 backend-->
+  <target name="jar-mix10" depends="matlab.build, clean, jar_noclean_mix10"
+          description="creates an executable release jar" />
 	<target name="jar_noclean_mix10" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<jar destfile="${entrypoint.x10_backend.jarname}">
-			<manifest>
-				<attribute name="Main-Class" value="${entrypoint.class}" />
-			</manifest>
-			<fileset dir="${basedir}/${bin.dir}"
-				includes="**/*.class" excludes="**/Fortran/**" />
-      <resources refid="runtime.classpath" />
-		</jar>
-		<echo file="${entrypoint.x10_backend.script.name}">${entrypoint.script.header}
-java -jar "${basedir}/${entrypoint.x10_backend.jarname}" $$*</echo>
-    <chmod file="${entrypoint.x10_backend.script.name}" perm="755" />
+		<natlab-jar basename="${entrypoint.x10_backend.name}" excludes="**/Fortran/**" />
 	</target>
  
 	<!-- jar build with fortran  backend-->
-  <target name="jar-fortran-backend" depends="matlab.build,
-		clean, jar_noclean_fb" description="creates an executable
-		release jar" />
-	<target name="jar_noclean_fb" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<jar destfile="${entrypoint.fortran_backend.jarname}">
-			<manifest>
-				<attribute name="Main-Class" value="${entrypoint.class}" />
-			</manifest>
-			<fileset dir="${basedir}/${bin.dir}"
-				includes="**/*.class" excludes="**/x10/**" />
-      <resources refid="runtime.classpath" />
-		</jar>
-		<echo file="${entrypoint.fortran_backend.script.name}">${entrypoint.script.header}
-java -jar "${basedir}/${entrypoint.fortran_backend.jarname}" $$*</echo>
-    <chmod file="${entrypoint.fortran_backend.script.name}" perm="755" />
+  <target name="jar-fortran-backend" depends="matlab.build, clean, jar_noclean_fb"
+          description="creates an executable release jar" />
+	<target name="jar_noclean_fb" depends="gen, compile" 
+          description="creates an executable release jar without cleaning first">
+		<natlab-jar basename="${entrypoint.fortran_backend.name}" excludes="**/x10/**" />
 	</target>
 
 	<!-- public versions of eclipse.xml targets -->

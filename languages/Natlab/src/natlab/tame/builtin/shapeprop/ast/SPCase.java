@@ -1,53 +1,48 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPCase extends SPNode{
-	static boolean Debug = false;
-	SPAbstractPattern first;
-	SPOutput next;
+public class SPCase<V extends Value<V>> extends SPNode<V> {
 	
-	public SPCase(SPAbstractPattern p, SPOutput o){
-		this.first = p;
-		//System.out.println("->");
-		this.next = o;
+	static boolean Debug = false;
+	SPPatternlist<V> patternlist;
+	SPOutputlist<V> outputlist;
+	
+	public SPCase(SPPatternlist<V> p, SPOutputlist<V> o) {
+		this.patternlist = p;
+		this.outputlist = o;
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
-		if(match.getIsError()==true){
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		ShapePropMatch<V> patternMatch = patternlist.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		/*
+		 * test whether there is any error when do shape matching.
+		 */
+		if (patternMatch.getIsError()) {
 			isPatternSide = false;
-			if(match.getNumMatched()!=argValues.size()){
-				if (Debug) System.out.println("matching part is over, break out!");
-				return match;
+			return patternMatch;
+		}
+		/*
+		 * if there is no error when do shape matching.
+		 */
+		else {
+			if (patternMatch.getHowManyMatched()==argValues.size()) {
+				isPatternSide = false;
+				if (Debug) System.out.println("matching part is done successfully!");
+				ShapePropMatch<V> outputMatch = outputlist.match(isPatternSide, patternMatch, argValues, Nargout);
+				// we may don't need argValues in output side.
+				return outputMatch;
 			}
-			//there is no possibility that, isError is true and getNumMatched equals to argVaules.size...funny...
+			else {
+				isPatternSide = false;
+				patternMatch.setIsError(true);
+				return patternMatch;
+			}			
 		}
-		if((match.getNumMatched()==1)&&(argValues.isEmpty()==true)){  //for matching an empty argument list
-			isPatternSide = false;
-			if (Debug) System.out.println("matching an empty argument list is done!");
-			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues, num);
-			return outputMatch;
-		}
-		if(match.getNumMatched()!=argValues.size()){ //match unsuccessful
-			isPatternSide = false;
-			match.setIsError();
-			return match;
-		}
-		if(match.getNumMatched()==argValues.size()){  //if pattern part is done with successful matching
-			isPatternSide = false;
-			if (Debug) System.out.println("matching part is done!");
-			ShapePropMatch outputMatch = next.match(isPatternSide, match, argValues, num); //I sense that maybe we don't need argValues in output
-			return outputMatch;
-		}
-		else
-			return null;
 	}
 	
 	public String toString(){
-		return first.toString()+"->"+next.toString();
+		return patternlist.toString() + "->" + outputlist.toString();
 	}
 }

@@ -1,35 +1,33 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPOr extends SPAbstractMatchExpr{
-	SPAbstractMatchExpr first;
-	SPAbstractMatchExpr next;
+public class SPOr<V extends Value<V>> extends SPAbstractMatchExpr<V> {
 	
-	public SPOr (SPAbstractMatchExpr first,SPAbstractMatchExpr next){
+	SPAbstractMatchExpr<V> first;
+	SPAbstractMatchExpr<V> next;
+	
+	public SPOr (SPAbstractMatchExpr<V> first,SPAbstractMatchExpr<V> next) {
 		this.first = first;
 		this.next = next;
-		//System.out.println("|");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		int indexBeforeOr = previousMatchResult.getNumMatched();
-		ShapePropMatch match = first.match(isPatternSide, previousMatchResult, argValues, num);
-		int indexAfterOr = match.getNumMatched();
-		if(indexBeforeOr==indexAfterOr){
-			if(match.getIsError()==true){
-				match.resetIsError();
-			}
-			ShapePropMatch continueMatch = next.match(isPatternSide, match, argValues, num);//actually, here, match is the same to previousMatchResult
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		int indexBeforeOr = previousMatchResult.getHowManyMatched();
+		ShapePropMatch<V> firstMatchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		int indexAfterOr = firstMatchResult.getHowManyMatched();
+		if (indexBeforeOr == indexAfterOr) { 
+			// which means first part matching fails, reset error flag, and goes to next part matching.
+			if (firstMatchResult.getIsError()) firstMatchResult.setIsError(false);
+			ShapePropMatch<V> continueMatch = next.match(isPatternSide, firstMatchResult, argValues, Nargout);
 			return continueMatch;
 		}
-		return match;
+		// which means first part matching succeed.
+		return firstMatchResult;
 	}
 	
-	public String toString(){
-		return first.toString()+"|"+next.toString();
+	public String toString() {
+		return first.toString() + "|" + next.toString();
 	}
 }

@@ -22,11 +22,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
+import natlab.utils.AstFunctions;
 import ast.Expr;
 import ast.List;
 import ast.LiteralExpr;
 import ast.Name;
 import ast.NameExpr;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 /**
  * comma separated list as it appears in function calls, or as the left
@@ -121,12 +126,8 @@ public class TIRCommaSeparatedList extends List<Expr> implements TIRNode {
     /**
      * returns true if all the expressions in the list are just name expressions
      */
-    //TODO - make this more efficient
     public boolean isAllNameExpressions(){
-        for (int i = 0; i < getNumChild(); i++){
-            if (!(getChild(i) instanceof NameExpr)) return false;
-        }
-        return true;
+      return Iterables.all(this, Predicates.instanceOf(NameExpr.class));
     }
     
     
@@ -147,12 +148,7 @@ public class TIRCommaSeparatedList extends List<Expr> implements TIRNode {
     
     @Override
     public String toString() {
-        String s = "[";
-        Iterator<Expr> i = this.iterator();
-        while(i.hasNext()){
-            s += i.next().getPrettyPrinted();
-            if (i.hasNext()) s += ",";
-        }
-        return s+"]";
+        return String.format("[%s]", 
+            Joiner.on(",").join(Iterables.transform(this, AstFunctions.prettyPrint())));
     }
 }

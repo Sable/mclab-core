@@ -1,30 +1,27 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPPlus extends SPAbstractMatchExpr{
+public class SPPlus<V extends Value<V>> extends SPAbstractMatchExpr<V> {
+	
 	static boolean Debug = false;
-	SPAbstractMatchExpr sp;
-	public SPPlus (SPAbstractMatchExpr sp){
+	SPAbstractMatchExpr<V> sp;
+	
+	public SPPlus (SPAbstractMatchExpr<V> sp) {
 		this.sp = sp;
-		//System.out.println("+");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		ShapePropMatch keepMatch = sp.match(isPatternSide, previousMatchResult, argValues, num);
-		while((argValues.size()>keepMatch.getNumMatched())&&(keepMatch.getIsError()==false)){
-			if (Debug) System.out.println("inside plus loop "+keepMatch.getNumMatched());
-			if (Debug) System.out.println(keepMatch.getNumMatched());
-			if (Debug) System.out.println("index doesn't point null, keep matching!");
-			keepMatch = sp.match(isPatternSide, keepMatch, argValues, num);
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		ShapePropMatch<V> matchResult = sp.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		while (argValues.size()>matchResult.getHowManyMatched() && !matchResult.getIsError()) {
+			if (Debug) System.out.println("inside multiple shape pattern matching.");
+			matchResult = sp.match(isPatternSide, matchResult, argValues, Nargout);
 		}
-		return keepMatch;
+		return matchResult;
 	}
 	
-	public String toString(){
-		return sp.toString()+"+";
+	public String toString() {
+		return sp.toString() + "+";
 	}
 }

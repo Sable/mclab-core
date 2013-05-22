@@ -234,7 +234,7 @@ rem
 
 # array wise binary numeric matrix function
 arrayBinaryNumericFunction; binaryNumericFunction
--Shape(M,M,anyDimensionBigger(3)->M)
+-Shape(M,M,atLeastOneDimNLT(3)->M||M,M,$,n=previousScalar(),k=previousShapeDim(n),latestMatchedLowercaseNLT(3)->M)
 -isComplex(A,A,R?->R)
 #TODO@Vineet confirm if the output has to be real ?
 cross
@@ -727,9 +727,9 @@ ctranspose
 
 # all these take multiple args
 Concatenation; versatileFunction
-horzcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K)
+horzcat;; Shape(M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K)
 -isComplex(A,A+ -> NUMXARGS>0?X:R)
-vertcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K)
+vertcat;; Shape(M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K)
 -isComplex(A,A+ -> NUMXARGS>0?X:R)
 # generalization of horz/vert cat
 cat

@@ -27,6 +27,7 @@ import java.util.Set;
 import natlab.tame.classes.reference.FunctionHandleClassReference;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.path.FunctionReference;
@@ -63,6 +64,13 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
         super(factory);
         functions.add(FunctionHandle.newInstance(f,partialValues));        
     }
+    
+    @Override
+    public String getSymbolic() {
+    	//TODO later
+    	return null;
+    }
+    
     @Override
     public FunctionHandleClassReference getMatlabClass() {
         return FunctionHandleClassReference.getInstance();
@@ -199,11 +207,16 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
         @Override
         public String toString() {
             if (partialValues.size() == 0){
-                return "@"+function.getname();
+                return "@"+function.getName();
             } else {
                 String s = partialValues.toString();
-                return "@"+function.getname()+"("+s.substring(1,s.length()-1)+",..)";
+                return "@"+function.getName()+"("+s.substring(1,s.length()-1)+",..)";
             }
         }
     }
+
+	@Override
+	public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+		return factory.getIsComplexInfoFactory().newisComplexInfoFromStr("REAL");
+	}
 }

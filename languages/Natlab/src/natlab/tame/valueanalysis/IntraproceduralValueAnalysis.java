@@ -24,6 +24,12 @@ import ast.*;
  * 
  * This class operates on the static IR.
  * 
+ * @author ant6n
+ * 
+ * extended by XU to support variables (also including arrays, 
+ * but how about function call?) dependence analysis in 
+ * loop statements.
+ * 
  */
 public class IntraproceduralValueAnalysis<V extends Value<V>>
 extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<V>>
@@ -33,9 +39,12 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     ValuePropagator<V> valuePropagator;
     ValueFlowMap<V> argMap;
     Args<V> args;
-    static boolean Debug = false;  //button of debug
+    static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
+    TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
+    Set<String> dependentVars = new HashSet<String>(); // XU added it to store dependency analysis result.
+    HashMap<String, LinkedList<V>> hookMap = new HashMap<String, LinkedList<V>>();
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
             StaticFunction function, ValueFactory<V> factory) {
@@ -113,6 +122,22 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
 
     /*********** statement cases *****************************************/
     @Override
+    public void caseTIRWhileStmt(TIRWhileStmt node)
+    {
+    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
+    	dependentVars.addAll(analyzeDependency.getResult());
+        parentForwarder.caseTIRWhileStmt(node);
+    }
+    
+    @Override
+    public void caseTIRForStmt(TIRForStmt node)
+    {
+    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
+    	dependentVars.addAll(analyzeDependency.getResult());
+        parentForwarder.caseTIRForStmt(node);
+    }
+    
+    @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
         if (checkNonViable(node)) return;
         if (Debug) System.out.println("ircall: "+node.getPrettyPrinted());
@@ -164,7 +189,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                     node.getLowerName(),node.getUpperName())){
                 results.add(Res.newInstance(
                 		factory.forRange(list.getFirst(),list.getLast(),null)));
-                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);//XU added to debug
+                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);
             }
         }
         //put results
@@ -231,7 +256,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 		callsite = this.node.createCallsiteObject(node);
                 	}
                     results.add(call(
-                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getname(),false));
+                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getName(),false));
                     //TODO - we assume overloading is no possible for a function handle value - is that Matlab semantics?
                 }
             } else {
@@ -325,10 +350,16 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //put in flow map
         ValueFlowMap<V> flow = getCurrentInSet();
         String targetName = node.getTargetName().getID();
+        
+        /*
+         * this comment and code below modified added by XU @ 6:36pm March 9th 2013
+         * this targetName can be used as a symbolic value of this target variable, 
+         * so I passed this symbolic info to newValueSet method below.
+         */
 
         //assign result
         setCurrentOutSet(assign(flow,targetName, 
-                Res.newInstance(factory.newValueSet(constant))));   //XU study this line!!!4.26.2.14am, after this line, we get class information, which means, type information is got here!!!
+                Res.newInstance(factory.newValueSet(targetName, constant))));
 
         //set in/out set
         associateInAndOut(node);
@@ -561,9 +592,10 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     	//get number of requested results
     	int numOfOutputVariables = 1;
     	if (callsite.getASTNode() instanceof TIRAbstractAssignToListStmt){                	
-    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets(); //XU added here, to pass number of output variables to the equation propagator/analysis
+    		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets();
+    		//XU added here, to pass number of output variables to the equation propagator/analysis
     	}
-
+    	
     	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
@@ -595,15 +627,31 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         	
         	//actually call
             //System.out.println("doFunctionCall result "+res);
-            if (function.isBuiltin()){
-                Args<V> argsObj = Args.newInstance(numOfOutputVariables,argumentList);
+        	if (function.isBuiltin()) {
+            	if (functionName.equals("horzcat") || functionName.equals("vertcat")) {
+            		LinkedList<V> hookList = new LinkedList<V>();
+                	for (Name arg : args.asNameList()) {
+                		hookList.add(flow.get(arg.getID()).getSingleton());
+                	}
+            		hookMap.put(targets.getName(0).getID(), hookList);
+            	}
+            	Args<V> argsObj;
+            	if ((functionName.equals("ones") || functionName.equals("zeros") || functionName.equals("rand"))
+            			&& args.size()==1 && hookMap.containsKey(args.asNameList().get(0).getID())) {
+            		argsObj = Args.newInstance(dependentVars, numOfOutputVariables
+            				, hookMap.get(args.asNameList().get(0).getID()));
+            	}
+            	else {
+            		argsObj = Args.newInstance(dependentVars,numOfOutputVariables,argumentList);
+            	}
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
-                if (function.getname().equals("nargin") && argsObj.size() == 0){
-                    results.add(Res.newInstance(factory.newMatrixValue(argMap.size())));
+                if (function.getName().equals("nargin") && argsObj.size() == 0){
+                	// changed by XU @ 6:41pm March 9th 2013, TODO unchecked!
+                    results.add(Res.newInstance(factory.newMatrixValue(null, argMap.size())));
                 } else {
                 	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);
-                	results.add(valuePropagator.call(function.getname(), argsObj));
+                	results.add(valuePropagator.call(function.getName(), argsObj));
                 }
             }else{
                 //simplify args
@@ -646,7 +694,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             String target, Res<V> values){
-    	if (Debug) System.out.println(values);//XU comment, at this point, the values are already combination of class and value, for me, U need to add shape into it.
         return assign(flow,new TIRCommaSeparatedList(new NameExpr(new Name(target))),values);
     }
     
@@ -662,7 +709,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private ValueFlowMap<V> assign(ValueFlowMap<V> flow, 
             TIRCommaSeparatedList targets, Res<V> values){
-       if (Debug) System.out.println("assign: "+targets+" = "+values);  //XU commented, at this point, values are already combination of class and value.
+       if (Debug) System.out.println("assign: "+targets+" = "+values);
        ValueFlowMap<V> result = flow.copy();
        if (!values.isViable()){
            return ValueFlowMap.newInstance(false);

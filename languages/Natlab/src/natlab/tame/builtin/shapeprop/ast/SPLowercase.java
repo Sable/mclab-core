@@ -5,130 +5,189 @@ import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPLowercase extends SPAbstractScalarExpr{
+public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V> {
+	
 	static boolean Debug = false;
 	String s;
-	public SPLowercase(String s){
+	
+	public SPLowercase(String s) {
 		this.s = s;
-		//System.out.println(s);
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		if(isPatternSide==true){
-			//for matching a vertcat expression, this step should be similar to Uppercase matching, to exam whether equals!
-			if(previousMatchResult.isInsideVertcat()==true){
+	/**
+	 * lowercase variables can appear in several cases: 
+	 * 1. as a vertcat shape pattern, like [m,n];
+	 * 2. on the lhs of an assignment statement by itself, like n=previousScalar();
+	 * 3. on the lhs of an assignment statement as an index of an uppercase, like M(m)=n;
+	 * 4. on the rhs of an assignment statement by itself, like M(2)=n.
+	 * we have three boolean values or "flags" to help matching algorithm informed which 
+	 * cases this lowercase is in, they are 
+	 * 		boolean	isInsideVertcat, 
+	 * 		boolean	isAssignLiteralToLHS and 
+	 * 		boolean	whetherLatestMatchedIsNum. 
+	 * isInsideVertcat can separate case 1 from other three cases, 
+	 * isAssignLiteralToLHS can separate case 3,4 from case 2, and 
+	 * whetherLatestMatchedIsNum can separate case 3 from case 4.
+	 */
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		if (isPatternSide) {
+			/* 
+			 * for matching a vertcat expression, like [m,n] or [j,k,..l]. 
+			 * if the first time encounter this lowercase, first, we try to match this lowercase with 
+			 * corresponding argument's shape, and then record this lowercase;
+			 * if not the first time encounter this lowercase, after matching this lowercase with 
+			 * corresponding argument's shape, we have to also check whether the matching results 
+			 * from two same lowercase matching are the same, like [l,k]*[k,n], k should match the same.
+			 */
+			if (previousMatchResult.getIsInsideVertcat()) {
 				if (Debug) System.out.println("a lowercase inside vertcat!");
-				if (Debug) System.out.println(previousMatchResult.getNumInVertcat());
-				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());
-				//get its shape information
-				Shape<?> argumentShape = ((HasShape)argument).getShape();
-				if (Debug) System.out.println("argument shape is "+argumentShape);
-				if(previousMatchResult.getAllLowercase().containsKey(s)){
-					try{
-						if(((previousMatchResult.getValueOfVariable(s))==argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()))==false){
-							if (Debug) System.out.println("two lowercase value not equal, throw error shape!");
-							if (Debug) System.out.println("MATLAB syntax error!");
-							previousMatchResult.setIsError();
-							HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-							lowercase.put(s, null);
-							ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-							match.saveLatestMatchedLowercase(s);
-							return match;
-						}
-						HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-						lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-						ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-						if (Debug) System.out.println(match.getAllLowercase());
-						match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
-						return match;
-					}catch (Exception e){}
-					//means one of them, the previous matched lowercase or current number in the argument, is null
-					if (Debug) System.out.println("there is null information in dimensions!");
-					previousMatchResult.setIsError();
+				Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult
+						.getHowManyMatched())).getShape();
+				int index = previousMatchResult.getNumInVertcat();
+				if (argumentShape.getDimensions().size() <= index) {
+					previousMatchResult.setIsError(true);
+					System.err.println("shape propagation fails in vertcat matching.");
 					return previousMatchResult;
 				}
-				HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-				if(argumentShape.getCertainDimensionSize(previousMatchResult.getNumInVertcat())==null){
-					lowercase.put(s, null);
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(match.getAllLowercase());
-					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
-					return match;
+				/* 
+				 * already encounter this lowercase before, checking whether the previous matched result 
+				 * is equal to this time matched result.
+				 */
+				if (previousMatchResult.getAllLowercase().containsKey(s)) {
+					if (previousMatchResult.getValueOfVariable(s).hasIntValue() 
+							&& argumentShape.getDimensions().get(index).hasIntValue()) {
+						if (!previousMatchResult.getValueOfVariable(s).getIntValue()
+								.equals(argumentShape.getDimensions().get(index).getIntValue())) {
+							System.err.println("two same lowercase's values are not equal" +
+									", go to next pattern matching!");
+							previousMatchResult.setIsError(true);
+							return previousMatchResult;
+						}
+						previousMatchResult.setNumInVertcat(index+1);
+						return previousMatchResult;						
+					}
+					System.err.println("shape propagation fails in vertcat matching.");
+					previousMatchResult.setIsError(true);
+					return previousMatchResult;
 				}
-				else{
-					lowercase.put(s, argumentShape.getDimensions().get(previousMatchResult.getNumInVertcat()));
-					ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-					if (Debug) System.out.println(match.getAllLowercase());
-					match.setNumInVertcat(previousMatchResult.getNumInVertcat()+1);
-					return match;
+				/*
+				 * first time encounter this lowercase, matching shape then record the value of matching result.
+				 */
+				else {
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					if (argumentShape.getDimensions().get(index).hasIntValue()) {
+						lowercase.put(s, new DimValue(argumentShape.getDimensions().get(index).getIntValue(), null));
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+						matchResult.setNumInVertcat(index+1);
+						return matchResult;
+					}
+					else if (argumentShape.getDimensions().get(index).hasSymbolic()) {
+						lowercase.put(s, new DimValue(null, argumentShape.getDimensions().get(index).getSymbolic()));
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+						matchResult.setNumInVertcat(index+1);
+						return matchResult;
+					}
+					else {
+						lowercase.put(s, new DimValue());
+						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+						matchResult.setNumInVertcat(index+1);
+						return matchResult;
+					}				
 				}
 			}
-			//for assign a lowercase's value to an ArrayIndex
-			if(previousMatchResult.isArrayIndexAssignRight()==true){
-				if (Debug) System.out.println("trying to assign the value of "+s.toString()+" to an array!");
-				List<Integer> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions();
-				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
-					if (Debug) System.out.println("inside assigning a lowercase's value to array with num index!");//i.e. M(2)=n;
-					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getLatestMatchedNumber()-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getLatestMatchedNumber());
-						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
+			/*
+			 * for matching the pattern that assigning a lowercase to 
+			 */
+			else if (previousMatchResult.getIsAssignLiteralToLHS()) {
+				if (Debug) System.out.println("trying to assign the value of "+s.toString()+" to an indexed array!");
+				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult
+						.getLatestMatchedUppercase()).getDimensions();
+				if (previousMatchResult.getWhetherLatestMatchedIsNum()) {
+					if (Debug) System.out.println("inside assigning a lowercase's value to a num indexed array!"); // i.e. M(2)=n;
+					/* 
+					 * array bound check for lhs, actually, we can also do this in array indexing node, 
+					 * but it's okay to put array bound check here. 
+					 */
+					if (dimensions.size() < previousMatchResult.getLatestMatchedNumber()) {
+						System.err.println("index exceed the array bound, check your shape equation.");
+						previousMatchResult.setIsError(true);
+						previousMatchResult.setIsAssignLiteralToLHS(false);
 						return previousMatchResult;
 					}
 					dimensions.remove((previousMatchResult.getLatestMatchedNumber()-1));
-					if(previousMatchResult.hasValue(s)){
+					if (previousMatchResult.hasValue(s)) 
 						dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), previousMatchResult.getValueOfVariable(s));
-					}
-					else{
-						dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), null);
-					}
+					else
+						dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), new DimValue());
 				}
-				else{
+				else {
 					if (Debug) System.out.println("inside assigning a lowercase's value to array with lowercase index!");//i.e. M(n)=m;
-					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
-					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
-						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
-						return previousMatchResult;
+					/* 
+					 * array bound check for lhs, actually, we can also do this in array indexing node, 
+					 * but it's okay to put array bound check here. 
+					 */
+					if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasIntValue()) {
+						if (dimensions.size() < previousMatchResult.getValueOfVariable(previousMatchResult
+								.getLatestMatchedLowercase()).getIntValue()) {
+							System.err.println("index exceed the array bound, check your shape equation.");
+							previousMatchResult.setIsError(true);
+							previousMatchResult.setIsAssignLiteralToLHS(false);
+							return previousMatchResult;
+						}
+						dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult
+								.getLatestMatchedLowercase()).getIntValue()-1);
+						if (previousMatchResult.hasValue(s)) 
+							dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult
+									.getLatestMatchedLowercase()).getIntValue()-1, previousMatchResult.getValueOfVariable(s));
+						else
+							dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult
+									.getLatestMatchedLowercase()).getIntValue()-1, new DimValue());
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1, previousMatchResult.getValueOfVariable(s));
+					else {
+						System.err.println("the index of uppercase shape dimension cannot be determined.");
+						previousMatchResult.setIsError(true);
+						return previousMatchResult;						
+					}
 				}
-				if (Debug) System.out.println("new dimension is "+dimensions);
-				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
-				if (Debug) System.out.println(uppercase);
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-				match.setArrayIndexAssignRight(false);
-				return match;
+				/*
+				 * both if and else branch, if matching successfully, will generate a new dimensions.
+				 */
+				if (Debug) System.out.println("new shape of "+previousMatchResult.getLatestMatchedUppercase() 
+						+ " is " + previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(), new ShapeFactory<V>().newShapeFromDimValues(dimensions));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
+				matchResult.setIsAssignLiteralToLHS(false);
+				return matchResult;
 			}
-			if(previousMatchResult.getAllLowercase().containsKey(s)){
-				if (Debug) System.out.println(s+" is contained in the hashmap!");
-				previousMatchResult.saveLatestMatchedLowercase(s);
-				return previousMatchResult;
+			/*
+			 * the case that assigning anything to a lowercase, like n=previousScalar() or n=rhs.
+			 */
+			else {
+				if (previousMatchResult.getAllLowercase().containsKey(s)) {
+					if (Debug) System.out.println(s+" has already been stored in the hashmap!");
+					previousMatchResult.saveLatestMatchedLowercase(s);
+					return previousMatchResult;
+				}
+				else {
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(s, new DimValue());
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+					matchResult.saveLatestMatchedLowercase(s);
+					return matchResult;					
+				}
 			}
-			//for store some information in a lowercase
-			HashMap<String, Integer> lowercase = new HashMap<String, Integer>();
-			lowercase.put(s, null);
-			ShapePropMatch match = new ShapePropMatch(previousMatchResult, lowercase, null);
-			match.saveLatestMatchedLowercase(s);
-			if (Debug) System.out.println("inside SPLowercase "+match.getLatestMatchedLowercase()+", vertcat expression now: "+match.getOutputVertcatExpr());
-			return match;
 		}
-		else{
+		else {
 			previousMatchResult.addToVertcatExpr(previousMatchResult.getValueOfVariable(s));
 			return previousMatchResult;
 		}
 		
 	}
 	
-	public String toString(){
+	public String toString() {
 		return s.toString();
 	}
 }

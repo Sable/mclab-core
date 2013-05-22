@@ -36,7 +36,6 @@ aspect PrettyPrint {
     syn String Stmt.getPrettyPrinted(){
         StringBuffer buf = new StringBuffer();
         buf.append(getPrettyPrintedLessComments());
-        if (this instanceof EmptyStmt) buf.append(getIndent());        
         //first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
         String space = (this instanceof EmptyStmt)?"":"  ";
         for(beaver.Symbol comment : getComments()) {
@@ -141,8 +140,7 @@ aspect PrettyPrint {
     eq Function.getPrettyPrintedLessComments() {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
-        buf.append(indent + "function ");
-        buf.append(" [");
+        buf.append(indent + "function [");
         boolean first = true;
         for(Name param : getOutputParams()) {
             if(!first) {

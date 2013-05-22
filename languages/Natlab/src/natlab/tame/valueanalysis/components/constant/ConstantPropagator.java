@@ -54,7 +54,6 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     private ConstantPropagator(){} //hidden private constructor
      
     @Override
-    //XU add this to support...
     public Constant caseBuiltin(Builtin builtin, Args<V> arg) {
         return null;
     }
@@ -117,11 +116,161 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
         }
     }
     
-    
     @Override
     public Constant caseClass(Builtin builtin, Args<V> arg) {
     	if (arg.size() == 1){
     		return Constant.get(arg.get(0).getMatlabClass().getName());    		
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+	 * unary plus
+	 */
+    public Constant caseUplus(Builtin builtin, Args<V> arg) {
+    	if(arg.size() == 1) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant) {
+    			Double res = ((DoubleConstant)((HasConstant)arg.get(0))
+    					.getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+	 * binary plus.
+	 */
+    public Constant casePlus(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 2) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant 
+    				&& ((HasConstant)arg.get(1)).getConstant() instanceof DoubleConstant) {
+    			Double res = ((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue() + 
+    					((DoubleConstant)((HasConstant)arg.get(1)).getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+	 * unary minus.
+	 */
+    public Constant caseUminus(Builtin builtin, Args<V> arg) {
+    	if(arg.size() == 1) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant) {
+    			Double res = -((DoubleConstant)((HasConstant)arg.get(0))
+    					.getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+	 * binary minus.
+	 */
+    public Constant caseMinus(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 2) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant 
+    				&& ((HasConstant)arg.get(1)).getConstant() instanceof DoubleConstant) {
+    			Double res = ((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue() - 
+    					((DoubleConstant)((HasConstant)arg.get(1)).getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+	/**
+	 * element-by-element multiplication.
+	 */
+    public Constant caseTimes(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 2) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant 
+    				&& ((HasConstant)arg.get(1)).getConstant() instanceof DoubleConstant) {
+    			Double res = ((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue() * 
+    					((DoubleConstant)((HasConstant)arg.get(1)).getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+	/**
+	 * matrix multiplication, when the arguments are both scalars, 
+	 * it works the same as element-by-element multiplication.
+	 */
+    public Constant caseMtimes(Builtin builtin, Args<V> arg) {
+    	return caseTimes(builtin, arg);
+    }
+    
+    @Override
+	/**
+	 * element-by-element rdivision.
+	 */
+    public Constant caseRdivide(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 2) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant 
+    				&& ((HasConstant)arg.get(1)).getConstant() instanceof DoubleConstant) {
+    			Double res = ((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue() / 
+    					((DoubleConstant)((HasConstant)arg.get(1)).getConstant()).getValue();
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+	/**
+	 * matrix rdivision, when the arguments are both scalars, 
+	 * it works the same as element-by-element rdivision.
+	 */
+    public Constant caseMrdivide(Builtin builtin, Args<V> arg) {
+    	return caseRdivide(builtin, arg);
+    }
+    
+    @Override
+	/**
+	 * element-by-element power.
+	 */
+    public Constant casePower(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 2) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant 
+    				&& ((HasConstant)arg.get(1)).getConstant() instanceof DoubleConstant) {
+    			Double res = Math.pow(((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue(), 
+    					((DoubleConstant)((HasConstant)arg.get(1)).getConstant()).getValue());
+    			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+     * array power, when the arguments are both scalars, 
+     * it works the same as element-by-element power.
+     */
+    public Constant caseMpower(Builtin builtin, Args<V> arg) {
+    	return casePower(builtin, arg);
+    }
+    
+    @Override
+	/**
+	 * exponential
+	 */
+    public Constant caseExp(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 1) {
+    		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant) {
+    			Double res = Math.exp(((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue());
+    			return new DoubleConstant(res);
+    		}
     	}
     	return null;
     }

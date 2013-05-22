@@ -32,6 +32,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Str
     {
         return fullSet.getSet();
     }
+    
     public Set<String> getNames( AssignStmt node )
     {
         HashSetFlowSet<String> set = flowSets.get(node);

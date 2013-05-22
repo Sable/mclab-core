@@ -42,7 +42,7 @@ public class Matcher {
   private static <T extends ASTNode<?>> List<Match> findMatching(Class<T> clazz, String pattern,
       ASTNode<?> tree) {
     return ImmutableList.copyOf(Optional.presentInstances(Iterables.transform(
-        NodeFinder.find(tree,  clazz), matchFunction(pattern))));
+        NodeFinder.find(clazz, tree), matchFunction(pattern))));
   }
 
   public static List<Match> findMatchingStatements(String pattern, ASTNode<?> tree) {

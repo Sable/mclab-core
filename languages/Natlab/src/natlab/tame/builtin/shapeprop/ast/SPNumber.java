@@ -6,70 +6,138 @@ import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPNumber extends SPAbstractScalarExpr{
+public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
+	
 	static boolean Debug = false;
 	Number n;
-	public SPNumber (Number n){
+	
+	public SPNumber (Number n) {
 		this.n = n;
-		//System.out.println(n.toString());
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		if(isPatternSide==true){//because number can pop up everywhere, so just store it in latestMatchedNumber!
-			if(previousMatchResult.isArrayIndexAssignRight()==true){
-				//FIXME
-				if (Debug) System.out.println("trying to assign "+n.toString()+" to an array!");
-				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				List<Integer> dimensions = new ArrayList<Integer>(previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()).getDimensions());
-				if(previousMatchResult.getWhetherLatestMatchedIsNum()==true){
-					if (Debug) System.out.println("inside assigning a num to array with num index!");//i.e. M(2)=2;
-					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getLatestMatchedNumber()-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getLatestMatchedNumber());
-						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
+	/**
+	 * number can appear in both pattern matching side and output emitting side:
+	 * 1. in the pattern matching side, numbers can appear at the lhs of assignment, 
+	 *    the array index number at the rhs of assignment or in a vertcat expression, 
+	 *    like [1,k];
+	 * 2. in the output emitting side, numbers can appear in a vertcat expression, 
+	 *    like [1,k], too.
+	 */
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		if (isPatternSide) {
+			if (previousMatchResult.getIsAssignLiteralToLHS()) {
+				if (Debug) System.out.println("trying to assign "+n.toString()+" to an indexed array!");
+				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult
+						.getLatestMatchedUppercase()).getDimensions();
+				if (previousMatchResult.getWhetherLatestMatchedIsNum()) {
+					if (Debug) System.out.println("inside assigning a number to a number indexed array!"); // i.e. M(2)=2;
+					/* 
+					 * array bound check for lhs, actually, we can also do this in array indexing node, 
+					 * but it's okay to put array bound check here. 
+					 */
+					if (dimensions.size() < previousMatchResult.getLatestMatchedNumber()) {
+						System.err.println("index exceed the array bound, check your shape equation.");
+						previousMatchResult.setIsError(true);
+						previousMatchResult.setIsAssignLiteralToLHS(false);
 						return previousMatchResult;
 					}
 					dimensions.remove(previousMatchResult.getLatestMatchedNumber()-1);
-					dimensions.add((previousMatchResult.getLatestMatchedNumber()-1), n.intValue());
+					dimensions.add(previousMatchResult.getLatestMatchedNumber()-1, new DimValue(n.intValue(), null));
 				}
-				else{
-					if (Debug) System.out.println("inside assigning a num to array with lowercase index!");//i.e. M(n)=2;
-					//deal with the case that index overflow
-					if((dimensions.size()-1)<(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1)){
-						if (Debug) System.out.println("index overflow "+dimensions.size()+" "+previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()));
-						if (Debug) System.out.println("dimension should not be changed!");
-						previousMatchResult.setArrayIndexAssignRight(false);
+				else {
+					if (Debug) System.out.println("inside assigning a number to a lowercase indexed array!");//i.e. M(n)=2;
+					/* 
+					 * array bound check for lhs, actually, we can also do this in array indexing node, 
+					 * but it's okay to put array bound check here. 
+					 */
+					if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasIntValue()) {
+						if (dimensions.size() < previousMatchResult.getValueOfVariable(previousMatchResult
+								.getLatestMatchedLowercase()).getIntValue()) {
+							if (Debug) System.out.println("index exceed the array bound, check you shape eqation.");
+							previousMatchResult.setIsError(true);
+							previousMatchResult.setIsAssignLiteralToLHS(false);
+							return previousMatchResult;
+						}
+						dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult
+								.getLatestMatchedLowercase()).getIntValue()-1);
+						dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult
+								.getLatestMatchedLowercase()).getIntValue()-1, new DimValue(n.intValue(), null));
+					}
+					else {
+						System.err.println("the index of uppercase shape dimension cannot be determined.");
+						previousMatchResult.setIsError(true);
 						return previousMatchResult;
 					}
-					dimensions.remove(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1);
-					dimensions.add(previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())-1, n.intValue());
 				}
-				if (Debug) System.out.println("new dimension is "+dimensions);
-				if (Debug) System.out.println("shape of "+previousMatchResult.getLatestMatchedUppercase()+" is "+previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<?>> uppercase = new HashMap<String, Shape<?>>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromIntegers(dimensions));
-				if (Debug) System.out.println(uppercase);
-				if (Debug) System.out.println("currently, all the matched matrix are "+previousMatchResult.getAllUppercase());
-				ShapePropMatch match = new ShapePropMatch(previousMatchResult, null, uppercase);
-				if (Debug) System.out.println("currently, all the matched matrix are "+match.getAllUppercase());
-				match.setArrayIndexAssignRight(false);
-				return match;
+				/*
+				 * both if and else branch, if matching successfully, will generate a new dimensions.
+				 */
+				if (Debug) System.out.println("new shape of "+previousMatchResult.getLatestMatchedUppercase() 
+						+ " is " + previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
+				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromDimValues(dimensions));
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
+				matchResult.setIsAssignLiteralToLHS(false);
+				return matchResult;
 			}
-			if (Debug) System.out.println("inside match a number!");
-			previousMatchResult.saveLatestMatchedNumber(n.intValue());
-			previousMatchResult.setWhetherLatestMatchedIsNum(true);
-			return previousMatchResult;
+			/*
+			 * when this number is in a vertcat pattern on the pattern matching side, like [1,k] or [j,2,...l], 
+			 * we should check whether the pointed dimension of current pointed argument has the exact same size.
+			 */
+			else if (previousMatchResult.getIsInsideVertcat()) {
+				if (Debug) System.out.println("inside matching a number in a vertcat pattern!");
+				Shape<V> shapeOfCurrentArg = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+				if (shapeOfCurrentArg!=null) {
+					List<DimValue> dimensions = shapeOfCurrentArg.getDimensions();
+					if (!dimensions.get(previousMatchResult.getNumInVertcat()).hasIntValue()) {
+						System.err.println("cannot determine whether the size of " + previousMatchResult
+								.getNumInVertcat() + " dimension equals to " + n.intValue());
+						previousMatchResult.setIsError(true);
+						return previousMatchResult;
+					}
+					if (dimensions.get(previousMatchResult.getNumInVertcat()).getIntValue() != n.intValue()) {
+						System.err.println("the size of " + previousMatchResult.getNumInVertcat() 
+								+ "dimension doesn't equal to " + n.intValue());
+						previousMatchResult.setIsError(true);
+						return previousMatchResult;
+					}
+					else {
+						if (Debug) System.out.println("shape matching in vertcat for number " + n.intValue() + " is successful.");
+						previousMatchResult.saveLatestMatchedNumber(n.intValue());
+						previousMatchResult.setWhetherLatestMatchedIsNum(true);
+						return previousMatchResult;
+					}
+				}
+				System.err.println("shape info of " + argValues.get(previousMatchResult.getHowManyMatched()) 
+						+ " is null, shape propagation fails.");
+				previousMatchResult.setIsError(true);
+				return previousMatchResult;
+			}
+			/*
+			 * for the case, the number is as an index of a vector shape
+			 * , just record it's value and mark it as latest matched number.
+			 */
+			else {
+				previousMatchResult.saveLatestMatchedNumber(n.intValue());
+				previousMatchResult.setWhetherLatestMatchedIsNum(true);
+				return previousMatchResult;
+			}
 		}
-		else{
+		/*
+		 * for the number in the output emitting side, it will only appear in a vertcat, like [1,k]. 
+		 * but currently, I have already handled this in the SPVertcatExpr node, what should I do?
+		 * btw, unless SPVertcatExpr won't call match method for its arglist, the program can never 
+		 * come here, so it's safe currently, even we return null here.
+		 */
+		else {
 			return null;
 		}
 		
 	}
 	
-	public String toString(){
+	public String toString() {
 		return n.toString();
 	}
 }

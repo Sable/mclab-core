@@ -1,0 +1,50 @@
+import beaver.Symbol;
+
+/**
+ * This aspect adds a few utility methods related to source information.
+ * In particular, it allows for working with lines and columns directly,
+ * as opposed to Beaver's packed coordinates. It also allows for modifying
+ * lines and columns, useful for e.g. propagating locations after a code
+ * transformation.
+ */
+aspect Positions {
+  public int ASTNode.getStartLine() {
+    return Symbol.getLine(getStart());
+  }
+
+  public int ASTNode.getStartColumn() {
+    return Symbol.getColumn(getStart());
+  }
+
+  public int ASTNode.getEndLine() {
+    return Symbol.getLine(getEnd());
+  }
+
+  public int ASTNode.getEndColumn() {
+    return Symbol.getColumn(getEnd());
+  }
+
+  public void ASTNode.setStartPosition(int line, int column) {
+    start = Symbol.makePosition(line, column);
+  }
+
+  public void ASTNode.setStartLine(int line) {
+    setStartPosition(line, getStartColumn());
+  }
+
+  public void ASTNode.setStartColumn(int column) {
+    setStartPosition(getStartLine(), column);
+  }
+
+  public void ASTNode.setEndPosition(int line, int column) {
+    end = Symbol.makePosition(line, column);
+  }
+
+  public void ASTNode.setEndLine(int line) {
+    setEndPosition(line, getEndColumn());
+  }
+
+  public void ASTNode.setEndColumn(int column) {
+    setEndPosition(getEndLine(), column);
+  }
+} 

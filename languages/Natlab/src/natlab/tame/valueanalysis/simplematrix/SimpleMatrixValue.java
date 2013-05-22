@@ -14,17 +14,28 @@ import natlab.tame.valueanalysis.aggrvalue.*;
 /**
  * represents a MatrixValue that is instantiable. It stores a constant,
  * on top of the matlab class
+ * 
+ * @author ant6n
+ * 
+ * extended by XU @ 8:33pm March 9th 2013, since we modified the constructor in Value class, 
+ * we should also modify the constructors in every subclass. This modification won't affect 
+ * any previous work, because we only add a new filed in MatrixValue class.
  */
 public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements HasConstant{
     static SimpleMatrixValueFactory factory = new SimpleMatrixValueFactory();
     Constant constant;
     
-    
+    // TODO(xu): Decide whether this is necessary / makes sense. This constructor was added to make code build
+    // after a merge.
     public SimpleMatrixValue(PrimitiveClassReference aClass) {
-        super(aClass);
+        this(null, aClass);
     }
-    public SimpleMatrixValue(Constant constant){
-        super(constant.getMatlabClass());
+    
+    public SimpleMatrixValue(String symbolic, PrimitiveClassReference aClass) {
+        super(symbolic, aClass);
+    }
+    public SimpleMatrixValue(String symbolic, Constant constant){
+        super(symbolic, constant.getMatlabClass());
         this.constant = constant;
     }
     
@@ -55,7 +66,7 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
                 "only Values with the same class can be merged, trying to merge :"+this+", "+other);
         if (constant == null) return this;
         if (constant.equals(((SimpleMatrixValue)other).constant)) return this;
-        return new SimpleMatrixValue(this.classRef);
+        return new SimpleMatrixValue(this.symbolic, this.classRef);
     }
 
     @Override
@@ -80,13 +91,13 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
     
     @Override
     public ValueSet<AggrValue<SimpleMatrixValue>> arraySubsref(Args<AggrValue<SimpleMatrixValue>> indizes) {
-        return ValueSet.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(this.getMatlabClass()));
+        return ValueSet.<AggrValue<SimpleMatrixValue>>newInstance(new SimpleMatrixValue(null, this.getMatlabClass()));
     }    
     @Override
     public AggrValue<SimpleMatrixValue> arraySubsasgn(
             Args<AggrValue<SimpleMatrixValue>> indizes,AggrValue<SimpleMatrixValue> value) {
         //TODO - check whether conversion is allowed
-        return new SimpleMatrixValue(this.getMatlabClass());
+        return new SimpleMatrixValue(null, this.getMatlabClass());
     }    
     @Override
     public Res<AggrValue<SimpleMatrixValue>> cellSubsref(Args<AggrValue<SimpleMatrixValue>> indizes) {
@@ -108,7 +119,7 @@ public class SimpleMatrixValue extends MatrixValue<SimpleMatrixValue> implements
     }    
     @Override
     public AggrValue<SimpleMatrixValue> toFunctionArgument(boolean recursive) {
-        return isConstant()?new SimpleMatrixValue(this.classRef):this;
+        return isConstant()?new SimpleMatrixValue(null, this.classRef):this;
     }
 }
 

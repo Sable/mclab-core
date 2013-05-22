@@ -1,30 +1,28 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.List;
-
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.*;
 
-public class SPArglist extends SPAbstractVertcatExprArg{
-	SPAbstractVertcatExprArg first;
-	SPAbstractVertcatExprArg next;
+public class SPArglist<V extends Value<V>> extends SPNode<V> {
 	
-	public SPArglist(SPAbstractVertcatExprArg first, SPAbstractVertcatExprArg next){
+	SPAbstractMatchElement<V> first;
+	SPArglist<V> next;
+	
+	public SPArglist(SPAbstractMatchElement<V> first, SPArglist<V> next) {
 		this.first = first;
 		this.next = next;
-		//System.out.println(",");
 	}
 	
-	public ShapePropMatch match(boolean isPatternSide, ShapePropMatch previousMatchResult, List<? extends Value<?>> argValues, int num){
-		previousMatchResult = first.match(isPatternSide, previousMatchResult, argValues, num);
-		if(next!=null){
-			ShapePropMatch continueMatch = next.match(isPatternSide, previousMatchResult, argValues, num);
+	public ShapePropMatch<V> match(boolean isPatternSide, ShapePropMatch<V> previousMatchResult, Args<V> argValues, int Nargout) {
+		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
+		if (next!=null) {
+			ShapePropMatch<V> continueMatch = next.match(isPatternSide, matchResult, argValues, Nargout);
 			return continueMatch;
 		}
-		return previousMatchResult;
+		return matchResult;
 	}
 	
-	public String toString(){
-		return first.toString()+(next==null?"":","+next);
+	public String toString() {
+		return first.toString() + (next==null? "" : ","+next);
 	}
 }

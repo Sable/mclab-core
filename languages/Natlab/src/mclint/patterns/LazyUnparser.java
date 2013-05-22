@@ -248,8 +248,8 @@ public class LazyUnparser extends AbstractNodeCaseHandler {
   }
   
   private boolean isInsideLoop(ASTNode<?> node) {
-    return NodeFinder.findParent(node, ForStmt.class) != null
-        || NodeFinder.findParent(node, WhileStmt.class) != null;
+    return NodeFinder.findParent(ForStmt.class, node) != null
+        || NodeFinder.findParent(WhileStmt.class, node) != null;
   }
   
   @Override

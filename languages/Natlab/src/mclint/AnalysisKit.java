@@ -1,49 +1,68 @@
 package mclint;
 
-import natlab.toolkits.analysis.test.LivenessAnalysis;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import natlab.toolkits.analysis.core.LivenessAnalysis;
+import natlab.toolkits.analysis.core.ReachingDefs;
+import natlab.toolkits.analysis.core.UseDefDefUseChain;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import analysis.Analysis;
 import ast.ASTNode;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
+
 public class AnalysisKit {
   private ASTNode<?> tree;
-  private VFAnalysis varorfun;
-  private ReachingDefs reachingDefs;
-  private LivenessAnalysis liveVars;
+  private ClassToInstanceMap<Analysis> analysisCache = MutableClassToInstanceMap.create();
 
   public static AnalysisKit forAST(ASTNode<?> tree) {
-    return new AnalysisKit(tree, new VFPreorderAnalysis(tree), new ReachingDefs(tree),
-        new LivenessAnalysis(tree));
+    return new AnalysisKit(tree);
   }
 
   public ASTNode<?> getAST() {
     return tree;
   }
-
-  private Analysis ensureAnalyzed(Analysis analysis) {
-    if (!analysis.isAnalyzed())
-      analysis.analyze();
+  
+  private <T extends Analysis> T construct(Class<T> clazz) {
+    T analysis = null;
+    try {
+      analysis = clazz.getConstructor(ASTNode.class).newInstance(tree);
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+    analysis.analyze();
     return analysis;
+  }
+  
+  private <T extends Analysis> T getOrCreate(Class<T> clazz) {
+    if (!analysisCache.containsKey(clazz)) {
+      analysisCache.putInstance(clazz, construct(clazz));
+    }
+    return analysisCache.getInstance(clazz);
   }
 
   public VFAnalysis getKindAnalysis() {
-    return (VFAnalysis) ensureAnalyzed(varorfun);
+   return getOrCreate(VFPreorderAnalysis.class);
   }
 
   public ReachingDefs getReachingDefinitionsAnalysis() {
-    return (ReachingDefs) ensureAnalyzed(reachingDefs);
+    return getOrCreate(ReachingDefs.class);
+  }
+  
+  public UseDefDefUseChain getUseDefDefUseChain() {
+    return getReachingDefinitionsAnalysis().getUseDefDefUseChain();
   }
 
   public LivenessAnalysis getLiveVariablesAnalysis() {
-    return (LivenessAnalysis) ensureAnalyzed(liveVars);
+    return getOrCreate(LivenessAnalysis.class);
+  }
+  
+  public void notifyTreeChanged() {
+    analysisCache.clear();
   }
 
-  private AnalysisKit(ASTNode<?> tree, VFAnalysis vf, ReachingDefs rd, LivenessAnalysis la) {
+  private AnalysisKit(ASTNode<?> tree) {
     this.tree = tree;
-    this.varorfun = vf;
-    this.reachingDefs = rd;
-    this.liveVars = la;
   }
 }

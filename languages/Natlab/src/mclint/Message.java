@@ -12,16 +12,17 @@ import ast.ASTNode;
  * @author ismail
  */
 public class Message implements Comparable<Message> {
+  private ASTNode<?> node;
   private Location location;
   private String code;
   private String description;
 
-  public static Message forLocation(Location location, String code, String description) {
-    return new Message(location, code, description);
+  public static Message regarding(ASTNode<?> node, String code, String description) {
+    return new Message(node, Location.of(node), code, description);
   }
 
-  public static Message regarding(ASTNode<?> node, String code, String description) {
-    return forLocation(Location.of(node), code, description);
+  public ASTNode<?> getAstNode() {
+    return node;
   }
 
   public Location getLocation() {
@@ -36,7 +37,8 @@ public class Message implements Comparable<Message> {
     return description;
   }
 
-  private Message(Location location, String code, String description) {
+  private Message(ASTNode<?> node, Location location, String code, String description) {
+    this.node = node;
     this.code = code;
     this.location = location;
     this.description = description;

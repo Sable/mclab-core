@@ -4,24 +4,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import mclint.AnalysisKit;
 import mclint.Lint;
 import mclint.LintAnalysis;
 import mclint.Message;
-import natlab.toolkits.analysis.test.ReachingDefs;
+import mclint.Project;
+import natlab.toolkits.analysis.core.Def;
+import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.ForStmt;
+import ast.GlobalStmt;
 import ast.LiteralExpr;
 import ast.MatrixExpr;
+import ast.Name;
 import ast.NameExpr;
 import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 // TODO Nested invariants? Suggest moving expressions out of several loop levels?
@@ -29,6 +34,7 @@ import com.google.common.collect.Sets;
 public class LoopInvariantComputation extends AbstractNodeCaseHandler implements LintAnalysis {
   private static final String WARNING = "Consider computing %s outside the loop.";
 
+  private Project project;
   private ASTNode<?> tree;
   private Lint lint;
   private ReachingDefs reachingDefs;
@@ -37,9 +43,8 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   private Stack<Set<Expr>> invariantStack = new Stack<Set<Expr>>();
   private Set<Expr> reported = Sets.newHashSet();
 
-  public LoopInvariantComputation(AnalysisKit kit) {
-    this.tree = kit.getAST();
-    this.reachingDefs = kit.getReachingDefinitionsAnalysis();
+  public LoopInvariantComputation(Project project) {
+    this.tree = project.asCompilationUnits();
   }
 
   private Message loopInvariant(ASTNode<?> node) {
@@ -50,6 +55,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   @Override
   public void analyze(Lint lint) {
     this.lint = lint;
+    this.reachingDefs = lint.getKit().getReachingDefinitionsAnalysis();
     this.tree.analyze(this);
   }
 
@@ -60,14 +66,14 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
       node.getChild(i).analyze(this);
   }
 
-  private boolean allDefsOutsideLoop(Set<AssignStmt> defs, ASTNode<?> loop) {
-    List<AssignStmt> loopDefs = NodeFinder.find(loop, AssignStmt.class);
-    for (AssignStmt def : defs) {
+  private boolean allDefsOutsideLoop(Set<Def> defs, ASTNode<?> loop) {
+    Iterable<Def> loopDefs = NodeFinder.find(Def.class, loop);
+    for (Def def : defs) {
       if (def == ReachingDefs.UNDEF)
         continue;
-      if (def == ReachingDefs.GLOBAL || def == ReachingDefs.PARAM)
+      if (def instanceof GlobalStmt || def instanceof Name)
         continue;
-      if (loopDefs.contains(def))
+      if (Iterables.contains(loopDefs, def))
         return false;
     }
     return true;
@@ -112,7 +118,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private static List<Expr> getChildren(Expr node) {
-    List<Expr> exprs = NodeFinder.find(node, Expr.class);
+    List<Expr> exprs = Lists.newArrayList(NodeFinder.find(Expr.class, node));
     exprs.remove(node);
     return exprs;
   }
@@ -148,9 +154,9 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
       }
       else if (node instanceof NameExpr) {
         String name = ((NameExpr)node).getName().getID();
-        Stmt parentStmt = NodeFinder.findParent(node, Stmt.class);
+        Stmt parentStmt = NodeFinder.findParent(Stmt.class, node);
         if (reachingDefs.getInFlowSets().containsKey(parentStmt)) {
-          Set<AssignStmt> inSet = reachingDefs.getInFlowSets().get(parentStmt).get(name);
+          Set<Def> inSet = reachingDefs.getInFlowSets().get(parentStmt).get(name);
           if (allDefsOutsideLoop(inSet, loopStack.peek()))
             invariantStack.peek().add(node);
         }

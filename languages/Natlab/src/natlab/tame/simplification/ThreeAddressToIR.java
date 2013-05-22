@@ -269,7 +269,6 @@ public class ThreeAddressToIR extends AbstractSimplification {
     
     @Override
     public void caseShellCommandStmt(ShellCommandStmt node) {
-        // TODO Auto-generated method stub
         super.caseShellCommandStmt(node);
     }
     
@@ -391,6 +390,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
                 NameExpr function;
                 TIRCommaSeparatedList args;
                 //get args and function
+                String s = node.getStructureString();
                 if (node.getRHS() instanceof NameExpr){
                     function = (NameExpr)(node.getRHS());
                     args = new TIRCommaSeparatedList();

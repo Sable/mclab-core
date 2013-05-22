@@ -3,7 +3,7 @@ package natlab.toolkits;
 import java.util.List;
 import java.util.Map;
 
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.path.FunctionReference.ReferenceType;

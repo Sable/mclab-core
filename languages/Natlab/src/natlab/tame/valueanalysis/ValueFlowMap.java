@@ -187,9 +187,19 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (obj instanceof ValueFlowMap<?>){
+        if (obj instanceof ValueFlowMap){
             ValueFlowMap<V> flowMap = (ValueFlowMap<V>)obj;
-            return flowMap.isViable==isViable && flowMap.map.equals(map);
+            boolean res1 = flowMap.isViable==isViable;
+            boolean res2 = this.toString().equals(flowMap.toString()); 
+            /*
+             *  it is so weird, for some benchmarks, if use 
+             *  "flowMap.map.equals(map);" instead of toString comparison, 
+             *  it will end up in infinite loop, because map comparison 
+             *  return false, while toString comparison return true, which 
+             *  apparently equals by our observation. TODO figure it out.
+             */
+            boolean result = res1 && res2;
+            return result;
         }
         return false;   
     }
@@ -204,22 +214,4 @@ public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, 
     public boolean isViable(){
         return isViable;
     }
-    
-    /**
-     * fast merge does the same as merge, except it destroys the arguments or this.
-     * It's faster by returning a modified version of the argument - usually
-     * whichever ValueFlowMap had more elements in it
-     * TODO - remove this, probably
-    public ValueFlowMap<V> fastMerge(ValueFlowMap<V> other){
-        if (this.map.size() > other.map.size()){
-            this.union(other);
-            return this;
-        } else {
-            other.union(this);
-            return other;
-        }
-    }*/
-    
-   
-    
 }

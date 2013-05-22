@@ -24,6 +24,7 @@ package natlab;
 import java.io.File;
 import java.util.List;
 
+import mclint.McLint;
 import natlab.options.Options;
 import natlab.tame.TamerTool;
 import ast.CompilationUnits;
@@ -87,6 +88,11 @@ public class Main {
       return;
     }
 
+    if (options.mclint()) {
+      McLint.main(options);
+      return;
+    }
+
     if (options.server()) {
       NatlabServer.create(options).start();
       return;
@@ -101,7 +107,7 @@ public class Main {
     log("Parsing " + Joiner.on(", ").join(files));
     List<CompilationProblem> errors = Lists.newArrayList();
     CompilationUnits cu;
-    if (options.matlab()) {
+    if (!options.natlab()) {
       cu = Parse.parseMatlabFiles(files, errors);
     } else {
       cu = Parse.parseNatlabFiles(files, errors);
@@ -124,7 +130,7 @@ public class Main {
       } else {
         File outputDir = new File(options.od());
         for (Program program : cu.getPrograms()) {
-          File outputFile = new File(outputDir, new File(program.getFullPath()).getName());
+          File outputFile = new File(outputDir, program.getFile().getName());
           Files.createParentDirs(outputFile);
           Files.write(program.getPrettyPrinted(), outputFile, Charsets.UTF_8);
         }

@@ -17,8 +17,7 @@
 // =========================================================================== //
 
 package natlab.toolkits.path;
-import natlab.toolkits.filehandling.genericFile.BuiltinFile;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 
 /**
  * A function or script within a Matlab program can not be uniquely identified by a name alone
@@ -46,25 +45,25 @@ public class FunctionReference {
   }
 
   /**
-   * creates a Function Reference referring to a function inside a matlab file
-   * @param name the name of the function
-   * @param path the path of the function (as an absolute File)
-   */
-  public FunctionReference(String name, GenericFile path) {
-    this(name, path, path instanceof BuiltinFile, ReferenceType.UNKNOWN);
-  }
-
-  /**
    * creates a Function Reference referring to a function or script inside
    * a matlab file - it will refer to the funciton or script with the same name as the given
    * one
    */
   public FunctionReference(GenericFile path) {
-    this(FolderHandler.getFileName(path), path);
+    this(path.getNameWithoutExtension(), path);
   }
 
   public FunctionReference(GenericFile path, ReferenceType type) {
-    this(FolderHandler.getFileName(path), path, path instanceof BuiltinFile, type);
+    this(path.getNameWithoutExtension(), path, false, type);
+  }
+
+  /**
+   * creates a Function Reference referring to a function inside a matlab file
+   * @param name the name of the function
+   * @param path the path of the function (as an absolute File)
+   */
+  public FunctionReference(String name, GenericFile path) {
+    this(name, path, false, ReferenceType.UNKNOWN);
   }
 
   public FunctionReference(GenericFile path, ast.Function f, ReferenceType type) {
@@ -72,10 +71,17 @@ public class FunctionReference {
   }
 
   /**
-   * returns the name of the function
-   * TODO(isbadawi): Safe to rename this to getName?
+   * creates a Function Reference referring to a builtin matlab function
+   * @param name the name of the builtin
    */
-  public String getname() {
+  public FunctionReference(String name) {
+    this(name, null, true, ReferenceType.UNKNOWN);
+  }
+
+  /**
+   * returns the name of the function
+   */
+  public String getName() {
     return name;
   }
 
@@ -85,17 +91,6 @@ public class FunctionReference {
    */
   public GenericFile getFile() {
     return path;
-  }
-
-  /**
-   * creates a Function Reference referring to a builtin matlab function
-   * @param name the name of the builtin
-   */
-  public FunctionReference(String name) {
-    this.name = name;
-    this.isBuiltin = true;
-    this.path = null;
-    this.referenceType = ReferenceType.UNKNOWN;
   }
 
   /**

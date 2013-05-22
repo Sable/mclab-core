@@ -23,9 +23,10 @@ import com.google.common.collect.Lists;
  * in the plugins directory, and add those that implement LintAnalysis to our list.
  * @author ismail
  *
+ * TODO I am 100% sure this can be a lot less ugly.
  */
 public class AnalysisLoader {
-  public static List<LintAnalysis> loadAnalyses(AnalysisKit code, File pluginDirectory) {
+  public static List<LintAnalysis> loadAnalyses(Project project, File pluginDirectory) {
     AnalysisLoader loader = new AnalysisLoader();
     try {
       loader.loadAnalysisClasses(pluginDirectory);
@@ -33,7 +34,7 @@ public class AnalysisLoader {
       e.printStackTrace();
       return Collections.emptyList();
     }
-    loader.instantiateAnalysisClasses(code);
+    loader.instantiateAnalysisClasses(project);
     return loader.analyses;
   }
 
@@ -122,22 +123,22 @@ public class AnalysisLoader {
    * printed and we keep going, ignoring the offending class. This should be
    * configurable, so that a failed instantiation can be made to stop the whole process.
    */
-  private void instantiateAnalysisClasses(AnalysisKit code) {
+  private void instantiateAnalysisClasses(Project project) {
     for (Class<LintAnalysis> clazz : analysisClasses) {
       String name = clazz.getName();
       Constructor<LintAnalysis> constructor = null;
       try {
-        constructor = clazz.getConstructor(AnalysisKit.class);
+        constructor = clazz.getConstructor(Project.class);
       } catch (SecurityException e) {
         System.err.println("Couldn't instantiate " + name + ". Is a security manager installed?");
       } catch (NoSuchMethodException e) {
-        System.err.println(name + " does not implement an (AnalysisKit) constructor.");
+        System.err.println(name + " does not implement a (Project) constructor.");
       }
       if (constructor == null) {
         continue;
       }
       try {
-        analyses.add(constructor.newInstance(code));
+        analyses.add(constructor.newInstance(project));
       } catch (IllegalArgumentException e) {
         // This one shouldn't happen; it would be an error on our end.
         System.err.println("Caught an IllegalArgumentException while instantiating " + name + ".");
@@ -146,7 +147,7 @@ public class AnalysisLoader {
       } catch (InstantiationException e) {
         System.err.println("Make sure " + name + " is not an abstract class!");
       } catch (IllegalAccessException e) {
-        System.err.println("Make sure the (AnalysisKit) constructor for " + name + " is public!");
+        System.err.println("Make sure the (Project) constructor for " + name + " is public!");
       } catch (InvocationTargetException e) {
         System.err.println("Caught the following exception while instantiating " + name + ":");
         e.getTargetException().printStackTrace();

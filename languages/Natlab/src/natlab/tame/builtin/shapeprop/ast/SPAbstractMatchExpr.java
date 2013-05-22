@@ -1,5 +1,7 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-public abstract class SPAbstractMatchExpr extends SPAbstractPattern{
+import natlab.tame.valueanalysis.value.Value;
+
+public abstract class SPAbstractMatchExpr<V extends Value<V>> extends SPAbstractPattern<V>{
 
 }

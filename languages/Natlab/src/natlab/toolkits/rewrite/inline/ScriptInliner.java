@@ -30,7 +30,6 @@ public class ScriptInliner<ScriptOrFunction extends ASTNode> extends Inliner<Scr
 
     public ScriptInliner(ScriptOrFunction tree, Map<String, Script> map) {
         super(tree, map);
-        // TODO Auto-generated constructor stub
     }
 
 }

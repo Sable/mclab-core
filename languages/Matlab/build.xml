@@ -65,7 +65,7 @@
 
 	<target name="compile.test.generators" unless="inside.eclipse">
 		<mkdir dir="${ant.bin.dir}" />
-		<javac includeantruntime="false" destdir="${ant.bin.dir}">
+		<javac destdir="${ant.bin.dir}">
 			<src path="${test.dir}" />
 			<include name="**/*TestGenerator.java" />
 		</javac>
@@ -119,7 +119,8 @@
 	<import file="../shared/eclipse.xml" />
 
 	<!-- public versions of cli.xml targets -->
-	<target name="build" depends="CommandLineInterface.build" description="generate and build all files" />
+	<!-- <target name="build" depends="CommandLineInterface.build" description="generate and build all files" /> -->
+  <target name="build" depends="gen, compile.with.tests" description="generate and build all files" />
 	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
 	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
 

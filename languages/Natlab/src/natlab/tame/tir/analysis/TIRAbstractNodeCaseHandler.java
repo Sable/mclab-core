@@ -113,7 +113,7 @@ public abstract class TIRAbstractNodeCaseHandler extends
 
     @Override
     public void caseTIRForStmt(TIRForStmt node) {
-        caseRangeForStmt(node);
+        caseForStmt(node);
     }
 
     @Override

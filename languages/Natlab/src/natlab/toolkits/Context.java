@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.toolkits.filehandling.genericFile.GenericFile;
+import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.BuiltinQuery;
 import natlab.toolkits.path.FolderHandler;
 import natlab.toolkits.path.FunctionReference;
@@ -65,7 +65,7 @@ public class Context{
 	    }
 	}
 
-	if (curProgram.getName() == name){
+	if (curProgram.getFile().getNameWithoutExtension().equals(name)) {
 	    if (inFunction)
 		throw new RuntimeException("Unexpected ?!");
 	    return new FunctionReference(curProgram.getFile());
@@ -151,7 +151,7 @@ public class Context{
     		inNested = false;
 
     	if (inNested){
-    		curProgram = NodeFinder.findParent(curFunction, Program.class);
+    		curProgram = NodeFinder.findParent(Program.class, curFunction);
     	}
     	else
     		if (inFunction)

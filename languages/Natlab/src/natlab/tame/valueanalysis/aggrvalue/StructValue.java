@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import natlab.tame.classes.reference.*;
 import natlab.tame.valueanalysis.*;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.*;
 
@@ -59,11 +60,17 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     public Res<AggrValue<D>> cellSubsref(Args<AggrValue<D>> indizes) {
         throw new UnsupportedOperationException();
     }
+    
     @Override
     public AggrValue<D> cellSubsasgn(Args<AggrValue<D>> indizes, Args<AggrValue<D>> values) {
         throw new UnsupportedOperationException();
     }
     
+    @Override
+    public String getSymbolic() {
+    	//TODO later
+    	return null;
+    }
 
     @Override
     public ClassReference getMatlabClass() {
@@ -115,5 +122,11 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
             return false;
         }
     }
+
+
+    @Override
+	public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+		return factory.getIsComplexInfoFactory().newisComplexInfoFromStr("REAL");
+	}
 }
 

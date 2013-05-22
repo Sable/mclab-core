@@ -10,59 +10,85 @@ import natlab.tame.builtin.shapeprop.ast.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
-public class ShapePropTool{
+public class ShapePropTool<V extends Value<V>> {
 	
 	static boolean Debug = false;
 	
-    public static SPNode parse(String source){
-    	//System.err.println("parsing: "+source);
+	/**
+	 * this static method is called by Builtin class.
+	 * @param equation
+	 * @return
+	 */
+    public static SPNode parse(String equation) {
+    	if (Debug) System.out.println("parsing: "+equation);
     	ShapePropParser parser = new ShapePropParser();
-    	ShapePropScanner input = new ShapePropScanner(new StringReader(source));
-    	try{
-    		SPNode sp = (SPNode) parser.parse(input);
+    	ShapePropScanner scanner = new ShapePropScanner(new StringReader(equation));
+    	try {
+    		SPNode sp = (SPNode) parser.parse(scanner);
         	return sp;
-    	}catch(Exception e){
+    	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
     	}
     }
     
-    public static List<Shape<?>> matchByValues(SPNode tree, Args<?> argValues){
-    	if(argValues!=null){
-    		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
-    		for(Value<?> arg:argValues){
-    			if(((HasShape)arg).getShape()==null){
-    				if (Debug) System.out.println(arg+"'s shape is undefined");
-    			    /*ArrayList<Shape<AggrValue<BasicMatrixValue>>> emptyList = new ArrayList<Shape<AggrValue<BasicMatrixValue>>>();
-    				emptyList.add(null);
-    				return emptyList;*/
+    /**
+     * this method is called by ShapePropagator class, the input arguments are the AST tree which is 
+     * the result of parse method, and a list of V extends Value<V> which is input arguments of the built-in.
+     * @param tree
+     * @param argValues
+     * @return
+     */
+    public List<Shape<V>> matchByValues(SPNode<V> tree, Args<V> argValues) {
+		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
+		/*
+		 * first, test whether the Args is empty, if not, every element value should has a shape; 
+		 * if the Args is empty, we can still do shape info propagation, i.e. a=ones().
+		 */
+    	if (argValues.size()!=0) {
+        	if (Debug) System.out.println(tree+" with arguments "+argValues);
+    		for (Value<V> arg : argValues) {
+    			if (((HasShape<V>)arg).getShape()==null) {
+    				System.err.println(arg+"'s shape info is unavailable.");
+    				//FIXME what if arg's shape info is null, if continue like this, the program will throw null pointer exception.
+    				return null;
     			}
     		}
     	}
-    	if (Debug) System.out.println(tree+" with arguments "+argValues);
-    	ShapePropMatch spmatch = tree.match(true, new ShapePropMatch(), argValues, argValues.getNargout());//FIXME make it better
-        /*if (spmatch == null || spmatch.isError || spmatch.numMatched != argValues.size()){
+    	// do shape info matching.
+    	ShapePropMatch<V> spmatch = tree.match(true, new ShapePropMatch<V>(), argValues, argValues.getNargout());
+    	/*
+    	 * if shape info propagation fails, return null.
+    	 */
+        if (spmatch == null || spmatch.isError || spmatch.howManyMatched != argValues.size()) {
+        	System.err.println("shape info propagation fails, since argument(s) "+argValues+" cannot match "+tree);
         	return null;
-        }*/
-    	if (Debug) System.out.println("inside shapeproptool matchByValue method, all the results are "+spmatch.getAllResults());
-        return spmatch.getAllResults();
+        }
+        else {
+            List<Shape<V>> results = spmatch.getAllResults();
+            if (Debug) System.out.println("all the results are "+results);
+            return results;        	
+        }
     }
     
-	static public void main(String[] args) throws IOException, Parser.Exception{	
-		/*System.out.println("print:   "+parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$"));
-		String s1 = parse("M,($|inf|'fro')?->$||[1,n]|[n,1],($|inf|-inf|'fro')?->$").toString();
-		System.out.println("reparsed "+parse(s1));*/
+    /**
+     * This main entry point is used for testing the scanner and parser of shape equation language.
+     * @param args
+     * @throws IOException
+     * @throws Parser.Exception
+     */
+	public static void main(String[] args) throws IOException, Parser.Exception {
+				
+		System.out.println("print:   "+parse("$,'a2'->M||#->[]"));
+		String s0 = parse("$,'a2'->M||#->[]").toString();
+		System.out.println("reparsed "+parse(s0));
 		
-		System.out.println("print:   "+parse("#->[]"));
-		String s1 = parse("#->[]").toString();
+		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
+		String s1 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
 		System.out.println("reparsed "+parse(s1));
 		
-		/*System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
-		String s1 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
-		System.out.println("reparsed "+parse(s1));*/
-		
-		/*System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=prescalar(),M(d)=1->M,M"));
-		String s2 = parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=prescalar(),M(d)=1->M,M").toString();
+		System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M"));
+		String s2 = parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M").toString();
 		System.out.println("reparsed "+parse(s2));
 		
 		System.out.println("print:   "+parse("($|M)*->M"));
@@ -73,8 +99,8 @@ public class ShapePropTool{
 		String s4 = parse("M->M").toString();
 		System.out.println("reparsed "+parse(s4));
 		
-		System.out.println("print:   "+parse("numargout(1),[j,k],n=min(j,k)->[n,1]||numargout(2),[j,k]->[j,j],[j,k],[k,k]||numargout(3),[j,k]->[j,j],[j,k],[k,k]||[j,k],value(0),n=min(j,k)->[j,n],[n,k],[k,k]||[j,k],stringValue('econ'),n=min(j,k)->[j,n],[n,n],[k,n]"));
-		String s5 = parse("numargout(1),[j,k],n=min(j,k)->[n,1]||numargout(2),[j,k]->[j,j],[j,k],[k,k]||numargout(3),[j,k]->[j,j],[j,k],[k,k]||[j,k],value(0),n=min(j,k)->[j,n],[n,k],[k,k]||[j,k],stringValue('econ'),n=min(j,k)->[j,n],[n,n],[k,n]").toString();
+		System.out.println("print:   "+parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$"));
+		String s5 = parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$").toString();
 		System.out.println("reparsed "+parse(s5));
 		
 		System.out.println("print:   "+parse("$,$|[m,n]->[m,n]||$|[m,n],$->[m,n]||[m,k]|[k,n]->[m,n]"));
@@ -85,67 +111,28 @@ public class ShapePropTool{
 		String s7 = parse("[m,m]->[m,m],$,$").toString();
 		System.out.println("reparsed "+parse(s7));
 		
-		System.out.println("print:   "+parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(),M=[M,m])+->M||[1,n],M=prevector()->M"));
-		String s8 = parse("$,m=prescalar()->[m,m]||M=[],($,m=prescalar(),M=[M,m])+->M||[1,n],M=prevector()->M").toString();
+		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M"));
+		String s8 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M").toString();
 		System.out.println("reparsed "+parse(s8));
 		
-		System.out.println("print:   "+parse("$->[]||M,n=presize(1),M(1)=0,(N,n=n+presize(1),N(1)=0,isequal(N,M))*,M(1)=n->M"));
-		String s9 = parse("$->[]||M,n=presize(1),M(1)=0,(N,n=n+presize(1),N(1)=0,isequal(N,M))*,M(1)=n->M").toString();
+		System.out.println("print:   "+parse(
+				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
+				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K"));
+		String s9 = parse("" +
+				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
+				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K").toString();
 		System.out.println("reparsed "+parse(s9));
 		
-		System.out.println("print:   "+parse("$->[]||M,n=presize(2),M(2)=0,(N,n=n+presize(2),N(2)=0,isequal(N,M))*,M(2)=n->M"));
-		String s10 = parse("$->[]||M,n=presize(2),M(2)=0,(N,n=n+presize(2),N(2)=0,isequal(N,M))*,M(2)=n->M").toString();
+		System.out.println("print:   "+parse(
+				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
+				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K"));
+		String s10 = parse(
+				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
+				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K").toString();
 		System.out.println("reparsed "+parse(s10));
 		
-		System.out.println("print:   "+parse("$->[]||$,d=prescalar(),M,n=presize(d),M(d)=0,(N,n=n+presize(d),N(d)=0,isequal(N,M))*,M(d)=0->M"));
-		String s11 = parse("$->[]||$,d=prescalar(),M,n=presize(d),M(d)=0,(N,n=n+presize(d),N(d)=0,isequal(N,M))*,M(d)=0->M").toString();
+		System.out.println("print:   "+parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M"));
+		String s11 = parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M").toString();
 		System.out.println("reparsed "+parse(s11));
-		
-		System.out.println("print:   "+parse("$|M->M||$,$,n=prescalar()->[1,n]||M,$,n=prescalar(),M(1)=n->M||M,[],$->M"));
-		String s12 = parse("$|M->M||$,$,n=prescalar()->[1,n]||M,$,n=prescalar(),M(1)=n->M||M,[],$->M").toString();
-		System.out.println("reparsed "+parse(s12));
-		
-		System.out.println("parsed:  "+parse("[1,j]|[j,1],($,k=presaclar())?,n=j+abs(k)->[n,n]||[m,n],($,k=prescalar())?->[k,1]"));
-		String s13 = parse("[1,j]|[j,1],($,k=presaclar())?,n=j+abs(k)->[n,n]||[m,n],($,k=prescalar())?->[k,1]").toString();
-		System.out.println("reparsed "+parse(s13));*/
-		
-/*		int n = 6;
-		SPNode sp0 = parse("$->[]");
-		System.err.println("for equation cat("+n+"), one corresponding shape equation is "+sp0+", the argument is "+n);
-		System.out.println("start to matching...");
-		ArrayList<Integer> arg0 = new ArrayList<Integer>(1);
-    	arg0.add(n);
-		ShapePropMatch spMatch0 = sp0.match(true, new ShapePropMatch(), arg0);
-		
-		SPNode sp = parse("[]->$");
-		System.err.println("for equation class(), one corresponding shape equation is "+sp+", the argument is []");
-		System.out.println("start to matching...");
-		ArrayList<Integer> arg = new ArrayList<Integer>(1);
-    	arg.add(null);
-		ShapePropMatch spMatch = sp.match(true, new ShapePropMatch(), arg);
-		
-		int m = 10;
-		SPNode sp1 = parse("$->$");
-		System.err.println("for equation real("+m+"), one corresponding shape equation is "+sp1+", the argument is "+m);
-		System.out.println("start to matching...");
-		ArrayList<Integer> arg1 = new ArrayList<Integer>(1);
-    	arg1.add(m);
-		ShapePropMatch spMatch1 = sp1.match(true, new ShapePropMatch(), arg1);
-		
-		int j =8;
-		SPNode sp2 = parse("$,n=previousScalar()->[n,n]");
-		System.err.println("for equation true("+j+"), one corresponding shape equation is "+sp2+", the argument is "+j);
-		System.out.println("start to matching...");
-		ArrayList<Integer> arg2 = new ArrayList<Integer>(1);
-    	arg2.add(j);
-		ShapePropMatch spMatch2 = sp2.match(true, new ShapePropMatch(), arg2);		
-		
-		int k = 6, l = 8;
-		SPNode sp3 = parse("$,$->$");
-		System.err.println("for equation min("+k+","+l+"), one corresponding shape equation is "+sp3+", the argument is "+k+","+l);
-		ArrayList<Integer> arg3 = new ArrayList<Integer>(2);
-    	arg3.add(k);
-    	arg3.add(l);
-		ShapePropMatch spMatch3 = sp3.match(true, new ShapePropMatch(), arg3);*/
 	}
 }

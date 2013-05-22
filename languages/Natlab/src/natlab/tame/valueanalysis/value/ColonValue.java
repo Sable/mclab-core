@@ -16,6 +16,11 @@ import natlab.tame.valueanalysis.components.shape.Shape;
  */
 public class ColonValue<V extends Value<V>> extends SpecialValue<V> {
 
+	@Override
+	public String getSymbolic() {
+		return null;
+	}
+	
     @Override
     public ClassReference getMatlabClass() {
         return null;

@@ -128,7 +128,7 @@ public class IntraproceduralLiveVariableAnalysis
 	public void caseTIRCallStmt(TIRCallStmt node) {
 		Map<String,LiveValue> map = copyInSet();
 		map = call(inputs.getNode().getCallsite(node),
-				node.getArguments(),node.getTargets(),map);
+		        node.getArguments(),node.getTargets(), map); // MADE A CHANGE HERE
 		System.out.println("result map "+map);
         setCurrentInSet(map);
 		setInOutSet(node);
