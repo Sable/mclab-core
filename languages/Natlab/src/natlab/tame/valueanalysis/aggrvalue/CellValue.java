@@ -222,7 +222,13 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
         if (usesMap){
             throw new UnsupportedOperationException();
         } else {
-            return "cell"+values+"";
+        	StringBuffer sb = new StringBuffer();
+        	sb.append("(cell,{");
+        	for (AggrValue<D> value : values) {
+        		sb.append(value.toString());
+        	}
+        	sb.append("},"+shape+")");
+            return sb.toString();
         }
     }
 }
