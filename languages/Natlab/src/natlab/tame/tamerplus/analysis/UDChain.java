@@ -27,6 +27,7 @@ public class UDChain implements TamerPlusAnalysis
     {
         fUsedVariablesNameCollector = engine.getUsedVariablesAnalysis();
         fReachingDefinitionsAnalysis = engine.getReachingDefinitionsAnalysis();
+        
         constructUDChain();
         
         if (DEBUG) printUDChain();

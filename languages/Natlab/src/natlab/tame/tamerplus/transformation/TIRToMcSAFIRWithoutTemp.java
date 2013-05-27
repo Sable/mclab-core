@@ -1,6 +1,5 @@
 package natlab.tame.tamerplus.transformation;
 
-import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -23,10 +22,12 @@ import ast.Function;
 import ast.IfStmt;
 import ast.WhileStmt;
 
+import com.google.common.collect.HashBiMap;
+
 @SuppressWarnings("rawtypes")
 public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements TamerPlusTransformation
 {
-    private HashMap<TIRNode, ASTNode> fTIRToRawASTTable;
+    private HashBiMap<TIRNode, ASTNode> fTIRToRawASTTable;
     private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
     private ASTNode<?> fTransformedTree;
     
@@ -126,13 +127,13 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements 
         }
     }
     
-    public boolean nodeDefinesTmpVariables(TIRNode node)
+    private boolean nodeDefinesTmpVariables(TIRNode node)
     {
         Set<String> definedVariablesNames = fDefinedVariablesNameCollector.getDefinedVariablesForNode(node);
         return isAnyVariableTemporary(definedVariablesNames);
     }
     
-    public boolean isAnyVariableTemporary(Set<String> definedVariablesNames)
+    private boolean isAnyVariableTemporary(Set<String> definedVariablesNames)
     {
         for (String variableName : definedVariablesNames)
         {
@@ -144,7 +145,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements 
         return false;
     }
     
-    public boolean isTemporaryVariable(String variableName)
+    private boolean isTemporaryVariable(String variableName)
     {
         return variableName.startsWith(TempFactory.getPrefix());
     }

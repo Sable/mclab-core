@@ -28,6 +28,7 @@ import ast.ForStmt;
 import ast.Name;
 import ast.NameExpr;
 
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -41,7 +42,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
 
     UDDUWeb fUDDUWeb;
     TIRToMcSAFIRTableBuilder fTIRToMcSAFIRTableBuilder;
-    private HashMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
+    private HashBiMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
     private HashMap<Expr, Name> fExprToTempVarName;
     private Set<String> fRemainingVariablesNames;
     
@@ -246,7 +247,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode)
     {
         Expr definition = getDefinitionForVariableAtNode(variable, useNode);
-        
         Queue<ASTNode> nodeQueue = Lists.newLinkedList();
         Set<ASTNode> markedNodes = Sets.newHashSet();
         ASTNode currentNode = null;
@@ -419,7 +419,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         }
     }
     
-    public HashMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
+    public HashBiMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
     }

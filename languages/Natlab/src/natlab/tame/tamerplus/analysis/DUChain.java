@@ -28,7 +28,6 @@ public class DUChain implements TamerPlusAnalysis
     public void analyze(AnalysisEngine engine)
     {
         fUDChains = engine.getUDChainAnalysis();
-        fUDChains.analyze(engine);
         this.constructDUChain();
         
         if (DEBUG) printDUChain();
