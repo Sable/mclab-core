@@ -247,27 +247,25 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	@Override
 	public Res<AggrValue<BasicMatrixValue>> cellSubsref(
 			Args<AggrValue<BasicMatrixValue>> indizes) {
-		throw new UnsupportedOperationException(); // TODO
+		throw new UnsupportedOperationException("cannot curly-braces-access a matrix!");
 	}
 
 	@Override
 	public AggrValue<BasicMatrixValue> cellSubsasgn(
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			Args<AggrValue<BasicMatrixValue>> values) {
-		throw new UnsupportedOperationException(); // TODO
+		throw new UnsupportedOperationException("cannot curly-braces-access a matrix!");
 	}
 
 	@Override
 	public ValueSet<AggrValue<BasicMatrixValue>> dotSubsref(String field) {
 		throw new UnsupportedOperationException("cannot dot-access a matrix!");
-		// return
-		// ValueSet.newInstance(factory.newErrorValue("cannot dot-access a matrix"));
 	}
 
 	@Override
 	public AggrValue<BasicMatrixValue> dotSubsasgn(String field,
 			AggrValue<BasicMatrixValue> value) {
-		throw new UnsupportedOperationException(); // TODO
+		throw new UnsupportedOperationException("cannot dot-access a matrix");
 	}
 
 	@Override
