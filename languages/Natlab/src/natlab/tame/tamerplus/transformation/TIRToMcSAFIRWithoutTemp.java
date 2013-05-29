@@ -150,6 +150,10 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements 
         return variableName.startsWith(TempFactory.getPrefix());
     }
     
+    /**
+     * Returns a tree without temporary variables
+     * @return transformed tree  
+     */
     public ASTNode<?> getTransformedTree()
     {
         return fTransformedTree;

@@ -303,6 +303,10 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         return fUDDUWeb.getVisitedStmtsLinkedList().get(0);
     }
     
+    /**
+     * Returns the new tree after UDDU web based variable coloring is applied
+     * @return transformed tree 
+     */
     public ASTNode<?> getTransformedTree()
     {
         return fTransformedTree;

@@ -1,8 +1,6 @@
 package natlab.tame.tamerplus.utils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tamerplus.analysis.DUChain;
@@ -15,7 +13,6 @@ import natlab.tame.tamerplus.analysis.UDDUWeb;
 import natlab.tame.tamerplus.analysis.UsedVariablesNameCollector;
 import ast.Name;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class TamerPlusUtils
@@ -45,17 +42,6 @@ public class TamerPlusUtils
             }
         }
         return nameSet;
-    }
-    
-  // Map must be a bijection in order for this to work properly
-    public static <K,V> HashMap<V,K> reverse(Map<K,V> map)
-    {
-        HashMap<V,K> rev = Maps.newHashMap();
-        for (Map.Entry<K,V> entry : map.entrySet())
-        {
-            rev.put(entry.getValue(), entry.getKey());
-        }
-        return rev;
     }
     
     public static void debugMode()

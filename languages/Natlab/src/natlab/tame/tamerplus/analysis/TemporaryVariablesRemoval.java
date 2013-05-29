@@ -419,16 +419,28 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         }
     }
     
+    /**
+     * Returns a bi-map of Tame IR to equivalent McSAF IR for analyzed tree and vice versa with temporary variables removed
+     * @return bi-map, key: start TIRNode/ASTNode, value: equivalent ASTNode/TIRNode
+     */
     public HashBiMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
     }
     
+    /**
+     * Returns a map of aggregated expression to original temporary variable
+     * @return map - key: aggregated expression, value: replaced temporary variable
+     */
     public HashMap<Expr, Name> getExprToTempVarTable()
     {
         return fExprToTempVarName;
     }
     
+    /**
+     * Returns the set of remaining variables after expression aggregation
+     * @return set of remaining variables
+     */
     public Set<String> getRemainingVariablesNames()
     {
         return fRemainingVariablesNames;

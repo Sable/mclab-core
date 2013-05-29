@@ -46,7 +46,7 @@ public class UDChain implements TamerPlusAnalysis
         }
     }
     
-    public Map<String, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<String> usedVariables)
+    private Map<String, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<String> usedVariables)
     {
         Map<String, Set<TIRNode>> usedVariablesToDefinitionsMap = Maps.newHashMap();
         Map<String, Set<TIRNode>> variableToReachingDefinitionsMap = fReachingDefinitionsAnalysis.getReachingDefinitionsForNode(node);
@@ -60,12 +60,21 @@ public class UDChain implements TamerPlusAnalysis
         }
         return usedVariablesToDefinitionsMap;
     }
-    
+
+    /**
+     * Returns the Use Definition chain
+     * @return map - key: node, value: map - key: used variable, value: set of definitions of that variable
+     */
     public Map<TIRNode, Map<String, Set<TIRNode>>> getChain() 
     {
         return fUDMap; 
     }
     
+    /**
+     * Returns the definitions map for a use statement
+     * @param useStmt
+     * @return map - key: used variable, value: set of definitions of that variable
+     */
     public Map<String, Set<TIRNode>> getDefinitionsMapFoUseStmt(TIRNode useStmt)
     {
         return fUDMap.get(useStmt);
@@ -73,7 +82,7 @@ public class UDChain implements TamerPlusAnalysis
         
     private void printUDChain()
     {
-        System.err.println("Use Definition Chain analysis result:");
+        System.out.println("\nUse Definition Chain analysis result:");
         StringBuilder sb = new StringBuilder();
         LinkedList<TIRNode> visitedStmts = fReachingDefinitionsAnalysis.getVisitedStmtsOrderedList();
         for (TIRNode visitedStmt : visitedStmts)

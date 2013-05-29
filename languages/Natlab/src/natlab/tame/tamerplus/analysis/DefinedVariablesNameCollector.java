@@ -131,6 +131,11 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         return Sets.newHashSet();
     }
 
+    /**
+     * Returns the set of defined variables for a given node
+     * @param node
+     * @return set of defined variables
+     */
     public Set<String> getDefinedVariablesForNode(TIRNode node)
     {
         Set<String> set = fNodeToDefinedVariablesMap.get(node);
@@ -141,6 +146,10 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         return set;
     }
     
+    /**
+     * Returns the full set of defined variables for the analyzed tree
+     * @return set of all defined variables
+     */
     public Set<String> getDefinedVariablesFullSet()
     {
         Set<String> definedVariablesFullSet = Sets.newHashSet(); 
@@ -153,7 +162,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     
     private void printNodeToDefinedVariablesMapContent()
     {
-        System.err.println("Defined variables names analysis results:");
+        System.out.println("\nDefined variables names analysis results:");
         for (Map.Entry<TIRNode, HashSet<String>> entry : fNodeToDefinedVariablesMap.entrySet())
         {
            System.out.print(NodePrinter.printNode(entry.getKey()) + "\t");
@@ -165,5 +174,4 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         }
         System.out.println("\n");
     }
-
 }

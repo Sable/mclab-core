@@ -78,6 +78,12 @@ public class DefiniteAssignment extends TIRAbstractSimpleStructuralForwardAnalys
         currentOutSet.addAll(fDefinedVariablesNameCollector.getDefinedVariablesForNode(node));
     }
     
+    /**
+     * Returns whether a variable is definitely assigned at input set of a given node
+     * @param node
+     * @param variableName
+     * @return true if the variable is definitely assigned at input set of a given node, false otherwise
+     */
     public boolean isDefinitelyAssignedAtInputOf(TIRNode node, String variableName)
     {
         if (!inFlowSets.containsKey((node)))

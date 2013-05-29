@@ -56,7 +56,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
         fVisitedNodes = engine.getReachingDefinitionsAnalysis().getVisitedStmtsOrderedList();
         initializeIRToRawASTTable();
         
-        if (DEBUG) System.err.println("Tame IR to McSAF IR Table Builder");
+        if (DEBUG) System.out.println("\nTame IR to McSAF IR Table Builder");
         
         getFunctionNode().tirAnalyze(this);
     }
@@ -486,6 +486,10 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
        matrixExpr.setRow(row, 0);
     }
     
+    /**
+     * Returns a bi-map of Tame IR to equivalent McSAF IR for analyzed tree and vice versa
+     * @return bi-map, key: start TIRNode/ASTNode, value: equivalent ASTNode/TIRNode
+     */
     public HashBiMap<TIRNode,  ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
