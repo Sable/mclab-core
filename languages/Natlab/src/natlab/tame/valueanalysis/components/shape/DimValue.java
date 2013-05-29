@@ -12,7 +12,7 @@ package natlab.tame.valueanalysis.components.shape;
  */
 public class DimValue {
 	Integer intValue;
-	String symbolic = "?";
+	String symbolic;
 	
 	public DimValue() {}
 	
@@ -59,6 +59,6 @@ public class DimValue {
 	}
 	@Override
 	public String toString() {
-		return hasIntValue() ? intValue.toString() : symbolic;
+		return hasIntValue() ? intValue.toString() : (symbolic!=null ? symbolic : "?");
 	}
 }
