@@ -52,8 +52,8 @@
 				<include name="**/*.jrag" />
 			</fileset> 
     </jastadd>
-    <jastadd package="${fortran.ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
-      <fileset dir="${src.dir}/${fortran.src.dir}">
+    <jastadd package="${fortran_simplified.ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+      <fileset dir="${src.dir}/${fortran_simplified.src.dir}">
 				<include name="**/*.ast" />
 				<include name="**/*.jadd" />
 				<include name="**/*.jrag" />
