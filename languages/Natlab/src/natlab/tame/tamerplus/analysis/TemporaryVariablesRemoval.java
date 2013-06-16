@@ -28,6 +28,7 @@ import ast.ForStmt;
 import ast.Name;
 import ast.NameExpr;
 
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -41,7 +42,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
 
     UDDUWeb fUDDUWeb;
     TIRToMcSAFIRTableBuilder fTIRToMcSAFIRTableBuilder;
-    private HashMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
+    private HashBiMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
     private HashMap<Expr, Name> fExprToTempVarName;
     private Set<String> fRemainingVariablesNames;
     
@@ -246,7 +247,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode)
     {
         Expr definition = getDefinitionForVariableAtNode(variable, useNode);
-        
         Queue<ASTNode> nodeQueue = Lists.newLinkedList();
         Set<ASTNode> markedNodes = Sets.newHashSet();
         ASTNode currentNode = null;
@@ -419,16 +419,28 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         }
     }
     
-    public HashMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
+    /**
+     * Returns a bi-map of Tame IR to equivalent McSAF IR for analyzed tree and vice versa with temporary variables removed
+     * @return bi-map, key: start TIRNode/ASTNode, value: equivalent ASTNode/TIRNode
+     */
+    public HashBiMap<TIRNode, ASTNode> getTIRToMcSAFIRTable()
     {
         return fTIRToMcSAFIRTable;
     }
     
+    /**
+     * Returns a map of aggregated expression to original temporary variable
+     * @return map - key: aggregated expression, value: replaced temporary variable
+     */
     public HashMap<Expr, Name> getExprToTempVarTable()
     {
         return fExprToTempVarName;
     }
     
+    /**
+     * Returns the set of remaining variables after expression aggregation
+     * @return set of remaining variables
+     */
     public Set<String> getRemainingVariablesNames()
     {
         return fRemainingVariablesNames;

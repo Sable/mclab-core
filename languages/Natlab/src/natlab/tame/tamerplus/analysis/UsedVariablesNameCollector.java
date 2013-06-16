@@ -170,6 +170,11 @@ import com.google.common.collect.Sets;
         return Sets.newHashSet();
     }
 
+    /**
+     * Returns the set of used variables for a given node
+     * @param node
+     * @return set of used variables
+     */
     public Set<String> getUsedVariablesForNode(TIRNode node)
     {
         Set<String> set = fNodeToUsedVariablesMap.get(node);
@@ -182,7 +187,7 @@ import com.google.common.collect.Sets;
     
     private void printNodeToUsedVariablesMapContent()
     {
-        System.err.println("Used variables names collector analysis results:");
+        System.out.println("\nUsed variables names collector analysis results:");
         for (Map.Entry<TIRNode, HashSet<String>> entry : fNodeToUsedVariablesMap.entrySet())
         {
            System.out.print(NodePrinter.printNode(entry.getKey()) + "\t");

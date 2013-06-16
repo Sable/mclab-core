@@ -25,7 +25,7 @@ public class BasicTamerTool {
 		 * currently, the type info is composed like double&3*3&REAL.
 		 */
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("YOUR_FILE_NAME_AND_PATH");
+		GenericFile gFile = GenericFile.create("/home/xu/for_test/bubble.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph

@@ -48,7 +48,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         fDefiniteAssignment = engine.getDefiniteAssignmentAnalysis();
         initializeStartMap();
         
-        if (DEBUG) System.err.println("Reaching Definitions analysis results: ");
+        if (DEBUG) System.out.println("\nReaching Definitions analysis results: ");
         
         super.analyze();
     }
@@ -202,11 +202,20 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
         associateOutSet((ASTNode<?>) node, getCurrentOutSet());
     }
     
+    /**
+     * Returns the reaching definitions for a given node
+     * @param node
+     * @return map - key: variable, value: set of reaching definitions of that variable
+     */
     public Map<String, Set<TIRNode>> getReachingDefinitionsForNode(TIRNode node)
     {
         return this.getOutFlowSets().get(node);
     }
     
+    /**
+     * Returns the set of visited statements in the order they're visited
+     * @return list of nodes
+     */
     public LinkedList<TIRNode> getVisitedStmtsOrderedList()
     {
         LinkedList<TIRNode> visitedStmtsLinkedList = Lists.newLinkedList();
@@ -249,16 +258,5 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
                 sb.append("\t").append(NodePrinter.printNode(reachingDef)).append("\n");
             }
         }
-    }
-    
-    public void printVisitedStmts()
-    {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Visited Stmts:\n");
-        for (TIRNode visitedStmt : getVisitedStmtsOrderedList())
-        {
-            sb.append(NodePrinter.printNode(visitedStmt)).append("\n");
-        }
-        System.out.println(sb.toString());
     }
 }

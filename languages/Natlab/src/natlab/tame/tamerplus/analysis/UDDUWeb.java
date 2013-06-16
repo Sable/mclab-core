@@ -32,7 +32,7 @@ public class UDDUWeb implements TamerPlusAnalysis
         fUDChain = engine.getUDChainAnalysis();
         fDUChain = engine.getDUChainAnalysis();
         
-        if (DEBUG) System.err.println("Use Definition Definition Use Web analysis results");
+        if (DEBUG) System.out.println("\nUse Definition Definition Use Web analysis results");
         constructUDDUWeb();
     }
     
@@ -149,11 +149,21 @@ public class UDDUWeb implements TamerPlusAnalysis
         return false;
     }
     
+    /**
+     * Returns the coloring of a variable in all the statements where it's used
+     * @param variableName
+     * @return map - key: use statement of the variable, value: color
+     */
     public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) 
     {
         return fUDWeb.get(variableName); 
     }
     
+    /**
+     * Returns the coloring of a variable in all the statements where it's defined
+     * @param variableName
+     * @return map - key: definition statement of the variable, value: color
+     */
     public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) 
     {
         return fDUWeb.get(variableName); 
@@ -163,5 +173,4 @@ public class UDDUWeb implements TamerPlusAnalysis
     {
         return fUDChain.getVisitedStmtsOrderedList();
     }
-    
 }

@@ -28,7 +28,6 @@ public class DUChain implements TamerPlusAnalysis
     public void analyze(AnalysisEngine engine)
     {
         fUDChains = engine.getUDChainAnalysis();
-        fUDChains.analyze(engine);
         this.constructDUChain();
         
         if (DEBUG) printDUChain();
@@ -81,11 +80,20 @@ public class DUChain implements TamerPlusAnalysis
         }
     }
     
+    /**
+     * Returns the Use Definition chain
+     * @return map - key: node, value: map - key: defined variable, value: set of uses of that variable
+     */
     public Map<TIRNode, HashMap<String, HashSet<TIRNode>>> getChain() 
     {
         return fDUMap; 
     }
     
+    /**
+     * Returns the definitions map for a use statement
+     * @param defStmt
+     * @return map - key: defined variable, value: set of uses of that variable
+     */
     public HashMap<String, HashSet<TIRNode>> getUsesMapForDefinitionStmt(TIRNode defStmt) 
     {
         return fDUMap.get(defStmt); 
@@ -93,7 +101,7 @@ public class DUChain implements TamerPlusAnalysis
     
     private void printDUChain()
     {
-        System.err.println("Definition Use Chain analysis results:");
+        System.out.println("\nDefinition Use Chain analysis results:");
         StringBuilder sb = new StringBuilder();
         LinkedList<TIRNode> visitedStmts = fUDChains.getVisitedStmtsOrderedList();
         for (TIRNode visitedStmt : visitedStmts)

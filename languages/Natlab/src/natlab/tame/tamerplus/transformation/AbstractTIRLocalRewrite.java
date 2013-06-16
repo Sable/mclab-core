@@ -6,7 +6,10 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import natlab.toolkits.rewrite.TransformedNode;
 import ast.ASTNode;
-
+/**
+ * @see AbstractLocalRewrite 
+ *
+ */
 @SuppressWarnings("rawtypes")
 public class AbstractTIRLocalRewrite extends TIRAbstractNodeCaseHandler
 {

@@ -114,11 +114,18 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					/*
 					 * add symbolic expression here.
 					 */
-					String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
-							+"+"+previousMatchResult.getValueOfVariable(arg[0]);
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
-							new DimValue(null, symbolicExp));
+					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
+							&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
+						String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
+								+"+"+previousMatchResult.getValueOfVariable(arg[0]);
+						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+								new DimValue(null, symbolicExp));						
+					}
+					else {
+						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+								new DimValue(null, null));
+					}
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					return matchResult;
 				}
@@ -142,11 +149,18 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				/*
 				 * add symbolic expression here.
 				 */
-				String symbolicExp = previousMatchResult.getValueOfVariable(arg[0])
-						+"-"+previousMatchResult.getValueOfVariable(arg[1])+"+1";
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
-						new DimValue(null, symbolicExp));
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasSymbolic()) {
+					String symbolicExp = previousMatchResult.getValueOfVariable(arg[0])
+							+"-"+previousMatchResult.getValueOfVariable(arg[1])+"+1";
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, symbolicExp));
+				}
+				else {
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, null));
+				}
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				return matchResult;
 			}
@@ -169,11 +183,18 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				/*
 				 * add symbolic expression here.
 				 */
-				String symbolicExp = "("+previousMatchResult.getValueOfVariable(arg[0])+")"
-						+"/"+previousMatchResult.getValueOfVariable(arg[1]);
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
-						new DimValue(null, symbolicExp));
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasSymbolic()) {
+					String symbolicExp = "("+previousMatchResult.getValueOfVariable(arg[0])+")"
+							+"/"+previousMatchResult.getValueOfVariable(arg[1]);
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, symbolicExp));					
+				}
+				else {
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, null));
+				}
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				return matchResult;
 			}
