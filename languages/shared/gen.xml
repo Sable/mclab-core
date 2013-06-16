@@ -59,6 +59,13 @@
 				<include name="**/*.jrag" />
 			</fileset> 
     </jastadd> 
+    <jastadd package="${fortran_readable.ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+      <fileset dir="${src.dir}/${fortran_readable.src.dir}">
+				<include name="**/*.ast" />
+				<include name="**/*.jadd" />
+				<include name="**/*.jrag" />
+			</fileset> 
+    </jastadd> 
 	</target>
 
         <!-- Gen - beaver: jflex, beaver, jastadd, and options -->
