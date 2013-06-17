@@ -34,7 +34,7 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
 			AggrValue<AdvancedMatrixValue> lower,
 			AggrValue<AdvancedMatrixValue> upper, AggrValue<AdvancedMatrixValue> inc) { 
 		return new AdvancedMatrixValue(null,
-				classPropagator.forRange(lower, upper, inc),shapePropagator.forRange(lower, upper, inc),
+				classPropagator.forRange(lower, upper, inc),shapePropagator.forRange(lower, upper, inc),null,
 				iscomplexinfoPropagator.forRange(lower, upper, inc));
 	}
 	
