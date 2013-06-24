@@ -413,10 +413,10 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         {
             fRemainingVariablesNames.remove(tmpVariableName);
         }
-        else
+        /*else
         {
             throw new NoSuchElementException("The variable: " + tmpVariableName + " is not defined.");
-        }
+        }*/
     }
     
     /**
