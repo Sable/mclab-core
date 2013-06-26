@@ -336,10 +336,10 @@ public class RightSimplification extends AbstractSimplification
             LinkedList<Stmt> backupNewStmts = newStmts;
             newStmts = new LinkedList();
 
-            
             simplifySCIfPat( e2, thenPart, elseVal );
-
-            newStmts = backupNewStmts;
+            
+            // hack to support all short circuit expressions.
+            // newStmts = backupNewStmts;
 
             simplifySCIfPat( e1, ASTHelpers.listToList(newStmts), elseVal );
         }
@@ -361,6 +361,10 @@ public class RightSimplification extends AbstractSimplification
             boolAssign.setOutputSuppressed(true);
 
             newStmts.add( ASTHelpers.newIfStmt( e, thenPart, new ast.List<Stmt>().add(boolAssign) ) );
+            
+            // remove all the duplicated thenPart stmt node.
+            for (Stmt stmt : thenPart) 
+            	if (newStmts.contains(stmt)) newStmts.remove(stmt);
         }
 
     }
