@@ -1,7 +1,9 @@
 package mclint;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import junit.framework.TestCase;
 import mclint.refactoring.RefactoringContext;
@@ -9,28 +11,23 @@ import mclint.util.Parsing;
 import ast.ASTNode;
 import ast.Program;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-
 public abstract class McLintTestCase extends TestCase {
   protected Project project;
   protected MatlabProgram program;
   protected AnalysisKit kit;
 
   @Override
-  protected void setUp() {
-    project = Project.at(Files.createTempDir());
+  protected void setUp() throws IOException {
+    project = Project.at(Files.createTempDirectory(null));
   }
 
   protected void parse(String code) {
-    File root = Files.createTempDir();
-    File file = new File(root, "f.m");
+    Path file = project.getProjectRoot().resolve("f.m");
     try {
-      Files.write(code, file, Charsets.UTF_8);
+      Files.write(file, code.getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
     }
-    project = Project.at(root);
-    program = project.getMatlabPrograms().iterator().next();
+    program = project.addMatlabProgram(file);
     program.parse();
     kit = program.analyze();
   }

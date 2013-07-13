@@ -1,27 +1,27 @@
 package mclint;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import junit.framework.TestCase;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
-import com.google.common.io.Files;
 
 public class ProjectTest extends TestCase {
-  private File projectRoot;
+  private Path projectRoot;
 
   @Override
-  protected void setUp() {
-    projectRoot = Files.createTempDir();
+  protected void setUp() throws IOException {
+    projectRoot = Files.createTempDirectory(null);
   }
 
   private void create(String path) throws IOException {
-    File file = new File(projectRoot, path);
-    Files.createParentDirs(file);
-    file.createNewFile();
+    Path file = projectRoot.resolve(path);
+    Files.createDirectories(file.getParent());
+    Files.createFile(file);
   }
 
   public void testSingleFile() throws IOException {

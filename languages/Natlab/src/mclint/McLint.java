@@ -2,6 +2,7 @@ package mclint;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -96,7 +97,7 @@ public class McLint {
   }
 
   public static void main(Options options) throws IOException {
-    Project project = Project.at(new File(options.getFiles().getFirst()));
+    Project project = Project.at(Paths.get(options.getFiles().getFirst()));
     List<LintAnalysis> analyses = getAllAnalyses(project);
     Lint lint = Lint.create(project, analyses);
     registerBuiltinListeners(lint);

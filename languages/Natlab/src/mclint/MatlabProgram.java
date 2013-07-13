@@ -1,38 +1,35 @@
 package mclint;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import mclint.transform.Transformer;
 import mclint.transform.Transformers;
 import mclint.util.Parsing;
-import natlab.utils.FileUtil;
 import ast.Program;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 
 public class MatlabProgram {
   private Project project;
-  private File file;
-  private File absoluteFile;
+  private Path file;
 
   private String code;
   private Program ast;
 
-  public static MatlabProgram at(File file, Project project) {
+  public static MatlabProgram at(Path file, Project project) {
     return new MatlabProgram(file, project);
   }
 
-  private MatlabProgram(File file, Project project) {
+  private MatlabProgram(Path file, Project project) {
     this.project = project;
     this.file = file;
-    this.absoluteFile = new File(project.getProjectRoot(), file.getPath());
   }
 
   public Project getProject() {
@@ -43,16 +40,18 @@ public class MatlabProgram {
    * Returns the path of this program relative to the project root.
    */
   public String getPath() {
-    return file.getPath();
+    return file.toString();
   }
 
   public boolean isPrivate() {
-    return "private".equals(file.getParent());
+    return file.getParent() != null
+        && "private".equals(file.getParent().getFileName().toString());
   }
 
   public String getPackage() {
     List<String> packageComponents = Lists.newArrayList();
-    for (String component : FileUtil.splitPath(file)) {
+    for (Path componentPath : file) {
+      String component = componentPath.toString();
       if (!component.startsWith("+")) {
         break;
       }
@@ -63,7 +62,7 @@ public class MatlabProgram {
 
   public Program parse() {
     if (ast == null) {
-      ast = Parsing.file(absoluteFile.getPath());
+      ast = Parsing.file(project.getProjectRoot().resolve(file).toString());
       ast.setMatlabProgram(this);
     }
     return ast;
@@ -79,7 +78,8 @@ public class MatlabProgram {
 
   public Transformer getLayoutPreservingTransformer() {
     try {
-      return Transformers.layoutPreserving(new FileReader(absoluteFile));
+      return Transformers.layoutPreserving(
+          new InputStreamReader(Files.newInputStream(file)));
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
@@ -89,14 +89,14 @@ public class MatlabProgram {
     write(project.getProjectRoot());
   }
 
-  public void write(File root) throws IOException {
-    File outputFile = new File(root, file.getPath());
-    Files.createParentDirs(outputFile);
+  public void write(Path root) throws IOException {
+    Path outputFile = root.resolve(file);
+    Files.createDirectories(outputFile.getParent());
     // TODO really what should happen is Project and MatlabPrograms get passed around everywhere,
     // and changes are made to their code (e.g. by assigning transformer.reconstructText()).
     if (code == null) {
       code = ast.getPrettyPrinted();
     }
-    Files.write(code, outputFile, Charsets.UTF_8);
+    Files.write(outputFile, code.getBytes(StandardCharsets.UTF_8));
   }
 }
