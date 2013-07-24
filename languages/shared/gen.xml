@@ -10,11 +10,6 @@
 		<jflex file="${src.dir}/${lexer.spec}" destdir="${gen.dir}" nobak="yes" />
 	</target>
 
-	<!-- generates Java files from Beaver parser spec -->
-	<target name="beaver" depends="def.beaver.task">
-		<beaver file="${src.dir}/${parser.spec}" destdir="${gen.dir}" terminalNames="yes" compress="no" useSwitch="yes" />
-	</target>
-	
 	<target name="parser" depends="def.beaver.task">
                 <mkdir dir="${gen.dir}/parser"/>
                 <!-- generate the parser phase 1, create a full .lalr specification from fragments-->
@@ -67,9 +62,6 @@
 			</fileset> 
     </jastadd> 
 	</target>
-
-        <!-- Gen - beaver: jflex, beaver, jastadd, and options -->
-        <target name="gen" depends="jflex, beaver, jastadd" />
 
 	<!-- Gen - parser+beaver: jflex, parser+beaver, jastadd, and options -->
         <target name="gen-parser" depends="jflex, parser, jastadd" />
