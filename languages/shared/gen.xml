@@ -6,8 +6,10 @@
 -->
 <project name="Gen">
 	<!-- generates Java files from JFlex scanner spec -->
-	<target name="jflex" depends="def.jflex.task">
+	<target name="jflex" depends="def.jflex.task, def.setloglevel.task">
+    <setloglevel level="error" />
 		<jflex file="${src.dir}/${lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+    <setloglevel level="info" />
 	</target>
 
 	<target name="parser" depends="def.beaver.task">
