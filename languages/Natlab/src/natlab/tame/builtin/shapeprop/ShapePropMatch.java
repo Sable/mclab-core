@@ -28,7 +28,6 @@ public class ShapePropMatch<V extends Value<V>> {
 	boolean isAssignLiteralToLHS = false;
 	boolean whetherLatestMatchedIsNum = false;
 	boolean isError = false;
-	boolean isMatchDone = false;
 	boolean isOutputDone = false;
 	/* 
 	 * isInsideVertcat is used for distinguish the lowercase in vertcat or not, 
@@ -62,7 +61,6 @@ public class ShapePropMatch<V extends Value<V>> {
         this.isAssignLiteralToLHS = parent.isAssignLiteralToLHS;
         this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
         this.isError = parent.isError;
-        this.isMatchDone = parent.isMatchDone;
         this.isOutputDone = parent.isOutputDone;
         this.isInsideVertcat = parent.isInsideVertcat;
         this.isInsideAssign = parent.isInsideAssign;
@@ -87,7 +85,6 @@ public class ShapePropMatch<V extends Value<V>> {
 		this.isAssignLiteralToLHS = parent.isAssignLiteralToLHS;
 		this.whetherLatestMatchedIsNum = parent.whetherLatestMatchedIsNum;
 	    this.isError = parent.isError;
-	    this.isMatchDone = parent.isMatchDone;
 	    this.isOutputDone = parent.isOutputDone;
 	    this.isInsideVertcat = parent.isInsideVertcat;
 	    this.isInsideAssign = parent.isInsideAssign;
@@ -174,14 +171,6 @@ public class ShapePropMatch<V extends Value<V>> {
     
     public int getNumInVertcat() {
     	return this.numInVertcat;
-    }
-    
-    public void setIsMatchDone() {
-    	this.isMatchDone = true;
-    }
-    
-    public boolean getIsMatchDone() {
-    	return isMatchDone;
     }
     
     public void setIsOutputDone() {
