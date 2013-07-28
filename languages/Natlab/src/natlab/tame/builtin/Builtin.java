@@ -4266,12 +4266,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractLogicalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasClassPropagationInfo {
+    public static abstract class AbstractLogicalByShapeAndTypeMatrixCreation extends AbstractByShapeAndTypeMatrixCreation implements HasShapePropagationInfo, HasClassPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractLogicalByShapeAndTypeMatrixCreation(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[]->$||($,n=previousScalar(),add())+->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
