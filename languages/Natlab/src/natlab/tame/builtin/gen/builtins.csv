@@ -562,6 +562,7 @@ nan
 # there is no optional type argument
 logicalByShapeAndTypeMatrixCreation; byShapeAndTypeMatrixCreation;
 -Class((numeric|logical)*->logical)
+-Shape([]->$||($,n=previousScalar(),add())+->M)
 true
 false
 

@@ -38,9 +38,8 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	
 	static boolean Debug = false;
 	List<DimValue> dimensions;
-	boolean isTop = false;
-	boolean outOfBound = false;
-	boolean mismatch = false;
+	boolean outOfBound = false; // for array bound check.
+	boolean mismatch = false; // for array bound check.
 	
 	public Shape(List<DimValue> dimensions) {
 		/* 
@@ -53,6 +52,10 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 	
     public List<DimValue> getDimensions() {
     	return dimensions;
+    }
+    
+    public void setDimensions(List<DimValue> newDimensions) {
+    	dimensions = newDimensions;
     }
 
     /**
@@ -102,10 +105,6 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	else return false;
     }
     
-    public void flagIsTop() {
-    	isTop = true;
-    }
-    
     public void flagOutOfBound() {
     	outOfBound = true;
     }
@@ -114,27 +113,37 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	mismatch = true;
     }
     
-    /**
-     * merge null with anything --> null
-     * merge shapes with different dimensions --> top
-     * should we replace top to growing the shape?
-     */
     @Override
     public Shape<V> merge(Shape<V> o) {
     	if (Debug) System.out.println("inside shape merge!");
     	if (this.equals(o)) return this;
-    	else if (o==null) return null;
-    	else if (dimensions.size()!=o.getDimensions().size()) {
-			/*
-			 * currently, push to top.
-			 * TODO, I kind of remember we decided to grow the shape, do it later.
-			 */
-			if (Debug) System.out.println("return a top shape!");
-			Shape<V> topShape = new Shape<V>(null);
-			topShape.flagIsTop();
-			return topShape;
+    	else if (o == null) return null;
+    	/*
+    	 * if the size of dimensions of two shapes are different, first, 
+    	 * we make them have the same size of dimensions by adding 
+    	 * trailing 1s at the end of the dimension with smaller size.
+    	 */
+    	else if (dimensions.size() > o.getDimensions().size()) {
+			List<DimValue> tempList = new ArrayList<DimValue>(dimensions.size());
+			for (int i=0; i<dimensions.size(); i++) {
+				if (i<o.getDimensions().size()) tempList.add(o.getDimensions().get(i));
+				else tempList.add(new DimValue(1, null));
+			}
+			o.setDimensions(tempList);
 		}
-		ArrayList<DimValue> list = new ArrayList<DimValue>(dimensions.size());
+    	else if (dimensions.size() < o.getDimensions().size()) {
+    		List<DimValue> tempList = new ArrayList<DimValue>(o.getDimensions().size());
+    		for (int i=0; i<o.getDimensions().size(); i++) {
+    			if (i<dimensions.size()) tempList.add(dimensions.get(i));
+    			else tempList.add(new DimValue(1, null));
+    		}
+    		this.setDimensions(tempList);
+    	}
+    	/*
+    	 * after we make the shapes have the same size of dimensions, 
+    	 * we start to merge them.
+    	 */
+		List<DimValue> list = new ArrayList<DimValue>(dimensions.size());
 		for (int i=0; i<dimensions.size(); i++) {
 			/* 
 			 * this equals method is not an override method, it calls 
@@ -160,8 +169,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 		if (obj instanceof Shape) {
 	    	if (Debug) System.out.println("inside check whether shape equals!");
 	    	Shape<V> o = (Shape)obj;
-	    	if (isTop==true || o.isTop==true) return true;
-	    	if (dimensions.size()!=o.getDimensions().size()) return false;
+	    	if (dimensions.size() != o.getDimensions().size()) return false;
 	    	for (int i=0; i<dimensions.size(); i++) {
 	    		if (!dimensions.get(i).equals(o.getDimensions().get(i))) {
 	    			return false;
@@ -197,10 +205,9 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * worry about dimensions may be null in this toString. 
      */
     public String toString() {
-    	if (isTop==true) return "[is top]";
-    	else if (outOfBound==true) return "[index out of bound]";
-    	else if (mismatch==true) return "[mismatched shape]";
-    	else if (isConstant()==false) {
+    	if (outOfBound) return "[index out of bound]";
+    	else if (mismatch) return "[mismatched shape]";
+    	else if (!isConstant()) {
     		List<String> dimension = new ArrayList<String>();
     		for (int i=0; i<dimensions.size(); i++) {
     			if (dimensions.get(i)==null) dimension.add("?");
