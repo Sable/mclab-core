@@ -3,13 +3,15 @@ package natlab.tame.tamerplus.analysis;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRNode;
 import ast.ASTNode;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 public class UDDUWeb implements TamerPlusAnalysis
 {
@@ -17,14 +19,10 @@ public class UDDUWeb implements TamerPlusAnalysis
     
     private UDChain fUDChain;
     private DUChain fDUChain;
-    private HashMap<String, HashMap<TIRNode, Integer>> fUDWeb;
-    private HashMap<String, HashMap<TIRNode, Integer>> fDUWeb;
+    private Table<String, TIRNode, Integer> fUDWeb = HashBasedTable.create();
+    private Table<String, TIRNode, Integer> fDUWeb = HashBasedTable.create();
     
-    public UDDUWeb(ASTNode<?> tree)
-    {
-        fUDWeb = Maps.newHashMap();
-        fDUWeb = Maps.newHashMap();
-    }
+    public UDDUWeb(ASTNode<?> tree) {}
 
     @Override
     public void analyze(AnalysisEngine engine)
@@ -59,12 +57,12 @@ public class UDDUWeb implements TamerPlusAnalysis
     
     private void markDefinition(TIRNode visitedStmt, String variableName, Integer color)
     {
-        createNewEntryInDUWebForVariable(variableName);
+        fDUWeb.put(variableName, visitedStmt, color);
         
-        fDUWeb.get(variableName).put(visitedStmt, color);
-        
-        if(DEBUG) System.out.println((new StringBuilder("Def of ")).append(variableName)
-                .append(" colored with\t").append(color).append(" in \t").append(NodePrinter.printNode(visitedStmt))); 
+        if(DEBUG) {
+          System.out.format("Def of %s colored with\t%s in \t%s\n", variableName, color,
+              NodePrinter.printNode(visitedStmt));
+        }
         
         HashSet<TIRNode> useSet = fDUChain.getUsesMapForDefinitionStmt(visitedStmt).get(variableName);
         
@@ -84,13 +82,13 @@ public class UDDUWeb implements TamerPlusAnalysis
     
     private void markUse(TIRNode visitedStmt, String variableName, Integer color)
     {
-        createNewEntryInUDWebForVariable(variableName);
+        fUDWeb.put(variableName, visitedStmt, color);
         
-        fUDWeb.get(variableName).put(visitedStmt, color);
-        
-        if(DEBUG) System.out.println((new StringBuilder("Use of ")).append(variableName)
-                .append(" colored with\t").append(color).append(" in \t").append(NodePrinter.printNode(visitedStmt)));
-        
+        if(DEBUG) {
+          System.out.format("Use of %s colored with\t%s in \t%s\n", variableName, color,
+              NodePrinter.printNode(visitedStmt));
+        }
+
         Set<TIRNode> definitionSet = fUDChain.getDefinitionsMapFoUseStmt(visitedStmt).get(variableName);
         
         if (definitionSet == null)
@@ -107,46 +105,14 @@ public class UDDUWeb implements TamerPlusAnalysis
         }
     }
     
-    private void createNewEntryInUDWebForVariable(String variableName)
-    {
-        if (fUDWeb.get(variableName) == null)
-        {
-            fUDWeb.put(variableName, new HashMap<TIRNode, Integer>());
-        }
-    }
-    
-    private void createNewEntryInDUWebForVariable(String variableName)
-    {
-        if (fDUWeb.get(variableName) == null)
-        {
-            fDUWeb.put(variableName, new HashMap<TIRNode, Integer>());
-        }
-    }
-    
     private boolean isMarkedInDUWeb(TIRNode visitedStmt, String variableName)
     {
-        if (fDUWeb.containsKey(variableName))
-        {
-            HashMap<TIRNode, Integer> webEntry = fDUWeb.get(variableName);
-            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null)
-            {
-                return true;
-            }
-        }
-        return false;
+       return fDUWeb.get(variableName, visitedStmt) != null;
     }
     
     private boolean isMarkedInUDWeb(TIRNode visitedStmt, String variableName)
     {
-        if (fUDWeb.containsKey(variableName))
-        {
-            HashMap<TIRNode, Integer> webEntry = fUDWeb.get(variableName);
-            if (webEntry != null && webEntry.containsKey(visitedStmt) && webEntry.get(visitedStmt) != null)
-            {
-                return true; 
-            }
-        }
-        return false;
+       return fUDWeb.get(variableName, visitedStmt) != null;
     }
     
     /**
@@ -154,9 +120,9 @@ public class UDDUWeb implements TamerPlusAnalysis
      * @param variableName
      * @return map - key: use statement of the variable, value: color
      */
-    public HashMap<TIRNode, Integer> getNodeAndColorForUse(String variableName) 
+    public Map<TIRNode, Integer> getNodeAndColorForUse(String variableName) 
     {
-        return fUDWeb.get(variableName); 
+        return fUDWeb.row(variableName); 
     }
     
     /**
@@ -164,9 +130,9 @@ public class UDDUWeb implements TamerPlusAnalysis
      * @param variableName
      * @return map - key: definition statement of the variable, value: color
      */
-    public HashMap<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) 
+    public Map<TIRNode, Integer> getNodeAndColorForDefinition(String variableName) 
     {
-        return fDUWeb.get(variableName); 
+      return fDUWeb.row(variableName);
     }
     
     public LinkedList<TIRNode> getVisitedStmtsLinkedList() 

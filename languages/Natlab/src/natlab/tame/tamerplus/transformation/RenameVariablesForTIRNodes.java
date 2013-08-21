@@ -1,7 +1,7 @@
 package natlab.tame.tamerplus.transformation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import natlab.tame.tamerplus.analysis.AnalysisEngine;
 import natlab.tame.tamerplus.analysis.UDDUWeb;
@@ -111,7 +111,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     
     private void renameConditionVariableForNode(Name conditionVariableName, TIRNode node)
     {
-        HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getID());
+        Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getID());
         if (nodeToColorMap != null &&  nodeToColorMap.containsKey(node))
         {
             renameVariableWithColor(conditionVariableName, nodeToColorMap.get(node));
@@ -267,7 +267,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         for (int i = 0; i < usedVariablesNames.getNumChild(); i++)
         {
             Name usedVariableName = usedVariablesNames.getName(i);
-            HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getID());
+            Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(usedVariableName.getID());
             if (nodeToColorMap != null && nodeToColorMap.containsKey(parentNode))
             {
                 renameVariableWithColor(usedVariableName, nodeToColorMap.get(parentNode));
@@ -284,7 +284,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         for (int i = 0; i < definedVariablesNames.getNumChild(); i++)
         {
             Name definedVariableName = definedVariablesNames.getName(i);
-            HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForDefinition(definedVariableName.getID());
+            Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForDefinition(definedVariableName.getID());
             if (nodeToColorMap != null && nodeToColorMap.containsKey(parentNode))
             {
                 renameVariableWithColor(definedVariableName, nodeToColorMap.get(parentNode));
@@ -294,8 +294,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
     
     private void renameVariableWithColor(Name variableName, Integer color)
     {
-        String updatedVariableName = (new StringBuilder(variableName.getNodeString())).append(COLOR_PREFIX).append(color).toString();
-        variableName.setID(updatedVariableName);
+        variableName.setID(String.format("%s%s%s", variableName.getNodeString(), COLOR_PREFIX, color));
     }
     
     private TIRNode getFunctionNode()
