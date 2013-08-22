@@ -25,7 +25,7 @@ import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -67,13 +67,13 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private boolean allDefsOutsideLoop(Set<Def> defs, ASTNode<?> loop) {
-    Iterable<Def> loopDefs = NodeFinder.find(Def.class, loop);
+    FluentIterable<Def> loopDefs = NodeFinder.find(Def.class, loop);
     for (Def def : defs) {
       if (def == ReachingDefs.UNDEF)
         continue;
       if (def instanceof GlobalStmt || def instanceof Name)
         continue;
-      if (Iterables.contains(loopDefs, def))
+      if (loopDefs.contains(defs))
         return false;
     }
     return true;

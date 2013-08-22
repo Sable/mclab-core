@@ -16,7 +16,6 @@ import ast.Stmt;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 public class Matcher {
@@ -41,8 +40,8 @@ public class Matcher {
 
   private static <T extends ASTNode<?>> List<Match> findMatching(Class<T> clazz, String pattern,
       ASTNode<?> tree) {
-    return ImmutableList.copyOf(Optional.presentInstances(Iterables.transform(
-        NodeFinder.find(clazz, tree), matchFunction(pattern))));
+    return ImmutableList.copyOf(Optional.presentInstances(NodeFinder.find(clazz, tree)
+        .transform(matchFunction(pattern))));
   }
 
   public static List<Match> findMatchingStatements(String pattern, ASTNode<?> tree) {

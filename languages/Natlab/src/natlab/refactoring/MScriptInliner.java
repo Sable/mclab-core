@@ -50,7 +50,7 @@ public class MScriptInliner {
 
 	public LinkedList<LinkedList<Exception>> inlineAll(){
 		LinkedList<LinkedList<Exception>>  res = Lists.newLinkedList();
-		for (Function f: Iterables.filter(NodeFinder.find(Function.class, cu),
+		for (Function f: NodeFinder.find(Function.class, cu).filter(
 		    Predicates.not(AstPredicates.nestedFunction()))) {
 				res.addAll(inlineAllScripts(f));
 		}
@@ -75,14 +75,13 @@ public class MScriptInliner {
 	private Set<String> findNested(Function f) {
 		if (f.getParent().getParent() instanceof Function)
 			f = (Function) f.getParent().getParent();
-		return Sets.newLinkedHashSet(Iterables.transform(
-		    NodeFinder.find(Function.class, f),
-		    AstFunctions.functionToName()));
+		return Sets.newLinkedHashSet(NodeFinder.find(Function.class, f)
+		    .transform(AstFunctions.functionToName()));
 	}
 	
 	private Set<Name> findNameExpr(ASTNode f) {
-	  return Sets.newLinkedHashSet(Iterables.filter(
-	      NodeFinder.find(Name.class, f), Predicates.or(
+	  return Sets.newLinkedHashSet(NodeFinder.find(Name.class, f)
+	      .filter(Predicates.or(
 	          AstPredicates.parentInstanceOf(NameExpr.class),
 	          AstPredicates.parentInstanceOf(FunctionHandleExpr.class))));
 	}
