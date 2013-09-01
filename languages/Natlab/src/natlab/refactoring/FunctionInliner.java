@@ -45,7 +45,6 @@ import ast.Stmt;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -63,17 +62,16 @@ public class FunctionInliner {
 	};
 	
 	private LinkedList<AssignStmt> functionCalls(Function f) {
-	  return Lists.newLinkedList(
-	          Iterables.filter(NodeFinder.find(AssignStmt.class, f.getStmtList()),
-	                  new Predicate<AssignStmt>() {
-	            @Override public boolean apply(AssignStmt stmt) {
-	              return stmt.getRHS() instanceof ParameterizedExpr;
-	            }
-	          }));
+	  return Lists.newLinkedList(NodeFinder.find(AssignStmt.class, f.getStmtList())
+	      .filter(new Predicate<AssignStmt>() {
+	        @Override public boolean apply(AssignStmt stmt) {
+	          return stmt.getRHS() instanceof ParameterizedExpr;
+	        }
+	      }));
 	}
 	
 	private Iterable<Function> nonNestedFunctions(ASTNode<?> tree) {
-	  return Iterables.filter(NodeFinder.find(Function.class, tree),
+	  return NodeFinder.find(Function.class, tree).filter(
 	      Predicates.not(AstPredicates.nestedFunction()));
 	}
 	

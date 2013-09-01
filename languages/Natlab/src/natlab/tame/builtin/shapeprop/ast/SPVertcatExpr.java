@@ -35,7 +35,6 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			if (!previousMatchResult.getIsInsideAssign() && vl==null) {
 				if (argValues.size()==0) {
 					// matching empty shape successfully.
-					previousMatchResult.setIsMatchDone();
 					return previousMatchResult;
 				}
 				previousMatchResult.setIsError(true);
@@ -88,14 +87,14 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				return previousMatchResult;
 			}
 			else {
-				//FIXME deal with the [m,k] or [m,k,j,..] kinds of output
+				//FIXME deal with the [m,k] or [m,k,j,..] kinds of output, don't forget things like [0,0].
 				ArrayList<DimValue> al = new ArrayList<DimValue>(arg.length);
 				for (String i : arg) {
 					if (previousMatchResult.hasValue(i)) {
 						al.add(previousMatchResult.getValueOfVariable(i));
 					}
 					else {
-						al.add(new DimValue());
+						al.add(new DimValue(Integer.parseInt(i), null));
 					}
 				}
 				if (Debug) System.out.println("the vertcat result is " + al);

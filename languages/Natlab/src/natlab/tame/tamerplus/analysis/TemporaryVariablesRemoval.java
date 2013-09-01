@@ -1,8 +1,8 @@
 package natlab.tame.tamerplus.analysis;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -101,7 +101,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         Name conditionVariableName = node.getConditionVarName();
         if (conditionVariableName != null)
         {
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
+            Map<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
             boolean isNodeAValidKeyInNodeToColorMap = (nodeAndColor != null &&  nodeAndColor.containsKey(node));
             if (isNodeAValidKeyInNodeToColorMap && isTemporaryVariable(conditionVariableName))
             {
@@ -118,7 +118,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
         Name conditionVariableName = node.getCondition().getName();
         if (conditionVariableName != null)
         {
-            HashMap<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
+            Map<TIRNode, Integer> nodeAndColor = fUDDUWeb.getNodeAndColorForUse(conditionVariableName.getNodeString());
             boolean isNodeAValidKeyInNodeToColorMap = nodeAndColor != null &&  nodeAndColor.containsKey(node);
             if (isNodeAValidKeyInNodeToColorMap && isTemporaryVariable(conditionVariableName))
             {
@@ -354,18 +354,18 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     private Integer getColorForVariableInUseNode(Name variable, TIRNode useNode)
     {
         String variableName = variable.getID();
-        HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(variableName);
+        Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForUse(variableName);
         return nodeToColorMap.get(useNode);
     }
     
     private TIRNode getDefintionNode(Name variable, Integer color)
     {
         String variableName = variable.getID();
-        HashMap<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForDefinition(variableName);
+        Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb.getNodeAndColorForDefinition(variableName);
         return findNodeWithColorInMap(color, nodeToColorMap);
     }
     
-    private TIRNode findNodeWithColorInMap(Integer color, HashMap<TIRNode, Integer> nodeToColorMap)
+    private TIRNode findNodeWithColorInMap(Integer color, Map<TIRNode, Integer> nodeToColorMap)
     {
         TIRNode seekedNode = null;
         for (TIRNode node : nodeToColorMap.keySet())

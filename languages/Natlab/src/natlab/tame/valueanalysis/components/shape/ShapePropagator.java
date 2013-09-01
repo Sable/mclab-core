@@ -227,36 +227,20 @@ public class ShapePropagator<V extends Value<V>>
      * 
      * Currently, if the shape is exactly known, we will proceed static array 
      * bound check here, if not, we leave the array bound check to the runtime. 
+     * 
      * And when we cannot proceed static array bound check during the shape 
-     * analysis of array set, we have to assume the indices are not out of array 
-     * bound, and return the original array's shape.
+     * analysis of array set, we have to assume the indices may be out of array 
+     * bound, mark array as allocatable array and leave the ABC to runtime.
      * 
-     * 1st, whether the indices may be out of array bound? If the upper bound 
-     * of the index is still smaller than the size of certain dimension, then 
-     * this will be definitely not out of array bound. And if the upper bound 
-     * of the index is bigger than the size of certain dimension, even the 
-     * lower bound may be smaller than the size of that dimension, we should 
-     * still grow the array to the upper bound of the index, this is safe. But 
-     * this is not always precise, since maybe on some branch, the index is 
-     * smaller than the corresponding dimension's size at runtime, in this 
-     * situation, we don't need to grow the array. But anyway, our analysis is 
-     * static analysis...
-     * 
-     * TODO advanced version of this array bound check: when we do bound check, 
-     * we can use the range value analysis result, i.e. if shape(a)=[2,b,5] 
-     * and range(b)=<3,5>, then a(2,4,4)=rhs will not grow array a, because 
-     * range(b)=<3,5>, by the way, do we need to say range(b)=<4,5> after this?
-     * wait a minute, this is totally unsafe, since in the runtime, if on one 
-     * branch shape(a)=[2,3,5], a(2,4,4)=rhs will be an error! So if the sizes 
-     * of some certain dimensions are symbolic and maybe have range values, this 
-     * cannot be done by static array bound check, should insert runtime array 
-     * bound check in the generated code. So, it is safe only when all the upper 
-     * bound of indices are smaller than the lower bound of all the dimensions 
-     * and of course bigger than 0. And it is definitely an index out of bound 
-     * error when any index' lower bound is bigger than the upper bound of the 
-     * corresponding dimension.
+     * Using range value analysis result in array bound check. If and only if 
+     * both the upper bound of the index is smaller than the size of corresponding 
+     * dimension and the lower bound of the index is larger than 0, we say it 
+     * is not out of the array bound. If not, we assign null to the corresponding 
+     * dimension, which means the array's shape is not exactly known, and will be 
+     * declared as allocatable array in the generated code.
      * 
      * TODO what is the maximum size which an array can be or can be declared?
+     * TODO in matlab array index, there is a keyword "end".
      * 
      * DONE: Since we cannot assume the input MATLAB code is 100% syntax correct 
      * and safe, we need to consider the situation that if the rhs value's shape 
@@ -269,8 +253,8 @@ public class ShapePropagator<V extends Value<V>>
     	if (lhsArrayShape==null) return null;
     	List<DimValue> indexedDimensions = new ArrayList<DimValue>();
     	List<DimValue> lhsArrayDimensions = lhsArrayShape.getDimensions();
-    	List<DimValue> newDimensions = lhsArrayDimensions; // if array need to be grew.
-    	// indices.size() can be bigger than lhsArrayDimensions.size(), grow it.
+    	List<DimValue> newDimensions = lhsArrayDimensions; // just a ref to original dimension.
+    	// if indices.size() is larger than lhsArrayDimensions.size(), grow it.
     	for (int i=0; i<indices.size(); i++) {
     		/*
     		 * ColonValue extends from SpecialValue which extends from Value, 
@@ -302,8 +286,7 @@ public class ShapePropagator<V extends Value<V>>
     		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
     			// insert array growth check.
     			if (i+1 > lhsArrayDimensions.size()) {
-    				newDimensions.add(new DimValue(((HasRangeValue<V>)indices.get(i))
-    						.getRangeValue().getUpperBound().intValue(), null));
+    				newDimensions.add(new DimValue(null, null));
     			}
     			else if (indices.size()==i+1 && lhsArrayDimensions.size()>i+1) {
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
@@ -343,9 +326,12 @@ public class ShapePropagator<V extends Value<V>>
     							> lhsArrayDimensions.get(i).getIntValue()) {
     						// grow the original array.
     						newDimensions.remove(i);
-    						newDimensions.add(i, new DimValue(((HasRangeValue<V>)indices.get(i))
-    								.getRangeValue().getUpperBound().intValue(), null));
+    						newDimensions.add(i, new DimValue(null, null));
     					}
+    				}
+    				else {
+    					newDimensions.remove(i);
+						newDimensions.add(i, new DimValue(null, null));
     				}
     				indexedDimensions.add(new DimValue(1, null));
     			}

@@ -1,7 +1,5 @@
 package mclint.refactoring;
 
-import static com.google.common.collect.Iterables.filter;
-
 import java.util.List;
 
 import mclint.MatlabProgram;
@@ -22,7 +20,6 @@ import ast.Script;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -80,8 +77,8 @@ class RenameVariable extends Refactoring {
     }
 
     ASTNode<?> parent = getParentFunctionOrScript(node);
-    Optional<Name> conflictingName = 
-        Iterables.tryFind(NodeFinder.find(Name.class, parent), AstPredicates.named(newName));
+    Optional<Name> conflictingName = NodeFinder.find(Name.class, parent)
+        .firstMatch(AstPredicates.named(newName));
     if (conflictingName.isPresent()) {
       addError(new NameConflict(conflictingName.get()));
       return false;
@@ -99,7 +96,7 @@ class RenameVariable extends Refactoring {
 
   private Iterable<Def> getAllDefsOfTargetName() {
     ASTNode<?> parent = getParentFunctionOrScript(node);
-    return filter(NodeFinder.find(Def.class, parent), new Predicate<Def>() {
+    return NodeFinder.find(Def.class, parent).filter(new Predicate<Def>() {
       @Override public boolean apply(Def def) {
         return !udduChain.getDefinedNamesOf(node.getID(), def).isEmpty();
       }
@@ -107,7 +104,7 @@ class RenameVariable extends Refactoring {
   }
 
   private static Name findGlobalNamed(final String name, ASTNode<?> tree) {
-    return FluentIterable.from(NodeFinder.find(Name.class, tree))
+    return NodeFinder.find(Name.class, tree)
         .firstMatch(new Predicate<Name>() {
           @Override public boolean apply(Name node) {
             return node.getParent().getParent() instanceof GlobalStmt

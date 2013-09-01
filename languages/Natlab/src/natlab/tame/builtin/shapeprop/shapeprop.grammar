@@ -22,7 +22,7 @@
 %typeof outputlist = "SPOutputlist";
 %typeof patternlist = "SPPatternlist";
 %typeof pattern, assertStmt = "SPAbstractPattern";
-%typeof matchExpr = "SPAbstractMatchExpr";
+%typeof matchExpr, basicMatchExpr = "SPAbstractMatchExpr";
 %typeof vectorExpr = "SPAbstractVectorExpr";
 %typeof vertcatExpr = "SPVertcatExpr";
 %typeof arglist = "SPArglist";
@@ -60,16 +60,20 @@ pattern
     ;
     
 matchExpr
-    = matchExpr.m OR matchExpr.n              {: return new SPOr(m,n); :}
-    | LRPAREN patternlist.p RRPAREN           {: return new SPRParen(p); :}
-    | matchExpr.m QUESTION                    {: return new SPQuestion(m); :}
-    | matchExpr.m MULT                        {: return new SPMult(m); :}
-    | matchExpr.m PLUS                        {: return new SPPlus(m); :}
-    | vectorExpr.v                            {: return v; :}
-    | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
-    | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
+    = basicMatchExpr.m OR basicMatchExpr.n    {: return new SPOr(m,n); :}
+    | basicMatchExpr.m QUESTION               {: return new SPQuestion(m); :}
+    | basicMatchExpr.m MULT                   {: return new SPMult(m); :}
+    | basicMatchExpr.m PLUS                   {: return new SPPlus(m); :}
+    | basicMatchExpr.m                        {: return m; :}
     ;
     
+basicMatchExpr
+	= LRPAREN patternlist.p RRPAREN           {: return new SPRParen(p); :}
+    | SQUOTATION ID.i SQUOTATION              {: return new SPStringLiteral(i); :}
+    | SQUOTATION LOWERCASE.i SQUOTATION       {: return new SPStringLiteral(i); :}
+	| vectorExpr.v                            {: return v; :}
+    ;
+
 vectorExpr
     = SCALAR.d                                {: return new SPScalar(d); :}  /* used to match a scalar input argument, whose shape is [1,1]. */
     | UPPERCASE.u                             {: return new SPUppercase(u); :}

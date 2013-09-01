@@ -18,7 +18,7 @@ import com.google.common.collect.FluentIterable;
  * a list of their names:
  * 
  * <pre>
- *  FluentIterable.from(NodeFinder.find(ast.Function.class, tree))
+ *  NodeFinder.find(ast.Function.class, tree))
  *    .filter(Predicates.not(AstPredicates.nestedFunction()))
  *    .transform(AstFunctions.functionToName())
  *    .toImmutableList();
@@ -26,10 +26,10 @@ import com.google.common.collect.FluentIterable;
  */
 public class NodeFinder {
   /**
-   * Returns an iterable of all the descendents of <tt>tree</tt>. This corresponds to a
+   * Returns an iterable of all the descendants of <tt>tree</tt>. This corresponds to a
    * depth-first traversal of the subtree rooted at <tt>tree</tt>.
    */
-  public static Iterable<ASTNode<?>> allDescendentsOf(final ASTNode<?> tree) {
+  public static Iterable<ASTNode<?>> allDescendantsOf(final ASTNode<?> tree) {
     Preconditions.checkNotNull(tree);
     return new Iterable<ASTNode<?>>() {
       @Override public Iterator<ASTNode<?>> iterator() {
@@ -70,8 +70,8 @@ public class NodeFinder {
   /**
    * Returns a lazy iterable of the nodes of this finder's type in <tt>tree</tt>.
    */
-  public static <T> Iterable<T> find(final Class<T> clazz, final ASTNode<?> tree) {
-    return FluentIterable.from(allDescendentsOf(tree)).filter(clazz);
+  public static <T> FluentIterable<T> find(final Class<T> clazz, final ASTNode<?> tree) {
+    return FluentIterable.from(allDescendantsOf(tree)).filter(clazz);
   }
 
   /**

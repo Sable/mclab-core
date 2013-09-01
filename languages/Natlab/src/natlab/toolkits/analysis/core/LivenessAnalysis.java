@@ -19,7 +19,6 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
@@ -83,7 +82,7 @@ public class LivenessAnalysis extends
 		}
 		
 		caseASTNode(s.getRHS());
-		currentOutSet.addAll(FluentIterable.from(NodeFinder.find(NameExpr.class, s))
+		currentOutSet.addAll(NodeFinder.find(NameExpr.class, s)
 		    .filter(not(in(lValues)))
 		    .transform(AstFunctions.nameExprToID())
 		    .toImmutableList());

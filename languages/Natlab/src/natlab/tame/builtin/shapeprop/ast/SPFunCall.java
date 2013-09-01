@@ -39,7 +39,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 	            return matchResult;	
 			}
 			else{
-				System.err.println("cannot get the value of previous matched Scalar in shape equation.");
+				if (Debug) System.err.println("cannot get the value of previous matched Scalar in shape equation.");
 	            return previousMatchResult;	
 			}	
 		}
@@ -78,7 +78,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			            return matchResult;
 					}
 				}
-				System.err.println("cannot get the size of a certain dimension of a shape in shape equation.");
+				if (Debug) System.err.println("cannot get the size of a certain dimension of a shape in shape equation.");
 				return previousMatchResult;
 			}
 		}
@@ -115,8 +115,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					 * add symbolic expression here.
 					 */
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
-							&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
+					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
 						String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
 								+"+"+previousMatchResult.getValueOfVariable(arg[0]);
 						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
@@ -129,7 +128,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					return matchResult;
 				}
-				System.err.println("cannot compute add function in shape equation!");
+				if (Debug) System.err.println("cannot compute add function in shape equation!");
 				return previousMatchResult;
 			}
 		}
@@ -164,7 +163,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				return matchResult;
 			}
-			System.err.println("cannot compute minus function in shape equation!");
+			if (Debug) System.err.println("cannot compute minus function in shape equation!");
 			return previousMatchResult;
 		}
 		else if (funName.equals("div") && arglist!=null) {
@@ -198,7 +197,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 				return matchResult;
 			}
-			System.err.println("cannot compute div function in shape equation!");
+			if (Debug) System.err.println("cannot compute div function in shape equation!");
 			return previousMatchResult;
 		}
 		else if (funName.equals("minimum") && arglist!=null) {
@@ -215,7 +214,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					return match;
 				}
 			}
-			System.err.println("cannot compute minimum function in shape equation!");
+			if (Debug) System.err.println("cannot compute minimum function in shape equation!");
 			return previousMatchResult;
 			
 		}
@@ -230,7 +229,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				return matchResult;
 			}
-			System.err.println("check your shape equation language for using copy() function.");
+			if (Debug) System.err.println("check your shape equation language for using copy() function.");
 			return previousMatchResult;
 		}
 		else if (funName.equals("numOutput") && arglist!=null) {
@@ -240,7 +239,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				if (Integer.parseInt(arg[0])==Nargout) return previousMatchResult;
 			}
 			previousMatchResult.setIsError(true);
-			System.err.println("the number of output arguments is not matched.");
+			if (Debug) System.err.println("the number of output arguments is not matched.");
 			return previousMatchResult;
 		}
 		else if (funName.equals("isequal") && arglist!=null) {
@@ -253,7 +252,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				if (first.equals(second)) return previousMatchResult;
 			}
 			previousMatchResult.setIsError(true);
-			System.err.println("two shapes are not equal.");
+			if (Debug) System.err.println("two shapes are not equal.");
 			return previousMatchResult;
 		}
 		else if (funName.equals("atLeastOneDimNLT") && arglist!=null) {
@@ -270,7 +269,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				}
 			}
 			previousMatchResult.setIsError(true);
-			System.err.println("cannot confirm whether the size of at least one dimension is not less than " + arg[0]);
+			if (Debug) System.err.println("cannot confirm whether the size of at least one dimension is not less than " + arg[0]);
 			return previousMatchResult;
 		}
 		else if (funName.equals("latestMatchedLowercaseNLT") && arglist!=null) {
@@ -282,11 +281,11 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				}
 			}
 			previousMatchResult.setIsError(true);
-			System.err.println("cannot confirm whether latest matched not less than " + arg[0]);
+			if (Debug) System.err.println("cannot confirm whether latest matched not less than " + arg[0]);
 			return previousMatchResult;
 		}
 		else {
-			System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) 
+			if (Debug) System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) 
 					+ "), check your shape equation in builtins.csv file!");
 			return previousMatchResult;
 		}
