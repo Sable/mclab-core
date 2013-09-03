@@ -6,6 +6,7 @@ import java.util.List;
 
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
@@ -41,6 +42,7 @@ public class AdvancedTamerTool {
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
 																				// simple
 																				// callgraph
+		callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(callgraph, inputValues);
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 		Args<AggrValue<AdvancedMatrixValue>> someargs = Args
 				.<AggrValue<AdvancedMatrixValue>> newInstance(Collections.EMPTY_LIST);

@@ -2,7 +2,12 @@ package natlab.tame.tamerplus.utils;
 
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import ast.ASTNode;
 import ast.Expr;
@@ -14,6 +19,8 @@ import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tamerplus.analysis.AnalysisEngine;
+import natlab.tame.tamerplus.analysis.DUChain;
+import natlab.tame.tamerplus.analysis.UDChain;
 import natlab.tame.tamerplus.analysis.UDDUWeb;
 import natlab.tame.tamerplus.transformation.TransformationEngine;
 import natlab.tame.tamerplus.utils.TamerPlusUtils;
@@ -62,11 +69,14 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 		System.out.println(callgraph.getPrettyPrinted());
 		System.out.println("########################################################################################");
 		
-		//((TIRNode)(callgraph.getAllFunctions().get(0).getAst())).tirAnalyze(this);
 		
+		//Map(table) that stores every variable name as a key to it's web and type 
+		HashMap<String, VariableMetadata> varWebTable ;
 		int size = analysis.getNodeList().size();
 		
 		for (int i=0 ; i<size ;i++){
+			
+			varWebTable = new HashMap<String, VariableMetadata>();
 			StaticFunction function = analysis.getNodeList().get(i).getFunction();
 			TransformationEngine transformationEngine = TransformationEngine
 	        		.forAST(function.getAst());
@@ -74,6 +84,36 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 	        		.getAnalysisEngine();
 	        
 	        UDDUWeb web = analysisEngine.getUDDUWebAnalysis();
+	        DUChain vDUChain = web.getDUChain();
+	        UDChain vUDChain = web.getUDChain();
+	        Map<String, HashSet<TIRNode>> varUses;
+	        Map<String, Set<TIRNode>> varDefs;
+	        HashSet<String> varSet = new HashSet<String>();
+	
+	        //get all statements
+	        LinkedList<TIRNode> allStatements = web.getVisitedStmtsLinkedList();
+	        //loop through the list, check if it is a definition in vDUChain
+	        //loops through only those variable definitions that are used somewhere and are not return variables
+	        for (TIRNode statement : allStatements){
+	        	
+	        	varUses = vDUChain.getUsesMapForDefinitionStmt(statement);
+	        	    	
+	        	if (null != varUses){
+	        		for (String var : varUses.keySet()){
+	        			if (!function.getAst().getOutParamSet().contains(var)){//Do not rename return variable
+	        				System.out.println("=="+statement.toString()+" defines "+var+"==");
+	        				if (!varWebTable.containsKey(var)){//add entry to the table
+	        										//get metaData
+	        					varWebTable.put(var, getVariableMetadata(analysis, statement, i, var, web));
+	        				}
+	        				else{//check for renaming 
+	        					
+	        				}
+	        			}
+	        		}
+	        	}
+	        }	
+
 	        for (TIRNode keys : web.getNodeAndColorForDefinition("p").keySet()){
 	        	if (keys instanceof TIRAssignLiteralStmt){
 	        		System.out.println(((TIRAssignLiteralStmt)keys).getLHS());
@@ -92,6 +132,11 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 		return callgraph;
 	}
 
+	public static VariableMetadata getVariableMetadata(ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis, TIRNode statement, int i, String var, UDDUWeb web){
+		//Implement here
+		return null;
+	}
+	
 	@Override
 	public void caseASTNode(ASTNode node) {
 		// TODO Auto-generated method stub
