@@ -4,7 +4,7 @@ public class VariableMetadata {
 	private Integer graphNumber;
 	private String mclass;
 	private String isComplex;
-	public VariableMetadata(Integer graphNumber, String mclass){
+	public VariableMetadata(Integer graphNumber, String mclass, String isComplex){
 		this.graphNumber = graphNumber;
 		this.mclass = mclass;
 		this.isComplex = isComplex;
