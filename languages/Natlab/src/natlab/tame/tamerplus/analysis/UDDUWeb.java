@@ -21,7 +21,7 @@ public class UDDUWeb implements TamerPlusAnalysis
     private DUChain fDUChain;
     private Table<String, TIRNode, Integer> fUDWeb = HashBasedTable.create();
     private Table<String, TIRNode, Integer> fDUWeb = HashBasedTable.create();
-    
+        
     public UDDUWeb(ASTNode<?> tree) {}
 
     @Override
@@ -56,7 +56,7 @@ public class UDDUWeb implements TamerPlusAnalysis
     }
     
     private void markDefinition(TIRNode visitedStmt, String variableName, Integer color)
-    {
+    {	
         fDUWeb.put(variableName, visitedStmt, color);
         
         if(DEBUG) {
@@ -138,5 +138,13 @@ public class UDDUWeb implements TamerPlusAnalysis
     public LinkedList<TIRNode> getVisitedStmtsLinkedList() 
     {
         return fUDChain.getVisitedStmtsOrderedList();
+    }
+    
+    public UDChain getUDChain(){
+    	return fUDChain;
+    }
+    
+    public DUChain getDUChain(){
+    	return fDUChain;
     }
 }
