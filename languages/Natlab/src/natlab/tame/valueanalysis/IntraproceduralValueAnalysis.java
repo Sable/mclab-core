@@ -65,10 +65,6 @@ import ast.Stmt;
  * 
  * @author ant6n
  * 
- * extended by XU to support variables (also including arrays, 
- * but how about function call?) dependence analysis in 
- * loop statements.
- * 
  */
 public class IntraproceduralValueAnalysis<V extends Value<V>>
 extends TIRAbstractSimpleStructuralForwardAnalysis<ValueFlowMap<V>>
@@ -81,8 +77,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     static boolean Debug = false;
     InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node;
     ClassRepository classRepository;
-    TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
-    Set<String> dependentVars = new HashSet<String>(); // XU added it to store dependency analysis result.
     HashMap<String, LinkedList<V>> hookMap = new HashMap<String, LinkedList<V>>();
     
     public IntraproceduralValueAnalysis(InterproceduralAnalysisNode<IntraproceduralValueAnalysis<V>, Args<V>, Res<V>> node,
@@ -159,23 +153,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         associateInAndOut(node);
     }
 
-    /*********** statement cases *****************************************/
-    @Override
-    public void caseTIRWhileStmt(TIRWhileStmt node)
-    {
-    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
-    	dependentVars.addAll(analyzeDependency.getResult());
-        parentForwarder.caseTIRWhileStmt(node);
-    }
-    
-    @Override
-    public void caseTIRForStmt(TIRForStmt node)
-    {
-    	LoopDependencyAnalysis analyzeDependency = new LoopDependencyAnalysis(node);
-    	dependentVars.addAll(analyzeDependency.getResult());
-        parentForwarder.caseTIRForStmt(node);
-    }
-    
+    /*********** statement cases *****************************************/    
     @Override
     public void caseTIRCallStmt(TIRCallStmt node) {
         if (checkNonViable(node)) return;
@@ -677,11 +655,11 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
             	Args<V> argsObj;
             	if ((functionName.equals("ones") || functionName.equals("zeros") || functionName.equals("rand"))
             			&& args.size()==1 && hookMap.containsKey(args.asNameList().get(0).getID())) {
-            		argsObj = Args.newInstance(dependentVars, numOfOutputVariables
+            		argsObj = Args.newInstance(numOfOutputVariables
             				, hookMap.get(args.asNameList().get(0).getID()));
             	}
             	else {
-            		argsObj = Args.newInstance(dependentVars,numOfOutputVariables,argumentList);
+            		argsObj = Args.newInstance(numOfOutputVariables,argumentList);
             	}
                 //spcial cases for some known functions
             	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
@@ -810,8 +788,3 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         return true;
     }
 }
-
-
-
-
-

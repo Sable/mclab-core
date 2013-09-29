@@ -27,30 +27,26 @@ import natlab.tame.valueanalysis.components.constant.*;
  * - generate an overall (abstract?) parent class containing arg-info?
  * - create a child class called Indizes?
  * @author ant6n
- * 
- * extended by XU to add number of output arguments and dependent variables into Args.
  */
 public class Args<V extends Value<V>> extends ArrayList<V>{
     private static final long serialVersionUID = 1L;
     private int nargout = 1;
-    private Set<String> dependentVars;
     
     public Args(Collection<V> list){
         super(list);
     }
     
-    private Args(Set<String> dependentVars,int nargout,Collection<V> list){
+    private Args(int nargout,Collection<V> list){
         super(list);
         this.nargout = nargout;
-        this.dependentVars = dependentVars;
     }
     
     public static <V extends Value<V>> Args<V> newInstance(Collection<V> list){
         return new Args<V>(list);
     }
     
-    public static <V extends Value<V>> Args<V> newInstance(Set<String> dependentVars,int nargout,Collection<V> list){
-        return new Args<V>(dependentVars,nargout,list);
+    public static <V extends Value<V>> Args<V> newInstance(int nargout,Collection<V> list){
+        return new Args<V>(nargout,list);
     }
     
     public static <V extends Value<V>> Args<V> newInstance(V arg){
@@ -143,14 +139,6 @@ public class Args<V extends Value<V>> extends ArrayList<V>{
     
     public int getNargout() {
     	return nargout;
-    }
-    
-    public boolean hasDependency() {
-    	return dependentVars!=null;
-    }
-    
-    public Set<String> getDependentVars() {
-    	return dependentVars;
     }
 }
 
