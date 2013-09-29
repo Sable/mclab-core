@@ -55,7 +55,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	public RangeValue<V> casePlus(Builtin builtin, Args<V> arg) {
 		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
-		if (range0 != null	|| range1 != null) {
+		if (range0 != null	&& range1 != null) {
 			DomainValue lower = range0.getLowerBound().binary_plus(range1.getLowerBound());
 			DomainValue upper = range0.getUpperBound().binary_minus(range1.getUpperBound());
 			return new RangeValue<V>(lower, upper);			
