@@ -5,225 +5,256 @@ import java.util.ArrayList;
 import natlab.tame.valueanalysis.value.*;
 import natlab.toolkits.analysis.Mergable;
 
+/**
+ * the representation of range value is <lower bound, upper bound>;
+ * lower bound can be one of -inf, real numbers and real numbers with +;
+ * upper bound can be one of real numbers with -, real numbers and +inf;
+ */	
 public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
-	
 	static boolean Debug = false;
-	private ArrayList<Double> rangeValue = new ArrayList<Double>(2);
-	// TODO should be two tops for each of upper bound and lower bound.
-	private boolean lowerBoundIsTop = false; 
-	private boolean upperBoundIsTop = false;
-	static RangeValueFactory factory = new RangeValueFactory();
+	DomainValue lowerBound;
+	DomainValue upperBound;
+	// track how many times lowerBound been merged.
+	private int lowerCounter = 0;
+	// track how many times upperBound been merged.
+	private int upperCounter= 0;
 	
-	public RangeValue() {
-		
+	public RangeValue(){}
+	
+	public RangeValue(DomainValue value) {
+		this.lowerBound = value.cloneThisValue();
+		this.upperBound = value.cloneThisValue();
 	}
 	
-	public RangeValue(Double value) {
-		this.setLowerBound(value);
-		this.setUpperBound(value);
-	}
-	
-	public RangeValue(Double lowerValue, Double upperValue) {
-		this.setLowerBound(lowerValue);
-		this.setUpperBound(upperValue);
+	public RangeValue(DomainValue lowerValue, DomainValue upperValue) {
+		this.lowerBound = lowerValue.cloneThisValue();
+		this.upperBound = upperValue.cloneThisValue();
 	}
 	
 	public RangeValue(RangeValue<V> rangeValue) {
-		this.setLowerBound(rangeValue.getLowerBound());
-		this.setUpperBound(rangeValue.getUpperBound());
-	}
-	
-	public void setLowerBound(Double value) {
-		this.rangeValue.add(0, value);
-	}
-	
-	public void setUpperBound(Double value) {
-		this.rangeValue.add(1, value);
+		this.lowerBound = rangeValue.lowerBound.cloneThisValue();
+		this.upperBound = rangeValue.upperBound.cloneThisValue();
 	}
 	
 	public boolean hasLowerBound() {
-		if (upperBoundIsTop) {
-			if (rangeValue!=null && (!rangeValue.isEmpty())) {
-				if (rangeValue.get(0)!=null) return true;
-			}
+		if (this.lowerBound != null) 
+			return true;
+		else 
 			return false;
-		}
-		else if (rangeValue.size()==2) {
-			if (rangeValue.get(0)!=null) return true;
-		}
-		return false;
 	}
 	
-	public Double getLowerBound() {
-		if (this.hasLowerBound()) return this.rangeValue.get(0);
+	public DomainValue getLowerBound() {
+		if (this.hasLowerBound()) 
+			return this.lowerBound;
 		else {
-			System.err.println("This value doesn't have lower bound.");
+			System.err.println("This value doesn't have a lower bound.");
 			return null;
 		}
 	}
 	
 	public boolean hasUpperBound() {
-		if (lowerBoundIsTop) {
-			if (rangeValue!=null && (!rangeValue.isEmpty())) {
-				if (rangeValue.get(0)!=null) return true;
-			}
+		if (this.upperBound != null) 
+			return true;
+		else 
 			return false;
-		}
-		else if (rangeValue.size()==2) {
-			if (rangeValue.get(1)!=null) return true;
-		}
-		return false;
 	}
 	
-	public Double getUpperBound() {
-		if (this.hasUpperBound()&&this.hasLowerBound()) return this.rangeValue.get(1);
-		else if (this.hasUpperBound()) return this.rangeValue.get(0);
+	public DomainValue getUpperBound() {
+		if (this.hasUpperBound()) 
+			return this.upperBound;
 		else {
-			System.err.println("This value doesn't have upper bound.");
+			System.err.println("This value doesn't have a upper bound.");
 			return null;
 		}
 	}
 	
 	public boolean isRangeValuePositive() {
-		if (hasLowerBound()) {
-			if (getLowerBound()>0) return true;
-		}
-		return false;
+		if (this.hasLowerBound() 
+				&& this.getLowerBound().greaterThanZero()) 
+			return true;
+		else 
+			return false;
 	}
 	
 	public boolean isRangeValueNegative() {
-		if (hasUpperBound()) {
-			if (getUpperBound()<0) return true;
-		}
-		return false;
+		if (this.hasUpperBound() 
+				&& this.getUpperBound().lessThanZero()) 
+			return true;
+		else 
+			return false;
 	}
 	
-	public void flagLowerBoundIsTop() {
-		lowerBoundIsTop = true;
+	public void pushLowerBoundtoTop() {
+		this.lowerBound.negativeInf = true;
 	}
 	
-	public void flagUpperBoundIsTop() {
-		upperBoundIsTop = true;
+	public void pushUpperBoundtoTop() {
+		this.upperBound.positiveInf = true;
 	}
 	
-	public boolean getLowerBoundIsTop() {
-		return lowerBoundIsTop;
+	public boolean isLowerBoundTop() {
+		return this.lowerBound.negativeInf;
 	}
 	
-	public boolean getUpperBoundIsTop() {
-		return upperBoundIsTop;
+	public boolean isUpperBoundTop() {
+		return this.upperBound.positiveInf;
 	}
 	
 	public boolean hasTop() {
-		if (lowerBoundIsTop || upperBoundIsTop) return true;
-		return false;
+		if (this.isLowerBoundTop() 
+				|| this.isUpperBoundTop()) 
+			return true;
+		else 
+			return false;
 	}
 	
-	public RangeValue<V> mergeTop(RangeValue<V> a, RangeValue<V> b) {
+	public boolean isInBounds(int lower, int upper) {
+		DomainValue low = new DomainValue();
+		low.realNum = lower;
+		DomainValue up = new DomainValue();
+		up.realNum = upper;
+		if (this.lowerBound.isGreaterThanEq(low) 
+				&& this.upperBound.isLessThanEq(up)) 
+			return true;
+		else 
+			return false;
+	}
+	
+	/*public RangeValue<V> mergeTop(RangeValue<V> a, RangeValue<V> b) {
 		RangeValue<V> mergedRange = new RangeValue<V>();
-		if (a.getLowerBoundIsTop() || b.getLowerBoundIsTop()) {
-			mergedRange.flagLowerBoundIsTop();
+		if (a.isLowerBoundTop() || b.isLowerBoundTop()) {
+			mergedRange.pushLowerBoundtoTop();
 		}
 		else {
-			if (a.getLowerBound()<=b.getLowerBound()) 
-				mergedRange.setLowerBound(a.getLowerBound());
-			else mergedRange.setLowerBound(b.getLowerBound());
+			if (a.getLowerBound().isLessThanEq(b.getLowerBound())) 
+				mergedRange.lowerBound = a.getLowerBound().cloneThisValue();
+			else mergedRange.lowerBound = b.getLowerBound().cloneThisValue();
 		}
-		if (a.getUpperBoundIsTop() || b.getUpperBoundIsTop()) {
-			mergedRange.flagUpperBoundIsTop();
+		if (a.isUpperBoundTop() || b.isUpperBoundTop()) {
+			mergedRange.pushUpperBoundtoTop();
 		}
 		else {
-			if (a.getUpperBound()>=b.getUpperBound()) 
-				mergedRange.setUpperBound(a.getUpperBound());
-			else mergedRange.setUpperBound(b.getUpperBound());
+			if (a.getUpperBound().isGreaterThanEq(b.getUpperBound())) 
+				mergedRange.upperBound = a.getUpperBound().cloneThisValue();
+			else mergedRange.upperBound = b.getUpperBound().cloneThisValue();
 		}
 		return mergedRange;
-	}
+	}*/
 	
-	public boolean isTopEquals(RangeValue<V> a, RangeValue<V> b) {
-		if (a.getLowerBoundIsTop() && b.getLowerBoundIsTop()) {
-			if (a.getUpperBoundIsTop() && b.getUpperBoundIsTop()) 
+	/*public boolean isTopEquals(RangeValue<V> a, RangeValue<V> b) {
+		if (a.isLowerBoundTop() && b.isLowerBoundTop()) {
+			if (a.isUpperBoundTop() && b.isUpperBoundTop()) 
 				return true;
 			else if (a.getUpperBound()==b.getUpperBound())
 				return true;
 			else
 				return false;
 		}
-		else if (a.getUpperBoundIsTop() && b.getUpperBoundIsTop()) {
+		else if (a.isUpperBoundTop() && b.isUpperBoundTop()) {
 			if (a.getLowerBound()==b.getLowerBound())
 				return true;
 			else
 				return false;
 		}
 		return false;
-	}
+	}*/
 	
-	public boolean isConstant() {
+	/*public boolean isConstant() {
 		if (hasLowerBound() && hasUpperBound()) {
 			boolean result = getLowerBound().equals(getUpperBound());
 			return result;
 		}
 		return false;
-	}
+	}*/
 	
 	@Override
-	public RangeValue<V> merge(RangeValue<V> o) {
+	/**
+	 * involving a counter to track how many times each bound been 
+	 * merged, if more than 5 (magic number), push the corresponding 
+	 * bound to top, lower to -inf and upper to +inf.
+	 */
+	public RangeValue<V> merge(RangeValue<V> other) {
 		if (Debug) System.out.println("inside range value merge!");
-		if (this.equals(o)) return this;
-		else if (o==null) return null;
-		else if (hasTop() || o.hasTop()) {
-			RangeValue<V> mergedRange = mergeTop(this, o);
-			return mergedRange;
+		RangeValue<V> res = new RangeValue<V>();
+		// null means unknown, is the bottom of range value lattice.
+		if (other == null) {
+			other = new RangeValue<V>();
+			other.lowerBound = this.lowerBound.cloneThisValue();
+			other.upperBound = this.upperBound.cloneThisValue();
 		}
-		Double newLowerBound;
-		Double newUpperBound;
-		int lowerResult = this.getLowerBound().compareTo(o.getLowerBound());
-		int upperResult = this.getUpperBound().compareTo(o.getUpperBound());
-		if (lowerResult>=0) {
-			newLowerBound = new Double(o.getLowerBound());
+		if (other.getLowerBound() == null) {
+			other.lowerBound = this.lowerBound.cloneThisValue();
 		}
-		else {
-			newLowerBound = new Double(this.getLowerBound());
+		if (other.getUpperBound() == null) {
+			other.upperBound = this.upperBound.cloneThisValue();
 		}
-		if (upperResult>=0) {
-			newUpperBound = new Double(this.getUpperBound());
-		}
-		else {
-			newUpperBound = new Double(o.getUpperBound());
-		}
-		return factory.newRangeValueFromBounds(newLowerBound, newUpperBound);
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		/**
-		 * When both lower and upper bound are equal,
-		 * return true.
-		 * TODO handle more situations!
-		 */
-		if (obj == null) return false;
-		if (obj instanceof RangeValue) {
-			if (Debug) System.out.println("inside check whether range value equals!");
-			RangeValue<V> o = (RangeValue<V>)obj;
-			if (hasTop() && o.hasTop()) return isTopEquals(this, o);
-			else if (hasTop()&&(!o.hasTop()) || (!hasTop())&&o.hasTop()) return false;
-			if (this.getLowerBound().equals(o.getLowerBound())
-					&&this.getUpperBound().equals(o.getUpperBound())) {
-				return true;
+		// separately merge lower and upper bound.
+		if (!this.lowerBound.equals(other.getLowerBound())) {
+			if (this.lowerCounter > 5 || other.lowerCounter > 5) {
+				res.pushLowerBoundtoTop();
+				this.pushLowerBoundtoTop();
+			}
+			else if (this.lowerBound.isLessThanEq(other.getUpperBound())) {
+				res.lowerBound = this.lowerBound.cloneThisValue();
+				this.lowerCounter++;
+				other.lowerCounter++;	
 			}
 			else {
-				return false;
-			}
+				res.lowerBound = other.getLowerBound().cloneThisValue();
+				this.lowerCounter++;
+				other.lowerCounter++;	
+			}			
 		}
-		return false;
+		else {
+			res.lowerBound = this.lowerBound.cloneThisValue();
+		}
+		if (!this.upperBound.equals(other.getUpperBound())) {
+			if (this.upperCounter > 5 || other.upperCounter > 5) {
+				res.pushUpperBoundtoTop();
+				this.pushUpperBoundtoTop();
+			}
+			else if (this.upperBound.isLessThanEq(other.getUpperBound())) {
+				res.upperBound = other.getUpperBound().cloneThisValue();
+				this.upperCounter++;
+				other.upperCounter++;
+			}
+			else {
+				res.upperBound = this.upperBound.cloneThisValue();
+				this.upperCounter++;
+				other.upperCounter++;
+			}	
+		}
+		else {
+			res.upperBound = this.upperBound.cloneThisValue();
+		}
+		return res;
+	}
+	
+	@Override
+	/**
+	 * When both lower and upper bound equals, return true.
+	 * TODO handle more situations!
+	 */
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		else if (obj instanceof RangeValue) {
+			if (Debug) System.out.println("inside check whether range value equals!");
+			RangeValue<V> other = (RangeValue<V>)obj;
+			if (this.getLowerBound().equals(other.getLowerBound()) 
+					&& this.getUpperBound().equals(other.getUpperBound())) {
+				return true;
+			}
+			else return false;
+		}
+		else return false;
 	}
 	
 	@Override
 	public String toString() {
 		return "<" 
-	+ (hasLowerBound()? getLowerBound():"-inf") 
-	+ "," 
-	+ (hasUpperBound()? getUpperBound():"+inf") 
+	+ (hasLowerBound()? getLowerBound():"?") 
+	+ ", " 
+	+ (hasUpperBound()? getUpperBound():"?") 
 	+ ">";
 	}
 }

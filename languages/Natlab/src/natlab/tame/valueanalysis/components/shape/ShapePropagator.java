@@ -6,7 +6,6 @@ import natlab.tame.builtin.*;
 import natlab.tame.builtin.shapeprop.ShapePropTool;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
 import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.rangeValue.*;
 
 /**
@@ -144,9 +143,8 @@ public class ShapePropagator<V extends Value<V>>
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
         				int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
@@ -163,9 +161,8 @@ public class ShapePropagator<V extends Value<V>>
     				if (rhsArrayShape.isConstant() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>rhsArrayDimensions.get(i).getIntValue()) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, rhsArrayDimensions.get(i).getIntValue())) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
@@ -181,9 +178,8 @@ public class ShapePropagator<V extends Value<V>>
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
         				int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
@@ -201,9 +197,8 @@ public class ShapePropagator<V extends Value<V>>
     				if (rhsArrayShape.isConstant() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>rhsArrayShape.getDimensions().get(i).getIntValue()) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, rhsArrayShape.getDimensions().get(i).getIntValue())) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
@@ -295,9 +290,8 @@ public class ShapePropagator<V extends Value<V>>
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
         				int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
     						/* 
     						 * index out of bound. Actually, when index larger 
     						 * than remaining elements, the error is 
@@ -318,12 +312,13 @@ public class ShapePropagator<V extends Value<V>>
     				if (lhsArrayShape.isConstant() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0) {
+    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.getLowerBound().lessThanZero()) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
-    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getUpperBound() 
-    							> lhsArrayDimensions.get(i).getIntValue()) {
+    					else if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, lhsArrayDimensions.get(i).getIntValue())) {
     						// grow the original array.
     						newDimensions.remove(i);
     						newDimensions.add(i, new DimValue(null, null));
@@ -340,7 +335,7 @@ public class ShapePropagator<V extends Value<V>>
     			// insert array growth check.
     			if (i+1 > lhsArrayDimensions.size()) {
     				newDimensions.add(new DimValue(((HasRangeValue<V>)indices.get(i))
-    						.getRangeValue().getUpperBound().intValue(), null));
+    						.getRangeValue().getUpperBound().getIntValue(), null));
     			}
     			if (indices.size()==i+1 && lhsArrayDimensions.size()>i+1) {
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
@@ -349,9 +344,8 @@ public class ShapePropagator<V extends Value<V>>
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
         				int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
@@ -369,16 +363,16 @@ public class ShapePropagator<V extends Value<V>>
     				if (lhsArrayShape.isConstant() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
     						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0) {
+    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound().lessThanZero()) {
     						// index out of bound.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
-    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getUpperBound() 
-    							> lhsArrayShape.getDimensions().get(i).getIntValue()) {
+    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, lhsArrayShape.getDimensions().get(i).getIntValue())) {
     						// grow the original array.
     						newDimensions.remove(i);
     						newDimensions.add(i, new DimValue(((HasRangeValue<V>)indices.get(i))
-    								.getRangeValue().getUpperBound().intValue(), null));
+    								.getRangeValue().getUpperBound().getIntValue(), null));
     					}
     				}
     				indexedDimensions.add(((HasShape<V>)indices.get(i))
