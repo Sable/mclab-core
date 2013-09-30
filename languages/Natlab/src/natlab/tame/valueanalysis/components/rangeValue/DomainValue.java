@@ -13,7 +13,7 @@ package natlab.tame.valueanalysis.components.rangeValue;
 public class DomainValue {
 	// the data members are in the order of they are in the domain.
 	boolean negativeInf = false;
-	double realNum = 0;
+	double realNum;
 	boolean superscriptPlus = false;
 	boolean superscriptMinus = false;
 	boolean positiveInf = false;
@@ -35,7 +35,7 @@ public class DomainValue {
 		instance.realNum = this.realNum;
 		instance.superscriptPlus = this.superscriptPlus;
 		instance.superscriptMinus = this.superscriptMinus;
-		instance.positiveInf = this.superscriptPlus;
+		instance.positiveInf = this.positiveInf;
 		return instance;
 	}
 	
@@ -182,19 +182,23 @@ public class DomainValue {
 		return res;
 	}
 	
-	boolean equals(DomainValue other) {
-		if (this.negativeInf && other.negativeInf 
-				|| this.positiveInf && other.positiveInf) {
-			return true;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		else if (obj instanceof DomainValue) {
+			DomainValue other = (DomainValue) obj;
+			if (this.negativeInf && other.negativeInf 
+					|| this.positiveInf && other.positiveInf) {
+				return true;
+			}
+			else if (this.realNum == other.realNum 
+						&& (this.superscriptMinus == other.superscriptMinus 
+								|| this.superscriptPlus == other.superscriptPlus)) {
+				return true;
+			}
+			else return false;
 		}
-		else if (this.realNum == other.realNum 
-					&& (this.superscriptMinus && other.superscriptMinus 
-							|| this.superscriptPlus && other.superscriptPlus)) {
-			return true;
-		}
-		else {
-			return false;
-		}	
+		else return false;
 	}
 	
 	// based on max, min and equals, we can have <= and >=.

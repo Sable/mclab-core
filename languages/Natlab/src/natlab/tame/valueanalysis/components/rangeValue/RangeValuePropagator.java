@@ -57,7 +57,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 != null	&& range1 != null) {
 			DomainValue lower = range0.getLowerBound().binary_plus(range1.getLowerBound());
-			DomainValue upper = range0.getUpperBound().binary_minus(range1.getUpperBound());
+			DomainValue upper = range0.getUpperBound().binary_plus(range1.getUpperBound());
 			return new RangeValue<V>(lower, upper);			
 		}
 		else
