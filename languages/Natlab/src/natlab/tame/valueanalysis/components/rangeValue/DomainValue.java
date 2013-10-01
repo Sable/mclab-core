@@ -43,6 +43,14 @@ public class DomainValue {
 		return (int)this.realNum;
 	}
 	
+	public void setSuperPlus() {
+		this.superscriptPlus = true;
+	}
+	
+	public void setSuperMinus() {
+		this.superscriptMinus = true;
+	}
+	
 	public boolean lessThanZero() {
 		if (this.negativeInf) {
 			return true;

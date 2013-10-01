@@ -20,7 +20,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
 	protected Constant constant;
 	protected Shape<AggrValue<BasicMatrixValue>> shape;
-	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
+	// with the reference to this range value, we can assign new range value to this basic matrix value.
+	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue = new RangeValue<AggrValue<BasicMatrixValue>>();
 	// TODO -- also need complex
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator

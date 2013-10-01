@@ -27,13 +27,21 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	}
 	
 	public RangeValue(DomainValue lowerValue, DomainValue upperValue) {
-		this.lowerBound = lowerValue.cloneThisValue();
-		this.upperBound = upperValue.cloneThisValue();
+		if (lowerValue != null) {
+			this.lowerBound = lowerValue.cloneThisValue();
+		}
+		if (upperValue != null) {
+			this.upperBound = upperValue.cloneThisValue();
+		}
 	}
 	
 	public RangeValue(RangeValue<V> rangeValue) {
-		this.lowerBound = rangeValue.lowerBound.cloneThisValue();
-		this.upperBound = rangeValue.upperBound.cloneThisValue();
+		if (rangeValue.lowerBound != null) {
+			this.lowerBound = rangeValue.lowerBound.cloneThisValue();
+		}
+		if (rangeValue.upperBound != null) {
+			this.upperBound = rangeValue.upperBound.cloneThisValue();
+		}
 	}
 	
 	public boolean hasLowerBound() {
@@ -52,6 +60,10 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		}
 	}
 	
+	public void setLowerBound(DomainValue value) {
+		this.lowerBound = value.cloneThisValue();
+	}
+	
 	public boolean hasUpperBound() {
 		if (this.upperBound != null) 
 			return true;
@@ -66,6 +78,10 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 			System.err.println("This value doesn't have a upper bound.");
 			return null;
 		}
+	}
+	
+	public void setUpperBound(DomainValue value) {
+		this.upperBound = value.cloneThisValue();
 	}
 	
 	public boolean isRangeValuePositive() {
@@ -142,24 +158,28 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		if (Debug) System.out.println("inside range value merge!");
 		RangeValue<V> res = new RangeValue<V>();
 		// separately merge lower and upper bound.
-		if (this.lowerBound.isLessThanEq(other.lowerBound)) {
-			res.lowerBound = this.lowerBound.cloneThisValue();
-		}
-		else {
-			res.lowerBound = other.lowerBound.cloneThisValue();
-		}
-		if (!res.lowerBound.equals(this.lowerBound)) {
-			this.lowerCounter++;
+		if (this.lowerBound != null) {
+			if (this.lowerBound.isLessThanEq(other.lowerBound)) {
+				res.lowerBound = this.lowerBound.cloneThisValue();
+			}
+			else {
+				res.lowerBound = other.lowerBound.cloneThisValue();
+			}
+			if (!res.lowerBound.equals(this.lowerBound)) {
+				this.lowerCounter++;
+			}			
 		}
 		// separately merge lower and upper bound.
-		if (this.upperBound.isGreaterThanEq(other.upperBound)) {
-			res.upperBound = this.upperBound;
-		}
-		else {
-			res.upperBound = other.upperBound;
-		}
-		if (!res.upperBound.equals(this.upperBound)) {
-			this.upperCounter++;
+		if (this.upperBound != null) {
+			if (this.upperBound.isGreaterThanEq(other.upperBound)) {
+				res.upperBound = this.upperBound;
+			}
+			else {
+				res.upperBound = other.upperBound;
+			}
+			if (!res.upperBound.equals(this.upperBound)) {
+				this.upperCounter++;
+			}			
 		}
 		if (Debug) System.err.println("merging "+this.toString()+" with "+other+" -> "+res);
 		if (Debug) System.err.println("lower bound merging counter: "+this.lowerCounter);
