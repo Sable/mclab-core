@@ -31,14 +31,14 @@ import java.util.List;
 
 import matlab.CompositePositionMap;
 import matlab.FunctionEndScanner;
+import matlab.FunctionEndScanner.NoChangeResult;
+import matlab.FunctionEndScanner.ProblemResult;
+import matlab.FunctionEndScanner.TranslationResult;
 import matlab.MatlabParser;
 import matlab.OffsetTracker;
 import matlab.PositionMap;
 import matlab.TextPosition;
 import matlab.TranslationProblem;
-import matlab.FunctionEndScanner.NoChangeResult;
-import matlab.FunctionEndScanner.ProblemResult;
-import matlab.FunctionEndScanner.TranslationResult;
 import natlab.toolkits.filehandling.GenericFile;
 
 import org.antlr.runtime.ANTLRReaderStream;
@@ -131,6 +131,24 @@ public class Parse {
     }
     return program;
   }
+  
+  public static class TranslateResult {
+    private Reader reader;
+    private PositionMap positionMap;
+    
+    public TranslateResult(Reader reader, PositionMap positionMap) {
+      this.reader = reader;
+      this.positionMap = positionMap;
+    }
+    
+    public Reader getReader() {
+      return reader;
+    }
+    
+    public PositionMap getPositionMap() {
+      return positionMap;
+    }
+  }
 
   /**
    * Perform the translation from a given Reader containing source code.
@@ -142,7 +160,7 @@ public class Parse {
    * @return A reader object giving access to the translated
    * source.
    */
-  public static Reader translateFile(String fName, Reader source, List<CompilationProblem> errors)
+  public static TranslateResult translateFile(String fName, Reader source, List<CompilationProblem> errors)
   {
     PositionMap prePosMap = null;
     try {
@@ -169,10 +187,9 @@ public class Parse {
       if (problems.isEmpty()) {
         PositionMap posMap = offsetTracker.buildPositionMap();
         if (prePosMap != null) {
-          posMap = new CompositePositionMap(posMap, prePosMap);
+          posMap = new CompositePositionMap(prePosMap, posMap);
         }
-        // TODO-JD: do something with the posMap
-        return new StringReader(destText);
+        return new TranslateResult(new StringReader(destText), posMap);
       }
       for (TranslationProblem problem : problems) {
         errors.add(new CompilationProblem(problem.getLine(), problem.getColumn(),
@@ -231,11 +248,13 @@ public class Parse {
    * errors. If an error occurs then null is returned. 
    */
   public static Program parseMatlabFile(String fName, List<CompilationProblem> errors) {
-    Reader source = translateFile(fName, errors);
+    TranslateResult source = translateFile(fName, errors);
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseNatlabFile(fName, source, errors);
+    Program result = parseNatlabFile(fName, source.getReader(), errors);
+    result.setPositionMap(source.getPositionMap());
+    return result;
   }
 
   /**
@@ -251,11 +270,13 @@ public class Parse {
    */
   public static Program parseMatlabFile(String fName, Reader file, List<CompilationProblem> errors) {
     // TODO - something should be done about the mapping file
-    Reader natlabFile = translateFile(fName, file, errors);
+    TranslateResult natlabFile = translateFile(fName, file, errors);
     if (!errors.isEmpty()) {
       return null;
     }
-    return parseNatlabFile(fName, natlabFile, errors);
+    Program result = parseNatlabFile(fName, natlabFile.getReader(), errors);
+    result.setPositionMap(natlabFile.getPositionMap());
+    return result;
   }
 
   /**
@@ -323,7 +344,7 @@ public class Parse {
    * @return A reader object giving access to the translated
    * source.
    */
-  public static Reader translateFile(String fName, List<CompilationProblem> errors) {
+  public static TranslateResult translateFile(String fName, List<CompilationProblem> errors) {
     Reader reader = fileReader(fName, errors);
     if (!errors.isEmpty()) {
       return null;
@@ -340,7 +361,7 @@ public class Parse {
    * @return A reader object giving access to the translated
    * source.
    */
-  public static Reader translateFile(GenericFile file, List<CompilationProblem> errors) {
+  public static TranslateResult translateFile(GenericFile file, List<CompilationProblem> errors) {
     Reader reader = fileReader(file, errors);
     if (!errors.isEmpty()) {
       return null;
@@ -360,7 +381,7 @@ public class Parse {
    * @return A reader object giving access to the translated
    * source.
    */
-  public static Reader translateFile(String fName, String source, List<CompilationProblem> errors) {
+  public static TranslateResult translateFile(String fName, String source, List<CompilationProblem> errors) {
     return translateFile(fName, new StringReader(source), errors);
   }
 }

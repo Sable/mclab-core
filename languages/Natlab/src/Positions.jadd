@@ -1,4 +1,7 @@
 import beaver.Symbol;
+import matlab.PositionMap;
+import matlab.TextPosition;
+import natlab.utils.NodeFinder;
 
 /**
  * This aspect adds a few utility methods related to source information.
@@ -8,19 +11,59 @@ import beaver.Symbol;
  * transformation.
  */
 aspect Positions {
+  private PositionMap Program.positionMap = null;
+
+  public void Program.setPositionMap(PositionMap positionMap) {
+    this.positionMap = positionMap;
+  }
+
+  protected PositionMap Program.getPositionMap() {
+    return positionMap;
+  }
+
+  protected PositionMap ASTNode.getPositionMap() {
+    return NodeFinder.findParent(Program.class, this).getPositionMap();
+  }
+
+  protected TextPosition ASTNode.getPreTranslationStartPosition() {
+    return getPositionMap().getPreTranslationPosition(
+      getTranslatedStartLine(), getTranslatedStartColumn());
+  }
+
+  protected TextPosition ASTNode.getPreTranslationEndPosition() {
+    return getPositionMap().getPreTranslationPosition(
+      getTranslatedEndLine(), getTranslatedEndColumn());
+  }
+
   public int ASTNode.getStartLine() {
-    return Symbol.getLine(getStart());
+    return getPreTranslationStartPosition().getLine();
   }
 
   public int ASTNode.getStartColumn() {
-    return Symbol.getColumn(getStart());
+    return getPreTranslationStartPosition().getColumn();
   }
 
   public int ASTNode.getEndLine() {
-    return Symbol.getLine(getEnd());
+    return getPreTranslationEndPosition().getLine();
   }
 
   public int ASTNode.getEndColumn() {
+    return getPreTranslationEndPosition().getColumn();
+  }
+
+  public int ASTNode.getTranslatedStartLine() {
+    return Symbol.getLine(getStart());
+  }
+
+  public int ASTNode.getTranslatedStartColumn() {
+    return Symbol.getColumn(getStart());
+  }
+
+  public int ASTNode.getTranslatedEndLine() {
+    return Symbol.getLine(getEnd());
+  }
+
+  public int ASTNode.getTranslatedEndColumn() {
     return Symbol.getColumn(getEnd());
   }
 
