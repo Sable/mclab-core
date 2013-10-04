@@ -65,7 +65,12 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					al.add(previousMatchResult.getValueOfVariable(arg[1]));
 				}
 				else {
-					al.add(new DimValue());
+					try {
+						int value = Integer.parseInt(arg[1]);
+						al.add(new DimValue(value, null));
+					} catch(NumberFormatException e) {
+						al.add(new DimValue());						
+					}
 				}
 				Shape<V> shape = new ShapeFactory<V>().newShapeFromDimValues(al);
 				previousMatchResult.addToOutput(shape);
