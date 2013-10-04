@@ -24,9 +24,9 @@ public class DomainValue {
 	public DomainValue(double value) {
 		this.realNum = value;
 	}
+	
 	/**
 	 * my own clone method, not using java clone.
-	 * @param other
 	 * @return
 	 */
 	DomainValue cloneThisValue() {
