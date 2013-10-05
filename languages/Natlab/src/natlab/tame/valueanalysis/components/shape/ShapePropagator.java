@@ -344,6 +344,7 @@ public class ShapePropagator<V extends Value<V>>
     				/*
     				 * proceed linear indexing, won't resize the 
     				 * shape of the matrix, but need array bound check.
+    				 * 
     				 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
     				/*
@@ -357,14 +358,24 @@ public class ShapePropagator<V extends Value<V>>
     					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
     							.isInBounds(0, howManyElementsRemain)) 
     					{
-    						/* 
-    						 * index out of bound. Actually, when index larger 
-    						 * than remaining elements, the error is 
-    						 * "attempt to grow array along ambiguous dimension"
-    						 * 
-    						 * TODO may need to mark the current flow set as nonviable.
-    						 */
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						if (lhsArrayShape.isScalar()) {
+    							newDimensions.remove(0);
+    							newDimensions.add(0, new DimValue(1, null));
+    							newDimensions.remove(1);
+    							newDimensions.add(1, new DimValue(
+    									((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    									.getUpperBound().getIntValue(), null));
+    						}
+    						else {
+        						/* 
+        						 * index out of bound. Actually, when index larger 
+        						 * than remaining elements, the error is 
+        						 * "attempt to grow array along ambiguous dimension"
+        						 * 
+        						 * TODO may need to mark the current flow set as nonviable.
+        						 */
+        						return new ShapeFactory<V>().getOutOfBoundShape();    							
+    						}
     					}
     				}
     				else {
@@ -373,8 +384,8 @@ public class ShapePropagator<V extends Value<V>>
     					 * static abc, have to mark that dimension as ? and leave 
     					 * it to the back end to generate runtime abc inlined code. 
     					 */
-    					newDimensions.remove(i);
-						newDimensions.add(i, new DimValue());    					
+    					newDimensions.remove(POS);
+						newDimensions.add(POS, new DimValue());    					
     				}
     			}
     			else {
