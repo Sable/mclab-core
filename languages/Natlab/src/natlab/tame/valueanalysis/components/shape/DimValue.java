@@ -21,6 +21,17 @@ public class DimValue {
 		this.symbolic = symbolic;
 	}
 	
+	/**
+	 * my own clone method, not using java clone.
+	 * @return
+	 */
+	DimValue cloneThisValue() {
+		DimValue instance = new DimValue();
+		instance.intValue = this.intValue;
+		instance.symbolic = new String(this.symbolic);
+		return instance;
+	}
+	
 	public boolean hasIntValue() {
 		return this.intValue!=null;
 	}

@@ -120,17 +120,33 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		}
 	}
 	
-	public boolean isLowerBoundTop() {
-		return this.lowerBound.negativeInf;
+	/**
+	 * known means neither null nor -inf.
+	 * @return
+	 */
+	public boolean isLowerBoundKnown() {
+		if (this.lowerBound != null) {
+			return this.lowerBound.negativeInf;
+		}
+		else 
+			return false;
 	}
 	
-	public boolean isUpperBoundTop() {
-		return this.upperBound.positiveInf;
+	/**
+	 * known means neither null nor +inf.
+	 * @return
+	 */
+	public boolean isUpperBoundKnown() {
+		if (this.upperBound != null) {
+			return this.upperBound.positiveInf;
+		}
+		else 
+			return false;
 	}
 	
-	public boolean hasTop() {
-		if (this.isLowerBoundTop() 
-				|| this.isUpperBoundTop()) 
+	public boolean isBothBoundsKnown() {
+		if (this.isLowerBoundKnown() 
+				|| this.isUpperBoundKnown()) 
 			return true;
 		else 
 			return false;

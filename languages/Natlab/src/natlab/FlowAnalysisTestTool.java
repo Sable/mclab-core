@@ -1,12 +1,16 @@
 package natlab;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
-import ast.*;
-import analysis.*;
-import natlab.CompilationProblem;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+
 import natlab.options.Options;
+import analysis.StructuralAnalysis;
+import ast.ASTNode;
+import ast.CompilationUnits;
+import ast.Program;
 
 /**
  * A tool for testing the functionality of an analysis. You specify
@@ -74,7 +78,7 @@ public class FlowAnalysisTestTool
             ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
             if( !opt.natlab() ){
                 //translate from matlab
-                Reader source = Parse.translateFile( fName, errList );
+                Reader source = Parse.translateFile( fName, errList ).getReader();
                 if( source == null )
                     throw new Exception( "Error translating file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
                 Program prog = Parse.parseNatlabFile( fName, source, errList );
