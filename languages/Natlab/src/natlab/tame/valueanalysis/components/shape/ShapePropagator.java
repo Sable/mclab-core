@@ -6,7 +6,6 @@ import natlab.tame.builtin.*;
 import natlab.tame.builtin.shapeprop.ShapePropTool;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
 import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.rangeValue.*;
 
 /**
@@ -106,14 +105,17 @@ public class ShapePropagator<V extends Value<V>>
      * b, it will also be considered as safe, which is not out of bound.
      */
     public Shape<V> arraySubsref(Shape<V> rhsArrayShape, Args<V> indices) {
-    	if (rhsArrayShape==null) return null;
+    	if (rhsArrayShape == null) return null;
     	List<DimValue> indexedDimensions = new ArrayList<DimValue>(indices.size());
     	List<DimValue> rhsArrayDimensions = rhsArrayShape.getDimensions();
+    	// first check, array get cannot resize the accessed matrix.
     	if (indices.size() > rhsArrayDimensions.size()) {
     		System.err.println("indices exceed the array's dimensions, check you code.");
+    		// TODO may need to mark the current flow set as nonviable.
     		return new ShapeFactory<V>().getOutOfBoundShape();
     	}
-    	for (int i=0; i<indices.size(); i++) {
+    	for (int i = 0; i < indices.size(); i++) {
+    		int POS = i + 1;
     		/*
     		 * ColonValue extends from SpecialValue which extends from Value, 
     		 * but BasicMatrixValue extends from MatrixValue which extends from 
@@ -122,32 +124,50 @@ public class ShapePropagator<V extends Value<V>>
     		 * we should deal with ColonValue first.
     		 */
     		if (indices.get(i) instanceof ColonValue) {
-    			// don't need to insert array bound check for ":" index.
-    			if (indices.size()==i+1 && rhsArrayDimensions.size()>i+1) {
+    			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
+        			/*
+        			 * proceed linear indexing, won't resize the shape of the indexed 
+        			 * array, but has to set the dimension of the return shape.
+        			 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
 					int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
 					/*
 					 * if only one index, the return shape will be a row, [1,X], so initialize 
 					 * the first dimension as 1, then add the second dimension.
 					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
-    				if (howManyElementsRemain==-1) indexedDimensions.add(new DimValue());
-    				else indexedDimensions.add(new DimValue(howManyElementsRemain, null));
+    				if (indices.size() == 1) indexedDimensions.add(new DimValue(1, null));
+    				if (howManyElementsRemain == -1) 
+    					indexedDimensions.add(new DimValue());
+    				else 
+    					indexedDimensions.add(new DimValue(howManyElementsRemain, null));
     			}
-    			else indexedDimensions.add(rhsArrayDimensions.get(i));
+    			else {
+    				/*
+    				 * the ordinary case.
+    				 */
+    				indexedDimensions.add(rhsArrayDimensions.get(i).cloneThisValue());
+    			}
     		}
     		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
-    			if (indices.size()==i+1 && rhsArrayDimensions.size()>i+1) {
+    			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
+        			/*
+        			 * proceed linear indexing, won't resize the shape of the indexed 
+        			 * array, but has to set the dimension of the return shape. 
+        			 * besides, need static array bound check.
+        			 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
-    				// need insert static array bound check.
     				if (rhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
         				int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
-    						// index out of bound.
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
+    						/* 
+    						 * index out of bound.
+    						 * 
+    						 * TODO may need to mark the current flow set as nonviable.
+    						 */
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
@@ -155,18 +175,25 @@ public class ShapePropagator<V extends Value<V>>
 					 * if only one index, the return shape will be a row, [1,X], so initialize 
 					 * the first dimension as 1, then add the second dimension.
 					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
+    				if (indices.size() == 1) indexedDimensions.add(new DimValue(1, null));
    					indexedDimensions.add(new DimValue(1, null));
     			}
     			else {
+    				/*
+    				 * the ordinary case.
+    				 */
     				// need insert static array bound check.
     				if (rhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>rhsArrayDimensions.get(i).getIntValue()) {
-    						// index out of bound.
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown())
+    				{
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, rhsArrayDimensions.get(i).getIntValue())) {
+    						/* 
+    						 * index out of bound.
+    						 * 
+    						 * TODO may need to mark the current flow set as nonviable.
+    						 */
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
@@ -174,17 +201,25 @@ public class ShapePropagator<V extends Value<V>>
     			}
     		}
     		else if (!((HasShape<V>)indices.get(i)).getShape().isScalar()) {
-    			if (indices.size()==i+1 && rhsArrayDimensions.size()>i+1) {
+    			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
+    				/*
+        			 * proceed linear indexing, won't resize the shape of the indexed 
+        			 * array, but has to set the dimension of the return shape. 
+        			 * besides, need static array bound check.
+        			 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
-    				// need insert static array bound check.
     				if (rhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
         				int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
-    						// index out of bound.
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
+    						/* 
+    						 * index out of bound.
+    						 * 
+    						 * TODO may need to mark the current flow set as nonviable.
+    						 */
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
@@ -192,22 +227,31 @@ public class ShapePropagator<V extends Value<V>>
 					 * if only one index, the return shape will be a row, [1,X], so initialize 
 					 * the first dimension as 1, then add the second dimension.
 					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
+    				if (indices.size() == 1) indexedDimensions.add(new DimValue(1, null));
+    				// add the value of the second dimension of the vector to the return shape.
     				indexedDimensions.add(((HasShape<V>)indices.get(i))
     						.getShape().getDimensions().get(1));
     			}
     			else {
+    				/*
+    				 * the ordinary case.
+    				 */
     				// need insert static array bound check.
     				if (rhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>rhsArrayShape.getDimensions().get(i).getIntValue()) {
-    						// index out of bound.
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, rhsArrayShape.getDimensions().get(i).getIntValue())) {
+    						/* 
+    						 * index out of bound.
+    						 * 
+    						 * TODO may need to mark the current flow set as nonviable.
+    						 */
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
+    				// add the value of the second dimension of the vector to the return shape.
     				indexedDimensions.add(((HasShape<V>)indices.get(i))
     						.getShape().getDimensions().get(1));
     			}
@@ -250,12 +294,16 @@ public class ShapePropagator<V extends Value<V>>
      * warnings.
      */
     public Shape<V> arraySubsasgn(Shape<V> lhsArrayShape, Args<V> indices, V value) {
-    	if (lhsArrayShape==null) return null;
-    	List<DimValue> indexedDimensions = new ArrayList<DimValue>();
+    	if (lhsArrayShape == null) return null;
     	List<DimValue> lhsArrayDimensions = lhsArrayShape.getDimensions();
-    	List<DimValue> newDimensions = lhsArrayDimensions; // just a ref to original dimension.
-    	// if indices.size() is larger than lhsArrayDimensions.size(), grow it.
+    	List<DimValue> newDimensions = new ArrayList<DimValue>();
+    	// need to copy a completely new dimension list from the old one.
+    	for (DimValue dim : lhsArrayDimensions) {
+    		newDimensions.add(dim.cloneThisValue());
+    	}
+    	
     	for (int i=0; i<indices.size(); i++) {
+    		int POS = i + 1;
     		/*
     		 * ColonValue extends from SpecialValue which extends from Value, 
     		 * but BasicMatrixValue extends from MatrixValue which extends from 
@@ -264,136 +312,187 @@ public class ShapePropagator<V extends Value<V>>
     		 * we should deal with ColonValue first.
     		 */
     		if (indices.get(i) instanceof ColonValue) {
-    			// insert array growth check.
-    			if (i+1 > lhsArrayDimensions.size()) {
+    			if (POS > lhsArrayDimensions.size()) {
+    				/*
+    				 * out-of-bound index with colon notation, matlab error.
+    				 */
     				System.err.println("cannot grow the array with ':'.");
+    				// TODO may need to mark the current flow set as nonviable.
     				return new ShapeFactory<V>().getOutOfBoundShape();
     			}
-    			// don't need to insert array bound check for ":" index.
-    			else if (indices.size()==i+1 && lhsArrayDimensions.size()>i+1) {
+    			else if (POS == indices.size() && POS < lhsArrayDimensions.size()) {
+    				/*
+    				 * proceed linear indexing, won't resize the shape of the matrix.
+    				 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
-					int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
-					/*
-					 * if only one index, the return shape will be a row, [1,X], so initialize 
-					 * the first dimension as 1, then add the second dimension.
-					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
-    				if (howManyElementsRemain==-1) indexedDimensions.add(new DimValue());
-    				else indexedDimensions.add(new DimValue(howManyElementsRemain, null));
     			}
-    			else indexedDimensions.add(lhsArrayDimensions.get(i));
+    			else {
+    				/*
+    				 * the ordinary case, won't resize the shape of the matrix.
+    				 */
+    			}
     		}
     		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
-    			// insert array growth check.
-    			if (i+1 > lhsArrayDimensions.size()) {
-    				newDimensions.add(new DimValue(null, null));
+    			if (POS > lhsArrayDimensions.size()) {
+    				/*
+    				 * out-of-bound index with a scalar, matrix can be grew.
+    				 * TODO using range value analysis result to improve accuracy.
+    				 */
+    				newDimensions.add(new DimValue());
     			}
-    			else if (indices.size()==i+1 && lhsArrayDimensions.size()>i+1) {
+    			else if (POS == indices.size() && POS < lhsArrayDimensions.size()) {
+    				/*
+    				 * proceed linear indexing, won't resize the 
+    				 * shape of the matrix, but need array bound check.
+    				 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
-    				// need insert static array bound check.
+    				/*
+    				 * using range value analysis result to proceed static abc.
+    				 */
     				if (lhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
         				int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) 
+    					{
     						/* 
     						 * index out of bound. Actually, when index larger 
     						 * than remaining elements, the error is 
     						 * "attempt to grow array along ambiguous dimension"
+    						 * 
+    						 * TODO may need to mark the current flow set as nonviable.
     						 */
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
-    				/*
-					 * if only one index, the return shape will be a row, [1,X], so initialize 
-					 * the first dimension as 1, then add the second dimension.
-					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
-   					indexedDimensions.add(new DimValue(1, null));
+    				else {
+    					/*
+    					 * the range value is not exactly unknown, cannot proceed 
+    					 * static abc, have to mark that dimension as ? and leave 
+    					 * it to the back end to generate runtime abc inlined code. 
+    					 */
+    					newDimensions.remove(i);
+						newDimensions.add(i, new DimValue());    					
+    				}
     			}
     			else {
-    				// need insert static array bound check.
+    				/*
+    				 * the ordinary case, out-of-bound index may grow the matrix.
+    				 * using range value analysis result to proceed static abc.
+    				 */
     				if (lhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0) {
-    						// index out of bound.
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
+    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.getLowerBound().lessThanZero()) {
+    						// TODO may need to mark the current flow set as nonviable.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
-    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getUpperBound() 
-    							> lhsArrayDimensions.get(i).getIntValue()) {
-    						// grow the original array.
+    					else if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, lhsArrayDimensions.get(i).getIntValue())) {
+    						/*
+    						 * grow the original array.
+    						 * TODO using range value analysis result to improve accuracy.
+    						 */
     						newDimensions.remove(i);
-    						newDimensions.add(i, new DimValue(null, null));
+    						newDimensions.add(i, new DimValue());
+    					}
+    					else {
+    						// in-bound array indexing, do nothing.
     					}
     				}
     				else {
+    					/*
+    					 * the range value is not exactly unknown, cannot proceed 
+    					 * static abc, have to mark that dimension as ? and leave 
+    					 * it to the back end to generate runtime abc inlined code. 
+    					 */
     					newDimensions.remove(i);
-						newDimensions.add(i, new DimValue(null, null));
+						newDimensions.add(i, new DimValue());
     				}
-    				indexedDimensions.add(new DimValue(1, null));
     			}
     		}
     		else if (!((HasShape<V>)indices.get(i)).getShape().isScalar()) {
-    			// insert array growth check.
-    			if (i+1 > lhsArrayDimensions.size()) {
-    				newDimensions.add(new DimValue(((HasRangeValue<V>)indices.get(i))
-    						.getRangeValue().getUpperBound().intValue(), null));
+    			/*
+				 * proceed linear indexing, won't resize the shape 
+				 * of the matrix, but need array bound check.
+				 */
+    			if (POS > lhsArrayDimensions.size()) {
+    				/*
+    				 * out-of-bound index with a scalar, matrix can be grew.
+    				 * TODO using range value analysis result to improve accuracy.
+    				 */
+    				newDimensions.add(new DimValue());
     			}
-    			if (indices.size()==i+1 && lhsArrayDimensions.size()>i+1) {
+    			if (POS == indices.size() && POS < lhsArrayDimensions.size()) {
+    				/*
+    				 * proceed linear indexing, won't resize the 
+    				 * shape of the matrix, but need array bound check.
+    				 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
-    				// need insert static array bound check.
+    				/*
+    				 * using range value analysis result to proceed static abc.
+    				 */
     				if (lhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
         				int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0 
-    							|| ((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.getUpperBound()>howManyElementsRemain) {
-    						// index out of bound.
+    					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, howManyElementsRemain)) {
+    						// TODO may need to mark the current flow set as nonviable.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
-    				/*
-					 * if only one index, the return shape will be a row, [1,X], so initialize 
-					 * the first dimension as 1, then add the second dimension.
-					 */
-    				if (indices.size()==1) indexedDimensions.add(new DimValue(1, null));
-    				indexedDimensions.add(((HasShape<V>)indices.get(i))
-    						.getShape().getDimensions().get(1));
+    				else {
+    					/*
+    					 * the range value is not exactly unknown, cannot proceed 
+    					 * static abc, have to mark that dimension as ? and leave 
+    					 * it to the back end to generate runtime abc inlined code. 
+    					 */
+    					newDimensions.remove(i);
+						newDimensions.add(i, new DimValue());    					
+    				}
     			}
     			else {
-    				// need insert static array bound check.
+    				/*
+    				 * the ordinary case, out-of-bound index may grow the matrix.
+    				 * using range value analysis result to proceed static abc.
+    				 */
     				if (lhsArrayShape.isConstant() 
-    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue()!=null 
-    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().hasTop()) {
-    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound()<=0) {
-    						// index out of bound.
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& !((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
+    				{
+    					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound().lessThanZero()) {
+    						// TODO may need to mark the current flow set as nonviable.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
-    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getUpperBound() 
-    							> lhsArrayShape.getDimensions().get(i).getIntValue()) {
-    						// grow the original array.
+    					else if (((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    							.isInBounds(0, lhsArrayShape.getDimensions().get(i).getIntValue())) {
+    						/*
+    						 * grow the original array.
+    						 * TODO using range value analysis result to improve accuracy.
+    						 */
     						newDimensions.remove(i);
-    						newDimensions.add(i, new DimValue(((HasRangeValue<V>)indices.get(i))
-    								.getRangeValue().getUpperBound().intValue(), null));
+    						newDimensions.add(i, new DimValue());
+    					}
+    					else {
+    						// in-bound array indexing, do nothing.
     					}
     				}
-    				indexedDimensions.add(((HasShape<V>)indices.get(i))
-    						.getShape().getDimensions().get(1));
+    				else {
+    					/*
+    					 * the range value is not exactly unknown, cannot proceed 
+    					 * static abc, have to mark that dimension as ? and leave 
+    					 * it to the back end to generate runtime abc inlined code. 
+    					 */
+    					newDimensions.remove(i);
+						newDimensions.add(i, new DimValue());
+    				}
     			}
-    		}
-    	}
-    	Shape<V> indexedShape = new ShapeFactory<V>().newShapeFromDimValues(indexedDimensions);
-    	/*
-    	 * test whether lhs indexed shape and the rhs value's shape matched.
-    	 */
-    	if (indexedShape.isConstant()) {
-			indexedShape.eliminateTrailingOnes().eliminateLeadingOnes();
-    		if(!indexedShape.equals(((HasShape<V>)value).getShape())) {
-    			return new ShapeFactory<V>().getMismatchShape();
     		}
     	}
     	Shape<V> resultShape = new ShapeFactory<V>().newShapeFromDimValues(newDimensions);

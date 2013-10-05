@@ -101,16 +101,14 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 			// loops through only those variable definitions that are used
 			// somewhere and are not return variables
 			for (TIRNode statement : allStatements) {
+				System.err.println("~~"+statement.toString());
 
 				varUses = vDUChain.getUsesMapForDefinitionStmt(statement);
 
 				if (null != varUses) {
 					for (String var : varUses.keySet()) {
-						if (!function.getAst().getOutParamSet().contains(var)) {// Do
-																				// not
-																				// rename
-																				// return
-																				// variable
+						if (!function.getAst().getOutParamSet().contains(var)) {
+										// Do not rename return variable
 							System.out.println("==" + statement.toString()
 									+ " defines " + var + "==");
 							if (!varWebTable.containsKey(var)) {

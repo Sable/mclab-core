@@ -15,17 +15,17 @@ import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 public class BasicTamerTool {
-	
+
+	/**
+	 * This main method is just for testing, doesn't follow the convention when passing a file 
+	 * to a program, please replace "YOUR_FILE_NAME_AND_PATH" below with your real testing 
+	 * file name and its path, and program argument support the type info of the input 
+	 * argument, which means you can pass the type info of the input argument to the program, 
+	 * currently, the type info is composed like double&3*3&REAL.
+	 */
 	public static void main(String[] args) {
-		/*
-		 * This main method is just for testing, doesn't follow the convention when passing a file 
-		 * to a program, please replace "YOUR_FILE_NAME_AND_PATH" below with your real testing 
-		 * file name and its path, and program argument support the type info of the input 
-		 * argument, which means you can pass the type info of the input argument to the program, 
-		 * currently, the type info is composed like double&3*3&REAL.
-		 */
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/xu/for_test/bubble.m");
+		GenericFile gFile = GenericFile.create("YOUR_FILE_NAME_AND_PATH");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -48,9 +48,10 @@ public class BasicTamerTool {
 
 	//TODO give more useful functions!
 
-	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze (
+	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(
 			String[] args, 
-			FileEnvironment env) {
+			FileEnvironment env) 
+	{
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
@@ -66,8 +67,7 @@ public class BasicTamerTool {
 		return analysis;
 	}
 
-	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues (
-			String[] args) {
+	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
 		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
 				args.length);
 		for (String argSpecs : args) {

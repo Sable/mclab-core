@@ -20,7 +20,7 @@ import ast.Script;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 
 class RenameVariable extends Refactoring {
@@ -45,7 +45,7 @@ class RenameVariable extends Refactoring {
   }
 
   private boolean targetNameIsGlobal() {
-    return Iterables.any(getAllDefsOfTargetName(), Predicates.instanceOf(GlobalStmt.class));
+    return getAllDefsOfTargetName().anyMatch(Predicates.instanceOf(GlobalStmt.class));
   }
 
   private void checkPreconditionsForFunctionOrScript(ASTNode<?> ast, MatlabProgram program) {
@@ -94,7 +94,7 @@ class RenameVariable extends Refactoring {
     return NodeFinder.findParent(Script.class, node);
   }
 
-  private Iterable<Def> getAllDefsOfTargetName() {
+  private FluentIterable<Def> getAllDefsOfTargetName() {
     ASTNode<?> parent = getParentFunctionOrScript(node);
     return NodeFinder.find(Def.class, parent).filter(new Predicate<Def>() {
       @Override public boolean apply(Def def) {
