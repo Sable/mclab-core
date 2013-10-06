@@ -99,7 +99,12 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 						al.add(previousMatchResult.getValueOfVariable(i));
 					}
 					else {
-						al.add(new DimValue(Integer.parseInt(i), null));
+						try {
+							int value = Integer.parseInt(arg[1]);
+							al.add(new DimValue(value, null));
+						} catch(NumberFormatException e) {
+							al.add(new DimValue());						
+						}
 					}
 				}
 				if (Debug) System.out.println("the vertcat result is " + al);
