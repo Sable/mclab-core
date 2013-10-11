@@ -28,7 +28,7 @@ public class DimValue {
 	DimValue cloneThisValue() {
 		DimValue instance = new DimValue();
 		instance.intValue = this.intValue;
-		instance.symbolic = new String(this.symbolic);
+		instance.symbolic = this.symbolic;
 		return instance;
 	}
 	

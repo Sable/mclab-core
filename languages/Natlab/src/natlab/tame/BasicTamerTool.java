@@ -25,7 +25,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("YOUR_FILE_NAME_AND_PATH");
+		GenericFile gFile = GenericFile.create("YOURF_FILE_NAME_AND_PATH");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -68,8 +68,8 @@ public class BasicTamerTool {
 	}
 
 	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
-		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
-				args.length);
+		ArrayList<AggrValue<BasicMatrixValue>> list = 
+				new ArrayList<AggrValue<BasicMatrixValue>>(args.length);
 		for (String argSpecs : args) {
 			String delims = "[\\&]";
 			String[] specs = argSpecs.split(delims);
