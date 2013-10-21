@@ -504,8 +504,21 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			}
 		}
 		else {
-			// System.err.println(lower.toString()+upper+inc); TODO
-			return null;
+			if (((DoubleConstant)((HasConstant)lower).getConstant()) == null 
+					|| ((DoubleConstant)((HasConstant)upper).getConstant()) == null)
+				return null;
+			else {
+				double lowerBound = ((DoubleConstant)((HasConstant)lower)
+						.getConstant()).getValue();
+				double upperBound = ((DoubleConstant)((HasConstant)upper)
+						.getConstant()).getValue();
+				if (lowerBound <= upperBound) {
+					return new RangeValue<V>(new DomainValue(lowerBound), new DomainValue(upperBound));
+				}
+				else {
+					return new RangeValue<V>(new DomainValue(upperBound), new DomainValue(lowerBound));
+				}
+			}
 		}
 	}
 	
