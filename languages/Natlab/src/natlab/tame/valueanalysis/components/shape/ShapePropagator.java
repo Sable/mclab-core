@@ -227,10 +227,25 @@ public class ShapePropagator<V extends Value<V>>
 					 * if only one index, the return shape will be a row, [1,X], so initialize 
 					 * the first dimension as 1, then add the second dimension.
 					 */
-    				if (indices.size() == 1) indexedDimensions.add(new DimValue(1, null));
-    				// add the value of the second dimension of the vector to the return shape.
-    				indexedDimensions.add(((HasShape<V>)indices.get(i))
-    						.getShape().getDimensions().get(1));
+    				if (indices.size() == 1 && rhsArrayDimensions.get(0).hasIntValue() 
+    						&& rhsArrayDimensions.get(0).getIntValue() == 1) {
+    					indexedDimensions.add(new DimValue(1, null));
+        				// add the value of the second dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(1));
+    				}
+    				else if (indices.size() == 1 && rhsArrayDimensions.get(1).hasIntValue() 
+    						&& rhsArrayDimensions.get(1).getIntValue() == 1) {
+        				// add the value of the second dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(1));
+    					indexedDimensions.add(new DimValue(1, null));
+    				}
+    				else {
+        				// add the value of the second dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(1));    					
+    				}
     			}
     			else {
     				/*
@@ -377,6 +392,14 @@ public class ShapePropagator<V extends Value<V>>
         						return new ShapeFactory<V>().getOutOfBoundShape();    							
     						}
     					}
+    				}
+    				else if (indices.size() == 1 && lhsArrayDimensions.get(0).hasIntValue() 
+    						&& lhsArrayDimensions.get(0).getIntValue() == 1) {
+    					// TODO do nothing!
+    				}
+    				else if (indices.size() == 1 && lhsArrayDimensions.get(1).hasIntValue() 
+    						&& lhsArrayDimensions.get(1).getIntValue() == 1) {
+    					// TODO do nothing!
     				}
     				else {
     					/*

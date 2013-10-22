@@ -60,7 +60,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					if (previousMatchResult.getAllUppercase().containsKey(s)) {
 						Shape<V> previousShape = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
 						if (!argumentShape.equals(previousShape)) {
-							System.err.println("MATLAB syntax error, then arguments should have the same shape (size).");
+							if (Debug) System.err.println("arguments don't have the same shape, go to next case.");
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;
 						}
