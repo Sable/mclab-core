@@ -23,6 +23,7 @@ import java.util.List;
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
 import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.shape.*;
 
 /**
  * propagates constants.
@@ -270,6 +271,32 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     		if (((HasConstant)arg.get(0)).getConstant() instanceof DoubleConstant) {
     			Double res = Math.exp(((DoubleConstant)((HasConstant)arg.get(0)).getConstant()).getValue());
     			return new DoubleConstant(res);
+    		}
+    	}
+    	return null;
+    }
+    
+    @Override
+    /**
+     * length
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public Constant caseLength(Builtin builtin, Args<V> arg) {
+    	if (arg.size() == 1) {
+    		if (((HasShape)arg.get(0)).getShape() != null 
+    				&& ((HasShape)arg.get(0)).getShape().isConstant()) {
+    			/*
+    			 * actually, according to the rule in Matlab, 
+    			 * length return the number of the largest dimension.
+    			 */
+    			int max = 0;
+    			for (DimValue i : (List<DimValue>)((HasShape)arg.get(0))
+    					.getShape().getDimensions()) {
+    				if (i.getIntValue() > max) {
+    					max = i.getIntValue();
+    				}
+    			}
+    			return new DoubleConstant(max);
     		}
     	}
     	return null;
