@@ -283,7 +283,8 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Constant caseLength(Builtin builtin, Args<V> arg) {
     	if (arg.size() == 1) {
-    		if (((HasShape)arg.get(0)).getShape() != null 
+    		if (arg.get(0) instanceof HasShape 
+    				&& ((HasShape)arg.get(0)).getShape() != null 
     				&& ((HasShape)arg.get(0)).getShape().isConstant()) {
     			/*
     			 * actually, according to the rule in Matlab, 
