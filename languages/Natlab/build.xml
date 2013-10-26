@@ -173,11 +173,11 @@
 	</target>
  
 	<!-- jar build with fortran  backend-->
-  <target name="jar-fortran-backend" depends="matlab.build, clean, jar_noclean_fb"
+  <target name="jar-mc2for" depends="matlab.build, clean, jar_noclean_mc2for"
           description="creates an executable release jar" />
-	<target name="jar_noclean_fb" depends="gen, compile" 
+	<target name="jar_noclean_mc2for" depends="gen, compile" 
           description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.fortran_backend.name}" excludes="**/x10/**" />
+		<natlab-jar basename="${entrypoint.fortran_backend.name}" excludes="**/x10/**,**/VRIRGen/**" />
 	</target>
 
 	<!-- public versions of eclipse.xml targets -->
