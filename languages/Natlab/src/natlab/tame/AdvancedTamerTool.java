@@ -20,7 +20,7 @@ import natlab.toolkits.path.FileEnvironment;
 public class AdvancedTamerTool {
 
 	public static void main(String[] args) {
-		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/bubble/drv_bubble";
+		String file = "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
 		// String file = "/home/2011/vkumar5/for_test";
 
 		String fileIn = file + ".m";
