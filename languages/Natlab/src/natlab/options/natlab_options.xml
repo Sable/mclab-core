@@ -241,4 +241,34 @@
       <long_desc>Displays all the stored preferences</long_desc>
     </boolopt>
   </section>
+
+  <!--***********************BACKENDS**********************************-->
+
+  <section>
+   <name>MiX10 Preferences</name>
+      <boolopt>
+	<name>Generate X10 code</name>
+	<alias>mix10c</alias>
+	<short_desc>Compile MATLAB to X10</short_desc>
+	<long_desc>Gnerate X10 code from given MATLAB code</long_desc>
+     </boolopt>
+     <boolopt>
+	<name>Explicitly use region arrays in generated code</name>
+        <alias>use_region_arrays</alias>
+	<short_desc>Use region arrays</short_desc>
+	<long_desc>Use region arrays instead of New arrays</long_desc>
+     </boolopt>		
+     <stropt>
+     	<name>Parallelize vector instructions</name>
+     	<alias>vec_par_length</alias>
+     	<short_desc>Define the threshold vector size to use parallel vector operations</short_desc>
+     	<long_desc>
+	Define the threshold vector size to use parallel version of 
+	operations for all or individual operations.
+        </long_desc>
+    </stropt>		
+ </section>
+
+
+
 </options>

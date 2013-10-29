@@ -29,6 +29,7 @@ import natlab.options.Options;
 import natlab.tame.TamerTool;
 import ast.CompilationUnits;
 import ast.Program;
+import natlab.backends.x10.Mix10;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -98,6 +99,10 @@ public class Main {
       return;
     }
 
+    if (options.mix10c()){
+    	Mix10.compile(options);
+    }
+    
     if (options.getFiles().isEmpty()) {
       System.err.println("No files provided, must have at least one file.");
       return;
