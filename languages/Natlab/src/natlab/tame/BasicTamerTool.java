@@ -94,7 +94,6 @@ public class BasicTamerTool {
 	 * the entry point coming from natlab.Main - uses the options object to select the proper behavior
 	 */
 	public static void main(Options options) {
-		//** parse args ********
 		FileEnvironment fileEnvironment = new FileEnvironment(options); //get path/files
 
 		//arguments - TODO for now just parse them as inputs

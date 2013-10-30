@@ -173,6 +173,18 @@
   </section>
   
   <section>
+  	<name>Tamer+ option</name>
+  	<boolopt>
+	  	<name>Tamer+ Version of the Input Program</name>
+  		<alias>tamerplus</alias>
+  		<short_desc>Get the Tamer+ version of a program</short_desc>
+  		<long_desc>
+  			Transform the program in Tamer IR to Tamer+ IR.
+  		</long_desc>
+	</boolopt>
+  </section>
+  
+  <section>
     <name>path and file options</name>
     <listopt>
       <name>Lookup path</name>

@@ -27,6 +27,7 @@ import java.util.List;
 import mclint.McLint;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
+import natlab.tame.tamerplus.TamerPlusMain;
 import ast.CompilationUnits;
 import ast.Program;
 import natlab.backends.x10.Mix10;
@@ -83,12 +84,16 @@ public class Main {
       return;
     }
 
-    if (options.tamer()){
+    if (options.tamer()) {
       //TODO - the parsing of the options should probably not be done by the tamer tool
       BasicTamerTool.main(options);
       return;
     }
 
+    if (options.tamerplus()) {
+    	TamerPlusMain.main(options);
+    }
+    
     if (options.mclint()) {
       McLint.main(options);
       return;
