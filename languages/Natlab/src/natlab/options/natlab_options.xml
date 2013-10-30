@@ -141,7 +141,7 @@
   	<boolopt>
 	  	<name>Tame a Matlab program</name>
   		<alias>t</alias>
-  		<alias>tame</alias>
+  		<alias>tamer</alias>
   		<short_desc>Tame a Matlab program</short_desc>
   		<long_desc>
   			Runs the Tamer on a program, and will output a full Matlab program either

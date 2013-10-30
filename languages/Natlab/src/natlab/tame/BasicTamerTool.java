@@ -1,8 +1,15 @@
 package natlab.tame;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import natlab.options.Options;
+import natlab.tame.builtin.classprop.ClassPropTool;
+import natlab.tame.builtin.classprop.ast.CP;
+import natlab.tame.builtin.classprop.ast.CPBuiltin;
+import natlab.tame.builtin.classprop.ast.CPChain;
+import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueAnalysis;
@@ -25,7 +32,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/sample/drv_babai.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/babai_8_kinds/nocheck/known_10_10000/drv_babai.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -77,8 +84,56 @@ public class BasicTamerTool {
 			 * TODO Below is just to test. Add actual code to make sense of the
 			 * argument specs
 			 */
+			//System.out.println(specs[1]);
 			list.add(new BasicMatrixValue("n", PrimitiveClassReference.DOUBLE, specs[1]));
 		}
 		return list;
+	}
+	
+	/**
+	 * the entry point coming from natlab.Main - uses the options object to select the proper behavior
+	 */
+	public static void main(Options options) {
+		//** parse args ********
+		FileEnvironment fileEnvironment = new FileEnvironment(options); //get path/files
+
+		//arguments - TODO for now just parse them as inputs
+		String args = "double&1*1"; //start with the default
+		if (options.arguments() != null && options.arguments().length() > 0){
+			args = options.arguments();
+		}/*
+		CP classProp = ClassPropTool.parse(args);
+		List<CP> classPropList = new LinkedList<CP>();
+		if (classProp instanceof CPChain){
+			classPropList = ((CPChain)classProp).asList();
+		} else if (classProp instanceof CPBuiltin){
+			classPropList.add(classProp);
+		} else {
+			throw new UnsupportedOperationException("Arguments have to be a list of builtin classes");
+		}
+		List<PrimitiveClassReference> inputClasses = new LinkedList<PrimitiveClassReference>();
+		for (CP element : classPropList){
+			if (element instanceof CPBuiltin){
+				inputClasses.add(PrimitiveClassReference.valueOf(((CPBuiltin)element).toString().toUpperCase()));
+			} else {
+				throw new UnsupportedOperationException(
+						"Arguments have to be list of builtin classes, received "+element);
+			}
+		}*/
+		
+		// TODO now it's for testing...
+		String[] argsList = {args};
+		
+		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(argsList);
+		
+		Callgraph<BasicMatrixValue> callgraph = new Callgraph<BasicMatrixValue>(
+				fileEnvironment,
+				Args.<AggrValue<BasicMatrixValue>>newInstance(inputValues),
+				new BasicMatrixValueFactory());
+		
+		
+		//** output info ***********
+		System.out.println(callgraph.prettyPrint());
+		
 	}
 }
