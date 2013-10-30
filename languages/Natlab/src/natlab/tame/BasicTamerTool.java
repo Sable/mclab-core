@@ -1,5 +1,8 @@
 package natlab.tame;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +14,9 @@ import natlab.tame.builtin.classprop.ast.CPBuiltin;
 import natlab.tame.builtin.classprop.ast.CPChain;
 import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.SimpleFunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tamerplus.transformation.TransformationEngine;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
@@ -95,44 +100,42 @@ public class BasicTamerTool {
 	 */
 	public static void main(Options options) {
 		FileEnvironment fileEnvironment = new FileEnvironment(options); //get path/files
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(fileEnvironment);
+		
 
 		//arguments - TODO for now just parse them as inputs
 		String args = "double&1*1"; //start with the default
 		if (options.arguments() != null && options.arguments().length() > 0){
 			args = options.arguments();
-		}/*
-		CP classProp = ClassPropTool.parse(args);
-		List<CP> classPropList = new LinkedList<CP>();
-		if (classProp instanceof CPChain){
-			classPropList = ((CPChain)classProp).asList();
-		} else if (classProp instanceof CPBuiltin){
-			classPropList.add(classProp);
-		} else {
-			throw new UnsupportedOperationException("Arguments have to be a list of builtin classes");
 		}
-		List<PrimitiveClassReference> inputClasses = new LinkedList<PrimitiveClassReference>();
-		for (CP element : classPropList){
-			if (element instanceof CPBuiltin){
-				inputClasses.add(PrimitiveClassReference.valueOf(((CPBuiltin)element).toString().toUpperCase()));
-			} else {
-				throw new UnsupportedOperationException(
-						"Arguments have to be list of builtin classes, received "+element);
-			}
-		}*/
 		
 		// TODO now it's for testing...
 		String[] argsList = {args};
 		
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(argsList);
-		
-		Callgraph<BasicMatrixValue> callgraph = new Callgraph<BasicMatrixValue>(
-				fileEnvironment,
-				Args.<AggrValue<BasicMatrixValue>>newInstance(inputValues),
-				new BasicMatrixValueFactory());
-		
-		
-		//** output info ***********
-		System.out.println(callgraph.prettyPrint());
-		
+		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
+				new ValueAnalysis<AggrValue<BasicMatrixValue>>(
+				callgraph,Args.newInstance(inputValues), factory);
+		System.out.println(analysis.toString());
+
+		for (int i = 0; i < analysis.getNodeList().size(); i++) {
+			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+					.getNodeList().get(i).getAnalysis()));
+			
+			// write the transformed result to files.
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter(
+						fileEnvironment.getPwd().getPath()
+						+ "/"
+						+ analysis.getNodeList().get(i).getFunction().getName() + ".tamer"));
+				out.write(ValueAnalysisPrinter.prettyPrint(analysis
+						.getNodeList().get(i).getAnalysis()));
+				out.flush();
+				out.close();
+			} catch (IOException e) {
+				System.err.println(e);
+			}
+		}
 	}
 }
