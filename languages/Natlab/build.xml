@@ -169,7 +169,7 @@
   <target name="jar-mix10" depends="matlab.build, clean, jar_noclean_mix10"
           description="creates an executable release jar" />
 	<target name="jar_noclean_mix10" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.x10_backend.name}" excludes="**/Fortran/**" />
+		<natlab-jar basename="${entrypoint.x10_backend.name}" excludes="**/Fortran/**, **/VRIRGen/**" />
 	</target>
  
 	<!-- jar build with fortran  backend-->
