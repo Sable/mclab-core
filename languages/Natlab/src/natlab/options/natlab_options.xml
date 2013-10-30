@@ -281,6 +281,23 @@
     </stropt>		
  </section>
 
-
+  <section>
+   <name>Mc2For Preferences</name>
+    
+    <boolopt>
+	<name>Generate Fortran code with run-time array bounds checking code</name>
+	<alias>codegen</alias>
+	<short_desc>Transform MATLAB to Fortran with run-time ABC code</short_desc>
+	<long_desc>Transform MATLAB to Fortran with run-time array bounds checking code</long_desc>
+    </boolopt>
+    
+    <boolopt>
+	<name>Generate Fortran code without run-time array bounds checking code</name>
+    <alias>nocheck</alias>
+	<short_desc>Transform MATLAB to Fortran without run-time ABC code</short_desc>
+	<long_desc>Transform MATLAB to Fortran without run-time array bounds checking code</long_desc>
+    </boolopt>
+    
+ </section>
 
 </options>

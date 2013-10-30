@@ -31,6 +31,7 @@ import natlab.tame.tamerplus.TamerPlusMain;
 import ast.CompilationUnits;
 import ast.Program;
 import natlab.backends.x10.Mix10;
+import natlab.backends.Fortran.codegen_readable.Main_readable;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -106,6 +107,11 @@ public class Main {
 
     if (options.mix10c()){
     	Mix10.compile(options);
+    }
+    
+    // Mc2For options
+    if (options.codegen() || options.nocheck()) {
+    	Main_readable.compile(options);
     }
     
     if (options.getFiles().isEmpty()) {
