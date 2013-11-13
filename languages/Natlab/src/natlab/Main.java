@@ -26,9 +26,12 @@ import java.util.List;
 
 import mclint.McLint;
 import natlab.options.Options;
-import natlab.tame.TamerTool;
+import natlab.tame.BasicTamerTool;
+import natlab.tame.tamerplus.TamerPlusMain;
 import ast.CompilationUnits;
 import ast.Program;
+import natlab.backends.x10.Mix10;
+import natlab.backends.Fortran.codegen_readable.Main_readable;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -82,12 +85,16 @@ public class Main {
       return;
     }
 
-    if (options.tame()){
+    if (options.tamer()) {
       //TODO - the parsing of the options should probably not be done by the tamer tool
-      TamerTool.main(options);
+      BasicTamerTool.main(options);
       return;
     }
 
+    if (options.tamerplus()) {
+    	TamerPlusMain.main(options);
+    }
+    
     if (options.mclint()) {
       McLint.main(options);
       return;
@@ -98,6 +105,15 @@ public class Main {
       return;
     }
 
+    if (options.mix10c()){
+    	Mix10.compile(options);
+    }
+    
+    // Mc2For options
+    if (options.codegen() || options.nocheck()) {
+    	Main_readable.compile(options);
+    }
+    
     if (options.getFiles().isEmpty()) {
       System.err.println("No files provided, must have at least one file.");
       return;

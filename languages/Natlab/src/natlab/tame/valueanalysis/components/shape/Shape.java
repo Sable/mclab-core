@@ -82,8 +82,8 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     /**
-     * returns true if this shape is scalar or may be scalar
-     * returns false if this shape is known to be non-scalar
+     * returns true if this shape may be scalar;
+     * returns false if this shape is known to be non-scalar.
      */
     public boolean maybeScalar() {
     	if (dimensions.size()!=2) return false;
@@ -102,6 +102,20 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	if (dimensions.size()!=2) return false;
     	else if (dimensions.get(0).equalsOne()&&dimensions.get(1).equalsOne()) 
     		return true;
+    	else return false;
+    }
+    
+    /**
+     * returns true if this shape may be vector.
+     */
+    public boolean maybeVector() {
+    	if (dimensions.size() != 2) return false;
+    	else if (dimensions.get(0).equalsOne() && !dimensions.get(1).equalsOne()) {
+    		return true;
+    	}
+    	else if (!dimensions.get(0).equalsOne() && dimensions.get(1).equalsOne()) {
+    		return true;
+    	}
     	else return false;
     }
     

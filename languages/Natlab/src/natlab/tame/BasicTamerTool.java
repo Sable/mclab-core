@@ -1,10 +1,22 @@
 package natlab.tame;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import natlab.options.Options;
+import natlab.tame.builtin.classprop.ClassPropTool;
+import natlab.tame.builtin.classprop.ast.CP;
+import natlab.tame.builtin.classprop.ast.CPBuiltin;
+import natlab.tame.builtin.classprop.ast.CPChain;
+import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.SimpleFunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tamerplus.transformation.TransformationEngine;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
@@ -25,7 +37,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/sample/drv_babai.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/babai_8_kinds/nocheck/known_10_10000/drv_babai.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -77,8 +89,53 @@ public class BasicTamerTool {
 			 * TODO Below is just to test. Add actual code to make sense of the
 			 * argument specs
 			 */
+			//System.out.println(specs[1]);
 			list.add(new BasicMatrixValue("n", PrimitiveClassReference.DOUBLE, specs[1]));
 		}
 		return list;
+	}
+	
+	/**
+	 * the entry point coming from natlab.Main - uses the options object to select the proper behavior
+	 */
+	public static void main(Options options) {
+		FileEnvironment fileEnvironment = new FileEnvironment(options); //get path/files
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(fileEnvironment);
+		
+
+		//arguments - TODO for now just parse them as inputs
+		String args = "double&1*1"; //start with the default
+		if (options.arguments() != null && options.arguments().length() > 0){
+			args = options.arguments();
+		}
+		
+		// TODO now it's for testing...
+		String[] argsList = {args};
+		
+		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(argsList);
+		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
+				new ValueAnalysis<AggrValue<BasicMatrixValue>>(
+				callgraph,Args.newInstance(inputValues), factory);
+		System.out.println(analysis.toString());
+
+		for (int i = 0; i < analysis.getNodeList().size(); i++) {
+			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+					.getNodeList().get(i).getAnalysis()));
+			
+			// write the transformed result to files.
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter(
+						fileEnvironment.getPwd().getPath()
+						+ "/"
+						+ analysis.getNodeList().get(i).getFunction().getName() + ".tamer"));
+				out.write(ValueAnalysisPrinter.prettyPrint(analysis
+						.getNodeList().get(i).getAnalysis()));
+				out.flush();
+				out.close();
+			} catch (IOException e) {
+				System.err.println(e);
+			}
+		}
 	}
 }
