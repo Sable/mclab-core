@@ -129,10 +129,8 @@
       <fileset dir="${basedir}/resources" />  
       <fileset dir="${basedir}/${bin.dir}" includes="**/*.class" excludes="@{excludes}" />
     </jar>
-    <echo file="@{basename}.sh">
-      ${entrypoint.script.header}
-      java -jar "${basedir}/@{basename}.jar" $$*
-    </echo>
+    <echo file="@{basename}.sh">${entrypoint.script.header}
+java -jar "${basedir}/@{basename}.jar" "$$@"</echo>
     <chmod file="@{basename}.sh" perm="755" />  
   </sequential>
   </macrodef>
