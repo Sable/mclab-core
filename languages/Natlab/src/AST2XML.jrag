@@ -8,7 +8,7 @@ Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill Universit
 
       http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
+  Unless rpublic voiduired by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -16,1067 +16,401 @@ Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill Universit
 
 */
 
-import java.io.*;
+import java.io.StringWriter;
+import java.util.Arrays;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import natlab.toolkits.analysis.varorfun.*;
+import com.google.common.collect.Iterables;
+
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.utils.NodeFinder;
 
 aspect ASTtoXML {
-    
-	private long ASTNode.uID = -1;
-	public void ASTNode.setuID(long id) {
-            uID = id;
-	}
-        /*
-	public long ASTNode.getuID() {
-		return uID;
-        }
-        */
-        inh long ASTNode.makeUId();
+  protected static boolean ASTNode.include_kinds_in_xml = true;
+  protected static VFFlowInsensitiveAnalysis ASTNode.kind_analysis_insensitive = null;
+  protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
+  protected static VFPreorderAnalysis ASTNode.kind_analysis_preorder = null;
+  protected static ASTNode ASTNode.parentProgram = null;
 
-        eq ASTNode.getChild(int i).makeUId(){
-            long m = getuID();
-            
-            if( i > 0 ){
-                long uid = getChild( i-1 ).getuID();
-                m = uid > m ? uid : m;
-            }
-            uID = m+1;
-            return m+1;
-        }
-
-        syn lazy long ASTNode.getuID();
-        eq ASTNode.getuID() = makeUId();
-        syn long CompilationUnits.makeUId() = 0;
-        protected static boolean ASTNode.include_kinds_in_xml = true;
-        protected static VFFlowInsensitiveAnalysis ASTNode.kind_analysis_insensitive = null;
-        protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
-        protected static VFPreorderAnalysis ASTNode.kind_analysis_preorder = null;
-        protected static ASTNode ASTNode.parentProgram = null;
-    
 	public long CompilationUnits.nodeCounter = 0;
 
 	public long ASTNode.nodeCounter() {
-	    long counter = 0;
-	    ASTNode node = this;
-		while(node != null && !(node instanceof CompilationUnits))
-	    		node = node.getParent();
-	  
-	    if( node instanceof CompilationUnits ){
-			counter =  ((CompilationUnits)node).nodeCounter++;
-	    }
-	    return counter;
-        }
+    if (this instanceof CompilationUnits) return ((CompilationUnits) this).nodeCounter++;
+    CompilationUnits parent = NodeFinder.findParent(CompilationUnits.class, this);
+    return parent == null ? 0 : parent.nodeCounter++;
+  }
 
-        //syn long ASTNode.nodeCounter() = getuID();
-
-    public Document CompilationUnits.ASTtoXML(boolean includeKinds) {
-        boolean oldIncludeKinds = include_kinds_in_xml;
-        include_kinds_in_xml = includeKinds;
-        Document result = ASTtoXML();
-        include_kinds_in_xml = oldIncludeKinds;
-        return result;
+  protected Element ASTNode.createXmlElement(Document doc, Element parent, Iterable<? extends ASTNode> children, String... attributes) {
+    Element e = doc.createElement(getClass().getSimpleName());
+    e.setAttribute("id", "" + nodeCounter());
+    e.setAttribute("line", "" + getStartLine());
+    for (int i = 0; i < attributes.length; i += 2) {
+      e.setAttribute(attributes[i], attributes[i + 1]);
     }
+    addChildrenXml(doc, e, children);
+    parent.appendChild(e);
+    return e;
+  }
 
-	public Document CompilationUnits.ASTtoXML() {
-		try{
-	        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-	        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-	        Document doc = docBuilder.newDocument();
+  protected Element ASTNode.createXmlElement(Document doc, Element parent, String... attributes) {
+    return createXmlElement(doc, parent, Collections.<ASTNode>emptyList(), attributes);
+  }
 
-            if (include_kinds_in_xml) {
-                kind_analysis_sensitive=new VFFlowSensitiveAnalysis(this);
-                kind_analysis_sensitive.analyze();
-
-                kind_analysis_insensitive=new VFFlowInsensitiveAnalysis(this);
-                kind_analysis_insensitive.analyze();
-
-                kind_analysis_preorder=new VFPreorderAnalysis(this);
-                kind_analysis_preorder.analyze();
-            }
-
-            parentProgram=null;
-	        long id = nodeCounter();
-			setuID(id);
-			
-			Element e = doc.createElement("CompilationUnits");
-			e.setAttribute("id", Long.toString(id));
-			e.setAttribute("name", "name"); 
-			for(Program p : getPrograms()){
-		    	p.getXML(doc, e);
-			}
-		    doc.appendChild(e);
-		
-            parentProgram=null;
-            kind_analysis_sensitive=null;
-            kind_analysis_insensitive=null;
-            kind_analysis_preorder=null;
-            	
-	        return doc;
-	        }catch (Exception e){
-	           throw new RuntimeException(e);
-	        }
-	}
-    
-    public String CompilationUnits.XMLtoString(Document doc) {
-    	try {
-	    	TransformerFactory transfac = TransformerFactory.newInstance();
-	    	transfac.setAttribute("indent-number", new Integer(4));
-	        Transformer trans = transfac.newTransformer();
-	        trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-	        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-			//trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			
-	        StringWriter sw = new StringWriter();
-	        StreamResult result = new StreamResult(sw);
-	        DOMSource source = new DOMSource(doc);
-	        trans.transform(source, result);
-	        
-	        return sw.toString();
-	        
-            }catch (Exception e){
-               throw new RuntimeException(e);
-            }
-        
+  protected void ASTNode.addChildrenXml(Document doc, Element e, Iterable<? extends ASTNode> children) {
+    for (ASTNode child : children) {
+      child.getXML(doc, e);
     }
-    
-    
-    syn boolean ASTNode.getXML(Document doc, Element parent) { throw new UnsupportedOperationException(getClass().getName() + ".getXML()"); }
-    
-    //program
-    eq EmptyProgram.getXML(Document doc, Element parent) {
-        return true;
+  }
+
+  protected void ASTNode.addChildrenXml(Document doc, Element e, String name, Iterable<? extends ASTNode> children) {
+    Element c = doc.createElement(name);
+    addChildrenXml(doc, c, children);
+    e.appendChild(c);
+  }
+
+  public Document CompilationUnits.ASTtoXML(boolean includeKinds) {
+    boolean oldIncludeKinds = include_kinds_in_xml;
+    include_kinds_in_xml = includeKinds;
+    Document result = ASTtoXML();
+    include_kinds_in_xml = oldIncludeKinds;
+    return result;
+  }
+
+  public Document CompilationUnits.ASTtoXML() {
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      if (include_kinds_in_xml) {
+        kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this);
+        kind_analysis_sensitive.analyze();
+        kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this);
+        kind_analysis_insensitive.analyze();
+        kind_analysis_preorder = new VFPreorderAnalysis(this);
+        kind_analysis_preorder.analyze();
+      }
+      parentProgram = null;
+      Element e = doc.createElement("CompilationUnits");
+      e.setAttribute("id", "" + nodeCounter());
+      addChildrenXml(doc, e, getPrograms());
+      doc.appendChild(e);
+      parentProgram = null;
+      kind_analysis_sensitive = null;
+      kind_analysis_insensitive = null;
+      kind_analysis_preorder = null;
+      return doc;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-	
-    eq Script.getXML(Document doc, Element parent) {
-        parentProgram=this;
-        long id = nodeCounter();
-        setuID(id);
+  }
 
-        Element e = doc.createElement("Script");
-        e.setAttribute("id", Long.toString(id));
-                       
-        for(HelpComment comment : getHelpComments()) {
-            comment.getXML(doc, e);
-        }
-        
+  public String CompilationUnits.XMLtoString(Document doc) {
+    try {
+      TransformerFactory factory = TransformerFactory.newInstance();
+      factory.setAttribute("indent-number", 4);
+      Transformer transformer = factory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-        e.setAttribute("fullpath", getFile().getPath());
-        e.setAttribute("name", getFile().getNameWithoutExtension());
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        parentProgram=null;
-        return true;
+      StringWriter sw = new StringWriter();
+      transformer.transform(new DOMSource(doc), new StreamResult(sw));
+      return sw.toString();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    
-    eq FunctionList.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
+  }
 
-		Element e = doc.createElement("FunctionList");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("fullpath", getFile().getPath());
-       
-        for(Function func : getFunctions()) {
-            func.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
+  public void ASTNode.getXML(Document doc, Element parent) { 
+    throw new UnsupportedOperationException(getClass().getName() + ".getXML()");
+  }
+
+  public void EmptyProgram.getXML(Document doc, Element parent) {}
+
+  public void Script.getXML(Document doc, Element parent) {
+    parentProgram=this;
+
+    Element e = createXmlElement(doc, parent, getHelpComments(),
+        "fullpath", getFile().getPath(), "name", getFile().getNameWithoutExtension());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+    parentProgram=null;
+  }
+
+  public void FunctionList.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getFunctions(), "fullpath", getFile().getPath());
+  }
+
+  public void Function.getXML(Document doc, Element parent) {
+    ASTNode previous = parentProgram;
+    parentProgram = this;
+    Element e = createXmlElement(doc, parent, "name", getName());
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+    addChildrenXml(doc, e, getHelpComments());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+    addChildrenXml(doc, e, getNestedFunctions());
+	  parentProgram = previous;
+  }
+
+  public void ClassDef.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getAttributes(), getSuperClasss(), getHelpComments(),
+        getPropertys(), getMethods(), getClassEvents()));
+  }
+
+  public void Properties.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(getAttributes(), getPropertys()));
+  }
+
+  public void Methods.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getAttributes(), getSignatures(), getPropAccs(), getFunctions()));
+  }
+
+  public void Signature.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, "name", getName());
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+  }
+
+  public void PropertyAccess.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, "name", getName(), "access", getAccess());
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+    addChildrenXml(doc, e, getHelpComments());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+    addChildrenXml(doc, e, getNestedFunctions());
+  }
+
+  public void ClassEvents.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(getAttributes(), getEvents()));
+  }
+
+  public void Attribute.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()), "name", getKey());
+  }
+
+  public void SuperClass.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "name", getName());
+  }
+
+  public void Property.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()), "name", getName());
+  }
+
+  public void Event.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "name", getName());
+  }
+
+  public void SuperClassMethodExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getFuncName(), getClassName()));
+  }
+
+  public void HelpComment.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "text", getText());
+  }
+
+  public void EmptyStmt.getXML(Document doc, Element parent) {}
+
+  public void ExprStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void AssignStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getLHS(), getRHS()),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void GlobalStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getNames(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void PersistentStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getNames(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ShellCommandStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "command", getCommand(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void BreakStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ContinueStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ReturnStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ForStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getAssignStmt()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void WhileStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getExpr()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void IfStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, getIfBlocks());
+    if (hasElseBlock()) {
+      getElseBlock().getXML(doc, e);
     }
-    
-    eq Function.getXML(Document doc, Element parent) {
-        ASTNode previous = parentProgram;
-        parentProgram=this;   
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("Function");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
+  }
 
-		Element e1 = doc.createElement("InputParamList");
-        	for(Name param : getInputParams()) {
-            	param.getXML(doc, e1);
-        	}
-		e.appendChild(e1);
+  public void IfBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getCondition()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
 
-		Element e2 = doc.createElement("OutputParamList");
-        	for(Name param : getOutputParams()) {
-            	param.getXML(doc, e2);
-        	}
-		e.appendChild(e2);
-        
-        for(HelpComment comment : getHelpComments()) {
-            comment.getXML(doc, e);
-        }
-        
-        Element e3 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e3);
-        }
-        e.appendChild(e3);
-        
-        for(Function func : getNestedFunctions()) {
-            func.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-	    parent.appendChild(e);      
-	    parentProgram=previous;
-        return true;
+  public void ElseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void SwitchStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getExpr()), getSwitchCaseBlocks()));
+    if (hasDefaultCaseBlock()) {
+      getDefaultCaseBlock().getXML(doc, e);
     }
-    
-    eq ClassDef.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
+  }
 
-        Element e = doc.createElement("ClassDef");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
+  public void SwitchCaseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getExpr()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
 
-        
-        for(Attribute attr : getAttributes()) {
-            attr.getXML(doc, e);
-        }        		
-		
-        for(SuperClass sup : getSuperClasss()) {
-            sup.getXML(doc, e);
-        }
-        
-        for(HelpComment comment : getHelpComments()) {
-            comment.getXML(doc, e);
-        }
-        for(Properties prop : getPropertys()) {
-            prop.getXML(doc, e);
-        }
-        for(Methods methods : getMethods()) {
-            methods.getXML(doc, e);
-        }
-        for(ClassEvents events : getClassEvents()) {
-            events.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
+  public void DefaultCaseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void TryStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getTryStmts());
+    if (getCatchStmts().getNumChild() > 0) {
+      addChildrenXml(doc, e, "StmtList", getCatchStmts());
     }
-    
-    eq Properties.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
+  }
 
-        Element e = doc.createElement("Properties");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Attribute attr : getAttributes()) {
-            attr.getXML(doc, e);
-        }
-        for(Property prop : getPropertys()) {
-            prop.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    } 
-    
-    eq Methods.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("Methods");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Attribute attr : getAttributes()) {
-            attr.getXML(doc, e);
-        }
-        for(Signature sign : getSignatures()) {
-            sign.getXML(doc, e);
-        }
-        for(PropertyAccess prop : getPropAccs()) {
-            prop.getXML(doc, e);
-        }
-        for(Function func : getFunctions()) {
-            func.getXML(doc, e);
-        }
-       e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
+  public void RangeExpr.getXML(Document doc, Element parent) {
+    if (hasIncr()) {
+      createXmlElement(doc, parent, Arrays.asList(getLower(), getIncr(), getUpper()));
+    } else {
+      createXmlElement(doc, parent, Arrays.asList(getLower(), getUpper()));
     }
-    
-    eq Signature.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
+  }
 
-       	Element e = doc.createElement("Signature");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
+  public void ColonExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent);
+  }
 
-		Element e1 = doc.createElement("InputParamList");
-        	for(Name param : getInputParams()) {
-            	param.getXML(doc, e1);
-        	}
-		e.appendChild(e1);
+  public void EndExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent);
+  }
 
-		Element e2 = doc.createElement("OutputParamList");
-        	for(Name param : getOutputParams()) {
-            	param.getXML(doc, e2);
-        	}
-		e.appendChild(e2);
+  public void Name.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "nameId", getID());
+  }
 
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
+  public void NameExpr.annotateXMLWithKind(Element e, String name, VFFlowset f, String n){
+    VFDatum d = null;
+    if (f != null) {
+      d = f.contains(n);
     }
-    
-    eq PropertyAccess.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-               
-		Element e = doc.createElement("PropertyAccess");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
-		e.setAttribute("access", getAccess());
-				
-		Element e1 = doc.createElement("InputParamList");
-        	for(Name param : getInputParams()) {
-            	param.getXML(doc, e1);
-        	}
-		e.appendChild(e1);
-
-		Element e2 = doc.createElement("OutputParamList");
-        	for(Name param : getOutputParams()) {
-            	param.getXML(doc, e2);
-        	}
-		e.appendChild(e2);
-
-        for(HelpComment comment : getHelpComments()) {
-            comment.getXML(doc, e);
-        }
-        
-        Element e3 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e3);
-        }
-        e.appendChild(e3);
-        
-        for(Function func : getNestedFunctions()) {
-            func.getXML(doc, e);
-        }
-           
-		e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);   
-        return true;
+    String kind="null";
+    if (d != null) {
+      kind = d.toString();
     }
-    
-    eq ClassEvents.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
+    e.setAttribute(name, kind);
+  }
 
-		Element e = doc.createElement("ClassEvents");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Attribute attr : getAttributes()) {
-            attr.getXML(doc, e);
-        }
-
-        for(Event eve : getEvents()) {
-            eve.getXML(doc, e);
-        }
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
+  public void NameExpr.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
+    if (include_kinds_in_xml) {
+      VFFlowset out_sensitive = kind_analysis_sensitive.getOutFlowSets()
+          .get(parentProgram != null ? parentProgram : getName());
+      VFFlowset out_insensitive = kind_analysis_insensitive.getFlowSets()
+          .get(parentProgram != null ? parentProgram : getName());
+      VFFlowset out_preorder = kind_analysis_preorder.getFlowSets().get(getName());
+      annotateXMLWithKind(e, "kind", out_preorder, getName().getID());
+      annotateXMLWithKind(e, "kind_insensitive", out_insensitive, getName().getID());
+      annotateXMLWithKind(e, "kind_sensitive", out_sensitive, getName().getID());
     }
-     
-    eq Attribute.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-        
-        	Element e = doc.createElement("Attribute");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getKey());
-		
-        getExpr().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq SuperClass.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("SuperClass");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq Property.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);	
-
-        Element e = doc.createElement("Property");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
-		
-        getExpr().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq Event.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-	      Element e = doc.createElement("Event");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("name", getName());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq SuperClassMethodExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("SuperClassMethodExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        getFuncName().getXML(doc, e);
-        getClassName().getXML(doc, e);
-
-            e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-		return true;
-    }
-    
-    eq HelpComment.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-    	String name = getClass().getName();
-				
-		Element e = doc.createElement(name.substring(name.lastIndexOf('.')+1));
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("text", getText());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq EmptyStmt.getXML(Document doc, Element parent) {
-		return true;
-    }
-    
-    eq ExprStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-        Element e = doc.createElement("ExprStmt");
-        e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        getExpr().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq AssignStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-        	Element e = doc.createElement("AssignStmt");
-		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", "" + getStartLine());
-        getLHS().getXML(doc, e);
-        getRHS().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-     
-    eq GlobalStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("GlobalStmt");
-		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
-        for(Name name : getNames()) {
-            name.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq PersistentStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-        Element e = doc.createElement("PersistentStmt");
-        e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
-        for(Name name : getNames()) {
-            name.getXML(doc, e);
-        }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq ShellCommandStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-        
-        Element e = doc.createElement("ShellCommandStmt");
-        e.setAttribute("id", Long.toString(id));
-        e.setAttribute("command", getCommand());
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq BreakStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("BreakStmt");
-		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq ContinueStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("ContinueStmt");
-		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq ReturnStmt.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("ReturnStmt");
-		e.setAttribute("id", Long.toString(id));
-        e.setAttribute("line", "" + getStartLine());
-        e.setAttribute("outputSuppressed", Boolean.toString(isOutputSuppressed()));
-
-        parent.appendChild(e);
-        return true;
-    }
-
-    eq ForStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("ForStmt");
-		e.setAttribute("id", Long.toString(id));
-
-        getAssignStmt().getXML(doc, e);
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-
-    eq WhileStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("WhileStmt");
-		e.setAttribute("id", Long.toString(id));
-
-        getExpr().getXML(doc, e);
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-
-    eq IfStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("IfStmt");
-		e.setAttribute("id", Long.toString(id));
-
-        for(IfBlock block : getIfBlocks()) {
-            block.getXML(doc, e);
-        }
-        if(hasElseBlock()) {
-            getElseBlock().getXML(doc, e);
-        } 
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-
-    eq IfBlock.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("IfBlock");
-		e.setAttribute("id", Long.toString(id));
-
-        getCondition().getXML(doc, e);
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq ElseBlock.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("ElseBlock");
-		e.setAttribute("id", Long.toString(id));
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-       	
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e); 
-        return true;
-    }
-
-    eq SwitchStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-        Element e = doc.createElement("SwitchStmt");
-		e.setAttribute("id", Long.toString(id));
-
-        getExpr().getXML(doc, e);
-
-        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
-            scase.getXML(doc, e);
-        }
-        if(hasDefaultCaseBlock()) {
-            getDefaultCaseBlock().getXML(doc, e);
-        } 
-    
-		e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq SwitchCaseBlock.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-        	Element e = doc.createElement("SwitchCaseBlock");
-		e.setAttribute("id", Long.toString(id));
-
-        getExpr().getXML(doc, e);
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq DefaultCaseBlock.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-	      Element e = doc.createElement("DefaultCaseBlock");
-		e.setAttribute("id", Long.toString(id));	
-
-        Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1); 
-     
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq TryStmt.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("TryStmt");
-		e.setAttribute("id", Long.toString(id));	
-
-		Element e1 = doc.createElement("StmtList");
-        for(Stmt stmt : getTryStmts()) {
-            stmt.getXML(doc, e1);
-        }
-        e.appendChild(e1);
-       
-        List<Stmt> catchList = getCatchStmts();
-        if (catchList.getNumChild()>0) {      
-	        Element e2 = doc.createElement("StmtList");
-	        for(Stmt stmt : catchList) {
-	            stmt.getXML(doc, e2);
-	        }
-	        e.appendChild(e2);
-	    }
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq RangeExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("RangeExpr");
-		e.setAttribute("id", Long.toString(id));	
-        getLower().getXML(doc, e);
-
-        if(hasIncr()) {
-            getIncr().getXML(doc, e);
-        }
-        
-       getUpper().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq ColonExpr.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("ColonExpr");
-		e.setAttribute("id", Long.toString(id));
-	
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq EndExpr.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("EndExpr");
-		e.setAttribute("id", Long.toString(id));	
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq Name.getXML(Document doc, Element parent) {
-    	long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("Name");
-		e.setAttribute("id", Long.toString(id));	
-		e.setAttribute("nameId", getID());	
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    syn boolean NameExpr.annotateXMLWithKind(Element e, String name, VFFlowset f, String n){
-        VFDatum d = null;
-        if ( f!=null )
-            d = f.contains(n);
-
-
-        String kind="null";
-        if (d!=null){
-            kind=d.toString();        
-        }        
-        e.setAttribute(name, kind);
-        return true;
-    }
-
-    eq NameExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		Name t = getName();
-		String nameid = getName().getID();
-		Element e = doc.createElement("NameExpr");
-		e.setAttribute("id", Long.toString(id));
-        getName().getXML(doc, e);
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        if (include_kinds_in_xml) {
-            VFFlowset out_sensitive=null;
-            if (parentProgram!=null)
-                out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( parentProgram );
-            else
-                out_sensitive = kind_analysis_sensitive.getOutFlowSets().get( t );
-
-
-            VFFlowset out_insensitive=null;
-            if (parentProgram!=null)
-                out_insensitive = kind_analysis_insensitive.getFlowSets().get( parentProgram );
-            else
-                out_insensitive = kind_analysis_insensitive.getFlowSets().get( t );
-
-            VFFlowset out_preorder = kind_analysis_preorder.getFlowSets().get(t );  
-            annotateXMLWithKind(e, "kind", out_preorder, nameid);
-            annotateXMLWithKind(e, "kind_insensitive", out_insensitive, nameid);
-            annotateXMLWithKind(e, "kind_sensitive", out_sensitive, nameid);
-        }
-        return true;
-    }
-    
-    eq DotExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("DotExpr");
-		e.setAttribute("id", Long.toString(id));
-
-      getTarget().getXML(doc, e);
-	getField().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq ParameterizedExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("ParameterizedExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        getTarget().getXML(doc, e);
-
-        for(Expr arg : getArgs()) {
-            arg.getXML(doc, e);
-        }    
-
-		e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq CellIndexExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("CellIndexExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        getTarget().getXML(doc, e);
-
-        for(Expr arg : getArgs()) {
-            arg.getXML(doc, e);
-        }
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq MatrixExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("MatrixExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Row row : getRows()) {
-            row.getXML(doc, e);
-        }
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq CellArrayExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("CellArrayExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Row row : getRows()) {
-            row.getXML(doc, e);
-        }
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq Row.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("Row");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Expr element : getElements()) {
-            element.getXML(doc, e);
-        }
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq FunctionHandleExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("FunctionHandleExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        getName().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq LambdaExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-		
-		Element e = doc.createElement("LambdaExpr");
-		e.setAttribute("id", Long.toString(id));
-
-        for(Name param : getInputParams()) {
-            param.getXML(doc, e);
-        }
-
-        getBody().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-        parent.appendChild(e);
-        return true;
-    }
-    
-    eq IntLiteralExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("IntLiteralExpr");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("value", getValue().getText());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-
-    eq FPLiteralExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("FPLiteralExpr");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("value", getValue().getText());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq StringLiteralExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-		Element e = doc.createElement("StringLiteralExpr");
-		e.setAttribute("id", Long.toString(id));
-		e.setAttribute("value", getValue());
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq UnaryExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-
-    		String name = getClass().getName();
-
-		Element e = doc.createElement(name.substring(name.lastIndexOf('.')+1));
-		e.setAttribute("id", Long.toString(id));
-
-        getOperand().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
-    
-    eq BinaryExpr.getXML(Document doc, Element parent) {
-        long id = nodeCounter();
-        setuID(id);
-    		String name = getClass().getName(); 
-
-		Element e = doc.createElement(name.substring(name.lastIndexOf('.')+1));
-		e.setAttribute("id", Long.toString(id));
-
-        getLHS().getXML(doc, e);
-        getRHS().getXML(doc, e);
-
-        e.setAttribute("line", "" + getStartLine());
-parent.appendChild(e);
-        return true;
-    }
+  }
+
+  public void DotExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getTarget(), getField()));
+  }
+
+  public void ParameterizedExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getTarget()), getArgs()));
+  }
+
+  public void CellIndexExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getTarget()), getArgs()));
+  }
+
+  public void MatrixExpr.getXML(Document doc, Element parent) {
+     createXmlElement(doc, parent, getRows());
+  }
+
+  public void CellArrayExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getRows());
+  }
+
+  public void Row.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getElements());
+  }
+
+  public void FunctionHandleExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getName()));
+  }
+
+  public void LambdaExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getInputParams(), Arrays.asList(getBody())));
+  }
+
+  public void IntLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue().getText());
+  }
+
+  public void FPLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue().getText());
+  }
+
+  public void StringLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue());
+  }
+
+  public void UnaryExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getOperand()));
+  }
+
+  public void BinaryExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getLHS(), getRHS()));
+  }
 }
