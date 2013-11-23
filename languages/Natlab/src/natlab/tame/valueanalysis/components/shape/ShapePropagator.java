@@ -352,8 +352,16 @@ public class ShapePropagator<V extends Value<V>>
     				/*
     				 * out-of-bound index with a scalar, matrix can be grew.
     				 * TODO using range value analysis result to improve accuracy.
+    				 * 
+    				 * quick fix, grow array with upper bound of index.
     				 */
-    				newDimensions.add(new DimValue());
+    				if (((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
+    						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue().hasUpperBound()) {
+    					newDimensions.add(new DimValue(
+    							((HasRangeValue<V>)indices.get(i)).getRangeValue().getUpperBound().getIntValue()
+    							, null));
+    				}
+    				else newDimensions.add(new DimValue());
     			}
     			else if (POS == indices.size() && POS < lhsArrayDimensions.size()) {
     				/*
@@ -377,6 +385,7 @@ public class ShapePropagator<V extends Value<V>>
     							newDimensions.remove(0);
     							newDimensions.add(0, new DimValue(1, null));
     							newDimensions.remove(1);
+    							// grow array with upper bound of index.
     							newDimensions.add(1, new DimValue(
     									((HasRangeValue<V>)indices.get(i)).getRangeValue()
     									.getUpperBound().getIntValue(), null));
@@ -430,9 +439,12 @@ public class ShapePropagator<V extends Value<V>>
     						/*
     						 * grow the original array.
     						 * TODO using range value analysis result to improve accuracy.
+    						 * 
+    						 * quick fix, grow array with upper bound of index.
     						 */
     						newDimensions.remove(i);
-    						newDimensions.add(i, new DimValue());
+    						newDimensions.add(i, new DimValue(((HasRangeValue<V>)indices.get(i))
+    								.getRangeValue().getUpperBound().getIntValue(), null));
     					}
     					else {
     						// in-bound array indexing, do nothing.

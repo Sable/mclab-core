@@ -37,7 +37,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/babai_8_kinds/nocheck/known_10_10000/drv_babai.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/for_test/fortran/vector/testMultiArray.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph

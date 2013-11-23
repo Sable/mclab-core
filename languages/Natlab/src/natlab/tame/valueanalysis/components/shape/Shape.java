@@ -106,6 +106,28 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     /**
+     * returns treu if this shape is row vector.
+     */
+    public boolean isRowVectro() {
+    	if (dimensions.size() != 2) return false;
+    	else if (dimensions.get(0).equalsOne() && !dimensions.get(1).equalsOne()) {
+    		return true;
+    	}
+    	else return false;
+    }
+    
+    /**
+     * returns true if this shape is column vector.
+     */
+    public boolean isColVector() {
+    	if (dimensions.size() != 2) return false;
+    	else if (!dimensions.get(0).equalsOne() && dimensions.get(1).equalsOne()) {
+    		return true;
+    	}
+    	else return false;
+    }
+    
+    /**
      * returns true if this shape may be vector.
      */
     public boolean maybeVector() {
