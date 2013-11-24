@@ -21,6 +21,7 @@ package natlab.tame.interproceduralAnalysis;
 import java.util.*;
 
 import natlab.tame.callgraph.FunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
 import natlab.toolkits.path.FunctionReference;
 
 /**
@@ -55,6 +56,7 @@ public class InterproceduralAnalysis<F extends FunctionAnalysis<A,R>,A,R> {
         this.factory = factory;
         this.mainArgs = mainArgs;
         analyze();
+        
     }
     
     
