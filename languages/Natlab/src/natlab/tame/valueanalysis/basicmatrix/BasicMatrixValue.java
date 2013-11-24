@@ -162,8 +162,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		if (this.hasShape()) {
 			if (this.hasRangeValue()) 
 				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						this.shape.merge(((BasicMatrixValue)other).getShape()), null);
-						//this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
+						this.shape.merge(((BasicMatrixValue)other).getShape()), 
+						this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
 			else 
 				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
 						this.shape.merge(((BasicMatrixValue)other).getShape()), null);
