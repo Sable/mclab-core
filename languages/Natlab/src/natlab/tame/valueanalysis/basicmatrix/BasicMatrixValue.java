@@ -21,7 +21,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	protected Constant constant;
 	protected Shape<AggrValue<BasicMatrixValue>> shape;
 	// with the reference to this range value, we can assign new range value to this basic matrix value.
-	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue = new RangeValue<AggrValue<BasicMatrixValue>>();
+	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator
@@ -60,7 +60,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			Shape<AggrValue<BasicMatrixValue>> shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
 		super(name, aClass);
-		this.constant = null;
 		this.shape = shape;
 		this.rangeValue = rangeValue;
 	}
@@ -73,7 +72,6 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 */
 	public BasicMatrixValue(String name, PrimitiveClassReference aClass, String shapeInfo) {
 		super(name, aClass);
-		this.constant = null;
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
 				.newShapeFromInputString(shapeInfo));
 	}
