@@ -149,10 +149,30 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				 * add symbolic expression here.
 				 */
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-				if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic() 
+				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
 						&& previousMatchResult.getValueOfVariable(arg[1]).hasSymbolic()) {
-					String symbolicExp = previousMatchResult.getValueOfVariable(arg[0])
-							+"-"+previousMatchResult.getValueOfVariable(arg[1])+"+1";
+					int temp = previousMatchResult.getValueOfVariable(arg[0]).getIntValue() + 1;
+					String symbolicExp = temp + "-" + previousMatchResult.getValueOfVariable(arg[1]);
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, symbolicExp));
+				}
+				else if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
+					int temp = previousMatchResult.getValueOfVariable(arg[1]).getIntValue() - 1;
+					String symbolicExp;
+					if (temp == 0) {
+						symbolicExp = previousMatchResult.getValueOfVariable(arg[0]).toString();
+					}
+					else {
+						symbolicExp = previousMatchResult.getValueOfVariable(arg[0]) + "-" + temp;
+					}
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
+							new DimValue(null, symbolicExp));
+				}
+				else if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic() 
+						&& previousMatchResult.getValueOfVariable(arg[1]).hasSymbolic()) {
+					String symbolicExp = previousMatchResult.getValueOfVariable(arg[0]) 
+							+ "-" + previousMatchResult.getValueOfVariable(arg[1]) + "+1";
 					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), 
 							new DimValue(null, symbolicExp));
 				}
