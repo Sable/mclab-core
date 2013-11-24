@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import natlab.tame.callgraph.SimpleFunctionCollection;
+import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
@@ -20,9 +21,10 @@ import natlab.toolkits.path.FileEnvironment;
 public class AdvancedTamerTool {
 
 	public static void main(String[] args) {
-		String file = "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
+		// String file =
+		// "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
 		// String file = "/home/2011/vkumar5/for_test";
-
+		String file = "/home/sameer/mclab/mbrt/drv_mbrt";
 		String fileIn = file + ".m";
 
 		GenericFile gFile = GenericFile.create(fileIn);
@@ -42,7 +44,11 @@ public class AdvancedTamerTool {
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
 																				// simple
 																				// callgraph
-		callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(callgraph, inputValues);
+
+		callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+				callgraph, inputValues);
+		
+	
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 		Args<AggrValue<AdvancedMatrixValue>> someargs = Args
 				.<AggrValue<AdvancedMatrixValue>> newInstance(Collections.EMPTY_LIST);
@@ -54,8 +60,9 @@ public class AdvancedTamerTool {
 				 * ("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))
 				 */
 				Args.newInstance(inputValues), factory);
-		System.out.println(analysis.toString());
 
+		// System.out.println(analysis.toString());
+		
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
 					.getNodeList().get(i).getAnalysis()));
