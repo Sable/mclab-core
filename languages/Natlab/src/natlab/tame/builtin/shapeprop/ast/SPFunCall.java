@@ -40,7 +40,10 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			}
 			else{
 				if (Debug) System.err.println("cannot get the value of previous matched Scalar in shape equation.");
-	            return previousMatchResult;	
+				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+				lowercase.put(latestMatchedLowercase, null);
+				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+	            return matchResult;
 			}	
 		}
 		else if(funName.equals("previousShapeDim")) {

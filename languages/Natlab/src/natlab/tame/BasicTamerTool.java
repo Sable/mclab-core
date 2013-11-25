@@ -37,7 +37,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/for_test/fortran/vector/testMultiArray.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/bubble/drv_bubble.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -90,7 +90,7 @@ public class BasicTamerTool {
 			 * argument specs
 			 */
 			//System.out.println(specs[1]);
-			list.add(new BasicMatrixValue("n", PrimitiveClassReference.DOUBLE, specs[1]));
+			list.add(new BasicMatrixValue(null, PrimitiveClassReference.DOUBLE, specs[1]));
 		}
 		return list;
 	}
