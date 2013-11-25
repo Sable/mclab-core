@@ -47,4 +47,5 @@ public class Call<Arg> {
 		return functionRef.hashCode()
 				+ (argument == null ? 0 : argument.hashCode());
 	}
+	
 }
