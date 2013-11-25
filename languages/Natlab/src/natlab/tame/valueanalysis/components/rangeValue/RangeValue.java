@@ -172,6 +172,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	 */
 	public RangeValue<V> merge(RangeValue<V> other) {
 		if (Debug) System.out.println("inside range value merge!");
+		if (other == null) return null;
 		RangeValue<V> res = new RangeValue<V>();
 		// separately merge lower and upper bound.
 		if (lowerBound != null) {
@@ -188,10 +189,10 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		// separately merge lower and upper bound.
 		if (upperBound != null) {
 			if (upperBound.isGreaterThanEq(other.upperBound)) {
-				res.upperBound = upperBound;
+				res.upperBound = upperBound.cloneThisValue();
 			}
 			else {
-				res.upperBound = other.upperBound;
+				res.upperBound = other.upperBound.cloneThisValue();
 			}
 			if (!res.upperBound.equals(upperBound)) {
 				upperCounter++;

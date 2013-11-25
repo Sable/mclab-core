@@ -294,7 +294,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			return null;
 	}
 	
-	@Override
+	/*@Override
 	public RangeValue<V> caseLt(Builtin builtin, Args<V> arg) {
 		if (((HasConstant)arg.get(0)).getConstant() == null 
 				&& ((HasShape<V>)arg.get(0)).getShape().isScalar() 
@@ -480,7 +480,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 		}
 		else 
 			return null;		
-	}
+	}*/
 	
 	/**
 	 * for loop variable.

@@ -424,8 +424,11 @@ public class ShapePropagator<V extends Value<V>>
     				/*
     				 * the ordinary case, out-of-bound index may grow the matrix.
     				 * using range value analysis result to proceed static abc.
+    				 * 
+    				 * since this is ordinary case, we don't need to require the 
+    				 * whole shape is exactly known.
     				 */
-    				if (lhsArrayShape.isConstant() 
+    				if (lhsArrayDimensions.get(i).hasIntValue() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
     				{
@@ -508,8 +511,11 @@ public class ShapePropagator<V extends Value<V>>
     				/*
     				 * the ordinary case, out-of-bound index may grow the matrix.
     				 * using range value analysis result to proceed static abc.
+    				 * 
+    				 * since this is ordinary case, we don't need to require the 
+    				 * whole shape is exactly known.
     				 */
-    				if (lhsArrayShape.isConstant() 
+    				if (lhsArrayDimensions.get(i).hasIntValue() 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue() != null 
     						&& ((HasRangeValue<V>)indices.get(i)).getRangeValue().isBothBoundsKnown()) 
     				{
@@ -518,7 +524,7 @@ public class ShapePropagator<V extends Value<V>>
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     					else if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.isInBounds(0, lhsArrayShape.getDimensions().get(i).getIntValue())) {
+    							.isInBounds(0, lhsArrayDimensions.get(i).getIntValue())) {
     						/*
     						 * grow the original array.
     						 * TODO using range value analysis result to improve accuracy.
