@@ -271,7 +271,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	 * since if a shape has trailing 1s which can be eliminated, 
     	 * its isTop, mismatch and outOfBound must be false. 
     	 */
-    	if (dimensions.size()==0) return this;
+    	if (dimensions.size() == 0) return this;
     	List<DimValue> newDim = new ArrayList<DimValue>();
     	int pos = 0; 
     	/*
@@ -279,14 +279,15 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	 * and since every variable in MATLAB is at least 2 dimensions. 
     	 * So pos is at least 2.
     	 */
-    	for (int i=dimensions.size()-1; i>=0; i--) {
-    		if (dimensions.get(i).getIntValue()!=1) {
-    			pos = i+1;
+    	for (int i = dimensions.size() - 1; i >= 0; i--) {
+    		if (dimensions.get(i).hasIntValue() 
+    				&& dimensions.get(i).getIntValue() != 1) {
+    			pos = i + 1;
     			break;
     		}
     	}
-    	if (pos<2) pos = 2;
-    	for (int i=0; i<pos; i++) {
+    	if (pos < 2) pos = 2;
+    	for (int i = 0; i < pos; i++) {
     		newDim.add(dimensions.get(i));
     	}
     	Shape<V> newShape = new Shape<V>(newDim);
@@ -294,7 +295,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     public Shape<V> eliminateLeadingOnes() {
-    	if (dimensions.size()==0) return this;
+    	if (dimensions.size() == 0) return this;
     	List<DimValue> newDim = new ArrayList<DimValue>();
     	int pos = 0; 
     	/*
@@ -302,14 +303,16 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	 * leading 1s, and since every variable in MATLAB is at least 2 
     	 * dimensions. So pos is at least oldDim.size()-2.
     	 */
-    	for (int i=0; i<dimensions.size(); i++) {
-    		if (dimensions.get(i).getIntValue()!=1) {
-    			pos = i+1;
+    	for (int i = 0; i < dimensions.size(); i++) {
+    		if (dimensions.get(i).hasIntValue() 
+    				&& dimensions.get(i).getIntValue() != 1) {
+    			pos = i + 1;
     			break;
     		}
     	}
-    	if (dimensions.size()-pos < 2) pos = dimensions.size()-2;
-    	for (int i=pos; i<dimensions.size(); i++) {
+    	if (dimensions.size() - pos < 2) 
+    		pos = dimensions.size() - 2;
+    	for (int i = pos; i < dimensions.size(); i++) {
     		newDim.add(dimensions.get(i));
     	}
     	Shape<V> newShape = new Shape<V>(newDim);
