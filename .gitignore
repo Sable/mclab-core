@@ -3,3 +3,6 @@ bin
 bin-ant
 bin-eclipse
 gen
+*.m
+*.n
+*.f95
