@@ -108,7 +108,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     /**
      * returns treu if this shape is row vector.
      */
-    public boolean isRowVectro() {
+    public boolean isRowVector() {
     	if (dimensions.size() != 2) return false;
     	else if (dimensions.get(0).equalsOne() && !dimensions.get(1).equalsOne()) {
     		return true;

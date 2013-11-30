@@ -396,7 +396,7 @@ public class ShapePropagator<V extends Value<V>>
     									((HasRangeValue<V>)indices.get(i)).getRangeValue()
     									.getUpperBound().getIntValue(), null));
     						}
-    						else if (lhsArrayShape.isRowVectro()) {
+    						else if (lhsArrayShape.isRowVector()) {
     							newDimensions.remove(1);
     							newDimensions.add(1, new DimValue(
     									((HasRangeValue<V>)indices.get(i)).getRangeValue()
@@ -420,7 +420,7 @@ public class ShapePropagator<V extends Value<V>>
     						}
     					}
     				}
-    				else if (indices.size() == 1 && lhsArrayShape.isRowVectro()) {
+    				else if (indices.size() == 1 && lhsArrayShape.isRowVector()) {
     					// TODO linear indexing of row-vectors.
     					newDimensions.remove(1);
     					newDimensions.add(1, new DimValue());
