@@ -118,11 +118,27 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 					 * add symbolic expression here.
 					 */
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
-						String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
-								+"+"+previousMatchResult.getValueOfVariable(arg[0]);
-						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
-								new DimValue(null, symbolicExp));						
+					if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasIntValue()) {
+						if (previousMatchResult.getValueOfVariable(arg[0]).hasSymbolic()) {
+							String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
+									+ "+" +previousMatchResult.getValueOfVariable(arg[0]);
+							lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+									new DimValue(null, symbolicExp));
+						}
+						else {
+							lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
+						}
+					}
+					else if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
+						if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasSymbolic()) {
+							String symbolicExp = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase())
+									+ "+" +previousMatchResult.getValueOfVariable(arg[0]);
+							lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+									new DimValue(null, symbolicExp));
+						}
+						else {
+							lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
+						}
 					}
 					else {
 						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
@@ -139,6 +155,13 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			String[] arg = arglist.toString().split(",");
 			if(arg.length==2){
 				if (Debug) System.out.println("try to compute " + arg[0] + " - " + arg[1]);
+				if (previousMatchResult.getValueOfVariable(arg[0]) == null 
+						|| previousMatchResult.getValueOfVariable(arg[1]) == null) {
+					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+					lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue());
+					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+		            return matchResult;
+				}
 				if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue() 
 						&& previousMatchResult.getValueOfVariable(arg[1]).hasIntValue()) {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();

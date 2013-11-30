@@ -379,14 +379,32 @@ public class ShapePropagator<V extends Value<V>>
     				{
         				int howManyElementsRemain = lhsArrayShape.getHowManyElements(i);
     					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
-    							.isInBounds(0, howManyElementsRemain)) 
-    					{
+    							.isInBounds(0, howManyElementsRemain)) {
+    						/*
+    						 * grow the original indexed array.
+    						 */
     						if (lhsArrayShape.isScalar()) {
+    							/*
+    							 * for the case where there is no preallocation and 
+    							 * using array assignment as array construction. 
+    							 */
     							newDimensions.remove(0);
     							newDimensions.add(0, new DimValue(1, null));
     							newDimensions.remove(1);
     							// grow array with upper bound of index.
     							newDimensions.add(1, new DimValue(
+    									((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    									.getUpperBound().getIntValue(), null));
+    						}
+    						else if (lhsArrayShape.isRowVectro()) {
+    							newDimensions.remove(1);
+    							newDimensions.add(1, new DimValue(
+    									((HasRangeValue<V>)indices.get(i)).getRangeValue()
+    									.getUpperBound().getIntValue(), null));
+    						}
+    						else if (lhsArrayShape.isColVector()) {
+    							newDimensions.remove(0);
+    							newDimensions.add(0, new DimValue(
     									((HasRangeValue<V>)indices.get(i)).getRangeValue()
     									.getUpperBound().getIntValue(), null));
     						}
@@ -402,13 +420,15 @@ public class ShapePropagator<V extends Value<V>>
     						}
     					}
     				}
-    				else if (indices.size() == 1 && lhsArrayDimensions.get(0).hasIntValue() 
-    						&& lhsArrayDimensions.get(0).getIntValue() == 1) {
-    					// TODO do nothing!
+    				else if (indices.size() == 1 && lhsArrayShape.isRowVectro()) {
+    					// TODO linear indexing of row-vectors.
+    					newDimensions.remove(1);
+    					newDimensions.add(1, new DimValue());
     				}
-    				else if (indices.size() == 1 && lhsArrayDimensions.get(1).hasIntValue() 
-    						&& lhsArrayDimensions.get(1).getIntValue() == 1) {
-    					// TODO do nothing!
+    				else if (indices.size() == 1 && lhsArrayShape.isColVector()) {
+    					// TODO linear indexing of column-vectors.
+    					newDimensions.remove(0);
+    					newDimensions.add(0, new DimValue());
     				}
     				else {
     					/*

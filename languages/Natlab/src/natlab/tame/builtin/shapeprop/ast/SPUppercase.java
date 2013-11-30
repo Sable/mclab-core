@@ -56,10 +56,13 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					/*
 					 * check whether or not current uppercase already in the previousMatchResult, 
 					 * cases like (M,M->M), those M on the pattern matching side should be the same. if not, return error.
+					 * 
+					 * updated by Xu at 8:36pm Nov. 25th, actually, it's also okay if the shapes are same without trailing 1s.
 					 */
 					if (previousMatchResult.getAllUppercase().containsKey(s)) {
 						Shape<V> previousShape = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
-						if (!argumentShape.equals(previousShape)) {
+						if (!argumentShape.equals(previousShape) 
+								&& !argumentShape.eliminateTrailingOnes().equals(previousShape.eliminateLeadingOnes())) {
 							if (Debug) System.err.println("arguments don't have the same shape, go to next case.");
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;
