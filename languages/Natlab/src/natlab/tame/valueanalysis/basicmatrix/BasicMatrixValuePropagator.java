@@ -9,20 +9,25 @@ import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.rangeValue.*;
 import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.isComplex.*;
 import natlab.tame.valueanalysis.value.*;
 
 public class BasicMatrixValuePropagator extends
 		MatrixPropagator<BasicMatrixValue> {
 	
 	static boolean Debug = false;
-	static ConstantPropagator<AggrValue<BasicMatrixValue>> constantProp = ConstantPropagator
-			.getInstance();
-	static ClassPropagator<AggrValue<BasicMatrixValue>> classProp = ClassPropagator
-			.getInstance();
-	static ShapePropagator<AggrValue<BasicMatrixValue>> shapeProp = ShapePropagator
-			.getInstance();
-	static RangeValuePropagator<AggrValue<BasicMatrixValue>> rangeValueProp = RangeValuePropagator
-			.getInstance();
+	// component propagators
+	static ConstantPropagator<AggrValue<BasicMatrixValue>> constantProp =
+			ConstantPropagator.getInstance();
+	static ClassPropagator<AggrValue<BasicMatrixValue>> classProp = 
+			ClassPropagator.getInstance();
+	static ShapePropagator<AggrValue<BasicMatrixValue>> shapeProp = 
+			ShapePropagator.getInstance();
+	static RangeValuePropagator<AggrValue<BasicMatrixValue>> rangeValueProp = 
+			RangeValuePropagator.getInstance();
+	static isComplexInfoPropagator<AggrValue<BasicMatrixValue>> iscomplexProp = 
+			isComplexInfoPropagator.getInstance();
+	
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	
 	public BasicMatrixValuePropagator() {
@@ -53,20 +58,22 @@ public class BasicMatrixValuePropagator extends
 		// if mclass propagation success, do shape propagation.
 		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
 		if (Debug) System.out.println("shapeProp result: " + matchShapeResult);
-
-		// TODO deal with complex info propagation
-		// TODO deal with range value propagation
 		
+		// range value propagation
 		RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
 		
-		return matchResultToRes(matchClassResult, matchShapeResult, rangeValueResult);
+		// iscomplexInfo propagation
+		List<isComplexInfo<AggrValue<BasicMatrixValue>>> iscomplexResult = builtin.visit(iscomplexProp, arg);
+		
+		return matchResultToRes(matchClassResult, matchShapeResult, rangeValueResult, iscomplexResult);
 
 	}
 
 	private Res<AggrValue<BasicMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
 			List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult,
-			RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult) {
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult,
+			List<isComplexInfo<AggrValue<BasicMatrixValue>>> iscomplexResult) {
 		/**
 		 * currently, class propagation equation doesn't take the number of output arguments 
 		 * into consideration, i.e. for the built-in function size(), there can be one output 
@@ -90,7 +97,12 @@ public class BasicMatrixValuePropagator extends
 				Set<ClassReference> values = matchClassResult.get(counter);
 				for (ClassReference classRef : values) {
 					map.put(classRef, factory.newMatrixValueFromClassShapeRange(
-							null, (PrimitiveClassReference)classRef, matchShapeResult.get(counter), rangeValueResult));
+							null
+							, (PrimitiveClassReference)classRef
+							, matchShapeResult.get(counter)
+							, rangeValueResult
+							, iscomplexResult.get(0)
+							));
 				}
 				result.add(ValueSet.newInstance(map));
 			}
@@ -102,7 +114,12 @@ public class BasicMatrixValuePropagator extends
 						new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
 				for (ClassReference classRef : values) {
 					map.put(classRef, factory.newMatrixValueFromClassShapeRange(
-							null, (PrimitiveClassReference)classRef, null, rangeValueResult));
+							null
+							, (PrimitiveClassReference)classRef
+							, null
+							, rangeValueResult
+							, iscomplexResult.get(0)
+							));
 				}
 				result.add(ValueSet.newInstance(map));
 			}
@@ -116,16 +133,28 @@ public class BasicMatrixValuePropagator extends
     public Res<AggrValue<BasicMatrixValue>> caseAbstractConcatenation(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> arg) {
 		if (Debug) System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation.");
+		// shape propagation
 		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
-		if (matchShapeResult == null) System.err.println("somehow, shape results from caseAbstractConcatenation are null");
-		else if (Debug) System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
+		if (matchShapeResult == null) 
+			System.err.println("somehow, shape results from caseAbstractConcatenation are null");
+		else if (Debug) 
+			System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
+		// iscomplex propagation
+		List<isComplexInfo<AggrValue<BasicMatrixValue>>> iscomplexResult = builtin.visit(iscomplexProp, arg);
+		
 		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
-		if (matchShapeResult!=null) {
-			for (int counter=0; counter<matchShapeResult.size(); counter++) {
+		if (matchShapeResult != null) {
+			for (int counter = 0; counter < matchShapeResult.size(); counter++) {
 				HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
 						new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
-				map.put((PrimitiveClassReference)getDominantCatArgClass(arg), factory.newMatrixValueFromClassShapeRange(
-						null, (PrimitiveClassReference)getDominantCatArgClass(arg), matchShapeResult.get(counter), null));
+				map.put((PrimitiveClassReference)getDominantCatArgClass(arg)
+						, factory.newMatrixValueFromClassShapeRange(
+						null
+						, (PrimitiveClassReference)getDominantCatArgClass(arg)
+						, matchShapeResult.get(counter)
+						, null
+						, iscomplexResult.get(0)
+						));
 				result.add(ValueSet.newInstance(map));
 			}
 	        return result;
@@ -133,8 +162,14 @@ public class BasicMatrixValuePropagator extends
 		else {
 			HashMap<ClassReference, AggrValue<BasicMatrixValue>> map = 
 					new HashMap<ClassReference, AggrValue<BasicMatrixValue>>();
-			map.put((PrimitiveClassReference)getDominantCatArgClass(arg), factory.newMatrixValueFromClassShapeRange(
-					null, (PrimitiveClassReference)getDominantCatArgClass(arg), null, null));
+			map.put((PrimitiveClassReference)getDominantCatArgClass(arg)
+					, factory.newMatrixValueFromClassShapeRange(
+					null
+					, (PrimitiveClassReference)getDominantCatArgClass(arg)
+					, null
+					, null
+					, iscomplexResult.get(0)
+					));
 			result.add(ValueSet.newInstance(map));
 			return result;
 		}

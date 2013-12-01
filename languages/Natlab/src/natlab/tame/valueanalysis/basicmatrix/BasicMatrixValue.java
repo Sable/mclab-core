@@ -7,6 +7,7 @@ import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.components.rangeValue.*;
+import natlab.tame.valueanalysis.components.isComplex.*;
 import natlab.tame.valueanalysis.value.*;
 
 /**
@@ -14,7 +15,10 @@ import natlab.tame.valueanalysis.value.*;
  * of the matlab class
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
-		HasConstant, HasShape<AggrValue<BasicMatrixValue>>, HasRangeValue<AggrValue<BasicMatrixValue>> {
+		HasConstant, 
+		HasShape<AggrValue<BasicMatrixValue>>, 
+		HasRangeValue<AggrValue<BasicMatrixValue>>, 
+		HasisComplexInfo<AggrValue<BasicMatrixValue>> {
 	
 	static boolean Debug = false;
 	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
@@ -23,9 +27,10 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	// with the reference to this range value, we can assign new range value to this basic matrix value.
 	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
+	protected isComplexInfo<AggrValue<BasicMatrixValue>> complex;
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
-	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator = ShapePropagator
-			.getInstance();
+	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator =
+			ShapePropagator.getInstance();
 
 	/**
 	 * Construct a BasicMatrixValue based on a Constant.
@@ -44,6 +49,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			this.rangeValue = (new RangeValueFactory<AggrValue<BasicMatrixValue>>(factory))
 					.newRangeValueFromDouble(((DoubleConstant)constant).getValue());			
 		}
+		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()
+				.newisComplexInfoFromStr("REAL");
 	}
 
 	/**
@@ -58,10 +65,12 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			String name,
 			PrimitiveClassReference aClass,
 			Shape<AggrValue<BasicMatrixValue>> shape,
-			RangeValue<AggrValue<BasicMatrixValue>> rangeValue) {
+			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
+			isComplexInfo<AggrValue<BasicMatrixValue>> complex) {
 		super(name, aClass);
 		this.shape = shape;
 		this.rangeValue = rangeValue;
+		this.complex = complex;
 	}
 
 	/**
@@ -70,29 +79,33 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * Shape information, we need to call corresponding factory method in 
 	 * BasicMatrixValueFactory, which is newMatrixValueFromInputShape.
 	 */
-	public BasicMatrixValue(String name, PrimitiveClassReference aClass, String shapeInfo) {
+	public BasicMatrixValue(String name
+			, PrimitiveClassReference aClass
+			, String shapeInfo
+			, String complexInfo) {
 		super(name, aClass);
 		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
 				.newShapeFromInputString(shapeInfo));
+		// TODO pass complexInfo
 	}
 	
 	public boolean hasSymbolic() {
-		return this.symbolic!=null;
+		return symbolic != null;
 	}
 	
 	public String getSymbolic() {
-		return this.symbolic;
+		return symbolic;
 	}
 	
 	public boolean hasMatlabClass() {
-		return this.classRef!=null;
+		return classRef != null;
 	}
 
 	/**
 	 * returns true if the represented data is a constant
 	 */
 	public boolean hasConstant() {
-		return this.constant!=null;
+		return constant != null;
 	}
 
 	@Override
@@ -101,11 +114,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * returns the constant represented by this data, or null if it is not constant
 	 */
 	public Constant getConstant() {
-		return this.constant;
+		return constant;
 	}
 	
 	public boolean hasShape() {
-		return this.shape!=null;
+		return shape != null;
 	}
 
 	/**
@@ -113,22 +126,31 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * there will be no shape info from result.
 	 */
 	public Shape<AggrValue<BasicMatrixValue>> getShape() {
-		return this.shape;
+		return shape;
 	}
 	
 	public boolean hasRangeValue() {
-		return this.rangeValue!=null;
+		return rangeValue != null;
 	}
 
 	public RangeValue<AggrValue<BasicMatrixValue>> getRangeValue() {
-		return this.rangeValue;
+		return rangeValue;
+	}
+	
+	public boolean hasisComplexInfo() {
+		return complex != null;
+	}
+
+	@Override
+	public isComplexInfo<AggrValue<BasicMatrixValue>> getisComplexInfo() {
+		return complex;
 	}
 	
 	/**
 	 * what's this used for?
 	 */
 	public void setConstantNull() {
-		this.constant = null;
+		constant = null;
 	}
 
 	@Override
@@ -158,23 +180,22 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			Constant result = this.constant.merge(((BasicMatrixValue)other).getConstant());
 			if (result!=null) return factory.newMatrixValue(this.getSymbolic(), result);
 		}
-		BasicMatrixValue newMatrix;
-		if (this.hasShape()) {
-			if (this.hasRangeValue()) 
-				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						this.shape.merge(((BasicMatrixValue)other).getShape()), 
-						this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
-			else 
-				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						this.shape.merge(((BasicMatrixValue)other).getShape()), null);
+		BasicMatrixValue newMatrix = factory.newMatrixValueFromClassShapeRange(
+				getSymbolic()
+				, getMatlabClass()
+				, null
+				, null
+				, null);
+		if (hasShape()) {
+			newMatrix.shape = shape.merge(((BasicMatrixValue)other).getShape());
 		}
-		else {
-			if (this.hasRangeValue()) 
-				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						null, this.rangeValue.merge(((BasicMatrixValue)other).getRangeValue()));
-			else
-				newMatrix = factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						null, null);
+		if (hasRangeValue()) {
+			newMatrix.rangeValue = rangeValue.merge(((BasicMatrixValue)other).getRangeValue());
+		}
+		if (hasisComplexInfo()) {
+			if (((BasicMatrixValue)other).getisComplexInfo() != null) {
+				newMatrix.complex = complex.merge(((BasicMatrixValue)other).getisComplexInfo());
+			}
 		}
 		return newMatrix;
 	}
@@ -193,22 +214,44 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (obj instanceof BasicMatrixValue) {
+		if (obj == null) {
+			return false;
+		}
+		else if (obj instanceof BasicMatrixValue) {
 			if (Debug) System.out.println("inside check whether BasicMatrixValue equals!");
 			BasicMatrixValue o = (BasicMatrixValue)obj;
-			if (this.hasConstant()) return this.constant.equals(o.getConstant());
-			boolean shapeResult, rangeResult;
-			if (this.shape==null && o.getShape()==null) return true;
-			shapeResult = this.shape.equals(o.getShape());
-			if (this.rangeValue==null && o.getRangeValue()==null) return shapeResult;
-			else if (this.rangeValue==null || o.getRangeValue()==null) return false;
+			if (hasConstant()) {
+				return constant.equals(o.getConstant());
+			}
 			else {
-				rangeResult = this.rangeValue.equals(o.getRangeValue());
-				return shapeResult && rangeResult;
+				boolean shapeResult, rangeResult, complexResult;
+				// test shape
+				if (shape == null) {
+					return o.getShape() == null;
+				}
+				else {
+					shapeResult = shape.equals(o.getShape());
+				}
+				// test range value
+				if (rangeValue == null) {
+					rangeResult = o.getRangeValue() == null;
+				}
+				else {
+					rangeResult = rangeValue.equals(o.getRangeValue());
+				}
+				// test complex
+				if (complex == null) {
+					complexResult = o.getisComplexInfo() == null;
+				}
+				else {
+					complexResult = complex.equals(o.getisComplexInfo());
+				}
+				return shapeResult && rangeResult && complexResult;
 			}
 		}
-		return false;		
+		else {
+			return false;		
+		}
 	}
 
 	@Override
@@ -220,27 +263,37 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * we should always be careful about null value!
 	 */
 	public String toString() {
-		return "(" + (hasSymbolic()? (this.symbolic + ",") : "")
-				+ (hasMatlabClass()? this.classRef : ",[mclass propagation fails]") 
-				+ (hasConstant()? ("," + this.constant) : "") 
-				+ (hasShape()? ("," + this.shape) : ",[shape propagation fails]")
-				+ (hasRangeValue()? ("," + this.rangeValue) : "")+")";
+		return "(" + (hasSymbolic()? (symbolic + ",") : "")
+				+ (hasMatlabClass()? classRef : ",[mclass propagation fails]") 
+				+ (hasConstant()? ("," + constant) : "") 
+				+ (hasShape()? ("," + shape) : ",[shape propagation fails]")
+				+ (hasRangeValue()? ("," + rangeValue) : "")
+				+ (hasisComplexInfo()? ("," + complex) : "") + ")";
 	}
 
 	@Override
 	public ValueSet<AggrValue<BasicMatrixValue>> arraySubsref(
 			Args<AggrValue<BasicMatrixValue>> indizes) {
 		return ValueSet.<AggrValue<BasicMatrixValue>> newInstance(
-				factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(), 
-						shapePropagator.arraySubsref(this.shape, indizes), null));
+				factory.newMatrixValueFromClassShapeRange(
+						getSymbolic()
+						, getMatlabClass()
+						, shapePropagator.arraySubsref(shape, indizes)
+						, null
+						, complex)
+						);
 	}
 
 	@Override
 	public AggrValue<BasicMatrixValue> arraySubsasgn(
 			Args<AggrValue<BasicMatrixValue>> indizes,
 			AggrValue<BasicMatrixValue> value) {
-		return factory.newMatrixValueFromClassShapeRange(this.getSymbolic(), this.getMatlabClass(),
-				shapePropagator.arraySubsasgn(this.shape, indizes, value), null);
+		return factory.newMatrixValueFromClassShapeRange(
+				getSymbolic()
+				, getMatlabClass()
+				, shapePropagator.arraySubsasgn(shape, indizes, value)
+				, null
+				, complex);
 	}
 
 	@Override
