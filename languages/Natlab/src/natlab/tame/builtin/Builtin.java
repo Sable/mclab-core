@@ -1270,7 +1270,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A->A");
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R->R || X,R->X || R,X->X || X,X->X");
             }
             return isComplexPropInfo;
         }

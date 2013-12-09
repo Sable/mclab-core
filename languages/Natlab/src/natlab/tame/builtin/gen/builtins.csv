@@ -224,7 +224,7 @@ power;; MatlabClass(logical 0->error, parent);; Shape($|M,$|M->M)
 dividingElementalArithmetic; elementalBinaryArithmetic
 -MatlabClass(logical 0->error, parent)
 -Shape($|M,$|M->M)
--isComplex(A,A->A) 
+-isComplex(R,R->R || X,R->X || R,X->X || X,X->X)  
 #TODO@Vineet - tweak the match algo to cover specific cases. Most of the cases will be either R or X. Deal with corner cases like 0,i./i, etc.
 # the following do not allow both args to be double under certain circumstances (...)
 ldivide
