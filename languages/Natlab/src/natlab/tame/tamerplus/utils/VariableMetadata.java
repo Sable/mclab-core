@@ -1,5 +1,11 @@
 package natlab.tame.tamerplus.utils;
 
+import natlab.tame.tamerplus.analysis.UDDUWeb;
+import natlab.tame.tir.TIRNode;
+import natlab.tame.valueanalysis.ValueAnalysis;
+import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+
 public class VariableMetadata {
 	private Integer graphNumber;
 	private String mclass;
@@ -21,5 +27,23 @@ public class VariableMetadata {
 	public String getIsComplex(){
 		return this.isComplex;
 	}
+	
+	public static VariableMetadata getVariableMetadata(
+			ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis,
+			TIRNode statement, int graphIndex, String var, UDDUWeb web) {
 
+		if (analysis.getNodeList().get(graphIndex).getAnalysis()
+				.getOutFlowSets().get(statement).isViable()) {
+
+			AdvancedMatrixValue temp = ((AdvancedMatrixValue) (analysis
+					.getNodeList().get(graphIndex).getAnalysis()
+					.getOutFlowSets().get(statement).get(var).getSingleton()));
+			return new VariableMetadata(web.getNodeAndColorForDefinition(var)
+					.get(statement), temp.getMatlabClass().getName(), temp
+					.getisComplexInfo().toString());
+
+		}
+
+		return null;
+	}
 }
