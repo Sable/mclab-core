@@ -7,6 +7,7 @@ import java.util.List;
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tamerplus.utils.IntOkAnalysis;
 import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
@@ -19,12 +20,14 @@ import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 public class AdvancedTamerTool {
+	
+	private Boolean debug = true;
 
 	public static void main(String[] args) {
 		// String file =
 		// "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
 		// String file = "/home/2011/vkumar5/for_test";
-		String file = "/home/sameer/mclab/mbrt/drv_mbrt";
+		String file = "/media/vineet/19F5-FD4C/Thesis/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/others/drv_bubble";
 		String fileIn = file + ".m";
 
 		GenericFile gFile = GenericFile.create(fileIn);
@@ -48,6 +51,8 @@ public class AdvancedTamerTool {
 		callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
 				callgraph, inputValues);
 		
+		//if (this.debug) callgraph = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
 	
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 		Args<AggrValue<AdvancedMatrixValue>> someargs = Args
@@ -60,6 +65,9 @@ public class AdvancedTamerTool {
 				 * ("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))
 				 */
 				Args.newInstance(inputValues), factory);
+		
+		if (this.debug)
+		 analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 
 		// System.out.println(analysis.toString());
 		

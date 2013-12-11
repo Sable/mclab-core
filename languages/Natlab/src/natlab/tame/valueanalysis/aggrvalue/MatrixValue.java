@@ -53,6 +53,10 @@ public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D>
         return classRef;
     }
     
+    
+    public void setMatlabClass(PrimitiveClassReference newClassRef) {
+        classRef = newClassRef;
+    }
     /**
      * creates a non constant matrix value with the given matlab class
      * @param class reference

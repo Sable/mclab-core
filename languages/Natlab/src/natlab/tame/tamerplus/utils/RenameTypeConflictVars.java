@@ -52,6 +52,7 @@ import natlab.toolkits.path.FileEnvironment;
 public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 
 	private static Integer suffix = 0;
+	private static boolean debug = true;
 
 	public static SimpleFunctionCollection renameConflictVarsInDifferentWebs(
 			SimpleFunctionCollection callgraph,
@@ -64,6 +65,11 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
 		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
 				callgraph, Args.newInstance(inputValues), factory);
+		
+		if (debug)
+			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
+		
 		System.out
 				.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 						+ analysis.toString());
