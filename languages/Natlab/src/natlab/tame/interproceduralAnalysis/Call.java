@@ -37,16 +37,15 @@ public class Call<Arg> {
 			return (aCall.functionRef.equals(functionRef))
 					&& ((aCall.argument != null) ? aCall.argument
 							.equals(argument) : aCall.argument == argument);
-		} else {
+		} else
 			return false;
-		}
 	}
 
 	@Override
 	public int hashCode() {
-
+		
 		return functionRef.hashCode()
 				+ (argument == null ? 0 : argument.hashCode());
 	}
-
+	
 }
