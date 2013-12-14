@@ -37,7 +37,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/diff/drv_diff.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/fdtd/drv_fdtd.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -104,7 +104,7 @@ public class BasicTamerTool {
 		
 
 		//arguments - TODO for now just parse them as inputs
-		String args = "double&1*1"; //start with the default
+		String args = "double&1*1&REAL"; //start with the default
 		if (options.arguments() != null && options.arguments().length() > 0){
 			args = options.arguments();
 		}
