@@ -35,17 +35,17 @@ public class ICCase extends ICNode{
 		if (matchCase.getNumMatched() == argValues.size() && false == matchCase.getError())  // input args have been matched
 		{	
 			matchCase.setMatchIsDone();
-			System.out.println("input args matched...matching output args now");
+			// System.out.println("input args matched...matching output args now");
 			isPatternSide = false;
 			isComplexInfoPropMatch outputMatch = ovl.match(isPatternSide, matchCase, argValues);
 			outputMatch.setOutputIsDone();
 			//
-			System.out.println("number of A args = "+outputMatch.getNumAargs());
+			// System.out.println("number of A args = "+outputMatch.getNumAargs());
 			return outputMatch;
 		}
 		else
 		{
-			System.out.println("Cannot match the arguments to equation!!! ");
+			// System.out.println("Cannot match the arguments to equation!!! ");
 			return previousMatchResult;
 		}
 		

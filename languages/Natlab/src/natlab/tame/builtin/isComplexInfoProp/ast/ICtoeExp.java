@@ -53,13 +53,13 @@ public class ICtoeExp extends ICternaryOpExp{
 	public isComplexInfoPropMatch match(boolean isPatternSide,
 			isComplexInfoPropMatch previousMatchResult, List<? extends Value<?>> argValues) {
 		
-		System.out.println("INSIDE teOp\n");
+		// System.out.println("INSIDE teOp\n");
 		
 		isComplexInfoPropMatch match = new isComplexInfoPropMatch(previousMatchResult);
 		if (false == isPatternSide)//has to be on the RHS
 		{
 			
-			System.out.println("INSIDE teOp\n");
+			// System.out.println("INSIDE teOp\n");
 			
 			if (match.getNumMatched() == argValues.size())
 			{	

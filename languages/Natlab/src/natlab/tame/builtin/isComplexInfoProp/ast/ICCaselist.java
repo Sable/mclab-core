@@ -31,7 +31,7 @@ public class ICCaselist extends ICNode {
 		if (csl != null) {
 			 match = csl.match(isPatternSide, previousMatchResult, argValues);
 			 if (match.getIsOutputDone() == true) {
-					System.out.println("matching done successfully!\n");
+					// System.out.println("matching done successfully!\n");
 
 					return match;
 				}
@@ -43,11 +43,11 @@ public class ICCaselist extends ICNode {
 		
 
 		if (match.getIsOutputDone() == true) {
-			System.out.println("matching done successfully!\n");
+			// System.out.println("matching done successfully!\n");
 
 			return match;
 		} else {
-			System.out.println("matching unsuccessful!\n");
+			// System.out.println("matching unsuccessful!\n");
 
 			return match;
 		}

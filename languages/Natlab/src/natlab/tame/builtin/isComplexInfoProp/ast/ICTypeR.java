@@ -50,7 +50,7 @@ public class ICTypeR extends ICType{
 					match.setLastMatchSucceed(true);
 					match.setLastMatchICType("REAL");
 					match.incNumRargs(1);
-					System.out.println("matched argument to REAL\n");
+					// System.out.println("matched argument to REAL\n");
 										
 				}
 				else
@@ -76,7 +76,7 @@ public class ICTypeR extends ICType{
 			{
 				//LHS matched 
 				match.loadOutput("REAL");
-				System.out.println("REAL.");
+				// System.out.println("REAL.");
 				return match;
 			}
 			else

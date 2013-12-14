@@ -162,7 +162,7 @@ public class isComplexInfoPropMatch {
 	@SuppressWarnings("unchecked")
 	public List<isComplexInfo<?>> getAllResults(){//FIXME better!
     	List<isComplexInfo<?>> results = new LinkedList<isComplexInfo<?>>();
-    	System.out.println(output);
+    	// System.out.println(output);
     	
     	for(Object value: output){
     		results.add((isComplexInfo<? extends Value<?>>)(value));    		
