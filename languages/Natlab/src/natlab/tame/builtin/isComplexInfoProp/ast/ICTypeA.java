@@ -61,7 +61,7 @@ public class ICTypeA extends ICType{
 					match.incNumAargs(1);
 					if(1 == isArgComplex) match.incNumRargs(1);
 					if(-1 == isArgComplex) match.incNumXargs(1);
-					System.out.println("matched argument to ANY\n");
+					// System.out.println("matched argument to ANY\n");
 										
 				}
 				else
@@ -88,7 +88,7 @@ public class ICTypeA extends ICType{
 			{
 				//LHS matched 
 				match.loadOutput("ANY");
-				System.out.println("ANY.");
+				// System.out.println("ANY.");
 				return match;
 			}
 			else

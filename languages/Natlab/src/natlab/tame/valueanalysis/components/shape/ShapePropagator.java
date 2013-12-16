@@ -273,8 +273,7 @@ public class ShapePropagator<V extends Value<V>>
     		}
     	}
     	Shape<V> resultShape = new ShapeFactory<V>().newShapeFromDimValues(indexedDimensions);
-    	if (resultShape.isConstant()) return resultShape.eliminateTrailingOnes();
-    	return resultShape;
+    	return resultShape.eliminateTrailingOnes();
     }
 
     /**
