@@ -402,8 +402,8 @@ Expr cell_access =
 LiteralExpr literal =
      INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i)); :}
   |  IM_INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i, true)); :}
-  |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f)); :}
-  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f, true)); :}
+  |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"))); :}
+  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"), true)); :}
   |  STRING.s {: return new StringLiteralExpr(s); :}
   ;
 

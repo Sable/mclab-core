@@ -939,7 +939,7 @@ fragment LETTER : 'a'..'z' | 'A'..'Z';
 fragment DIGIT : '0'..'9';
 IDENTIFIER : ('_' | '$' | LETTER) ('_' | '$' | LETTER | DIGIT)* { couldBeFieldName = false; };
 fragment INT_NUMBER : DIGIT+;
-fragment SCI_EXP : ('e' | 'E') ('+' | '-')? DIGIT+;
+fragment SCI_EXP : ('d' | 'D' | 'e' | 'E') ('+' | '-')? DIGIT+;
 fragment FP_NUMBER : (DIGIT+ '.' DIGIT*) | ('.' DIGIT+);
 NUMBER : (INT_NUMBER | FP_NUMBER) SCI_EXP? ('i' | 'I' | 'j' | 'J')? { couldBeFieldName = false; };
 
