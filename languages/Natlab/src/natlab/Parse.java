@@ -128,6 +128,7 @@ public class Parse {
     Stmt.setDefaultOutputSuppression(true);
     if (program != null) {
       program.setFile(GenericFile.create(fName));
+      Weeder.check(program, errors);
     }
     return program;
   }
@@ -269,7 +270,6 @@ public class Parse {
    * errors. If an error occurs then null is returned. 
    */
   public static Program parseMatlabFile(String fName, Reader file, List<CompilationProblem> errors) {
-    // TODO - something should be done about the mapping file
     TranslateResult natlabFile = translateFile(fName, file, errors);
     if (!errors.isEmpty()) {
       return null;
@@ -299,9 +299,9 @@ public class Parse {
   private static CompilationUnits parseMultipleFiles(boolean matlab, List<String> files,
       List<CompilationProblem> errors) {
     CompilationUnits cu = new CompilationUnits();
+    List<CompilationProblem> fileErrors = Lists.newArrayList();
     for (String fName : files) {
-      List<CompilationProblem> fileErrors = Lists.newArrayList();
-      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, errors);
+      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, fileErrors);
       if (program != null) {
         cu.addProgram(program);
       } else {
