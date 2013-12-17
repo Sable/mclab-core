@@ -1,0 +1,13 @@
+1 1
+12 4
+function [a, b, c] = f0()
+a = 1;
+b = 2;
+c = 3;
+end
+function [] = main()
+[a, b, c] = f0();
+[~, b, c] = f0();
+[a, ~, ~] = f0();
+[~, ~, ~] = f0();
+end
