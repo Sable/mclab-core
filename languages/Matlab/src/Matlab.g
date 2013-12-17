@@ -52,7 +52,7 @@ private OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
 
 private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
 
-public boolean hasProblem() { 
+public boolean hasProblem() {
     return !problems.isEmpty();
 }
 
@@ -146,7 +146,7 @@ private boolean isElementSeparator() {
     case AT:
         return true;
     }
-    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
+    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) ||
              isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
              isLParen(prevToken) || isRParen(nextToken));
 }
@@ -160,7 +160,7 @@ private boolean isCompoundStmtHeaderSeparator() {
     }
     Token prevToken = input.LT(-1);
     Token nextToken = input.LT(2); //2, not 1 because we haven't matched the FILLER yet
-    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) || 
+    return !(isBinaryOperator(prevToken) || isBinaryOperator(nextToken) ||
              isPrefixOperator(prevToken) || isPostfixOperator(nextToken) ||
              isLParen(prevToken) || isRParen(nextToken));
 }
@@ -185,9 +185,9 @@ private String insertDeletedComments() {
         //no offset changes or advancement
         return "";
     }
-    
+
     TextPosition missingNewlineAdjustment = new TextPosition(0, 0);
-    
+
     Token prevTok = input.LT(-1);
     if(prevTok.getType() != LINE_TERMINATOR) {
         TextPosition chompedPrecedingEOFPos = LengthScanner.getLength(prevTok.getText());
@@ -198,7 +198,7 @@ private String insertDeletedComments() {
         }
         missingNewlineAdjustment = new TextPosition(line, col);
     }
-    
+
     boolean leadingCommentsEndWithNewline = true;
     String leadingCommentsString = leadingComments.toString();
     String chompedLeadingComments = chomp(leadingCommentsString);
@@ -207,29 +207,29 @@ private String insertDeletedComments() {
         chompedLeadingComments = leadingCommentsString;
     }
     TextPosition chompedLeadingCommentsEOFPos = LengthScanner.getLength(chompedLeadingComments);
-    
+
     //introduce fudge factor
     offsetTracker.recordOffsetChange(-1 * missingNewlineAdjustment.getLine(), -1 * missingNewlineAdjustment.getColumn());
-    
+
     if(leadingCommentsEndWithNewline) {
         offsetTracker.recordOffsetChange(-1 * (chompedLeadingCommentsEOFPos.getLine() + 1), Math.max(0, leadingCommentsPos));
         offsetTracker.advanceByTextSize(leadingCommentsString); //for text (NB: not chomped)
-    
+
         offsetTracker.recordOffsetChange(-1, chompedLeadingCommentsEOFPos.getColumn() - 1);
         offsetTracker.advanceToNewLine(1, 1); //for inserted newline
         offsetTracker.recordOffsetChange(1, 0);
     } else {
         offsetTracker.recordOffsetChange(-1 * chompedLeadingCommentsEOFPos.getLine(), Math.max(0, leadingCommentsPos));
         offsetTracker.advanceByTextSize(leadingCommentsString); //for text (NB: not chomped)
-    
+
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceToNewLine(1, 1); //for inserted newline
         offsetTracker.recordOffsetChange(0, 0);
     }
-    
+
     //cancel fudge factor
     offsetTracker.recordOffsetChange(missingNewlineAdjustment.getLine(), missingNewlineAdjustment.getColumn());
-    
+
     String commentString = leadingCommentsString + "\n";
     leadingComments.setLength(0);
     return commentString;
@@ -257,7 +257,7 @@ private static boolean isPreTransposeChar(int ch) {
     case '}':
     case ']':
     case '_': //at the end of an identifier
-    case '\'': //at the end of a transpose 
+    case '\'': //at the end of a transpose
                //NB: if this was at the end of a string, it would have been an escape instead of a close quote
         return true;
     default:
@@ -268,7 +268,7 @@ private static boolean isPreTransposeChar(int ch) {
 //TODO-AC: This content is duplicated from the parser...maybe it can be factored out
 private final List<matlab.TranslationProblem> problems = new ArrayList<matlab.TranslationProblem>();
 
-public boolean hasProblem() { 
+public boolean hasProblem() {
     return !problems.isEmpty();
 }
 
@@ -454,15 +454,15 @@ function_separator :
         //first inserted newline
         offsetTracker.recordOffsetChange(0, -1);
         offsetTracker.advanceToNewLine(1, 1);
-        
+
         TextPosition eofPos = LengthScanner.getLength(input.LT(-1).getText());
-        
+
         //second inserted newline
         int startCol = eofPos.getLine() == 1 ? input.LT(-1).getCharPositionInLine() : 0;
         int lineLength = eofPos.getColumn() - 1 + startCol;
         offsetTracker.recordOffsetChange(-1, lineLength - 1);
         offsetTracker.advanceToNewLine(1, 1);
-        
+
         //fudge factor to point following stuff back to location preceding inserted newlines
         offsetTracker.recordOffsetChange(-1, lineLength);
      }
@@ -484,7 +484,7 @@ function_ending :
 function_body :
      t_FUNCTION (t_FILLER? output_params t_FILLER? t_ASSIGN)? t_FILLER? name t_FILLER? (input_params t_FILLER?)?
      (stmt_separator -> template(original={$text}, extra={insertDeletedComments()}) "<original><extra>")
-     (t_FILLER? stmt_or_function)* t_FILLER? 
+     (t_FILLER? stmt_or_function)* t_FILLER?
      t_END
   ;
 
@@ -493,7 +493,7 @@ input_params :
   ;
 
 input_param_list :
-     name (t_FILLER? t_COMMA t_FILLER? name)*
+     name_or_tilde (t_FILLER? t_COMMA t_FILLER? name_or_tilde)*
   ;
 
 output_params :
@@ -515,7 +515,7 @@ stmt_or_function :
   ;
 
 class_def :
-     t_CLASSDEF (t_FILLER? attributes)? t_FILLER? t_IDENTIFIER (t_FILLER? t_LT t_FILLER? superclass_list)? fill_sep+ (t_FILLER? class_body)* t_FILLER? t_END 
+     t_CLASSDEF (t_FILLER? attributes)? t_FILLER? t_IDENTIFIER (t_FILLER? t_LT t_FILLER? superclass_list)? fill_sep+ (t_FILLER? class_body)* t_FILLER? t_END
   ;
 
 fill_sep :
@@ -561,7 +561,7 @@ methods_body :
   ;
 
 events_block :
-     t_EVENTS (t_FILLER? attributes)? fill_sep+ (t_FILLER? events_body)* t_FILLER? t_END 
+     t_EVENTS (t_FILLER? attributes)? fill_sep+ (t_FILLER? events_body)* t_FILLER? t_END
   ;
 
 events_body :
@@ -729,7 +729,7 @@ cell_access :
   |  {inSquare() || inCurly()}? name t_AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
 
-arg_list :  
+arg_list :
      arg (t_FILLER? t_COMMA t_FILLER? arg)*
   ;
 
@@ -747,7 +747,7 @@ cell_array :
   ;
 
 optional_row_list :
-     
+
   |  quiet_element_separator_list
   |  (quiet_element_separator_list? quiet_row_separator)+ quiet_element_separator_list?
   |  (quiet_element_separator_list? quiet_row_separator)* row_list (quiet_row_separator_list quiet_element_separator_list?)?
@@ -791,7 +791,12 @@ element_list :
   ;
 
 element :
+     expr_or_tilde
+  ;
+
+expr_or_tilde options { k=2; } :
      expr
+  |  t_NOT
   ;
 
 //non-empty
@@ -812,6 +817,11 @@ quiet_element_separator_comma :
 
 name :
      t_IDENTIFIER
+  ;
+
+name_or_tilde :
+     t_IDENTIFIER
+  |  t_NOT
   ;
 
 //// Terminal Rules ////////////////////////////////////////////////////////////
@@ -892,7 +902,7 @@ t_STRING : STRING { offsetTracker.advanceByTextSize($text); };
 t_ANNOTATION : ANNOTATION { offsetTracker.advanceByTextSize($text); };
 
 t_BRACKET_COMMENT : BRACKET_COMMENT { offsetTracker.advanceByTextSize($text); };
-t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); } -> 
+t_COMMENT : COMMENT { offsetTracker.advanceByTextSize($text); } ->
     template(revised={$text.startsWith("\%\%") ? ("\% " + $text.substring(2)) : $text}) "<revised>";
     //NB: it's safe to do this here because the offsets don't change
 
@@ -979,7 +989,7 @@ LSQUARE : '[' { couldBeFieldName = false; };
 RSQUARE : ']' { couldBeFieldName = false; };
 
 ASSIGN : '=' { couldBeFieldName = false; };
- 
+
 //NB: matched AFTER transpose
 fragment STRING_CHAR : ~('\'' | '\r' | '\n') | '\'\'';
 STRING : {!isPreTransposeChar(input.LA(-1))}?=>'\'' STRING_CHAR* ('\'' | (LINE_TERMINATOR)=> { $type = MISC; }) { couldBeFieldName = false; };

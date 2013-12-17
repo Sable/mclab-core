@@ -66,7 +66,9 @@ List output_params =
 //shared by input and output parameters
 List param_list =
      name.p {: return new List<Name>().add(p); :}
+  |  NOT    {: return new List<Name>().add(new Name("~")); :}
   |  param_list.l COMMA name.p {: return l.add(p); :}
+  |  param_list.l COMMA NOT    {: return l.add(new Name("~")); :}  // TODO: Add new AST node type?
   ;
 
 //used to mix stmts and nested functions in a containing function
@@ -446,6 +448,7 @@ List element_list =
   
 Expr element =
      expr.e  {: return e; :}
+  |  NOT     {: return new NameExpr(new Name("~")); :}
   ;
 
 List arg_list =
