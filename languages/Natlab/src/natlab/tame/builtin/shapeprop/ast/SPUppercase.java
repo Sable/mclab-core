@@ -48,7 +48,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				else {
 					Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 					Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
-					if (argumentConstant!=null) {
+					if (argumentConstant!=null && !(argumentConstant instanceof CharConstant)) {
 						if (Debug) System.out.println("it's a constant!");
 						previousMatchResult.setIsError(true);
 						return previousMatchResult;

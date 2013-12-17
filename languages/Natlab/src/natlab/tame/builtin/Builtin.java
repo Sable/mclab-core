@@ -5319,7 +5319,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$");
+                shapePropInfo = ShapePropTool.parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(1), $|M, $->$||numOutput(2),[m,n]->$,$");
             }
             return shapePropInfo;
         }
@@ -5716,12 +5716,21 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
+    public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractMultiaryToScalarLogicalVersatileQuery(this,arg);
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M,$|M->$");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -5735,6 +5744,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R->R || X,R->R || R,X->R || X,X->R");
+            }
+            return isComplexPropInfo;
         }
 
     }
@@ -5977,7 +5995,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }
@@ -6012,7 +6030,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }

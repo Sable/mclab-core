@@ -4,19 +4,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import natlab.options.Options;
-import natlab.tame.builtin.classprop.ClassPropTool;
-import natlab.tame.builtin.classprop.ast.CP;
-import natlab.tame.builtin.classprop.ast.CPBuiltin;
-import natlab.tame.builtin.classprop.ast.CPChain;
-import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.SimpleFunctionCollection;
-import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.tamerplus.transformation.TransformationEngine;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
@@ -37,7 +29,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/fdtd/drv_fdtd.m");
+		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/unsupported/edit/drv_edit.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
