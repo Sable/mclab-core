@@ -29,8 +29,10 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 		if (isPatternSide) {
 			if (previousMatchResult.getIsAssignLiteralToLHS()) {
 				if (Debug) System.out.println("trying to assign "+n.toString()+" to an indexed array!");
-				List<DimValue> dimensions = previousMatchResult.getShapeOfVariable(previousMatchResult
-						.getLatestMatchedUppercase()).getDimensions();
+				// when modify shapes, make sure not modifying the original one.
+				List<DimValue> dimensions = new ArrayList<DimValue>(
+						previousMatchResult.getShapeOfVariable(previousMatchResult
+								.getLatestMatchedUppercase()).getDimensions());
 				if (previousMatchResult.getWhetherLatestMatchedIsNum()) {
 					if (Debug) System.out.println("inside assigning a number to a number indexed array!"); // i.e. M(2)=2;
 					/* 
