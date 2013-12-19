@@ -18,33 +18,42 @@
 
 package natlab.toolkits.analysis.example;
 
-import java.util.*;
-import ast.*;
-import analysis.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.varorfun.*;
+import java.util.Set;
+
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Stmt;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Jesse Doherty
  */
-public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<String>>
+public class UseCollector extends AbstractDepthFirstAnalysis<Set<String>>
 {
     private VFPreorderAnalysis kindAnalysis;
 
-    private HashSetFlowSet<String> fullSet;
+    private Set<String> fullSet;
     private boolean inLHS = false;
 
     public UseCollector(ASTNode<?> tree)
     {
         super(tree);
-        fullSet = new HashSetFlowSet<String>();
+        fullSet = Sets.newHashSet();
         kindAnalysis = new VFPreorderAnalysis(tree);
         kindAnalysis.analyze();
     }
 
-    public HashSetFlowSet<String> newInitialFlow()
+    public Set<String> newInitialFlow()
     {
-        return new HashSetFlowSet<String>();
+        return Sets.newHashSet();
     }
 
     /**
@@ -52,18 +61,18 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
      */
     public Set<String> getAllUses()
     {
-        return fullSet.getSet();
+        return Sets.newHashSet(fullSet);
     }
     /**
      * Gets a set of uses in the given statement. 
      */
     public Set<String> getUses( Stmt node )
     {
-        HashSetFlowSet<String> set = flowSets.get(node);
+        Set<String> set = flowSets.get(node);
         if( set == null )
-            return new HashSet<String>();
+            return Sets.newHashSet();
         else
-            return set.getSet();
+            return Sets.newHashSet(set);
     }
 
     /**
@@ -72,7 +81,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
      */
     public void caseAssignStmt( AssignStmt node )
     {
-        HashSetFlowSet<String> prevSet = currentSet;
+        Set<String> prevSet = currentSet;
         inLHS = true;
         currentSet = newInitialFlow();
 
@@ -93,7 +102,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<HashSetFlowSet<Stri
      */
     public void caseStmt( AssignStmt node )
     {
-        HashSetFlowSet<String> prevSet = currentSet;
+        Set<String> prevSet = currentSet;
         currentSet = newInitialFlow();
 
         caseASTNode( node );

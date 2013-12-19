@@ -9,7 +9,7 @@ import java.util.Iterator;
  * @author Jesse Doherty
  */
 @Deprecated
-public interface FlowSet<D> extends FlowData, Iterable<D>
+public interface FlowSet<D> extends Iterable<D>
 {
     /**
      * Copies the flow set and returns the new copy.

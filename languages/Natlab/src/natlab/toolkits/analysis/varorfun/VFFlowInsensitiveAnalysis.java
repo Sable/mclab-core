@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import natlab.LookupFile;
-import natlab.toolkits.analysis.AbstractPreorderAnalysis;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import analysis.AbstractDepthFirstAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
@@ -27,7 +27,7 @@ import ast.StringLiteralExpr;
 
 import com.google.common.collect.Sets;
 
-public class VFFlowInsensitiveAnalysis extends AbstractPreorderAnalysis<VFFlowset> implements VFAnalysis{
+public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<VFFlowset> implements VFAnalysis{
   private boolean inFunction=true;
   private Function currentFunction = null;
   private Script currentScript = null;

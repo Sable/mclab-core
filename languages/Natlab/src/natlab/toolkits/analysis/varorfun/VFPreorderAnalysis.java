@@ -16,23 +16,40 @@ Copyright 2011 Anton Dubrau, Jesse Doherty, Soroush Radpour and McGill Universit
 */
 
 package natlab.toolkits.analysis.varorfun;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
-import javax.swing.BoundedRangeModel;
-
-import ast.*;
-import natlab.toolkits.analysis.*;
+import natlab.LookupFile;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.*;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CellIndexExpr;
+import ast.EndExpr;
+import ast.Expr;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.FunctionList;
+import ast.GlobalStmt;
+import ast.LValueExpr;
+import ast.LambdaExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.PersistentStmt;
+import ast.Script;
+import ast.StringLiteralExpr;
 
 /** 
  * An implementation of a preorder analysis for the var or fun
  * analysis. 
  * 
  */
-public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > implements VFAnalysis
+public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis< VFFlowset > implements VFAnalysis
 {
     private boolean inFunction=true;
     private Function currentFunction = null;

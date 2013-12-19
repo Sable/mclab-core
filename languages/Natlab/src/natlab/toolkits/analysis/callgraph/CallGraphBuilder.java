@@ -1,12 +1,35 @@
 package natlab.toolkits.analysis.callgraph;
 
-import java.util.*;
-import natlab.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.varorfun.*;
-import natlab.toolkits.analysis.handlepropagation.*;
-import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
-import ast.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import natlab.CompilationProblem;
+import natlab.toolkits.analysis.handlepropagation.HandlePropagationAnalysis;
+import natlab.toolkits.analysis.handlepropagation.MayMustTreeSet;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.AnonymousHandleValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.NamedHandleValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CellIndexExpr;
+import ast.DotExpr;
+import ast.Expr;
+import ast.Function;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Script;
+import ast.Stmt;
+
+import com.google.common.collect.Sets;
 
 /**
  *
@@ -215,7 +238,7 @@ public class CallGraphBuilder
      * Builds the graph for a given script or function. It will
      * populate the maps and build up the worklist.
      */
-    private class GraphNodeBuilder extends AbstractPreorderAnalysis<HashSetFlowSet<String>>
+    private class GraphNodeBuilder extends AbstractDepthFirstAnalysis<Set<String>>
     {
         GraphNodeBuilder( ASTNode tree )
         {
@@ -227,9 +250,9 @@ public class CallGraphBuilder
         private ASTNode currentCallable = null;
         private boolean inFunction = false;
         
-        public HashSetFlowSet<String> newInitialFlow()
+        public Set<String> newInitialFlow()
         {
-            return new HashSetFlowSet<String>();
+            return Sets.newHashSet();
         }
 
         public void caseFunction( Function node )

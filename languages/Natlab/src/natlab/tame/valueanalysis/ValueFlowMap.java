@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import natlab.tame.valueanalysis.value.Value;
-import natlab.toolkits.analysis.FlowData;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -27,7 +26,7 @@ import natlab.toolkits.analysis.Mergable;
  * @author ant6n
  */
 public class ValueFlowMap<V extends Value<V>> //extends AbstractFlowMap<String, ValueSet<V>> 
-       implements Mergable<ValueFlowMap<V>>,FlowData{  
+       implements Mergable<ValueFlowMap<V>> {  
     LinkedHashMap<String,ValueSet<V>> map = new LinkedHashMap<String,ValueSet<V>>();
     private boolean isViable = true;
     
