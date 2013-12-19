@@ -266,9 +266,20 @@ public class ShapePropagator<V extends Value<V>>
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
     				}
-    				// add the value of the second dimension of the vector to the return shape.
-    				indexedDimensions.add(((HasShape<V>)indices.get(i))
-    						.getShape().getDimensions().get(1));
+    				if (((HasShape<V>)indices.get(i)).getShape().isRowVector()) {
+        				// add the value of the 2nd dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(1));
+    				}
+    				else if (((HasShape<V>)indices.get(i)).getShape().isColVector()) {
+        				// add the value of the 1st dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(0));    					
+    				}
+    				else {
+    					// TODO what if it's a matrix?
+    					indexedDimensions.add(new DimValue());
+    				}
     			}
     		}
     	}
