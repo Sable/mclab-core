@@ -671,7 +671,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     {
         boolean change = false;
         for( String s : keys )
-            change = false || set.removeByKey( s );
+            change = set.remove(s) == null;
         return change;
     }
 
@@ -895,7 +895,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected void destroyInfo()
     {
-        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
+        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.entrySet() ){
             destroyInfo( e.getKey(), e.getValue() );
         }
     }
@@ -935,7 +935,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected void undefAll()
     {
-        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.toList() ){
+        for( Map.Entry<String,TreeSet<Value>> e : currentOutSet.entrySet() ){
             change = true;
             TreeSet<Value> values = new TreeSet<Value>();
             values.addAll( e.getValue() );
