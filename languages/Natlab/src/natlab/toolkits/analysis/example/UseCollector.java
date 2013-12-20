@@ -167,7 +167,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<Set<String>>
                 if (kindAnalysis.getFlowSets().containsKey(name)){
                     kindAnalysis.analyze();
                 }
-                VFDatum kind = kindAnalysis.getFlowSets().get(name).contains(nameExpr.getName().getID());
+                VFDatum kind = kindAnalysis.getFlowSets().get(name).get(nameExpr.getName().getID());
                 return (kind!=null) && (kind.isVariable() || kind.isID());
             }
         }

@@ -63,7 +63,7 @@ public class SimpleCallGraphBuilder{
                         curRHS.add(h.getName().getID());
                 }
                 @Override public void caseNameExpr(NameExpr n){
-                    VFDatum d = kindAnalysis.getFlowSets().get(n).contains(n.getName().getID());
+                    VFDatum d = kindAnalysis.getFlowSets().get(n).get(n.getName().getID());
                     if (d==null)
                         System.out.println(n.getName().getID());
                     if ((d!=null) && (!VFDatum.FUN.equals(d))){ //TODO FUNCTION CALLS

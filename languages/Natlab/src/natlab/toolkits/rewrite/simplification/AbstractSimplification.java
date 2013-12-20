@@ -48,7 +48,7 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     public abstract Set<Class<? extends AbstractSimplification>> getDependencies();
     
     private VFDatum getKind(NameExpr expr) {
-      return kindAnalysis.getFlowSets().get(expr.getName()).contains(expr.getName().getID());
+      return kindAnalysis.getFlowSets().get(expr.getName()).get(expr.getName().getID());
     }
 
     private boolean isVar(NameExpr expr) {

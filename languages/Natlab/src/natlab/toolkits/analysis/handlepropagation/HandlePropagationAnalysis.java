@@ -13,7 +13,6 @@ import natlab.toolkits.analysis.handlepropagation.handlevalues.AnonymousHandleVa
 import natlab.toolkits.analysis.handlepropagation.handlevalues.NamedHandleValue;
 import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
 import natlab.toolkits.analysis.varorfun.VFDatum;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.utils.LoadFunction;
 import analysis.AbstractSimpleStructuralForwardAnalysis;
@@ -89,7 +88,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
     //The kind analysis used to compute values.
     protected VFPreorderAnalysis kindAnalysis;
     protected VFPreorderAnalysis preorderKindAnalysis;
-    protected VFFlowset preorderSet;
+    protected Map<String, VFDatum> preorderSet;
 
     public TreeSet<Value> allHandleTargets = new TreeSet<Value>();
     private boolean inAssignment = false;
@@ -786,7 +785,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      * Abstracts getting a kind flowset. This is to deal with possible
      * differences in getting it for scripts and functions.
      */
-    protected VFFlowset getKindSet(){
+    protected Map<String, VFDatum> getKindSet(){
         return kindAnalysis.getFlowSets().get(currentStmt);
     }
 
@@ -795,7 +794,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
      */
     protected VFDatum getKindDatum( NameExpr n )
     {
-	return preorderKindAnalysis.getFlowSets().get(n).contains(n.getName().getID());
+	return preorderKindAnalysis.getFlowSets().get(n).get(n.getName().getID());
     }
 
     /**
@@ -812,7 +811,7 @@ public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAn
         else if( values == null || values.size()==0){
 	    if ( getKindSet() == null )
 		return true;
-            VFDatum kind = getKindSet().contains(id);
+            VFDatum kind = getKindSet().get(id);
             if( kind == null || kind.isID() || 
                 kind.isVariable() )
                 return true;

@@ -287,7 +287,7 @@ public class CallGraphBuilder
         {
             if( !inLvalues ){
                 String id = node.getName().getID();
-                VFDatum datum =  nameResolver.getFlowSets().get( currentStmt ).contains(id);
+                VFDatum datum =  nameResolver.getFlowSets().get( currentStmt ).get(id);
                 if( datum == null ){
                     CallSiteLabel label = CallSiteLabel.makeFunctionLabel();
                     addToLabelMaps( label, node );
@@ -328,7 +328,7 @@ public class CallGraphBuilder
                 if( node.getTarget() instanceof NameExpr ){
                     //This is the only case currently dealt with
                     String id = ((NameExpr)node.getTarget()).getName().getID();
-                    VFDatum datum = nameResolver.getFlowSets().get( currentStmt ).contains(id);
+                    VFDatum datum = nameResolver.getFlowSets().get( currentStmt ).get(id);
                     if( datum == null ){
                         CallSiteLabel label = CallSiteLabel.makeUnknownLabel();
                         addToLabelMaps( label, node );

@@ -16,14 +16,18 @@
 */
 
 package natlab.toolkits.analysis.varorfun;
+
+import natlab.toolkits.analysis.Mergable;
+
 /**
  * Datums used by var or function analysis.
  */
 
-public enum VFDatum
+public enum VFDatum implements Mergable<VFDatum>
 {    
     UNDEF, VAR, PREFIX, FUN, LDVAR, BOT, WAR, TOP, IVAR, IFUN;
  
+    @Override
     public VFDatum merge(VFDatum ov){
         if( this == ov )
             return this;
