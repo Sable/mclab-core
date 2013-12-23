@@ -118,10 +118,7 @@ public class Parse {
     }
     if (parser.hasError()) {
       for (String error : parser.getErrors()) {
-        // return an array of string with {line, column, msg}
-        String[] message = error.split("\\],\\[");
-        errors.add(new CompilationProblem(Integer.parseInt(message[0]),
-            Integer.parseInt(message[1]), message[3]));
+        errors.add(new CompilationProblem(error));
       }
       return null;
     }
@@ -254,7 +251,9 @@ public class Parse {
       return null;
     }
     Program result = parseNatlabFile(fName, source.getReader(), errors);
-    result.setPositionMap(source.getPositionMap());
+    if (result != null) {
+      result.setPositionMap(source.getPositionMap());
+    }
     return result;
   }
 
