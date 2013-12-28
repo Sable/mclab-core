@@ -3654,7 +3654,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$->$");
+                shapePropInfo = ShapePropTool.parse("$|M->$");
             }
             return shapePropInfo;
         }
@@ -5995,7 +5995,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }
@@ -6030,7 +6030,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }
@@ -7110,7 +7110,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Randi extends AbstractRandomFunction implements HasClassPropagationInfo {
+    public static class Randi extends AbstractRandomFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Randi singleton = null;
         public static Randi getInstance(){
@@ -7126,6 +7126,15 @@ public abstract class Builtin {
             return "randi";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$->$||$,M->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -7139,6 +7148,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R? -> R");
+            }
+            return isComplexPropInfo;
         }
 
     }

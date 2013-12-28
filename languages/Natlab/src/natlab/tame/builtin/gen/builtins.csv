@@ -488,7 +488,7 @@ toLogicalMatrixQuery; matrixQuery
 # unary return logicals
 unaryToLogicalMatrixQuery; toLogicalMatrixQuery
 -Class(matrix->logical)
--Shape($->$)
+-Shape($|M->$)
 scalarUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
 not
 any
@@ -884,7 +884,7 @@ randomFunction; impureFunction
 -Shape([]->$||($,n=previousScalar(),add())+->M)
 rand
 randn
-randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))
+randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double));; Shape($->$||$,M->M);; isComplex(R,R? -> R)
 randperm;; Shape($,n=previousScalar()->[1,n])
 
 
