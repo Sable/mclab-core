@@ -21,6 +21,7 @@ public class AllTests {
     suite.addTestSuite(NatlabParserFailTests.class);
     
     suite.addTestSuite(LocationTest.class);
+    suite.addTestSuite(WeederTest.class);
 
     suite.addTestSuite(TransformedNodeTests.class);
 

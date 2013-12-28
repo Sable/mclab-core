@@ -25,13 +25,13 @@ import java.io.File;
 import java.util.List;
 
 import mclint.McLint;
+import natlab.backends.Fortran.codegen_readable.Main_readable;
+import natlab.backends.x10.Mix10;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
 import natlab.tame.tamerplus.TamerPlusMain;
 import ast.CompilationUnits;
 import ast.Program;
-import natlab.backends.x10.Mix10;
-import natlab.backends.Fortran.codegen_readable.Main_readable;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -131,6 +131,7 @@ public class Main {
 
     if (!errors.isEmpty()) {
       System.err.println(CompilationProblem.toStringAll(errors));
+      return;
     }
 
     if (options.xml()) {

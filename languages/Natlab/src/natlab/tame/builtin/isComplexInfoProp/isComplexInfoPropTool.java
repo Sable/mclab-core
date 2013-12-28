@@ -22,7 +22,7 @@ public class isComplexInfoPropTool {
 		isComplexInfoPropParser parser = new isComplexInfoPropParser();
 		isComplexInfoPropScanner input = new isComplexInfoPropScanner(
 				new StringReader(source));
-		System.out.println(source);
+		// System.out.println(source);
 		try {
 			ICCaselist iclist = (ICCaselist) parser.parse(input);
 			return iclist;

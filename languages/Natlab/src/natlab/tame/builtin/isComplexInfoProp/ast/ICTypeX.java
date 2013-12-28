@@ -39,7 +39,7 @@ public class ICTypeX extends ICType{
 				Value<?> argument = argValues.get(previousMatchResult.getNumMatched());// get the value of argument
 		
 				 int isArgComplex =  (new ArgICType()).getArgICType(argument);
-				 System.out.println("argument is #"+argument+"\n");
+				 // System.out.println("argument is #"+argument+"\n");
 				
 				 
 			
@@ -50,7 +50,7 @@ public class ICTypeX extends ICType{
 					match.setLastMatchSucceed(true);
 					match.setLastMatchICType("COMPLEX");
 					match.incNumXargs(1);
-					System.out.println("matched argument to COMPLEX\n");
+					// System.out.println("matched argument to COMPLEX\n");
 										
 				}
 				else
@@ -78,7 +78,7 @@ public class ICTypeX extends ICType{
 			{
 				//LHS matched 
 				match.loadOutput("COMPLEX");
-				System.out.println("COMPLEX.");
+				// System.out.println("COMPLEX.");
 				return match;
 			}
 			else

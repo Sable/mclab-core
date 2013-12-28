@@ -1,4 +1,5 @@
 import beaver.Symbol;
+import matlab.NullPositionMap;
 import matlab.PositionMap;
 import matlab.TextPosition;
 import natlab.utils.NodeFinder;
@@ -11,7 +12,7 @@ import natlab.utils.NodeFinder;
  * transformation.
  */
 aspect Positions {
-  private PositionMap Program.positionMap = null;
+  private PositionMap Program.positionMap = new NullPositionMap();
 
   public void Program.setPositionMap(PositionMap positionMap) {
     this.positionMap = positionMap;

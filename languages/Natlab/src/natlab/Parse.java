@@ -118,16 +118,14 @@ public class Parse {
     }
     if (parser.hasError()) {
       for (String error : parser.getErrors()) {
-        // return an array of string with {line, column, msg}
-        String[] message = error.split("\\],\\[");
-        errors.add(new CompilationProblem(Integer.parseInt(message[0]),
-            Integer.parseInt(message[1]), message[3]));
+        errors.add(new CompilationProblem(error));
       }
       return null;
     }
     Stmt.setDefaultOutputSuppression(true);
     if (program != null) {
       program.setFile(GenericFile.create(fName));
+      Weeder.check(program, errors);
     }
     return program;
   }
@@ -253,7 +251,9 @@ public class Parse {
       return null;
     }
     Program result = parseNatlabFile(fName, source.getReader(), errors);
-    result.setPositionMap(source.getPositionMap());
+    if (result != null) {
+      result.setPositionMap(source.getPositionMap());
+    }
     return result;
   }
 
@@ -269,7 +269,6 @@ public class Parse {
    * errors. If an error occurs then null is returned. 
    */
   public static Program parseMatlabFile(String fName, Reader file, List<CompilationProblem> errors) {
-    // TODO - something should be done about the mapping file
     TranslateResult natlabFile = translateFile(fName, file, errors);
     if (!errors.isEmpty()) {
       return null;
@@ -299,9 +298,9 @@ public class Parse {
   private static CompilationUnits parseMultipleFiles(boolean matlab, List<String> files,
       List<CompilationProblem> errors) {
     CompilationUnits cu = new CompilationUnits();
+    List<CompilationProblem> fileErrors = Lists.newArrayList();
     for (String fName : files) {
-      List<CompilationProblem> fileErrors = Lists.newArrayList();
-      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, errors);
+      Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, fileErrors);
       if (program != null) {
         cu.addProgram(program);
       } else {

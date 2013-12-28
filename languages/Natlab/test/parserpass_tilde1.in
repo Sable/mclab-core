@@ -1,0 +1,17 @@
+function f0(a)
+end
+
+function f1(~)
+end
+
+function f2(a, ~)
+end
+
+function f3(~, a)
+end
+
+function f4(~, ~)
+end
+
+function f5(a, ~, b)
+end

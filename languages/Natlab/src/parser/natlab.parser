@@ -66,7 +66,9 @@ List output_params =
 //shared by input and output parameters
 List param_list =
      name.p {: return new List<Name>().add(p); :}
+  |  NOT    {: return new List<Name>().add(new Name("~")); :}
   |  param_list.l COMMA name.p {: return l.add(p); :}
+  |  param_list.l COMMA NOT    {: return l.add(new Name("~")); :}  // TODO: Add new AST node type?
   ;
 
 //used to mix stmts and nested functions in a containing function
@@ -402,8 +404,8 @@ Expr cell_access =
 LiteralExpr literal =
      INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i)); :}
   |  IM_INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i, true)); :}
-  |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f)); :}
-  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f, true)); :}
+  |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"))); :}
+  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"), true)); :}
   |  STRING.s {: return new StringLiteralExpr(s); :}
   ;
 
@@ -446,6 +448,7 @@ List element_list =
   
 Expr element =
      expr.e  {: return e; :}
+  |  NOT     {: return new NameExpr(new Name("~")); :}
   ;
 
 List arg_list =

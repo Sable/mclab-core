@@ -90,3 +90,5 @@ parserpass_class
 parserpass_end
 parserpass_powprefix
 parserpass_leadingws
+parserpass_tilde1
+parserpass_tilde2

@@ -84,9 +84,11 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			, String shapeInfo
 			, String complexInfo) {
 		super(name, aClass);
-		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>()
-				.newShapeFromInputString(shapeInfo));
+		this.shape = new ShapeFactory<AggrValue<BasicMatrixValue>>()
+				.newShapeFromInputString(shapeInfo);
 		// TODO pass complexInfo
+		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()
+				.newisComplexInfoFromStr(complexInfo);
 	}
 	
 	public boolean hasSymbolic() {

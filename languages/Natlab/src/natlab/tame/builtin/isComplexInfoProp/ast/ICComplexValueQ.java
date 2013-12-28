@@ -47,7 +47,7 @@ public class ICComplexValueQ extends ICAbstractValue{
 		{
 			isComplexInfoPropMatch lastMatch = xv.match(isPatternSide, previousMatchResult, argValues); 
 			
-			System.out.println(lastMatch.getNumMatched()+"~"+lastMatch.getLastMatchICType()+"\n");
+			// System.out.println(lastMatch.getNumMatched()+"~"+lastMatch.getLastMatchICType()+"\n");
 		
 			while (lastMatch.getNumMatched()<argValues.size() && true == lastMatch.getLastMatchSucceed())
 			{

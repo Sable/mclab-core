@@ -662,7 +662,7 @@ doubleResultVersatileQuery; versatileQuery
 
 # TODO fix this output?!
 size;; Class(any (numeric|logical)? -> double double double double double double double double double double double double double double double)
--Shape(numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$)
+-Shape(numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(1), $|M, $->$||numOutput(2),[m,n]->$,$)
 
 # scalar numerical 
 scalarDoubleResultVersatileQuery; doubleResultVersatileQuery
@@ -700,6 +700,8 @@ isscalar
 
 multiaryToScalarLogicalVersatileQuery; versatileQuery
 -Class(any any any*->logical)
+-Shape($|M,$|M->$)
+-isComplex(R,R->R || X,R->R || R,X->R || X,X->R)
 # same as isequal; but nan == nan
 isequalwithequalnans
 # recursive equal all
