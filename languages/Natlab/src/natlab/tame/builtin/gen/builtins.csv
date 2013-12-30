@@ -249,9 +249,8 @@ mtimes;; MatlabClass(logical 0->double, parent);; Shape($|M,$|M->M||[m,n],[n,k]-
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
--Shape($|M,$|M->M)
-mldivide
-mrdivide
+mldivide;; Shape([m,k],[m,n]->[k,n])
+mrdivide;; Shape([m,k],[n,k]->[m,n])
 
 
 # improper numerical matrix functions don't have a fixed arity, and take (optional) extra

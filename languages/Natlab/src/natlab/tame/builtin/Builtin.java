@@ -1485,23 +1485,14 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic implements HasShapePropagationInfo {
+    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDividingArrayArithmetic(this,arg);
         }
         
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
-            }
-            return shapePropInfo;
-        }
-
     }
-    public static class Mldivide extends AbstractDividingArrayArithmetic  {
+    public static class Mldivide extends AbstractDividingArrayArithmetic implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mldivide singleton = null;
         public static Mldivide getInstance(){
@@ -1517,8 +1508,17 @@ public abstract class Builtin {
             return "mldivide";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[m,k],[m,n]->[k,n]");
+            }
+            return shapePropInfo;
+        }
+
     }
-    public static class Mrdivide extends AbstractDividingArrayArithmetic  {
+    public static class Mrdivide extends AbstractDividingArrayArithmetic implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mrdivide singleton = null;
         public static Mrdivide getInstance(){
@@ -1534,6 +1534,15 @@ public abstract class Builtin {
             return "mrdivide";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[m,k],[n,k]->[m,n]");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static abstract class AbstractImproperNumericFunction extends AbstractNumericFunction  {
         //visit visitor
