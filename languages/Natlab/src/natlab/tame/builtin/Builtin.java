@@ -7139,7 +7139,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$->$||$,M->M");
+                shapePropInfo = ShapePropTool.parse("$->$||$,($,n=previousScalar(),add())+->M");
             }
             return shapePropInfo;
         }
@@ -7163,7 +7163,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("R,R? -> R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R* -> R");
             }
             return isComplexPropInfo;
         }

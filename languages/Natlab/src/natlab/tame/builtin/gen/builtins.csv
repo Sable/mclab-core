@@ -883,7 +883,7 @@ randomFunction; impureFunction
 -Shape([]->$||($,n=previousScalar(),add())+->M)
 rand
 randn
-randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double));; Shape($->$||$,M->M);; isComplex(R,R? -> R)
+randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double));; Shape($->$||$,($,n=previousScalar(),add())+->M);; isComplex(R,R* -> R)
 randperm;; Shape($,n=previousScalar()->[1,n])
 
 
