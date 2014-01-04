@@ -249,8 +249,8 @@ mtimes;; MatlabClass(logical 0->double, parent);; Shape($|M,$|M->M||[m,n],[n,k]-
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
-mldivide;; Shape([m,k],[m,n]->[k,n])
-mrdivide;; Shape([m,k],[n,k]->[m,n])
+mldivide;; Shape($,M->M||[m,k],[m,n]->[k,n])
+mrdivide;; Shape(M,$->M||[m,k],[n,k]->[m,n])
 
 
 # improper numerical matrix functions don't have a fixed arity, and take (optional) extra
@@ -730,9 +730,9 @@ ctranspose
 # all these take multiple args
 Concatenation; versatileFunction
 horzcat;; Shape([]->[0,0]||M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K)
--isComplex(A,A+ -> NUMXARGS>0?X:R)
+-isComplex(A,A* -> NUMXARGS>0?X:R)
 vertcat;; Shape([]->[0,0]||M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K)
--isComplex(A,A+ -> NUMXARGS>0?X:R)
+-isComplex(A,A* -> NUMXARGS>0?X:R)
 # generalization of horz/vert cat
 cat
 

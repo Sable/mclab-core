@@ -1512,7 +1512,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[m,k],[m,n]->[k,n]");
+                shapePropInfo = ShapePropTool.parse("$,M->M||[m,k],[m,n]->[k,n]");
             }
             return shapePropInfo;
         }
@@ -1538,7 +1538,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[m,k],[n,k]->[m,n]");
+                shapePropInfo = ShapePropTool.parse("M,$->M||[m,k],[n,k]->[m,n]");
             }
             return shapePropInfo;
         }
@@ -6004,7 +6004,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }
@@ -6039,7 +6039,7 @@ public abstract class Builtin {
         public ICNode getisComplexPropagationInfo(){
             //set isComplexPropInfo if not defined
             if (isComplexPropInfo == null){
-                isComplexPropInfo = isComplexInfoPropTool.parse("A,A+ -> NUMXARGS>0?X:R");
+                isComplexPropInfo = isComplexInfoPropTool.parse("A,A* -> NUMXARGS>0?X:R");
             }
             return isComplexPropInfo;
         }
