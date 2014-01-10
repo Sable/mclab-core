@@ -820,8 +820,8 @@ builtin
 
 timeFunction; impureFunction
 clock;; Class(none -> double);; Shape([]->[1,6])
-tic
-toc
+tic;; Class(none -> double);; Shape([]->$);; isComplex(A*->R)
+toc;; Class(none -> double);; Shape([]->$);; isComplex(A*->R)
 cputime
 
 

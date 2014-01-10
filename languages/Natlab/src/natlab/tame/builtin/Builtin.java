@@ -6306,7 +6306,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Tic extends AbstractTimeFunction  {
+    public static class Tic extends AbstractTimeFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Tic singleton = null;
         public static Tic getInstance(){
@@ -6322,8 +6322,41 @@ public abstract class Builtin {
             return "tic";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[]->$");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("none -> double");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A*->R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
-    public static class Toc extends AbstractTimeFunction  {
+    public static class Toc extends AbstractTimeFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Toc singleton = null;
         public static Toc getInstance(){
@@ -6339,6 +6372,39 @@ public abstract class Builtin {
             return "toc";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[]->$");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("none -> double");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A*->R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Cputime extends AbstractTimeFunction  {
         //returns the singleton instance of this class
