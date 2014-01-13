@@ -34,6 +34,7 @@ public class Call<Arg> {
 	public boolean equals(Object obj) {
 		if (obj instanceof Call<?>) {
 			Call<?> aCall = (Call<?>) obj;
+			System.out.println( aCall.functionRef.getName());
 			return (aCall.functionRef.equals(functionRef))
 					&& ((aCall.argument != null) ? aCall.argument
 							.equals(argument) : aCall.argument == argument);

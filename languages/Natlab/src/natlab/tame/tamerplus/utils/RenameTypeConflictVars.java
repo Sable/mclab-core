@@ -66,8 +66,8 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
 				callgraph, Args.newInstance(inputValues), factory);
 		
-		if (debug)
-			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+//		if (debug)
+//			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
 		
 		System.out
