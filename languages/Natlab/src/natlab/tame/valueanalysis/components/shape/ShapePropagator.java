@@ -241,6 +241,14 @@ public class ShapePropagator<V extends Value<V>>
         						.getShape().getDimensions().get(1));
     					indexedDimensions.add(new DimValue(1, null));
     				}
+    				else if (indices.size() == 1 
+    						&& ((HasShape<V>)indices.get(0)).getShape().isRowVector()) {
+    					indexedDimensions.add(new DimValue(1, null));
+        				// add the value of the second dimension of the vector to the return shape.
+        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        						.getShape().getDimensions().get(1));
+    				}
+    				// TODO what if the indices is a column vector
     				else {
         				// add the value of the second dimension of the vector to the return shape.
         				indexedDimensions.add(((HasShape<V>)indices.get(i))
@@ -526,6 +534,10 @@ public class ShapePropagator<V extends Value<V>>
     						// TODO may need to mark the current flow set as nonviable.
     						return new ShapeFactory<V>().getOutOfBoundShape();
     					}
+    				}
+    				else if (!lhsArrayShape.isConstant() && lhsArrayShape.isRowVector() 
+    						&& ((HasShape<V>)indices.get(i)).getShape().isRowVector()) {
+    					// keep the original shape.
     				}
     				else {
     					/*

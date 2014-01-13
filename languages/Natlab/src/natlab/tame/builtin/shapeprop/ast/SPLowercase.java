@@ -74,6 +74,18 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 						previousMatchResult.setNumInVertcat(index+1);
 						return previousMatchResult;
 					}
+					else if (!previousMatchResult.getValueOfVariable(s).hasIntValue() 
+							&& argumentShape.getDimensions().get(index).hasIntValue()) {
+						// TODO
+						previousMatchResult.setNumInVertcat(index+1);
+						return previousMatchResult;
+					}
+					else if (previousMatchResult.getValueOfVariable(s).hasIntValue() 
+							&& !argumentShape.getDimensions().get(index).hasIntValue()) {
+						// TODO
+						previousMatchResult.setNumInVertcat(index+1);
+						return previousMatchResult;
+					}
 					else {
 						System.err.println("shape propagation fails in vertcat matching.");
 						previousMatchResult.setIsError(true);

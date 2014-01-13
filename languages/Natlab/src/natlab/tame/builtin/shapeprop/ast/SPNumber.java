@@ -94,13 +94,13 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 				if (shapeOfCurrentArg!=null) {
 					List<DimValue> dimensions = shapeOfCurrentArg.getDimensions();
 					if (!dimensions.get(previousMatchResult.getNumInVertcat()).hasIntValue()) {
-						System.err.println("cannot determine whether the size of " + previousMatchResult
+						if (Debug) System.err.println("cannot determine whether the size of " + previousMatchResult
 								.getNumInVertcat() + " dimension equals to " + n.intValue());
 						previousMatchResult.setIsError(true);
 						return previousMatchResult;
 					}
 					if (dimensions.get(previousMatchResult.getNumInVertcat()).getIntValue() != n.intValue()) {
-						System.err.println("the size of " + previousMatchResult.getNumInVertcat() 
+						if (Debug) System.err.println("the size of " + previousMatchResult.getNumInVertcat() 
 								+ "dimension doesn't equal to " + n.intValue());
 						previousMatchResult.setIsError(true);
 						return previousMatchResult;

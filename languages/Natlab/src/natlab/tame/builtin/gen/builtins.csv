@@ -249,9 +249,8 @@ mtimes;; MatlabClass(logical 0->double, parent);; Shape($|M,$|M->M||[m,n],[n,k]-
 # integers can only be comibned with scalar doubles -- or not?
 mpower;; Shape($,$|M->M||$|M,$->M)
 dividingArrayArithmetic; arrayBinaryArithmetic
--Shape($|M,$|M->M)
-mldivide
-mrdivide
+mldivide;; Shape($,M->M||[m,k],[m,n]->[k,n])
+mrdivide;; Shape(M,$->M||[m,k],[n,k]->[m,n])
 
 
 # improper numerical matrix functions don't have a fixed arity, and take (optional) extra
@@ -488,7 +487,7 @@ toLogicalMatrixQuery; matrixQuery
 # unary return logicals
 unaryToLogicalMatrixQuery; toLogicalMatrixQuery
 -Class(matrix->logical)
--Shape($->$)
+-Shape($|M->$)
 scalarUnaryToLogicalMatrixQuery; unaryToLogicalMatrixQuery
 not
 any
@@ -731,9 +730,9 @@ ctranspose
 # all these take multiple args
 Concatenation; versatileFunction
 horzcat;; Shape([]->[0,0]||M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K)
--isComplex(A,A+ -> NUMXARGS>0?X:R)
+-isComplex(A,A* -> NUMXARGS>0?X:R)
 vertcat;; Shape([]->[0,0]||M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K)
--isComplex(A,A+ -> NUMXARGS>0?X:R)
+-isComplex(A,A* -> NUMXARGS>0?X:R)
 # generalization of horz/vert cat
 cat
 
@@ -821,8 +820,8 @@ builtin
 
 timeFunction; impureFunction
 clock;; Class(none -> double);; Shape([]->[1,6])
-tic
-toc
+tic;; Class(none -> double);; Shape([]->$);; isComplex(A*->R)
+toc;; Class(none -> double);; Shape([]->$);; isComplex(A*->R)
 cputime
 
 
@@ -884,7 +883,7 @@ randomFunction; impureFunction
 -Shape([]->$||($,n=previousScalar(),add())+->M)
 rand
 randn
-randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double))
+randi;; Class(numeric|logical (numeric|logical)* typeString(numeric)|(none->double));; Shape($->$||$,($,n=previousScalar(),add())+->M);; isComplex(R,R* -> R)
 randperm;; Shape($,n=previousScalar()->[1,n])
 
 

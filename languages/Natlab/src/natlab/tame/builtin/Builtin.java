@@ -1485,23 +1485,14 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic implements HasShapePropagationInfo {
+    public static abstract class AbstractDividingArrayArithmetic extends AbstractArrayBinaryArithmetic  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDividingArrayArithmetic(this,arg);
         }
         
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$|M,$|M->M");
-            }
-            return shapePropInfo;
-        }
-
     }
-    public static class Mldivide extends AbstractDividingArrayArithmetic  {
+    public static class Mldivide extends AbstractDividingArrayArithmetic implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mldivide singleton = null;
         public static Mldivide getInstance(){
@@ -1517,8 +1508,17 @@ public abstract class Builtin {
             return "mldivide";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$,M->M||[m,k],[m,n]->[k,n]");
+            }
+            return shapePropInfo;
+        }
+
     }
-    public static class Mrdivide extends AbstractDividingArrayArithmetic  {
+    public static class Mrdivide extends AbstractDividingArrayArithmetic implements HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static Mrdivide singleton = null;
         public static Mrdivide getInstance(){
@@ -1534,6 +1534,15 @@ public abstract class Builtin {
             return "mrdivide";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,$->M||[m,k],[n,k]->[m,n]");
+            }
+            return shapePropInfo;
+        }
+
     }
     public static abstract class AbstractImproperNumericFunction extends AbstractNumericFunction  {
         //visit visitor
@@ -3654,7 +3663,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$->$");
+                shapePropInfo = ShapePropTool.parse("$|M->$");
             }
             return shapePropInfo;
         }
@@ -6297,7 +6306,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Tic extends AbstractTimeFunction  {
+    public static class Tic extends AbstractTimeFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Tic singleton = null;
         public static Tic getInstance(){
@@ -6313,8 +6322,41 @@ public abstract class Builtin {
             return "tic";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[]->$");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("none -> double");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A*->R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
-    public static class Toc extends AbstractTimeFunction  {
+    public static class Toc extends AbstractTimeFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Toc singleton = null;
         public static Toc getInstance(){
@@ -6330,6 +6372,39 @@ public abstract class Builtin {
             return "toc";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("[]->$");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("none -> double");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A*->R");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Cputime extends AbstractTimeFunction  {
         //returns the singleton instance of this class
@@ -7110,7 +7185,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Randi extends AbstractRandomFunction implements HasClassPropagationInfo {
+    public static class Randi extends AbstractRandomFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Randi singleton = null;
         public static Randi getInstance(){
@@ -7126,6 +7201,15 @@ public abstract class Builtin {
             return "randi";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$->$||$,($,n=previousScalar(),add())+->M");
+            }
+            return shapePropInfo;
+        }
+
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -7139,6 +7223,15 @@ public abstract class Builtin {
                 classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
             }
             return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("R,R* -> R");
+            }
+            return isComplexPropInfo;
         }
 
     }

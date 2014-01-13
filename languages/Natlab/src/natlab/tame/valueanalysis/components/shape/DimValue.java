@@ -58,13 +58,20 @@ public class DimValue {
 	}
 	
 	public boolean equals(DimValue o) {
-		if (intValue!=null&&o.hasIntValue()) {
-			if (intValue==o.getIntValue()) return true;
-			return false;
+		if (intValue != null && o.hasIntValue()) {
+			if (intValue.equals(o.getIntValue())) 
+				return true;
+			else 
+				return false;
 		}
-		else if (intValue==null&&!o.hasIntValue()) {
-			if (symbolic==o.getSymbolic()) return true;
-			return false;
+		else if (intValue == null && !o.hasIntValue()) {
+			if (symbolic !=null && o.hasSymbolic() 
+					&& symbolic.equals(o.getSymbolic())) 
+				return true;
+			else if (symbolic == null && !o.hasSymbolic())
+				return true;
+			else 
+				return false;
 		}
 		return false;
 	}
