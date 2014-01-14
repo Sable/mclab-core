@@ -18,6 +18,7 @@ Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill Universit
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -32,7 +33,6 @@ import com.google.common.collect.Iterables;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.utils.NodeFinder;
 
@@ -333,10 +333,10 @@ aspect ASTtoXML {
     createXmlElement(doc, parent, "nameId", getID());
   }
 
-  public void NameExpr.annotateXMLWithKind(Element e, String name, VFFlowset f, String n){
+  public void NameExpr.annotateXMLWithKind(Element e, String name, Map<String, VFDatum> f, String n){
     VFDatum d = null;
     if (f != null) {
-      d = f.contains(n);
+      d = f.get(n);
     }
     String kind="null";
     if (d != null) {
@@ -348,11 +348,11 @@ aspect ASTtoXML {
   public void NameExpr.getXML(Document doc, Element parent) {
     Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
     if (include_kinds_in_xml) {
-      VFFlowset out_sensitive = kind_analysis_sensitive.getOutFlowSets()
+      Map<String, VFDatum> out_sensitive = kind_analysis_sensitive.getOutFlowSets()
           .get(parentProgram != null ? parentProgram : getName());
-      VFFlowset out_insensitive = kind_analysis_insensitive.getFlowSets()
+      Map<String, VFDatum> out_insensitive = kind_analysis_insensitive.getFlowSets()
           .get(parentProgram != null ? parentProgram : getName());
-      VFFlowset out_preorder = kind_analysis_preorder.getFlowSets().get(getName());
+      Map<String, VFDatum> out_preorder = kind_analysis_preorder.getFlowSets().get(getName());
       annotateXMLWithKind(e, "kind", out_preorder, getName().getID());
       annotateXMLWithKind(e, "kind_insensitive", out_insensitive, getName().getID());
       annotateXMLWithKind(e, "kind_sensitive", out_sensitive, getName().getID());

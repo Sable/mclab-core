@@ -6,6 +6,7 @@ import java.util.Map;
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.refactoring.Exceptions.RenameRequired;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
+import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
@@ -51,7 +52,9 @@ public class FevalToCall {
 	public List<RefactorException> replace(ParameterizedExpr node, VFFlowInsensitiveAnalysis kind){
 		List<RefactorException> errors = Lists.newLinkedList();
 		String target = ((StringLiteralExpr)node.getArg(0)).getValue();
-		if (kind.getFlowSets().get(context.peek().curFunction).getKind(target).isVariable())
+		Map<String, VFDatum> kinds = kind.getFlowSets().get(context.peek().curFunction);
+		VFDatum targetKind = kinds.containsKey(target) ? kinds.get(target) : VFDatum.UNDEF;
+		if (targetKind.isVariable())
 			errors.add(new RenameRequired(new Name(target)));
         if (errors.isEmpty()) {
             node.setTarget(new NameExpr(new Name(target)));

@@ -9,7 +9,6 @@ import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FunctionReference;
 import natlab.utils.AbstractNodeFunction;
@@ -137,15 +136,18 @@ public class MScriptInliner {
 		for(int j=target.getStmtList().getNumChild()-1;j>=0;j--){
 			list.insertChild(target.getStmtList().getChild(j), i);
 		}
-		VFFlowset kind_f_results = kind_analysis_f.getOutFlowSets().get(f);
+		Map<String, VFDatum> kind_f_results = kind_analysis_f.getOutFlowSets().get(f);
 		VFFlowSensitiveAnalysis kind_analysis_post = new VFFlowSensitiveAnalysis(f);
 		kind_analysis_post.analyze();
 		for (Name n: symbols_s){
 			String sym = n.getID();
 			VFDatum kind_s;
-            kind_s=kind_analysis_s.getOutFlowSets().get(target).getKind(sym);
-			VFDatum kind_f=kind_f_results.getKind(sym);
-			VFDatum kind_post = kind_analysis_post.getOutFlowSets().get(f).getKind(sym);
+            kind_s=kind_analysis_s.getOutFlowSets().get(target).get(sym);
+            if (kind_s == null) kind_s = VFDatum.UNDEF;
+			VFDatum kind_f=kind_f_results.get(sym);
+			if (kind_f == null) kind_f = VFDatum.UNDEF;
+			VFDatum kind_post = kind_analysis_post.getOutFlowSets().get(f).get(sym);
+			if (kind_post == null) kind_post = VFDatum.UNDEF;
 			if (kind_s!=VFDatum.UNDEF && kind_f!=VFDatum.UNDEF && kind_s.merge(kind_f)==VFDatum.TOP)
 				e.add(new Exceptions.RenameRequired(n));
 			if (kind_s.isFunction() || kind_s.isID()){

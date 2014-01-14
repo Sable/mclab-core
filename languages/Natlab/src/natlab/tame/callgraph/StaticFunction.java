@@ -25,7 +25,6 @@ import natlab.tame.simplification.ThreeAddressToIR;
 import natlab.tame.tir.TIRFunction;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFDatum;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.RenameSymbols;
@@ -110,11 +109,11 @@ public class StaticFunction implements Cloneable {
         //perform variable or function analysis on function and get result
         VFPreorderAnalysis functionAnalysis = new VFPreorderAnalysis(this.function,this.context.getFunctionOrScriptQuery());
         functionAnalysis.analyze();
-        VFFlowset flowset; 
+        Map<String, VFDatum> flowset; 
         flowset = functionAnalysis.getFlowSets().get(function);
         
         //go through all symbols, and put them in the symbol table
-        for (Map.Entry<String, VFDatum> entry : flowset) {
+        for (Map.Entry<String, VFDatum> entry : flowset.entrySet()) {
             String name = entry.getKey();
             VFDatum vf = entry.getValue();
             

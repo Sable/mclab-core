@@ -12,7 +12,7 @@ import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.utils.NodeFinder;
 import analysis.Analysis;
@@ -47,7 +47,7 @@ public class ExtractFunction extends Refactoring {
   private Map<String, Set<Def>> reachingAfter;
   private Set<String> liveBefore;
   private Set<String> liveAfter;
-  private VFFlowset kinds;
+  private Map<String, VFDatum> kinds;
 
   private LinkedList<RefactorException> errors = Lists.newLinkedList();
   private Set<String> addedGlobals = Sets.newHashSet();
@@ -96,7 +96,7 @@ public class ExtractFunction extends Refactoring {
   private Iterable<String> liveVariablesAtInputOfNewFunction() {
     return Iterables.filter(liveBefore, new Predicate<String>() {
       @Override public boolean apply(String id) {
-        return kinds.getKind(id).isVariable();
+        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable();
       }
     });
   }
@@ -104,7 +104,8 @@ public class ExtractFunction extends Refactoring {
   private Iterable<String> liveVariablesDefinedInNewFunction() {
     return Iterables.filter(liveAfter, new Predicate<String>() {
       @Override public boolean apply(String id) {
-        return kinds.getKind(id).isVariable() && reachingAfter.containsKey(id);
+        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable() &&
+            reachingAfter.containsKey(id);
       }
     });
   }

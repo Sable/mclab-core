@@ -8,6 +8,8 @@ import ast.Expr;
 import ast.FunctionHandleExpr;
 import ast.LambdaExpr;
 
+import com.google.common.collect.Sets;
+
 public class SimpleFunctionHandleAnalysis extends
 		AbstractSimpleStructuralForwardAnalysis<VariableEntryFlowSet> {
 	
@@ -72,14 +74,12 @@ public class SimpleFunctionHandleAnalysis extends
 	
 	@Override
 	public VariableEntryFlowSet copy(VariableEntryFlowSet source) {
-		return (VariableEntryFlowSet) source.copy();
+		return (VariableEntryFlowSet) Sets.newHashSet(source);
 	}
 	
 	@Override
 	public VariableEntryFlowSet merge(VariableEntryFlowSet in1, VariableEntryFlowSet in2) {
-		VariableEntryFlowSet out = new VariableEntryFlowSet();
-		in1.union(in2, out);
-		return out;
+	  return (VariableEntryFlowSet) Sets.newHashSet(Sets.union(in1, in2));
 	}
 
 	@Override

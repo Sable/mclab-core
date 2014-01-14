@@ -1,8 +1,14 @@
 package natlab.toolkits.analysis.handlepropagation;
 
-import java.util.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
+import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeSet;
+
+import natlab.toolkits.analysis.handlepropagation.handlevalues.AbstractValue;
+import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
+
+import com.google.common.collect.ForwardingMap;
 
 /**
  * Special implementation of FlowSet for HandlePropagation
@@ -15,15 +21,24 @@ import natlab.toolkits.analysis.handlepropagation.handlevalues.*;
  *
  * @see HandleTarget
  */
-public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
+public class HandleFlowset extends ForwardingMap<String, TreeSet<Value>>
 {
-    public HashMap<String, TreeSet<Value>> getMap(){
-	return map;
+    private Map<String, TreeSet<Value>> map;
+    
+    @Override
+    public Map<String, TreeSet<Value>> delegate() {
+      return map;
     }
+  
+    public Map<String, TreeSet<Value>> getMap(){
+	  return map;
+    }
+    
+    
     public void addAll( String key, Collection<Value> values )
     {
-        if( !map.containsKey(key) )
-            map.put(key, new TreeSet<Value>());
+        if(containsKey(key) )
+            put(key, new TreeSet<Value>());
         for( Value target: values ){
             add(key, target);
         }
@@ -60,7 +75,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
     }
     public void add(String key, Value value)
     {
-        TreeSet<Value> oldSet = map.get(key);
+        TreeSet<Value> oldSet = get(key);
         if( oldSet == null ){
             TreeSet<Value> set = new TreeSet<Value>();
             set.add( value );
@@ -90,7 +105,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
 
         //if it has 0 or 1 entry then it must be correct
         if( entry.getValue().size()==0 || entry.getValue().size()==1 )
-            super.add(entry);
+            map.put(entry.getKey(), entry.getValue());
         else{
             TreeSet<Value> set = entry.getValue();
             boolean hasDO, hasDHO, hasDWH;
@@ -114,7 +129,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
                 newSet.remove(AbstractValue.newDataHandleOnly());
                 entry = new AbstractMap.SimpleEntry<String,TreeSet<Value>>( entry.getKey(), newSet );
             }
-            super.add(entry);
+            map.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -128,7 +143,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
      */
     public boolean remove( String key, Value value )
     {
-        TreeSet<Value> set = map.get(key);
+        TreeSet<Value> set = get(key);
         if( set != null )
             return set.remove( value );
         else
@@ -141,18 +156,10 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
      */
     public boolean contains( String key, Value value )
     {
-        TreeSet<Value> set = map.get(key);
-        if( set != null )
-            return set.contains( value );
-        else
-            return false;
+        TreeSet<Value> set = get(key);
+        return set != null && set.contains(value);
     }
 
-    public TreeSet<Value> get( String key )
-    {
-        return map.get(key);
-    }
-    
     /**
      * Copies the flowset into another one. Does a clone of the sets
      * in map.
@@ -163,7 +170,7 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
             return;
         else{
             other.clear();
-            for( Map.Entry<String,TreeSet<Value>> entry : map.entrySet() ){
+            for( Map.Entry<String,TreeSet<Value>> entry : entrySet() ){
                 other.add(entry.getKey(), new TreeSet<Value>(entry.getValue()));
             }
         }
@@ -190,14 +197,14 @@ public class HandleFlowset extends HashMapFlowSet<String, TreeSet<Value>>
 
         HandleFlowset tmpDest = new HandleFlowset();
         
-        for( Map.Entry<String, TreeSet<Value>> entry : this.toList()){
+        for( Map.Entry<String, TreeSet<Value>> entry : entrySet()){
             String key = entry.getKey();
             TreeSet<Value> set = new TreeSet<Value>(entry.getValue());
             if( !other.containsKey( entry.getKey() ) )
                 set.add( AbstractValue.newUndef() );
             tmpDest.add( key, set );
         }
-        for( Map.Entry<String, TreeSet<Value>> entry : other.toList()){
+        for( Map.Entry<String, TreeSet<Value>> entry : entrySet()){
             if( tmpDest.containsKey( entry.getKey() ) ){
                 TreeSet<Value> tmpSet = tmpDest.get( entry.getKey() );
                 for( Value value : entry.getValue() ){

@@ -21,13 +21,36 @@
 
 package natlab.toolkits.rewrite.threeaddress;
 
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
 
-import ast.*;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TempFactory;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.CellArrayExpr;
+import ast.CellIndexExpr;
+import ast.ColonExpr;
+import ast.DotExpr;
+import ast.EndCallExpr;
+import ast.EndExpr;
+import ast.Expr;
+import ast.LambdaExpr;
+import ast.List;
+import ast.LiteralExpr;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.RangeExpr;
+import ast.Row;
+import ast.UnaryExpr;
 
 /**
  * Used to collect sub expressions from an expression. For each
@@ -45,7 +68,7 @@ import natlab.toolkits.analysis.varorfun.*;
 public class ExpressionCollector extends AbstractLocalRewrite
 {
     private LinkedList<AssignStmt> newAssignments;
-    private VFFlowset resolvedNames;
+    private Map<String, VFDatum> resolvedNames;
     private VFPreorderAnalysis kindAnalysis;
     protected boolean isLHS = false;
     //protected boolean rewritingEnds = false;
@@ -56,7 +79,7 @@ public class ExpressionCollector extends AbstractLocalRewrite
     protected HashMap< Expr, HashSet<EndCallExpr>> targetAndEndMap;
     
     public ExpressionCollector( ASTNode tree, 
-                                VFFlowset resolvedNames )
+                                Map<String, VFDatum> resolvedNames )
     {
         super( tree );
         this.resolvedNames = resolvedNames;
@@ -295,12 +318,12 @@ public class ExpressionCollector extends AbstractLocalRewrite
             VFDatum kind;
             if( resolvedNames == null )
                 try{
-                    kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).contains(nameExpr.getName().getID());
+                    kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).get(nameExpr.getName().getID());
                 }catch( NullPointerException e ){
                     kind = null;
                 }
             else
-                kind = resolvedNames.contains( nameExpr.getName().getID() );
+                kind = resolvedNames.get( nameExpr.getName().getID() );
             //System.out.println("kind: "+nameExpr.getPrettyPrinted() + " " + kind);
             return (kind!=null) && kind.isVariable();
         }
@@ -324,10 +347,10 @@ public class ExpressionCollector extends AbstractLocalRewrite
                     //TODO - not efficient, but probably better than making assumptiions!
                 }
                 
-                kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).contains(nameExpr.getName().getID());
+                kind = kindAnalysis.getFlowSets().get(nameExpr.getName()).get(nameExpr.getName().getID());
                 
             }else
-                kind = resolvedNames.contains( nameExpr.getName().getID() );
+                kind = resolvedNames.get( nameExpr.getName().getID() );
             //System.out.println("kind: "+nameExpr.getPrettyPrinted() + " " + kind);
             return (kind!=null) && kind.isFunction();
         }
