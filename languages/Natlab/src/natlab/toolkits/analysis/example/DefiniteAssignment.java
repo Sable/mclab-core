@@ -1,6 +1,7 @@
 package natlab.toolkits.analysis.example;
 
-import natlab.toolkits.analysis.HashSetFlowSet;
+import java.util.Set;
+
 import analysis.AbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -9,15 +10,17 @@ import ast.Name;
 import ast.Script;
 import ast.Stmt;
 
-public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis< HashSetFlowSet<String> >
+import com.google.common.collect.Sets;
+
+public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<Set<String>>
 {
 
-    public HashSetFlowSet<String> newInitialFlow()
+    public Set<String> newInitialFlow()
     {
-        return new HashSetFlowSet<String>();
+        return Sets.newHashSet();
     }
 
-    public DefiniteAssignment( ASTNode tree )
+    public DefiniteAssignment( ASTNode<?> tree )
     {
         super(tree);
         currentOutSet = newInitialFlow();
@@ -39,14 +42,14 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
     
     public void caseAssignStmt( AssignStmt node )
     {
-        inFlowSets.put(node, currentInSet.copy() );
+        inFlowSets.put(node, Sets.newHashSet(currentInSet));
         //This line was not in the slides, it is here to make sure that the assignStmt 
         //actually owns the outset it is modifying.
         currentOutSet = copy(currentInSet);
         for( String s: node.getLValues()){
             currentOutSet.add( s );
         }
-        outFlowSets.put(node, currentOutSet.copy() );
+        outFlowSets.put(node, Sets.newHashSet(currentOutSet));
     }
 
     //This method was not in the slides. It is there to add info for each statement.
@@ -58,15 +61,13 @@ public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<
         outFlowSets.put( node, currentInSet );
     }
     
-    public HashSetFlowSet<String> copy( HashSetFlowSet<String> source)
+    public Set<String> copy(Set<String> source)
     {
-      return source.copy();
+      return Sets.newHashSet(source);
     }
     
-    public HashSetFlowSet<String> merge( HashSetFlowSet<String> in1, HashSetFlowSet<String> in2)
+    public Set<String> merge(Set<String> in1, Set<String> in2)
     {
-        HashSetFlowSet<String> out = new HashSetFlowSet<String>();
-        in1.intersection( in2, out );
-        return out;
+      return Sets.newHashSet(Sets.intersection(in1, in2));
     }
 }

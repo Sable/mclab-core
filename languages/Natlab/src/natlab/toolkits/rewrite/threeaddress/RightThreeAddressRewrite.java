@@ -22,8 +22,9 @@
 package natlab.toolkits.rewrite.threeaddress;
 
 import java.util.LinkedList;
+import java.util.Map;
 
-import natlab.toolkits.analysis.varorfun.VFFlowset;
+import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.AbstractLocalRewrite;
 import natlab.toolkits.rewrite.TransformedNode;
@@ -116,7 +117,7 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
      * sub-expressions into temporaries. 
      */
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
-                                                   VFFlowset resolvedNames )
+                                                   Map<String, VFDatum> resolvedNames )
     {
         LinkedList<AssignStmt> newAssignList = Lists.newLinkedList();
         Expr rhs;

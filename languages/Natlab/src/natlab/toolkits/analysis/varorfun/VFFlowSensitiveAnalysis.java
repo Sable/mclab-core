@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import natlab.LookupFile;
+import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import analysis.AbstractStructuralForwardAnalysis;
 import ast.ASTNode;
@@ -25,7 +26,9 @@ import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
 
-public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<VFFlowset> implements VFAnalysis{
+import com.google.common.collect.Maps;
+
+public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<Map<String, VFDatum>> implements VFAnalysis{
   private Function currentFunction = null;
   private Script currentScript = null;
   private FunctionOrScriptQuery lookupQuery = null;
@@ -46,8 +49,8 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
 
   @Override
-  public VFFlowset newInitialFlow() {
-    return new VFFlowset();
+  public Map<String, VFDatum> newInitialFlow() {
+    return Maps.newHashMap();
   }
   public VFFlowSensitiveAnalysis( ASTNode tree , FunctionOrScriptQuery lookup )
   {
@@ -62,11 +65,11 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
 
   private void putInVar(String name) {
-    currentInSet.add(ValueDatumPair.create(name, VFDatum.VAR));
+    MergeUtil.mergePut(currentInSet, name, VFDatum.VAR);
   }
 
   private void putOutVar(String name) {
-    currentOutSet.add(ValueDatumPair.create(name, VFDatum.VAR));
+    MergeUtil.mergePut(currentOutSet, name, VFDatum.VAR);
   }
 
   public void caseScript( Script node )
@@ -77,7 +80,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     currentOutSet = currentInSet;
     node.getStmts().analyze(this);
     currentScript=null;
-    outFlowSets.put( node, currentOutSet.copy() );
+    outFlowSets.put( node, Maps.newHashMap(currentOutSet) );
   }
 
   @Override
@@ -96,9 +99,9 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     currentInSet = newInitialFlow();
     currentOutSet = currentInSet;
     if (node.getParent().getParent() instanceof Function){
-      for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent())) {
+      for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).entrySet()) {
         if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
-          currentInSet.add( pair );
+          MergeUtil.mergePut(currentInSet, pair.getKey(), pair.getValue());
       }        	
     }
 
@@ -169,7 +172,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   @Override
   public void caseFunctionHandleExpr( FunctionHandleExpr node )
   {
-    currentOutSet.add(ValueDatumPair.create(node.getName().getID(), VFDatum.FUN ));
+    MergeUtil.mergePut(currentOutSet, node.getName().getID(), VFDatum.FUN);
     annotateNode(node.getName());
   }
 
@@ -180,23 +183,20 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     if ( inFunction )
     {
       String s = node.getName().getID();
-      VFDatum d = currentOutSet.contains( s );
+      VFDatum d = currentOutSet.get( s );
       if ( s!=null && d==null || VFDatum.BOT.equals( d ) )
       {
-        if ( scriptOrFunctionExists( s ) ) 
-          currentOutSet.add(ValueDatumPair.create( s, VFDatum.FUN ) );
-        else if ( packageExists( s ) ) 
-          currentOutSet.add(ValueDatumPair.create( s, VFDatum.PREFIX) );
-        else 
-          currentOutSet.add(ValueDatumPair.create( s, VFDatum.BOT ) );
+        VFDatum val = scriptOrFunctionExists(s) ? VFDatum.FUN 
+            : packageExists(s) ? VFDatum.PREFIX : VFDatum.BOT;
+        MergeUtil.mergePut(currentOutSet, s, val);
       }
     }
     else{
       String s = node.getName().getID();
-      VFDatum d = currentOutSet.contains( s );		    
+      VFDatum d = currentOutSet.get( s );		    
       if ( d==null || VFDatum.BOT.equals(d) )
       {
-        currentOutSet.add(ValueDatumPair.create( s, VFDatum.LDVAR ) );
+        MergeUtil.mergePut(currentOutSet, s, VFDatum.LDVAR);
       }
     }
     annotateNode(node.getName());
@@ -260,7 +260,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
     target.analyze( this );
 
 
-    VFDatum d =  currentOutSet.contains( targetName ); 
+    VFDatum d =  currentOutSet.get( targetName ); 
     if ( d == null || d == VFDatum.BOT || VFDatum.LDVAR == d || d == VFDatum.WAR || d == VFDatum.TOP ) { 
       endCandidates.add(res);
     }
@@ -347,14 +347,14 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
 
   private void bindError(NameExpr n, EndExpr e){
-    currentOutSet.add(n.getName().getID(), VFDatum.TOP);
+    MergeUtil.mergePut(currentOutSet, n.getName().getID(), VFDatum.TOP);
     annotateNode(n.getName());
   }
 
   private void bindWarn(NameExpr n, EndExpr e){
-    VFDatum d = currentOutSet.contains(n.getName().getID());
+    VFDatum d = currentOutSet.get(n.getName().getID());
     if (d != VFDatum.VAR)
-      currentOutSet.add(n.getName().getID(), VFDatum.WAR);
+      MergeUtil.mergePut(currentOutSet, n.getName().getID(), VFDatum.WAR);
     annotateNode(n.getName());
   }
 
@@ -363,16 +363,16 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
   @Override
   public VFDatum getResult(Name n) {
-    return outFlowSets.get(n).contains(n.getID());
+    return outFlowSets.get(n).get(n.getID());
   }
 
   @Override
-  public VFFlowset processBreaks() {
+  public Map<String, VFDatum> processBreaks() {
     return currentOutSet;
   }
 
   @Override
-  public VFFlowset processContinues() {
+  public Map<String, VFDatum> processContinues() {
     return currentOutSet;
   }
 
@@ -398,14 +398,14 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<V
   }
 
   @Override
-  public VFFlowset copy(VFFlowset source) {
-    return source.copy();
+  public Map<String, VFDatum> copy(Map<String, VFDatum> source) {
+    return Maps.newHashMap(source);
   }
 
   @Override
-  public VFFlowset merge(VFFlowset in1, VFFlowset in2) {
-    VFFlowset out = new VFFlowset();
-    in1.union(in2,out);
-    return out;
+  public Map<String, VFDatum> merge(Map<String, VFDatum> in1, Map<String, VFDatum> in2) {
+    // TODO(isbadawi): Originally this was doing AbstractFlowSet.union, and the
+    // element type was Map.Entry<String, VFDatum>. Make sure behavior is the same
+    return MergeUtil.unionMerge(in1, in2);
   }
 }

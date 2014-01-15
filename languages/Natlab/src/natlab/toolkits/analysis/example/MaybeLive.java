@@ -20,13 +20,14 @@ package natlab.toolkits.analysis.example;
 
 import java.util.Set;
 
-import natlab.toolkits.analysis.HashSetFlowSet;
 import natlab.toolkits.analysis.core.NameCollector;
 import analysis.AbstractSimpleStructuralBackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Name;
 import ast.Stmt;
+
+import com.google.common.collect.Sets;
 
 /**
  * Performs a naive Live Variable analysis. It ignores the possibility
@@ -37,7 +38,7 @@ import ast.Stmt;
  * @author Jesse Doherty
  */
 public class MaybeLive 
-    extends AbstractSimpleStructuralBackwardAnalysis<HashSetFlowSet<String>>
+    extends AbstractSimpleStructuralBackwardAnalysis<Set<String>>
 {
 
     private NameCollector nameCollector; 
@@ -55,33 +56,28 @@ public class MaybeLive
     }
 
     /**
-     * Merges the two sets by using the union defined by {@link
-     * HashSetFlowSet}. 
+     * Merges the two sets using set union.
      */
-    public HashSetFlowSet<String> merge( HashSetFlowSet<String> in1, 
-                       HashSetFlowSet<String> in2)
+    public Set<String> merge(Set<String> in1, Set<String> in2)
     {
-        HashSetFlowSet<String> out = new HashSetFlowSet<String>();
-        in1.union( in2, out );
-        return out;
+        return Sets.newHashSet(Sets.union(in1, in2));
     }
 
     /**
-     * Returns a copy of {@code in} by using it's {@code copy()}
-     * method. 
+     * Returns a copy of {@code in}.
      */
-    public HashSetFlowSet<String> copy( HashSetFlowSet<String> in)
+    public Set<String> copy(Set<String> in)
     {
-        return in.copy();
+        return Sets.newHashSet(in);
     }
 
     /**
      * The initial flow is an empty set. Initially, no variables are
      * live. 
      */
-    public HashSetFlowSet<String> newInitialFlow()
+    public Set<String> newInitialFlow()
     {
-        return new HashSetFlowSet<String>();
+        return Sets.newHashSet();
     }
 
     /**
@@ -116,7 +112,7 @@ public class MaybeLive
     public void caseStmt( Stmt node )
     {
         outFlowSets.put( node, currentOutSet );
-        HashSetFlowSet<String> myInSet = copy(currentOutSet);
+        Set<String> myInSet = copy(currentOutSet);
 
         caseASTNode( node );
 

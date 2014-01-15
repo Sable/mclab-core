@@ -16,23 +16,42 @@ Copyright 2011 Anton Dubrau, Jesse Doherty, Soroush Radpour and McGill Universit
 */
 
 package natlab.toolkits.analysis.varorfun;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-import javax.swing.BoundedRangeModel;
-
-import ast.*;
-import natlab.toolkits.analysis.*;
+import natlab.LookupFile;
+import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.*;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CellIndexExpr;
+import ast.EndExpr;
+import ast.Expr;
+import ast.Function;
+import ast.FunctionHandleExpr;
+import ast.FunctionList;
+import ast.GlobalStmt;
+import ast.LValueExpr;
+import ast.LambdaExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.PersistentStmt;
+import ast.Script;
+import ast.StringLiteralExpr;
+
+import com.google.common.collect.Maps;
 
 /** 
  * An implementation of a preorder analysis for the var or fun
  * analysis. 
  * 
  */
-public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > implements VFAnalysis
+public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, VFDatum>> implements VFAnalysis
 {
     private boolean inFunction=true;
     private Function currentFunction = null;
@@ -70,9 +89,9 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
    	public static VFAnalysis analyzeTree(ASTNode n, FunctionOrScriptQuery lookup){
    		return new VFPreorderAnalysis(n, lookup);
    	}
-    public VFFlowset newInitialFlow()
+    public Map<String, VFDatum> newInitialFlow()
     {
-        return new VFFlowset();
+        return Maps.newHashMap();
     }
 
     public void caseCondition( Expr condExpr )
@@ -105,9 +124,9 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         currentFunction=node;
         currentSet = newInitialFlow();
         if (node.getParent() != null && node.getParent().getParent() != null && node.getParent().getParent() instanceof Function){
-            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent())) {
+            for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).entrySet()) {
                 if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
-                    currentSet.add( pair );
+                    MergeUtil.mergePut(currentSet, pair.getKey(), pair.getValue());
             }        	
         }
         if(DEBUG){
@@ -116,19 +135,17 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     	}
         // Add output params to set
         for( Name n : node.getOutputParams() ){
-            currentSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
+            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
         }
 
         // Add input params to set
         for( Name n : node.getInputParams() ){
-            currentSet.add( new ValueDatumPair<String,VFDatum>(n.getID(), VFDatum.VAR ) );
+            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
         }
         
         // Process body
         node.getStmts().analyze(this);
 
-        //backup currentSet
-        VFFlowset myFlowSet = currentSet;
         flowSets.put( node, currentSet );
         for( Function f : node.getNestedFunctions() ){
             f.analyze( this );
@@ -144,7 +161,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         //analyze the rhs
         node.getRHS().analyze( this );
         for( NameExpr n : lhs.getNameExpressions() ){
-            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getName().getID(), VFDatum.VAR ) );
+            MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
             annotateNode(n.getName());
         }
         node.getLHS().analyze( this );
@@ -153,7 +170,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     public void caseGlobalStmt( GlobalStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
+            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
             annotateNode(n);
         }
     }
@@ -161,14 +178,14 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     public void casePersistentStmt( PersistentStmt node )
     {
         for( Name n : node.getNames() ){
-            currentSet.add( new ValueDatumPair<String,VFDatum>( n.getID(), VFDatum.VAR ) );
+            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
             annotateNode(n);
         }
     }
 
     public void caseFunctionHandleExpr( FunctionHandleExpr node )
     {
-        currentSet.add( new ValueDatumPair<String,VFDatum>( node.getName().getID(), VFDatum.FUN ) );
+        MergeUtil.mergePut(currentSet, node.getName().getID(), VFDatum.FUN);
         annotateNode(node.getName());        
     }
 
@@ -211,7 +228,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
 
         target.analyze( this );
         
-        VFDatum d =  currentSet.contains( targetName ); 
+        VFDatum d =  currentSet.get( targetName ); 
         if ( d == null || d == VFDatum.BOT || VFDatum.LDVAR == d || d == VFDatum.TOP ) { 
             if (endCandidates == null ) System.out.println ("NULL");
             endCandidates.add(res);
@@ -242,7 +259,7 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
                 if( args.getChild( i ) instanceof StringLiteralExpr )  {
                     String param = ( (StringLiteralExpr) args.getChild( i ) ).getValue();
                     if (param.charAt(0)!='-'){
-                        currentSet.add( new ValueDatumPair( param  , VFDatum.LDVAR ) );
+                        MergeUtil.mergePut(currentSet, param, VFDatum.LDVAR);
                     }
                 }
         }
@@ -299,36 +316,36 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
     }
 
     private void bindError(NameExpr n, EndExpr e){
-        currentSet.add(n.getName().getID(), VFDatum.TOP);
+        MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.TOP);
         annotateNode(n.getName());
     }
 
 
     private void bindWarn(NameExpr n, EndExpr e){
-        VFDatum d = currentSet.contains(n.getName().getID());
+        VFDatum d = currentSet.get(n.getName().getID());
         if (d != VFDatum.VAR)
-            currentSet.add(n.getName().getID(), VFDatum.VAR);
+            MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
         annotateNode(n.getName());
     }
     
     public void caseCellIndexExpr(CellIndexExpr node){
         NameExpr n = new ArrayList<NameExpr>(((CellIndexExpr) node).getTarget().getNameExpressions()).get(0);
-        currentSet.add( new ValueDatumPair( n.getName().getID(), VFDatum.VAR ) );
+        MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
         annotateNode(n.getName());
     	caseMyLValue(node);
     }
 
     public void caseLambdaExpr(LambdaExpr node){
-    	VFFlowset backup = currentSet.copy();
+    	Map<String, VFDatum> backup = Maps.newHashMap(currentSet);
     	Set<String> inputSet=new TreeSet<String>();
     	for (Name inputParam: node.getInputParams()){
-    		currentSet.add(new ValueDatumPair<String,VFDatum>(inputParam.getID(),VFDatum.VAR));
+    	    MergeUtil.mergePut(currentSet, inputParam.getID(), VFDatum.VAR);
     		inputSet.add(inputParam.getID());
     	}
     	caseASTNode(node);
-    	for (Entry<String, VFDatum> p:currentSet){
+    	for (Map.Entry<String, VFDatum> p:currentSet.entrySet()){
     		if (! inputSet.contains(p.getKey()))
-    			backup.add(new ValueDatumPair(p.getKey(), p.getValue()));
+    		    MergeUtil.mergePut(backup, p.getKey(), p.getValue());
     	}
     	currentSet=backup;
     }
@@ -339,23 +356,20 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         if ( inFunction )
         {
             String s = node.getName().getID();
-            VFDatum d = currentSet.contains( s );
+            VFDatum d = currentSet.get( s );
             if ( s!=null && (d==null || VFDatum.BOT.equals( d ) ))
             {
-            	if ( scriptOrFunctionExists( s ) ) 
-                    currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.FUN ) );
-            	else if ( packageExists( s ) ) 
-                   currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.PREFIX) );
-                else 
-                    currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.BOT ) );
+              VFDatum val = scriptOrFunctionExists(s) ? VFDatum.FUN
+                  : packageExists(s) ? VFDatum.PREFIX : VFDatum.BOT;
+              MergeUtil.mergePut(currentSet, s, val);
             }
         }
         else{
             String s = node.getName().getID();
-            VFDatum d = currentSet.contains( s );		    
+            VFDatum d = currentSet.get( s );		    
             if ( d==null || VFDatum.BOT.equals(d) )
             {
-                currentSet.add( new ValueDatumPair<String,VFDatum>( s, VFDatum.LDVAR ) );
+                MergeUtil.mergePut(currentSet, s, VFDatum.LDVAR);
             }
         }
         annotateNode(node.getName());
@@ -377,11 +391,11 @@ public class VFPreorderAnalysis extends AbstractPreorderAnalysis< VFFlowset > im
         if (inFunction)
         	flowSets.put(n, currentSet);
         else
-        	flowSets.put(n, currentSet.copy());
+        	flowSets.put(n, Maps.newHashMap(currentSet));
     }
     @Override
 	public VFDatum getResult(Name n) {
-		return flowSets.get(n).contains(n.getID());
+		return flowSets.get(n).get(n.getID());
 	}
     
     

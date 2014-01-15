@@ -23,7 +23,6 @@ import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FunctionReference;
@@ -82,11 +81,12 @@ public class FunctionInliner {
 		    context.push(f);
 		    VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
 		    kind_analysis_caller.analyze();
-		    VFFlowset kind = kind_analysis_caller.getFlowSets().get(f);
+		    Map<String, VFDatum> kind = kind_analysis_caller.getFlowSets().get(f);
 		    for (ParameterizedExpr p: NodeFinder.find(ParameterizedExpr.class, f.getStmts())){
 		      if (p.getTarget() instanceof NameExpr){
 		        String name = ((NameExpr)p.getTarget()).getName().getID();
-		        if (!kind.getKind(name).isVariable()){
+		        VFDatum nameKind = kind.containsKey(name) ? kind.get(name) : VFDatum.UNDEF;
+		        if (nameKind.isVariable()) {
 		          FunctionReference lookupreference = context.peek().resolve(name);
 
 		          ASTNode lookup = context.resolveFunctionReference(lookupreference);
@@ -178,15 +178,17 @@ public class FunctionInliner {
             new VFFlowInsensitiveAnalysis(f, 
                                           context.peek().getFunctionOrScriptQuery());
 		kind_analysis_caller.analyze();
-		VFFlowset kind_caller_results = kind_analysis_caller.getFlowSets().get(f);
+		Map<String, VFDatum> kind_caller_results = kind_analysis_caller.getFlowSets().get(f);
 		ParameterizedExpr rhs = (ParameterizedExpr) s.getRHS();
 		if (!(rhs.getChild(0) instanceof NameExpr)){
 			errors.add(new TargetNotFoundException(rhs.getTarget().getNameExpressions().iterator().next().getName()));
 			return errors;
 		}
 		NameExpr ne = (NameExpr) rhs.getChild(0);
-		if (!kind_caller_results.getKind(ne.getName().getID()).isFunction()){
-			errors.add(new TargetNotAFunction(ne.getName(),f , kind_caller_results.contains(ne.getName().getID()).toString()));
+		VFDatum neKind = kind_caller_results.containsKey(ne.getName().getID()) ?
+		    kind_caller_results.get(ne.getName().getID()) : VFDatum.UNDEF;
+		if (!neKind.isFunction()){
+			errors.add(new TargetNotAFunction(ne.getName(),f , kind_caller_results.get(ne.getName().getID()).toString()));
 			return errors;
 		}
 		
@@ -267,13 +269,24 @@ public class FunctionInliner {
 			Name n = nameExpr.getName();
 			String sym = n.getID();
 			VFDatum kind_callee;
-			if (kind_analysis_callee.getFlowSets().get(n)!=null)
-				kind_callee=kind_analysis_callee.getFlowSets().get(n).getKind(sym);
-			else{
-				kind_callee=kind_analysis_callee.getFlowSets().get(target).getKind(sym);
+			if (kind_analysis_callee.getFlowSets().get(n)!=null) {
+			  kind_callee = kind_analysis_callee.getFlowSets().get(n).get(sym);
+			  if (kind_callee == null) {
+			    kind_callee = VFDatum.UNDEF;
+			  }
 			}
-			VFDatum kind_caller=kind_caller_results.getKind(sym);
-			VFDatum kind_post = kind_analysis_post.getFlowSets().get(f).getKind(sym);
+			else{
+	           kind_callee = kind_analysis_callee.getFlowSets().get(target).get(sym);
+	           if (kind_callee == null) {
+	             kind_callee = VFDatum.UNDEF;
+	           }
+			}
+			VFDatum kind_caller=kind_caller_results.containsKey(sym) ?
+			    kind_caller_results.get(sym) : VFDatum.UNDEF;
+			VFDatum kind_post = kind_analysis_post.getFlowSets().get(f).get(sym);
+			if (kind_post == null) {
+			  kind_post = VFDatum.UNDEF;
+			}
 			
 			if (kind_callee!=VFDatum.UNDEF && kind_caller!=VFDatum.UNDEF && kind_callee.merge(kind_caller)==VFDatum.TOP){
 				errors.add(new RenameRequired(new Name(n.getID())));

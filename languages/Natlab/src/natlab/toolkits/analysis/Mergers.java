@@ -2,7 +2,6 @@ package natlab.toolkits.analysis;
 
 import java.util.Set;
 
-
 import com.google.common.collect.Sets;
 
 /**
@@ -16,9 +15,7 @@ public class Mergers {
   public static <T> Merger<Set<T>> union() {
     return new Merger<Set<T>>() {
       @Override public Set<T> merge(Set<T> o1, Set<T> o2) {
-        Set<T> result = Sets.newHashSet(o1);
-        result.addAll(o2);
-        return result;
+        return Sets.newHashSet(Sets.union(o1, o2));
       }
     };
   }
@@ -29,9 +26,7 @@ public class Mergers {
   public static <T> Merger<Set<T>> intersection() {
     return new Merger<Set<T>>() {
       @Override public Set<T> merge(Set<T> o1, Set<T> o2) {
-        Set<T> result = Sets.newHashSet(o1);
-        result.retainAll(o2);
-        return result;
+        return Sets.newHashSet(Sets.intersection(o1, o2));
       }
     };
   }

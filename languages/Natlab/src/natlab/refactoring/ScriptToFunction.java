@@ -16,7 +16,6 @@ import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowset;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
@@ -173,13 +172,15 @@ public class ScriptToFunction {
             //            System.exit(0);
         }
 		funcKind.analyze();
-		VFFlowset funcRes = funcKind.getFlowSets().get(f);
-		for (Map.Entry<String, VFDatum> entry: scriptKind.getFlowSets().get(script)){
-			if (entry.getValue()!=null && entry.getValue().isID() && funcRes.getKind(entry.getKey()).isID())
+		Map<String, VFDatum> funcRes = funcKind.getFlowSets().get(f);
+		for (Map.Entry<String, VFDatum> entry: scriptKind.getFlowSets().get(script).entrySet()){
+		    VFDatum kind = funcRes.get(entry.getKey());
+		    if (kind == null) kind = VFDatum.UNDEF;
+			if (entry.getValue()!=null && entry.getValue().isID() && kind.isID())
 				errors.add(new IDConflictException(new Name(entry.getKey())));
-            if (entry.getValue()!=null && entry.getValue().isID() && funcRes.getKind(entry.getKey()).isFunction())
+            if (entry.getValue()!=null && entry.getValue().isID() && kind.isFunction())
 				errors.add(new Exceptions.WarnIDToFunException(new Name(entry.getKey())));
-            if (funcRes.getKind(entry.getKey())==VFDatum.TOP)
+            if (kind==VFDatum.TOP)
                 errors.add(new Exceptions.KindConflict(new Name(entry.getKey())));
 		}
 		return errors;
