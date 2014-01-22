@@ -1,7 +1,7 @@
 package natlab.toolkits.analysis.functionhandle;
 
 import natlab.FlowAnalysisTestTool;
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
@@ -11,7 +11,7 @@ import ast.LambdaExpr;
 import com.google.common.collect.Sets;
 
 public class SimpleFunctionHandleAnalysis extends
-		AbstractSimpleStructuralForwardAnalysis<VariableEntryFlowSet> {
+		ForwardAnalysis<VariableEntryFlowSet> {
 	
 	public static void main(String[] args) throws Exception {
 		String source = "D:/Classes/McLab/matlabfiddle/small/test2.m";

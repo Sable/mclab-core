@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
@@ -16,7 +16,7 @@ import ast.ParameterizedExpr;
 import ast.Stmt;
 
 import com.google.common.collect.Maps;
-public class CopyAnalysis extends AbstractSimpleStructuralForwardAnalysis<Map<String, AssignStmt>>{
+public class CopyAnalysis extends ForwardAnalysis<Map<String, AssignStmt>>{
 	
 	private LivenessAnalysis live;
 	

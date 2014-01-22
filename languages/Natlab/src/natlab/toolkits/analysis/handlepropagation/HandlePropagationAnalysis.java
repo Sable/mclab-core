@@ -15,7 +15,7 @@ import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.utils.LoadFunction;
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellArrayExpr;
@@ -47,7 +47,7 @@ import ast.StringLiteralExpr;
  * could be a handle with no information associated with it such as
  * input parameters.
  */
-public class HandlePropagationAnalysis extends AbstractSimpleStructuralForwardAnalysis< HandleFlowset >
+public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
 {
     /*
       CONTRACT for the expression casses:

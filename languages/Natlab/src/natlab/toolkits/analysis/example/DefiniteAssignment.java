@@ -2,7 +2,7 @@ package natlab.toolkits.analysis.example;
 
 import java.util.Set;
 
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
@@ -12,7 +12,7 @@ import ast.Stmt;
 
 import com.google.common.collect.Sets;
 
-public class DefiniteAssignment extends AbstractSimpleStructuralForwardAnalysis<Set<String>>
+public class DefiniteAssignment extends ForwardAnalysis<Set<String>>
 {
 
     public Set<String> newInitialFlow()

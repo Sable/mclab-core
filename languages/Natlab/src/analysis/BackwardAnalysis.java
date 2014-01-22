@@ -22,9 +22,9 @@ package analysis;
 /**
  * @author Jesse Doherty
  */
-public abstract class AbstractSimpleStructuralBackwardAnalysis<A> extends analysis.natlab.NatlabAbstractSimpleStructuralBackwardAnalysis<A>
+public abstract class BackwardAnalysis<A> extends analysis.natlab.NatlabAbstractSimpleStructuralBackwardAnalysis<A>
 {
-    public AbstractSimpleStructuralBackwardAnalysis(ast.ASTNode tree)
+    public BackwardAnalysis(ast.ASTNode tree)
     {
         super( tree );
     }

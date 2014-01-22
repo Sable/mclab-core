@@ -26,7 +26,7 @@ import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.analysis.Merger;
 import natlab.toolkits.analysis.Mergers;
 import natlab.utils.NodeFinder;
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
@@ -46,7 +46,7 @@ import com.google.common.collect.Sets;
  * @author Jesse Doherty
  */
 public class ReachingDefs extends
-        AbstractSimpleStructuralForwardAnalysis<Map<String, Set<Def>>> {
+        ForwardAnalysis<Map<String, Set<Def>>> {
   public static Def UNDEF = new AssignStmt();
 
   private Set<Name> defs = Sets.newHashSet();

@@ -20,11 +20,11 @@ package natlab.tame.tir.analysis;
 
 import ast.ASTNode;
 import natlab.tame.tir.*;
-import analysis.AbstractSimpleStructuralBackwardAnalysis;
+import analysis.BackwardAnalysis;
 import nodecases.NodeCaseHandler;
 
 public abstract class TIRAbstractSimpleStructuralBackwardAnalysis<F> extends
-        AbstractSimpleStructuralBackwardAnalysis<F> implements TIRNodeCaseHandler {
+        BackwardAnalysis<F> implements TIRNodeCaseHandler {
 
     TIRNodeForwarder nodeForwarder = new TIRNodeForwarder(this);
     TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);

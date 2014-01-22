@@ -21,7 +21,7 @@ package natlab.toolkits.analysis.example;
 import java.util.Set;
 
 import natlab.toolkits.analysis.core.NameCollector;
-import analysis.AbstractSimpleStructuralBackwardAnalysis;
+import analysis.BackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Name;
@@ -38,7 +38,7 @@ import com.google.common.collect.Sets;
  * @author Jesse Doherty
  */
 public class MaybeLive 
-    extends AbstractSimpleStructuralBackwardAnalysis<Set<String>>
+    extends BackwardAnalysis<Set<String>>
 {
 
     private NameCollector nameCollector; 

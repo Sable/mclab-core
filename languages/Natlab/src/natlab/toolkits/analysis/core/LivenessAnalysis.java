@@ -7,7 +7,7 @@ import java.util.Set;
 
 import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
-import analysis.AbstractSimpleStructuralBackwardAnalysis;
+import analysis.BackwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
@@ -22,7 +22,7 @@ import ast.Stmt;
 import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
-		AbstractSimpleStructuralBackwardAnalysis<Set<String>> {
+		BackwardAnalysis<Set<String>> {
 
 	public LivenessAnalysis(ASTNode<?> tree) {
 		super(tree);	

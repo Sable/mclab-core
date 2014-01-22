@@ -38,7 +38,7 @@ import natlab.toolkits.analysis.*;
 
 
 abstract public class TIRAbstractSimpleStructuralForwardAnalysis<F> extends
-        AbstractSimpleStructuralForwardAnalysis<F> implements TIRNodeCaseHandler {
+        ForwardAnalysis<F> implements TIRNodeCaseHandler {
     TIRNodeForwarder nodeForwarder = new TIRNodeForwarder(this);
     TIRParentForwardingNodeCasehandler parentForwarder = new TIRParentForwardingNodeCasehandler(this);
     

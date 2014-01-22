@@ -2,7 +2,7 @@ package natlab.toolkits.analysis.core;
 
 import java.util.Set;
 
-import analysis.AbstractSimpleStructuralForwardAnalysis;
+import analysis.ForwardAnalysis;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
@@ -14,7 +14,7 @@ import ast.Stmt;
 import com.google.common.collect.Sets;
 
 public class DefinitelyAssignedAnalysis extends
-    AbstractSimpleStructuralForwardAnalysis<Set<String>> {
+    ForwardAnalysis<Set<String>> {
 
   public DefinitelyAssignedAnalysis(ASTNode tree) {
     super(tree);
