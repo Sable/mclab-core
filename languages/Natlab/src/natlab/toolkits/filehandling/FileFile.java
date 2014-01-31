@@ -33,7 +33,7 @@ public class FileFile extends GenericFile {
     }
 
     public FileFile(String name){
-        file = new File(name);
+        this(new File(name));
     }
     
     @Override
