@@ -238,23 +238,26 @@ DefaultCaseBlock default_case =
   ;
   
 IfStmt if_statement = 
-     IF expr.e stmt_separator stmt_seq.l END
-        {: return new IfStmt(new List<IfBlock>().add(new IfBlock(e, l)), new Opt<ElseBlock>()); :}
-  |  IF expr.e stmt_separator stmt_seq.l else_clause.els END
-        {: return new IfStmt(new List<IfBlock>().add(new IfBlock(e, l)), new Opt<ElseBlock>(els)); :}
-  |  IF expr.e stmt_separator stmt_seq.l else_if_clause.elseif+ END
+     if_clause.i END
+        {: return new IfStmt(new List<IfBlock>().add(i), new Opt<ElseBlock>()); :}
+  |  if_clause.i else_clause.els END
+        {: return new IfStmt(new List<IfBlock>().add(i), new Opt<ElseBlock>(els)); :}
+  |  if_clause.i else_if_clause.elseif+ END
         {:
             List<IfBlock> ifBlocks = elseif;
-            ifBlocks.insertChild(new IfBlock(e, l), 0);
+            ifBlocks.insertChild(i, 0);
             return new IfStmt(ifBlocks, new Opt<ElseBlock>());
         :}
-  |  IF expr.e stmt_separator stmt_seq.l else_if_clause.elseif+ else_clause.els END
+  |  if_clause.i else_if_clause.elseif+ else_clause.els END
         {:
             List<IfBlock> ifBlocks = elseif;
-            ifBlocks.insertChild(new IfBlock(e, l), 0);
+            ifBlocks.insertChild(i, 0);
             return new IfStmt(ifBlocks, new Opt<ElseBlock>(els));
         :}
   ;
+
+IfBlock if_clause =
+     IF expr.e stmt_separator stmt_seq.l {: return new IfBlock(e, l); :}
 
 IfBlock else_if_clause = 
      ELSEIF expr.e stmt_separator stmt_seq.l  {: return new IfBlock(e, l); :}
