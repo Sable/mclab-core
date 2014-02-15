@@ -176,12 +176,20 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 				}
 				if (iscomplex.equals(((AdvancedMatrixValue) other)
 						.getisComplexInfo()) != true) {
+					
 					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
 							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
-									.getShape()),
+								.getShape()),
 							this.iscomplex.merge(((AdvancedMatrixValue) other)
 									.getisComplexInfo()));
 				}
+				else{
+					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
+							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+								.getShape()), this.iscomplex.merge(((AdvancedMatrixValue) other)
+										.getisComplexInfo()));
+				}
+				
 			}
 
 			return this;

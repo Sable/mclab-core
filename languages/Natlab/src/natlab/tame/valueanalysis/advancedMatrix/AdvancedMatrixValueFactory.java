@@ -6,6 +6,7 @@ import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.isComplex.*;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
+import natlab.tame.valueanalysis.components.rangeValue.RangeValue;
 import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.*;
 
@@ -15,6 +16,15 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
     public AdvancedMatrixValue newMatrixValue(String symbolic, Constant constant) {
         return new AdvancedMatrixValue(symbolic, constant);
     }
+	
+	public AdvancedMatrixValue newMatrixValueFromClassShapeRange(
+			String symbolic,
+			PrimitiveClassReference aClass,
+			Shape<AggrValue<AdvancedMatrixValue>> shape,
+			RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue, 
+			isComplexInfo<AggrValue<AdvancedMatrixValue>> complex) {
+		return new AdvancedMatrixValue(symbolic, aClass, shape, rangeValue, complex);
+	}
     
     static AggrValuePropagator<AdvancedMatrixValue> propagator = 
     		new AggrValuePropagator<AdvancedMatrixValue>(new AdvancedMatrixValuePropagator());

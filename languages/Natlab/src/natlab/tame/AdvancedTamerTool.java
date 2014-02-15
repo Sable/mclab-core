@@ -1,5 +1,8 @@
 package natlab.tame;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,13 +25,16 @@ import natlab.toolkits.path.FileEnvironment;
 public class AdvancedTamerTool {
 	
 	private Boolean debug = true;
-
+	private Boolean doIntOk = true;
+	private Boolean doVarRename = false; //TODO test and debug the analysis before turning it on
 	public static void main(String[] args) {
 		// String file =
 		// "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
 		// String file = "/home/2011/vkumar5/for_test";
-		String file = "/home/sameer/mclab/mbrt/drv_mbrt";
+		String file = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/drv_diff";
 		String fileIn = file + ".m";
+		
+		String fileOut = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/diff.tame";
 
 		GenericFile gFile = GenericFile.create(fileIn);
 		/* /home/xuli/test/hello.m */
@@ -36,40 +42,47 @@ public class AdvancedTamerTool {
 															// environment obj
 		AdvancedTamerTool tool = new AdvancedTamerTool();
 		// System.out.println(args[0]);
-		tool.analyze(args, env);
+		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = tool.analyze(args, env);
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(fileOut,true));
+			
+			for (int i = 0; i < analysis.getNodeList().size(); i++) {
+				out.write(ValueAnalysisPrinter.prettyPrint(analysis
+						.getNodeList().get(i).getAnalysis()));
+			}
+			//out.write(analysis.toString());
+			out.close();
+		} catch (IOException e) {
+			System.out.println("Exception ");
 
+		}
 	}
 
 	public ValueAnalysis<AggrValue<AdvancedMatrixValue>> analyze(String[] args,
 			FileEnvironment env) {
 
 		List<AggrValue<AdvancedMatrixValue>> inputValues = getListOfInputValues(args);
-		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); // build
-																				// simple
-																				// callgraph
-
-		callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
-				callgraph, inputValues);
+		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); 
 		
-		//if (this.debug) callgraph = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		/*
+		 * Rename variables with conflicting types
+		 */
+		if (doVarRename)
+			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+				callgraph, inputValues);
 		
 	
 		ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();
-		Args<AggrValue<AdvancedMatrixValue>> someargs = Args
-				.<AggrValue<AdvancedMatrixValue>> newInstance(Collections.EMPTY_LIST);
 		ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
-				callgraph,
-				/*
-				 * Args.newInstance((factory.getValuePropagator().call(Builtin.
-				 * getInstance
-				 * ("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE)))
-				 */
-				Args.newInstance(inputValues), factory);
+				callgraph, Args.newInstance(inputValues), factory);
 		
-//		if (this.debug)
-//		 analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
-
-		// System.out.println(analysis.toString());
+		/*
+		 * transform callgraph with IntegerOkay analysis
+		 */
+		if (doIntOk)
+		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
+		if(debug)  System.out.println(analysis.toString());
 		
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
@@ -82,34 +95,17 @@ public class AdvancedTamerTool {
 			String[] args) {
 		List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(
 				1);
-		// ls.add(PrimitiveClassReference.INT8);
-		// ls.add(PrimitiveClassReference.DOUBLE);
-		//
-		// ArrayList<AggrValue<AdvancedMatrixValue>> list = new
-		// ArrayList<AggrValue<AdvancedMatrixValue>>(ls.size());
-		// for (PrimitiveClassReference ref : ls){
-		// list.add(new AdvancedMatrixValue(ref)); //TODO change to read
-		// isComplex input from user
-		// }
-
 		ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(
 				args.length);
 		for (String argSpecs : args) {
-			// System.out.println(argSpecs);
+			
 			String delims = "[\\&]";
 			String[] specs = argSpecs.split(delims);
 
-			/*
-			 * TODO Below is just to test. Add actual code to make sense of the
-			 * argument specs
-			 */
 			/* TODO also add code to read INT, FLOAT, etc. */
 			list.add(new AdvancedMatrixValue("n",
 					PrimitiveClassReference.DOUBLE, specs[1], specs[2]));
-			// XU changed here to support initial input shape info.
-			// @25th,Jul,2012
-
-		}
+			}
 		return list;
 
 	}
