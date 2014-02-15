@@ -301,10 +301,9 @@ public class Parse {
     List<CompilationProblem> fileErrors = Lists.newArrayList();
     for (String fName : files) {
       Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, fileErrors);
+      errors.addAll(fileErrors);
       if (program != null) {
         cu.addProgram(program);
-      } else {
-        errors.addAll(fileErrors);
       }
     }
     return cu;
