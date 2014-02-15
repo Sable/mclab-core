@@ -29,7 +29,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/aaron/Dropbox/benchmarks/unsupported/edit/drv_edit.m");
+		GenericFile gFile = GenericFile.create("/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/drv_diff.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph

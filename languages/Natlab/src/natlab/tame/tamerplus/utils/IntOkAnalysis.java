@@ -15,14 +15,15 @@ import java.util.Set;
 
 import ast.ASTNode;
 import ast.AssignStmt;
+import ast.ColonExpr;
 import ast.Expr;
 import ast.FPLiteralExpr;
+import ast.ForStmt;
 import ast.IntLiteralExpr;
 import ast.LiteralExpr;
 import ast.Name;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
-
 import natlab.tame.TamerTool;
 import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
@@ -41,6 +42,7 @@ import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRAssignLiteralStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCopyStmt;
+import natlab.tame.tir.TIRForStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
@@ -48,7 +50,6 @@ import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 import natlab.tame.valueanalysis.*;
-
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueAnalysis;
@@ -90,9 +91,9 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 						.forAST(function.getAst());
 				AnalysisEngine analysisEngine = transformationEngine
 						.getAnalysisEngine();
-
+				//Get UDDUWeb
 				UDDUWeb web = analysisEngine.getUDDUWebAnalysis();
-				
+				//Get list of all the variables
 				ArrayList<String> varList = getVariableList(web, function);
 				
 				if (debug){
@@ -103,6 +104,7 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 				}
 				
 				Map<String,VarIsIntOk> intOkMap = new HashMap<String, VarIsIntOk>();
+				//A list by graph-colour for lists of VarIsIntOk for each colour.
 				ArrayList<ArrayList<VarIsIntOk>> colourList = new ArrayList<ArrayList<VarIsIntOk>>();
 				
 				
@@ -111,10 +113,14 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 						
 							System.out.println("--"+var);
 					}
+					
+					//Map of node and color for each var's definitions
 					Map<TIRNode, Integer> varDefs = web.getNodeAndColorForDefinition(var);
 					if(debug){
 						System.out.println("defs: "+var+" "+varDefs.toString());
 					}
+					
+					//Map of node and color for each var's uses
 					Map<TIRNode, Integer> varUses = web.getNodeAndColorForUse(var);
 					if(debug){
 						System.out.println("uses: "+var+" "+varUses.toString());
@@ -204,7 +210,13 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 					var = ((TIRAbstractAssignStmt)statement).getVarName();
 					vars.add(var);
 					}
-					
+				}	
+				
+				if (statement instanceof TIRForStmt){
+					var = ((TIRForStmt)statement).getAssignStmt().getVarName();
+					vars.add(var);
+				}
+				
 					for(String var1 : vars){
 					if(debug) System.out.println("var is "+var1);
 					AdvancedMatrixValue temp;
@@ -220,10 +232,11 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 					
 					
 					col = web.getNodeAndColorForDefinition(var1).get(statement);
-					if(debug) System.out.println("col is "+col);
+					//if(debug) System.out.println("col is "+col);
 					varList = colourList.get(col);
-					if(debug) System.out.println("varlist is "+varList.get(0));
+				//	if(debug) System.out.println("varlist is "+varList.get(0));
 					if (/*varList.contains(var) &&*/ isVarIntOkinList(varList,var1)){
+						
 					temp.setMatlabClass(PrimitiveClassReference.INT64);
 					}
 					}
@@ -232,7 +245,7 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 					
 					//System.out.println(temp.getMatlabClass().getName());
 				}
-				}
+				
 				
 				
 			
@@ -417,6 +430,14 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		varInfo.setVarName(var);
 		varInfo.setNode(useNode);
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
+//		/*REMOVE THIS*/
+//		if (var.equals("i")){
+//			varIntOk.setIsInt(true);
+//			varInfo.setIsIntOk(varIntOk);
+//			System.err.println("FUCK THE i FKFKFKFKFKFFKFKFKFKFK");
+//			return varInfo;
+//			
+//		}
 		
 		if(useNode instanceof TIRArraySetStmt){
 			ParameterizedExpr lhs = (ParameterizedExpr) ((TIRArraySetStmt)useNode).getLHS();
@@ -425,14 +446,20 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 			varIntOk = CheckRHS.handleUseRHSExpr(((TIRArraySetStmt) useNode).getRHS(), var);
 			
 			for (Expr arg : ((ParameterizedExpr)lhs).getArgs()){
+				if (arg instanceof NameExpr )
 				args.add(	((NameExpr)arg).getVarName());
 				}
 			if (args.contains(var)){
 				varIntOk.setIsInt(true);
+				if (var.equals("i"))
+					System.err.println("i is TRUE IN ARRAY SET");
 			}
 			
 			
 			varInfo.setIsIntOk(varIntOk);
+			
+			
+			
 			return varInfo;
 			
 		}
@@ -442,10 +469,12 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 			ArrayList<String> args = new ArrayList<String>();
 			
 			for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
+				if (arg instanceof NameExpr )
 				args.add(	((NameExpr)arg).getVarName());
 				}
 			if (args.contains(var)){
 				varIntOk.setIsInt(true);
+				
 			}
 			if (rhs.getVarName().equals(var)){
 				varIntOk.setIsInt(true);   //CHECK THIS
@@ -471,8 +500,20 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 			return varInfo;
 			
 		}
+		
+		else if (useNode instanceof TIRForStmt){
+			System.err.println("VARIABLE IN FOR LOOP IS "+((ForStmt) useNode).getAssignStmt().toString()+" "+var);
+			varIntOk = CheckRHS.handleUseRHSExpr(((ForStmt) useNode).getAssignStmt().getRHS(), var);
+			
+			varInfo.setIsIntOk(varIntOk);
+			return varInfo;
+		}
+		
 		varInfo.setIsIntOk(varIntOk);
 		return varInfo;
+		
+		
+		
 	}
 
 
@@ -482,6 +523,7 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		varInfo.setVarName(var);
 		varInfo.setNode(defNode);
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
+		
 		
 		if (defNode instanceof TIRAssignLiteralStmt){
 			
@@ -526,7 +568,14 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 			return varInfo;
 		}
 		
-		
+		else if(defNode instanceof TIRForStmt){
+			
+			varIntOk = CheckRHS.handleForStmt((TIRForStmt) defNode);
+			/**/
+			//varIntOk.setIsInt(true);
+			varInfo.setIsIntOk(varIntOk);
+			return varInfo;
+		}
 		
 		
 		
