@@ -31,10 +31,10 @@ public class AdvancedTamerTool {
 		// String file =
 		// "/home/2011/vkumar5/mclab_git/mclab/languages/Natlab/src/natlab/backends/x10/benchmarks/mc_for_benchmarks/nb1d/drv_nb1d";
 		// String file = "/home/2011/vkumar5/for_test";
-		String file = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/drv_diff";
+		String file = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/lgdr/drv_lgdr";
 		String fileIn = file + ".m";
 		
-		String fileOut = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/diff.tame";
+		String fileOut = "/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/lgdr/lgdr.tame";
 
 		GenericFile gFile = GenericFile.create(fileIn);
 		/* /home/xuli/test/hello.m */
@@ -79,6 +79,13 @@ public class AdvancedTamerTool {
 		/*
 		 * transform callgraph with IntegerOkay analysis
 		 */
+		if (doIntOk)
+		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
+		if (doVarRename)
+			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+				callgraph, inputValues);
+		
 		if (doIntOk)
 		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
