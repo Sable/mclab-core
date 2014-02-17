@@ -258,6 +258,7 @@ IfStmt if_statement =
 
 IfBlock if_clause =
      IF expr.e stmt_separator stmt_seq.l {: return new IfBlock(e, l); :}
+  ;
 
 IfBlock else_if_clause = 
      ELSEIF expr.e stmt_separator stmt_seq.l  {: return new IfBlock(e, l); :}
