@@ -43,6 +43,7 @@ import natlab.tame.tir.TIRAssignLiteralStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRForStmt;
+import natlab.tame.tir.TIRFunction;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
@@ -430,29 +431,53 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		varInfo.setVarName(var);
 		varInfo.setNode(useNode);
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
-//		/*REMOVE THIS*/
-//		if (var.equals("i")){
-//			varIntOk.setIsInt(true);
-//			varInfo.setIsIntOk(varIntOk);
-//			System.err.println("FUCK THE i FKFKFKFKFKFFKFKFKFKFK");
+
+		
+//		if (useNode instanceof TIRFunction){
+//			for (Name v: ((TIRFunction) useNode).getInputParams()){
+//				if(v.getVarName().equals(var)){
+//					varInfo.setIsIntOk(varIntOk);
+//				}
+//			}
+//			System.err.println(((TIRFunction) useNode).getNodeString());
+//			System.exit(1);
 //			return varInfo;
-//			
 //		}
 		
-		if(useNode instanceof TIRArraySetStmt){
+		if(useNode instanceof TIRCallStmt){
+			varIntOk = CheckRHS.handleUseRHSExpr(((TIRCallStmt) useNode).getRHS(), var);
+			
+			varInfo.setIsIntOk(varIntOk);
+			return varInfo;
+		}
+		
+		else if(useNode instanceof TIRArraySetStmt){
+			
+			if (((TIRArraySetStmt) useNode).getRHS().getVarName().equals(var)){
+				varIntOk.setDepends(true);
+				varIntOk.getDependsOn().add(((TIRArraySetStmt) useNode).getLHS().getVarName());
+				varInfo.setIsIntOk(varIntOk);
+				
+				
+				
+				return varInfo;
+			}
 			ParameterizedExpr lhs = (ParameterizedExpr) ((TIRArraySetStmt)useNode).getLHS();
 			ArrayList<String> args = new ArrayList<String>();
 			
-			varIntOk = CheckRHS.handleUseRHSExpr(((TIRArraySetStmt) useNode).getRHS(), var);
+			//varIntOk = CheckRHS.handleUseRHSExpr(((TIRArraySetStmt) useNode).getRHS(), var);
 			
 			for (Expr arg : ((ParameterizedExpr)lhs).getArgs()){
 				if (arg instanceof NameExpr )
 				args.add(	((NameExpr)arg).getVarName());
 				}
 			if (args.contains(var)){
+				if (var.equals("mc_t4")){
+					System.err.println(((TIRArraySetStmt) useNode).getNodeString());
+				//	System.exit(1);
+				}
 				varIntOk.setIsInt(true);
-				if (var.equals("i"))
-					System.err.println("i is TRUE IN ARRAY SET");
+				
 			}
 			
 			
@@ -499,6 +524,7 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 			varInfo.setIsIntOk(varIntOk);
 			return varInfo;
 			
+			
 		}
 		
 		else if (useNode instanceof TIRForStmt){
@@ -523,7 +549,31 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		varInfo.setVarName(var);
 		varInfo.setNode(defNode);
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
+	
+		if (defNode instanceof TIRCallStmt){
+			
+//			if (var.equals("mc_t4")){
+//				System.err.println(((TIRCallStmt) defNode).getNodeString());
+//				System.exit(0);
+//			}
+			varIntOk = CheckRHS.handleCallStmt((TIRCallStmt)defNode);
+			varInfo.setIsIntOk(varIntOk);
+			return varInfo;
+			
+		}
 		
+		
+		
+		if (defNode instanceof TIRFunction){
+			for (Name v: ((TIRFunction) defNode).getInputParams()){
+				if(v.getVarName().equals(var)){
+					varInfo.setIsIntOk(varIntOk);
+					
+				}
+			}
+			
+			return varInfo;
+		}
 		
 		if (defNode instanceof TIRAssignLiteralStmt){
 			
@@ -534,6 +584,8 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		}
 		
 		else if (defNode instanceof TIRCopyStmt){
+			
+			
 			if (debug) System.out.println("&&&&&&&&&&&"+varInfo);
 			varIntOk = CheckRHS.handleCopyStmt((TIRCopyStmt)defNode, web);
 			varInfo.setIsIntOk(varIntOk);
@@ -563,6 +615,9 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		}
 		
 		else if(defNode instanceof TIRAbstractAssignToListStmt){
+			
+			
+			
 			varIntOk = CheckRHS.handleAssignToListStmt((TIRAbstractAssignToListStmt)defNode);
 			varInfo.setIsIntOk(varIntOk);
 			return varInfo;
