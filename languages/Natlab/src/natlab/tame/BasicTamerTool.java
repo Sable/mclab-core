@@ -9,6 +9,8 @@ import java.util.List;
 import natlab.options.Options;
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.tamerplus.utils.IntOkAnalysis;
+import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
@@ -19,6 +21,9 @@ import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
 
 public class BasicTamerTool {
+	
+	private Boolean doIntOk = true;
+	private Boolean doVarRename = false;
 
 	/**
 	 * This main method is just for testing, doesn't follow the convention when passing a file 
@@ -29,7 +34,7 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/diff/drv_diff.m");
+		GenericFile gFile = GenericFile.create("/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/fdtd/drv_fdtd.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -56,21 +61,46 @@ public class BasicTamerTool {
 			String[] args, 
 			FileEnvironment env) 
 	{
+		
+		
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+		
+		if (doVarRename)
+			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+				callgraph, inputValues);
+		
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
 				new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 				callgraph,Args.newInstance(inputValues), factory);
+		
+		
+		if (doIntOk)
+		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
+		if (doVarRename)
+			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+				callgraph, inputValues);
+		
+		if (doIntOk)
+		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		
+		
 		System.out.println(analysis.toString());
 
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
 					.getNodeList().get(i).getAnalysis()));
 		}
+		
+		
+		
 		return analysis;
 	}
 
+	
+	
 	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
 		ArrayList<AggrValue<BasicMatrixValue>> list = 
 				new ArrayList<AggrValue<BasicMatrixValue>>(args.length);

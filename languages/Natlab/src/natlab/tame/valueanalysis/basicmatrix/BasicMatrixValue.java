@@ -28,6 +28,8 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
 	protected isComplexInfo<AggrValue<BasicMatrixValue>> complex;
+	
+	
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
 	static ShapePropagator<AggrValue<BasicMatrixValue>> shapePropagator =
 			ShapePropagator.getInstance();

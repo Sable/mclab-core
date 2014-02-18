@@ -37,6 +37,9 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	Shape<AggrValue<AdvancedMatrixValue>> shape;
 	isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex;
 	RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue;
+	
+	static ShapePropagator<AggrValue<AdvancedMatrixValue>> shapePropagator =
+			ShapePropagator.getInstance();
 
 	public AdvancedMatrixValue(String symbolic, PrimitiveClassReference aClass) {
 		super(symbolic, aClass);
@@ -138,6 +141,10 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	public boolean isConstant() {
 		return constant != null;
 	}
+	
+	public boolean hasConstant() {
+		return constant != null;
+	}
 
 	@Override
 	/**
@@ -157,112 +164,222 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	@Override
 	public AdvancedMatrixValue merge(AggrValue<AdvancedMatrixValue> other) {
-
+//
+//		if (!(other instanceof AdvancedMatrixValue))
+//			throw new UnsupportedOperationException(
+//					"can only merge a Matrix Value with another Matrix Value");
+//		if (!other.getMatlabClass().equals(classRef))
+//			throw new UnsupportedOperationException(
+//					"only Values with the same class can be merged, trying to merge :"
+//							+ this + ", " + other);
+//		System.out.println("this constant is ~" + constant + " " + other);
+//
+//		if (constant == null) {
+//
+//			if (((AdvancedMatrixValue) other).constant == null) {
+//
+//				if (iscomplex == null) {
+//					return this;
+//				}
+//				if (iscomplex.equals(((AdvancedMatrixValue) other)
+//						.getisComplexInfo()) != true) {
+//					
+//					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
+//							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+//								.getShape()),
+//							this.iscomplex.merge(((AdvancedMatrixValue) other)
+//									.getisComplexInfo()));
+//				}
+//				else{
+//					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
+//							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+//								.getShape()), this.iscomplex.merge(((AdvancedMatrixValue) other)
+//										.getisComplexInfo()));
+//				}
+//				
+//			}
+//
+//			return this;
+//
+//		}
+//		if (constant.equals(((AdvancedMatrixValue) other).constant)) {
+//
+//			return this;
+//		}
+//		AdvancedMatrixValue newMatrix = new AdvancedMatrixValue(this.symbolic, 
+//				new AdvancedMatrixValue(this.symbolic, this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
+//						.getShape()),
+//				this.iscomplex.merge(((AdvancedMatrixValue) other)
+//						.getisComplexInfo()));
+//
+//		System.out.println(newMatrix);
+//
+//		return newMatrix;
+		if (Debug) System.out.println("inside BasicMatrixValue merge!");
 		if (!(other instanceof AdvancedMatrixValue))
 			throw new UnsupportedOperationException(
-					"can only merge a Matrix Value with another Matrix Value");
-		if (!other.getMatlabClass().equals(classRef))
+					"can only merge a Basic Matrix Value with another Basic Matrix Value");
+		/**
+		 * TODO, currently, we cannot merge two matrix value with different class 
+		 * information. i.e. 
+		 * 		if
+		 *			c='a';
+		 *		else
+		 *			c=12;
+		 *		end
+		 * what we have at the merge point is a c=[(double,12.0,[1, 1]), (char,a,[1, 1])]
+		 */
+		else if (!other.getMatlabClass().equals(this.getMatlabClass()))
 			throw new UnsupportedOperationException(
 					"only Values with the same class can be merged, trying to merge :"
-							+ this + ", " + other);
-		System.out.println("this constant is ~" + constant + " " + other);
-
-		if (constant == null) {
-
-			if (((AdvancedMatrixValue) other).constant == null) {
-
-				if (iscomplex == null) {
-					return this;
-				}
-				if (iscomplex.equals(((AdvancedMatrixValue) other)
-						.getisComplexInfo()) != true) {
-					
-					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
-							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
-								.getShape()),
-							this.iscomplex.merge(((AdvancedMatrixValue) other)
-									.getisComplexInfo()));
-				}
-				else{
-					return new AdvancedMatrixValue(this.symbolic, new AdvancedMatrixValue(this.symbolic, 
-							this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
-								.getShape()), this.iscomplex.merge(((AdvancedMatrixValue) other)
-										.getisComplexInfo()));
-				}
-				
+							+ this + ", " + other + " has failed");
+		else if (this.constant!=null&&((AdvancedMatrixValue)other).getConstant()!=null) {
+			Constant result = this.constant.merge(((AdvancedMatrixValue)other).getConstant());
+			if (result!=null) return factory.newMatrixValue(this.getSymbolic(), result);
+		}
+		AdvancedMatrixValue newMatrix = factory.newMatrixValueFromClassShapeRange(
+				getSymbolic()
+				, getMatlabClass()
+				, null
+				, null
+				, null);
+		if (hasShape()) {
+			newMatrix.shape = shape.merge(((AdvancedMatrixValue)other).getShape());
+		}
+		if (hasRangeValue()) {
+			newMatrix.rangeValue = rangeValue.merge(((AdvancedMatrixValue)other).getRangeValue());
+		}
+		if (hasisComplexInfo()) {
+			if (((AdvancedMatrixValue)other).getisComplexInfo() != null) {
+				newMatrix.iscomplex = iscomplex.merge(((AdvancedMatrixValue)other).getisComplexInfo());
 			}
-
-			return this;
-
 		}
-		if (constant.equals(((AdvancedMatrixValue) other).constant)) {
-
-			return this;
-		}
-		AdvancedMatrixValue newMatrix = new AdvancedMatrixValue(this.symbolic, 
-				new AdvancedMatrixValue(this.symbolic, this.classRef),this.shape.merge(((AdvancedMatrixValue) other)
-						.getShape()),
-				this.iscomplex.merge(((AdvancedMatrixValue) other)
-						.getisComplexInfo()));
-
-		System.out.println(newMatrix);
-
 		return newMatrix;
+		
+		
+	}
+
+	private boolean hasShape() {
+		// TODO Auto-generated method stub
+		return shape !=null;
+	}
+	
+	public boolean hasRangeValue() {
+		return rangeValue != null;
+	}
+	
+	public boolean hasisComplexInfo() {
+		return iscomplex != null;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null)
+//		if (obj == null)
+//			return false;
+//		if (!(obj instanceof AdvancedMatrixValue))
+//			return false;
+//		AdvancedMatrixValue m = (AdvancedMatrixValue) obj;
+//		if (isConstant())
+//			return constant.equals(m.constant);
+//		if (Debug)
+//			System.out.println(m.getMatlabClass());
+//
+//		if ((shape == null)
+//				&& (((HasShape) ((AdvancedMatrixValue) obj)).getShape() == null)) {
+//			return (classRef.equals(m.getMatlabClass())) && true;
+//		}
+//		boolean bs = (classRef.equals(m.getMatlabClass()) && shape
+//				.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
+//
+//		// TODO NOW - complex part
+//
+//		if ((iscomplex == null)
+//				&& (((HasisComplexInfo) ((AdvancedMatrixValue) obj))
+//						.getisComplexInfo() == null)) {
+//			return (classRef.equals(m.getMatlabClass())) && true;
+//		}
+//		return ((classRef.equals(m.getMatlabClass()) && iscomplex
+//				.equals(((HasisComplexInfo) ((AdvancedMatrixValue) obj))
+//						.getisComplexInfo())) && bs);
+		
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AdvancedMatrixValue))
-			return false;
-		AdvancedMatrixValue m = (AdvancedMatrixValue) obj;
-		if (isConstant())
-			return constant.equals(m.constant);
-		if (Debug)
-			System.out.println(m.getMatlabClass());
-
-		if ((shape == null)
-				&& (((HasShape) ((AdvancedMatrixValue) obj)).getShape() == null)) {
-			return (classRef.equals(m.getMatlabClass())) && true;
 		}
-		boolean bs = (classRef.equals(m.getMatlabClass()) && shape
-				.equals(((HasShape) ((AdvancedMatrixValue) obj)).getShape()));
-
-		// TODO NOW - complex part
-
-		if ((iscomplex == null)
-				&& (((HasisComplexInfo) ((AdvancedMatrixValue) obj))
-						.getisComplexInfo() == null)) {
-			return (classRef.equals(m.getMatlabClass())) && true;
+		else if (obj instanceof AdvancedMatrixValue) {
+			if (Debug) System.out.println("inside check whether BasicMatrixValue equals!");
+			BasicMatrixValue o = (BasicMatrixValue)obj;
+			if (hasConstant()) {
+				return constant.equals(o.getConstant());
+			}
+			else {
+				boolean shapeResult, rangeResult, complexResult;
+				// test shape
+				if (shape == null) {
+					return o.getShape() == null;
+				}
+				else {
+					shapeResult = shape.equals(o.getShape());
+				}
+				// test range value
+				if (rangeValue == null) {
+					rangeResult = o.getRangeValue() == null;
+				}
+				else {
+					rangeResult = rangeValue.equals(o.getRangeValue());
+				}
+				// test complex
+				if (iscomplex == null) {
+					complexResult = o.getisComplexInfo() == null;
+				}
+				else {
+					complexResult = iscomplex.equals(o.getisComplexInfo());
+				}
+				return shapeResult && rangeResult && complexResult;
+			}
 		}
-		return ((classRef.equals(m.getMatlabClass()) && iscomplex
-				.equals(((HasisComplexInfo) ((AdvancedMatrixValue) obj))
-						.getisComplexInfo())) && bs);
+		else {
+			return false;		
+		}
+		
+		
 	}
 
 	@Override
 	public String toString() {
-		return "(" + classRef + (isConstant() ? ("," + constant) : "") + ","
-				+ shape + "," + "{" + iscomplex + "}" + ")";// XU added shape
+		return "(" + (hasSymbolic()? (symbolic + ",") : "")
+				+ (hasMatlabClass()? classRef : ",[mclass propagation fails]") 
+				+ (hasConstant()? ("," + constant) : "") 
+				+ (hasShape()? ("," + shape) : ",[shape propagation fails]")
+				+ (hasRangeValue()? ("," + rangeValue) : "")
+				+ (hasisComplexInfo()? ("," + iscomplex) : "") + ")";
+	}
+
+	private boolean hasMatlabClass() {
+		// TODO Auto-generated method stub
+		return classRef != null;
+		}
+
+	private boolean hasSymbolic() {
+		// TODO Auto-generated method stub
+		return symbolic != null;
 	}
 
 	public static final AdvancedMatrixValueFactory FACTORY = new AdvancedMatrixValueFactory();
 	
-	static ShapePropagator<AggrValue<AdvancedMatrixValue>> shapePropagator = ShapePropagator
-			.getInstance();
+//	static ShapePropagator<AggrValue<AdvancedMatrixValue>> shapePropagator = ShapePropagator
+//			.getInstance();
 
 	@Override
 	public ValueSet<AggrValue<AdvancedMatrixValue>> arraySubsref(
 			Args<AggrValue<AdvancedMatrixValue>> indizes) {
-		if(null == indizes)
-		{System.out.println("indizes is null");}
-		return ValueSet
-				.<AggrValue<AdvancedMatrixValue>> newInstance(new AdvancedMatrixValue(null,
-						this.getMatlabClass(), shapePropagator.arraySubsref(
-								this.getShape(), indizes), null, this.iscomplex));
-		// TODO
-		//ADD A ISCOMPLEX ANALYSIS TO ISCOMPLEXINFOPROPOGATOR
+		return ValueSet.<AggrValue<AdvancedMatrixValue>> newInstance(
+				factory.newMatrixValueFromClassShapeRange(
+						getSymbolic()
+						, getMatlabClass()
+						, shapePropagator.arraySubsref(shape, indizes)
+						, null
+						, iscomplex)
+						);
 	}
 
 	@Override
@@ -289,8 +406,12 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	public AggrValue<AdvancedMatrixValue> arraySubsasgn(
 			Args<AggrValue<AdvancedMatrixValue>> indizes,
 			AggrValue<AdvancedMatrixValue> value) {
-		return new AdvancedMatrixValue(null, this.getMatlabClass(),
-				shapePropagator.arraySubsasgn(this.getShape(), indizes, value), null, this.iscomplex);
+		return factory.newMatrixValueFromClassShapeRange(
+				getSymbolic()
+				, getMatlabClass()
+				, shapePropagator.arraySubsasgn(shape, indizes, value)
+				, null
+				, iscomplex);
 	}
 
 	@Override
@@ -314,4 +435,5 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		// TODO Auto-generated method stub
 		return this.rangeValue;
 	}
+	
 }

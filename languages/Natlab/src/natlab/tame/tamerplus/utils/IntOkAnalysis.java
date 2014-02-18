@@ -55,8 +55,8 @@ import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValueFactory;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
@@ -70,15 +70,15 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 	private static Boolean debug =true;
 	
 	
-		public static ValueAnalysis<AggrValue<AdvancedMatrixValue>> analyzeForIntOk(
+		public static ValueAnalysis<AggrValue<BasicMatrixValue>> analyzeForIntOk(
 			SimpleFunctionCollection callgraph,
-			List<AggrValue<AdvancedMatrixValue>> inputValues) {
+			List<AggrValue<BasicMatrixValue>> inputValues) {
 			
 			
 			if (debug) System.out.println("analyzing for IntOk");
 			
-			ValueFactory<AggrValue<AdvancedMatrixValue>> factory = new AdvancedMatrixValueFactory();	
-			ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis = new ValueAnalysis<AggrValue<AdvancedMatrixValue>>(
+			ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();	
+			ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 					callgraph, Args.newInstance(inputValues), factory);
 			
 			int size = analysis.getNodeList().size();
@@ -184,7 +184,7 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 	
 	
 	private static void changeMclass(
-				ValueAnalysis<AggrValue<AdvancedMatrixValue>> analysis,
+				ValueAnalysis<AggrValue<BasicMatrixValue>> analysis,
 				TIRNode statement, UDDUWeb web, int graphIndex, ArrayList<ArrayList<VarIsIntOk>> colourList) {
 				
 //				int i=0;
@@ -220,14 +220,14 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 				
 					for(String var1 : vars){
 					if(debug) System.out.println("var is "+var1);
-					AdvancedMatrixValue temp;
+					BasicMatrixValue temp;
 					if (analysis.getNodeList().get(graphIndex).getAnalysis()
 							.getOutFlowSets().get(statement).isViable()){
 					
 						
 						if(null != ( (analysis.getNodeList().get(graphIndex).getAnalysis().getOutFlowSets().get(statement).get(var1)))){
 								
-						temp = ((AdvancedMatrixValue) (analysis
+						temp = ((BasicMatrixValue) (analysis
 							.getNodeList().get(graphIndex).getAnalysis()
 							.getOutFlowSets().get(statement).get(var1).getSingleton()));
 					
@@ -433,6 +433,8 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 
 		
+		
+		
 //		if (useNode instanceof TIRFunction){
 //			for (Name v: ((TIRFunction) useNode).getInputParams()){
 //				if(v.getVarName().equals(var)){
@@ -528,6 +530,8 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		}
 		
 		else if (useNode instanceof TIRForStmt){
+			
+			
 			System.err.println("VARIABLE IN FOR LOOP IS "+((ForStmt) useNode).getAssignStmt().toString()+" "+var);
 			varIntOk = CheckRHS.handleUseRHSExpr(((ForStmt) useNode).getAssignStmt().getRHS(), var);
 			
@@ -549,6 +553,8 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler{
 		varInfo.setVarName(var);
 		varInfo.setNode(defNode);
 		IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
+		
+		
 	
 		if (defNode instanceof TIRCallStmt){
 			
