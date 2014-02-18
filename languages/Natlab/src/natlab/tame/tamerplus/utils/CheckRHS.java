@@ -99,7 +99,8 @@ public class CheckRHS {
 		else if (rhs instanceof ParameterizedExpr){
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -147,7 +148,8 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 		else if (rhs instanceof ParameterizedExpr){
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -174,6 +176,13 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 		
 		Expr rhs = defNode.getRHS();
 		
+		if (rhs instanceof RangeExpr){
+			
+			//varIntOk.setIsInt(true);
+			//TODO: Depends on range 
+		}
+		
+		
 		if (rhs instanceof IntLiteralExpr){
 			varIntOk.setIsInt(true);
 			
@@ -198,7 +207,8 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 		else if (rhs instanceof ParameterizedExpr){
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -242,7 +252,8 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 		else if (rhs instanceof ParameterizedExpr){
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -328,7 +339,8 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 		else if (rhs instanceof ParameterizedExpr){
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -378,7 +390,8 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 			String rhsName = ((ParameterizedExpr)rhs).getVarName();
 			
 			ArrayList<String> args = new ArrayList<String>();
-			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")){
+			if (rhsName.equals("plus") || rhsName.equals("minus") || rhsName.equals("mtimes") || rhsName.equals("colon")
+					|| rhsName.equals("power") || rhsName.equals("times") || rhsName.equals("uminus")){
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
 				args.add(	((NameExpr)arg).getVarName());
 				}
@@ -389,16 +402,12 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 				}
 				
 				varIntOk.setDependsOn(args);
-				if(defNode.getLHS().getNodeString().equals("[mc_t4]")){
-					System.err.println(args);
-					varIntOk.setIsInt(true);
-					//System.exit(1);
-				}
 				
-				if (args.size()>0){
-					varIntOk.setIsInt(false);
-					varIntOk.setDepends(true);
-				}
+				
+//				if (args.size()>0){
+//					varIntOk.setIsInt(false);
+//					varIntOk.setDepends(true);
+//				}
 					//varIntOk.setDepends(true);
 			}
 			
