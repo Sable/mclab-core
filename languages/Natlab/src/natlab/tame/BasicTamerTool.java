@@ -61,6 +61,7 @@ public class BasicTamerTool {
 	}
 
 	//TODO give more useful functions!
+	public void setDoIntOk(boolean value) { doIntOk = value; }
 
 	public static ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(
 			String[] args, 
