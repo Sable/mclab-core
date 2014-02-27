@@ -18,7 +18,6 @@ Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill Universit
 
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -30,7 +29,6 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Iterables;
 
-import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
@@ -41,7 +39,6 @@ aspect ASTtoXML {
   protected static VFFlowInsensitiveAnalysis ASTNode.kind_analysis_insensitive = null;
   protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
   protected static VFPreorderAnalysis ASTNode.kind_analysis_preorder = null;
-  protected static ASTNode ASTNode.parentProgram = null;
 
 	public long CompilationUnits.nodeCounter = 0;
 
@@ -99,12 +96,10 @@ aspect ASTtoXML {
         kind_analysis_preorder = new VFPreorderAnalysis(this);
         kind_analysis_preorder.analyze();
       }
-      parentProgram = null;
       Element e = doc.createElement("CompilationUnits");
       e.setAttribute("id", "" + nodeCounter());
       addChildrenXml(doc, e, getPrograms());
       doc.appendChild(e);
-      parentProgram = null;
       kind_analysis_sensitive = null;
       kind_analysis_insensitive = null;
       kind_analysis_preorder = null;
@@ -137,12 +132,9 @@ aspect ASTtoXML {
   public void EmptyProgram.getXML(Document doc, Element parent) {}
 
   public void Script.getXML(Document doc, Element parent) {
-    parentProgram=this;
-
     Element e = createXmlElement(doc, parent, getHelpComments(),
         "fullpath", getFile().getPath(), "name", getFile().getNameWithoutExtension());
     addChildrenXml(doc, e, "StmtList", getStmts());
-    parentProgram=null;
   }
 
   public void FunctionList.getXML(Document doc, Element parent) {
@@ -150,15 +142,12 @@ aspect ASTtoXML {
   }
 
   public void Function.getXML(Document doc, Element parent) {
-    ASTNode previous = parentProgram;
-    parentProgram = this;
     Element e = createXmlElement(doc, parent, "name", getName());
     addChildrenXml(doc, e, "InputParamList", getInputParams());
     addChildrenXml(doc, e, "OutputParamList", getOutputParams());
     addChildrenXml(doc, e, getHelpComments());
     addChildrenXml(doc, e, "StmtList", getStmts());
     addChildrenXml(doc, e, getNestedFunctions());
-	  parentProgram = previous;
   }
 
   public void ClassDef.getXML(Document doc, Element parent) {
@@ -334,29 +323,12 @@ aspect ASTtoXML {
     createXmlElement(doc, parent, "nameId", getID());
   }
 
-  public void NameExpr.annotateXMLWithKind(Element e, String name, Map<String, VFDatum> f, String n){
-    VFDatum d = null;
-    if (f != null) {
-      d = f.get(n);
-    }
-    String kind="null";
-    if (d != null) {
-      kind = d.toString();
-    }
-    e.setAttribute(name, kind);
-  }
-
   public void NameExpr.getXML(Document doc, Element parent) {
     Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
     if (include_kinds_in_xml) {
-      Map<String, VFDatum> out_sensitive = kind_analysis_sensitive.getOutFlowSets()
-          .get(parentProgram != null ? parentProgram : getName());
-      Map<String, VFDatum> out_insensitive = kind_analysis_insensitive.getFlowSets()
-          .get(parentProgram != null ? parentProgram : getName());
-      Map<String, VFDatum> out_preorder = kind_analysis_preorder.getFlowSets().get(getName());
-      annotateXMLWithKind(e, "kind", out_preorder, getName().getID());
-      annotateXMLWithKind(e, "kind_insensitive", out_insensitive, getName().getID());
-      annotateXMLWithKind(e, "kind_sensitive", out_sensitive, getName().getID());
+      e.setAttribute("kind", kind_analysis_preorder.getResult(getName()).toString());
+      e.setAttribute("kind_insensitive", kind_analysis_insensitive.getResult(getName()).toString());
+      e.setAttribute("kind_sensitive", kind_analysis_sensitive.getResult(getName()).toString());
     }
   }
 
