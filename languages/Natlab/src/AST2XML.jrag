@@ -55,6 +55,7 @@ aspect ASTtoXML {
     Element e = doc.createElement(getClass().getSimpleName());
     e.setAttribute("id", "" + nodeCounter());
     e.setAttribute("line", "" + getStartLine());
+    e.setAttribute("col", "" + getStartColumn());
     for (int i = 0; i < attributes.length; i += 2) {
       e.setAttribute(attributes[i], attributes[i + 1]);
     }
