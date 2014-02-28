@@ -30,6 +30,8 @@ import natlab.backends.x10.Mix10;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
 import natlab.tame.tamerplus.TamerPlusMain;
+import natlab.toolkits.rewrite.Simplifier;
+import natlab.toolkits.rewrite.simplification.FullSimplification;
 import ast.CompilationUnits;
 import ast.Program;
 
@@ -132,6 +134,10 @@ public class Main {
     if (!errors.isEmpty()) {
       System.err.println(CompilationProblem.toStringAll(errors));
       return;
+    }
+
+    if (options.simplify()) {
+      Simplifier.simplify(cu, FullSimplification.class);
     }
 
     if (options.xml()) {
