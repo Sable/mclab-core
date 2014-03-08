@@ -22,8 +22,8 @@ import natlab.toolkits.path.FileEnvironment;
 
 public class BasicTamerTool {
 	
-	private Boolean doIntOk = true;
-	private Boolean doVarRename = false;
+	private static Boolean doIntOk = true;
+	private static Boolean doVarRename = false;
 
 	/**
 	 * This main method is just for testing, doesn't follow the convention when passing a file 
@@ -40,15 +40,20 @@ public class BasicTamerTool {
 		// build simple callgraph
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
 		// get input argument type info
-		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
-		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
-		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
-				new ValueAnalysis<AggrValue<BasicMatrixValue>>(
-						callgraph, 
-						Args.newInstance(inputValues), 
-						factory);
-		System.out.println(analysis.toString());
-
+		
+		/*
+		 * Commented below by Vineet : 17th Feb 2014
+		 * Instead a call is made to analyze method
+		 */
+//		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
+//		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
+//		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = 
+//				new ValueAnalysis<AggrValue<BasicMatrixValue>>(
+//						callgraph, 
+//						Args.newInstance(inputValues), 
+//						factory);
+//		System.out.println(analysis.toString());
+		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = analyze(args, env);
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
 					.getNodeList().get(i).getAnalysis()));
@@ -57,7 +62,7 @@ public class BasicTamerTool {
 
 	//TODO give more useful functions!
 
-	public ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(
+	public static ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(
 			String[] args, 
 			FileEnvironment env) 
 	{
