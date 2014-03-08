@@ -184,13 +184,13 @@ public abstract class NatlabAbstractStructuralAnalysis<A > extends nodecases.Abs
      */
     public void caseCondition( Expr condExpr )
     {
-        caseExpr( condExpr );
+        condExpr.analyze(this);
     }
 
     public abstract A newInitialFlow();
 
     public void caseSwitchExpr( Expr switchExpr )
     {
-        caseExpr( switchExpr );
+        switchExpr.analyze(this);
     }
 }

@@ -121,7 +121,7 @@ public abstract class NatlabAbstractDepthFirstAnalysis<A>
     }
     public void caseCondition( Expr condExpr )
     {
-        caseExpr( condExpr );
+        condExpr.analyze(this);
     }
 
     public void caseASTNode(ASTNode node)
@@ -144,7 +144,7 @@ public abstract class NatlabAbstractDepthFirstAnalysis<A>
     @Override
     public void caseSwitchExpr( Expr switchExpr )
     {
-        caseExpr( switchExpr );
+        switchExpr.analyze(this);
     }
 
 }

@@ -43,6 +43,13 @@
       options.</long_desc>
     </boolopt>
     <boolopt>
+      <name>Simplify</name>
+      <alias>s</alias>
+      <alias>simplify</alias>
+      <short_desc>Simplify the AST after parsing</short_desc>
+      <long_desc>Simplify the AST after parsing</long_desc>
+    </boolopt>
+    <boolopt>
       <name>XML IR</name>
       <alias>x</alias>
       <alias>xml</alias>
