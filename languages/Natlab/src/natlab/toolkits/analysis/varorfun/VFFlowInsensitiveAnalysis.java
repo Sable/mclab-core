@@ -223,7 +223,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
     else if (node instanceof ParameterizedExpr)
       target = ((ParameterizedExpr) node).getTarget();
     else
-      System.err.println("in LValue without any target");
+      log("in LValue without any target");
     return target;
   }
 
@@ -306,10 +306,10 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
 
     if (endCandidates == null || endCandidates.size() == 0 ){
       if (outerParameterizedExpr==null)
-        System.err.println("Cannot bind end to anything");
+        log("Cannot bind end to anything");
       else {
         NameExpr res = new ArrayList<NameExpr>(getTarget(outerParameterizedExpr).getNameExpressions()).get(0);
-        System.err.println("No candidates, making " +res.getName().getID() + " a TOP" );
+        log("No candidates, making " +res.getName().getID() + " a TOP" );
         bindError(res, e);
       }
       return;
@@ -321,7 +321,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
 
     if (inFunction && endCandidates.size() > 1 ){
       bindError(endCandidates.get(0), e);
-      System.err.println("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
+      log("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
       return;
     }
 
@@ -333,13 +333,13 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
           if ( toBind==null )
             toBind=n;
           else{
-            System.err.println("More than one candidate, making " + n.getName().getID() + " a TOP" );
+            log("More than one candidate, making " + n.getName().getID() + " a TOP" );
             bindError(n, e);
           }
         }
       }            
       if (toBind == null){ // all cands exist in the lib{
-        System.err.println("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
+        log("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP" );
         bindError(endCandidates.get(0), e);
       }
       else

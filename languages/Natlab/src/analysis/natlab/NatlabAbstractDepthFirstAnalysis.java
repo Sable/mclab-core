@@ -30,6 +30,12 @@ public abstract class NatlabAbstractDepthFirstAnalysis<A>
 {
     public static boolean DEBUG=false;
 
+    protected void log(Object message) {
+      if (DEBUG) {
+        System.err.println(message);
+      }
+    }
+
     protected Map<ASTNode, A> flowSets;
     protected A currentSet;
     protected ASTNode tree;

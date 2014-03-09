@@ -24,6 +24,8 @@ package natlab;
 import java.io.File;
 import java.util.List;
 
+import analysis.AbstractDepthFirstAnalysis;
+import analysis.AbstractStructuralAnalysis;
 import mclint.McLint;
 import natlab.backends.Fortran.codegen_readable.Main_readable;
 import natlab.backends.x10.Mix10;
@@ -85,6 +87,12 @@ public class Main {
     if (options.version()) {
       System.out.println("The version of this release is: " + VersionInfo.getVersion());
       return;
+    }
+
+    if (options.quiet()) {
+      AbstractDepthFirstAnalysis.DEBUG = false;
+      AbstractStructuralAnalysis.DEBUG = false;
+      
     }
 
     if (options.tamer()) {

@@ -129,10 +129,10 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
                     MergeUtil.mergePut(currentSet, pair.getKey(), pair.getValue());
             }        	
         }
-        if(DEBUG){
-        	System.err.println("in caseFunction "+ node.getName());
-        	System.err.println(currentSet);
-    	}
+
+        log("in caseFunction " + node.getName());
+        log(currentSet);
+
         // Add output params to set
         for( Name n : node.getOutputParams() ){
             MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
@@ -196,7 +196,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     	else if (node instanceof ParameterizedExpr)
             target = ((ParameterizedExpr) node).getTarget();
     	else
-            System.err.println("in LValue without any target");
+            log("in LValue without any target");
         return target;
     }
     
@@ -273,10 +273,10 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     public void caseEndExpr(EndExpr e) {
         if (endCandidates == null || endCandidates.size() == 0 ){
             if (outerParameterizedExpr==null)
-                System.err.println("Cannot bind end to anything");
+                log("Cannot bind end to anything");
             else {
                 NameExpr res = new ArrayList<NameExpr>(getTarget(outerParameterizedExpr).getNameExpressions()).get(0);
-                System.err.println("No candidates, making " +res.getName().getID() + " a TOP" );
+                log("No candidates, making " +res.getName().getID() + " a TOP" );
                 bindError(res, e);
             }
             return;
@@ -288,9 +288,9 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
 
         if (inFunction && endCandidates.size() > 1 ){
             bindError(endCandidates.get(0), e);
-            System.err.println("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP, Cands are :");
+            log("More than one candidate, making " +endCandidates.get(0).getName().getID() + " a TOP, Cands are :");
             for (NameExpr n: endCandidates)
-                System.err.println("    " +n.getName().getID());
+                log("    " +n.getName().getID());
             return;
         }
         
@@ -302,7 +302,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
                     if ( toBind==null )
                         toBind=n;
                     else{
-                        System.err.println("More than one candidate, making " + n.getName().getID() + " a TOP" );
+                        log("More than one candidate, making " + n.getName().getID() + " a TOP" );
                         bindError(n, e);
                     }
                 }
