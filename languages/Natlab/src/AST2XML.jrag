@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Iterables;
 
+import natlab.LookupFile;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
@@ -124,9 +125,22 @@ aspect ASTtoXML {
 
   public void EmptyProgram.getXML(Document doc, Element parent) {}
 
+  private FunctionOrScriptQuery Program.getEnvironmentForKindAnalysis() {
+      final FunctionOrScriptQuery baseline = LookupFile.getFunctionOrScriptQueryObject();
+      final FunctionOrScriptQuery env = new FileEnvironment(getFile()).getFunctionOrScriptQuery(getFile());
+      return new FunctionOrScriptQuery() {
+        @Override public boolean isFunctionOrScript(String name) {
+          return env.isFunctionOrScript(name) || baseline.isFunctionOrScript(name);
+        }
+
+        @Override public boolean isPackage(String name) {
+          return env.isPackage(name) || baseline.isPackage(name);
+        }
+      };
+  }
+
   protected void Program.doKindAnalysis() {
-      FileEnvironment fileEnvironment = new FileEnvironment(getFile());
-      FunctionOrScriptQuery env = new FileEnvironment(getFile()).getFunctionOrScriptQuery(getFile());
+      FunctionOrScriptQuery env = getEnvironmentForKindAnalysis();
       kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this, env);
       kind_analysis_sensitive.analyze();
       kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this, env);
