@@ -32,6 +32,8 @@ import com.google.common.collect.Iterables;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import natlab.toolkits.path.FileEnvironment;
 import natlab.utils.NodeFinder;
 
 aspect ASTtoXML {
@@ -88,21 +90,10 @@ aspect ASTtoXML {
   public Document CompilationUnits.ASTtoXML() {
     try {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      if (include_kinds_in_xml) {
-        kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this);
-        kind_analysis_sensitive.analyze();
-        kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this);
-        kind_analysis_insensitive.analyze();
-        kind_analysis_preorder = new VFPreorderAnalysis(this);
-        kind_analysis_preorder.analyze();
-      }
       Element e = doc.createElement("CompilationUnits");
       e.setAttribute("id", "" + nodeCounter());
       addChildrenXml(doc, e, getPrograms());
       doc.appendChild(e);
-      kind_analysis_sensitive = null;
-      kind_analysis_insensitive = null;
-      kind_analysis_preorder = null;
       return doc;
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -131,13 +122,30 @@ aspect ASTtoXML {
 
   public void EmptyProgram.getXML(Document doc, Element parent) {}
 
+  protected void Program.doKindAnalysis() {
+      FileEnvironment fileEnvironment = new FileEnvironment(getFile());
+      FunctionOrScriptQuery env = new FileEnvironment(getFile()).getFunctionOrScriptQuery(getFile());
+      kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this, env);
+      kind_analysis_sensitive.analyze();
+      kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this, env);
+      kind_analysis_insensitive.analyze();
+      kind_analysis_preorder = new VFPreorderAnalysis(this, env);
+      kind_analysis_preorder.analyze();
+  }
+
   public void Script.getXML(Document doc, Element parent) {
+    if (include_kinds_in_xml) {
+        doKindAnalysis();
+    }
     Element e = createXmlElement(doc, parent, getHelpComments(),
         "fullpath", getFile().getPath(), "name", getFile().getNameWithoutExtension());
     addChildrenXml(doc, e, "StmtList", getStmts());
   }
 
   public void FunctionList.getXML(Document doc, Element parent) {
+    if (include_kinds_in_xml) {
+        doKindAnalysis();
+    }
     createXmlElement(doc, parent, getFunctions(), "fullpath", getFile().getPath());
   }
 
