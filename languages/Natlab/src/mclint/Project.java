@@ -68,10 +68,9 @@ public class Project {
     write(projectRoot);
   }
 
-  // TODO(ismail): Fix this to actually write at given root...
   public void write(Path root) throws IOException {
     for (MatlabProgram program : programs) {
-      program.write();
+      program.write(root);
     }
   }
 }
