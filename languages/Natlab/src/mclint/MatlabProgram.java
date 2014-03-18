@@ -23,6 +23,10 @@ public class MatlabProgram {
   private String code;
   private Program ast;
   
+  public static MatlabProgram at(Path file) throws IOException {
+    return Project.at(file.getParent()).getMatlabProgram(file);
+  }
+  
   public static MatlabProgram at(Path file, Project project) {
     return new MatlabProgram(file, project);
   }
