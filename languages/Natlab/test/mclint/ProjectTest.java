@@ -29,7 +29,7 @@ public class ProjectTest extends TestCase {
 
     Project project = Project.at(projectRoot);
     MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
-    assertEquals("f.m", f.getPath());
+    assertEquals("f.m", f.getPath().toString());
     assertFalse(f.isPrivate());
     assertEquals("", f.getPackage());
   }
@@ -39,7 +39,7 @@ public class ProjectTest extends TestCase {
 
     Project project = Project.at(projectRoot);
     MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
-    assertEquals("private/f.m", f.getPath());
+    assertEquals("private/f.m", f.getPath().toString());
     assertTrue(f.isPrivate());
     assertEquals("", f.getPackage());
   }
@@ -52,14 +52,14 @@ public class ProjectTest extends TestCase {
     FluentIterable<MatlabProgram> programs = FluentIterable.from(project.getMatlabPrograms());
     assertTrue(programs.anyMatch(new Predicate<MatlabProgram>() {
       @Override public boolean apply(MatlabProgram program) {
-        return program.getPath().equals("+pkg/f.m")
+        return program.getPath().toString().equals("+pkg/f.m")
             && !program.isPrivate()
             && program.getPackage().equals("pkg");
       }
     }));
     assertTrue(programs.anyMatch(new Predicate<MatlabProgram>() {
       @Override public boolean apply(MatlabProgram program) {
-        return program.getPath().equals("+pkg/+nested/f.m")
+        return program.getPath().toString().equals("+pkg/+nested/f.m")
             && !program.isPrivate()
             && program.getPackage().equals("pkg.nested");
       }

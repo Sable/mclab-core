@@ -7,16 +7,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 import ast.CompilationUnits;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class Project {
   private Path projectRoot;
-  private List<MatlabProgram> programs = Lists.newArrayList();
+  private Map<Path, MatlabProgram> programs = Maps.newHashMap();
 
   public static Project at(final Path projectRoot) throws IOException {
     Preconditions.checkArgument(Files.isDirectory(projectRoot),
@@ -47,18 +47,22 @@ public class Project {
 
   public MatlabProgram addMatlabProgram(Path program) {
     MatlabProgram matlabProgram = MatlabProgram.at(program, this);
-    programs.add(matlabProgram);
+    programs.put(matlabProgram.getPath(), matlabProgram);
     return matlabProgram;
+  }
+  
+  public MatlabProgram getMatlabProgram(Path rootRelativePath) {
+    return programs.get(rootRelativePath);
   }
 
   public Iterable<MatlabProgram> getMatlabPrograms() {
-    return Collections.unmodifiableList(programs);
+    return Collections.unmodifiableCollection(programs.values());
   }
 
   public CompilationUnits asCompilationUnits() {
     CompilationUnits units = new CompilationUnits();
     units.setProject(this);
-    for (MatlabProgram program : programs) {
+    for (MatlabProgram program : getMatlabPrograms()) {
       units.addProgram(program.parse());
     }
     return units;
@@ -69,7 +73,7 @@ public class Project {
   }
 
   public void write(Path root) throws IOException {
-    for (MatlabProgram program : programs) {
+    for (MatlabProgram program : getMatlabPrograms()) {
       program.write(root);
     }
   }

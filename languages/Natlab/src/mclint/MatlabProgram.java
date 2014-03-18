@@ -22,7 +22,7 @@ public class MatlabProgram {
 
   private String code;
   private Program ast;
-
+  
   public static MatlabProgram at(Path file, Project project) {
     return new MatlabProgram(file, project);
   }
@@ -39,8 +39,8 @@ public class MatlabProgram {
   /**
    * Returns the path of this program relative to the project root.
    */
-  public String getPath() {
-    return file.toString();
+  public Path getPath() {
+    return file;
   }
 
   public boolean isPrivate() {
