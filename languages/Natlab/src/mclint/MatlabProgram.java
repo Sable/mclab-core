@@ -16,6 +16,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+// TODO(isbadawi): There is lots of awkward interrelated state in this class
+// -- file, code, ast, the transformers, etc. are all kinds of views on the same thing,
+// except that changes might be made to some of them...
+// Need to think harder about modeling this.
 public class MatlabProgram {
   private Project project;
   private Path file;

@@ -1,14 +1,11 @@
 package natlab.refactoring;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import mclint.refactoring.Refactoring;
 import mclint.refactoring.RefactoringContext;
 import mclint.transform.Transformer;
-import natlab.refactoring.Exceptions.RefactorException;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
 import natlab.toolkits.analysis.core.ReachingDefs;
@@ -31,7 +28,6 @@ import ast.Stmt;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ExtractFunction extends Refactoring {
@@ -49,7 +45,6 @@ public class ExtractFunction extends Refactoring {
   private Set<String> liveAfter;
   private Map<String, VFDatum> kinds;
 
-  private LinkedList<RefactorException> errors = Lists.newLinkedList();
   private Set<String> addedGlobals = Sets.newHashSet();
   private Set<String> addedInputs = Sets.newHashSet();
 
@@ -61,7 +56,7 @@ public class ExtractFunction extends Refactoring {
     this.to = to;
     this.extractedFunctionName = extractedFunctionName;
 
-    this.transformer = context.getMatlabProgram().getBasicTransformer();
+    this.transformer = context.getTransformer();
   }
 
   private void extractStatements() {
@@ -150,11 +145,11 @@ public class ExtractFunction extends Refactoring {
   }
 
   private void reportVariableMightBeUndefined(String id) {
-    errors.add(new Exceptions.FunctionInputCanBeUndefined(new Name(id)));
+    addError(new Exceptions.FunctionInputCanBeUndefined(new Name(id)));
   }
 
   private void reportOutputMightBeUndefined(String id) {
-    errors.add(new Exceptions.FunctionOutputCanBeUndefined(new Name(id)));
+    addError(new Exceptions.FunctionOutputCanBeUndefined(new Name(id)));
   }
 
   private void makeExtractedFunctionSiblingOfOriginal() {
@@ -198,11 +193,6 @@ public class ExtractFunction extends Refactoring {
 
   public Function getExtractedFunction() {
     return extracted;
-  }
-
-  @Override
-  public List<RefactorException> getErrors() {
-    return errors;
   }
 
   @Override
