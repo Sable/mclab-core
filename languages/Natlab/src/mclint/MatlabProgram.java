@@ -28,7 +28,8 @@ public class MatlabProgram {
   private Program ast;
   
   public static MatlabProgram at(Path file) throws IOException {
-    return Project.at(file.getParent()).getMatlabProgram(file);
+    Path root = file.getParent();
+    return Project.at(root).getMatlabProgram(root.relativize(file));
   }
   
   public static MatlabProgram at(Path file, Project project) {
