@@ -11,20 +11,26 @@ import mclint.util.Parsing;
 import ast.ASTNode;
 import ast.Program;
 
+import com.google.common.base.Joiner;
+
 public abstract class McLintTestCase extends TestCase {
   protected Project project;
   protected MatlabProgram program;
   protected AnalysisKit kit;
-
+  
   @Override
   protected void setUp() throws IOException {
     project = Project.at(Files.createTempDirectory(null));
   }
-
-  protected void parse(String code) {
+  
+  private String join(String... lines) {
+    return Joiner.on('\n').join(lines);
+  }
+  
+  protected void parse(String... lines) {
     Path file = project.getProjectRoot().resolve("f.m");
     try {
-      Files.write(file, code.getBytes(StandardCharsets.UTF_8));
+      Files.write(file, join(lines).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
     }
     program = project.addMatlabProgram(file);
@@ -32,12 +38,18 @@ public abstract class McLintTestCase extends TestCase {
     kit = program.analyze();
   }
 
-  protected RefactoringContext createContext() {
+  protected RefactoringContext createBasicTransformerContext() {
+    return RefactoringContext.create(program, program.getBasicTransformer());
+  }
+  
+  protected RefactoringContext createLayoutPreservingContext() {
     return RefactoringContext.create(program);
   }
 
-  protected void assertEquivalent(String expectedCode, ASTNode<?> program) {
-    Program expected = Parsing.string(expectedCode);
-    assertEquals(expected.getPrettyPrinted(), program.getPrettyPrinted());
+  protected void assertEquivalent(ASTNode<?> program, String... lines) {
+    Program expected = Parsing.string(join(lines));
+    // Not sure why these calls to trim() are necessary; sometimes getPrettyPrinted() seems to
+    // tack on a newline at the end of the output...
+    assertEquals(expected.getPrettyPrinted().trim(), program.getPrettyPrinted().trim());
   }
 }

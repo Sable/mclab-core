@@ -10,8 +10,11 @@ public class RefactoringContext {
   private Transformer transformer;
 
   public static RefactoringContext create(MatlabProgram program) {
-    return new RefactoringContext(program.getProject(), program,
-        program.getLayoutPreservingTransformer());
+    return create(program, program.getLayoutPreservingTransformer());
+  }
+  
+  public static RefactoringContext create(MatlabProgram program, Transformer transformer) {
+    return new RefactoringContext(program.getProject(), program, transformer);
   }
 
   private RefactoringContext(Project project, MatlabProgram program, Transformer transformer) {
