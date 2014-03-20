@@ -51,6 +51,10 @@ public class MatlabProgram {
   public Path getPath() {
     return file;
   }
+  
+  public Path getAbsolutePath() {
+    return getProject().getProjectRoot().resolve(getPath());
+  }
 
   public boolean isPrivate() {
     return file.getParent() != null
@@ -71,7 +75,7 @@ public class MatlabProgram {
 
   public Program parse() {
     if (ast == null) {
-      ast = Parsing.file(project.getProjectRoot().resolve(file).toString());
+      ast = Parsing.file(getAbsolutePath().toString());
       ast.setMatlabProgram(this);
     }
     return ast;
@@ -88,7 +92,7 @@ public class MatlabProgram {
   public Transformer getLayoutPreservingTransformer() {
     try {
       return Transformers.layoutPreserving(
-          new InputStreamReader(Files.newInputStream(file)));
+          new InputStreamReader(Files.newInputStream(getAbsolutePath())));
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
