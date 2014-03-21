@@ -1,8 +1,13 @@
 package mclint.util;
 
+import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Program;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 /**
  * Useful methods for manipulating ASTs.
@@ -42,6 +47,19 @@ public class AstUtil {
   
   public static boolean removed(ASTNode<?> node) {
     return NodeFinder.findParent(Program.class, node) == null;
+  }
+  
+  // This is used by the pretty printer. It's declared here because JastAdd gives a syntax
+  // error for the <T extends ASTNode<?>> part.
+  public static <T extends ASTNode<?>> String join(String delimiter, Iterable<T> nodes) {
+    String result = Joiner.on(delimiter).join(
+        Iterables.filter(
+          Iterables.transform(nodes, AstFunctions.prettyPrint()),
+          Predicates.not(Predicates.containsPattern("^$"))));
+    if (!result.isEmpty() && delimiter.equals("\n")) {
+      result += "\n";
+    }
+    return result;
   }
 
   private AstUtil() {}
