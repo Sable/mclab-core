@@ -2,18 +2,25 @@ package mclint.refactoring;
 
 import mclint.MatlabProgram;
 import mclint.Project;
+import mclint.transform.Transformer;
 
 public class RefactoringContext {
   private Project project;
   private MatlabProgram program;
+  private Transformer transformer;
 
   public static RefactoringContext create(MatlabProgram program) {
-    return new RefactoringContext(program.getProject(), program);
+    return create(program, program.getLayoutPreservingTransformer());
+  }
+  
+  public static RefactoringContext create(MatlabProgram program, Transformer transformer) {
+    return new RefactoringContext(program.getProject(), program, transformer);
   }
 
-  private RefactoringContext(Project project, MatlabProgram program) {
+  private RefactoringContext(Project project, MatlabProgram program, Transformer transformer) {
     this.project = project;
     this.program = program;
+    this.transformer = transformer;
   }
 
   public Project getProject() {
@@ -22,5 +29,9 @@ public class RefactoringContext {
 
   public MatlabProgram getMatlabProgram() {
     return program;
+  }
+  
+  public Transformer getTransformer() {
+    return transformer;
   }
 }

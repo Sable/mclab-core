@@ -40,7 +40,7 @@ public class Location implements Comparable<Location> {
   @Override
   public String toString() {
     return String.format("%s [%d, %d]",
-        program == null ? "<string>" : program.getPath(), line, column);
+        program == null ? "<string>" : program.getPath().toString(), line, column);
   }
 
   private Location(MatlabProgram program, int line, int column) {
@@ -52,7 +52,7 @@ public class Location implements Comparable<Location> {
   @Override
   public int compareTo(Location location) {
     return ComparisonChain.start()
-        .compare(getMatlabProgram().getPath(), location.getMatlabProgram().getPath())
+        .compare(getMatlabProgram().getPath().toString(), location.getMatlabProgram().getPath().toString())
         .compare(getLine(), location.getLine())
         .compare(getColumn(), location.getColumn())
         .result();

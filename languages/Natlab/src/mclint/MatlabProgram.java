@@ -16,13 +16,22 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+// TODO(isbadawi): There is lots of awkward interrelated state in this class
+// -- file, code, ast, the transformers, etc. are all kinds of views on the same thing,
+// except that changes might be made to some of them...
+// Need to think harder about modeling this.
 public class MatlabProgram {
   private Project project;
   private Path file;
 
   private String code;
   private Program ast;
-
+  
+  public static MatlabProgram at(Path file) throws IOException {
+    Path root = file.getParent();
+    return Project.at(root).getMatlabProgram(root.relativize(file));
+  }
+  
   public static MatlabProgram at(Path file, Project project) {
     return new MatlabProgram(file, project);
   }
@@ -39,8 +48,12 @@ public class MatlabProgram {
   /**
    * Returns the path of this program relative to the project root.
    */
-  public String getPath() {
-    return file.toString();
+  public Path getPath() {
+    return file;
+  }
+  
+  public Path getAbsolutePath() {
+    return getProject().getProjectRoot().resolve(getPath());
   }
 
   public boolean isPrivate() {
@@ -62,7 +75,7 @@ public class MatlabProgram {
 
   public Program parse() {
     if (ast == null) {
-      ast = Parsing.file(project.getProjectRoot().resolve(file).toString());
+      ast = Parsing.file(getAbsolutePath().toString());
       ast.setMatlabProgram(this);
     }
     return ast;
@@ -79,7 +92,7 @@ public class MatlabProgram {
   public Transformer getLayoutPreservingTransformer() {
     try {
       return Transformers.layoutPreserving(
-          new InputStreamReader(Files.newInputStream(file)));
+          new InputStreamReader(Files.newInputStream(getAbsolutePath())));
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
