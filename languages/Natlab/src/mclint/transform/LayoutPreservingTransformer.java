@@ -56,6 +56,7 @@ class LayoutPreservingTransformer implements Transformer {
   public void remove(ASTNode<?> node) {
     tokensOf(node).clear();
     AstUtil.remove(node);
+    tokensByPosition = indexByPosition(tokens);
   }
   
   @Override
