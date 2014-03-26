@@ -72,10 +72,6 @@ class LayoutPreservingTransformer implements Transformer {
     AstUtil.replace(oldNode, newNode);
   }
   
-  private Token newline() {
-    return new ClassicToken(1, "\n");
-  }
-  
   @Override
   public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
     List<Token> tokens = null;
@@ -85,7 +81,6 @@ class LayoutPreservingTransformer implements Transformer {
       tokens = tokensOf(node.getChild(i - 1));
     }
     tokens.addAll(getTokens(newNode));
-    tokens.add(newline());
     node.insertChild(newNode, i);
   }
   
@@ -178,12 +173,26 @@ class LayoutPreservingTransformer implements Transformer {
     return table;
   }
   
+  private static boolean isSynthetic(ASTNode<?> node) {
+    return node.getStartLine() == 0;
+  }
+  
   private List<Token> getTokens(ASTNode<?> node) {
+    if (!isSynthetic(node)) {
+      return tokensOf(node);
+    }
     try {
-      return getTokens(new StringReader(node.getPrettyPrinted()));
+      List<Token> tokens = getTokens(new StringReader(node.getPrettyPrinted()));
+      // TODO(isbadawi): This feels hacky, and specific to statements
+      tokens.add(newline());
+      return tokens;
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  private static Token newline() {
+    return new ClassicToken(1, "\n");
   }
 
   private static List<Token> getTokens(Reader source) throws IOException {
