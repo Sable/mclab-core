@@ -16,8 +16,13 @@ import org.antlr.runtime.Token;
 import ast.ASTNode;
 import ast.Program;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.google.common.io.CharStreams;
@@ -30,7 +35,9 @@ import com.google.common.io.CharStreams;
  *
  */
 class LayoutPreservingTransformer implements Transformer {
+  // The token stream
   private List<Token> tokens;
+  // Maps <line, column> to index into the token stream
   private Table<Integer, Integer, Integer> tokensByPosition;
   private Program program;
 
@@ -78,9 +85,29 @@ class LayoutPreservingTransformer implements Transformer {
     node.insertChild(newNode, i);
   }
 
-  private List<Token> tokensOf(ASTNode<?> node) {
-    return tokens.subList(startIndex(node), endIndex(node) + 1);
+  List<Token> tokensOf(ASTNode<?> node) {
+    return tokens.subList(
+        lastMatchingIndex(hasText("\n"), startIndex(node)) + 1, endIndex(node) + 1);
   }
+  
+  private int lastMatchingIndex(Predicate<Token> predicate, int start) {
+    for (int i = start; i >= 0; i--) {
+      if (predicate.apply(tokens.get(i))) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  
+  private int firstMatchingIndex(Predicate<Token> predicate, int start) {
+    for (int i = start; i < tokens.size(); ++i) {
+      if (predicate.apply(tokens.get(i))) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  
 
   // Tokens are from ANTLR, where columns are 0-based, and lines are 1-based.
   // But the AST is from Beaver, where they are both 1-based.
@@ -97,12 +124,18 @@ class LayoutPreservingTransformer implements Transformer {
     return program;
   }
   
-  public String reconstructText() {
-    StringBuilder sb = new StringBuilder();
-    for (Token token : tokens) {
-      sb.append(token.getText());
+  private static Function<Token, String> GET_TEXT = new Function<Token, String>() {
+    @Override public String apply(Token token) {
+      return token.getText();
     }
-    return sb.toString();
+  };
+  
+  private static Predicate<Token> hasText(String text) {
+    return Predicates.compose(Predicates.equalTo(text), GET_TEXT);
+  }
+  
+  public String reconstructText() {
+    return Joiner.on("").join(Iterables.transform(tokens, GET_TEXT));
   }
   
   private LayoutPreservingTransformer(Program program, List<Token> tokens,
@@ -116,9 +149,10 @@ class LayoutPreservingTransformer implements Transformer {
     Table<Integer, Integer, Integer> table = HashBasedTable.create();
     int index = 0;
     for (Token token : tokens) {
-      table.put(token.getLine(), token.getCharPositionInLine(), index);
-      table.put(token.getLine(),
-          token.getCharPositionInLine() + token.getText().length() - 1, index);
+      int startColumn = token.getCharPositionInLine();
+      int endColumn = startColumn + token.getText().length() - 1;
+      table.put(token.getLine(), startColumn, index);
+      table.put(token.getLine(), endColumn, index);
       index++;
     }
     return table;

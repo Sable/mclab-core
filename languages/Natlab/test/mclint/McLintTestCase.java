@@ -23,7 +23,7 @@ public abstract class McLintTestCase extends TestCase {
     project = Project.at(Files.createTempDirectory(null));
   }
   
-  private String join(String... lines) {
+  protected String join(String... lines) {
     return Joiner.on('\n').join(lines);
   }
   
