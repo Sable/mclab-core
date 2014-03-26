@@ -1,5 +1,8 @@
 package mclint.transform;
 
+import static com.google.common.base.Predicates.not;
+import static com.google.common.base.Predicates.or;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -84,11 +87,27 @@ class LayoutPreservingTransformer implements Transformer {
     tokens.add(newline());
     node.insertChild(newNode, i);
   }
-
+  
   List<Token> tokensOf(ASTNode<?> node) {
-    return tokens.subList(
-        lastMatchingIndex(hasText("\n"), startIndex(node)) + 1, endIndex(node) + 1);
+    int startIndex = leadingWhitespace(startIndex(node));
+    int endIndex = endIndex(node);
+    // If this is the last, but not the only, statement on the line 
+    if (tokens.get(startIndex).getCharPositionInLine() != 0 &&
+        tokens.get(endIndex).getText().equals("\n")) {
+      endIndex = trailingWhitespace(endIndex);
+    }
+    return tokens.subList(startIndex, endIndex + 1);
   }
+  
+  private int leadingWhitespace(int start) {
+    return lastMatchingIndex(newlineOrText, start - 1) + 1;
+  }
+  
+  private int trailingWhitespace(int start) {
+    return firstMatchingIndex(newlineOrText, start) - 1;
+  }
+  
+  private Predicate<Token> newlineOrText = or(hasText("\n"), not(hasText("[ \\t]")));
   
   private int lastMatchingIndex(Predicate<Token> predicate, int start) {
     for (int i = start; i >= 0; i--) {
@@ -131,7 +150,7 @@ class LayoutPreservingTransformer implements Transformer {
   };
   
   private static Predicate<Token> hasText(String text) {
-    return Predicates.compose(Predicates.equalTo(text), GET_TEXT);
+    return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
   }
   
   public String reconstructText() {
@@ -157,8 +176,8 @@ class LayoutPreservingTransformer implements Transformer {
     }
     return table;
   }
-
-  private static List<Token> getTokens(ASTNode<?> node) {
+  
+  private List<Token> getTokens(ASTNode<?> node) {
     try {
       return getTokens(new StringReader(node.getPrettyPrinted()));
     } catch (IOException e) {
