@@ -62,7 +62,7 @@ class LayoutPreservingTransformer implements Transformer {
 
   private static int clamp(int i, int min, int max) {
     if (i < min) {
-      return i;
+      return min;
     }
     if (i > max) {
       return max;
