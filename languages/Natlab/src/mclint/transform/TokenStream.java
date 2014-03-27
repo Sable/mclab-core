@@ -51,6 +51,17 @@ class TokenStream {
     return tokens.subList(startIndex(node), endIndex(node) + 1);
   }
   
+  public List<Token> getInsertionPoint(ASTNode<?> node, int i) {
+    if (i == 0) {
+      int index = startIndex(node.getChild(0));
+      return tokens.subList(index, index);
+    }
+    if (i >= node.getNumChild()) {
+      return getTokensForAstNode(node.getChild(node.getNumChild() - 1));
+    }
+    return getTokensForAstNode(node.getChild(i - 1));
+  }
+  
   private int leadingWhitespace(int start) {
     return lastMatchingIndex(newlineOrText, start - 1) + 1;
   }
@@ -113,6 +124,11 @@ class TokenStream {
   
   private List<Token> synthesizeNewTokens(ASTNode<?> node) {
     List<Token> tokens = tokenize(node.getPrettyPrinted());
+    // HACK TEMPORARY
+    for (Token token : tokens) {
+      token.setLine(1);
+      token.setCharPositionInLine(0);
+    }
     // TODO(isbadawi): This looks out of place 
     tokens.add(new ClassicToken(1, "\n"));
     return tokens;

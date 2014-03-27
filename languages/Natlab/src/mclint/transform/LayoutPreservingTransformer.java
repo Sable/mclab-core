@@ -54,20 +54,9 @@ class LayoutPreservingTransformer implements Transformer {
   
   @Override
   public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    ASTNode<?> target = node.getChild(clamp(i, 0, node.getNumChild() - 1));
-    List<Token> tokens = tokenStream.getTokensForAstNode(target);
+    List<Token> tokens = tokenStream.getInsertionPoint(node, i);
     tokens.addAll(tokenStream.getTokensForAstNode(newNode));
     node.insertChild(newNode, i);
-  }
-
-  private static int clamp(int i, int min, int max) {
-    if (i < min) {
-      return min;
-    }
-    if (i > max) {
-      return max;
-    }
-    return i;
   }
 
   public Program getProgram() {
