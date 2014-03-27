@@ -194,4 +194,23 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
         "end"
     ), transformer.reconstructText());
   }
+   public void testInsertingNewCodeIntoEmptyFunction() {
+    parse(
+        "function f",
+        "end"
+    );
+    Function f = ((FunctionList) program.parse()).getFunction(0);
+    AssignStmt newCode = new AssignStmt(
+        new NameExpr(new Name("x")),
+        new IntLiteralExpr(new DecIntNumericLiteralValue("1")));
+    
+    Transformer transformer = program.getLayoutPreservingTransformer();
+    transformer.insert(f.getStmts(), newCode, 0);
+    
+    assertEquals(join(
+        "function f",
+        "x = 1;",
+        "end"
+    ), transformer.reconstructText());
+ }
 }

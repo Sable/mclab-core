@@ -2,9 +2,11 @@ package mclint.transform;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.List;
 
 import matlab.MatlabLexer;
+import mclint.transform.TokenStream.TokenNode;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ClassicToken;
@@ -16,151 +18,230 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.AbstractSequentialIterator;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
-// A stream of tokens returned by a lexer, with operations for manipulating it
-class TokenStream {
-  private List<Token> tokens;
-  // Maps <line, column> to index into tokens
-  private Table<Integer, Integer, Integer> tokensByPosition;
-  
+class TokenStream implements Iterable<TokenNode> {
+  static class TokenNode {
+    private Token token;
+    private TokenNode previous;
+    private TokenNode next;
+    
+    public static TokenNode create(List<Token> tokens) {
+      TokenNode head = new TokenNode(null, null, null);
+      TokenNode node = head;
+      for (Token token : tokens) {
+        node.next = new TokenNode(token, node, null);
+        node = node.next;
+      }
+      return head;
+    }
+
+    public TokenNode(Token token, TokenNode previous, TokenNode next) {
+      this.token = token;
+      this.previous = previous;
+      this.next = next;
+    }
+
+    public Token getToken() {
+      return token;
+    }
+
+    public TokenNode getPrevious() {
+      return previous;
+    }
+
+    public TokenNode getNext() {
+      return next;
+    }
+    
+    private List<Token> asTokenList(TokenNode until) {
+      List<Token> tokens = Lists.newArrayList();
+      for (TokenNode node = this; node != until.getNext(); node = node.getNext()) {
+        tokens.add(node.getToken());
+      }
+      return tokens;
+    }
+    
+    public TokenNode copyUntil(TokenNode until) {
+      return TokenNode.create(asTokenList(until)).getNext();
+    }
+    
+    public void removeUntil(TokenNode until) {
+      this.previous.next = until.next;
+      until.next.previous = this.previous;
+    }
+    
+    public void spliceBefore(TokenNode newStart, TokenNode newEnd) {
+      newStart.previous = this.previous;
+      this.previous.next = newStart;
+      newEnd.next = this;
+      this.previous = newEnd;
+    }
+    
+    public void spliceAfter(TokenNode newStart, TokenNode newEnd) {
+      newStart.previous = this;
+      newEnd.next = this.next;
+      if (this.next != null) {
+        this.next.previous = newEnd;
+      }
+      this.next = newStart;
+    }
+  }
+  private TokenNode head;
+  private Table<Integer, Integer, TokenNode> byPosition;
+
   public static TokenStream create(String code) {
-    return new TokenStream(tokenize(code)).index();
+    List<Token> tokens = tokenize(code);
+    TokenNode node = TokenNode.create(tokens);
+    return new TokenStream(node).index();
   }
   
-  public TokenStream index() {
-    tokensByPosition = indexByPosition(tokens);
-    return this;
-  }
-  
-  public String asString() {
-    return Joiner.on("").join(Iterables.transform(tokens, GET_TEXT));
-  }
-  
-  private static boolean isSynthetic(ASTNode<?> node) {
-    return node.getStartLine() == 0;
+  @Override public Iterator<TokenNode> iterator() {
+    return new AbstractSequentialIterator<TokenNode>(head.getNext()) {
+      protected TokenNode computeNext(TokenNode previous) {
+        return previous.getNext();
+      }
+    };
   }
 
-  public List<Token> getTokensForAstNode(ASTNode<?> node) {
-    if (isSynthetic(node)) {
-      return synthesizeNewTokens(node);
+  public String asString() {
+    return Joiner.on("").join(Iterables.transform(this, GET_TEXT));
+  }
+
+  private static boolean isSynthetic(ASTNode<?> node) {
+    return node.getStartLine() == 0 && !(node instanceof ast.List);
+  }
+
+  public void removeAstNode(ASTNode<?> node) {
+    startNode(node).removeUntil(endNode(node));
+  }
+  
+  public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
+    TokenNode startNode;
+    TokenNode endNode;
+    if (isSynthetic(newNode)) {
+      startNode = synthesizeNewTokens(newNode);
+    } else {
+      startNode = startNode(newNode).copyUntil(endNode(newNode));
     }
-    return tokens.subList(startIndex(node), endIndex(node) + 1);
-  }
-  
-  public List<Token> getInsertionPoint(ASTNode<?> node, int i) {
-    if (i == 0) {
-      int index = startIndex(node.getChild(0));
-      return tokens.subList(index, index);
+    for (endNode = startNode; endNode.getNext() != null; endNode = endNode.getNext()) {}
+
+    if (node.getNumChild() == 0) {
+      // TODO(isbadawi): This is brittle, assumes statements lists I think
+      nextMatchingNode(hasText("\n"), startNode(node)).spliceAfter(startNode, endNode);
+    } else if (i == 0) {
+      startNode(node.getChild(0)).spliceBefore(startNode, endNode);
+    } else if (i >= node.getNumChild()) {
+      endNode(node.getChild(node.getNumChild() - 1)).spliceAfter(startNode, endNode);
+    } else {
+      endNode(node.getChild(i - 1)).spliceAfter(startNode, endNode);
     }
-    if (i >= node.getNumChild()) {
-      return getTokensForAstNode(node.getChild(node.getNumChild() - 1));
-    }
-    return getTokensForAstNode(node.getChild(i - 1));
   }
   
-  private int leadingWhitespace(int start) {
-    return lastMatchingIndex(newlineOrText, start - 1) + 1;
+  private TokenNode leadingWhitespace(TokenNode start) {
+    return previousMatchingNode(newlineOrText, start.getPrevious()).getNext();
   }
-  
-  private int trailingWhitespace(int start) {
-    return firstMatchingIndex(newlineOrText, start) - 1;
+
+  private TokenNode trailingWhitespace(TokenNode start) {
+    return nextMatchingNode(newlineOrText, start).getPrevious();
   }
-  
-  private Predicate<Token> newlineOrText = Predicates.or(
-      hasText("\n"), 
+
+  private Predicate<TokenNode> newlineOrText = Predicates.or(
+      hasText("\n"),
       Predicates.not(hasText("[ \\t]")));
-  
-  private int lastMatchingIndex(Predicate<Token> predicate, int start) {
-    for (int i = start; i >= 0; i--) {
-      if (predicate.apply(tokens.get(i))) {
-        return i;
+
+  private TokenNode previousMatchingNode(Predicate<TokenNode> predicate, TokenNode start) {
+    TokenNode node;
+    for (node = start; node.getToken() != null; node = node.getPrevious()) {
+      if (predicate.apply(node)) {
+        return node;
       }
     }
-    return -1;
+    return node;
   }
-  
-  private int firstMatchingIndex(Predicate<Token> predicate, int start) {
-    for (int i = start; i < tokens.size(); ++i) {
-      if (predicate.apply(tokens.get(i))) {
-        return i;
+
+  private TokenNode nextMatchingNode(Predicate<TokenNode> predicate, TokenNode start) {
+    for (TokenNode node = start; node != null; node = node.getNext()) {
+      if (predicate.apply(node)) {
+        return node;
       }
     }
-    return -1;
+    return null;
   }
 
   // Tokens are from ANTLR, where columns are 0-based, and lines are 1-based.
   // But the AST is from Beaver, where they are both 1-based.
   // This is why we subtract 1 from the column.
-  
+
   // The "token" index is the index into token stream that you get by just looking
   // at the node positions, and not applying any whitespace heuristics.
-  private int tokenStartIndex(ASTNode<?> node) {
-    return tokensByPosition.get(node.getStartLine(), node.getStartColumn() - 1);
-  }
-  
-  private int tokenEndIndex(ASTNode<?> node) {
-    return tokensByPosition.get(node.getEndLine(), node.getEndColumn() - 1);
-  }
-
-  private int startIndex(ASTNode<?> node) {
-    return leadingWhitespace(tokenStartIndex(node));
-  }
-  
-  private int endIndex(ASTNode<?> node) {
-    int startIndex = startIndex(node);
-    int endIndex = tokenEndIndex(node);
-    // If this is the last, but not the only, statement on the line 
-    if (tokens.get(startIndex).getCharPositionInLine() != 0 &&
-        tokens.get(endIndex).getText().equals("\n")) {
-      endIndex = trailingWhitespace(endIndex);
+  private TokenNode tokenStartNode(ASTNode<?> node) {
+    if (node instanceof ast.List){
+      node = node.getParent();
     }
-    return endIndex;
+    return byPosition.get(node.getStartLine(), node.getStartColumn() - 1);
   }
 
-  
-  private List<Token> synthesizeNewTokens(ASTNode<?> node) {
+  private TokenNode tokenEndNode(ASTNode<?> node) {
+    if (node instanceof ast.List) {
+      node = node.getParent();
+    }
+    return byPosition.get(node.getEndLine(), node.getEndColumn() - 1);
+  }
+
+  private TokenNode startNode(ASTNode<?> node) {
+    return leadingWhitespace(tokenStartNode(node));
+  }
+
+  private TokenNode endNode(ASTNode<?> node) {
+    TokenNode startNode = startNode(node);
+    TokenNode endNode = tokenEndNode(node);
+    // If this is the last, but not the only, statement on the line
+    if (startNode.getToken().getCharPositionInLine() != 0 &&
+        endNode.getToken().getText().equals("\n")) {
+      endNode = trailingWhitespace(endNode);
+    }
+    return endNode;
+  }
+
+
+  private TokenNode synthesizeNewTokens(ASTNode<?> node) {
+    // TODO(isbadawi): Somehow associate nodes with tokens here
     List<Token> tokens = tokenize(node.getPrettyPrinted());
-    // HACK TEMPORARY
-    for (Token token : tokens) {
-      token.setLine(1);
-      token.setCharPositionInLine(0);
-    }
-    // TODO(isbadawi): This looks out of place 
     tokens.add(new ClassicToken(1, "\n"));
-    return tokens;
+    return TokenNode.create(tokens).getNext();
   }
-  
-  private static Function<Token, String> GET_TEXT = new Function<Token, String>() {
-    @Override public String apply(Token token) {
-      return token.getText();
+
+  private static Function<TokenNode, String> GET_TEXT = new Function<TokenNode, String>() {
+    @Override public String apply(TokenNode node) {
+      return node.getToken().getText();
     }
   };
-  
-  private static Predicate<Token> hasText(String text) {
+
+  private static Predicate<TokenNode> hasText(String text) {
     return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
   }
 
-  private TokenStream(List<Token> tokens) {
-    this.tokens = tokens;
+  private TokenStream(TokenNode head) {
+    this.head = head;
   }
 
-  private static Table<Integer, Integer, Integer> indexByPosition(List<Token> tokens) {
-    Table<Integer, Integer, Integer> table = HashBasedTable.create();
-    int index = 0;
-    for (Token token : tokens) {
+  private TokenStream index() {
+    byPosition = HashBasedTable.create();
+    for (TokenNode tokenNode : this) {
+      Token token = tokenNode.getToken();
       int startColumn = token.getCharPositionInLine();
       int endColumn = startColumn + token.getText().length() - 1;
-      table.put(token.getLine(), startColumn, index);
-      table.put(token.getLine(), endColumn, index);
-      index++;
+      byPosition.put(token.getLine(), startColumn, tokenNode);
+      byPosition.put(token.getLine(), endColumn, tokenNode);
     }
-    return table;
+    return this;
   }
-  
+
   private static List<Token> tokenize(String code) {
     List<Token> tokens = Lists.newArrayList();
     MatlabLexer lexer = new MatlabLexer(getAntlrStream(code));
@@ -171,7 +252,7 @@ class TokenStream {
     }
     return tokens;
   }
-  
+
   private static ANTLRReaderStream getAntlrStream(String code) {
     try {
       return new ANTLRReaderStream(new StringReader(code));

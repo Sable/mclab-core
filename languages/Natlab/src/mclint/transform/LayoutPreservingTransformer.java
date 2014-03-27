@@ -2,13 +2,9 @@ package mclint.transform;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
 
 import mclint.util.AstUtil;
 import mclint.util.Parsing;
-
-import org.antlr.runtime.Token;
-
 import ast.ASTNode;
 import ast.Program;
 
@@ -34,28 +30,26 @@ class LayoutPreservingTransformer implements Transformer {
   
   @Override
   public void remove(ASTNode<?> node) {
-    tokenStream.getTokensForAstNode(node).clear();
+    tokenStream.removeAstNode(node);;
     AstUtil.remove(node);
-    tokenStream.index();
   }
   
   @Override
   public void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
-    List<Token> tokens = tokenStream.getTokensForAstNode(oldNode);
-    tokens.clear();
-    List<Token> newTokens = tokenStream.getTokensForAstNode(newNode);
-    
-    tokens.addAll(newTokens);
-    newTokens.get(0).setLine(oldNode.getStartLine());
-    newTokens.get(0).setCharPositionInLine(oldNode.getStartColumn() - 1);
-    
+//    List<Token> tokens = tokenStream.getTokensForAstNode(oldNode);
+//    tokens.clear();
+//    List<Token> newTokens = tokenStream.getTokensForAstNode(newNode);
+//    
+//    tokens.addAll(newTokens);
+//    newTokens.get(0).setLine(oldNode.getStartLine());
+//    newTokens.get(0).setCharPositionInLine(oldNode.getStartColumn() - 1);
+//    
     AstUtil.replace(oldNode, newNode);
   }
   
   @Override
   public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    List<Token> tokens = tokenStream.getInsertionPoint(node, i);
-    tokens.addAll(tokenStream.getTokensForAstNode(newNode));
+    tokenStream.insertAstNode(node, newNode, i);
     node.insertChild(newNode, i);
   }
 
