@@ -58,6 +58,13 @@
       transformations.</long_desc>
     </boolopt>
     <boolopt>
+      <name>JSON IR</name>
+      <alias>j</alias>
+      <alias>json</alias>
+      <short_desc>Prints the JSON IR</short_desc>
+      <long_desc>Prints the JSON IR</long_desc>
+    </boolopt>
+    <boolopt>
       <name>Matlab Input</name>
       <alias>m</alias>
       <alias>matlab</alias>

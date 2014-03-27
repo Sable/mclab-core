@@ -24,8 +24,6 @@ package natlab;
 import java.io.File;
 import java.util.List;
 
-import analysis.AbstractDepthFirstAnalysis;
-import analysis.AbstractStructuralAnalysis;
 import mclint.McLint;
 import natlab.backends.Fortran.codegen_readable.Main_readable;
 import natlab.backends.x10.Mix10;
@@ -34,6 +32,8 @@ import natlab.tame.BasicTamerTool;
 import natlab.tame.tamerplus.TamerPlusMain;
 import natlab.toolkits.rewrite.Simplifier;
 import natlab.toolkits.rewrite.simplification.FullSimplification;
+import analysis.AbstractDepthFirstAnalysis;
+import analysis.AbstractStructuralAnalysis;
 import ast.CompilationUnits;
 import ast.Program;
 
@@ -146,6 +146,11 @@ public class Main {
 
     if (options.simplify()) {
       Simplifier.simplify(cu, FullSimplification.class);
+    }
+    
+    if (options.json()) {
+      System.out.println(cu.getJsonString());
+      return;
     }
 
     if (options.xml()) {
