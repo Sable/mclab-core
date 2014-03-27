@@ -84,13 +84,14 @@ public class BasicTamerTool {
 		if (doIntOk)
 		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
-		if (doVarRename)
-			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
-				callgraph, inputValues);
+		// if (doVarRename)
+		// 	callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+		// 		callgraph, inputValues);
 		
-		if (doIntOk)
-		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		// if (doIntOk)
+		//     analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
+		//TODO: Add a fixed point solver to repeat IntOk and VarRenaming.
 		
 		System.out.println(analysis.toString());
 
