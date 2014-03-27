@@ -48,14 +48,7 @@ class TokenStream {
     if (isSynthetic(node)) {
       return synthesizeNewTokens(node);
     }
-    int startIndex = leadingWhitespace(startIndex(node));
-    int endIndex = endIndex(node);
-    // If this is the last, but not the only, statement on the line 
-    if (tokens.get(startIndex).getCharPositionInLine() != 0 &&
-        tokens.get(endIndex).getText().equals("\n")) {
-      endIndex = trailingWhitespace(endIndex);
-    }
-    return tokens.subList(startIndex, endIndex + 1);
+    return tokens.subList(startIndex(node), endIndex(node) + 1);
   }
   
   private int leadingWhitespace(int start) {
@@ -91,12 +84,30 @@ class TokenStream {
   // Tokens are from ANTLR, where columns are 0-based, and lines are 1-based.
   // But the AST is from Beaver, where they are both 1-based.
   // This is why we subtract 1 from the column.
-  private int startIndex(ASTNode<?> node) {
+  
+  // The "token" index is the index into token stream that you get by just looking
+  // at the node positions, and not applying any whitespace heuristics.
+  private int tokenStartIndex(ASTNode<?> node) {
     return tokensByPosition.get(node.getStartLine(), node.getStartColumn() - 1);
   }
   
-  private int endIndex(ASTNode<?> node) {
+  private int tokenEndIndex(ASTNode<?> node) {
     return tokensByPosition.get(node.getEndLine(), node.getEndColumn() - 1);
+  }
+
+  private int startIndex(ASTNode<?> node) {
+    return leadingWhitespace(tokenStartIndex(node));
+  }
+  
+  private int endIndex(ASTNode<?> node) {
+    int startIndex = startIndex(node);
+    int endIndex = tokenEndIndex(node);
+    // If this is the last, but not the only, statement on the line 
+    if (tokens.get(startIndex).getCharPositionInLine() != 0 &&
+        tokens.get(endIndex).getText().equals("\n")) {
+      endIndex = trailingWhitespace(endIndex);
+    }
+    return endIndex;
   }
 
   
