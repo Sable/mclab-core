@@ -89,7 +89,9 @@ aspect PrettyPrint {
   }
 
   protected String Stmt.wrap(String s, Object... args) {
-    return getIndent() + String.format(s, args) + (isOutputSuppressed() ? ";" : "");
+    return getIndent() +
+      (args.length == 0 ? s : String.format(s, args)) +
+      (isOutputSuppressed() ? ";" : "");
   }
 
   eq CSLExpr.getPrettyPrintedLessComments() =
