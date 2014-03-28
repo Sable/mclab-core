@@ -1,12 +1,18 @@
 package mclint.util;
 
+import java.util.List;
+import java.util.Map;
+
 import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
+import ast.EmptyStmt;
 import ast.Program;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
 /**
@@ -60,6 +66,18 @@ public class AstUtil {
       result += "\n";
     }
     return result;
+  }
+  
+  // This is used by the JSON serializer, again declared here because JastAdd won't allow generic
+  // methods.
+  public static <T extends ASTNode<?>> List<Map<String, Object>> asJsonArray(Iterable<T> nodes) {
+    return FluentIterable.from(nodes)
+        .filter(Predicates.not(Predicates.instanceOf(EmptyStmt.class)))
+        .transform(new Function<ASTNode<?>, Map<String, Object>>() {
+      @Override public Map<String, Object> apply(ASTNode<?> node) {
+        return node.getJson();
+      }
+    }).toImmutableList();
   }
 
   private AstUtil() {}

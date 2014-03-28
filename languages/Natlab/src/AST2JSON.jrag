@@ -1,0 +1,248 @@
+import java.util.Map;
+
+import org.json.simple.JSONValue;
+
+import com.google.common.collect.ImmutableMap;
+
+import static mclint.util.AstUtil.asJsonArray;
+
+aspect Json {
+  public String ASTNode.getJsonString() {
+    return JSONValue.toJSONString(getJson());
+  }
+
+  public Map<String, Object> ASTNode.getJson() {
+    return ImmutableMap.<String, Object>builder()
+      .put("type", getClass().getSimpleName())
+      .put("position", getJsonPosition())
+      .putAll(getExtraJson())
+      .build();
+  }
+
+  protected Map<String, Object> ASTNode.getJsonPosition() {
+    return ImmutableMap.<String, Object>of(
+        "start", ImmutableMap.of("line", getStartLine(), "column", getStartColumn()),
+        "end", ImmutableMap.of("line", getEndLine(), "column", getEndColumn()));
+  }
+
+  protected Map<String, Object> CompilationUnits.getJsonPosition() {
+    return ImmutableMap.of();
+  }
+
+  syn Map<String, ? extends Object> ASTNode.getExtraJson() {
+    throw new UnsupportedOperationException(getClass().getSimpleName() + "#getExtraJson()");
+  }
+
+  eq CompilationUnits.getExtraJson() = ImmutableMap.of(
+    "programs", asJsonArray(getPrograms())
+  );
+  eq EmptyProgram.getExtraJson() = ImmutableMap.of();
+  eq Script.getExtraJson() {
+    doKindAnalysis();
+    return ImmutableMap.of(
+      "full_path", getFile().getPath(),
+      "name", getFile().getNameWithoutExtension(),
+      "help_comments", asJsonArray(getHelpComments()),
+      "body", asJsonArray(getStmts())
+    );
+  }
+  eq FunctionList.getExtraJson() {
+    doKindAnalysis();
+    return ImmutableMap.of(
+      "full_path", getFile().getPath(),
+      "functions", asJsonArray(getFunctions())
+    );
+  }
+  eq Function.getExtraJson() = ImmutableMap.<String, Object>builder()
+    .put("name", getName())
+    .put("inputs", asJsonArray(getInputParams()))
+    .put("outputs", asJsonArray(getOutputParams()))
+    .put("help_comments", asJsonArray(getHelpComments()))
+    .put("body", asJsonArray(getStmts()))
+    .put("nested_functions", asJsonArray(getNestedFunctions()))
+    .build();
+  eq ClassDef.getExtraJson() = ImmutableMap.<String, Object>builder()
+    .put("name", getName())
+    .put("attributes", asJsonArray(getAttributes()))
+    .put("superclasses", asJsonArray(getSuperClasss()))
+    .put("help_comments", asJsonArray(getHelpComments()))
+    .put("properties", asJsonArray(getPropertys()))
+    .put("methods", asJsonArray(getMethods()))
+    .put("class_events", asJsonArray(getClassEvents()))
+    .build();
+  eq Properties.getExtraJson() = ImmutableMap.of(
+    "attributes", asJsonArray(getAttributes()),
+    "properties", asJsonArray(getPropertys())
+  );
+  eq Methods.getExtraJson() = ImmutableMap.of(
+    "attributes", asJsonArray(getAttributes()),
+    "signatures", asJsonArray(getSignatures()),
+    "property_accesses", asJsonArray(getPropAccs()),
+    "functions", asJsonArray(getFunctions())
+  );
+  eq Signature.getExtraJson() = ImmutableMap.of(
+    "name", getName(),
+    "inputs", asJsonArray(getInputParams()),
+    "outputs", asJsonArray(getOutputParams())
+  );
+  eq PropertyAccess.getExtraJson() = ImmutableMap.<String, Object>builder()
+    .put("name", getName())
+    .put("access", getAccess())
+    .put("inputs", asJsonArray(getInputParams()))
+    .put("outputs", asJsonArray(getOutputParams()))
+    .put("help_comments", asJsonArray(getHelpComments()))
+    .put("body", asJsonArray(getStmts()))
+    .put("nested_functions", asJsonArray(getNestedFunctions()))
+    .build();
+  eq ClassEvents.getExtraJson() = ImmutableMap.of(
+    "attributes", asJsonArray(getAttributes()),
+    "events", asJsonArray(getEvents())
+  );
+  eq Attribute.getExtraJson() = ImmutableMap.of(
+    "name", getKey(),
+    "value", getExpr().getJson()
+  );
+  eq SuperClass.getExtraJson() = ImmutableMap.of(
+    "name", getName()
+  );
+  eq Property.getExtraJson() = ImmutableMap.of(
+    "name", getName(),
+    "value", getExpr().getJson()
+  );
+  eq Event.getExtraJson() = ImmutableMap.of(
+    "name", getName()
+  );
+  eq SuperClassMethodExpr.getExtraJson() = ImmutableMap.of(
+    "func_name", getFuncName(),
+    "class_name", getClassName()
+  );
+  eq HelpComment.getExtraJson() = ImmutableMap.of(
+    "text", getText()
+  );
+  eq EmptyStmt.getExtraJson() = ImmutableMap.of();
+  eq ExprStmt.getExtraJson() = ImmutableMap.of(
+    "expression", getExpr().getJson(),
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq AssignStmt.getExtraJson() = ImmutableMap.of(
+    "lhs", getLHS().getJson(),
+    "rhs", getRHS().getJson(),
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq GlobalStmt.getExtraJson() = ImmutableMap.of(
+    "names", asJsonArray(getNames()),
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq PersistentStmt.getExtraJson() = ImmutableMap.of(
+    "names", asJsonArray(getNames()),
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq ShellCommandStmt.getExtraJson() = ImmutableMap.of(
+    "command", getCommand(),
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq BreakStmt.getExtraJson() = ImmutableMap.of(
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq ContinueStmt.getExtraJson() = ImmutableMap.of(
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq ReturnStmt.getExtraJson() = ImmutableMap.of(
+    "output_suppressed", isOutputSuppressed()
+  );
+  eq ForStmt.getExtraJson() = ImmutableMap.of(
+    "header", getAssignStmt().getJson(),
+    "body", asJsonArray(getStmts())
+  );
+  eq WhileStmt.getExtraJson() = ImmutableMap.of(
+    "condition", getExpr().getJson(),
+    "body", asJsonArray(getStmts())
+  );
+  eq IfStmt.getExtraJson() = ImmutableMap.of(
+    "if_blocks", asJsonArray(getIfBlocks()),
+    "else_block", hasElseBlock() ? getElseBlock().getJson() : ImmutableMap.of()
+  );
+  eq IfBlock.getExtraJson() = ImmutableMap.of(
+    "condition", getCondition().getJson(),
+    "body", asJsonArray(getStmts())
+  );
+  eq ElseBlock.getExtraJson() = ImmutableMap.of(
+    "body", asJsonArray(getStmts())
+  );
+  eq SwitchStmt.getExtraJson() = ImmutableMap.of(
+    "expression", getExpr().getJson(),
+    "cases", asJsonArray(getSwitchCaseBlocks()),
+    "default_case", hasDefaultCaseBlock() ? getDefaultCaseBlock().getJson() : ImmutableMap.of()
+  );
+  eq SwitchCaseBlock.getExtraJson() = ImmutableMap.of(
+    "expression", getExpr().getJson(),
+    "body", asJsonArray(getStmts())
+  );
+  eq DefaultCaseBlock.getExtraJson() = ImmutableMap.of(
+    "body", asJsonArray(getStmts())
+  );
+  eq TryStmt.getExtraJson() = ImmutableMap.of(
+    "body", asJsonArray(getTryStmts()),
+    "handler", asJsonArray(getCatchStmts())
+  );
+  eq RangeExpr.getExtraJson() = ImmutableMap.of(
+    "start", getLower().getJson(),
+    "stop", getUpper().getJson(),
+    "step", hasIncr() ? getIncr().getJson() : ImmutableMap.of()
+  );
+  eq ColonExpr.getExtraJson() = ImmutableMap.of();
+  eq EndExpr.getExtraJson() = ImmutableMap.of();
+  eq Name.getExtraJson() = ImmutableMap.of(
+    "name", getID()
+  );
+  eq NameExpr.getExtraJson() = ImmutableMap.of(
+    "name", getName().getJson(),
+    "kind", kind_analysis_preorder.getResult(getName()).toString()
+  );
+  eq DotExpr.getExtraJson() = ImmutableMap.of(
+    "target", getTarget().getJson(),
+    "field", getField()
+  );
+  eq ParameterizedExpr.getExtraJson() = ImmutableMap.of(
+    "target", getTarget().getJson(),
+    "args", asJsonArray(getArgs())
+  );
+  eq CellIndexExpr.getExtraJson() = ImmutableMap.of(
+    "target", getTarget().getJson(),
+    "args", asJsonArray(getArgs())
+  );
+  eq MatrixExpr.getExtraJson() = ImmutableMap.of(
+    "rows", asJsonArray(getRows())
+  );
+  eq CellArrayExpr.getExtraJson() = ImmutableMap.of(
+    "rows", asJsonArray(getRows())
+  );
+  eq Row.getExtraJson() = ImmutableMap.of(
+    "elements", asJsonArray(getElements())
+  );
+  eq FunctionHandleExpr.getExtraJson() = ImmutableMap.of(
+    "name", getName().getJson()
+  );
+  eq LambdaExpr.getExtraJson() = ImmutableMap.of(
+    "inputs", asJsonArray(getInputParams()),
+    "body", getBody().getJson()
+  );
+  eq IntLiteralExpr.getExtraJson() = ImmutableMap.of(
+    "value", Integer.parseInt(getValue().getText()),
+    "raw", getValue().getText()
+  );
+  eq FPLiteralExpr.getExtraJson() = ImmutableMap.of(
+    "value", Double.parseDouble(getValue().getText()),
+    "raw", getValue().getText()
+  );
+  eq StringLiteralExpr.getExtraJson() = ImmutableMap.of(
+    "value", getValue()
+  );
+  eq UnaryExpr.getExtraJson() = ImmutableMap.of(
+    "operand", getOperand().getJson()
+  );
+  eq BinaryExpr.getExtraJson() = ImmutableMap.of(
+    "lhs", getLHS().getJson(),
+    "rhs", getRHS().getJson()
+  );
+}

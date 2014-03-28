@@ -177,7 +177,8 @@ aspect ASTtoXML {
   public void ClassDef.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, Iterables.concat(
         getAttributes(), getSuperClasss(), getHelpComments(),
-        getPropertys(), getMethods(), getClassEvents()));
+        getPropertys(), getMethods(), getClassEvents()),
+        "name", getName());
   }
 
   public void Properties.getXML(Document doc, Element parent) {
