@@ -77,7 +77,7 @@ public class AstUtil {
       @Override public Map<String, Object> apply(ASTNode<?> node) {
         return node.getJson();
       }
-    }).toImmutableList();
+    }).toList();
   }
 
   private AstUtil() {}
