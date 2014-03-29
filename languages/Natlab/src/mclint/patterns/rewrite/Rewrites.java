@@ -31,10 +31,8 @@ public class Rewrites {
 
       @Override
       public boolean processLine(String line) {
-        Iterator<String> parts = SPLITTER.split(line).iterator();
-        String from = parts.next();
-        String to = parts.next();
-        refactorings.add(Rewrite.of(from, to, Rewrite.Visit.Expressions));
+        List<String> parts = SPLITTER.splitToList(line);
+        refactorings.add(Rewrite.of(parts.get(0), parts.get(1), Rewrite.Visit.Expressions));
         return true;
       }
     });

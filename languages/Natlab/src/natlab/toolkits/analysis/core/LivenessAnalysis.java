@@ -85,7 +85,7 @@ public class LivenessAnalysis extends
 		currentOutSet.addAll(NodeFinder.find(NameExpr.class, s)
 		    .filter(not(in(lValues)))
 		    .transform(AstFunctions.nameExprToID())
-		    .toImmutableList());
+		    .toList());
 
 		inFlowSets.put(s, Sets.newHashSet(currentInSet));
 	}

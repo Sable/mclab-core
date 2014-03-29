@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+import com.google.common.base.StandardSystemProperty;
+
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -57,7 +59,7 @@ public class PrettyPrintTest extends TestCase {
 	public static void testProgFile()
 	{
 		StringBuffer inline = null;
-		String basePath = System.getProperty("user.dir") + "/languages/Natlab/test/";
+		String basePath = StandardSystemProperty.USER_DIR.value() + "/languages/Natlab/test/";
 		//System.out.println(basePath);
 		String filename = basePath + "prettyprinttest.in";
 		try
