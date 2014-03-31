@@ -1,14 +1,15 @@
 package natlab.utils;
 
 import java.util.Iterator;
-import java.util.Stack;
+import java.util.List;
 
 import ast.ASTNode;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.AbstractSequentialIterator;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.TreeTraverser;
 
 /**
  * A utility that finds nodes of a certain type in the AST, and returns them as a lazy iterable.
@@ -25,30 +26,26 @@ import com.google.common.collect.FluentIterable;
  * </pre>
  */
 public class NodeFinder {
+  private static class AstNodeTreeTraverser extends TreeTraverser<ASTNode<?>> {
+    @Override
+    public Iterable<ASTNode<?>> children(ASTNode<?> root) {
+      // ASTNode is iterable, but it's Iterable<T extends ASTNode> (without the <?>).
+      // If it was Iterable<T extends ASTNode<?>>, we could just write
+      // return Iterables.concat(root);
+      List<ASTNode<?>> children = Lists.newArrayList();
+      for (ASTNode<?> child : root) {
+        children.add(child);
+      }
+      return children;
+    }
+  }
+
   /**
    * Returns an iterable of all the descendants of <tt>tree</tt>. This corresponds to a
    * depth-first traversal of the subtree rooted at <tt>tree</tt>.
    */
-  public static Iterable<ASTNode<?>> allDescendantsOf(final ASTNode<?> tree) {
-    Preconditions.checkNotNull(tree);
-    return new Iterable<ASTNode<?>>() {
-      @Override public Iterator<ASTNode<?>> iterator() {
-        final Stack<ASTNode<?>> toVisit = new Stack<ASTNode<?>>();
-        toVisit.push(tree);
-        return new AbstractIterator<ASTNode<?>>() {
-          @Override protected ASTNode<?> computeNext() {
-            if (toVisit.empty()) {
-              return endOfData();
-            }
-            ASTNode<?> next = toVisit.pop();
-            for (ASTNode<?> child : next) {
-              toVisit.push(child);
-            }
-            return next;
-          }
-        };
-      }
-    };
+  public static Iterable<ASTNode<?>> allDescendantsOf(ASTNode<?> tree) {
+    return new AstNodeTreeTraverser().preOrderTraversal(Preconditions.checkNotNull(tree));
   }
   
   /**
