@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import matlab.MatlabLexer;
-import mclint.transform.TokenStream.TokenNode;
+import mclint.transform.TokenStream.Node;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ClassicToken;
@@ -24,23 +24,23 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
-class TokenStream implements Iterable<TokenNode> {
-  static class TokenNode {
+public class TokenStream implements Iterable<Node> {
+  public static class Node {
     private Token token;
-    private TokenNode previous;
-    private TokenNode next;
+    private Node previous;
+    private Node next;
     
-    public static TokenNode create(List<Token> tokens) {
-      TokenNode head = new TokenNode(null, null, null);
-      TokenNode node = head;
+    public static Node create(List<Token> tokens) {
+      Node head = new Node(null, null, null);
+      Node node = head;
       for (Token token : tokens) {
-        node.next = new TokenNode(token, node, null);
+        node.next = new Node(token, node, null);
         node = node.next;
       }
       return head;
     }
 
-    public TokenNode(Token token, TokenNode previous, TokenNode next) {
+    public Node(Token token, Node previous, Node next) {
       this.token = token;
       this.previous = previous;
       this.next = next;
@@ -50,39 +50,39 @@ class TokenStream implements Iterable<TokenNode> {
       return token;
     }
 
-    public TokenNode getPrevious() {
+    public Node getPrevious() {
       return previous;
     }
 
-    public TokenNode getNext() {
+    public Node getNext() {
       return next;
     }
     
-    private List<Token> asTokenList(TokenNode until) {
+    private List<Token> asTokenList(Node until) {
       List<Token> tokens = Lists.newArrayList();
-      for (TokenNode node = this; node != until.getNext(); node = node.getNext()) {
+      for (Node node = this; node != until.getNext(); node = node.getNext()) {
         tokens.add(node.getToken());
       }
       return tokens;
     }
     
-    public TokenNode copyUntil(TokenNode until) {
-      return TokenNode.create(asTokenList(until)).getNext();
+    public Node copyUntil(Node until) {
+      return Node.create(asTokenList(until)).getNext();
     }
     
-    public void removeUntil(TokenNode until) {
+    public void removeUntil(Node until) {
       this.previous.next = until.next;
       until.next.previous = this.previous;
     }
     
-    public void spliceBefore(TokenNode newStart, TokenNode newEnd) {
+    public void spliceBefore(Node newStart, Node newEnd) {
       newStart.previous = this.previous;
       this.previous.next = newStart;
       newEnd.next = this;
       this.previous = newEnd;
     }
     
-    public void spliceAfter(TokenNode newStart, TokenNode newEnd) {
+    public void spliceAfter(Node newStart, Node newEnd) {
       newStart.previous = this;
       newEnd.next = this.next;
       if (this.next != null) {
@@ -91,18 +91,18 @@ class TokenStream implements Iterable<TokenNode> {
       this.next = newStart;
     }
   }
-  private TokenNode head;
-  private Table<Integer, Integer, TokenNode> byPosition;
+  private Node head;
+  private Table<Integer, Integer, Node> byPosition;
 
   public static TokenStream create(String code) {
     List<Token> tokens = tokenize(code);
-    TokenNode node = TokenNode.create(tokens);
+    Node node = Node.create(tokens);
     return new TokenStream(node).index();
   }
   
-  @Override public Iterator<TokenNode> iterator() {
-    return new AbstractSequentialIterator<TokenNode>(head.getNext()) {
-      protected TokenNode computeNext(TokenNode previous) {
+  @Override public Iterator<Node> iterator() {
+    return new AbstractSequentialIterator<Node>(head.getNext()) {
+      protected Node computeNext(Node previous) {
         return previous.getNext();
       }
     };
@@ -121,8 +121,8 @@ class TokenStream implements Iterable<TokenNode> {
   }
   
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    TokenNode startNode;
-    TokenNode endNode;
+    Node startNode;
+    Node endNode;
     if (isSynthetic(newNode)) {
       startNode = synthesizeNewTokens(newNode);
     } else {
@@ -142,20 +142,20 @@ class TokenStream implements Iterable<TokenNode> {
     }
   }
   
-  private TokenNode leadingWhitespace(TokenNode start) {
+  private Node leadingWhitespace(Node start) {
     return previousMatchingNode(newlineOrText, start.getPrevious()).getNext();
   }
 
-  private TokenNode trailingWhitespace(TokenNode start) {
+  private Node trailingWhitespace(Node start) {
     return nextMatchingNode(newlineOrText, start).getPrevious();
   }
 
-  private Predicate<TokenNode> newlineOrText = Predicates.or(
+  private Predicate<Node> newlineOrText = Predicates.or(
       hasText("\n"),
       Predicates.not(hasText("[ \\t]")));
 
-  private TokenNode previousMatchingNode(Predicate<TokenNode> predicate, TokenNode start) {
-    TokenNode node;
+  private Node previousMatchingNode(Predicate<Node> predicate, Node start) {
+    Node node;
     for (node = start; node.getToken() != null; node = node.getPrevious()) {
       if (predicate.apply(node)) {
         return node;
@@ -164,8 +164,8 @@ class TokenStream implements Iterable<TokenNode> {
     return node;
   }
 
-  private TokenNode nextMatchingNode(Predicate<TokenNode> predicate, TokenNode start) {
-    for (TokenNode node = start; node != null; node = node.getNext()) {
+  private Node nextMatchingNode(Predicate<Node> predicate, Node start) {
+    for (Node node = start; node != null; node = node.getNext()) {
       if (predicate.apply(node)) {
         return node;
       }
@@ -179,27 +179,27 @@ class TokenStream implements Iterable<TokenNode> {
 
   // The "token" index is the index into token stream that you get by just looking
   // at the node positions, and not applying any whitespace heuristics.
-  private TokenNode tokenStartNode(ASTNode<?> node) {
+  private Node tokenStartNode(ASTNode<?> node) {
     if (node instanceof ast.List){
       node = node.getParent();
     }
     return byPosition.get(node.getStartLine(), node.getStartColumn() - 1);
   }
 
-  private TokenNode tokenEndNode(ASTNode<?> node) {
+  private Node tokenEndNode(ASTNode<?> node) {
     if (node instanceof ast.List) {
       node = node.getParent();
     }
     return byPosition.get(node.getEndLine(), node.getEndColumn() - 1);
   }
 
-  private TokenNode startNode(ASTNode<?> node) {
+  private Node startNode(ASTNode<?> node) {
     return leadingWhitespace(tokenStartNode(node));
   }
 
-  private TokenNode endNode(ASTNode<?> node) {
-    TokenNode startNode = startNode(node);
-    TokenNode endNode = tokenEndNode(node);
+  private Node endNode(ASTNode<?> node) {
+    Node startNode = startNode(node);
+    Node endNode = tokenEndNode(node);
     // If this is the last, but not the only, statement on the line
     if (startNode.getToken().getCharPositionInLine() != 0 &&
         endNode.getToken().getText().equals("\n")) {
@@ -209,30 +209,30 @@ class TokenStream implements Iterable<TokenNode> {
   }
 
 
-  private TokenNode synthesizeNewTokens(ASTNode<?> node) {
+  private Node synthesizeNewTokens(ASTNode<?> node) {
     // TODO(isbadawi): Somehow associate nodes with tokens here
     List<Token> tokens = tokenize(node.getPrettyPrinted());
     tokens.add(new ClassicToken(1, "\n"));
-    return TokenNode.create(tokens).getNext();
+    return Node.create(tokens).getNext();
   }
 
-  private static Function<TokenNode, String> GET_TEXT = new Function<TokenNode, String>() {
-    @Override public String apply(TokenNode node) {
+  private static Function<Node, String> GET_TEXT = new Function<Node, String>() {
+    @Override public String apply(Node node) {
       return node.getToken().getText();
     }
   };
 
-  private static Predicate<TokenNode> hasText(String text) {
+  private static Predicate<Node> hasText(String text) {
     return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
   }
 
-  private TokenStream(TokenNode head) {
+  private TokenStream(Node head) {
     this.head = head;
   }
 
   private TokenStream index() {
     byPosition = HashBasedTable.create();
-    for (TokenNode tokenNode : this) {
+    for (Node tokenNode : this) {
       Token token = tokenNode.getToken();
       int startColumn = token.getCharPositionInLine();
       int endColumn = startColumn + token.getText().length() - 1;
