@@ -146,6 +146,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     transformer.remove(first);
     transformer.remove(second);
     
+    System.out.println(transformer.reconstructText());
     assertEquals(join(
         "function f",
         "end"

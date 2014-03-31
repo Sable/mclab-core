@@ -25,21 +25,105 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
 public class TokenStream implements Iterable<Node> {
+  public static class Fragment implements Iterable<Node> {
+    private Node start;
+    private Node end;
+    
+    public Node getStart() {
+      return start;
+    }
+    
+    public Node getEnd() {
+      return end;
+    }
+    
+    public static Fragment create(List<Token> tokens) {
+      Node head = new Node(tokens.get(0), null, null);
+      Node tail = head;
+      for (Token token : tokens.subList(1, tokens.size())) {
+        tail.next = new Node(token, tail, null);
+        tail = tail.next;
+      }
+      return create(head, tail);
+    }
+    
+    public static Fragment single(Node node) {
+      return create(node, node);
+    }
+    
+    public static Fragment create(Node start) {
+      Node end;
+      for (end = start; end.getNext() != null; end = end.getNext()) {}
+      return create(start, end);
+    }
+    
+    public static Fragment createTopLevel(List<Token> tokens) {
+      Fragment fragment = Fragment.create(tokens);
+      Node head = new Node(null, null, fragment.getStart());
+      fragment.getStart().previous = head;
+      Node tail = new Node(null, fragment.getEnd(), null);
+      fragment.getEnd().next = tail;
+      return create(head, tail);
+    }
+    
+    public static Fragment create(Node start, Node end) {
+      return new Fragment(start, end);
+    }
+    
+    private List<Token> asTokenList() {
+      List<Token> tokens = Lists.newArrayList();
+      for (Node node = getStart(); node != getEnd().getNext(); node = node.getNext()) {
+        tokens.add(node.getToken());
+      }
+      return tokens;
+    }
+
+    public Fragment copy() {
+      return Fragment.create(asTokenList());
+    }
+    
+    public void remove() {
+      getStart().previous.next = getEnd().next;
+      getEnd().next.previous = getStart().previous;
+    }
+    
+    public void spliceBefore(Fragment fragment) {
+      getStart().previous = fragment.getStart().previous;
+      if (getStart().previous != null) {
+        getStart().previous.next = getStart();
+      }
+      fragment.getStart().previous = getEnd();
+      getEnd().next = fragment.getStart();
+    }
+    
+    public void spliceAfter(Fragment fragment) {
+      getStart().previous = fragment.getEnd();
+      getEnd().next = fragment.getEnd().next;
+      if (getEnd().next != null) {
+        getEnd().next.previous = getEnd();
+      }
+      fragment.getEnd().next = getStart();
+    }
+    
+    public Iterator<Node> iterator() {
+      return new AbstractSequentialIterator<Node>(getStart()) {
+        @Override protected Node computeNext(Node previous) {
+          return previous == getEnd() ? null : previous.getNext();
+        }
+      };
+    }
+    
+    private Fragment(Node start, Node end) {
+      this.start = start;
+      this.end = end;
+    }
+  }
+
   public static class Node {
     private Token token;
     private Node previous;
     private Node next;
     
-    public static Node create(List<Token> tokens) {
-      Node head = new Node(null, null, null);
-      Node node = head;
-      for (Token token : tokens) {
-        node.next = new Node(token, node, null);
-        node = node.next;
-      }
-      return head;
-    }
-
     public Node(Token token, Node previous, Node next) {
       this.token = token;
       this.previous = previous;
@@ -57,55 +141,16 @@ public class TokenStream implements Iterable<Node> {
     public Node getNext() {
       return next;
     }
-    
-    private List<Token> asTokenList(Node until) {
-      List<Token> tokens = Lists.newArrayList();
-      for (Node node = this; node != until.getNext(); node = node.getNext()) {
-        tokens.add(node.getToken());
-      }
-      return tokens;
-    }
-    
-    public Node copyUntil(Node until) {
-      return Node.create(asTokenList(until)).getNext();
-    }
-    
-    public void removeUntil(Node until) {
-      this.previous.next = until.next;
-      until.next.previous = this.previous;
-    }
-    
-    public void spliceBefore(Node newStart, Node newEnd) {
-      newStart.previous = this.previous;
-      this.previous.next = newStart;
-      newEnd.next = this;
-      this.previous = newEnd;
-    }
-    
-    public void spliceAfter(Node newStart, Node newEnd) {
-      newStart.previous = this;
-      newEnd.next = this.next;
-      if (this.next != null) {
-        this.next.previous = newEnd;
-      }
-      this.next = newStart;
-    }
   }
-  private Node head;
+  private Fragment stream;
   private Table<Integer, Integer, Node> byPosition;
 
   public static TokenStream create(String code) {
-    List<Token> tokens = tokenize(code);
-    Node node = Node.create(tokens);
-    return new TokenStream(node).index();
+    return new TokenStream(Fragment.createTopLevel(tokenize(code))).index();
   }
   
   @Override public Iterator<Node> iterator() {
-    return new AbstractSequentialIterator<Node>(head.getNext()) {
-      protected Node computeNext(Node previous) {
-        return previous.getNext();
-      }
-    };
+    return Fragment.create(stream.getStart().getNext(), stream.getEnd().getPrevious()).iterator();
   }
 
   public String asString() {
@@ -117,28 +162,28 @@ public class TokenStream implements Iterable<Node> {
   }
 
   public void removeAstNode(ASTNode<?> node) {
-    startNode(node).removeUntil(endNode(node));
+    fragment(node).remove();
   }
   
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    Node startNode;
-    Node endNode;
+    Fragment oldFragment = fragment(node);
+    Fragment newFragment;
     if (isSynthetic(newNode)) {
-      startNode = synthesizeNewTokens(newNode);
+      newFragment = synthesizeNewTokens(newNode);
     } else {
-      startNode = startNode(newNode).copyUntil(endNode(newNode));
+      newFragment = fragment(newNode).copy();
     }
-    for (endNode = startNode; endNode.getNext() != null; endNode = endNode.getNext()) {}
 
     if (node.getNumChild() == 0) {
       // TODO(isbadawi): This is brittle, assumes statements lists I think
-      nextMatchingNode(hasText("\n"), startNode(node)).spliceAfter(startNode, endNode);
+      newFragment.spliceAfter(
+          Fragment.single(nextMatchingNode(hasText("\n"), oldFragment.getStart())));
     } else if (i == 0) {
-      startNode(node.getChild(0)).spliceBefore(startNode, endNode);
+      newFragment.spliceBefore(fragment(node.getChild(0)));
     } else if (i >= node.getNumChild()) {
-      endNode(node.getChild(node.getNumChild() - 1)).spliceAfter(startNode, endNode);
+      newFragment.spliceAfter(fragment(node.getChild(node.getNumChild() - 1)));
     } else {
-      endNode(node.getChild(i - 1)).spliceAfter(startNode, endNode);
+      newFragment.spliceAfter(fragment(node.getChild(i - 1)));
     }
   }
   
@@ -177,43 +222,36 @@ public class TokenStream implements Iterable<Node> {
   // But the AST is from Beaver, where they are both 1-based.
   // This is why we subtract 1 from the column.
 
-  // The "token" index is the index into token stream that you get by just looking
+  // The "token" fragment is the portion of the token stream that you get by just looking
   // at the node positions, and not applying any whitespace heuristics.
-  private Node tokenStartNode(ASTNode<?> node) {
+  private Fragment tokenFragment(ASTNode<?> node) {
     if (node instanceof ast.List){
       node = node.getParent();
     }
-    return byPosition.get(node.getStartLine(), node.getStartColumn() - 1);
+    return Fragment.create(
+        byPosition.get(node.getStartLine(), node.getStartColumn() - 1),
+        byPosition.get(node.getEndLine(), node.getEndColumn() - 1));
   }
+  
+  private Fragment fragment(ASTNode<?> node) {
+    Fragment tokenFragment = tokenFragment(node);
+    Node startNode = leadingWhitespace(tokenFragment.getStart());
 
-  private Node tokenEndNode(ASTNode<?> node) {
-    if (node instanceof ast.List) {
-      node = node.getParent();
-    }
-    return byPosition.get(node.getEndLine(), node.getEndColumn() - 1);
-  }
-
-  private Node startNode(ASTNode<?> node) {
-    return leadingWhitespace(tokenStartNode(node));
-  }
-
-  private Node endNode(ASTNode<?> node) {
-    Node startNode = startNode(node);
-    Node endNode = tokenEndNode(node);
+    Node endNode = tokenFragment.getEnd();
     // If this is the last, but not the only, statement on the line
     if (startNode.getToken().getCharPositionInLine() != 0 &&
         endNode.getToken().getText().equals("\n")) {
       endNode = trailingWhitespace(endNode);
     }
-    return endNode;
+    return Fragment.create(startNode, endNode);
   }
 
 
-  private Node synthesizeNewTokens(ASTNode<?> node) {
+  private Fragment synthesizeNewTokens(ASTNode<?> node) {
     // TODO(isbadawi): Somehow associate nodes with tokens here
     List<Token> tokens = tokenize(node.getPrettyPrinted());
     tokens.add(new ClassicToken(1, "\n"));
-    return Node.create(tokens).getNext();
+    return Fragment.create(tokens);
   }
 
   private static Function<Node, String> GET_TEXT = new Function<Node, String>() {
@@ -226,8 +264,8 @@ public class TokenStream implements Iterable<Node> {
     return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
   }
 
-  private TokenStream(Node head) {
-    this.head = head;
+  private TokenStream(Fragment stream) {
+    this.stream = stream;
   }
 
   private TokenStream index() {
