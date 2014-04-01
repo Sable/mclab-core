@@ -22,6 +22,13 @@ import com.google.common.collect.Iterables;
  */
 public class AstUtil {
   /**
+   * Returns true if a node is synthetic (i.e. is not the result of parsing).
+   */
+  public static boolean isSynthetic(ASTNode<?> node) {
+    return node.getStartLine() == 0 && !(node instanceof ast.List);
+  }
+
+  /**
    * Replaces a subtree with another, correctly updating parent/child links.
    */
   public static void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {

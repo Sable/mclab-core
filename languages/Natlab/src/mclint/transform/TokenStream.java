@@ -1,12 +1,8 @@
 package mclint.transform;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
+import mclint.util.AstUtil;
+import mclint.util.TokenUtil;
 
-import matlab.MatlabLexer;
-
-import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.Token;
 
 import ast.ASTNode;
@@ -15,7 +11,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
 public class TokenStream {
@@ -23,7 +18,8 @@ public class TokenStream {
   private Table<Integer, Integer, TokenStreamFragment.Node> byPosition;
 
   public static TokenStream create(String code) {
-    TokenStreamFragment fragment = TokenStreamFragment.fromTokenList(tokenize(code));
+    TokenStreamFragment fragment = 
+        TokenStreamFragment.fromTokenList(TokenUtil.tokenize(code));
     return new TokenStream(TokenStreamFragment.withSentinelNodes(fragment)).index();
   }
 
@@ -31,18 +27,13 @@ public class TokenStream {
     return stream.withoutSentinelNodes().asString();
   }
 
-  private static boolean isSynthetic(ASTNode<?> node) {
-    return node.getStartLine() == 0 && !(node instanceof ast.List);
-  }
-
   public void removeAstNode(ASTNode<?> node) {
     fragment(node).remove();
   }
   
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    TokenStreamFragment oldFragment = fragment(node);
     TokenStreamFragment newFragment;
-    if (isSynthetic(newNode)) {
+    if (AstUtil.isSynthetic(newNode)) {
       newFragment = synthesizeNewTokens(newNode);
     } else {
       newFragment = fragment(newNode).copy();
@@ -52,7 +43,8 @@ public class TokenStream {
     if (node.getNumChild() == 0) {
       // TODO(isbadawi): This is brittle, assumes statements lists I think
       newFragment.spliceAfter(
-          TokenStreamFragment.fromSingleNode(nextMatchingNode(hasText("\n"), oldFragment.getStart())));
+          TokenStreamFragment.fromSingleNode(
+              nextMatchingNode(hasText("\n"), fragment(node).getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
     } else if (i >= node.getNumChild()) {
@@ -109,7 +101,7 @@ public class TokenStream {
   }
   
   private TokenStreamFragment baseFragment(ASTNode<?> node) {
-    if (node.hasTokenStreamFragment() || isSynthetic(node)) {
+    if (node.hasTokenStreamFragment() || AstUtil.isSynthetic(node)) {
       return node.tokenize();
     }
     return tokenFragment(node);
@@ -160,25 +152,5 @@ public class TokenStream {
       byPosition.put(token.getLine(), endColumn, tokenNode);
     }
     return this;
-  }
-
-  private static List<Token> tokenize(String code) {
-    List<Token> tokens = Lists.newArrayList();
-    MatlabLexer lexer = new MatlabLexer(getAntlrStream(code));
-    Token token = lexer.nextToken();
-    while (token != Token.EOF_TOKEN) {
-      tokens.add(token);
-      token = lexer.nextToken();
-    }
-    return tokens;
-  }
-
-  private static ANTLRReaderStream getAntlrStream(String code) {
-    try {
-      return new ANTLRReaderStream(new StringReader(code));
-    } catch (IOException e) {
-      // Will never happen, since it's a StringReader...
-      return null;
-    }
   }
 }
