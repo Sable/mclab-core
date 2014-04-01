@@ -48,7 +48,7 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
     return end;
   }
   
-  public static TokenStreamFragment create(List<Token> tokens) {
+  public static TokenStreamFragment fromTokenList(List<Token> tokens) {
     TokenStreamFragment.Node head = new TokenStreamFragment.Node(tokens.get(0), null, null);
     TokenStreamFragment.Node tail = head;
     for (Token token : tokens.subList(1, tokens.size())) {
@@ -59,30 +59,27 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
   
   public static TokenStreamFragment fromSingleToken(String token) {
-    return create(Arrays.asList((Token) new ClassicToken(1, token)));
+    return fromTokenList(Arrays.asList((Token) new ClassicToken(1, token)));
   }
   
-  public static TokenStreamFragment single(TokenStreamFragment.Node node) {
+  public static TokenStreamFragment fromSingleNode(TokenStreamFragment.Node node) {
     return create(node, node);
-  }
-  
-  public static TokenStreamFragment create(TokenStreamFragment.Node start) {
-    TokenStreamFragment.Node end;
-    for (end = start; end.getNext() != null; end = end.getNext()) {}
-    return create(start, end);
-  }
-  
-  public static TokenStreamFragment createTopLevel(List<Token> tokens) {
-    TokenStreamFragment fragment = TokenStreamFragment.create(tokens);
-    TokenStreamFragment.Node head = new TokenStreamFragment.Node(null, null, fragment.getStart());
-    fragment.getStart().previous = head;
-    TokenStreamFragment.Node tail = new TokenStreamFragment.Node(null, fragment.getEnd(), null);
-    fragment.getEnd().next = tail;
-    return create(head, tail);
   }
   
   public static TokenStreamFragment create(TokenStreamFragment.Node start, TokenStreamFragment.Node end) {
     return new TokenStreamFragment(start, end);
+  }
+  
+  public static TokenStreamFragment withSentinelNodes(TokenStreamFragment fragment) {
+    Node head = new Node(null, null, fragment.getStart());
+    fragment.getStart().previous = head;
+    Node tail = new Node(null, fragment.getEnd(), null);
+    fragment.getEnd().next = tail;
+    return create(head, tail);
+  }
+  
+  public TokenStreamFragment withoutSentinelNodes() {
+    return create(getStart().getNext(), getEnd().getPrevious());
   }
   
   private List<Token> asTokenList() {
@@ -94,7 +91,7 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
 
   public TokenStreamFragment copy() {
-    return TokenStreamFragment.create(asTokenList());
+    return TokenStreamFragment.fromTokenList(asTokenList());
   }
   
   public void remove() {

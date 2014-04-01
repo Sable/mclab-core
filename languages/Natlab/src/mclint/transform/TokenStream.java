@@ -13,11 +13,9 @@ import org.antlr.runtime.Token;
 import ast.ASTNode;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
@@ -26,15 +24,16 @@ public class TokenStream implements Iterable<TokenStreamFragment.Node> {
   private Table<Integer, Integer, TokenStreamFragment.Node> byPosition;
 
   public static TokenStream create(String code) {
-    return new TokenStream(TokenStreamFragment.createTopLevel(tokenize(code))).index();
+    TokenStreamFragment fragment = TokenStreamFragment.fromTokenList(tokenize(code));
+    return new TokenStream(TokenStreamFragment.withSentinelNodes(fragment)).index();
   }
   
   @Override public Iterator<TokenStreamFragment.Node> iterator() {
-    return TokenStreamFragment.create(stream.getStart().getNext(), stream.getEnd().getPrevious()).iterator();
+    return stream.withoutSentinelNodes().iterator();
   }
 
   public String asString() {
-    return Joiner.on("").join(Iterables.transform(this, GET_TEXT));
+    return stream.withoutSentinelNodes().asString();
   }
 
   private static boolean isSynthetic(ASTNode<?> node) {
@@ -58,7 +57,7 @@ public class TokenStream implements Iterable<TokenStreamFragment.Node> {
     if (node.getNumChild() == 0) {
       // TODO(isbadawi): This is brittle, assumes statements lists I think
       newFragment.spliceAfter(
-          TokenStreamFragment.single(nextMatchingNode(hasText("\n"), oldFragment.getStart())));
+          TokenStreamFragment.fromSingleNode(nextMatchingNode(hasText("\n"), oldFragment.getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
     } else if (i >= node.getNumChild()) {
