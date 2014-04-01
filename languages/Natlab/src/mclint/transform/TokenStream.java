@@ -77,7 +77,7 @@ public class TokenStream implements Iterable<Node> {
     
     private List<Token> asTokenList() {
       List<Token> tokens = Lists.newArrayList();
-      for (Node node = getStart(); node != getEnd().getNext(); node = node.getNext()) {
+      for (Node node : this) {
         tokens.add(node.getToken());
       }
       return tokens;
