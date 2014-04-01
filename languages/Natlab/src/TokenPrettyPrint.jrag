@@ -2,37 +2,37 @@ import com.google.common.collect.FluentIterable;
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
-import mclint.transform.TokenStream;
+import mclint.transform.TokenStreamFragment;
 import static mclint.util.AstUtil.joinTokens;
 
 aspect TokenPrettyPrint {
-  private TokenStream.Fragment ASTNode.fragment = null;
+  private TokenStreamFragment ASTNode.fragment = null;
   public boolean ASTNode.hasTokenStreamFragment() {
     return this.fragment != null;
   }
-  public void ASTNode.setTokenStreamFragment(TokenStream.Fragment fragment) {
+  public void ASTNode.setTokenStreamFragment(TokenStreamFragment fragment) {
     this.fragment = fragment;
   }
 
-  protected static TokenStream.Fragment ASTNode.fragmentFromObject(Object fragment) {
+  protected static TokenStreamFragment ASTNode.fragmentFromObject(Object fragment) {
     if (fragment instanceof String) {
-      return TokenStream.Fragment.fromSingleToken((String) fragment);
+      return TokenStreamFragment.fromSingleToken((String) fragment);
     } else {
-      return (TokenStream.Fragment) fragment;
+      return (TokenStreamFragment) fragment;
     }
   }
 
-  protected static TokenStream.Fragment ASTNode.concatFragments(Object... objects) {
+  protected static TokenStreamFragment ASTNode.concatFragments(Object... objects) {
     FluentIterable<Object> fragments = FluentIterable.from(Arrays.asList(objects));
-    TokenStream.Fragment result = fragmentFromObject(fragments.first().orNull());
+    TokenStreamFragment result = fragmentFromObject(fragments.first().orNull());
     for (Object fragment : fragments.skip(1)) {
       result = result.spliceBefore(fragmentFromObject(fragment));
     }
     return result;
   }
 
-  protected TokenStream.Fragment Stmt.wrapFragments(Object... fragments) {
-    TokenStream.Fragment fragment = concatFragments(fragments);
+  protected TokenStreamFragment Stmt.wrapFragments(Object... fragments) {
+    TokenStreamFragment fragment = concatFragments(fragments);
     if (isOutputSuppressed()) {
       return concatFragments(getIndent(), fragment, ";");
     } else {
@@ -40,14 +40,14 @@ aspect TokenPrettyPrint {
     }
   }
 
-  public TokenStream.Fragment ASTNode.tokenize() {
+  public TokenStreamFragment ASTNode.tokenize() {
     if (fragment == null) {
       fragment = doTokenize();
     }
     return fragment;
   }
 
-  syn TokenStream.Fragment ASTNode.doTokenize() {
+  syn TokenStreamFragment ASTNode.doTokenize() {
     throw new UnsupportedOperationException(getClass().getSimpleName() + "#doTokenize");
   }
 
@@ -83,7 +83,7 @@ aspect TokenPrettyPrint {
   eq IntLiteralExpr.doTokenize() = concatFragments(getValue().getText());
   eq FPLiteralExpr.doTokenize() = concatFragments(getValue().getText());
 
-  syn TokenStream.Fragment BinaryExpr.tokenize(String op) =
+  syn TokenStreamFragment BinaryExpr.tokenize(String op) =
     concatFragments("(", getLHS().tokenize(), " ", op, " ", getRHS().tokenize(), ")");
 
   eq PlusExpr.doTokenize() = tokenize("+");
