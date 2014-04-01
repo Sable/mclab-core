@@ -2,7 +2,6 @@ package mclint.transform;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Iterator;
 import java.util.List;
 
 import matlab.MatlabLexer;
@@ -19,17 +18,13 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
-public class TokenStream implements Iterable<TokenStreamFragment.Node> {
+public class TokenStream {
   private TokenStreamFragment stream;
   private Table<Integer, Integer, TokenStreamFragment.Node> byPosition;
 
   public static TokenStream create(String code) {
     TokenStreamFragment fragment = TokenStreamFragment.fromTokenList(tokenize(code));
     return new TokenStream(TokenStreamFragment.withSentinelNodes(fragment)).index();
-  }
-  
-  @Override public Iterator<TokenStreamFragment.Node> iterator() {
-    return stream.withoutSentinelNodes().iterator();
   }
 
   public String asString() {
@@ -157,7 +152,7 @@ public class TokenStream implements Iterable<TokenStreamFragment.Node> {
 
   private TokenStream index() {
     byPosition = HashBasedTable.create();
-    for (TokenStreamFragment.Node tokenNode : this) {
+    for (TokenStreamFragment.Node tokenNode : this.stream.withoutSentinelNodes()) {
       Token token = tokenNode.getToken();
       int startColumn = token.getCharPositionInLine();
       int endColumn = startColumn + token.getText().length() - 1;
