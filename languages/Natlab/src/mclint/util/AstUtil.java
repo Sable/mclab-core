@@ -3,6 +3,8 @@ package mclint.util;
 import java.util.List;
 import java.util.Map;
 
+import mclint.transform.TokenStream;
+import mclint.transform.TokenStream.Fragment;
 import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
@@ -78,6 +80,22 @@ public class AstUtil {
         return node.getJson();
       }
     }).toList();
+  }
+  
+  public static <T extends ASTNode<?>> TokenStream.Fragment joinTokens(String delimiter, Iterable<T> nodes) {
+    FluentIterable<T> fragments = FluentIterable.from(nodes);
+    if (fragments.isEmpty()) {
+      return Fragment.fromSingleToken("");
+    }
+    TokenStream.Fragment result = Iterables.getFirst(nodes, null).tokenize();
+    for (T node : Iterables.skip(nodes, 1)) {
+      result = result.spliceBefore(Fragment.fromSingleToken(delimiter));
+      result = result.spliceBefore(node.tokenize());
+    }
+    if (delimiter.equals("\n")) {
+      result = result.spliceBefore(Fragment.fromSingleToken("\n"));
+    }
+    return result;
   }
 
   private AstUtil() {}

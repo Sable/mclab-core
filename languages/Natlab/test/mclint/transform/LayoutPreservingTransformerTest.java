@@ -146,7 +146,6 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     transformer.remove(first);
     transformer.remove(second);
     
-    System.out.println(transformer.reconstructText());
     assertEquals(join(
         "function f",
         "end"
@@ -161,10 +160,8 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     );
     Function f = ((FunctionList) program.parse()).getFunction(0);
     AssignStmt first = (AssignStmt) f.getStmt(0);
-    
     Transformer transformer = program.getLayoutPreservingTransformer();
-    transformer.insert(first.getParent(), first, 1);
-    
+    transformer.insert(first.getParent(), first.fullCopy(), 1);
     assertEquals(join(
         "function f",
         "  x =     2; ",

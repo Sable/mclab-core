@@ -2,6 +2,7 @@ package mclint.transform;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,6 +48,10 @@ public class TokenStream implements Iterable<Node> {
       return create(head, tail);
     }
     
+    public static Fragment fromSingleToken(String token) {
+      return create(Arrays.asList((Token) new ClassicToken(1, token)));
+    }
+    
     public static Fragment single(Node node) {
       return create(node, node);
     }
@@ -87,22 +92,28 @@ public class TokenStream implements Iterable<Node> {
       getEnd().next.previous = getStart().previous;
     }
     
-    public void spliceBefore(Fragment fragment) {
+    // Splices this fragment in before the given fragment.
+    // Returns the combined fragment (which may or may not be useful).
+    public Fragment spliceBefore(Fragment fragment) {
       getStart().previous = fragment.getStart().previous;
       if (getStart().previous != null) {
         getStart().previous.next = getStart();
       }
       fragment.getStart().previous = getEnd();
       getEnd().next = fragment.getStart();
+      return Fragment.create(getStart(), fragment.getEnd());
     }
     
-    public void spliceAfter(Fragment fragment) {
+    // Splices this fragment in after the given fragment.
+    // Returns the combined fragment (which may or may not be useful).
+    public Fragment spliceAfter(Fragment fragment) {
       getStart().previous = fragment.getEnd();
       getEnd().next = fragment.getEnd().next;
       if (getEnd().next != null) {
         getEnd().next.previous = getEnd();
       }
       fragment.getEnd().next = getStart();
+      return Fragment.create(fragment.getStart(), getEnd());
     }
     
     public Iterator<Node> iterator() {
@@ -111,6 +122,10 @@ public class TokenStream implements Iterable<Node> {
           return previous == getEnd() ? null : previous.getNext();
         }
       };
+    }
+    
+    public String asString() {
+      return Joiner.on("").join(Iterables.transform(this, GET_TEXT));
     }
     
     private Fragment(Node start, Node end) {
@@ -172,6 +187,7 @@ public class TokenStream implements Iterable<Node> {
       newFragment = synthesizeNewTokens(newNode);
     } else {
       newFragment = fragment(newNode).copy();
+      newNode.setTokenStreamFragment(newFragment);
     }
 
     if (node.getNumChild() == 0) {
@@ -188,6 +204,9 @@ public class TokenStream implements Iterable<Node> {
   }
   
   private Node leadingWhitespace(Node start) {
+    if (start.getPrevious() == null) {
+      return start;
+    }
     return previousMatchingNode(newlineOrText, start.getPrevious()).getNext();
   }
 
@@ -201,7 +220,7 @@ public class TokenStream implements Iterable<Node> {
 
   private Node previousMatchingNode(Predicate<Node> predicate, Node start) {
     Node node;
-    for (node = start; node.getToken() != null; node = node.getPrevious()) {
+    for (node = start; node != null && node.getToken() != null; node = node.getPrevious()) {
       if (predicate.apply(node)) {
         return node;
       }
@@ -210,7 +229,7 @@ public class TokenStream implements Iterable<Node> {
   }
 
   private Node nextMatchingNode(Predicate<Node> predicate, Node start) {
-    for (Node node = start; node != null; node = node.getNext()) {
+    for (Node node = start; node != null && node.getToken() != null; node = node.getNext()) {
       if (predicate.apply(node)) {
         return node;
       }
@@ -225,19 +244,26 @@ public class TokenStream implements Iterable<Node> {
   // The "token" fragment is the portion of the token stream that you get by just looking
   // at the node positions, and not applying any whitespace heuristics.
   private Fragment tokenFragment(ASTNode<?> node) {
-    if (node instanceof ast.List){
-      node = node.getParent();
-    }
     return Fragment.create(
         byPosition.get(node.getStartLine(), node.getStartColumn() - 1),
         byPosition.get(node.getEndLine(), node.getEndColumn() - 1));
   }
   
+  private Fragment baseFragment(ASTNode<?> node) {
+    if (node.hasTokenStreamFragment() || isSynthetic(node)) {
+      return node.tokenize();
+    }
+    return tokenFragment(node);
+  }
+  
   private Fragment fragment(ASTNode<?> node) {
-    Fragment tokenFragment = tokenFragment(node);
-    Node startNode = leadingWhitespace(tokenFragment.getStart());
+    if (node instanceof ast.List){
+      node = node.getParent();
+    }
+    Fragment baseFragment = baseFragment(node);
+    Node startNode = leadingWhitespace(baseFragment.getStart());
 
-    Node endNode = tokenFragment.getEnd();
+    Node endNode = baseFragment.getEnd();
     // If this is the last, but not the only, statement on the line
     if (startNode.getToken().getCharPositionInLine() != 0 &&
         endNode.getToken().getText().equals("\n")) {
@@ -248,10 +274,7 @@ public class TokenStream implements Iterable<Node> {
 
 
   private Fragment synthesizeNewTokens(ASTNode<?> node) {
-    // TODO(isbadawi): Somehow associate nodes with tokens here
-    List<Token> tokens = tokenize(node.getPrettyPrinted());
-    tokens.add(new ClassicToken(1, "\n"));
-    return Fragment.create(tokens);
+    return node.tokenize().spliceBefore(Fragment.fromSingleToken("\n"));
   }
 
   private static Function<Node, String> GET_TEXT = new Function<Node, String>() {

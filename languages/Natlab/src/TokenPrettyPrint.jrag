@@ -1,0 +1,109 @@
+import com.google.common.collect.FluentIterable;
+import org.antlr.runtime.ClassicToken;
+import org.antlr.runtime.Token;
+
+import mclint.transform.TokenStream;
+import static mclint.util.AstUtil.joinTokens;
+
+aspect TokenPrettyPrint {
+  private TokenStream.Fragment ASTNode.fragment = null;
+  public boolean ASTNode.hasTokenStreamFragment() {
+    return this.fragment != null;
+  }
+  public void ASTNode.setTokenStreamFragment(TokenStream.Fragment fragment) {
+    this.fragment = fragment;
+  }
+
+  protected static TokenStream.Fragment ASTNode.fragmentFromObject(Object fragment) {
+    if (fragment instanceof String) {
+      return TokenStream.Fragment.fromSingleToken((String) fragment);
+    } else {
+      return (TokenStream.Fragment) fragment;
+    }
+  }
+
+  protected static TokenStream.Fragment ASTNode.concatFragments(Object... objects) {
+    FluentIterable<Object> fragments = FluentIterable.from(Arrays.asList(objects));
+    TokenStream.Fragment result = fragmentFromObject(fragments.first().orNull());
+    for (Object fragment : fragments.skip(1)) {
+      result = result.spliceBefore(fragmentFromObject(fragment));
+    }
+    return result;
+  }
+
+  protected TokenStream.Fragment Stmt.wrapFragments(Object... fragments) {
+    TokenStream.Fragment fragment = concatFragments(fragments);
+    if (isOutputSuppressed()) {
+      return concatFragments(getIndent(), fragment, ";");
+    } else {
+      return concatFragments(getIndent(), fragment);
+    }
+  }
+
+  public TokenStream.Fragment ASTNode.tokenize() {
+    if (fragment == null) {
+      fragment = doTokenize();
+    }
+    return fragment;
+  }
+
+  syn TokenStream.Fragment ASTNode.doTokenize() {
+    throw new UnsupportedOperationException(getClass().getSimpleName() + "#doTokenize");
+  }
+
+  eq Script.doTokenize() = joinTokens("\n", getStmts());
+  eq FunctionList.doTokenize() = joinTokens("\n", getFunctions());
+  eq Function.doTokenize() = concatFragments(
+    getIndent(), "function [", joinTokens(", ", getOutputParams()), "] = ",
+    getName(), "(", joinTokens(", ", getInputParams()), ")", "\n",
+    joinTokens("\n", getStmts()), joinTokens("\n", getNestedFunctions()), "end");
+
+  eq EmptyStmt.doTokenize() = concatFragments("");
+  eq ExprStmt.doTokenize() = wrapFragments(getExpr().tokenize());
+  eq AssignStmt.doTokenize() = wrapFragments(getLHS().tokenize(), " = ", getRHS().tokenize());
+  eq GlobalStmt.doTokenize() = wrapFragments("global", " ", joinTokens(" ", getNames()));
+  eq PersistentStmt.doTokenize() = wrapFragments("persistent", " ", joinTokens(" ", getNames()));
+  eq ShellCommandStmt.doTokenize() = wrapFragments("!", getCommand());
+  eq BreakStmt.doTokenize() = wrapFragments("break");
+  eq ContinueStmt.doTokenize() = wrapFragments("continue");
+  eq ReturnStmt.doTokenize() = wrapFragments("return");
+  eq ForStmt.doTokenize() = concatFragments(
+    getIndent(), "for", " ", getAssignStmt().tokenize(), "\n", joinTokens("\n", getStmts()), "end");
+  eq WhileStmt.doTokenize() = concatFragments(
+    getIndent(), "while", " ", getExpr().tokenize(), "\n", joinTokens("\n", getStmts()), "end");
+  eq IfStmt.doTokenize() = concatFragments(
+    getIndent(), "if", " ", joinTokens("elseif ", getIfBlocks()),
+    hasElseBlock() ? getElseBlock().tokenize() : "", getIndent(), "end");
+  // TODO
+
+  eq Name.doTokenize() = concatFragments(getID());
+  eq NameExpr.doTokenize() = getName().tokenize();
+  eq ParameterizedExpr.doTokenize() = concatFragments(
+    getTarget().tokenize(), "(", joinTokens(", ", getArgs()), ")");
+  eq IntLiteralExpr.doTokenize() = concatFragments(getValue().getText());
+  eq FPLiteralExpr.doTokenize() = concatFragments(getValue().getText());
+
+  syn TokenStream.Fragment BinaryExpr.tokenize(String op) =
+    concatFragments("(", getLHS().tokenize(), " ", op, " ", getRHS().tokenize(), ")");
+
+  eq PlusExpr.doTokenize() = tokenize("+");
+  eq MinusExpr.doTokenize() = tokenize("-");
+  eq MTimesExpr.doTokenize() = tokenize("*");
+  eq MDivExpr.doTokenize() = tokenize("/");
+  eq MLDivExpr.doTokenize() = tokenize("\\");
+  eq MPowExpr.doTokenize() = tokenize("^");
+  eq ETimesExpr.doTokenize() = tokenize(".*");
+  eq EDivExpr.doTokenize() = tokenize("./");
+  eq ELDivExpr.doTokenize() = tokenize(".\\");
+  eq EPowExpr.doTokenize() = tokenize(".^");
+  eq AndExpr.doTokenize() = tokenize("&");
+  eq OrExpr.doTokenize() = tokenize("|");
+  eq ShortCircuitAndExpr.doTokenize() = tokenize("&&");
+  eq ShortCircuitOrExpr.doTokenize() = tokenize("||");
+  eq LTExpr.doTokenize() = tokenize("<");
+  eq GTExpr.doTokenize() = tokenize(">");
+  eq LEExpr.doTokenize() = tokenize("<=");
+  eq GEExpr.doTokenize() = tokenize(">=");
+  eq EQExpr.doTokenize() = tokenize("==");
+  eq NEExpr.doTokenize() = tokenize("~=");
+}

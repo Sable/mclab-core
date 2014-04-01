@@ -155,7 +155,15 @@ public class ExtractFunction extends Refactoring {
   private void makeExtractedFunctionSiblingOfOriginal() {
     ast.List<Function> list = 
         NodeFinder.findParent(FunctionList.class, original).getFunctions();
+    ast.List<Stmt> stmts = extracted.getStmts().fullCopy();
+    while (extracted.getNumStmt() != 0) {
+      extracted.getStmts().removeChild(0);
+    }
+    
     transformer.insert(list, extracted, list.getIndexOfChild(original) + 1);
+    for (Stmt stmt : stmts) {
+      transformer.insert(extracted.getStmts(), stmt, extracted.getNumStmt());
+    }
   }
 
   private void replaceExtractedStatementsWithCallToExtractedFunction() {
