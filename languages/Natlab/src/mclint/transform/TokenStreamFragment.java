@@ -105,32 +105,28 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
     return TokenStreamFragment.fromTokens(Iterables.transform(this, Node.GET_TOKEN));
   }
   
+  private static void link(Node from, Node to) {
+    if (from != null) from.next = to;
+    if (to != null) to.previous = from;
+  }
+  
   public void remove() {
-    getStart().previous.next = getEnd().next;
-    getEnd().next.previous = getStart().previous;
+    link(getStart().previous, getEnd().next);
   }
   
   // Splices this fragment in before the given fragment.
   // Returns the combined fragment (which may or may not be useful).
   public TokenStreamFragment spliceBefore(TokenStreamFragment fragment) {
-    getStart().previous = fragment.getStart().previous;
-    if (getStart().previous != null) {
-      getStart().previous.next = getStart();
-    }
-    fragment.getStart().previous = getEnd();
-    getEnd().next = fragment.getStart();
+    link(fragment.getStart().previous, getStart());
+    link(getEnd(), fragment.getStart());
     return TokenStreamFragment.create(getStart(), fragment.getEnd());
   }
   
   // Splices this fragment in after the given fragment.
   // Returns the combined fragment (which may or may not be useful).
   public TokenStreamFragment spliceAfter(TokenStreamFragment fragment) {
-    getStart().previous = fragment.getEnd();
-    getEnd().next = fragment.getEnd().next;
-    if (getEnd().next != null) {
-      getEnd().next.previous = getEnd();
-    }
-    fragment.getEnd().next = getStart();
+    link(getEnd(), fragment.getEnd().next);
+    link(fragment.getEnd(), getStart());
     return TokenStreamFragment.create(fragment.getStart(), getEnd());
   }
   
