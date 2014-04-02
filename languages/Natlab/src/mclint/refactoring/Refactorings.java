@@ -1,7 +1,7 @@
 package mclint.refactoring;
 
+import mclint.transform.StatementRange;
 import natlab.refactoring.ExtractFunction;
-import ast.Function;
 import ast.Name;
 
 public class Refactorings {
@@ -9,8 +9,8 @@ public class Refactorings {
     return new RenameVariable(context, name, newName);
   }
 
-  public static Refactoring extractFunction(RefactoringContext context, Function f, int from, int to,
+  public static Refactoring extractFunction(RefactoringContext context, StatementRange statements, 
       String extractedFunctionName) {
-    return new ExtractFunction(context, f, from, to, extractedFunctionName);
+    return new ExtractFunction(context, statements, extractedFunctionName);
   }
 }
