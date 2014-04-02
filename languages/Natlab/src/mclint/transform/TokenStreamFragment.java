@@ -2,18 +2,36 @@ package mclint.transform;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.AbstractSequentialIterator;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   public static class Node {
+    public static Function<Node, Token> GET_TOKEN = new Function<Node, Token>() {
+      @Override public Token apply(Node node) {
+        return node.getToken();
+      }
+    };
+    
+    public static Function<Node, String> GET_TEXT = new Function<Node, String>() {
+      @Override public String apply(Node node) {
+        return node.getToken().getText();
+      }
+    };
+    
+    public static Predicate<Node> hasText(final String text) {
+      return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
+    }
+
     private Token token;
     Node previous;
     Node next;
@@ -48,10 +66,11 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
     return end;
   }
   
-  public static TokenStreamFragment fromTokenList(List<Token> tokens) {
+  public static TokenStreamFragment fromTokens(Iterable<Token> tokenIterable) {
+    FluentIterable<Token> tokens = FluentIterable.from(tokenIterable);
     TokenStreamFragment.Node head = new TokenStreamFragment.Node(tokens.get(0), null, null);
     TokenStreamFragment.Node tail = head;
-    for (Token token : tokens.subList(1, tokens.size())) {
+    for (Token token : tokens.skip(1)) {
       tail.next = new TokenStreamFragment.Node(token, tail, null);
       tail = tail.next;
     }
@@ -59,7 +78,7 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
   
   public static TokenStreamFragment fromSingleToken(String token) {
-    return fromTokenList(Arrays.asList((Token) new ClassicToken(1, token)));
+    return fromTokens(Arrays.asList((Token) new ClassicToken(1, token)));
   }
   
   public static TokenStreamFragment fromSingleNode(TokenStreamFragment.Node node) {
@@ -81,17 +100,9 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   public TokenStreamFragment withoutSentinelNodes() {
     return create(getStart().getNext(), getEnd().getPrevious());
   }
-  
-  private List<Token> asTokenList() {
-    List<Token> tokens = Lists.newArrayList();
-    for (TokenStreamFragment.Node node : this) {
-      tokens.add(node.getToken());
-    }
-    return tokens;
-  }
 
   public TokenStreamFragment copy() {
-    return TokenStreamFragment.fromTokenList(asTokenList());
+    return TokenStreamFragment.fromTokens(Iterables.transform(this, Node.GET_TOKEN));
   }
   
   public void remove() {
@@ -132,7 +143,7 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
   
   public String asString() {
-    return Joiner.on("").join(Iterables.transform(this, TokenStream.GET_TEXT));
+    return Joiner.on("").join(Iterables.transform(this, Node.GET_TEXT));
   }
   
   private TokenStreamFragment(TokenStreamFragment.Node start, TokenStreamFragment.Node end) {

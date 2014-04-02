@@ -7,7 +7,6 @@ import org.antlr.runtime.Token;
 
 import ast.ASTNode;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
@@ -19,7 +18,7 @@ public class TokenStream {
 
   public static TokenStream create(String code) {
     TokenStreamFragment fragment = 
-        TokenStreamFragment.fromTokenList(TokenUtil.tokenize(code));
+        TokenStreamFragment.fromTokens(TokenUtil.tokenize(code));
     return new TokenStream(TokenStreamFragment.withSentinelNodes(fragment)).index();
   }
 
@@ -44,7 +43,9 @@ public class TokenStream {
       // TODO(isbadawi): This is brittle, assumes statements lists I think
       newFragment.spliceAfter(
           TokenStreamFragment.fromSingleNode(
-              nextMatchingNode(hasText("\n"), fragment(node).getStart())));
+              nextMatchingNode(
+                  TokenStreamFragment.Node.hasText("\n"), 
+                  fragment(node).getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
     } else if (i >= node.getNumChild()) {
@@ -66,8 +67,8 @@ public class TokenStream {
   }
 
   private Predicate<TokenStreamFragment.Node> newlineOrText = Predicates.or(
-      hasText("\n"),
-      Predicates.not(hasText("[ \\t]")));
+      TokenStreamFragment.Node.hasText("\n"),
+      Predicates.not(TokenStreamFragment.Node.hasText("[ \\t]")));
 
   private TokenStreamFragment.Node previousMatchingNode(Predicate<TokenStreamFragment.Node> predicate, TokenStreamFragment.Node start) {
     TokenStreamFragment.Node node;
@@ -126,16 +127,6 @@ public class TokenStream {
 
   private TokenStreamFragment synthesizeNewTokens(ASTNode<?> node) {
     return node.tokenize().spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
-  }
-
-  static Function<TokenStreamFragment.Node, String> GET_TEXT = new Function<TokenStreamFragment.Node, String>() {
-    @Override public String apply(TokenStreamFragment.Node node) {
-      return node.getToken().getText();
-    }
-  };
-
-  private static Predicate<TokenStreamFragment.Node> hasText(String text) {
-    return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
   }
 
   private TokenStream(TokenStreamFragment stream) {
