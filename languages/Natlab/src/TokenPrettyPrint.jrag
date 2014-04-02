@@ -72,16 +72,66 @@ aspect TokenPrettyPrint {
   eq WhileStmt.doTokenize() = concatFragments(
     getIndent(), "while", " ", getExpr().tokenize(), "\n", joinTokens("\n", getStmts()), "end");
   eq IfStmt.doTokenize() = concatFragments(
-    getIndent(), "if", " ", joinTokens("elseif ", getIfBlocks()),
+    getIndent(), "if", " ", joinTokens(getIndent() + "elseif ", getIfBlocks()),
     hasElseBlock() ? getElseBlock().tokenize() : "", getIndent(), "end");
-  // TODO
+  eq IfBlock.doTokenize() = concatFragments(
+    getCondition().tokenize(), "\n", joinTokens("\n", getStmts()));
+  eq ElseBlock.doTokenize() = concatFragments(
+    getIndent(), "else", "\n", joinTokens("\n", getStmts()));
+  eq SwitchStmt.doTokenize() = concatFragments(
+    getIndent(), "switch", " ", getExpr().doTokenize(), "\n",
+    joinTokens("", getSwitchCaseBlocks()),
+    hasDefaultCaseBlock() ? getDefaultCaseBlock().tokenize() : "", getIndent());
+  eq SwitchCaseBlock.doTokenize() = concatFragments(
+    getIndent(), "case", " ", getExpr().tokenize(), "\n",
+    joinTokens("\n", getStmts()));
+  eq DefaultCaseBlock.doTokenize() = concatFragments(
+    getIndent(), "otherwise", " ", joinTokens("\n", getStmts()));
+  eq TryStmt.doTokenize() = concatFragments(
+    getIndent(), "try", "\n", joinTokens("\n", getTryStmts()),
+    getCatchStmts().getNumChild() > 0 ? "catch" : "",
+    getCatchStmts().getNumChild() > 0 ? "\n" : "",
+    getCatchStmts().getNumChild() > 0 ? joinTokens("\n", getCatchStmts()) : "",
+    getIndent(), "end");
 
+  eq RangeExpr.doTokenize() = concatFragments(
+    "(", getLower().tokenize(), " : ",
+    hasIncr() ? getIncr().tokenize() : "", hasIncr() ? " : " : "",
+    getUpper().tokenize(), ")");
+  eq ColonExpr.doTokenize() = concatFragments(":");
+  eq EndExpr.doTokenize() = concatFragments("end");
   eq Name.doTokenize() = concatFragments(getID());
   eq NameExpr.doTokenize() = getName().tokenize();
+  eq DotExpr.doTokenize() = concatFragments(
+    getTarget().tokenize(), ".", getField().tokenize());
   eq ParameterizedExpr.doTokenize() = concatFragments(
     getTarget().tokenize(), "(", joinTokens(", ", getArgs()), ")");
+  eq CellIndexExpr.doTokenize() = concatFragments(
+    getTarget().tokenize(), "{", joinTokens(", ", getArgs()), "}");
+  eq MatrixExpr.doTokenize() = concatFragments(
+    "[", joinTokens("; ", getRows()), "]");
+  eq CellArrayExpr.doTokenize() = concatFragments(
+    "{", joinTokens("; ", getRows()), "}");
+  eq Row.doTokenize() = joinTokens(", ", getElements());
+  eq FunctionHandleExpr.doTokenize() = concatFragments(
+    "@", getName().tokenize());
+  eq LambdaExpr.doTokenize() = concatFragments(
+    "(", "@", "(", joinTokens(", ", getInputParams()), ")", " ",
+    getBody().tokenize(), ")");
   eq IntLiteralExpr.doTokenize() = concatFragments(getValue().getText());
   eq FPLiteralExpr.doTokenize() = concatFragments(getValue().getText());
+  eq StringLiteralExpr.doTokenize() = concatFragments("'", getValue(), "'");
+
+  eq UMinusExpr.doTokenize() = concatFragments(
+    "(", "-", getOperand().tokenize(), ")");
+  eq UPlusExpr.doTokenize() = concatFragments(
+    "(", "+", getOperand().tokenize(), ")");
+  eq NotExpr.doTokenize() = concatFragments(
+    "(", "~", getOperand().tokenize(), ")");
+  eq MTransposeExpr.doTokenize() = concatFragments(
+    "(", getOperand().tokenize(), "'", ")");
+  eq ArrayTransposeExpr.doTokenize() = concatFragments(
+    "(", getOperand().tokenize(), ".'", ")");
 
   syn TokenStreamFragment BinaryExpr.tokenize(String op) =
     concatFragments("(", getLHS().tokenize(), " ", op, " ", getRHS().tokenize(), ")");
