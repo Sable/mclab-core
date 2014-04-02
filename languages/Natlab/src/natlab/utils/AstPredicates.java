@@ -5,6 +5,7 @@ import ast.Function;
 import ast.Name;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 /**
  * Some useful Guava predicates for ASTs.
@@ -20,11 +21,7 @@ public class AstPredicates {
   
   public static <T extends ASTNode<?>, U extends ASTNode<?>> 
     Predicate<T> parentInstanceOf(final Class<U> clazz) {
-    return new Predicate<T>() {
-      @Override public boolean apply(T node) {
-        return clazz.isInstance(node.getParent());
-      }
-    };
+    return Predicates.compose(Predicates.instanceOf(clazz), AstFunctions.<T>getParent());
   }
 
   public static Predicate<Function> nestedFunction() {

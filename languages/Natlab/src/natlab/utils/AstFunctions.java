@@ -27,6 +27,14 @@ public class AstFunctions {
     return FUNCTION_NAME;
   }
   
+  public static <T extends ASTNode<?>> Function<T, ASTNode<?>> getParent() {
+    return new Function<T, ASTNode<?>>() {
+      @Override public ASTNode<?> apply(T node) {
+        return node.getParent();
+      }
+    };
+  }
+  
   public static <T extends ASTNode<?>> Function<T, String> prettyPrint() {
     return new Function<T, String>() {
       @Override public String apply(T node) {
@@ -56,4 +64,5 @@ public class AstFunctions {
   
   private static Function<NameExpr, String> NAME_EXPR_ID =
       Functions.compose(NAME_ID, NAME_EXPR_NAME);
+  
 }
