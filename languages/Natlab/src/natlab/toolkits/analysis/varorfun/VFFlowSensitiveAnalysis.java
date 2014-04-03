@@ -131,8 +131,8 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
 
   private boolean scriptOrFunctionExists(String name){
     return 
-        ((currentFunction != null) && (currentFunction.lookupFunction(name) != null))
-        || ((currentScript != null) && (false)) //TODO - should return if name is the name of the script
+        (currentFunction != null && currentFunction.lookupFunction(name) != null)
+        || (currentScript != null && name.equals(currentScript.getName()))
         || lookupQuery.isFunctionOrScript(name);
   }
   private boolean packageExists(String name){
