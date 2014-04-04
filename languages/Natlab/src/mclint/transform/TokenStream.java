@@ -6,6 +6,7 @@ import mclint.util.TokenUtil;
 import org.antlr.runtime.Token;
 
 import ast.ASTNode;
+import ast.Function;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -126,7 +127,21 @@ public class TokenStream {
 
 
   private TokenStreamFragment synthesizeNewTokens(ASTNode<?> node) {
-    return node.tokenize().spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+    TokenStreamFragment tokens = node.tokenize();
+    // This part is kind of lame. Depending on the kind of node we're inserting we may
+    // need to insert tokens before/after to make sure we don't mess anything up.
+    // For instance, if there's no newline after the "end" of a function a declaration,
+    // and we just insert a new function after it, then we'll get a syntax error
+    // ("endfunction [] =..."). There's probably a cleaner way of expressing this than
+    // just tacking it all on here. Also for now I'm just adding tokens on unconditionally
+    // -- it would be nicer to check somehow if they're really necessary.
+    // TODO(isbadawi): Find a better place to put these things
+    // TODO(isbadawi): Look at surrounding tokens instead of unconditionally adding newlines
+    tokens = tokens.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+    if (node instanceof Function) {
+      tokens = tokens.spliceAfter(TokenStreamFragment.fromSingleToken("\n"));
+    }
+    return tokens;
   }
 
   private TokenStream(TokenStreamFragment stream) {
