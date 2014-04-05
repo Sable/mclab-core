@@ -22,7 +22,7 @@ import natlab.toolkits.path.FileEnvironment;
 
 public class BasicTamerTool {
 	
-	private static Boolean doIntOk = false;
+	private static Boolean doIntOk = true;
 	private static Boolean doVarRename = false;
 
 	/**
