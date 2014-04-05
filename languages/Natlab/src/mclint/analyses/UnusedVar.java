@@ -8,12 +8,14 @@ import mclint.Message;
 import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
+import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import ast.ForStmt;
 import ast.Function;
 import ast.Name;
 import ast.Stmt;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
@@ -36,7 +38,8 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   @Override
   public void caseFunction(Function node) {
     Set<String> outputParamsCopy = Sets.newHashSet(outputParams);
-    outputParams.addAll(node.getOutParamSet());
+    outputParams.addAll(Sets.newHashSet(
+        Iterables.transform(node.getOutputParams(), AstFunctions.nameToID())));
     super.caseFunction(node);
     outputParams.retainAll(outputParamsCopy);
   }

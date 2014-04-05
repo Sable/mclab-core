@@ -133,7 +133,7 @@ aspect PrettyPrint {
   eq WhileStmt.getPrettyPrintedLessComments() = String.format("%swhile %s\n%s%send",
     getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()), getIndent());
   eq IfStmt.getPrettyPrintedLessComments() = String.format("%sif %s%s%send",
-    getIndent(), join("elseif ", getIfBlocks()),
+    getIndent(), join(getIndent() + "elseif ", getIfBlocks()),
     hasElseBlock() ? getElseBlock().getPrettyPrinted() : "", getIndent());
   eq IfBlock.getPrettyPrintedLessComments() = String.format("%s\n%s",
     getCondition().getPrettyPrinted(), join("\n", getStmts()));

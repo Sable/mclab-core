@@ -19,7 +19,9 @@
 //                                                                             //
 // =========================================================================== //
 
-import java.util.*;
+import java.util.Map;
+import com.google.common.collect.Maps;
+import natlab.utils.AstFunctions;
 
 aspect NameResolution{
 
@@ -27,24 +29,13 @@ aspect NameResolution{
     syn Function FunctionList.getMainFunction() = getFunction(0);
 
     syn lazy Map<String,Function> FunctionList.getSiblings() = new HashMap<String,Function>();
-    syn lazy Map<String,Function> FunctionList.getNested()
-    {
-        HashMap<String,Function> table = new HashMap<String,Function>();
-        for( int i=0; i<getNumFunction(); i++ ){
-            table.put( getFunction(i).getName(), getFunction(i) );
-        }
-        //TODO-JD: add alias for main function with file name
-        return table;
+    syn lazy Map<String,Function> FunctionList.getNested() {
+        return Maps.uniqueIndex(getFunctions(), AstFunctions.functionToName());
     }
     syn LocalFunctionLookupInterface FunctionList.getParentFunction() = null;
 
-    syn lazy Map<String,Function> Function.getNested()
-    {
-        HashMap<String, Function> table = new HashMap<String,Function>();
-        for( int i=0; i<getNumNestedFunction(); i++ ){
-            table.put( getNestedFunction(i).getName(), getNestedFunction(i) );
-        }
-        return table;
+    syn lazy Map<String,Function> Function.getNested() {
+        return Maps.uniqueIndex(getNestedFunctions(), AstFunctions.functionToName());
     }
     inh Map<String, Function> Function.getSiblings();
     eq FunctionList.getFunction(int i).getSiblings() = getNested();
@@ -67,51 +58,5 @@ aspect NameResolution{
     syn Function FunctionList.lookupFunction( String name )
     {
         return getNested().get(name);
-    }
-
-    //helper function to get all visible functions from a given Function
-    //this probably won't be called often
-    syn Map<String,Function> FunctionList.getVisible()
-    {
-        /*HashMap<String,Function> table = new HashMap<String,Function>();
-        table.put(getMainFunction().getName(), getMainFunction());
-        return table;*/
-        return getNested();
-    }
-    syn Map<String,Function> Function.getVisible()
-    {
-        Map<String,Function> table = getParentFunction().getVisible();
-        table.putAll(getNested());
-        return table;
-    }
-
-    //get a set containing all input and output parameters for a function
-    syn lazy Set<String> Function.getOutParamSet()
-    {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
-        for( int i=0; i<getNumOutputParam(); i++ ){
-            if( !names.add( getOutputParam(i).getID() ) )
-                //TODO-JD:add error msg
-                System.err.println("duplicate output parameters");
-        }
-        return names;
-    }
-    syn lazy Set<String> Function.getInParamSet()
-    {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
-        for( int i=0; i<getNumInputParam(); i++ ){
-            if( !names.add( getInputParam(i).getID() ) )
-                //TODO-JD:add error msg
-                System.err.println("duplicate input parameters");
-        }
-        return names;
-    }
-        
-    syn lazy Set<String> Function.getParamSet()
-    {
-        LinkedHashSet<String> names = new LinkedHashSet<String>();
-        names.addAll(getInParamSet());
-        names.addAll(getOutParamSet());
-        return names;
     }
 }
