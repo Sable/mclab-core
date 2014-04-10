@@ -6,10 +6,13 @@ import mclint.util.TokenUtil;
 import org.antlr.runtime.Token;
 
 import ast.ASTNode;
+import ast.EmptyStmt;
 import ast.Function;
+import ast.Stmt;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
@@ -31,14 +34,72 @@ public class TokenStream {
     fragment(node).remove();
   }
 
+  private String getIndentation(ASTNode<?> node) {
+    TokenStreamFragment fragment = baseFragment(node);
+    TokenStreamFragment.Node start = leadingWhitespace(fragment.getStart());
+    TokenStreamFragment.Node end = fragment.getStart().getPrevious();
+    return TokenStreamFragment.create(start, end).copy().asString();
+  }
+  
+  private int getNumNonEmptyChild(ASTNode<?> node) {
+    return FluentIterable
+        .from(node)
+        .filter(Predicates.not(Predicates.instanceOf(EmptyStmt.class)))
+        .size();
+  }
+  
+  private ASTNode<?> getPreviousNonEmptyStmt(ASTNode<?> node, int i) {
+    for (int j = i; j >= 0; --j) {
+      if (!(node.getChild(j) instanceof EmptyStmt)) {
+        return node.getChild(j);
+      }
+    }
+    return null;
+  }
+  
+  private ASTNode<?> getNextNonEmptyStmt(ASTNode<?> node, int i) {
+    for (int j = i; j < node.getNumChild(); ++j) {
+      if (!(node.getChild(j) instanceof EmptyStmt)) {
+        return node.getChild(j);
+      }
+    }
+    return null;
+  }
+  
+  private ASTNode<?> getNearestNonEmptyStmt(ASTNode<?> node, int i) {
+    if (i == 0) {
+      return getNextNonEmptyStmt(node, 0);
+    }
+    if (i >= node.getNumChild()) {
+      return getPreviousNonEmptyStmt(node, node.getNumChild() - 1);
+    }
+    ASTNode<?> previous = getPreviousNonEmptyStmt(node, i - 1);
+    return previous != null ? previous : getNextNonEmptyStmt(node, i - 1);
+  }
+  
+  private String guessIndentation(ASTNode<?> node, int i) {
+    if (getNumNonEmptyChild(node) == 0) {
+      // Nothing to go on. Let's just say two spaces -- maybe this could be configurable?
+      return "  ";
+    }
+    return getIndentation(getNearestNonEmptyStmt(node, i));
+  }
+
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
     TokenStreamFragment newFragment;
     if (AstUtil.isSynthetic(newNode)) {
       newFragment = synthesizeNewTokens(newNode);
     } else {
       // TODO(isbadawi): Need to deep copy -- each node in the subtree should have a new fragment.
-      newFragment = fragment(newNode).copy();
+      newFragment = baseFragment(newNode).copy();
       newNode.setTokenStreamFragment(newFragment);
+    }
+
+    if (newNode instanceof Stmt) {
+      String indentation = guessIndentation(node, i);
+      newFragment = TokenStreamFragment
+          .fromSingleToken(indentation)
+          .spliceBefore(newFragment);
     }
 
     if (node.getNumChild() == 0) {
@@ -103,6 +164,8 @@ public class TokenStream {
         byPosition.get(node.getEndLine(), node.getEndColumn() - 1));
   }
 
+  // The "base" fragment is the token fragment, unless the node has an explicitly
+  // set fragment (or is synthetic and we're going to make one now).
   private TokenStreamFragment baseFragment(ASTNode<?> node) {
     if (node.hasTokenStreamFragment() || AstUtil.isSynthetic(node)) {
       return node.tokenize();
@@ -110,6 +173,9 @@ public class TokenStream {
     return tokenFragment(node);
   }
 
+  // The fragment is the portion of the token stream corresponding to the given node,
+  // plus applying any heuristics for indentation, surrounding whitespace, etc.
+  // It's the "extended" range of the node.
   private TokenStreamFragment fragment(ASTNode<?> node) {
     if (node instanceof ast.List){
       node = node.getParent();

@@ -188,7 +188,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     assertEquals(join(
         "function f",
         "  x =     2; ",
-        "x = 1;",
+        "  x = 1;",
         "end"
     ), transformer.reconstructText());
   }
@@ -207,7 +207,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     
     assertEquals(join(
         "function f",
-        "x = 1;",
+        "  x = 1;",
         "end"
     ), transformer.reconstructText());
  }
