@@ -18,7 +18,7 @@ public class TokenStream {
   private Table<Integer, Integer, TokenStreamFragment.Node> byPosition;
 
   public static TokenStream create(String code) {
-    TokenStreamFragment fragment = 
+    TokenStreamFragment fragment =
         TokenStreamFragment.fromTokens(TokenUtil.tokenize(code));
     return new TokenStream(TokenStreamFragment.withSentinelNodes(fragment)).index();
   }
@@ -30,12 +30,13 @@ public class TokenStream {
   public void removeAstNode(ASTNode<?> node) {
     fragment(node).remove();
   }
-  
+
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
     TokenStreamFragment newFragment;
     if (AstUtil.isSynthetic(newNode)) {
       newFragment = synthesizeNewTokens(newNode);
     } else {
+      // TODO(isbadawi): Need to deep copy -- each node in the subtree should have a new fragment.
       newFragment = fragment(newNode).copy();
       newNode.setTokenStreamFragment(newFragment);
     }
@@ -45,7 +46,7 @@ public class TokenStream {
       newFragment.spliceAfter(
           TokenStreamFragment.fromSingleNode(
               nextMatchingNode(
-                  TokenStreamFragment.Node.hasText("\n"), 
+                  TokenStreamFragment.Node.hasText("\n"),
                   fragment(node).getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
@@ -55,7 +56,7 @@ public class TokenStream {
       newFragment.spliceAfter(fragment(node.getChild(i - 1)));
     }
   }
-  
+
   private TokenStreamFragment.Node leadingWhitespace(TokenStreamFragment.Node start) {
     if (start.getPrevious() == null) {
       return start;
@@ -101,14 +102,14 @@ public class TokenStream {
         byPosition.get(node.getStartLine(), node.getStartColumn() - 1),
         byPosition.get(node.getEndLine(), node.getEndColumn() - 1));
   }
-  
+
   private TokenStreamFragment baseFragment(ASTNode<?> node) {
     if (node.hasTokenStreamFragment() || AstUtil.isSynthetic(node)) {
       return node.tokenize();
     }
     return tokenFragment(node);
   }
-  
+
   private TokenStreamFragment fragment(ASTNode<?> node) {
     if (node instanceof ast.List){
       node = node.getParent();
