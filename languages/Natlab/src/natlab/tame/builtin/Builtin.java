@@ -7384,7 +7384,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Load extends AbstractIoFunction  {
+    public static class Load extends AbstractIoFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Load singleton = null;
         public static Load getInstance(){
@@ -7400,6 +7400,39 @@ public abstract class Builtin {
             return "load";
         }
         
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("#->[]");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("char->none");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
+
+        private ICNode isComplexPropInfo = null;
+        public ICNode getisComplexPropagationInfo(){
+            //set isComplexPropInfo if not defined
+            if (isComplexPropInfo == null){
+                isComplexPropInfo = isComplexInfoPropTool.parse("A->X");
+            }
+            return isComplexPropInfo;
+        }
+
     }
     public static class Save extends AbstractIoFunction  {
         //returns the singleton instance of this class
