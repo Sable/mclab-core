@@ -900,7 +900,7 @@ system
 
 
 ioFunction; systemFunction
-load
+load;; Class(char->none);; Shape(#->[]);; isComplex(A->X)
 save
 input
 textscan
