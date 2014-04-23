@@ -27,14 +27,14 @@ public class BasicTamerTool {
 
 	/**
 	 * This main method is just for testing, doesn't follow the convention when passing a file 
-	 * to a program, please replace "YOUR_FILE_NAME_AND_PATH" below with your real testing 
-	 * file name and its path, and program argument support the type info of the input 
+	 * to a program, please replace "YOUR_FULL_PATH_FILE_NAME" below with your real testing 
+	 * file with its full path, and program argument support the type info of the input 
 	 * argument, which means you can pass the type info of the input argument to the program, 
 	 * currently, the type info is composed like double&3*3&REAL.
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/Volumes/Macintosh HD 2/work/McGill/mclab/mix10/benchmarks/matlab/new-benchmarks/fdtd/drv_fdtd.m");
+		GenericFile gFile = GenericFile.create("YOUR_FULL_PATH_FILE_NAME");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -66,8 +66,6 @@ public class BasicTamerTool {
 			String[] args, 
 			FileEnvironment env) 
 	{
-		
-		
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
@@ -84,13 +82,14 @@ public class BasicTamerTool {
 		if (doIntOk)
 		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
-		if (doVarRename)
-			callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
-				callgraph, inputValues);
+		// if (doVarRename)
+		// 	callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
+		// 		callgraph, inputValues);
 		
-		if (doIntOk)
-		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
+		// if (doIntOk)
+		//     analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 		
+		//TODO: Add a fixed point solver to repeat IntOk and VarRenaming.
 		
 		System.out.println(analysis.toString());
 
@@ -98,14 +97,10 @@ public class BasicTamerTool {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
 					.getNodeList().get(i).getAnalysis()));
 		}
-		
-		
-		
+				
 		return analysis;
 	}
 
-	
-	
 	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
 		ArrayList<AggrValue<BasicMatrixValue>> list = 
 				new ArrayList<AggrValue<BasicMatrixValue>>(args.length);

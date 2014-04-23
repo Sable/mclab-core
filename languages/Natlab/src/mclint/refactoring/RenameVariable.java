@@ -123,7 +123,7 @@ class RenameVariable extends Refactoring {
       return;
     }
 
-    Transformer transformer = context.getMatlabProgram().getBasicTransformer();
+    Transformer transformer = context.getTransformer();
     for (Def def : getAllDefsOfTargetName()) {
       for (Name use : udduChain.getUsesOf(node.getID(), def)) {
         transformer.replace(use, new Name(newName)); 

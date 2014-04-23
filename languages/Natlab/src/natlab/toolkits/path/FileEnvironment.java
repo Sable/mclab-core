@@ -10,6 +10,7 @@ import natlab.toolkits.filehandling.GenericFile;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -106,7 +107,7 @@ public class FileEnvironment {
           this.matlabPath = MatlabPath.getMatlabPath();
 		} else {
 		  this.natlabPath =
-		      new MatlabPath(Joiner.on(System.getProperty("path.separator")).join(paths));
+		      new MatlabPath(Joiner.on(StandardSystemProperty.PATH_SEPARATOR.value()).join(paths));
 		}
 		this.folderHandlers = getFolderHandlers();
 	}

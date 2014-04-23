@@ -24,6 +24,14 @@ package analysis;
  */
 public abstract class AbstractStructuralAnalysis<A> extends analysis.natlab.NatlabAbstractStructuralAnalysis<A>
 {
+    public static boolean DEBUG = true;
+
+    protected void log(Object message) {
+      if (DEBUG) {
+        System.err.println(message);
+      }
+    }
+
     public AbstractStructuralAnalysis(ast.ASTNode tree){
         super( tree );
     }

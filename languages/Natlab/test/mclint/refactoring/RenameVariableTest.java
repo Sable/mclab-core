@@ -12,13 +12,13 @@ import ast.Script;
 
 public class RenameVariableTest extends McLintTestCase {
   private void rename(Name node, String newName) {
-    Refactoring rename = Refactorings.renameVariable(createContext(), node, newName);
+    Refactoring rename = Refactorings.renameVariable(createBasicTransformerContext(), node, newName);
     assertTrue(rename.checkPreconditions());
     rename.apply();
   }
 
   private void assertRenameFails(ASTNode<?> tree, Name name, String newName) {
-    Refactoring rename = Refactorings.renameVariable(createContext(), name, newName);
+    Refactoring rename = Refactorings.renameVariable(createBasicTransformerContext(), name, newName);
     assertFalse(String.format("Expected renaming of %s to %s to fail", name.getID(), newName),
         rename.checkPreconditions());
   }
@@ -30,7 +30,7 @@ public class RenameVariableTest extends McLintTestCase {
 
     rename(x, "z");
 
-    assertEquivalent("z = 0; y = z;", script);
+    assertEquivalent(script, "z = 0; y = z;");
   }
 
   public void testRenameDef() {
@@ -40,7 +40,7 @@ public class RenameVariableTest extends McLintTestCase {
 
     rename(x, "z");
 
-    assertEquivalent("z = 0; y = z;", script);
+    assertEquivalent(script, "z = 0; y = z;");
   }
 
   public void testRenameArrayGet() {
@@ -51,7 +51,7 @@ public class RenameVariableTest extends McLintTestCase {
 
     rename(x, "z");
 
-    assertEquivalent("z = [1,2]; y = z(1);", script);
+    assertEquivalent(script, "z = [1,2]; y = z(1);");
   }
 
   public void testRenameArraySet() {
@@ -62,7 +62,7 @@ public class RenameVariableTest extends McLintTestCase {
 
     rename(x, "z");
 
-    assertEquivalent("z(2) = 4; y = z(1);", script);
+    assertEquivalent(script, "z(2) = 4; y = z(1);");
   }
 
   public void testRenameWithConflict() {
@@ -74,10 +74,11 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameWithInputParamConflict() {
-    parse(new StringBuilder()
-    .append("function x(in)\n")
-    .append("x = 0; y = x;\n")
-    .append("end").toString());
+    parse(
+        "function x(in)",
+        "  x = 0; y = x;",
+        "end"
+    );
     Function function = ((FunctionList) kit.getAST()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) function.getStmt(1)).getRHS()).getName();
 
@@ -85,10 +86,11 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameWithOutputParamConflict() {
-    parse(new StringBuilder()
-    .append("function out = x(i)\n")
-    .append("x = 0; y = x;\n")
-    .append("end").toString());
+    parse(
+        "function out = x(i)",
+        "  x = 0; y = x;",
+        "end"
+    );
     Function function = ((FunctionList) kit.getAST()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) function.getStmt(1)).getRHS()).getName();
 
@@ -102,56 +104,61 @@ public class RenameVariableTest extends McLintTestCase {
 
     rename(x, "z");
 
-    assertEquivalent("[y, z] = f(); y = z;", script);
+    assertEquivalent(script, "[y, z] = f(); y = z;");
   }
 
   public void testRenameFunctionParameter() {
-    parse(new StringBuilder()
-    .append("function f(x)\n")
-    .append("  y = x;\n")
-    .append("end").toString());
+    parse(
+        "function f(x)",
+        "  y = x;",
+        "end"
+    );
 
     Name x = ((FunctionList) kit.getAST()).getFunction(0).getInputParam(0);
 
     rename(x, "z");
 
-    assertEquivalent(new StringBuilder()
-    .append("function f(z)\n")
-    .append("  y = z;\n")
-    .append("end").toString(), kit.getAST());
+    assertEquivalent(kit.getAST(),
+        "function f(z)",
+        "  y = z;",
+        "end"
+    );
   }
 
   public void testRenameGlobalVariableAcrossFunctions() {
-    parse(new StringBuilder()
-    .append("function f1()\n")
-    .append("  global x; y = x;\n")
-    .append("end\n")
-    .append("function f2()\n")
-    .append("  global x; x = 4;\n")
-    .append("end").toString());
+    parse(
+        "function f1()",
+        "  global x; y = x;",
+        "end",
+        "function f2()",
+        "  global x; x = 4;",
+        "end"
+    );
 
     Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();
 
     rename(x, "z");
 
-    assertEquivalent(new StringBuilder()
-    .append("function f1()\n")
-    .append("  global z; y = z;\n")
-    .append("end\n")
-    .append("function f2()\n")
-    .append("  global z; z = 4;\n")
-    .append("end").toString(), kit.getAST());
+    assertEquivalent(kit.getAST(), 
+        "function f1()",
+        "  global z; y = z;",
+        "end",
+        "function f2()",
+        "  global z; z = 4;",
+        "end"
+    );
   }
 
   public void testRenameGlobalVariableWithNameConflict() {
-    parse(new StringBuilder()
-    .append("function f1()\n")
-    .append("  global x; y = x;\n")
-    .append("end\n")
-    .append("function f2()\n")
-    .append("  global x; x = z;\n")
-    .append("end").toString());
+    parse(
+        "function f()",
+        "  global x; y = x;",
+        "end",
+        "function f2()",
+        "  global x; x = z;",
+        "end"
+    );
 
     Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();

@@ -1,6 +1,5 @@
 package natlab.tame.tamerplus.utils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,46 +7,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ast.ASTNode;
-import ast.AssignStmt;
-import ast.Expr;
-import ast.Name;
-import ast.NameExpr;
-
-import natlab.tame.TamerTool;
-import natlab.tame.callgraph.Callgraph;
+import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
-import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tamerplus.analysis.AnalysisEngine;
 import natlab.tame.tamerplus.analysis.DUChain;
 import natlab.tame.tamerplus.analysis.UDChain;
 import natlab.tame.tamerplus.analysis.UDDUWeb;
 import natlab.tame.tamerplus.transformation.TransformationEngine;
-import natlab.tame.tamerplus.utils.TamerPlusUtils;
 import natlab.tame.tir.TIRAssignLiteralStmt;
-import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
-import natlab.toolkits.filehandling.GenericFile;
-import natlab.toolkits.path.FileEnvironment;
-import natlab.tame.valueanalysis.*;
-
-import natlab.tame.callgraph.SimpleFunctionCollection;
-import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueAnalysis;
-import natlab.tame.valueanalysis.ValueAnalysisPrinter;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
-import natlab.toolkits.filehandling.GenericFile;
-import natlab.toolkits.path.FileEnvironment;
+import natlab.utils.AstFunctions;
+import ast.ASTNode;
+import ast.Expr;
+import ast.Name;
+import ast.NameExpr;
+
+import com.google.common.collect.FluentIterable;
 
 public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 
@@ -113,7 +96,11 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 
 				if (null != varUses) {
 					for (String var : varUses.keySet()) {
-						if (!function.getAst().getOutParamSet().contains(var)) {
+					  Set<String> outParamSet = FluentIterable
+					      .from(function.getAst().getOutputParams())
+					      .transform(AstFunctions.nameToID())
+					      .toSet();
+						if (!outParamSet.contains(var)) {
 										// Do not rename return variable
 							System.out.println("==" + statement.toString()
 									+ " defines " + var + "==");

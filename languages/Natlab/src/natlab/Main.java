@@ -32,6 +32,8 @@ import natlab.tame.BasicTamerTool;
 import natlab.tame.tamerplus.TamerPlusMain;
 import natlab.toolkits.rewrite.Simplifier;
 import natlab.toolkits.rewrite.simplification.FullSimplification;
+import analysis.AbstractDepthFirstAnalysis;
+import analysis.AbstractStructuralAnalysis;
 import ast.CompilationUnits;
 import ast.Program;
 
@@ -87,6 +89,12 @@ public class Main {
       return;
     }
 
+    if (options.quiet()) {
+      AbstractDepthFirstAnalysis.DEBUG = false;
+      AbstractStructuralAnalysis.DEBUG = false;
+      
+    }
+
     if (options.tamer()) {
       //TODO - the parsing of the options should probably not be done by the tamer tool
       BasicTamerTool.main(options);
@@ -138,6 +146,11 @@ public class Main {
 
     if (options.simplify()) {
       Simplifier.simplify(cu, FullSimplification.class);
+    }
+    
+    if (options.json()) {
+      System.out.println(cu.getJsonString());
+      return;
     }
 
     if (options.xml()) {

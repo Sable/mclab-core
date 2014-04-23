@@ -28,6 +28,7 @@ import java.util.prefs.Preferences;
 import natlab.options.Options;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -50,7 +51,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class NatlabPreferences {
   //*** the keys and defaults for the options ********************************
-  private static final String PATH_SEPARATOR = System.getProperty("path.separator");
+  private static final String PATH_SEPARATOR = StandardSystemProperty.PATH_SEPARATOR.value();
   private static final String MATLAB_PATH_KEY = "matlab_path";
   private static final String MATLAB_PATH_DEFAULT = "";
   private static final String NATLAB_PATH_KEY = "natlab_path";

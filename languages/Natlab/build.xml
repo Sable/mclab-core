@@ -13,6 +13,7 @@
 	<path id="jastaddparser.jar.path" path="${lib.dir}/${jastaddparser.jar.path.prop}" />
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
   <path id="guava.jar.path" path="${lib.dir}/${guava.jar.path.prop}" />
+  <path id="json.jar.path" path="${lib.dir}/${json.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
 			<include name="${antlr.task.jar.path.prop}" />
@@ -97,6 +98,7 @@
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
       <path refid="guava.jar.path" />
+      <path refid="json.jar.path" />
 			<path location="${basedir}/${matlab.bin.dir}" />
 		</path>
 		<path id="test.classpath">
@@ -104,6 +106,7 @@
 			<path refid="beaver.rt.jar.path" />
 			<path refid="antlr.jar.path" />
       <path refid="guava.jar.path" />
+      <path refid="json.jar.path" />
 			<path location="${basedir}/${bin.dir}" />
 			<path location="${basedir}/${matlab.bin.dir}" />
       <path location="${basedir}/resources" />
@@ -124,7 +127,7 @@
     <jar destfile="@{basename}.jar">
       <manifest><attribute name="Main-Class" value="${entrypoint.class}" /></manifest>
       <zipgroupfileset dir="${lib.dir}"
-        includes="${beaver.rt.jar.path.prop},${antlr3.rt.jar.path.prop},${string.template.jar.path.prop},${antlr2.jar.path.prop},${guava.jar.path.prop}" />
+        includes="${beaver.rt.jar.path.prop},${antlr3.rt.jar.path.prop},${string.template.jar.path.prop},${antlr2.jar.path.prop},${guava.jar.path.prop},${json.jar.path.prop}" />
       <fileset dir="${matlab.bin.dir}/" includes="**/*.class" />
       <fileset dir="${basedir}/resources" />  
       <fileset dir="${basedir}/${bin.dir}" includes="**/*.class" excludes="@{excludes}" />

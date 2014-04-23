@@ -57,7 +57,7 @@ public abstract class NatlabAbstractSimpleStructuralBackwardAnalysis<A> extends 
     }
     public void caseCondition( Expr condExpr )
     {
-        caseExpr( condExpr );
+        condExpr.analyze(this);
     }
     public void caseLoopVarAsCondition( AssignStmt node )
     {

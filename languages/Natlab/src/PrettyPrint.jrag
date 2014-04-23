@@ -18,789 +18,217 @@
 //   limitations under the License.                                            //
 //                                                                             //
 // =========================================================================== //
+import static mclint.util.AstUtil.join;
 
 aspect PrettyPrint {
+  protected static final String ASTNode.INDENT_TAB = "  ";
 
-    protected static final String ASTNode.INDENT_TAB = "  ";
-         
-    syn String ASTNode.getPrettyPrinted() {
-        StringBuffer buf = new StringBuffer();
-        for(beaver.Symbol comment : getComments()) {
-            buf.append(getIndent() + comment.value + "\n");
-        }
-        buf.append(getPrettyPrintedLessComments());
-        return buf.toString();
-    } 
+  syn String ASTNode.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    for (beaver.Symbol comment : getComments()) {
+      buf.append(getIndent() + comment.value + "\n");
+    }
+    buf.append(getPrettyPrintedLessComments());
+    return buf.toString();
+  }
 
-    //case Stmt - print comments after the statement
-    syn String Stmt.getPrettyPrinted(){
-        StringBuffer buf = new StringBuffer();
-        buf.append(getPrettyPrintedLessComments());
-        //first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
-        String space = (this instanceof EmptyStmt)?"":"  ";
-        for(beaver.Symbol comment : getComments()) {
-            buf.append(space + comment.value);
-            space = "\n"+getIndent(); //later comments -- full indent
-        }
-        return buf.toString();            
+  //case Stmt - print comments after the statement
+  syn String Stmt.getPrettyPrinted(){
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
+    // first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
+    String space = (this instanceof EmptyStmt) ? "" : "  ";
+    for (beaver.Symbol comment : getComments()) {
+      buf.append(space + comment.value);
+      space = "\n" + getIndent(); // later comments -- full indent
     }
-    
-    //Special case to deal with comments at the end of functions
-    syn String Function.getPrettyPrinted() {
-        StringBuffer buf = new StringBuffer();
-        buf.append( getPrettyPrintedLessComments() );
+    return buf.toString();
+  }
 
-        StringBuffer cbuf = new StringBuffer();
-        for( beaver.Symbol comment : getComments() ){
-            cbuf.append(comment.value);
-            cbuf.append("\n");
-        }
-        if( cbuf.length() > 0 ){
-            buf.insert( buf.length() - getIndent().length() - 3, cbuf.toString() );
-        }
-        return buf.toString();
-    }
+  //Special case to deal with comments at the end of functions
+  syn String Function.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
 
+    StringBuffer cbuf = new StringBuffer();
+    for (beaver.Symbol comment : getComments()) {
+      cbuf.append(comment.value + "\n");
+    }
+    if (cbuf.length() > 0) {
+      buf.insert(buf.length() - getIndent().length() - 3, cbuf.toString());
+    }
+    return buf.toString();
+  }
 
-    
-    syn String ASTNode.getIndent(){
-        ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent();
-        }
-        return "";
-    } 
+  syn String ASTNode.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null) {
+      return "";
+    }
+    return parent.getIndent();
+  }
 
+  eq Stmt.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null || parent.getParent() instanceof Program) {
+      return "";
+    }
+    return parent.getIndent() + ASTNode.INDENT_TAB;
+  }
 
-    //default - exception
-    syn String ASTNode.getPrettyPrintedLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()"); }
-    
+  eq Function.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null || parent.getParent() instanceof Program) {
+      return "";
+    }
+    return parent.getIndent() + ASTNode.INDENT_TAB;
+  }
 
-    //IR
-    eq CSLExpr.getPrettyPrintedLessComments() = "CSL["+getName().getPrettyPrinted()+"]";
-    eq EndCallExpr.getPrettyPrintedLessComments() = "end("+getArray().getPrettyPrinted() + ", " + getNumDim() + ", " + getWhatDim() + ")";
+  syn String ASTNode.getPrettyPrintedLessComments() {
+    throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()");
+  }
 
-    eq CheckScalarStmt.getPrettyPrintedLessComments() = getIndent() + "check_scalar("+getNameExpr().getPrettyPrinted() + ")"+ (isOutputSuppressed() ? ";" : "");
+  protected String Stmt.wrap(String s, Object... args) {
+    return getIndent() +
+      (args.length == 0 ? s : String.format(s, args)) +
+      (isOutputSuppressed() ? ";" : "");
+  }
 
-    //AST
+  eq CSLExpr.getPrettyPrintedLessComments() =
+    String.format("CSL[%s]", getName().getPrettyPrinted());
+  eq EndCallExpr.getPrettyPrintedLessComments() =
+    String.format("end(%s, %s, %s)", getArray().getPrettyPrinted(), getNumDim(), getWhatDim());
+  eq CheckScalarStmt.getPrettyPrintedLessComments() = wrap("check_scalar(%s)", getNameExpr().getPrettyPrinted());
 
-    eq CompilationUnits.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
+  eq CompilationUnits.getPrettyPrintedLessComments() = join("\n==========================\n\n", getPrograms());
+  eq EmptyProgram.getPrettyPrintedLessComments() = "";
+  eq Script.getPrettyPrintedLessComments() = join("\n", getHelpComments()) + join("\n", getStmts());
+  eq FunctionList.getPrettyPrintedLessComments() = join("\n", getFunctions());
+  eq FunctionList.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
+    for(beaver.Symbol comment : getComments()) {
+      buf.append(comment.value);
+      buf.append("\n");
+    }
+    return buf.toString();
+  }
+  eq Function.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s(%s)\n%s%s%s%send",
+    getIndent(), join(", ", getOutputParams()), getName(),
+    join(", ", getInputParams()), join("\n", getHelpComments()),
+    join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
+  eq HelpComment.getPrettyPrintedLessComments() = getText();
 
-        boolean first = true;
-        for( Program p : getPrograms() ){
-            if( first )
-                first = false;
-            else
-                buf.append("\n==========================\n\n");
-            
-            buf.append( p.getPrettyPrinted() );
-        }
-        return buf.toString();
-    }
+  eq EmptyStmt.getPrettyPrintedLessComments() = "";
+  eq ExprStmt.getPrettyPrintedLessComments() = wrap(getExpr().getPrettyPrinted());
+  eq AssignStmt.getPrettyPrintedLessComments() = wrap("%s = %s", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+  eq GlobalStmt.getPrettyPrintedLessComments() = wrap("global %s", join(" ", getNames()));
+  eq PersistentStmt.getPrettyPrintedLessComments() = wrap("persistent %s", join(" ", getNames()));
+  eq ShellCommandStmt.getPrettyPrintedLessComments() = wrap("!%s", getCommand());
+  eq BreakStmt.getPrettyPrintedLessComments() = wrap("break");
+  eq ContinueStmt.getPrettyPrintedLessComments() = wrap("continue");
+  eq ReturnStmt.getPrettyPrintedLessComments() = wrap("return");
+  eq ForStmt.getPrettyPrintedLessComments() = String.format("%sfor %s\n%s%send",
+    getIndent(), getAssignStmt().getPrettyPrinted().trim(), join("\n", getStmts()), getIndent());
+  eq WhileStmt.getPrettyPrintedLessComments() = String.format("%swhile %s\n%s%send",
+    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()), getIndent());
+  eq IfStmt.getPrettyPrintedLessComments() = String.format("%sif %s%s%send",
+    getIndent(), join(getIndent() + "elseif ", getIfBlocks()),
+    hasElseBlock() ? getElseBlock().getPrettyPrinted() : "", getIndent());
+  eq IfBlock.getPrettyPrintedLessComments() = String.format("%s\n%s",
+    getCondition().getPrettyPrinted(), join("\n", getStmts()));
+  eq ElseBlock.getPrettyPrintedLessComments() = String.format("%selse \n%s",
+    getIndent(), join("\n", getStmts()));
+  eq SwitchStmt.getPrettyPrintedLessComments() = String.format("%sswitch %s\n%s%s%send",
+    getIndent(), getExpr().getPrettyPrinted(), join("", getSwitchCaseBlocks()),
+    hasDefaultCaseBlock() ? getDefaultCaseBlock().getPrettyPrinted() : "", getIndent());
+  eq SwitchCaseBlock.getPrettyPrintedLessComments() = String.format("%scase %s\n%s",
+    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()));
+  eq DefaultCaseBlock.getPrettyPrintedLessComments() = String.format("%sotherwise \n%s",
+    getIndent(), join("\n", getStmts()));
+  eq TryStmt.getPrettyPrintedLessComments() = String.format("%stry \n%s%s%send",
+    getIndent(), join("\n", getTryStmts()),
+    getCatchStmts().getNumChild() > 0 ? (getIndent() + "catch \n" + join("\n", getCatchStmts())) : "",
+    getIndent());
 
-    //program
-    eq EmptyProgram.getPrettyPrintedLessComments() {
-        return "";
-    }
-      
-    // Script    
-    eq Script.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        return buf.toString();
-    }
-    
-    eq FunctionList.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        for(Function func : getFunctions()) {
-            buf.append(func.getPrettyPrinted());
-            buf.append('\n');
-        }
-        return buf.toString();
-    }
-    
-    eq FunctionList.getPrettyPrinted() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getPrettyPrintedLessComments());
-        for(beaver.Symbol comment : getComments()) {
-            buf.append(comment.value);
-            buf.append("\n");
-        }
-        return buf.toString();
-    }
-    
-    eq Function.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "function [");
-        boolean first = true;
-        for(Name param : getOutputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append("] = ");
-        buf.append(getName());
-        buf.append("(");
-        first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(")");
-        buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        for(Function func : getNestedFunctions()) {
-            buf.append(func.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append(indent + "end");
-        return buf.toString();
-    }
-       
-    //help comments
-    
-    eq HelpComment.getPrettyPrintedLessComments() = getText();
-    
-    //stmts
-    eq EmptyStmt.getPrettyPrintedLessComments() = "";
-    eq ExprStmt.getPrettyPrintedLessComments() = getIndent() + getExpr().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
-    eq AssignStmt.getPrettyPrintedLessComments() = getIndent() + getLHS().getPrettyPrinted() + " = " + getRHS().getPrettyPrinted() + (isOutputSuppressed() ? ";" : "");
-    
-    
-    eq GlobalStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append( getIndent() + "global");
-        for(Name name : getNames()) {
-            buf.append(" ");
-            buf.append(name.getPrettyPrinted());
-        }
-        if(isOutputSuppressed()) {
-            buf.append(";");
-        }
-        return buf.toString();
-    }
-    eq PersistentStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append( getIndent() + "persistent");
-        for(Name name : getNames()) {
-            buf.append(" ");
-            buf.append(name.getPrettyPrinted());
-        }
-        if(isOutputSuppressed()) {
-            buf.append(";");
-        }
-        return buf.toString();
-    }
-    eq ShellCommandStmt.getPrettyPrintedLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
-    
-    eq BreakStmt.getPrettyPrintedLessComments() = getIndent() + "break" + (isOutputSuppressed() ? ";" : "");
-    eq ContinueStmt.getPrettyPrintedLessComments() = getIndent() + "continue" + (isOutputSuppressed() ? ";" : "");
-    eq ReturnStmt.getPrettyPrintedLessComments() = getIndent() + "return" + (isOutputSuppressed() ? ";" : "");
+  eq RangeExpr.getPrettyPrintedLessComments() = String.format("(%s : %s%s)",
+    getLower().getPrettyPrinted(),
+    hasIncr() ? (getIncr().getPrettyPrinted() + " : ") : "",
+    getUpper().getPrettyPrinted());
+  eq ColonExpr.getPrettyPrintedLessComments() = ":";
+  eq EndExpr.getPrettyPrintedLessComments() = "end";
+  eq Name.getPrettyPrintedLessComments() = getID();
+  eq NameExpr.getPrettyPrintedLessComments() = getName().getPrettyPrinted();
+  eq DotExpr.getPrettyPrintedLessComments() = getTarget().getPrettyPrinted() + "." + getField().getPrettyPrinted();
+  eq ParameterizedExpr.getPrettyPrintedLessComments() = String.format("%s(%s)",
+    getTarget().getPrettyPrinted(), join(", ", getArgs()));
+  eq CellIndexExpr.getPrettyPrintedLessComments() = String.format("%s{%s}",
+    getTarget().getPrettyPrinted(), join(", ", getArgs()));
+  eq MatrixExpr.getPrettyPrintedLessComments() = String.format("[%s]", join("; ", getRows()));
+  eq CellArrayExpr.getPrettyPrintedLessComments() = String.format("{%s}", join("; ", getRows()));
+  eq Row.getPrettyPrintedLessComments() = join(", ", getElements());
+  eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getPrettyPrinted();
+  eq LambdaExpr.getPrettyPrintedLessComments() = String.format("(@(%s) %s)",
+    join(", ", getInputParams()), getBody().getPrettyPrinted());
+  eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+  eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+  eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue() + "'";
+  eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
+  eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
+  eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
+  eq MTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
+  eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
 
-    eq ForStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "for ");
-        String assignStmt = getAssignStmt().getPrettyPrinted();
-        buf.append( assignStmt.trim() );   // remove all tabs
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        buf.append(indent + "end");
-        return buf.toString();
-    }
+  syn String BinaryExpr.getPrettyPrintedLessComments(String op) = "(" + getLHS().getPrettyPrinted() + " " + op + " " + getRHS().getPrettyPrinted() + ")";
+  eq PlusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
+  eq MinusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
+  eq MTimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
+  eq MDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
+  eq MLDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
+  eq MPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
+  eq ETimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
+  eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
+  eq ELDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
+  eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
+  eq AndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
+  eq OrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
+  eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
+  eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
+  eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");
+  eq GTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">");
+  eq LEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<=");
+  eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
+  eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
+  eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
 
-    eq WhileStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "while ");
-        buf.append(getExpr().getPrettyPrinted());
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        buf.append(indent + "end");
-        return buf.toString();
+  protected static String ASTNode.joinAttributes(ast.List<Attribute> attrs) {
+    String attributes = join(", ", attrs);
+    if (!attributes.isEmpty()) {
+      attributes = "(" + attributes + ") ";
     }
+    return attributes;
+  }
 
-    // if-elseif-else
-    eq IfStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        boolean first = true;
-        for(IfBlock block : getIfBlocks()) {
-            if(!first) {
-                buf.append( indent + "elseif " );
-            }else {
-            	buf.append( indent + "if " );
-            }
-            buf.append(block.getPrettyPrinted());
-            first = false;
-        }
-        if(hasElseBlock()) {
-            buf.append(getElseBlock().getPrettyPrinted());
-        }
-        buf.append(indent + "end");
-        return buf.toString();
-    }
-
-    eq IfBlock.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        //buf.append(indent + "if ");
-        buf.append(getCondition().getPrettyPrinted());
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        return buf.toString();
-    }
-
-    eq ElseBlock.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "else ");
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        return buf.toString();
-    }
-/////////////////////////////////////////////
-    // switch-case
-    eq SwitchStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "switch ");
-        buf.append(getExpr().getPrettyPrinted());
-        buf.append('\n');
-        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
-            buf.append(scase.getPrettyPrinted());
-        }
-        if(hasDefaultCaseBlock()) {
-            buf.append(getDefaultCaseBlock().getPrettyPrinted());
-        }
-        buf.append( indent + "end");
-        return buf.toString();
-    }
-    eq SwitchCaseBlock.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "case ");
-        buf.append(getExpr().getPrettyPrinted());
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        return buf.toString();
-    }
-    eq DefaultCaseBlock.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append(indent + "otherwise ");
-        buf.append('\n');
-        for(Stmt stmt : getStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        return buf.toString();
-    }
-
-    // try-catch
-    eq TryStmt.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        String indent = getIndent();
-        buf.append( indent + "try ");
-        buf.append('\n');
-        for(Stmt stmt : getTryStmts()) {
-            String stmtStr = stmt.getPrettyPrinted();         
-            buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-        }
-        List<Stmt> catchList = getCatchStmts();
-        if (catchList.getNumChild()>0) {
-            buf.append( indent + "catch ");
-            buf.append('\n');        
-            for(Stmt stmt : catchList) {
-                String stmtStr = stmt.getPrettyPrinted();         
-            	buf.append(stmtStr.equals("") ? "" : stmtStr + "\n" );
-            }
-        }
-        buf.append( indent + "end" );
-        return buf.toString();
-    }
-
-    //exprs
-    
-    eq RangeExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('(');
-        buf.append(getLower().getPrettyPrinted());
-        buf.append(" : ");
-        if(hasIncr()) {
-            buf.append(getIncr().getPrettyPrinted());
-            buf.append(" : ");
-        }
-        buf.append(getUpper().getPrettyPrinted());
-        buf.append(')');
-        return buf.toString();
-    }
-    eq ColonExpr.getPrettyPrintedLessComments() = ":";
-
-    eq EndExpr.getPrettyPrintedLessComments() = "end";
-    
-    eq Name.getPrettyPrintedLessComments() = getID();
-
-    //accesses
-    eq NameExpr.getPrettyPrintedLessComments() = getName().getPrettyPrinted();
-    eq DotExpr.getPrettyPrintedLessComments() = getTarget().getPrettyPrinted() + "." + getField().getPrettyPrinted();
-    eq ParameterizedExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getTarget().getPrettyPrinted());
-        buf.append('(');
-        boolean first = true;
-        for(Expr arg : getArgs()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(arg.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(')');
-        return buf.toString();
-    }
-    eq CellIndexExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getTarget().getPrettyPrinted());
-        buf.append('{');
-        boolean first = true;
-        for(Expr arg : getArgs()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(arg.getPrettyPrinted());
-            first = false;
-        }
-        buf.append('}');
-        return buf.toString();
-    }
-
-    eq MatrixExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('[');
-        boolean first = true;
-        for(Row row : getRows()) {
-            if(!first) {
-                buf.append("; ");
-            }
-            buf.append(row.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(']');
-        return buf.toString();
-    }
-    eq CellArrayExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('{');
-        boolean first = true;
-        for(Row row : getRows()) {
-            if(!first) {
-                buf.append("; ");
-            }
-            buf.append(row.getPrettyPrinted());
-            first = false;
-        }
-        buf.append('}');
-        return buf.toString();
-    }
-    eq Row.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        boolean first = true;
-        for(Expr element : getElements()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(element.getPrettyPrinted());
-            first = false;
-        }
-        return buf.toString();
-    }
-    
-    //eq FunctionHandleExpr.getPrettyPrintedLessComments() = getIndent() + "@" + getName().getStructureString();
-    eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getPrettyPrintedLessComments();
-    
-    eq LambdaExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("(@(");
-        boolean first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(") ");
-        buf.append(getBody().getPrettyPrinted());
-        buf.append(")");
-        return buf.toString();
-    }
-    
-    //literals
-    eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
-    eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
-    eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue() + "'";
-    
-    eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
-    eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
-    eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
-    eq MTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
-    eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
-    
-    syn String BinaryExpr.getPrettyPrintedLessComments(String op) = "(" + getLHS().getPrettyPrinted() + " " + op + " " + getRHS().getPrettyPrinted() + ")";
-    
-    eq PlusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
-    eq MinusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
-    
-    eq MTimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
-    eq MDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
-    eq MLDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
-    eq MPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
-    
-    eq ETimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
-    eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
-    eq ELDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
-    eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
-    
-    eq AndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
-    eq OrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
-    eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
-    eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
-    eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");
-    eq GTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">");
-    eq LEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<=");
-    eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
-    eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
-    eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
-    
-    // Class
-    
-    eq ClassDef.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("classdef ");
-		boolean first = true;
-        for(Attribute attr : getAttributes()) {
-            if(first)
-            	buf.append("(");            
-            else
-                buf.append(", ");
-            buf.append(attr.getPrettyPrinted());
-            first = false;
-        }
-        if(!first)
-        	buf.append(") ");
-        buf.append(getName());
-        first = true;
-        for(SuperClass sup : getSuperClasss()) {
-            if(first)
-            	buf.append(" < ");
-            else
-                buf.append(" & ");
-            buf.append(sup.getPrettyPrinted());
-            first = false;
-        }
-        buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Properties prop : getPropertys()) {
-            buf.append(prop.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Methods methods : getMethods()) {
-            buf.append(methods.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(ClassEvents events : getClassEvents()) {
-            buf.append(events.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append("end");
-        return buf.toString();
-    }
-    
-    eq Properties.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getIndent() + "properties ");
-		boolean first = true;
-        for(Attribute attr : getAttributes()) {
-            if(first)
-            	buf.append("(");            
-            else
-                buf.append(", ");
-            buf.append(attr.getPrettyPrinted());
-            first = false;
-        }
-        if(!first)
-        	buf.append(") ");
-        buf.append('\n');
-        for(Property prop : getPropertys()) {
-            buf.append(prop.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append(getIndent() + "end");
-        return buf.toString();
-    } 
-    
-    eq Methods.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getIndent() + "methods ");
-		boolean first = true;
-        for(Attribute attr : getAttributes()) {
-            if(first)
-            	buf.append("(");            
-            else
-                buf.append(", ");
-            buf.append(attr.getPrettyPrinted());
-            first = false;
-        }
-        if(!first)
-        	buf.append(") ");
-        buf.append('\n');
-        for(Signature sign : getSignatures()) {
-            buf.append(sign.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(PropertyAccess prop : getPropAccs()) {
-            buf.append(prop.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Function func : getFunctions()) {
-            buf.append(func.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append(getIndent() + "end");
-        return buf.toString();
-    }
-    
-    eq Signature.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getIndent() + "[");
-        boolean first = true;
-        for(Name param : getOutputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append("] = ");
-        buf.append(getName());
-        buf.append("(");
-        first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(")");
-        return buf.toString();
-    }
-    
-    eq PropertyAccess.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getIndent() + "function ");
-        buf.append("[");
-        boolean first = true;
-        for(Name param : getOutputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append("] = ");
-        buf.append(getAccess());
-        buf.append(".");
-        buf.append(getName());
-        buf.append("(");
-        first = true;
-        for(Name param : getInputParams()) {
-            if(!first) {
-                buf.append(", ");
-            }
-            buf.append(param.getPrettyPrinted());
-            first = false;
-        }
-        buf.append(")");
-        buf.append('\n');
-        for(HelpComment comment : getHelpComments()) {
-            buf.append(comment.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Stmt stmt : getStmts()) {
-            buf.append(stmt.getPrettyPrinted());
-            buf.append('\n');
-        }
-        for(Function func : getNestedFunctions()) {
-            buf.append(func.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append(getIndent() + "end");
-        return buf.toString();
-    }
-    
-    eq ClassEvents.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getIndent() + "events ");
-		boolean first = true;
-        for(Attribute attr : getAttributes()) {
-            if(first)
-            	buf.append("(");            
-            else
-                buf.append(", ");
-            buf.append(attr.getPrettyPrinted());
-            first = false;
-        }
-        if(!first)
-        	buf.append(") ");
-        buf.append('\n');
-        for(Event eve : getEvents()) {
-            buf.append(eve.getPrettyPrinted());
-            buf.append('\n');
-        }
-        buf.append(getIndent() + "end");
-        return buf.toString();
-    }
-    
-    eq Attribute.getPrettyPrintedLessComments() = getKey() + " = " + getExpr().getPrettyPrinted();
-    eq SuperClass.getPrettyPrintedLessComments() = getName();
-    eq Property.getPrettyPrintedLessComments() = getIndent() + getName() + " = " + getExpr().getPrettyPrinted() + ";";
-    eq Event.getPrettyPrintedLessComments() = getIndent() + getName();
-    
-    eq SuperClassMethodExpr.getPrettyPrintedLessComments() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getFuncName().getPrettyPrinted());
-        buf.append("@");
-        buf.append(getClassName().getPrettyPrinted());
-		return buf.toString();
-    }
-    
-   eq Stmt.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	ASTNode gparent = parent.getParent();
-    	    return (gparent instanceof Program) ? "" : parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    eq SwitchCaseBlock.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    } 
-    
-    eq DefaultCaseBlock.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    eq Function.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-    	     ASTNode gparent = parent.getParent();
-    	     return (gparent instanceof Program) ? "" : parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq Properties.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq Methods.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq ClassEvents.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq PropertyAccess.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq Property.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-    	    return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq Signature.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-    
-    eq Event.getIndent() {
-    	ASTNode parent = getParent();
-    	if ( parent != null ){
-        	return parent.getIndent() + ASTNode.INDENT_TAB;
-        }
-        return "" ;
-    }
-
+  eq ClassDef.getPrettyPrintedLessComments() = String.format("classdef %s%s%s\n%s%s%s%send",
+    joinAttributes(getAttributes()), getName(),
+    getNumSuperClass() > 0 ? (" < " + join(" & ", getSuperClasss())) : "",
+    join("\n", getHelpComments()), join("\n", getPropertys()),
+    join("\n", getMethods()), join("\n", getClassEvents()));
+  eq Properties.getPrettyPrintedLessComments() = String.format("%sproperties %s\n%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getPropertys()), getIndent());
+  eq Methods.getPrettyPrintedLessComments() = String.format("%smethods %s\n%s%s%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getSignatures()),
+    join("\n", getPropAccs()), join("\n", getFunctions()), getIndent());
+  eq Signature.getPrettyPrintedLessComments() = String.format("%s[%s] = %s(%s)",
+    getIndent(), join(", ", getOutputParams()), getName(), join(", ", getInputParams()));
+  eq PropertyAccess.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s.%s(%s)\n%s%s%s%send",
+    getIndent(), join(", ", getOutputParams()), getAccess(), getName(), join(", ", getInputParams()),
+    join("\n", getHelpComments()), join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
+  eq ClassEvents.getPrettyPrintedLessComments() = String.format("%sevents %s\n%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getEvents()), getIndent());
+  eq Attribute.getPrettyPrintedLessComments() = getKey() + " = " + getExpr().getPrettyPrinted();
+  eq SuperClass.getPrettyPrintedLessComments() = getName();
+  eq Property.getPrettyPrintedLessComments() = getIndent() + getName() + " = " + getExpr().getPrettyPrinted() + ";";
+  eq Event.getPrettyPrintedLessComments() = getIndent() + getName();
+  eq SuperClassMethodExpr.getPrettyPrintedLessComments() = getFuncName().getPrettyPrinted() + "@" + getClassName().getPrettyPrinted();
 }
