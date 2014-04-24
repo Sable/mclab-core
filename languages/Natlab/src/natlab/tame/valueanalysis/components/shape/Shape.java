@@ -337,6 +337,13 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * will result in a shape for A that is the result of this method.
      */
     public Shape<V> growByIndices(Args<V> indizes){
-    	return this; //FIXME -- do something here. For now, assume matrizes don't grow.
-    }   
+    	return this;
+    }
+    
+    public void setToUnknown() {
+    	int length = dimensions.size();
+    	for (int i = 0; i < length; i++) {
+    		dimensions.set(i, new DimValue());
+    	}
+    }
 }

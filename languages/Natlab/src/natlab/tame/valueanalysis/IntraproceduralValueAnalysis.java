@@ -12,6 +12,7 @@ import natlab.tame.builtin.Builtin;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.interproceduralAnalysis.Call;
 import natlab.tame.interproceduralAnalysis.Callsite;
 import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
@@ -37,9 +38,8 @@ import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.tame.tir.analysis.TIRParentForwardingNodeCasehandler;
 import natlab.tame.valueanalysis.aggrvalue.FunctionHandleValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
-import natlab.tame.valueanalysis.components.constant.LogicalConstant;
+import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.shape.*;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Res;
 import natlab.tame.valueanalysis.value.Value;
@@ -689,13 +689,28 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 //perform analysis for call
                 results.add(node.analyze(function, argsObj, callsite));
             }
-        }        
+        }
         if (Debug) System.out.println("called "+function+", received "+Res.newInstance(results));
         if (cross(flow,args,partialArgs).size() > 1){
         	if (Debug) System.out.println("exiting");
         	if (Debug) System.out.println(results);
         	//System.exit(0);
         }
+        // change the size of each dimension of the data-loaded variable to unknown.
+		if (functionName.equals("load")) {
+			for (Name arg : args.asNameList()) {
+				V value = flow.get(arg.getID()).getSingleton();
+				if (value.getMatlabClass().equals(PrimitiveClassReference.CHAR) 
+						&& value instanceof HasConstant) {
+					String argName = ((CharConstant)((HasConstant)value).getConstant()).getValue();
+					String varName = argName.split("\\.")[0];
+					V value2 = flow.get(varName).getSingleton();
+					if (value2 instanceof HasShape) {
+						((HasShape<V>)value2).getShape().setToUnknown();
+					}
+				}
+			}
+		}
         //FIXME
         return Res.newInstance(results);
     }
