@@ -27,6 +27,7 @@ import java.util.Set;
 
 import natlab.CompilationProblem;
 import natlab.Parse;
+import natlab.backends.vrirGen.ColonExprAnalysis;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
@@ -71,6 +72,11 @@ public class SimpleFunctionCollection extends
 	private FileEnvironment fileEnvironment;
 	private static boolean DEBUG = false;
 	private ClassRepository classRepository;
+	public static boolean convertColonToRange = false; // Determines whether to
+														// run transformation
+														// which converts
+														// ColonExpr to
+														// RangeExpr.
 
 	/**
 	 * The function collection gets created via a path environment object This
@@ -135,8 +141,8 @@ public class SimpleFunctionCollection extends
 
 		Program program = Parse.parseMatlabFile(funcRef.getFile(), errList);
 		if (program == null) {
-			throw new UnsupportedOperationException("cannot parse file " + funcRef
-					+ ":\n" + errList);
+			throw new UnsupportedOperationException("cannot parse file "
+					+ funcRef + ":\n" + errList);
 		}
 		program.setFile(funcRef.getFile());
 
@@ -160,12 +166,15 @@ public class SimpleFunctionCollection extends
 
 		// We reduce lambda expressions at this point, because they create extra
 		// functions
+		if (convertColonToRange) {
+			ColonExprAnalysis.analyze(program);
+		}
 		program = (Program) Simplifier.simplify(
 				program,
 				new VFPreorderAnalysis(program, fileEnvironment
 						.getFunctionOrScriptQuery(funcRef.path)),
 				LambdaSimplification.class);
-
+		System.out.println(program.getPrettyPrinted());
 		loadedFiles.add(funcRef.getFile());
 		boolean success = true;
 
@@ -204,6 +213,7 @@ public class SimpleFunctionCollection extends
 		for (String otherName : function.getCalledFunctions().keySet()) {
 			FunctionReference ref = function.getCalledFunctions()
 					.get(otherName);
+
 			if (ref == null) {
 				unfoundFunctions.add(otherName);
 				success = false;
