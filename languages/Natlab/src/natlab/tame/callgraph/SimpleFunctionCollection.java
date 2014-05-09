@@ -27,7 +27,7 @@ import java.util.Set;
 
 import natlab.CompilationProblem;
 import natlab.Parse;
-import natlab.backends.vrirGen.ColonExprAnalysis;
+import natlab.backends.vrirGen.ColonExprSimplification;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
@@ -167,14 +167,13 @@ public class SimpleFunctionCollection extends
 		// We reduce lambda expressions at this point, because they create extra
 		// functions
 		if (convertColonToRange) {
-			ColonExprAnalysis.analyze(program);
+			ColonExprSimplification.analyze(program);
 		}
 		program = (Program) Simplifier.simplify(
 				program,
 				new VFPreorderAnalysis(program, fileEnvironment
 						.getFunctionOrScriptQuery(funcRef.path)),
 				LambdaSimplification.class);
-		System.out.println(program.getPrettyPrinted());
 		loadedFiles.add(funcRef.getFile());
 		boolean success = true;
 
