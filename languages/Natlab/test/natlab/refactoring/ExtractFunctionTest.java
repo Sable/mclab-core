@@ -1,13 +1,17 @@
 package natlab.refactoring;
 
 import mclint.McLintTestCase;
+import mclint.refactoring.Refactorings;
+import mclint.transform.StatementRange;
+import ast.Function;
 import ast.FunctionList;
 
 
 public class ExtractFunctionTest extends McLintTestCase {
   private ExtractFunction extract(int from, int to) {
-    ExtractFunction xf = new ExtractFunction(createBasicTransformerContext(),
-        ((FunctionList) kit.getAST()).getFunction(0), from, to, "xf");
+    Function enclosingFunction = ((FunctionList) kit.getAST()).getFunction(0);
+    ExtractFunction xf = Refactorings.extractFunction(createBasicTransformerContext(),
+        StatementRange.create(enclosingFunction, from, to), "xf");
     xf.apply();
     return xf;
   }

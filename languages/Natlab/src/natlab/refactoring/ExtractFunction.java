@@ -55,12 +55,6 @@ public class ExtractFunction extends Refactoring {
     this.extractedFunctionName = extractedFunctionName;
     this.transformer = context.getTransformer();
   }
-  
-  @Deprecated
-  public ExtractFunction(RefactoringContext context,
-      Function enclosingFunction, int from, int to, String extractedFunctionName) {
-    this(context, StatementRange.create(enclosingFunction, from, to), extractedFunctionName);
-  }
 
   private void extractStatements() {
     extracted = new Function();
