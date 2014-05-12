@@ -60,7 +60,7 @@ public class ExtractFunction extends Refactoring {
     extracted = new Function();
     extracted.setName(extractedFunctionName);
     for (Stmt stmt : extractionRange) {
-      extracted.addStmt((Stmt) stmt.fullCopy());
+      extracted.addStmt(transformer.copy(stmt));
     }
   }
 

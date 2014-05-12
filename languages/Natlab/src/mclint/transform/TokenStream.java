@@ -33,6 +33,14 @@ public class TokenStream {
   public void removeAstNode(ASTNode<?> node) {
     fragment(node).remove();
   }
+  
+  public void replaceAstNode(ASTNode<?> oldNode, ASTNode<?> newNode) {
+    TokenStreamFragment oldFragment = baseFragment(oldNode);
+    TokenStreamFragment newFragment = synthesizeFragment(newNode);
+    
+    newFragment.spliceBefore(oldFragment);
+    oldFragment.remove();
+  }
 
   private String getIndentation(ASTNode<?> node) {
     TokenStreamFragment fragment = baseFragment(node);
@@ -85,16 +93,19 @@ public class TokenStream {
     }
     return getIndentation(getNearestNonEmptyStmt(node, i));
   }
+  
+  private TokenStreamFragment synthesizeFragment(ASTNode<?> node) {
+    if (AstUtil.isSynthetic(node)) {
+      return synthesizeNewTokens(node);
+    }
+    // TODO(isbadawi): Need to deep copy -- each node in the subtree should have a new fragment.
+    TokenStreamFragment fragment = baseFragment(node).copy();
+    node.setTokenStreamFragment(fragment);
+    return fragment;
+  }
 
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
-    TokenStreamFragment newFragment;
-    if (AstUtil.isSynthetic(newNode)) {
-      newFragment = synthesizeNewTokens(newNode);
-    } else {
-      // TODO(isbadawi): Need to deep copy -- each node in the subtree should have a new fragment.
-      newFragment = baseFragment(newNode).copy();
-      newNode.setTokenStreamFragment(newFragment);
-    }
+    TokenStreamFragment newFragment = synthesizeFragment(newNode);
 
     if (newNode instanceof Stmt) {
       String indentation = guessIndentation(node, i);
@@ -192,6 +203,13 @@ public class TokenStream {
     }
     return TokenStreamFragment.create(startNode, endNode);
   }
+  
+  @SuppressWarnings("unchecked")
+  public <T extends ASTNode<?>> T copyAstNode(T node) {
+    T copy = (T) node.fullCopy();
+    copy.setTokenStreamFragment(baseFragment(node).copy());
+    return copy;
+  }
 
 
   private TokenStreamFragment synthesizeNewTokens(ASTNode<?> node) {
@@ -205,7 +223,9 @@ public class TokenStream {
     // -- it would be nicer to check somehow if they're really necessary.
     // TODO(isbadawi): Find a better place to put these things
     // TODO(isbadawi): Look at surrounding tokens instead of unconditionally adding newlines
-    tokens = tokens.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+    if (node instanceof Function || node instanceof Stmt) {
+      tokens = tokens.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+    }
     if (node instanceof Function) {
       tokens = tokens.spliceAfter(TokenStreamFragment.fromSingleToken("\n"));
     }

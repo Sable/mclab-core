@@ -36,14 +36,7 @@ class LayoutPreservingTransformer implements Transformer {
   
   @Override
   public void replace(ASTNode<?> oldNode, ASTNode<?> newNode) {
-//    List<Token> tokens = tokenStream.getTokensForAstNode(oldNode);
-//    tokens.clear();
-//    List<Token> newTokens = tokenStream.getTokensForAstNode(newNode);
-//    
-//    tokens.addAll(newTokens);
-//    newTokens.get(0).setLine(oldNode.getStartLine());
-//    newTokens.get(0).setCharPositionInLine(oldNode.getStartColumn() - 1);
-//    
+    tokenStream.replaceAstNode(oldNode, newNode);
     AstUtil.replace(oldNode, newNode);
   }
   
@@ -51,6 +44,11 @@ class LayoutPreservingTransformer implements Transformer {
   public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
     tokenStream.insertAstNode(node, newNode, i);
     node.insertChild(newNode, i);
+  }
+  
+  @Override
+  public <T extends ASTNode<?>> T copy(T node) {
+    return tokenStream.copyAstNode(node);
   }
 
   public Program getProgram() {
