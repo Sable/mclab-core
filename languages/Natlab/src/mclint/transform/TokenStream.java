@@ -79,8 +79,9 @@ public class TokenStream {
   
   private String guessIndentation(ASTNode<?> node, int i) {
     if (getNumNonEmptyChild(node) == 0) {
-      // Nothing to go on. Let's just say two spaces -- maybe this could be configurable?
-      return "  ";
+      // Nothing to go on.
+      // Let's just say two spaces per indentation level (maybe this could be configurable?).
+      return node.getIndent() + "  ";
     }
     return getIndentation(getNearestNonEmptyStmt(node, i));
   }
