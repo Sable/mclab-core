@@ -206,11 +206,13 @@ public class TokenStream {
   public <T extends ASTNode<?>> T copyAstNode(T node) {
     T copy = (T) node.fullCopy();
     TokenStreamFragment fragment = baseFragment(node).copy();
-    // To be safe, add some parens around binary expressions.
-    // TODO(isbadawi): Don't do this if there are already parens.
+    // To be safe, add some parens around binary expressions (if they're not there already).
     if (node instanceof BinaryExpr) {
-      fragment = TokenStreamFragment.fromSingleToken("(").spliceBefore(fragment);
-      fragment = TokenStreamFragment.fromSingleToken(")").spliceAfter(fragment);
+      String serialized = fragment.asString().trim();
+      if (!(serialized.startsWith("(") && serialized.endsWith(")"))) {
+        fragment = TokenStreamFragment.fromSingleToken("(").spliceBefore(fragment);
+        fragment = TokenStreamFragment.fromSingleToken(")").spliceAfter(fragment);
+      }
     }
     copy.setTokenStreamFragment(fragment);
     return copy;
