@@ -6,6 +6,7 @@ import mclint.util.TokenUtil;
 import org.antlr.runtime.Token;
 
 import ast.ASTNode;
+import ast.BinaryExpr;
 import ast.EmptyStmt;
 import ast.Function;
 import ast.Stmt;
@@ -98,10 +99,7 @@ public class TokenStream {
     if (AstUtil.isSynthetic(node)) {
       return synthesizeNewTokens(node);
     }
-    // TODO(isbadawi): Need to deep copy -- each node in the subtree should have a new fragment.
-    TokenStreamFragment fragment = baseFragment(node).copy();
-    node.setTokenStreamFragment(fragment);
-    return fragment;
+    return node.tokenize();
   }
 
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
@@ -207,10 +205,16 @@ public class TokenStream {
   @SuppressWarnings("unchecked")
   public <T extends ASTNode<?>> T copyAstNode(T node) {
     T copy = (T) node.fullCopy();
-    copy.setTokenStreamFragment(baseFragment(node).copy());
+    TokenStreamFragment fragment = baseFragment(node).copy();
+    // To be safe, add some parens around binary expressions.
+    // TODO(isbadawi): Don't do this if there are already parens.
+    if (node instanceof BinaryExpr) {
+      fragment = TokenStreamFragment.fromSingleToken("(").spliceBefore(fragment);
+      fragment = TokenStreamFragment.fromSingleToken(")").spliceAfter(fragment);
+    }
+    copy.setTokenStreamFragment(fragment);
     return copy;
   }
-
 
   private TokenStreamFragment synthesizeNewTokens(ASTNode<?> node) {
     TokenStreamFragment tokens = node.tokenize();

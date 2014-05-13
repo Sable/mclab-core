@@ -2,6 +2,7 @@ package mclint.refactoring;
 
 import mclint.transform.StatementRange;
 import natlab.refactoring.ExtractFunction;
+import ast.AssignStmt;
 import ast.Expr;
 import ast.Name;
 
@@ -18,5 +19,9 @@ public class Refactorings {
   public static ExtractVariable extractVariable(RefactoringContext context, Expr expression,
       String extractedVariableName) {
     return new ExtractVariable(context, expression, extractedVariableName);
+  }
+  
+  public static InlineVariable inlineVariable(RefactoringContext context, AssignStmt definition) {
+    return new InlineVariable(context, definition);
   }
 }
