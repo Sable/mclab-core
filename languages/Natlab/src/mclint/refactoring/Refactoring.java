@@ -25,6 +25,10 @@ public abstract class Refactoring {
   protected void addErrors(List<RefactorException> otherErrors) {
     errors.addAll(otherErrors);
   }
+  
+  public RefactoringContext getContext() {
+    return context;
+  }
 
   public List<RefactorException> getErrors() {
     return Collections.unmodifiableList(errors);
