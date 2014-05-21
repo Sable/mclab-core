@@ -17,7 +17,6 @@ import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.filehandling.GenericFile;
-import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.CompilationUnits;
 import ast.ExprStmt;
@@ -27,6 +26,7 @@ import ast.Name;
 import ast.NameExpr;
 import ast.Script;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 public class ScriptToFunction {
@@ -51,17 +51,15 @@ public class ScriptToFunction {
 	}
 	
 	public List<RefactorException> replace(final Script script, Function f){
-		final List<ExprStmt> calls = new LinkedList<ExprStmt>();
 		System.out.println("Script Name: " + script.getName());
-		NodeFinder.apply(ExprStmt.class, context.cu, new AbstractNodeFunction<ExprStmt>() {
-
-			@Override
-			public void apply(ExprStmt node) {
-				if (node.getExpr() instanceof NameExpr && 
-                    ((NameExpr) node.getExpr()).getName().getID().equals(script.getName()))
-					calls.add(node);
-			}
-		});
+		List<ExprStmt> calls = NodeFinder.find(ExprStmt.class, context.cu)
+		    .filter(new Predicate<ExprStmt>() {
+		      @Override public boolean apply(ExprStmt node) {
+		        return node.getExpr() instanceof NameExpr &&
+		            ((NameExpr) node.getExpr()).getName().getID().equals(script.getName());
+		      }
+		    })
+		    .toList();
 		f.setStmtList(script.getStmtList().copy());
 		FunctionList fl = new FunctionList();
 		fl.addFunction(f);

@@ -78,14 +78,4 @@ public class NodeFinder {
   public static <T> T findParent(Class<T> clazz, ASTNode<?> node) {
     return FluentIterable.from(allAncestorsOf(node)).filter(clazz).first().orNull();
   }
-
-  /**
-   * Applies <tt>func</tt> to each node of type <tt>type</tt> in <tt>n</tt>.
-   */
-  public static <T> void apply(final Class<T> type, final ASTNode<?> n,
-      final AbstractNodeFunction<T> func) {
-    for (T node : NodeFinder.find(type, n)) {
-      func.apply(node);
-    }
-  }
 }

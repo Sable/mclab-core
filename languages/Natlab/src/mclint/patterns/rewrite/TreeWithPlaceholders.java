@@ -7,7 +7,6 @@ import mclint.patterns.Match;
 import mclint.patterns.MatchHandler;
 import mclint.util.AstUtil;
 import mclint.util.Parsing;
-import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.NameExpr;
@@ -46,14 +45,11 @@ public class TreeWithPlaceholders implements MatchHandler {
 
   @Override
   public void handle(final Match match) {
-    NodeFinder.apply(NameExpr.class, tree, new AbstractNodeFunction<NameExpr>() {
-      @Override
-      public void apply(NameExpr node) {
-        if (isPlaceholder(node)) {
-          replacePlaceholder(node, match.getBoundNode(getMeta(node)));
-        }
+    for (NameExpr node : NodeFinder.find(NameExpr.class, tree)) {
+      if (isPlaceholder(node)) {
+        replacePlaceholder(node, match.getBoundNode(getMeta(node)));
       }
-    });
+    }
   }
 
   public ASTNode<?> getTree() {
