@@ -2,9 +2,11 @@ package mclint.refactoring;
 
 import mclint.transform.StatementRange;
 import natlab.refactoring.ExtractFunction;
+import natlab.refactoring.MScriptInliner;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.Name;
+import ast.Script;
 
 public class Refactorings {
   public static RenameVariable renameVariable(RefactoringContext context, Name name, String newName) {
@@ -23,5 +25,9 @@ public class Refactorings {
   
   public static InlineVariable inlineVariable(RefactoringContext context, AssignStmt definition) {
     return new InlineVariable(context, definition);
+  }
+  
+  public static MScriptInliner inlineScript(RefactoringContext context, Script script) {
+    return new MScriptInliner(context, script);
   }
 }

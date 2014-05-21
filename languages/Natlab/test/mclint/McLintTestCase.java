@@ -15,8 +15,6 @@ import com.google.common.base.Joiner;
 
 public abstract class McLintTestCase extends TestCase {
   protected Project project;
-  protected MatlabProgram program;
-  protected AnalysisKit kit;
   
   @Override
   protected void setUp() throws IOException {
@@ -27,23 +25,21 @@ public abstract class McLintTestCase extends TestCase {
     return Joiner.on('\n').join(lines);
   }
   
-  protected void parse(String... lines) {
-    Path file = project.getProjectRoot().resolve("f.m");
+  protected MatlabProgram parse(String path, String... lines) {
+    Path file = project.getProjectRoot().resolve(path);
     try {
       Files.write(file, join(lines).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
     }
-    program = project.addMatlabProgram(file);
-    program.parse();
-    kit = program.analyze();
-  }
-
-  protected RefactoringContext createBasicTransformerContext() {
-    return RefactoringContext.create(program, program.getBasicTransformer());
+    return project.addMatlabProgram(file);
   }
   
-  protected RefactoringContext createLayoutPreservingContext() {
-    return RefactoringContext.create(program);
+  protected RefactoringContext basicContext() {
+    return RefactoringContext.create(project, RefactoringContext.Transformations.BASIC);
+  }
+
+  protected RefactoringContext layoutPreservingContext() {
+    return RefactoringContext.create(project, RefactoringContext.Transformations.LAYOUT_PRESERVING);
   }
 
   protected void assertEquivalent(ASTNode<?> program, String... lines) {

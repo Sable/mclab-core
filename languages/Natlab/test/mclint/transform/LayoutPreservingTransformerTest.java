@@ -1,5 +1,6 @@
 package mclint.transform;
 
+import mclint.MatlabProgram;
 import mclint.McLintTestCase;
 import natlab.DecIntNumericLiteralValue;
 import ast.AssignStmt;
@@ -11,7 +12,7 @@ import ast.NameExpr;
 
 public class LayoutPreservingTransformerTest extends McLintTestCase {
   public void testRemovingFirstStatement() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2;",
         "  y =  3   +2 ; ",
@@ -31,7 +32,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingMiddleStatement() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2;",
         "  z =  4  ",
@@ -53,7 +54,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingLastStatement() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2;",
         "  y =  3   +2 ; ",
@@ -73,7 +74,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingInlineStatementAtEndOfLine() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; x = 3;",
         "  y =  3   +2 ; ",
@@ -94,7 +95,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingInlineStatementInMiddle() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; x = 3; y = 3   + 2; ",
         "end"
@@ -113,7 +114,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingFirstInlineStatement() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; x = 3; y = 3   + 2; ",
         "end"
@@ -132,7 +133,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
 
   public void testRemovingTwoThings() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; ",
         "  y = 3   + 2; ",
@@ -153,7 +154,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
   
   public void testCopyingAStatement() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; ",
         "end"
@@ -161,7 +162,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     Function f = ((FunctionList) program.parse()).getFunction(0);
     AssignStmt first = (AssignStmt) f.getStmt(0);
     Transformer transformer = program.getLayoutPreservingTransformer();
-    transformer.insert(first.getParent(), first.fullCopy(), 1);
+    transformer.insert(first.getParent(), transformer.copy(first), 1);
     assertEquals(join(
         "function f",
         "  x =     2; ",
@@ -171,7 +172,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
   }
   
   public void testInsertingNewCode() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "  x =     2; ",
         "end"
@@ -193,7 +194,7 @@ public class LayoutPreservingTransformerTest extends McLintTestCase {
     ), transformer.reconstructText());
   }
    public void testInsertingNewCodeIntoEmptyFunction() {
-    parse(
+    MatlabProgram program = parse("f.m",
         "function f",
         "end"
     );

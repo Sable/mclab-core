@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import mclint.refactoring.RefactoringContext;
 import mclint.reports.ReportGenerator;
 import mclint.util.AstUtil;
 
@@ -43,6 +44,14 @@ public class Lint {
   public AnalysisKit getKit() {
     // TODO fix this, this is just to make it compile
     return AnalysisKit.forAST(project.asCompilationUnits());
+  }
+  
+  public RefactoringContext getBasicRefactoringContext() {
+    return RefactoringContext.create(project, RefactoringContext.Transformations.BASIC);
+  }
+
+  public RefactoringContext getLayoutPreservingRefactoringContext() {
+    return RefactoringContext.create(project, RefactoringContext.Transformations.LAYOUT_PRESERVING);
   }
 
   public void registerListenerForMessageCode(String code, MessageListener listener) {

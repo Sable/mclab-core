@@ -7,6 +7,7 @@ aspect McLint {
 
   public void CompilationUnits.setProject(Project project) {
     this.project = project;
+    setRootFolder(GenericFile.create(project.getProjectRoot().toAbsolutePath().toFile()));
   }
 
   public Project CompilationUnits.getProject() {

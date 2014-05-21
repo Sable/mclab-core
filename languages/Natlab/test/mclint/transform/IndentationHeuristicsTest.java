@@ -1,5 +1,6 @@
 package mclint.transform;
 
+import mclint.MatlabProgram;
 import mclint.McLintTestCase;
 import natlab.DecIntNumericLiteralValue;
 import ast.AssignStmt;
@@ -18,7 +19,7 @@ public class IndentationHeuristicsTest extends McLintTestCase {
   }
 
   public void testInsertingNewStatementIntoFunctionMatchesFollowingIndentation() {
-    parse(
+    MatlabProgram program = parse("f.m",
       "function f",
       "    x = 4;",
       "end"
@@ -37,7 +38,7 @@ public class IndentationHeuristicsTest extends McLintTestCase {
   }
 
   public void testInsertingNewStatementIntoFunctionMatchesPriorIndentation() {
-    parse(
+    MatlabProgram program = parse("f.m",
       "function f",
       "    x = 4;",
       "end"

@@ -1,5 +1,6 @@
 package natlab.refactoring;
 
+import mclint.MatlabProgram;
 import mclint.McLintTestCase;
 import mclint.refactoring.Refactorings;
 import mclint.transform.StatementRange;
@@ -9,15 +10,16 @@ import ast.FunctionList;
 
 public class ExtractFunctionTest extends McLintTestCase {
   private ExtractFunction extract(int from, int to) {
-    Function enclosingFunction = ((FunctionList) kit.getAST()).getFunction(0);
-    ExtractFunction xf = Refactorings.extractFunction(createBasicTransformerContext(),
+    MatlabProgram f = project.getMatlabProgram("f.m");
+    Function enclosingFunction = ((FunctionList) f.parse()).getFunction(0);
+    ExtractFunction xf = Refactorings.extractFunction(basicContext(),
         StatementRange.create(enclosingFunction, from, to), "xf");
     xf.apply();
     return xf;
   }
 
   public void testExtractFunction() {
-    parse(
+    parse("f.m",
         "function f()",
         "  f = 1;",
         "  b = f + 1;",
@@ -33,7 +35,7 @@ public class ExtractFunctionTest extends McLintTestCase {
   } 
 
   public void testExtractFunctionMaybeUndefInput() {
-    parse(
+    parse("f.m",
         "function f()",
         "  if (1)",
         "    f = 1;",
@@ -48,7 +50,7 @@ public class ExtractFunctionTest extends McLintTestCase {
   }
 
   public void testExtractFunctionMaybeUndefOutput() {
-    parse(
+    parse("f.m",
         "function f()",
         "  f = 1;",
         "  b = 1;",

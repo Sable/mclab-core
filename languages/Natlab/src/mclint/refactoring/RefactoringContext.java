@@ -3,35 +3,43 @@ package mclint.refactoring;
 import mclint.MatlabProgram;
 import mclint.Project;
 import mclint.transform.Transformer;
+import ast.ASTNode;
 
 public class RefactoringContext {
-  private Project project;
-  private MatlabProgram program;
-  private Transformer transformer;
+  public static enum Transformations {
+    BASIC,
+    LAYOUT_PRESERVING
+  };
 
-  public static RefactoringContext create(MatlabProgram program) {
-    return create(program, program.getLayoutPreservingTransformer());
+  private Project project;
+  private Transformations transformations;
+
+  public static RefactoringContext create(Project project, Transformations transformations) {
+    return new RefactoringContext(project, transformations);
   }
   
-  public static RefactoringContext create(MatlabProgram program, Transformer transformer) {
-    return new RefactoringContext(program.getProject(), program, transformer);
+  public static RefactoringContext create(Project project) {
+    return new RefactoringContext(project, Transformations.LAYOUT_PRESERVING);
   }
 
-  private RefactoringContext(Project project, MatlabProgram program, Transformer transformer) {
+  private RefactoringContext(Project project, Transformations transformations) {
     this.project = project;
-    this.program = program;
-    this.transformer = transformer;
+    this.transformations = transformations;
   }
 
   public Project getProject() {
     return project;
   }
 
-  public MatlabProgram getMatlabProgram() {
-    return program;
+  public Transformer getTransformer(MatlabProgram program) {
+    if (transformations == Transformations.BASIC) {
+      return program.getBasicTransformer();
+    } else {
+      return program.getLayoutPreservingTransformer();
+    }
   }
   
-  public Transformer getTransformer() {
-    return transformer;
+  public Transformer getTransformer(ASTNode<?> node) {
+    return getTransformer(node.getMatlabProgram());
   }
 }

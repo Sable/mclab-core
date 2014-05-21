@@ -27,7 +27,7 @@ public class ExtractVariable extends Refactoring {
 
   @Override
   public void apply() {
-    Transformer transformer = context.getTransformer();
+    Transformer transformer = context.getTransformer(expression);
 
     AssignStmt newStmt = new AssignStmt(
         new NameExpr(new Name(extractedVariableName)),

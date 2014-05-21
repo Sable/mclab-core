@@ -36,7 +36,7 @@ class RenameVariable extends Refactoring {
     super(context);
     this.node = node;
     this.newName = newName;
-    this.udduChain = context.getMatlabProgram().analyze().getUseDefDefUseChain();
+    this.udduChain = node.getMatlabProgram().analyze().getUseDefDefUseChain();
     this.renameGlobally = renameGlobally;
   }
 
@@ -51,8 +51,9 @@ class RenameVariable extends Refactoring {
   private void checkPreconditionsForFunctionOrScript(ASTNode<?> ast, MatlabProgram program) {
     Name decl = findGlobalNamed(node.getID(), ast);
     if (decl != null) {
-      RefactoringContext newContext = RefactoringContext.create(program);
-      Refactoring rename = new RenameVariable(newContext, decl, newName, false);
+      // FIXME(isbadawi): Now that contexts aren't bound to a specific program, this is wrong.
+      // Might need to change the API for RenameVariable.
+      Refactoring rename = new RenameVariable(context, decl, newName, false);
       if (!rename.checkPreconditions()) {
         addErrors(rename.getErrors());
       }
@@ -123,7 +124,7 @@ class RenameVariable extends Refactoring {
       return;
     }
 
-    Transformer transformer = context.getTransformer();
+    Transformer transformer = context.getTransformer(node);
     for (Def def : getAllDefsOfTargetName()) {
       for (Name use : udduChain.getUsesOf(node.getID(), def)) {
         transformer.replace(use, new Name(newName)); 

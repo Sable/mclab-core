@@ -19,9 +19,7 @@ import mclint.refactoring.RemoveUnusedVar;
 import mclint.reports.ReportGenerators;
 import natlab.options.Options;
 import natlab.refactoring.Exceptions.RefactorException;
-import natlab.utils.NodeFinder;
 import ast.Name;
-import ast.Program;
 
 import com.google.common.collect.ImmutableList;
 
@@ -81,8 +79,7 @@ public class McLint {
           return false;
         }
         String newName = System.console().readLine("    rename %s to: ", node.getID());
-        Program parent = NodeFinder.findParent(Program.class, node);
-        RefactoringContext context = RefactoringContext.create(parent.getMatlabProgram());
+        RefactoringContext context = lint.getLayoutPreservingRefactoringContext();
         Refactoring rename = Refactorings.renameVariable(context, node, newName);
         if (!rename.checkPreconditions()) {
           for (RefactorException error : rename.getErrors()) {

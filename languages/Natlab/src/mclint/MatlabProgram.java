@@ -26,6 +26,8 @@ public class MatlabProgram {
 
   private String code;
   private Program ast;
+  private Transformer basicTransformer;
+  private Transformer layoutPreservingTransformer;
   
   public static MatlabProgram at(Path file) throws IOException {
     Path root = file.getParent();
@@ -86,16 +88,22 @@ public class MatlabProgram {
   }
 
   public Transformer getBasicTransformer() {
-    return Transformers.basic(ast);
+    if (basicTransformer == null) {
+      basicTransformer = Transformers.basic(ast);
+    }
+    return basicTransformer;
   }
 
   public Transformer getLayoutPreservingTransformer() {
-    try {
-      return Transformers.layoutPreserving(
-          new InputStreamReader(Files.newInputStream(getAbsolutePath())));
-    } catch (IOException e) {
-      throw Throwables.propagate(e);
+    if (layoutPreservingTransformer == null) {
+      try {
+        layoutPreservingTransformer = Transformers.layoutPreserving(
+            new InputStreamReader(Files.newInputStream(getAbsolutePath())));
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
     }
+    return layoutPreservingTransformer;
   }
 
   public void write() throws IOException {

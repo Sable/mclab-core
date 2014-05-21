@@ -53,7 +53,7 @@ public class ExtractFunction extends Refactoring {
     this.context = context;
     this.extractionRange = extractionRange;
     this.extractedFunctionName = extractedFunctionName;
-    this.transformer = context.getTransformer();
+    this.transformer = context.getTransformer(extractionRange.getEnclosingFunction());
   }
 
   private void extractStatements() {

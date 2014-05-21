@@ -54,6 +54,10 @@ public class Project {
   public MatlabProgram getMatlabProgram(Path rootRelativePath) {
     return programs.get(rootRelativePath);
   }
+  
+  public MatlabProgram getMatlabProgram(String rootRelativePath) {
+    return getMatlabProgram(getProjectRoot().resolve(rootRelativePath));
+  }
 
   public Iterable<MatlabProgram> getMatlabPrograms() {
     return Collections.unmodifiableCollection(programs.values());

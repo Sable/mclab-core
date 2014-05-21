@@ -24,9 +24,9 @@ public class InlineVariable extends Refactoring {
 
   @Override
   public void apply() {
-    Transformer transformer = context.getTransformer();
+    Transformer transformer = context.getTransformer(definition);
 
-    UseDefDefUseChain udduChain = context.getMatlabProgram().analyze().getUseDefDefUseChain();
+    UseDefDefUseChain udduChain = definition.getMatlabProgram().analyze().getUseDefDefUseChain();
     for (Name name : udduChain.getUses(definition)) {
       transformer.replace(name.getParent(), transformer.copy(definition.getRHS()));
     }
