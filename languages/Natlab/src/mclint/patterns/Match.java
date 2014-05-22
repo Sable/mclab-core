@@ -1,17 +1,15 @@
 package mclint.patterns;
 
+import java.util.List;
 import java.util.Map;
-
-import natlab.utils.AstFunctions;
 
 import ast.ASTNode;
 import ast.Expr;
-import ast.List;
 import ast.Stmt;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class Match {
@@ -37,8 +35,8 @@ public class Match {
     return clazz.cast(getBoundNode(var));
   }
   
-  public List<?> getBoundList(char var) {
-    return getBoundNode(var, List.class);
+  public ast.List<?> getBoundList(char var) {
+    return getBoundNode(var, ast.List.class);
   }
   
   public Stmt getBoundStmt(char var) {
@@ -60,9 +58,11 @@ public class Match {
             if (!(node instanceof ast.List)) {
               return node.getPrettyPrinted();
             }
-            @SuppressWarnings("unchecked")
-            ast.List<? extends ASTNode<?>> list = (ast.List<? extends ASTNode<?>>) node;
-            return Joiner.on(", ").join(Iterables.transform(list, AstFunctions.prettyPrint()));
+            List<String> parts = Lists.newArrayList();
+            for (ASTNode<?> child : node) {
+              parts.add(child.getPrettyPrinted());
+            }
+            return Joiner.on(", ").join(parts);
           }
         })));
   }
