@@ -18,12 +18,11 @@ package natlab.toolkits.path;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import natlab.toolkits.filehandling.GenericFile;
-import natlab.toolkits.filehandling.GenericFileFilters;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
@@ -37,9 +36,9 @@ public class FolderHandler{
 
   private FolderHandler addPath(GenericFile path){
     for (GenericFile f : path.listChildren()) {
-      if (GenericFileFilters.CLASS_DIRECTORY.accept(f)) {
+      if (f.isClassDirectory()) {
         String className = f.getName().substring(1);
-        for (GenericFile subfile : f.listChildren(GenericFileFilters.MATLAB)) {
+        for (GenericFile subfile : f.listChildren(GenericFile::isMatlabFile)) {
           String name = subfile.getNameWithoutExtension();
           if (name.equals(className)){
             classes.put(name, subfile);
@@ -48,16 +47,16 @@ public class FolderHandler{
           }
         }
       }
-      if (GenericFileFilters.PACKAGE_DIRECTORY.accept(f)) {
+      if (f.isPackageDirectory()) {
         String packageName = f.getName().substring(1);
         packages.put(packageName, f);
       }
-      if (GenericFileFilters.PRIVATE_DIRECTORY.accept(f)) {
-        for (GenericFile subfile: f.listChildren(GenericFileFilters.MATLAB)) {
+      if (f.isPrivateDirectory()) {
+        for (GenericFile subfile: f.listChildren(GenericFile::isMatlabFile)) {
           privateFunctions.put(subfile.getNameWithoutExtension(), subfile);
         }
       }
-      if (GenericFileFilters.MATLAB.accept(f)) {
+      if (f.isMatlabFile()) {
         functions.put(f.getNameWithoutExtension(), f);
       }
     }
@@ -85,13 +84,10 @@ public class FolderHandler{
   }
 
   public List<GenericFile> getAllSpecialized(String classname){
-    List<GenericFile> list = Lists.newArrayList();
-    for (Map<String,GenericFile> map : specializedFunction.rowMap().values()) {
-      if (map.containsKey(classname)) {
-        list.add(map.get(classname));
-      }
-    }
-    return list;
+    return specializedFunction.rowMap().values().stream()
+        .filter(map -> map.containsKey(classname))
+        .map(map -> map.get(classname))
+        .collect(Collectors.toList());
   }
 
   public Map<String, GenericFile> lookupSpecializedAll(String name){

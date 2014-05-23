@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 /**
@@ -80,12 +81,10 @@ public abstract class GenericFile implements Serializable {
      * Returns a list of all the children that are accepted by the filter
      * returns null if the GenericFile is not a dir, or some exception occurs
      */
-    public Collection<GenericFile> listChildren(GenericFileFilter filter){
-        ArrayList<GenericFile> list = new ArrayList<GenericFile>();
-        for (GenericFile file : listChildren()){
-            if (filter.accept(file)) list.add(file);
-        }
-        return list;
+    public Collection<GenericFile> listChildren(Predicate<GenericFile> filter){
+      return listChildren().stream()
+          .filter(filter)
+          .collect(Collectors.toList());
     }
 
     /**
@@ -133,6 +132,22 @@ public abstract class GenericFile implements Serializable {
     
     public String toString() {
         return this.getClass().getSimpleName()+":"+getPath();
+    }
+    
+    public boolean isMatlabFile() {
+      return getExtension().equalsIgnoreCase("m");
+    }
+    
+    public boolean isPrivateDirectory() {
+      return isDir() && getName().equalsIgnoreCase("private");
+    }
+    
+    public boolean isPackageDirectory() {
+      return isDir() && getName().startsWith("+");
+    }
+    
+    public boolean isClassDirectory() {
+      return isDir() && getName().startsWith("@");
     }
     
     /**
