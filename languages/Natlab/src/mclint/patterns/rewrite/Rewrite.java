@@ -40,7 +40,7 @@ public class Rewrite {
   public static Rewrite of(String fromPattern, String toPattern, final Visit visit) {
     final TreeWithPlaceholders preprocessed = TreeWithPlaceholders.fromPattern(toPattern);
     return of(fromPattern, match -> {
-      preprocessed.handle(match);
+      preprocessed.accept(match);
       ASTNode<?> tree = preprocessed.getTree();
       if (tree instanceof ExprStmt && visit == Visit.Expressions) {
         tree = ((ExprStmt) tree).getExpr();
