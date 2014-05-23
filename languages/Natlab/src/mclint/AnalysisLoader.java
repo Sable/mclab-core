@@ -2,7 +2,6 @@ package mclint;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -93,12 +92,7 @@ public class AnalysisLoader {
 
   @SuppressWarnings("unchecked")
   private void loadAnalysisClasses(File pluginDirectory) throws MalformedURLException, IOException {
-    String[] jars = pluginDirectory.list(new FilenameFilter() {
-      @Override
-      public boolean accept(File file, String name) {
-        return name.endsWith(".jar");
-      }
-    });
+    String[] jars = pluginDirectory.list((file, name) -> name.endsWith(".jar"));
     for (int i = 0; i < jars.length; ++i) {
       jars[i] = new File(pluginDirectory, jars[i]).getAbsolutePath();
     }

@@ -2,9 +2,9 @@ package mclint.patterns.rewrite;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import mclint.patterns.Match;
-import mclint.patterns.MatchHandler;
 import mclint.patterns.Matcher;
 import mclint.util.AstUtil;
 import ast.ASTNode;
@@ -12,7 +12,7 @@ import ast.ExprStmt;
 
 public class Rewrite {
   private String pattern;
-  private MatchHandler handler;
+  private Consumer<Match> handler;
   private Visit visit;
 
   public static enum Visit {
@@ -39,33 +39,29 @@ public class Rewrite {
 
   public static Rewrite of(String fromPattern, String toPattern, final Visit visit) {
     final TreeWithPlaceholders preprocessed = TreeWithPlaceholders.fromPattern(toPattern);
-    return of(fromPattern, new MatchHandler() {
-      public void handle(final Match match) {
-        preprocessed.handle(match);
-        ASTNode<?> tree = preprocessed.getTree();
-        if (tree instanceof ExprStmt && visit == Visit.Expressions) {
-          tree = ((ExprStmt) tree).getExpr();
-        }
-        AstUtil.replace(match.getMatchingNode(), tree);
+    return of(fromPattern, match -> {
+      preprocessed.handle(match);
+      ASTNode<?> tree = preprocessed.getTree();
+      if (tree instanceof ExprStmt && visit == Visit.Expressions) {
+        tree = ((ExprStmt) tree).getExpr();
       }
+      AstUtil.replace(match.getMatchingNode(), tree);
     }, visit);
   }
 
-  public static Rewrite of(String pattern, MatchHandler handler) {
+  public static Rewrite of(String pattern, Consumer<Match> handler) {
     return of(pattern, handler, Visit.All);
   }
 
-  public static Rewrite of(String pattern, MatchHandler handler, Visit visit) {
+  public static Rewrite of(String pattern, Consumer<Match> handler, Visit visit) {
     return new Rewrite(pattern, handler, visit);
   }
 
   public void apply(ASTNode<?> tree) {
-    for (Match match : visit.getMatches(pattern, tree)) {
-      handler.handle(match);
-    }
+    visit.getMatches(pattern, tree).forEach(handler);
   }
 
-  private Rewrite(String pattern, MatchHandler handler, Visit visit) {
+  private Rewrite(String pattern, Consumer<Match> handler, Visit visit) {
     this.pattern = pattern;
     this.handler = handler;
     this.visit = visit;
