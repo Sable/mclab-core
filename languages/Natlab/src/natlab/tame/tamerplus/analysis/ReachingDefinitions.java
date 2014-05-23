@@ -17,8 +17,6 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.MergeUtil;
-import natlab.toolkits.analysis.Merger;
-import natlab.toolkits.analysis.Mergers;
 import ast.ASTNode;
 
 import com.google.common.collect.Lists;
@@ -33,7 +31,6 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     private DefiniteAssignment fDefiniteAssignment;
     private Map<String, Set<TIRNode>> fStartMap;
     private LinkedList<TIRNode> fVisitedStmts;
-    private static final Merger<Set<TIRNode>> UNION_MERGER = Mergers.union();
     
     public ReachingDefinitions(ASTNode<?> tree)
     {
@@ -176,7 +173,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     public Map<String, Set<TIRNode>> merge(Map<String, Set<TIRNode>> in1,
         Map<String, Set<TIRNode>> in2)
     {
-        return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
+        return MergeUtil.unionMerge(in1, in2, (a, b) -> Sets.newHashSet(Sets.union(a, b)));
     }
 
     @Override

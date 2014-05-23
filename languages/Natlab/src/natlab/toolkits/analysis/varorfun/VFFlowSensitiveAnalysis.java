@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import natlab.LookupFile;
+import natlab.toolkits.analysis.Mergable;
 import natlab.toolkits.analysis.MergeUtil;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import analysis.AbstractStructuralForwardAnalysis;
@@ -65,11 +66,11 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
   }
 
   private void putInVar(String name) {
-    MergeUtil.mergePut(currentInSet, name, VFDatum.VAR);
+    currentInSet.merge(name, VFDatum.VAR, Mergable::merge);
   }
 
   private void putOutVar(String name) {
-    MergeUtil.mergePut(currentOutSet, name, VFDatum.VAR);
+    currentOutSet.merge(name, VFDatum.VAR, Mergable::merge);
   }
 
   public void caseScript( Script node )
@@ -101,8 +102,8 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
     if (node.getParent().getParent() instanceof Function){
       for( Map.Entry<String, VFDatum> pair : outFlowSets.get(node.getParent().getParent()).entrySet()) {
         if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
-          MergeUtil.mergePut(currentInSet, pair.getKey(), pair.getValue());
-      }        	
+          currentInSet.merge(pair.getKey(), pair.getValue(), Mergable::merge);
+      }
     }
 
     for( Name n : node.getOutputParams() ){
@@ -172,7 +173,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
   @Override
   public void caseFunctionHandleExpr( FunctionHandleExpr node )
   {
-    MergeUtil.mergePut(currentOutSet, node.getName().getID(), VFDatum.FUN);
+    currentOutSet.merge(node.getName().getID(), VFDatum.FUN, Mergable::merge);
     annotateNode(node.getName());
   }
 
@@ -188,15 +189,15 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
       {
         VFDatum val = scriptOrFunctionExists(s) ? VFDatum.FUN 
             : packageExists(s) ? VFDatum.PREFIX : VFDatum.BOT;
-        MergeUtil.mergePut(currentOutSet, s, val);
+        currentOutSet.merge(s, val, Mergable::merge);
       }
     }
     else{
       String s = node.getName().getID();
-      VFDatum d = currentOutSet.get( s );		    
+      VFDatum d = currentOutSet.get( s );
       if ( d==null || VFDatum.BOT.equals(d) )
       {
-        MergeUtil.mergePut(currentOutSet, s, VFDatum.LDVAR);
+        currentOutSet.merge(s, VFDatum.LDVAR, Mergable::merge);
       }
     }
     annotateNode(node.getName());
@@ -347,14 +348,15 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
   }
 
   private void bindError(NameExpr n, EndExpr e){
-    MergeUtil.mergePut(currentOutSet, n.getName().getID(), VFDatum.TOP);
+    currentOutSet.merge(n.getName().getID(), VFDatum.TOP, Mergable::merge);
     annotateNode(n.getName());
   }
 
   private void bindWarn(NameExpr n, EndExpr e){
     VFDatum d = currentOutSet.get(n.getName().getID());
-    if (d != VFDatum.VAR)
-      MergeUtil.mergePut(currentOutSet, n.getName().getID(), VFDatum.WAR);
+    if (d != VFDatum.VAR) {
+      currentOutSet.merge(n.getName().getID(), VFDatum.WAR, Mergable::merge);
+    }
     annotateNode(n.getName());
   }
 

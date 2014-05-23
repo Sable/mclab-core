@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import natlab.toolkits.analysis.MergeUtil;
-import natlab.toolkits.analysis.Merger;
-import natlab.toolkits.analysis.Mergers;
 import natlab.utils.NodeFinder;
 import analysis.ForwardAnalysis;
 import ast.ASTNode;
@@ -49,7 +47,6 @@ public class ReachingDefs extends
   public static Def UNDEF = new AssignStmt();
 
   private Set<Name> defs = Sets.newHashSet();
-  private static final Merger<Set<Def>> UNION_MERGER = Mergers.union();
 
   private Map<String, Set<Def>> startMap;
   private DefinitelyAssignedAnalysis definiteAssignment;
@@ -75,7 +72,7 @@ public class ReachingDefs extends
 
   @Override
   public Map<String, Set<Def>> merge(Map<String, Set<Def>> in1, Map<String, Set<Def>> in2) {
-    return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
+    return MergeUtil.unionMerge(in1, in2, (a, b) -> Sets.newHashSet(Sets.union(a, b)));
   }
 
   @Override

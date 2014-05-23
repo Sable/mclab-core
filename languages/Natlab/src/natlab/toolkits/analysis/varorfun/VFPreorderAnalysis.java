@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import natlab.LookupFile;
-import natlab.toolkits.analysis.MergeUtil;
+import natlab.toolkits.analysis.Mergable;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import analysis.AbstractDepthFirstAnalysis;
 import ast.ASTNode;
@@ -126,8 +126,8 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
         if (node.getParent() != null && node.getParent().getParent() != null && node.getParent().getParent() instanceof Function){
             for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).entrySet()) {
                 if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
-                    MergeUtil.mergePut(currentSet, pair.getKey(), pair.getValue());
-            }        	
+                    currentSet.merge(pair.getKey(), pair.getValue(), Mergable::merge);
+            }
         }
 
         log("in caseFunction " + node.getName());
@@ -135,12 +135,12 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
 
         // Add output params to set
         for( Name n : node.getOutputParams() ){
-            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
+            currentSet.merge(n.getID(), VFDatum.VAR, Mergable::merge);
         }
 
         // Add input params to set
         for( Name n : node.getInputParams() ){
-            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
+            currentSet.merge(n.getID(), VFDatum.VAR, Mergable::merge);
         }
         
         // Process body
@@ -161,7 +161,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
         //analyze the rhs
         node.getRHS().analyze( this );
         for( NameExpr n : lhs.getNameExpressions() ){
-            MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
+            currentSet.merge(n.getName().getID(), VFDatum.VAR, Mergable::merge);
             annotateNode(n.getName());
         }
         node.getLHS().analyze( this );
@@ -170,7 +170,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     public void caseGlobalStmt( GlobalStmt node )
     {
         for( Name n : node.getNames() ){
-            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
+            currentSet.merge(n.getID(), VFDatum.VAR, Mergable::merge);
             annotateNode(n);
         }
     }
@@ -178,15 +178,15 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     public void casePersistentStmt( PersistentStmt node )
     {
         for( Name n : node.getNames() ){
-            MergeUtil.mergePut(currentSet, n.getID(), VFDatum.VAR);
+            currentSet.merge(n.getID(), VFDatum.VAR, Mergable::merge);
             annotateNode(n);
         }
     }
 
     public void caseFunctionHandleExpr( FunctionHandleExpr node )
     {
-        MergeUtil.mergePut(currentSet, node.getName().getID(), VFDatum.FUN);
-        annotateNode(node.getName());        
+        currentSet.merge(node.getName().getID(), VFDatum.FUN, Mergable::merge);
+        annotateNode(node.getName());
     }
 
    private ASTNode getTarget(LValueExpr node){
@@ -259,7 +259,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
                 if( args.getChild( i ) instanceof StringLiteralExpr )  {
                     String param = ( (StringLiteralExpr) args.getChild( i ) ).getValue();
                     if (param.charAt(0)!='-'){
-                        MergeUtil.mergePut(currentSet, param, VFDatum.LDVAR);
+                        currentSet.merge(param, VFDatum.LDVAR, Mergable::merge);
                     }
                 }
         }
@@ -316,21 +316,22 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     }
 
     private void bindError(NameExpr n, EndExpr e){
-        MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.TOP);
+        currentSet.merge(n.getName().getID(), VFDatum.TOP, Mergable::merge);
         annotateNode(n.getName());
     }
 
 
     private void bindWarn(NameExpr n, EndExpr e){
         VFDatum d = currentSet.get(n.getName().getID());
-        if (d != VFDatum.VAR)
-            MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
+        if (d != VFDatum.VAR) {
+            currentSet.merge(n.getName().getID(), VFDatum.VAR, Mergable::merge);
+        }
         annotateNode(n.getName());
     }
     
     public void caseCellIndexExpr(CellIndexExpr node){
         NameExpr n = new ArrayList<NameExpr>(((CellIndexExpr) node).getTarget().getNameExpressions()).get(0);
-        MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.VAR);
+        currentSet.merge(n.getName().getID(), VFDatum.VAR, Mergable::merge);
         annotateNode(n.getName());
     	caseMyLValue(node);
     }
@@ -339,13 +340,14 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     	Map<String, VFDatum> backup = Maps.newHashMap(currentSet);
     	Set<String> inputSet=new TreeSet<String>();
     	for (Name inputParam: node.getInputParams()){
-    	    MergeUtil.mergePut(currentSet, inputParam.getID(), VFDatum.VAR);
+            currentSet.merge(inputParam.getID(), VFDatum.VAR, Mergable::merge);
     		inputSet.add(inputParam.getID());
     	}
     	caseASTNode(node);
     	for (Map.Entry<String, VFDatum> p:currentSet.entrySet()){
-    		if (! inputSet.contains(p.getKey()))
-    		    MergeUtil.mergePut(backup, p.getKey(), p.getValue());
+    		if (! inputSet.contains(p.getKey())) {
+    		    backup.merge(p.getKey(), p.getValue(), Mergable::merge);
+    		}
     	}
     	currentSet=backup;
     }
@@ -361,7 +363,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
             {
               VFDatum val = scriptOrFunctionExists(s) ? VFDatum.FUN
                   : packageExists(s) ? VFDatum.PREFIX : VFDatum.BOT;
-              MergeUtil.mergePut(currentSet, s, val);
+              currentSet.merge(s, val, Mergable::merge);
             }
         }
         else{
@@ -369,7 +371,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
             VFDatum d = currentSet.get( s );		    
             if ( d==null || VFDatum.BOT.equals(d) )
             {
-                MergeUtil.mergePut(currentSet, s, VFDatum.LDVAR);
+              currentSet.merge(s, VFDatum.LDVAR, Mergable::merge);
             }
         }
         annotateNode(node.getName());
