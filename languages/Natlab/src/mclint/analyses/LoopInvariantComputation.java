@@ -3,6 +3,7 @@ package mclint.analyses;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import mclint.Lint;
 import mclint.LintAnalysis;
@@ -16,17 +17,13 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.ForStmt;
-import ast.GlobalStmt;
 import ast.LiteralExpr;
 import ast.MatrixExpr;
-import ast.Name;
 import ast.NameExpr;
 import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 // TODO Nested invariants? Suggest moving expressions out of several loop levels?
@@ -67,16 +64,11 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private boolean allDefsOutsideLoop(Set<Def> defs, ASTNode<?> loop) {
-    FluentIterable<Def> loopDefs = NodeFinder.find(Def.class, loop);
-    for (Def def : defs) {
-      if (def == ReachingDefs.UNDEF)
-        continue;
-      if (def instanceof GlobalStmt || def instanceof Name)
-        continue;
-      if (loopDefs.contains(defs))
-        return false;
-    }
-    return true;
+    Set<Def> loopDefs = NodeFinder.find(Def.class, loop).collect(Collectors.toSet());
+    return NodeFinder.find(Def.class, loop)
+        .filter(def -> def instanceof AssignStmt)
+        .filter(def -> def != ReachingDefs.UNDEF)
+        .allMatch(def -> !loopDefs.contains(def));
   }
 
   private void caseLoopStmt(ASTNode<?> node) {
@@ -118,7 +110,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
   }
 
   private static List<Expr> getChildren(Expr node) {
-    List<Expr> exprs = Lists.newArrayList(NodeFinder.find(Expr.class, node));
+    List<Expr> exprs = NodeFinder.find(Expr.class, node).collect(Collectors.toList());
     exprs.remove(node);
     return exprs;
   }

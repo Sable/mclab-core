@@ -1,15 +1,13 @@
 package mclint.patterns;
 
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import ast.ASTNode;
 import ast.Expr;
 import ast.Stmt;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class Match {
@@ -53,17 +51,11 @@ public class Match {
   
   private String getBindingsAsString() {
     return String.format("{%s}", Joiner.on(", ").withKeyValueSeparator(": ")
-        .join(Maps.transformValues(bindings, new Function<ASTNode<?>, String>() {
-          @Override public String apply(ASTNode<?> node) {
-            if (!(node instanceof ast.List)) {
-              return node.getPrettyPrinted();
-            }
-            List<String> parts = Lists.newArrayList();
-            for (ASTNode<?> child : node) {
-              parts.add(child.getPrettyPrinted());
-            }
-            return Joiner.on(", ").join(parts);
+        .join(Maps.transformValues(bindings, node -> {
+          if (!(node instanceof ast.List)) {
+            return node.getPrettyPrinted();
           }
+          return node.stream().map(ASTNode::getPrettyPrinted).collect(Collectors.joining(", "));
         })));
   }
 

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class Project {
     return getMatlabProgram(getProjectRoot().resolve(rootRelativePath));
   }
 
-  public Iterable<MatlabProgram> getMatlabPrograms() {
+  public Collection<MatlabProgram> getMatlabPrograms() {
     return Collections.unmodifiableCollection(programs.values());
   }
 

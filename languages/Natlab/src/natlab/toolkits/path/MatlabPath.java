@@ -21,14 +21,13 @@ package natlab.toolkits.path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import natlab.NatlabPreferences;
 import natlab.toolkits.filehandling.GenericFile;
 
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -193,11 +192,8 @@ public class MatlabPath extends AbstractPathEnvironment {
     }
     
     public List<FolderHandler> getAsFolderHandlerList(){
-      return ImmutableList.copyOf(Lists.transform(directories, 
-          new Function<CachedDirectory, FolderHandler>() {
-        @Override public FolderHandler apply(CachedDirectory dir) {
-          return FolderHandler.getFolderHandler(dir);
-        }
-      }));
+      return directories.stream()
+          .map(FolderHandler::getFolderHandler)
+          .collect(Collectors.toList());
     }
 }

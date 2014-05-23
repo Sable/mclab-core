@@ -2,6 +2,7 @@ package natlab.refactoring;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import mclint.refactoring.Refactoring;
 import mclint.refactoring.RefactoringContext;
@@ -26,9 +27,6 @@ import ast.ParameterizedExpr;
 import ast.Row;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class ExtractFunction extends Refactoring {
@@ -86,25 +84,21 @@ public class ExtractFunction extends Refactoring {
     kinds = kindAnalysis.getFlowSets().get(original);
   }
 
-  private Iterable<String> liveVariablesAtInputOfNewFunction() {
-    return Iterables.filter(liveBefore, new Predicate<String>() {
-      @Override public boolean apply(String id) {
-        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable();
-      }
-    });
+  private Set<String> liveVariablesAtInputOfNewFunction() {
+    return liveBefore.stream()
+        .filter(id -> kinds.getOrDefault(id, VFDatum.UNDEF).isVariable())
+        .collect(Collectors.toSet());
   }
 
-  private Iterable<String> liveVariablesDefinedInNewFunction() {
-    return Iterables.filter(liveAfter, new Predicate<String>() {
-      @Override public boolean apply(String id) {
-        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable() &&
-            reachingAfter.containsKey(id);
-      }
-    });
+  private Set<String> liveVariablesDefinedInNewFunction() {
+    return liveAfter.stream()
+        .filter(id -> kinds.getOrDefault(id, VFDatum.UNDEF).isVariable() &&
+                      reachingAfter.containsKey(id))
+        .collect(Collectors.toSet());
   }
 
   private boolean containsGlobalStmt(Set<Def> defs) {
-    return Iterables.any(defs, Predicates.instanceOf(GlobalStmt.class));
+    return defs.stream().anyMatch(def -> def instanceof GlobalStmt);
   }
 
   private boolean originallyGlobal(String id) {

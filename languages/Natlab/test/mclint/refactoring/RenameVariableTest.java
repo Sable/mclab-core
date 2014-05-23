@@ -13,14 +13,12 @@ import ast.Script;
 
 public class RenameVariableTest extends McLintTestCase {
   private void rename(Name node, String newName) {
-    MatlabProgram program = project.getMatlabProgram("f.m");
     Refactoring rename = Refactorings.renameVariable(basicContext(), node, newName);
     assertTrue(rename.checkPreconditions());
     rename.apply();
   }
 
   private void assertRenameFails(ASTNode<?> tree, Name name, String newName) {
-    MatlabProgram program = project.getMatlabProgram("f.m");
     Refactoring rename = Refactorings.renameVariable(basicContext(), name, newName);
     assertFalse(String.format("Expected renaming of %s to %s to fail", name.getID(), newName),
         rename.checkPreconditions());
@@ -127,7 +125,7 @@ public class RenameVariableTest extends McLintTestCase {
         "end"
     );
   }
-
+  
   public void testRenameGlobalVariableAcrossFunctions() {
     MatlabProgram program = parse("f.m", 
         "function f1()",

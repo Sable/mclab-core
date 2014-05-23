@@ -9,9 +9,7 @@ import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.GenericFile;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -160,23 +158,15 @@ public class FileEnvironment {
 	  return new FunctionOrScriptQuery() {
 	    public boolean isPackage(final String name) {
 	      return pwd.lookupPackage(name) != null
-	          || Iterables.any(folders, new Predicate<FolderHandler>() {
-	            @Override public boolean apply(FolderHandler f) {
-	              return f.lookupPackage(name) != null;
-	            }
-	          });
+	          || folders.stream().anyMatch(f -> f.lookupPackage(name) != null);
 	    }
 	    public boolean isFunctionOrScript(final String name) {
 	      return query.isBuiltin(name)
 	          || pwd.lookupFunctions(name) != null
 	          || pwd.lookupSpecializedAll(name).size() > 0
 	          || fwd.lookupPrivateFunctions(name) != null
-	          || Iterables.any(folders, new Predicate<FolderHandler>() {
-	            @Override public boolean apply(FolderHandler f) {
-	              return f.lookupFunctions(name) != null
-	                  || f.lookupSpecializedAll(name).size() > 0;
-	            }
-	          });
+	          || folders.stream().anyMatch(f -> f.lookupFunctions(name) != null ||
+	                                            f.lookupSpecializedAll(name).size() > 0);
 	    }
 	  };
 	}

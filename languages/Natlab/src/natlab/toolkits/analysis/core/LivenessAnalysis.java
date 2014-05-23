@@ -1,11 +1,8 @@
 package natlab.toolkits.analysis.core;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import analysis.BackwardAnalysis;
 import ast.ASTNode;
@@ -72,9 +69,9 @@ BackwardAnalysis<Set<String>> {
 
     caseASTNode(s.getRHS());
     currentOutSet.addAll(NodeFinder.find(NameExpr.class, s)
-        .filter(not(in(lValues)))
-        .transform(AstFunctions.nameExprToID())
-        .toList());
+        .filter(name -> !lValues.contains(name))
+        .map(name -> name.getName().getID())
+        .collect(Collectors.toList()));
 
     inFlowSets.put(s, copy(currentInSet));
   }

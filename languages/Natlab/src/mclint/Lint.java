@@ -5,13 +5,12 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import mclint.refactoring.RefactoringContext;
 import mclint.reports.ReportGenerator;
 import mclint.util.AstUtil;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -71,7 +70,7 @@ public class Lint {
         analysis.analyze(this);
         for (final Message message : currentMessages) {
           Collection<MessageListener> listeners = messageListeners.get(message.getCode());
-          if (!Iterables.any(listeners, addressesMessage(message))) {
+          if (!listeners.stream().anyMatch(listener -> listener.messageReported(message))) {
             messages.add(message);
           } else {
             changed = true;
@@ -81,11 +80,9 @@ public class Lint {
         }
       }
     }
-    messages = Lists.newArrayList(Iterables.filter(messages, new Predicate<Message>() {
-      @Override public boolean apply(Message message) {
-        return !AstUtil.removed(message.getAstNode());
-      }
-    }));
+    messages = messages.stream()
+        .filter(message -> !AstUtil.removed(message.getAstNode()))
+        .collect(Collectors.toList());
   }
 
   public void writeReport(ReportGenerator reporter, OutputStream out) {
@@ -96,13 +93,5 @@ public class Lint {
       System.err.println("Could not write report: ");
       e.printStackTrace();
     }
-  }
-
-  private static Predicate<MessageListener> addressesMessage(final Message message) {
-    return new Predicate<MessageListener>() {
-      @Override public boolean apply(MessageListener listener) {
-        return listener.messageReported(message);
-      }
-    };
   }
 }

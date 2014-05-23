@@ -2,8 +2,8 @@ package natlab.refactoring;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import mclint.MatlabProgram;
 import mclint.refactoring.Refactoring;
 import mclint.refactoring.RefactoringContext;
 import mclint.transform.Transformer;
@@ -13,20 +13,17 @@ import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.filehandling.GenericFile;
-import natlab.utils.AstFunctions;
-import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
 import ast.ExprStmt;
 import ast.FunctionHandleExpr;
+import ast.FunctionList;
 import ast.Name;
 import ast.NameExpr;
 import ast.Script;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class MScriptInliner extends Refactoring {
   private CompilationUnits cu;
@@ -46,28 +43,26 @@ public class MScriptInliner extends Refactoring {
 
   @Override
   public void apply() {
-    for (MatlabProgram program : context.getProject().getMatlabPrograms()) {
-      if (!(program.parse() instanceof ast.FunctionList)) {
-        continue;
-      }
-      for (ast.Function f : ((ast.FunctionList) program.parse()).getFunctions()) {
-        inlineCallsToScript(f);
-      }
-    }
+    context.getProject().getMatlabPrograms().stream()
+        .filter(program -> program.parse() instanceof FunctionList)
+        .flatMap(program -> ((FunctionList) program.parse()).getFunctions().stream())
+        .forEach(this::inlineCallsToScript);
   }
 
   private static Set<String> findNested(ast.Function f) {
-    if (f.getParent().getParent() instanceof ast.Function)
+    if (f.getParent().getParent() instanceof ast.Function) {
       f = (ast.Function) f.getParent().getParent();
-    return Sets.newLinkedHashSet(NodeFinder.find(ast.Function.class, f)
-        .transform(AstFunctions.functionToName()));
+    }
+    return NodeFinder.find(ast.Function.class, f)
+        .map(ast.Function::getName)
+        .collect(Collectors.toSet());
   }
 
   private static Set<Name> findNameExpr(ASTNode f) {
-    return Sets.newLinkedHashSet(NodeFinder.find(Name.class, f)
-        .filter(Predicates.or(
-            AstPredicates.parentInstanceOf(NameExpr.class),
-            AstPredicates.parentInstanceOf(FunctionHandleExpr.class))));
+    return NodeFinder.find(Name.class, f)
+        .filter(name -> name.getParent() instanceof NameExpr ||
+                        name.getParent() instanceof FunctionHandleExpr)
+        .collect(Collectors.toSet());
   }
 
   private ASTNode<?> resolveCall(ExprStmt call) {
@@ -95,18 +90,15 @@ public class MScriptInliner extends Refactoring {
   }
   
   public void inlineCallsToScript(ast.Function f) {
-    for (ExprStmt call : NodeFinder.find(ExprStmt.class, f)) {
-      if (isCallToScript(call)) {
-        inlineCallToScript(call);
-      }
-    }
+    NodeFinder.find(ExprStmt.class, f)
+        .filter(this::isCallToScript)
+        .forEach(this::inlineCallToScript);
   }
 
   public void inlineCallToScript(ExprStmt callStmt) {
     ast.Function f = NodeFinder.findParent(ast.Function.class, callStmt);
     VFFlowSensitiveAnalysis kind_analysis_f = new VFFlowSensitiveAnalysis(f);
     kind_analysis_f.analyze();
-    NameExpr ne = (NameExpr) callStmt.getExpr();
 
     VFFlowSensitiveAnalysis kind_analysis_s = new VFFlowSensitiveAnalysis(target);
     kind_analysis_s.analyze();

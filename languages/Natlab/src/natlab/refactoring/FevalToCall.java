@@ -2,6 +2,8 @@ package natlab.refactoring;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import natlab.refactoring.Exceptions.RefactorException;
 import natlab.refactoring.Exceptions.RenameRequired;
@@ -16,8 +18,6 @@ import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.StringLiteralExpr;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -32,27 +32,18 @@ public class FevalToCall {
 	  final ImmutableMap.Builder<ParameterizedExpr, List<RefactorException>> builder =
 	      ImmutableMap.builder();
 
-		for (ast.Function f: NodeFinder.find(ast.Function.class, context.cu)){
+	    NodeFinder.find(ast.Function.class, context.cu).forEach(f -> {
 			context.push(f);
 			final VFFlowInsensitiveAnalysis kind = new VFFlowInsensitiveAnalysis(context.cu);
 			kind.analyze();
 
 			builder.putAll(NodeFinder.find(ParameterizedExpr.class, f)
-			    .filter(new Predicate<ParameterizedExpr>() {
-			      @Override public boolean apply(ParameterizedExpr node) {
-			        return node.getTarget() instanceof NameExpr &&
-			            ((NameExpr) node.getTarget()).getName().getID().equals("feval") &&
-			            node.getArg(0) instanceof StringLiteralExpr;
-			      }
-			    })
-			    .toMap(new Function<ParameterizedExpr, List<RefactorException>>() {
-			      @Override public List<RefactorException> apply(ParameterizedExpr node) {
-			        return replace(node, kind);
-			      }
-			    }));
-
+			    .filter(node -> node.getTarget() instanceof NameExpr)
+			    .filter(node -> ((NameExpr) node.getTarget()).getName().getID().equals("feval"))
+			    .filter(node -> node.getArg(0) instanceof StringLiteralExpr)
+			    .collect(Collectors.toMap(Function.identity(), node -> replace(node, kind))));
 			context.pop();
-		}
+		});
 		return builder.build();
 	}
 	

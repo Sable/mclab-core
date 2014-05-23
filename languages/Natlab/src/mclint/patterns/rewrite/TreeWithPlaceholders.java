@@ -45,11 +45,9 @@ public class TreeWithPlaceholders implements MatchHandler {
 
   @Override
   public void handle(final Match match) {
-    for (NameExpr node : NodeFinder.find(NameExpr.class, tree)) {
-      if (isPlaceholder(node)) {
-        replacePlaceholder(node, match.getBoundNode(getMeta(node)));
-      }
-    }
+    NodeFinder.find(NameExpr.class, tree)
+        .filter(TreeWithPlaceholders::isPlaceholder)
+        .forEach(node -> replacePlaceholder(node, match.getBoundNode(getMeta(node))));
   }
 
   public ASTNode<?> getTree() {

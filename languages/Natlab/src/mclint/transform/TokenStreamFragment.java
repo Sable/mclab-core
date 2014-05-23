@@ -2,36 +2,17 @@ package mclint.transform;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.AbstractSequentialIterator;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 
 public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   public static class Node {
-    public static Function<Node, Token> GET_TOKEN = new Function<Node, Token>() {
-      @Override public Token apply(Node node) {
-        return node.getToken();
-      }
-    };
-    
-    public static Function<Node, String> GET_TEXT = new Function<Node, String>() {
-      @Override public String apply(Node node) {
-        return node.getToken().getText();
-      }
-    };
-    
-    public static Predicate<Node> hasText(final String text) {
-      return Predicates.compose(Predicates.containsPattern(text), GET_TEXT);
-    }
-
     private Token token;
     Node previous;
     Node next;
@@ -102,7 +83,9 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
 
   public TokenStreamFragment copy() {
-    return TokenStreamFragment.fromTokens(Iterables.transform(this, Node.GET_TOKEN));
+    return TokenStreamFragment.fromTokens(StreamSupport.stream(spliterator(), false)
+        .map(Node::getToken)
+        .collect(Collectors.toList()));
   }
   
   private static void link(Node from, Node to) {
@@ -139,7 +122,9 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   }
   
   public String asString() {
-    return Joiner.on("").join(Iterables.transform(this, Node.GET_TEXT));
+    return StreamSupport.stream(spliterator(), false)
+        .map(node -> node.getToken().getText())
+        .collect(Collectors.joining(""));
   }
   
   private TokenStreamFragment(TokenStreamFragment.Node start, TokenStreamFragment.Node end) {

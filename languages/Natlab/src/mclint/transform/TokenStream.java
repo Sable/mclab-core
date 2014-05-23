@@ -1,5 +1,7 @@
 package mclint.transform;
 
+import java.util.function.Predicate;
+
 import mclint.util.AstUtil;
 import mclint.util.TokenUtil;
 
@@ -11,9 +13,6 @@ import ast.EmptyStmt;
 import ast.Function;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
@@ -51,10 +50,7 @@ public class TokenStream {
   }
   
   private int getNumNonEmptyChild(ASTNode<?> node) {
-    return FluentIterable
-        .from(node)
-        .filter(Predicates.not(Predicates.instanceOf(EmptyStmt.class)))
-        .size();
+    return (int) node.stream().filter(n -> !(n instanceof EmptyStmt)).count();
   }
   
   private ASTNode<?> getPreviousNonEmptyStmt(ASTNode<?> node, int i) {
@@ -117,7 +113,7 @@ public class TokenStream {
       newFragment.spliceAfter(
           TokenStreamFragment.fromSingleNode(
               nextMatchingNode(
-                  TokenStreamFragment.Node.hasText("\n"),
+                  n -> n.getToken().getText().contains("\n"),
                   fragment(node).getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
@@ -139,14 +135,13 @@ public class TokenStream {
     return nextMatchingNode(newlineOrText, start).getPrevious();
   }
 
-  private Predicate<TokenStreamFragment.Node> newlineOrText = Predicates.or(
-      TokenStreamFragment.Node.hasText("\n"),
-      Predicates.not(TokenStreamFragment.Node.hasText("[ \\t]")));
+  private Predicate<TokenStreamFragment.Node> newlineOrText = node ->
+    node.getToken().getText().contains("\n") || !node.getToken().getText().matches(".*[ \\t].*");
 
   private TokenStreamFragment.Node previousMatchingNode(Predicate<TokenStreamFragment.Node> predicate, TokenStreamFragment.Node start) {
     TokenStreamFragment.Node node;
     for (node = start; node != null && node.getToken() != null; node = node.getPrevious()) {
-      if (predicate.apply(node)) {
+      if (predicate.test(node)) {
         return node;
       }
     }
@@ -155,7 +150,7 @@ public class TokenStream {
 
   private TokenStreamFragment.Node nextMatchingNode(Predicate<TokenStreamFragment.Node> predicate, TokenStreamFragment.Node start) {
     for (TokenStreamFragment.Node node = start; node != null && node.getToken() != null; node = node.getNext()) {
-      if (predicate.apply(node)) {
+      if (predicate.test(node)) {
         return node;
       }
     }

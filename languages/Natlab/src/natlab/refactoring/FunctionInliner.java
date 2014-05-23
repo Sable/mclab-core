@@ -4,8 +4,11 @@ package natlab.refactoring;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.NameResolutionChangeException;
@@ -27,14 +30,11 @@ import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
-import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CompilationUnits;
 import ast.Expr;
-import ast.Function;
-import ast.List;
 import ast.MatrixExpr;
 import ast.Name;
 import ast.NameExpr;
@@ -42,8 +42,6 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -60,66 +58,48 @@ public class FunctionInliner {
 		this.cu = cu;
 	};
 	
-	private LinkedList<AssignStmt> functionCalls(Function f) {
-	  return Lists.newLinkedList(NodeFinder.find(AssignStmt.class, f.getStmtList())
-	      .filter(new Predicate<AssignStmt>() {
-	        @Override public boolean apply(AssignStmt stmt) {
-	          return stmt.getRHS() instanceof ParameterizedExpr;
-	        }
+	private List<AssignStmt> functionCalls(ast.Function f) {
+	  return NodeFinder.find(AssignStmt.class, f.getStmts())
+	      .filter(stmt -> stmt.getRHS() instanceof ParameterizedExpr)
+	      .collect(Collectors.toList());
+	}
+
+	public int countCalls() {
+	  return NodeFinder.find(ast.Function.class, cu)
+	      .filter(f -> !(f.getParent().getParent() instanceof ast.Function))
+	      .collect(Collectors.summingInt(f -> {
+	        context.push(f);
+	        VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
+	        kind_analysis_caller.analyze();
+	        Map<String, VFDatum> kind = kind_analysis_caller.getFlowSets().get(f);
+	        int count = (int) NodeFinder.find(ParameterizedExpr.class, f.getStmts())
+	            .filter(p -> p.getTarget() instanceof NameExpr)
+	            .map(p -> ((NameExpr) p.getTarget()).getName().getID())
+	            .filter(name -> context.peek().getAllOverloads(name).size() < 2)
+	            .filter(name -> kind.getOrDefault(name, VFDatum.UNDEF).isVariable())
+	            .map(name -> context.resolveFunctionReference(context.peek().resolve(name)))
+	            .filter(lookup -> lookup instanceof ast.Function)
+	            .count();
+	        context.pop();
+	        return count;
 	      }));
 	}
-	
-	private Iterable<Function> nonNestedFunctions(ASTNode<?> tree) {
-	  return NodeFinder.find(Function.class, tree).filter(
-	      Predicates.not(AstPredicates.nestedFunction()));
-	}
-	
-	public int countCalls(){
-		int res = 0;
-		
-		for (Function f : nonNestedFunctions(cu)) {
-		    context.push(f);
-		    VFFlowInsensitiveAnalysis kind_analysis_caller = new VFFlowInsensitiveAnalysis(f);
-		    kind_analysis_caller.analyze();
-		    Map<String, VFDatum> kind = kind_analysis_caller.getFlowSets().get(f);
-		    for (ParameterizedExpr p: NodeFinder.find(ParameterizedExpr.class, f.getStmts())){
-		      if (p.getTarget() instanceof NameExpr){
-		        String name = ((NameExpr)p.getTarget()).getName().getID();
-		        VFDatum nameKind = kind.containsKey(name) ? kind.get(name) : VFDatum.UNDEF;
-		        if (nameKind.isVariable()) {
-		          FunctionReference lookupreference = context.peek().resolve(name);
 
-		          ASTNode lookup = context.resolveFunctionReference(lookupreference);
-		          if (context.peek().getAllOverloads(name).size()<2 && lookup instanceof Function){
-		            res++;
-		          }
-		        }
-		      }
-		    }
-		}
-		return res;
-	}
-
-	public HashMap<AssignStmt, LinkedList<RefactorException>> inlineAll(){
-		HashMap<AssignStmt, LinkedList<RefactorException>>  res = Maps.newHashMap();
-		for (Function f: nonNestedFunctions(cu)) {
-			res.putAll(inlineAll(f));
-		}
-		return res;
+	public Map<AssignStmt, LinkedList<RefactorException>> inlineAll(){
+	  return NodeFinder.find(ast.Function.class, cu)
+	      .filter(f -> !(f.getParent().getParent() instanceof ast.Function))
+	      .map(this::inlineAll)
+	      .reduce(new HashMap<>(), (m1, m2) -> { m1.putAll(m2); return m1; });
 	}
 	
-	public HashMap<AssignStmt, LinkedList<RefactorException>> inlineAll(Function f){
+	public Map<AssignStmt, LinkedList<RefactorException>> inlineAll(ast.Function f){
 		VFFlowInsensitiveAnalysis kind = new VFFlowInsensitiveAnalysis(f);
 		kind.analyze();
 		RightSimplification rs = new RightSimplification(f, new VFPreorderAnalysis(f));
         rs.transform();
-		int l=functionCalls(f).size();
-		HashMap<AssignStmt, LinkedList<RefactorException>> errors = Maps.newHashMap();
-		for (int i=0;i<l;i++){
-			AssignStmt s = functionCalls(f).get(i);
-            errors.put(s, inline(s));
-		}
-		return errors;
+        
+        return functionCalls(f).stream()
+            .collect(Collectors.toMap(Function.identity(), this::inline));
 	}
 
 	private Collection<NameExpr> getUses(AssignStmt s, Collection<NameExpr> all, ReachingDefs defAnalysis){
@@ -137,16 +117,14 @@ public class FunctionInliner {
 		return uses;
 	}
 
-	private boolean removeExtra(Function f, AssignStmt s){
+	private boolean removeExtra(ast.Function f, AssignStmt s){
 		String left = ((NameExpr)s.getLHS()).getName().getID();
 		String right = ((NameExpr)s.getRHS()).getName().getID();
 		LivenessAnalysis l = new LivenessAnalysis(f);
 		ReachingDefs defs = new ReachingDefs(f);
 		CopyAnalysis copies = new CopyAnalysis(f);
-		java.util.List<NameExpr> exprs = 
-		        Lists.newArrayList(NodeFinder.find(NameExpr.class, f.getStmts()));
-		if (exprs == null)
-			throw new RuntimeException("exprs is null");
+		List<NameExpr> exprs = NodeFinder.find(NameExpr.class, f.getStmts())
+		    .collect(Collectors.toList());
 		l.analyze();
 		defs.analyze(); 
 		copies.analyze();
@@ -159,7 +137,7 @@ public class FunctionInliner {
 			if (copy != s  || copy == null)
 				return false;
 		}
-		List<Stmt> parent=(List<Stmt>) s.getParent();
+		ast.List<Stmt> parent= (ast.List<Stmt>) s.getParent();
 		int k=0;
 		for(;parent.getChild(k)!=s;k++);
 		
@@ -172,7 +150,7 @@ public class FunctionInliner {
 	
 	public LinkedList<RefactorException> inline(AssignStmt s){
 		LinkedList<RefactorException> errors = Lists.newLinkedList();
-        Function f = NodeFinder.findParent(Function.class, s);
+        ast.Function f = NodeFinder.findParent(ast.Function.class, s);
 		context.push(f);
 		VFFlowInsensitiveAnalysis kind_analysis_caller = 
             new VFFlowInsensitiveAnalysis(f, 
@@ -194,9 +172,9 @@ public class FunctionInliner {
 		
 		FunctionReference lookupreference = context.peek().resolve(ne.getName().getID());
 		ASTNode lookupres = context.resolveFunctionReference(lookupreference);
-		Function target = null;
-		if (context.peek().getAllOverloads(ne.getName().getID()).size()<2 && lookupres instanceof Function)
-			target = (Function)lookupres;
+		ast.Function target = null;
+		if (context.peek().getAllOverloads(ne.getName().getID()).size()<2 && lookupres instanceof ast.Function)
+			target = (ast.Function)lookupres;
 		else{
 			errors.add(new TargetNotFoundException(ne.getName()));
 			return errors;
@@ -218,7 +196,7 @@ public class FunctionInliner {
 		VFFlowInsensitiveAnalysis kind_analysis_callee = new VFFlowInsensitiveAnalysis(target);
 		kind_analysis_callee.analyze();
 		
-		List list=(List) s.getParent();
+		ast.List list=(ast.List) s.getParent();
 		int k=0;
 		for (;list.getChild(k)!=s;k++);
 		    //just go forward in list
@@ -261,8 +239,8 @@ public class FunctionInliner {
 		for(int j=nlist.size()-1;j>=0;j--){
 			list.insertChild(nlist.get(j),k);
 		}
-		java.util.List<NameExpr> symbols = 
-		        Lists.newArrayList(NodeFinder.find(NameExpr.class, target.getStmtList()));
+		List<NameExpr> symbols = NodeFinder.find(NameExpr.class, target.getStmts())
+		    .collect(Collectors.toList());
 		VFFlowInsensitiveAnalysis kind_analysis_post = new VFFlowInsensitiveAnalysis(f);
 		kind_analysis_post.analyze();
 		for (NameExpr nameExpr: symbols){

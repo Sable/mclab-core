@@ -1,6 +1,7 @@
 package mclint.analyses;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import mclint.Lint;
 import mclint.LintAnalysis;
@@ -8,14 +9,12 @@ import mclint.Message;
 import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
-import natlab.utils.AstFunctions;
 import natlab.utils.NodeFinder;
 import ast.ForStmt;
 import ast.Function;
 import ast.Name;
 import ast.Stmt;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
@@ -38,8 +37,9 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   @Override
   public void caseFunction(Function node) {
     Set<String> outputParamsCopy = Sets.newHashSet(outputParams);
-    outputParams.addAll(Sets.newHashSet(
-        Iterables.transform(node.getOutputParams(), AstFunctions.nameToID())));
+    outputParams.addAll(node.getOutputParams().stream()
+        .map(Name::getID)
+        .collect(Collectors.toSet()));
     super.caseFunction(node);
     outputParams.retainAll(outputParamsCopy);
   }

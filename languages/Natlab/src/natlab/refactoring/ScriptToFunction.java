@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import natlab.refactoring.Exceptions.IDConflictException;
 import natlab.refactoring.Exceptions.RefactorException;
@@ -26,9 +27,6 @@ import ast.Name;
 import ast.NameExpr;
 import ast.Script;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
-
 public class ScriptToFunction {
 	ParsedCompilationUnitsContextStack context;
 	Set<Script> scripts;
@@ -36,7 +34,7 @@ public class ScriptToFunction {
 	public Map<Script, Integer> outputCount = new HashMap<Script, Integer>();
 	public ScriptToFunction(CompilationUnits cu){
 		context = new ParsedCompilationUnitsContextStack(new LinkedList<GenericFile>(), cu.getRootFolder(), cu);
-		scripts = Sets.newHashSet(NodeFinder.find(Script.class, cu));
+		scripts = NodeFinder.find(Script.class, cu).collect(Collectors.toSet());
 	}
 	
 	public Map<Script, List<RefactorException>> replaceAll(){
@@ -53,13 +51,9 @@ public class ScriptToFunction {
 	public List<RefactorException> replace(final Script script, Function f){
 		System.out.println("Script Name: " + script.getName());
 		List<ExprStmt> calls = NodeFinder.find(ExprStmt.class, context.cu)
-		    .filter(new Predicate<ExprStmt>() {
-		      @Override public boolean apply(ExprStmt node) {
-		        return node.getExpr() instanceof NameExpr &&
-		            ((NameExpr) node.getExpr()).getName().getID().equals(script.getName());
-		      }
-		    })
-		    .toList();
+		    .filter(node -> node.getExpr() instanceof NameExpr)
+		    .filter(node -> ((NameExpr) node.getExpr()).getName().getID().equals(script.getName()))
+		    .collect(Collectors.toList());
 		f.setStmtList(script.getStmtList().copy());
 		FunctionList fl = new FunctionList();
 		fl.addFunction(f);

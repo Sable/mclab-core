@@ -3,7 +3,9 @@ package mclint.patterns;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import mclint.util.Parsing;
 import natlab.utils.NodeFinder;
@@ -13,8 +15,6 @@ import ast.ForStmt;
 import ast.Program;
 import ast.Stmt;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
@@ -30,18 +30,13 @@ public class Matcher {
     return new Matcher(UnparsedPattern.fromString(pattern), tree, stack).match();
   }
 
-  private static <T extends ASTNode<?>> Function<T, Optional<Match>> matchFunction(final String p) {
-    return new Function<T, Optional<Match>>() {
-      @Override public Optional<Match> apply(T node) {
-        return match(p, node);
-      }
-    };
-  }
-
   private static <T extends ASTNode<?>> List<Match> findMatching(Class<T> clazz, String pattern,
       ASTNode<?> tree) {
-    return ImmutableList.copyOf(Optional.presentInstances(NodeFinder.find(clazz, tree)
-        .transform(matchFunction(pattern))));
+    return NodeFinder.find(clazz, tree)
+        .map(node -> match(pattern, node))
+        .filter(match -> match.isPresent())
+        .map(match -> match.get())
+        .collect(Collectors.toList());
   }
 
   public static List<Match> findMatchingStatements(String pattern, ASTNode<?> tree) {
@@ -85,16 +80,16 @@ public class Matcher {
       if (stack.peek() instanceof String) {
         String top = (String) stack.peek();
         if (!pattern.consume(top)) {
-          return Optional.absent();
+          return Optional.empty();
         }
         stack.pop();
       } else if (shouldUnparse()) {
         unparse();
       } else if (!bind()) {
-        return Optional.absent();
+        return Optional.empty();
       }
     }
-    return Optional.fromNullable(pattern.finished() ? new Match(tree, bindings, pattern) : null);
+    return Optional.ofNullable(pattern.finished() ? new Match(tree, bindings, pattern) : null);
   }
 
   private boolean bind() {
