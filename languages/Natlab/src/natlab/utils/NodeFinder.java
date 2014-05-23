@@ -1,6 +1,5 @@
 package natlab.utils;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -46,17 +45,13 @@ public class NodeFinder {
   
   private static Iterable<ASTNode<?>> allAncestorsOf(final ASTNode<?> tree) {
     Preconditions.checkNotNull(tree);
-    return new Iterable<ASTNode<?>>() {
-      @Override public Iterator<ASTNode<?>> iterator() {
-        return new AbstractSequentialIterator<ASTNode<?>>(tree.getParent()) {
-          @Override protected ASTNode<?> computeNext(ASTNode<?> previous) {
-            return previous.getParent();
-          }
-        };
+    return () -> new AbstractSequentialIterator<ASTNode<?>>(tree.getParent()) {
+      @Override protected ASTNode<?> computeNext(ASTNode<?> previous) {
+        return previous.getParent();
       }
     };
   }
-  
+
   private static <T> Stream<T> asStream(Iterable<T> iterable) {
     return StreamSupport.stream(iterable.spliterator(), false);
   }
