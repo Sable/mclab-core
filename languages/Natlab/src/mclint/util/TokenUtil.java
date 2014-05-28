@@ -2,6 +2,7 @@ package mclint.util;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import matlab.MatlabLexer;
@@ -9,11 +10,9 @@ import matlab.MatlabLexer;
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.Token;
 
-import com.google.common.collect.Lists;
-
 public class TokenUtil {
   public static List<Token> tokenize(String code) {
-    List<Token> tokens = Lists.newArrayList();
+    List<Token> tokens = new ArrayList<>();
     MatlabLexer lexer = new MatlabLexer(getAntlrStream(code));
     Token token = lexer.nextToken();
     while (token != Token.EOF_TOKEN) {

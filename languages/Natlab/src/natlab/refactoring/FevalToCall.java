@@ -1,5 +1,6 @@
 package natlab.refactoring;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -10,7 +11,6 @@ import natlab.refactoring.Exceptions.RenameRequired;
 import natlab.toolkits.ParsedCompilationUnitsContextStack;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.NodeFinder;
 import ast.CompilationUnits;
 import ast.Name;
@@ -19,12 +19,11 @@ import ast.ParameterizedExpr;
 import ast.StringLiteralExpr;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 public class FevalToCall {
 	ParsedCompilationUnitsContextStack context;
 	public FevalToCall(CompilationUnits cu){
-		context = new ParsedCompilationUnitsContextStack(Lists.<GenericFile>newLinkedList(),
+		context = new ParsedCompilationUnitsContextStack(new LinkedList<>(),
 		    cu.getRootFolder(), cu);
 	}
 	
@@ -48,7 +47,7 @@ public class FevalToCall {
 	}
 	
 	public List<RefactorException> replace(ParameterizedExpr node, VFFlowInsensitiveAnalysis kind){
-		List<RefactorException> errors = Lists.newLinkedList();
+		List<RefactorException> errors = new LinkedList<>();
 		String target = ((StringLiteralExpr)node.getArg(0)).getValue();
 		Map<String, VFDatum> kinds = kind.getFlowSets().get(context.peek().curFunction);
 		VFDatum targetKind = kinds.containsKey(target) ? kinds.get(target) : VFDatum.UNDEF;

@@ -1,5 +1,6 @@
 package mclint.analyses;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -38,7 +39,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
 
   private Stack<ASTNode<?>> loopStack = new Stack<ASTNode<?>>();
   private Stack<Set<Expr>> invariantStack = new Stack<Set<Expr>>();
-  private Set<Expr> reported = Sets.newHashSet();
+  private Set<Expr> reported = new HashSet<>();
 
   public LoopInvariantComputation(Project project) {
     this.tree = project.asCompilationUnits();
@@ -76,7 +77,7 @@ public class LoopInvariantComputation extends AbstractNodeCaseHandler implements
     invariantStack.push(Sets.<Expr>newHashSet());
     Set<Expr> oldInvariants;
     do {
-      oldInvariants = Sets.newHashSet(invariantStack.peek());
+      oldInvariants = new HashSet<>(invariantStack.peek());
       if (node instanceof ForStmt)
         caseASTNode(((ForStmt)node).getStmts());
       else

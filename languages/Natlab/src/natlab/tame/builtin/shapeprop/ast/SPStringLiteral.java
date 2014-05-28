@@ -1,9 +1,10 @@
 package natlab.tame.builtin.shapeprop.ast;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.constant.CharConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 public class SPStringLiteral<V extends Value<V>> extends SPAbstractMatchElement<V> {
 	

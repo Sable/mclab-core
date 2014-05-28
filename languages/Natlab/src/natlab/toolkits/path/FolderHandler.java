@@ -16,6 +16,7 @@ Copyright 2011 Soroush Radpour and McGill University.
 
 package natlab.toolkits.path;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,16 +24,15 @@ import java.util.stream.Collectors;
 import natlab.toolkits.filehandling.GenericFile;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
 /* For a folder finds all the files that are accessible */
 public class FolderHandler{
-  private Map<String, GenericFile> classes = Maps.newHashMap(); //constructors?
-  private Map<String, GenericFile> packages = Maps.newHashMap(); //overloaded methods besides constructors?
-  private Map<String, GenericFile> functions = Maps.newHashMap();
+  private Map<String, GenericFile> classes = new HashMap<>(); //constructors?
+  private Map<String, GenericFile> packages = new HashMap<>(); //overloaded methods besides constructors?
+  private Map<String, GenericFile> functions = new HashMap<>();
   private Table<String, String, GenericFile> specializedFunction = HashBasedTable.create();
-  private Map<String, GenericFile> privateFunctions = Maps.newHashMap();
+  private Map<String, GenericFile> privateFunctions = new HashMap<>();
 
   private FolderHandler addPath(GenericFile path){
     for (GenericFile f : path.listChildren()) {
@@ -92,9 +92,9 @@ public class FolderHandler{
 
   public Map<String, GenericFile> lookupSpecializedAll(String name){
     if (specializedFunction.containsRow(name)) {
-      return Maps.newHashMap(specializedFunction.rowMap().get(name));
+      return new HashMap<>(specializedFunction.rowMap().get(name));
     }
-    return Maps.newHashMap();
+    return new HashMap<>();
   }
 
   public GenericFile lookupFunctions(String name){

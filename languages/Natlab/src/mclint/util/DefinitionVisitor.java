@@ -1,5 +1,6 @@
 package mclint.util;
 
+import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.CellIndexExpr;
@@ -7,7 +8,6 @@ import ast.DotExpr;
 import ast.Function;
 import ast.Name;
 import ast.ParameterizedExpr;
-import nodecases.AbstractNodeCaseHandler;
 
 /**
  * Provides a quick way to visit every node where a name is (potentially)

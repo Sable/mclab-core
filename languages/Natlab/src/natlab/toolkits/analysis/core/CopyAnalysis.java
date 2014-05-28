@@ -1,5 +1,6 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class CopyAnalysis extends ForwardAnalysis<Map<String, AssignStmt>>{
 
 	@Override
 	public void caseStmt(Stmt s){
-        outFlowSets.put( s, Maps.newHashMap(currentOutSet));
+        outFlowSets.put( s, new HashMap<>(currentOutSet));
 	}
 
 
@@ -83,22 +84,22 @@ public class CopyAnalysis extends ForwardAnalysis<Map<String, AssignStmt>>{
 		if ((s.getRHS() instanceof NameExpr) && (s.getLHS() instanceof NameExpr)){
 			currentOutSet.put(((NameExpr)s.getLHS()).getName().getID(), s);
 		}
-        outFlowSets.put( s, Maps.newHashMap(currentOutSet));
+        outFlowSets.put( s, new HashMap<>(currentOutSet));
 	}
 	
 	@Override
 	public Map<String, AssignStmt> copy(Map<String, AssignStmt> source) {
-		return Maps.newHashMap(source);
+		return new HashMap<>(source);
 	}
 
 	@Override
 	public Map<String, AssignStmt> merge(Map<String, AssignStmt> in1, Map<String, AssignStmt> in2) {
-	    return Maps.newHashMap(Maps.difference(in1, in2).entriesInCommon());
+	    return new HashMap<>(Maps.difference(in1, in2).entriesInCommon());
 	}
 
 	@Override
 	public Map<String, AssignStmt> newInitialFlow() {
-		return Maps.newHashMap();
+		return new HashMap<>();
 	}
 
 }

@@ -96,13 +96,13 @@ public class DefiniteAssignment extends TIRAbstractSimpleStructuralForwardAnalys
     @Override
     public HashSet<String> merge(HashSet<String> in1, HashSet<String> in2)
     {
-        return Sets.newHashSet(Sets.intersection(in1, in2));
+        return new HashSet<>(Sets.intersection(in1, in2));
     }
 
     @Override
     public HashSet<String> copy(HashSet<String> source)
     {
-        return Sets.newHashSet(source);
+        return new HashSet<>(source);
     }
     
     private void setInOutSet(TIRNode node)
@@ -114,6 +114,6 @@ public class DefiniteAssignment extends TIRAbstractSimpleStructuralForwardAnalys
     @Override
     public HashSet<String> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 }

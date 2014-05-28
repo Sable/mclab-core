@@ -12,7 +12,6 @@ import natlab.tame.callgraph.Callgraph;
 import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.tamerplus.transformation.TransformationEngine;
-import natlab.tame.tamerplus.utils.TamerPlusUtils;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
 import natlab.toolkits.filehandling.GenericFile;

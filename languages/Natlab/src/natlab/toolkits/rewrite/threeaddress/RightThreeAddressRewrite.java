@@ -35,8 +35,6 @@ import ast.ExprStmt;
 import ast.ForStmt;
 import ast.Program;
 
-import com.google.common.collect.Lists;
-
 /**
  * Transforms and simplifies RValue expressions. Results in such
  * expressions containing at most one indexing, field access, operator
@@ -63,7 +61,7 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
     {
         rewriteChildren( node );
         
-        LinkedList<AssignStmt> newAssignments = Lists.newLinkedList();
+        LinkedList<AssignStmt> newAssignments = new LinkedList<>();
         newAssignments.add(node);
         newAssignments = processAssignmentList( newAssignments,
                                                 nameResolver.getFlowSets().get(node) );
@@ -119,7 +117,7 @@ public class RightThreeAddressRewrite extends AbstractLocalRewrite
     public LinkedList<AssignStmt> processAssignmentList( LinkedList<AssignStmt> assignList, 
                                                    Map<String, VFDatum> resolvedNames )
     {
-        LinkedList<AssignStmt> newAssignList = Lists.newLinkedList();
+        LinkedList<AssignStmt> newAssignList = new LinkedList<>();
         Expr rhs;
         ExpressionCollector ec;
         while( assignList.size() > 0 ){

@@ -22,9 +22,8 @@ import java.util.Map;
 /**
  * Inlines A Script within a Script or a Function.
  */
-
-
-import ast.*;
+import ast.ASTNode;
+import ast.Script;
 
 public class ScriptInliner<ScriptOrFunction extends ASTNode> extends Inliner<Script,ScriptOrFunction> {
 

@@ -1,6 +1,7 @@
 package natlab.tame.interproceduralAnalysis.examples.live;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 

@@ -5,8 +5,6 @@ import java.util.Iterator;
 import ast.Function;
 import ast.Stmt;
 
-import com.google.common.collect.FluentIterable;
-
 public class StatementRange implements Iterable<Stmt> {
   private Function enclosingFunction;
   private ast.List<Stmt> statements;
@@ -59,7 +57,7 @@ public class StatementRange implements Iterable<Stmt> {
   }
   
   @Override public Iterator<Stmt> iterator() {
-    return FluentIterable.from(getStatements())
+    return getStatements().stream()
         .skip(getStartIndex())
         .limit(size())
         .iterator();

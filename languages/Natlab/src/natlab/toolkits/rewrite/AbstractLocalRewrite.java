@@ -18,11 +18,9 @@
 
 package natlab.toolkits.rewrite;
 
-import ast.*;
-import ast.List;
 import nodecases.AbstractNodeCaseHandler;
-
-import java.lang.UnsupportedOperationException;
+import ast.ASTNode;
+import ast.List;
 
 public abstract class AbstractLocalRewrite extends AbstractNodeCaseHandler
 {

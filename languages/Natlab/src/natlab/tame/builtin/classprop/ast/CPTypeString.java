@@ -1,11 +1,19 @@
 package natlab.tame.builtin.classprop.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.constant.CharConstant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.value.Value;
 
 // if next is a string, consumes it (otherwise no match)

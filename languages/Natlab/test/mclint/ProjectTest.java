@@ -6,8 +6,6 @@ import java.nio.file.Path;
 
 import junit.framework.TestCase;
 
-import com.google.common.collect.Iterables;
-
 public class ProjectTest extends TestCase {
   private Path projectRoot;
 
@@ -26,7 +24,7 @@ public class ProjectTest extends TestCase {
     create("f.m");
 
     Project project = Project.at(projectRoot);
-    MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
+    MatlabProgram f = project.getMatlabProgram("f.m");
     assertEquals("f.m", f.getPath().toString());
     assertFalse(f.isPrivate());
     assertEquals("", f.getPackage());
@@ -36,7 +34,7 @@ public class ProjectTest extends TestCase {
     create("private/f.m");
 
     Project project = Project.at(projectRoot);
-    MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
+    MatlabProgram f = project.getMatlabProgram("private/f.m");
     assertEquals("private/f.m", f.getPath().toString());
     assertTrue(f.isPrivate());
     assertEquals("", f.getPackage());

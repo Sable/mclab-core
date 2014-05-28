@@ -1,14 +1,13 @@
 package natlab.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import ast.ASTNode;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractSequentialIterator;
-import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
 
 /*
@@ -31,7 +30,7 @@ public class NodeFinder {
       // ASTNode is iterable, but it's Iterable<T extends ASTNode> (without the <?>).
       // If it was Iterable<T extends ASTNode<?>>, we could just write
       // return Iterables.concat(root);
-      List<ASTNode<?>> children = Lists.newArrayList();
+      List<ASTNode<?>> children = new ArrayList<>();
       for (ASTNode<?> child : root) {
         children.add(child);
       }
@@ -40,18 +39,9 @@ public class NodeFinder {
   }
 
   private static Iterable<ASTNode<?>> allDescendantsOf(ASTNode<?> tree) {
-    return new AstNodeTreeTraverser().preOrderTraversal(Preconditions.checkNotNull(tree));
+    return new AstNodeTreeTraverser().preOrderTraversal(Objects.requireNonNull(tree));
   }
   
-  private static Iterable<ASTNode<?>> allAncestorsOf(final ASTNode<?> tree) {
-    Preconditions.checkNotNull(tree);
-    return () -> new AbstractSequentialIterator<ASTNode<?>>(tree.getParent()) {
-      @Override protected ASTNode<?> computeNext(ASTNode<?> previous) {
-        return previous.getParent();
-      }
-    };
-  }
-
   private static <T> Stream<T> asStream(Iterable<T> iterable) {
     return StreamSupport.stream(iterable.spliterator(), false);
   }
@@ -68,10 +58,11 @@ public class NodeFinder {
    * Returns null if no such parent exists.
    */
   public static <T> T findParent(Class<T> clazz, ASTNode<?> node) {
-    return asStream(allAncestorsOf(node))
+    return Stream.iterate(node, ASTNode::getParent)
+        .filter(n -> clazz.isInstance(n) || n.getParent() == null)
+        .findFirst()
         .filter(clazz::isInstance)
         .map(clazz::cast)
-        .findFirst()
         .orElse(null);
   }
 }

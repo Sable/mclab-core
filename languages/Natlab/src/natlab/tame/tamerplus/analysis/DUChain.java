@@ -10,8 +10,6 @@ import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRNode;
 import ast.ASTNode;
 
-import com.google.common.collect.Maps;
-
 public class DUChain implements TamerPlusAnalysis
 {
     public static boolean DEBUG = false;
@@ -21,7 +19,7 @@ public class DUChain implements TamerPlusAnalysis
     
     public DUChain(ASTNode<?> tree)
     {
-        fDUMap = Maps.newHashMap();
+        fDUMap = new HashMap<>();
     }
     
     @Override
@@ -66,7 +64,7 @@ public class DUChain implements TamerPlusAnalysis
     {
         if (!fDUMap.containsKey(defStmt))
         {
-            HashMap<String, HashSet<TIRNode>> useSiteMap = Maps.newHashMap();
+            HashMap<String, HashSet<TIRNode>> useSiteMap = new HashMap<>();
             fDUMap.put(defStmt, useSiteMap);
         }
     }

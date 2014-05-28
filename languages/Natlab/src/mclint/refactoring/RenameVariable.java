@@ -1,5 +1,6 @@
 package mclint.refactoring;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -18,15 +19,13 @@ import ast.Name;
 import ast.Program;
 import ast.Script;
 
-import com.google.common.collect.Lists;
-
 class RenameVariable extends Refactoring {
   private Name node;
   private String newName;
   private UseDefDefUseChain udduChain;
   private boolean renameGlobally;
 
-  private List<Refactoring> globalRenames = Lists.newArrayList();
+  private List<Refactoring> globalRenames = new ArrayList<>();
 
   public RenameVariable(RefactoringContext context, Name node, String newName,
       boolean renameGlobally) {

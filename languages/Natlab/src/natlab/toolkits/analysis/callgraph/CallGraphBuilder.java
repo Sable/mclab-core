@@ -1,6 +1,7 @@
 package natlab.toolkits.analysis.callgraph;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -28,8 +29,6 @@ import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
-
-import com.google.common.collect.Sets;
 
 /**
  *
@@ -252,7 +251,7 @@ public class CallGraphBuilder
         
         public Set<String> newInitialFlow()
         {
-            return Sets.newHashSet();
+            return new HashSet<>();
         }
 
         public void caseFunction( Function node )

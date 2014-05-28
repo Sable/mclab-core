@@ -1,5 +1,6 @@
 package natlab.refactoring;
 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +13,6 @@ import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
-import natlab.toolkits.filehandling.GenericFile;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.CompilationUnits;
@@ -22,8 +22,6 @@ import ast.FunctionList;
 import ast.Name;
 import ast.NameExpr;
 import ast.Script;
-
-import com.google.common.collect.Lists;
 
 public class MScriptInliner extends Refactoring {
   private CompilationUnits cu;
@@ -68,7 +66,7 @@ public class MScriptInliner extends Refactoring {
   private ASTNode<?> resolveCall(ExprStmt call) {
     String target = ((NameExpr) call.getExpr()).getName().getID();
     ParsedCompilationUnitsContextStack context =
-        new ParsedCompilationUnitsContextStack(Lists.<GenericFile>newLinkedList(), cu.getRootFolder(), cu);
+        new ParsedCompilationUnitsContextStack(new LinkedList<>(), cu.getRootFolder(), cu);
     ast.Function enclosingFunction = NodeFinder.findParent(ast.Function.class, call);
     context.push(enclosingFunction);
     return context.resolveFunctionReference(context.peek().resolve(target));

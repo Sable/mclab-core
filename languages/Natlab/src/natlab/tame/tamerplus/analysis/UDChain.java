@@ -1,5 +1,6 @@
 package natlab.tame.tamerplus.analysis;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -7,7 +8,6 @@ import java.util.Set;
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRNode;
 import ast.ASTNode;
-import com.google.common.collect.Maps;
 
 public class UDChain implements TamerPlusAnalysis
 {
@@ -19,7 +19,7 @@ public class UDChain implements TamerPlusAnalysis
     
     public UDChain(ASTNode<?> tree)
     {
-        fUDMap = Maps.newHashMap();
+        fUDMap = new HashMap<>();
     }
     
     @Override
@@ -48,7 +48,7 @@ public class UDChain implements TamerPlusAnalysis
     
     private Map<String, Set<TIRNode>> getUsedVariablesToDefinitionsMapForNode(TIRNode node, Set<String> usedVariables)
     {
-        Map<String, Set<TIRNode>> usedVariablesToDefinitionsMap = Maps.newHashMap();
+        Map<String, Set<TIRNode>> usedVariablesToDefinitionsMap = new HashMap<>();
         Map<String, Set<TIRNode>> variableToReachingDefinitionsMap = fReachingDefinitionsAnalysis.getReachingDefinitionsForNode(node);
         for (String variableName : variableToReachingDefinitionsMap.keySet())
         {

@@ -27,7 +27,6 @@ import natlab.toolkits.analysis.core.ReachingDefs;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
-import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.simplification.RightSimplification;
 import natlab.utils.NodeFinder;
@@ -42,18 +41,15 @@ import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 public class FunctionInliner {
 	private CompilationUnits cu;
 	public int extra = 0;
 	public int removed = 0;
 
-	HashMap<String, Script> scripts = Maps.newHashMap();
+	HashMap<String, Script> scripts = new HashMap<>();
 	final ParsedCompilationUnitsContextStack context;
 	public FunctionInliner(CompilationUnits cu) {
-		context=new ParsedCompilationUnitsContextStack(Lists.<GenericFile>newLinkedList(),
+		context=new ParsedCompilationUnitsContextStack(new LinkedList<>(),
 		    cu.getRootFolder(), cu);
 		this.cu = cu;
 	};
@@ -103,7 +99,7 @@ public class FunctionInliner {
 	}
 
 	private Collection<NameExpr> getUses(AssignStmt s, Collection<NameExpr> all, ReachingDefs defAnalysis){
-		LinkedList<NameExpr> uses = Lists.newLinkedList();
+		LinkedList<NameExpr> uses = new LinkedList<>();
 		for (NameExpr n: all){
 			Stmt aUse= NodeFinder.findParent(Stmt.class, n);
 			Map<String, Set<Def>> output= defAnalysis.getOutFlowSets().get(aUse);
@@ -149,7 +145,7 @@ public class FunctionInliner {
 	}
 	
 	public LinkedList<RefactorException> inline(AssignStmt s){
-		LinkedList<RefactorException> errors = Lists.newLinkedList();
+		LinkedList<RefactorException> errors = new LinkedList<>();
         ast.Function f = NodeFinder.findParent(ast.Function.class, s);
 		context.push(f);
 		VFFlowInsensitiveAnalysis kind_analysis_caller = 
@@ -189,10 +185,10 @@ public class FunctionInliner {
 		}
 		
 		
-		ContextStack calleeContext = new ContextStack(Lists.<GenericFile>newLinkedList(),
+		ContextStack calleeContext = new ContextStack(new LinkedList<>(),
 		    lookupreference.path.getParent());
 		calleeContext.push(target);
-		LinkedList<AssignStmt> toRemove = Lists.newLinkedList();
+		LinkedList<AssignStmt> toRemove = new LinkedList<>();
 		VFFlowInsensitiveAnalysis kind_analysis_callee = new VFFlowInsensitiveAnalysis(target);
 		kind_analysis_callee.analyze();
 		
@@ -201,7 +197,7 @@ public class FunctionInliner {
 		for (;list.getChild(k)!=s;k++);
 		    //just go forward in list
 		list.removeChild(k);
-		LinkedList<Stmt> nlist = Lists.newLinkedList();
+		LinkedList<Stmt> nlist = new LinkedList<>();
 		
 		for (int i=0;i<rhs.getNumArg();i++){
 			AssignStmt newStmt = new AssignStmt(new NameExpr(target.getInputParam(i)), rhs.getArg(i));

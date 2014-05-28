@@ -1,6 +1,7 @@
 package mclint.patterns;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,13 +17,12 @@ import ast.Program;
 import ast.Stmt;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 public class Matcher {
   private UnparsedPattern pattern;
   private Stack<Object> stack;
   private ASTNode<?> tree;
-  private Map<Character, ASTNode<?>> bindings = Maps.newHashMap();
+  private Map<Character, ASTNode<?>> bindings = new HashMap<>();
 
   private static Optional<Match> match(String pattern, ASTNode<?> tree) {
     Stack<Object> stack = new Stack<Object>();

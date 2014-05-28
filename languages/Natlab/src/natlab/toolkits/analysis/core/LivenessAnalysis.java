@@ -1,5 +1,6 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,8 +16,6 @@ import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Script;
 import ast.Stmt;
-
-import com.google.common.collect.Sets;
 
 public class LivenessAnalysis extends
 BackwardAnalysis<Set<String>> {
@@ -53,7 +52,7 @@ BackwardAnalysis<Set<String>> {
   @Override
   public void caseAssignStmt(AssignStmt s) {
     outFlowSets.put(s, copy(currentOutSet));
-    Set<NameExpr> lValues = Sets.newHashSet();
+    Set<NameExpr> lValues = new HashSet<>();
 
     if (s.getLHS() instanceof MatrixExpr) {
       for (Expr expr : ((MatrixExpr) s.getLHS()).getRow(0).getElements()) {
@@ -96,18 +95,18 @@ BackwardAnalysis<Set<String>> {
 
   @Override
   public Set<String> copy(Set<String> source) {
-    return Sets.newHashSet(source);
+    return new HashSet<>(source);
   }
 
   @Override
   public Set<String> merge(Set<String> in1, Set<String> in2) {
-    Set<String> out = Sets.newHashSet(in1);
+    Set<String> out = new HashSet<>(in1);
     out.addAll(in2);
     return out;
   }
 
   @Override
   public Set<String> newInitialFlow() {
-    return Sets.newHashSet();
+    return new HashSet<>();
   }
 }

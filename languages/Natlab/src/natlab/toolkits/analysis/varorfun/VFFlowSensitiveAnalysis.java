@@ -2,6 +2,7 @@ package natlab.toolkits.analysis.varorfun;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,6 @@ import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
 
-import com.google.common.collect.Maps;
-
 public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<Map<String, VFDatum>> implements VFAnalysis{
   private Function currentFunction = null;
   private Script currentScript = null;
@@ -51,7 +50,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
 
   @Override
   public Map<String, VFDatum> newInitialFlow() {
-    return Maps.newHashMap();
+    return new HashMap<>();
   }
   public VFFlowSensitiveAnalysis( ASTNode tree , FunctionOrScriptQuery lookup )
   {
@@ -81,7 +80,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
     currentOutSet = currentInSet;
     node.getStmts().analyze(this);
     currentScript=null;
-    outFlowSets.put( node, Maps.newHashMap(currentOutSet) );
+    outFlowSets.put( node, new HashMap<>(currentOutSet) );
   }
 
   @Override
@@ -401,7 +400,7 @@ public class VFFlowSensitiveAnalysis extends AbstractStructuralForwardAnalysis<M
 
   @Override
   public Map<String, VFDatum> copy(Map<String, VFDatum> source) {
-    return Maps.newHashMap(source);
+    return new HashMap<>(source);
   }
 
   @Override

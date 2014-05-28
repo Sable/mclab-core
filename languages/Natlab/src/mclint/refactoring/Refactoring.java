@@ -1,15 +1,14 @@
 package mclint.refactoring;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import natlab.refactoring.Exceptions.RefactorException;
 
-import com.google.common.collect.Lists;
-
 public abstract class Refactoring {
   protected RefactoringContext context;
-  private List<RefactorException> errors = Lists.newArrayList();
+  private List<RefactorException> errors = new ArrayList<>();
 
   protected Refactoring(RefactoringContext context) {
     this.context = context;

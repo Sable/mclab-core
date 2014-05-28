@@ -1,6 +1,7 @@
 package natlab.toolkits.analysis.varorfun;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,6 @@ import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<String, VFDatum>> implements VFAnalysis{
   private boolean inFunction=true;
   private Function currentFunction = null;
@@ -46,7 +44,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
 
   @Override
   public Map<String, VFDatum> newInitialFlow() {
-    return Maps.newHashMap();
+    return new HashMap<>();
   }
 
   public VFFlowInsensitiveAnalysis( ASTNode tree , FunctionOrScriptQuery lookup ) {
@@ -73,7 +71,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
     currentScript=node;
     currentSet = newInitialFlow();
     inFunction=false;
-    withEndExpressions = Sets.newHashSet();
+    withEndExpressions = new HashSet<>();
     pass = 0;
     node.getStmts().analyze(this);
     analyzeEndExpressions();

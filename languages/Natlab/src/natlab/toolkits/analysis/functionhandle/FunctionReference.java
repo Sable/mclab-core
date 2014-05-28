@@ -1,6 +1,7 @@
 package natlab.toolkits.analysis.functionhandle;
 
-import ast.*;
+import ast.FunctionHandleExpr;
+import ast.LambdaExpr;
 
 /**
  * a reference to a function

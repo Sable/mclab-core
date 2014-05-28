@@ -1,5 +1,6 @@
 package mclint.analyses;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,13 +16,11 @@ import ast.Function;
 import ast.Name;
 import ast.Stmt;
 
-import com.google.common.collect.Sets;
-
 public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
   private LivenessAnalysis liveVar;
 
   /* We shouldn't warn that output parameters aren't used. */
-  private Set<String> outputParams = Sets.newHashSet();
+  private Set<String> outputParams = new HashSet<>();
 
   protected Lint lint;
 
@@ -36,7 +35,7 @@ public class UnusedVar extends DefinitionVisitor implements LintAnalysis {
 
   @Override
   public void caseFunction(Function node) {
-    Set<String> outputParamsCopy = Sets.newHashSet(outputParams);
+    Set<String> outputParamsCopy = new HashSet<>(outputParams);
     outputParams.addAll(node.getOutputParams().stream()
         .map(Name::getID)
         .collect(Collectors.toSet()));

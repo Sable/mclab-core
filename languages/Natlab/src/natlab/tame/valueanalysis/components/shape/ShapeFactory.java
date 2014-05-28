@@ -1,9 +1,12 @@
 package natlab.tame.valueanalysis.components.shape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * allows construction of shapes

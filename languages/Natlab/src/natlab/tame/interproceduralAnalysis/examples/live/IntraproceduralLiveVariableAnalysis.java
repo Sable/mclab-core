@@ -30,8 +30,6 @@ import ast.Function;
 import ast.Name;
 import ast.NameExpr;
 
-import com.google.common.collect.Maps;
-
 
 /**
  * the intraprocedural analysis upon which the interprocedural value analysis is built
@@ -100,17 +98,17 @@ public class IntraproceduralLiveVariableAnalysis
 	//*** inherited mcsaf functions **************************************************
 	@Override
 	public Map<String, LiveValue> copy(Map<String, LiveValue> source) {
-	  return Maps.newHashMap(source);
+	  return new HashMap<>(source);
 	}
 
 	@Override
 	public Map<String, LiveValue> newInitialFlow() {
-		return Maps.newHashMap();
+		return new HashMap<>();
 	}
 
 	@Override
 	public Map<String, LiveValue> merge(Map<String, LiveValue> in1, Map<String, LiveValue> in2) {
-	  Map<String, LiveValue> out = Maps.newHashMap();
+	  Map<String, LiveValue> out = new HashMap<>();
 		//fill in everything from in1
 		for (String name : in1.keySet()){
 			if (in2.containsKey(name)){

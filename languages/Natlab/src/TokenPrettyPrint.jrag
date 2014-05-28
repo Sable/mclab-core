@@ -1,4 +1,3 @@
-import com.google.common.collect.FluentIterable;
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
@@ -23,10 +22,9 @@ aspect TokenPrettyPrint {
   }
 
   protected static TokenStreamFragment ASTNode.concatFragments(Object... objects) {
-    FluentIterable<Object> fragments = FluentIterable.from(Arrays.asList(objects));
-    TokenStreamFragment result = fragmentFromObject(fragments.first().orNull());
-    for (Object fragment : fragments.skip(1)) {
-      result = result.spliceBefore(fragmentFromObject(fragment));
+    TokenStreamFragment result = fragmentFromObject(objects[0]);
+    for (int i = 1; i < objects.length; ++i) {
+      result = result.spliceBefore(fragmentFromObject(objects[i]));
     }
     return result;
   }

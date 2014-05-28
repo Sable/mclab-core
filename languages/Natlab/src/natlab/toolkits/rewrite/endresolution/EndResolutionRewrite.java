@@ -21,14 +21,25 @@
 
 package natlab.toolkits.rewrite.endresolution;
 
-import ast.*;
-import nodecases.AbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.rewrite.endresolution.indentedAccess;
-import natlab.toolkits.analysis.varorfun.*;
 import java.util.LinkedList;
-import java.util.HashSet;
-import java.util.ArrayList;
+
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ElseBlock;
+import ast.EndExpr;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.IntLiteralExpr;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Stmt;
+import ast.StringLiteralExpr;
 
 
 /**

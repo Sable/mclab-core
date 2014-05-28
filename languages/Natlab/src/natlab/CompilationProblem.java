@@ -21,9 +21,6 @@
 
 package natlab;
 
-import java.util.List;
-
-import com.google.common.base.Joiner;
 
 /**
  * Describes the position and nature of a problem encountered while compiling
@@ -76,9 +73,5 @@ public class CompilationProblem {
       return String.format("[%d, %d] %s", line, col, msg);
     }
     return msg;
-  }
-
-  public static String toStringAll(List<CompilationProblem> errors) {
-    return Joiner.on('\n').join(errors);
   }
 }

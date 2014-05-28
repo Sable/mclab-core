@@ -1,13 +1,15 @@
 package natlab.tame.builtin.shapeprop.ast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.constant.CharConstant;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.shape.HasShape;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	

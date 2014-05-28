@@ -21,7 +21,7 @@ package natlab.tame.valueanalysis.components.constant;
 import java.util.ArrayList;
 import java.util.List;
 
-import natlab.tame.classes.reference.*;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 
 /**
  * This is a char constant (String). This can only store char arrays which are strings,

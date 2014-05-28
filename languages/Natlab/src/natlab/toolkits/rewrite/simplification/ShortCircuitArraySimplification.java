@@ -19,11 +19,24 @@
 package natlab.toolkits.rewrite.simplification;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import ast.*;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.*;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.rewrite.TempFactory;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AndExpr;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.OrExpr;
+import ast.Stmt;
+import ast.WhileStmt;
 
 /**
  * Simplifies Array short circuiting boolean expressions into explicit

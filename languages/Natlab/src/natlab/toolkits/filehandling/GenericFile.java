@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.google.common.io.CharStreams;
+
 
 /**
  * A generic file is a File object, but it may not necessarily represent a
@@ -63,6 +65,10 @@ public abstract class GenericFile implements Serializable {
      * @throws IOException
      */
     abstract public Reader getReader() throws IOException;
+    
+    public String getContents() throws IOException {
+      return CharStreams.toString(getReader());
+    }
     
     /**
      * @return true iff the generic file refers to a directory
@@ -153,7 +159,7 @@ public abstract class GenericFile implements Serializable {
     /**
      * returns the last modified date of the file
      */
-    public abstract long lastModifiedDate();    
+    public abstract long lastModifiedDate();
         
     /**
      * returns true if the file exists

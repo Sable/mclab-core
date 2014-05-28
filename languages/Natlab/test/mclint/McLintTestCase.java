@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import junit.framework.TestCase;
 import mclint.refactoring.RefactoringContext;
 import mclint.util.Parsing;
 import ast.ASTNode;
 import ast.Program;
-
-import com.google.common.base.Joiner;
 
 public abstract class McLintTestCase extends TestCase {
   protected Project project;
@@ -22,7 +22,7 @@ public abstract class McLintTestCase extends TestCase {
   }
   
   protected String join(String... lines) {
-    return Joiner.on('\n').join(lines);
+    return Arrays.stream(lines).collect(Collectors.joining("\n"));
   }
   
   protected MatlabProgram parse(String path, String... lines) {

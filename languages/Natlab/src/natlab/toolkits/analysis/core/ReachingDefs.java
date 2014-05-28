@@ -18,6 +18,7 @@
 
 package natlab.toolkits.analysis.core;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class ReachingDefs extends
         ForwardAnalysis<Map<String, Set<Def>>> {
   public static Def UNDEF = new AssignStmt();
 
-  private Set<Name> defs = Sets.newHashSet();
+  private Set<Name> defs = new HashSet<>();
 
   private Map<String, Set<Def>> startMap;
   private DefinitelyAssignedAnalysis definiteAssignment;
@@ -72,13 +73,13 @@ public class ReachingDefs extends
 
   @Override
   public Map<String, Set<Def>> merge(Map<String, Set<Def>> in1, Map<String, Set<Def>> in2) {
-    return MergeUtil.unionMerge(in1, in2, (a, b) -> Sets.newHashSet(Sets.union(a, b)));
+    return MergeUtil.unionMerge(in1, in2, (a, b) -> new HashSet<>(Sets.union(a, b)));
   }
 
   @Override
   public Map<String, Set<Def>> copy(Map<String, Set<Def>> in) {
     return in.entrySet().stream()
-        .collect(Collectors.toMap(e -> e.getKey(), e -> Sets.newHashSet(e.getValue())));
+        .collect(Collectors.toMap(e -> e.getKey(), e -> new HashSet<>(e.getValue())));
   }
 
   @Override
@@ -89,7 +90,7 @@ public class ReachingDefs extends
     currentOutSet.putAll(NodeFinder.find(Name.class, f.getStmts())
         .map(Name::getID)
         .distinct()
-        .collect(Collectors.toMap(name -> name, name -> Sets.newHashSet(UNDEF))));
+        .collect(Collectors.toMap(name -> name, name -> new HashSet<>(Collections.singleton(UNDEF)))));
     currentOutSet.putAll(f.getInputParams().stream()
         .collect(Collectors.toMap(Name::getID, Sets::<Def>newHashSet)));
     caseASTNode(f.getStmts());
@@ -104,7 +105,7 @@ public class ReachingDefs extends
     currentOutSet.putAll(NodeFinder.find(Name.class, f)
         .map(Name::getID)
         .distinct()
-        .collect(Collectors.toMap(name -> name, name -> Sets.newHashSet(UNDEF))));
+        .collect(Collectors.toMap(name -> name, name -> new HashSet<>(Collections.singleton(UNDEF)))));
     caseASTNode(f.getStmts());
     outFlowSets.put(f, currentOutSet);
   }

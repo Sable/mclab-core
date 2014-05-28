@@ -1,14 +1,16 @@
 package natlab.tame.valueanalysis.components.mclass;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
-import natlab.tame.builtin.*;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.BuiltinVisitor;
 import natlab.tame.builtin.classprop.ClassPropTool;
 import natlab.tame.builtin.classprop.HasClassPropagationInfo;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * given a builtin and values, returns the mclasses of the results. The results are returned as

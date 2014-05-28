@@ -1,14 +1,24 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
-import natlab.tame.classes.reference.*;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.components.rangeValue.*;
-import natlab.tame.valueanalysis.components.isComplex.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.isComplex.HasisComplexInfo;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
+import natlab.tame.valueanalysis.components.rangeValue.HasRangeValue;
+import natlab.tame.valueanalysis.components.rangeValue.RangeValue;
+import natlab.tame.valueanalysis.components.rangeValue.RangeValueFactory;
+import natlab.tame.valueanalysis.components.shape.HasShape;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+import natlab.tame.valueanalysis.components.shape.ShapePropagator;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 
 /**
  * represents a MatrixValue that is instantiable. It stores a constant, on top

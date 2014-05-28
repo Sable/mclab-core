@@ -17,6 +17,7 @@ Copyright 2011 Anton Dubrau, Jesse Doherty, Soroush Radpour and McGill Universit
 
 package natlab.toolkits.analysis.varorfun;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +44,6 @@ import ast.ParameterizedExpr;
 import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
-
-import com.google.common.collect.Maps;
 
 /** 
  * An implementation of a preorder analysis for the var or fun
@@ -91,7 +90,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
    	}
     public Map<String, VFDatum> newInitialFlow()
     {
-        return Maps.newHashMap();
+        return new HashMap<>();
     }
 
     public void caseCondition( Expr condExpr )
@@ -337,7 +336,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     }
 
     public void caseLambdaExpr(LambdaExpr node){
-    	Map<String, VFDatum> backup = Maps.newHashMap(currentSet);
+    	Map<String, VFDatum> backup = new HashMap<>(currentSet);
     	Set<String> inputSet=new TreeSet<String>();
     	for (Name inputParam: node.getInputParams()){
             currentSet.merge(inputParam.getID(), VFDatum.VAR, Mergable::merge);
@@ -393,7 +392,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
         if (inFunction)
         	flowSets.put(n, currentSet);
         else
-        	flowSets.put(n, Maps.newHashMap(currentSet));
+        	flowSets.put(n, new HashMap<>(currentSet));
     }
     @Override
 	public VFDatum getResult(Name n) {

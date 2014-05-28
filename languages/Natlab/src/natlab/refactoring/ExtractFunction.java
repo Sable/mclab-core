@@ -1,5 +1,6 @@
 package natlab.refactoring;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,8 +28,6 @@ import ast.ParameterizedExpr;
 import ast.Row;
 import ast.Stmt;
 
-import com.google.common.collect.Sets;
-
 public class ExtractFunction extends Refactoring {
   private StatementRange extractionRange;
   private String extractedFunctionName;
@@ -42,8 +41,8 @@ public class ExtractFunction extends Refactoring {
   private Set<String> liveAfter;
   private Map<String, VFDatum> kinds;
 
-  private Set<String> addedGlobals = Sets.newHashSet();
-  private Set<String> addedInputs = Sets.newHashSet();
+  private Set<String> addedGlobals = new HashSet<>();
+  private Set<String> addedInputs = new HashSet<>();
   
   public ExtractFunction(RefactoringContext context, StatementRange extractionRange,
       String extractedFunctionName) {

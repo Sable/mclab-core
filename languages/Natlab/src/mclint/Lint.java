@@ -2,6 +2,7 @@ package mclint;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +13,6 @@ import mclint.reports.ReportGenerator;
 import mclint.util.AstUtil;
 
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -24,12 +24,12 @@ import com.google.common.collect.Multimap;
  */
 
 public class Lint {
-  private List<Message> messages = Lists.newArrayList();
+  private List<Message> messages = new ArrayList<>();
   private List<LintAnalysis> analyses;
   private Multimap<String, MessageListener> messageListeners = LinkedHashMultimap.create();
   private Project project;
 
-  private List<Message> currentMessages = Lists.newArrayList();
+  private List<Message> currentMessages = new ArrayList<>();
 
   public static Lint create(Project project, List<LintAnalysis> analyses) {
     return new Lint(project, analyses);
@@ -88,7 +88,7 @@ public class Lint {
   public void writeReport(ReportGenerator reporter, OutputStream out) {
     Collections.sort(messages);
     try {
-      reporter.write(Lists.newArrayList(messages), out);
+      reporter.write(new ArrayList<>(messages), out);
     } catch (IOException e) {
       System.err.println("Could not write report: ");
       e.printStackTrace();

@@ -1,8 +1,5 @@
 package natlab.tame.valueanalysis.components.isComplex;
 
-import java.util.List;
-
-import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.value.Value;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.analysis.Mergable;
