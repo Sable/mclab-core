@@ -12,3 +12,4 @@ notifications:
       - mclab@sable.mcgill.ca
     on_success: change
     on_failure: always
+  slack: sable-mclab:BCSCOEsSkQxkbBoNbuwrzVTC
