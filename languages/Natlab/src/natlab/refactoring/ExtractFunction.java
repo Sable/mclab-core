@@ -173,23 +173,21 @@ public class ExtractFunction extends Refactoring {
     for (Name input : extracted.getInputParams()) {
       call.getArgs().add(new NameExpr(new Name(input.getID())));
     }
-    if (extracted.getNumOutputParam() == 0) {
+
+    switch (extracted.getNumOutputParam()) {
+    case 0:
       return new ExprStmt(call);
-    }
-    AssignStmt assign = new AssignStmt();
-    assign.setRHS(call);
-    if (extracted.getNumOutputParam() == 1) {
-      assign.setLHS(new NameExpr(new Name(extracted.getOutputParam(0).getID())));
-    } else {
+    case 1:
+      return new AssignStmt(
+          new NameExpr(new Name(extracted.getOutputParam(0).getID())), call);
+    default:
       Row row = new Row();
       for (Name name : extracted.getOutputParams()) {
         row.addElement(new NameExpr(new Name(name.getID())));
       }
-      MatrixExpr lhs = new MatrixExpr();
-      lhs.addRow(row);
-      assign.setLHS(lhs);
+      return new AssignStmt(
+          new MatrixExpr(new ast.List<Row>().add(row)), call);
     }
-    return assign;
   }
 
   public Function getExtractedFunction() {
