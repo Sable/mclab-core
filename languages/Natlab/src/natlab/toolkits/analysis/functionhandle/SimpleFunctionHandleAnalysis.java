@@ -1,5 +1,7 @@
 package natlab.toolkits.analysis.functionhandle;
 
+import java.util.HashSet;
+
 import natlab.FlowAnalysisTestTool;
 import analysis.ForwardAnalysis;
 import ast.ASTNode;
@@ -74,12 +76,12 @@ public class SimpleFunctionHandleAnalysis extends
 	
 	@Override
 	public VariableEntryFlowSet copy(VariableEntryFlowSet source) {
-		return (VariableEntryFlowSet) Sets.newHashSet(source);
+		return (VariableEntryFlowSet) new HashSet<>(source);
 	}
 	
 	@Override
 	public VariableEntryFlowSet merge(VariableEntryFlowSet in1, VariableEntryFlowSet in2) {
-	  return (VariableEntryFlowSet) Sets.newHashSet(Sets.union(in1, in2));
+	  return (VariableEntryFlowSet) new HashSet<>(Sets.union(in1, in2));
 	}
 
 	@Override

@@ -2,10 +2,9 @@
 
 package natlab.tame.builtin.classprop;
 
-import beaver.Symbol;
-import beaver.Scanner;
-
 import natlab.tame.builtin.classprop.ClassPropParser.Terminals;
+import beaver.Scanner;
+import beaver.Symbol;
 
 
 

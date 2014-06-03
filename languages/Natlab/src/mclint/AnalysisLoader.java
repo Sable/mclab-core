@@ -2,20 +2,18 @@ package mclint;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-
-import com.google.common.collect.Lists;
 
 /**
  * Loads and instantiates analyses. All the ugly ClassLoader/JAR hell code goes here.
@@ -38,8 +36,8 @@ public class AnalysisLoader {
     return loader.analyses;
   }
 
-  private List<Class<LintAnalysis>> analysisClasses = Lists.newArrayList();
-  private List<LintAnalysis> analyses = Lists.newArrayList();
+  private List<Class<LintAnalysis>> analysisClasses = new ArrayList<>();
+  private List<LintAnalysis> analyses = new ArrayList<>();
 
   /**
    * Inspects the given jar files and retrieves an array of fully qualified class names.
@@ -48,7 +46,7 @@ public class AnalysisLoader {
    * @throws IOException
    */
   private String[] getAllClasses(String[] jars) throws IOException {
-    List<String> classes = Lists.newArrayList();
+    List<String> classes = new ArrayList<>();
     for (String jar : jars) {
       JarInputStream jarFile = null;
       try {
@@ -82,7 +80,7 @@ public class AnalysisLoader {
    * @return its interfaces
    */
   private List<Class<?>> getInterfaces(Class<?> clazz) {
-    List<Class<?>> interfaces = Lists.newArrayList();
+    List<Class<?>> interfaces = new ArrayList<>();
     Class<?> current = clazz;
     while (current != null && current != Object.class) {  
       interfaces.addAll(Arrays.asList(current.getInterfaces()));
@@ -93,12 +91,7 @@ public class AnalysisLoader {
 
   @SuppressWarnings("unchecked")
   private void loadAnalysisClasses(File pluginDirectory) throws MalformedURLException, IOException {
-    String[] jars = pluginDirectory.list(new FilenameFilter() {
-      @Override
-      public boolean accept(File file, String name) {
-        return name.endsWith(".jar");
-      }
-    });
+    String[] jars = pluginDirectory.list((file, name) -> name.endsWith(".jar"));
     for (int i = 0; i < jars.length; ++i) {
       jars[i] = new File(pluginDirectory, jars[i]).getAbsolutePath();
     }

@@ -1,9 +1,10 @@
 package natlab.tame.builtin.classprop.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import natlab.tame.builtin.classprop.ClassPropTool;
 import natlab.tame.builtin.classprop.ClassPropMatch;
+import natlab.tame.builtin.classprop.ClassPropTool;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.value.Value;
 

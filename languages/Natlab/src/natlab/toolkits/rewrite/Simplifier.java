@@ -19,6 +19,7 @@
 package natlab.toolkits.rewrite;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -26,9 +27,6 @@ import java.util.Set;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.simplification.AbstractSimplification;
 import ast.ASTNode;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Performs simplifications. Takes care of dependencies and any needed
@@ -57,7 +55,7 @@ public class Simplifier
      */
     @SuppressWarnings("unchecked")
     public Simplifier(ASTNode tree,Class... todo){
-        this(tree, Sets.newHashSet(Arrays.<Class<? extends AbstractSimplification>>asList(todo)));
+        this(tree, new HashSet<>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)));
     }
 
     /**
@@ -69,7 +67,7 @@ public class Simplifier
             VFPreorderAnalysis kindAnalysis,
             Class ... todo){
         this(tree,
-             Sets.newHashSet(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
+             new HashSet<>(Arrays.<Class<? extends AbstractSimplification>>asList(todo)),
              kindAnalysis);
     }
     
@@ -105,7 +103,7 @@ public class Simplifier
                        Set<Class<? extends AbstractSimplification>> todo, 
                        VFPreorderAnalysis kindAna )
     {
-        simplifications = Lists.newLinkedList();
+        simplifications = new LinkedList<>();
         kind = kindAna;
         if( !kind.isAnalyzed() )
             kind.analyze();
@@ -134,7 +132,7 @@ public class Simplifier
      */
     protected void buildDependencies( Set<Class<? extends AbstractSimplification>> startSet )
     {
-        Set<Class<? extends AbstractSimplification>> seenStartSet = Sets.newHashSet();
+        Set<Class<? extends AbstractSimplification>> seenStartSet = new HashSet<>();
         while( !startSet.isEmpty() ){
             Iterator<Class<? extends AbstractSimplification>> iter = startSet.iterator();
             Class<? extends AbstractSimplification> simpClass = iter.next();

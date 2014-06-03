@@ -18,13 +18,12 @@
 
 package natlab.utils;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import ast.Expr;
 import ast.StringLiteralExpr;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
 /**
  * Some helper methods for dealing with the load function.
@@ -58,7 +57,7 @@ public class LoadFunction {
       return set;
     }
 
-    set = Sets.newHashSet();
+    set = new HashSet<>();
 
     boolean noFlag = true;
     String filename = arg0;
@@ -98,7 +97,7 @@ public class LoadFunction {
    */
   private static Set<String> handleAsciiFlag(String arg, String filename) {
     if (arg.equals("-ascii")){
-      return ImmutableSet.of(genVarName(filename));
+      return Collections.singleton(genVarName(filename));
     }
     return null;
   }

@@ -1,6 +1,9 @@
 package natlab.tame.tamerplus.utils;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import natlab.tame.tamerplus.analysis.DUChain;
 import natlab.tame.tamerplus.analysis.DefinedVariablesNameCollector;
@@ -10,20 +13,16 @@ import natlab.tame.tamerplus.analysis.TemporaryVariablesRemoval;
 import natlab.tame.tamerplus.analysis.UDChain;
 import natlab.tame.tamerplus.analysis.UDDUWeb;
 import natlab.tame.tamerplus.analysis.UsedVariablesNameCollector;
-import natlab.utils.AstFunctions;
 import ast.Name;
-
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Sets;
 
 public class TamerPlusUtils
 {
     public static Set<String> getNameListAsStringSet(Iterable<Name> nameList)
     {
-        return Sets.newHashSet(FluentIterable.from(nameList)
-            .filter(Predicates.notNull())
-            .transform(AstFunctions.nameToID()));
+      return StreamSupport.stream(nameList.spliterator(), false)
+          .filter(Objects::nonNull)
+          .map(Name::getID)
+          .collect(Collectors.toSet());
     }
     
     public static void debugMode()

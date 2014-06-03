@@ -3,13 +3,11 @@ package natlab.toolkits.path;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import natlab.toolkits.filehandling.GenericFile;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 /**
  * Mock subclass of GenericFile for testing purposes.
@@ -23,13 +21,13 @@ public class MockFile extends GenericFile {
   private List<GenericFile> children;
   
   private MockFile(String name) {
-    this(name, null);
+    this(name, "");
   }
   
   private MockFile(String name, String contents) {
     this.name = name;
     this.contents = contents;
-    this.children = Lists.newArrayList();
+    this.children = new ArrayList<>();
   }
   
   public static MockFile directory(String name) {
@@ -60,7 +58,7 @@ public class MockFile extends GenericFile {
 
   @Override
   public Reader getReader() throws IOException {
-    return new StringReader(Strings.nullToEmpty(contents));
+    return new StringReader(contents);
   }
 
 
@@ -71,7 +69,7 @@ public class MockFile extends GenericFile {
 
   @Override
   public Collection<? extends GenericFile> listChildren() {
-    return Lists.newArrayList(children);
+    return new ArrayList<>(children);
   }
 
   @Override
@@ -89,12 +87,7 @@ public class MockFile extends GenericFile {
 
   @Override
   public GenericFile getChild(String name) {
-    for (GenericFile file : children) {
-      if (file.getName().equals(name)) {
-        return file;
-      }
-    }
-    return null;
+    return children.stream().filter(f -> f.getName().equals(name)).findFirst().orElse(null);
   }
 
   //// Don't care about these:

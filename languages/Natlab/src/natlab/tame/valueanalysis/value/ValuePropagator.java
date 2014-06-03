@@ -7,7 +7,6 @@ import natlab.tame.classes.reference.BuiltinCompoundClassReference;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.FunctionHandleClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 
 /**
  * Propagate values for builtin functions.

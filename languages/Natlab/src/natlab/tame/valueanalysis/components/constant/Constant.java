@@ -18,12 +18,13 @@
 
 package natlab.tame.valueanalysis.components.constant;
 
+import java.util.List;
+
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import ast.FPLiteralExpr;
 import ast.IntLiteralExpr;
 import ast.LiteralExpr;
 import ast.StringLiteralExpr;
-import natlab.tame.classes.reference.PrimitiveClassReference;
-import java.util.*;
 
 /**
  * represents an actual specific Matlab value.

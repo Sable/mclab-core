@@ -1,12 +1,13 @@
 package natlab.toolkits.analysis.varorfun;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import natlab.LookupFile;
-import natlab.toolkits.analysis.MergeUtil;
+import natlab.toolkits.analysis.Mergable;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import analysis.AbstractDepthFirstAnalysis;
 import ast.ASTNode;
@@ -26,9 +27,6 @@ import ast.PersistentStmt;
 import ast.Script;
 import ast.StringLiteralExpr;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<String, VFDatum>> implements VFAnalysis{
   private boolean inFunction=true;
   private Function currentFunction = null;
@@ -46,7 +44,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
 
   @Override
   public Map<String, VFDatum> newInitialFlow() {
-    return Maps.newHashMap();
+    return new HashMap<>();
   }
 
   public VFFlowInsensitiveAnalysis( ASTNode tree , FunctionOrScriptQuery lookup ) {
@@ -61,11 +59,11 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
   }
 
   private void putVar(String name) {
-    MergeUtil.mergePut(currentSet, name, VFDatum.VAR);
+    currentSet.merge(name, VFDatum.VAR, Mergable::merge);
   }
 
   private void putFun(String name) {
-    MergeUtil.mergePut(currentSet, name, VFDatum.FUN);
+    currentSet.merge(name, VFDatum.FUN, Mergable::merge);
   }
 
   @Override
@@ -73,7 +71,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
     currentScript=node;
     currentSet = newInitialFlow();
     inFunction=false;
-    withEndExpressions = Sets.newHashSet();
+    withEndExpressions = new HashSet<>();
     pass = 0;
     node.getStmts().analyze(this);
     analyzeEndExpressions();
@@ -94,7 +92,7 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
       if (flowSets.containsKey(node.getParent().getParent()))
         for( Map.Entry<String, VFDatum> pair : flowSets.get(node.getParent().getParent()).entrySet()){
           if( pair.getValue()==VFDatum.VAR  || pair.getValue()==VFDatum.BOT)
-            MergeUtil.mergePut(currentSet, pair.getKey(), pair.getValue());
+            currentSet.merge(pair.getKey(), pair.getValue(), Mergable::merge);
         }
     }
 
@@ -203,17 +201,17 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
     String s = node.getName().getID();
     VFDatum d = currentSet.get( s );
     if (s.equals("Inf") || s.equals("inf") || s.equals("NaN") || s.equals("nan"))
-      MergeUtil.mergePut(currentSet, s, VFDatum.IFUN);
+      currentSet.merge(s, VFDatum.IFUN, Mergable::merge);
     if (inFunction){
       if ( s!=null && d==null || VFDatum.BOT.equals( d )  ) {
         VFDatum val = scriptOrFunctionExists(s) ? VFDatum.IFUN
             : packageExists(s) ? VFDatum.PREFIX : VFDatum.BOT;
-        MergeUtil.mergePut(currentSet, s, val);
+        currentSet.merge(s, val, Mergable::merge);
       }
     }
     else if ( d==null || VFDatum.BOT.equals(d) )
-      MergeUtil.mergePut(currentSet, s, VFDatum.LDVAR);
-    annotateNode(node.getName());        
+      currentSet.merge(s, VFDatum.LDVAR, Mergable::merge);
+    annotateNode(node.getName());
   }
 
   private ASTNode getTarget(LValueExpr node){
@@ -348,15 +346,16 @@ public class VFFlowInsensitiveAnalysis extends AbstractDepthFirstAnalysis<Map<St
   }
 
   private void bindError(NameExpr n, EndExpr e){
-    MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.TOP);
+    currentSet.merge(n.getName().getID(), VFDatum.TOP, Mergable::merge);
     annotateNode(n.getName());
   }
 
 
   private void bindWarn(NameExpr n, EndExpr e){
     VFDatum d = currentSet.get(n.getName().getID());
-    if (d != VFDatum.VAR)
-      MergeUtil.mergePut(currentSet, n.getName().getID(), VFDatum.WAR);
+    if (d != VFDatum.VAR) {
+      currentSet.merge(n.getName().getID(), VFDatum.WAR, Mergable::merge);
+    }
     annotateNode(n.getName());
   }
 

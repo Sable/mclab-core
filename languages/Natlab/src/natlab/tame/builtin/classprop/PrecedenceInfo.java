@@ -1,7 +1,22 @@
 package natlab.tame.builtin.classprop;
 
 import java.util.HashMap;
-import natlab.tame.builtin.classprop.ast.*;
+
+import natlab.tame.builtin.classprop.ast.CP;
+import natlab.tame.builtin.classprop.ast.CPAny;
+import natlab.tame.builtin.classprop.ast.CPBegin;
+import natlab.tame.builtin.classprop.ast.CPBuiltin;
+import natlab.tame.builtin.classprop.ast.CPChain;
+import natlab.tame.builtin.classprop.ast.CPCoerce;
+import natlab.tame.builtin.classprop.ast.CPEnd;
+import natlab.tame.builtin.classprop.ast.CPError;
+import natlab.tame.builtin.classprop.ast.CPMap;
+import natlab.tame.builtin.classprop.ast.CPNone;
+import natlab.tame.builtin.classprop.ast.CPNum;
+import natlab.tame.builtin.classprop.ast.CPPackaged;
+import natlab.tame.builtin.classprop.ast.CPScalar;
+import natlab.tame.builtin.classprop.ast.CPTypeString;
+import natlab.tame.builtin.classprop.ast.CPUnion;
 
 /**
  * a class that just give the precedence info for ast nodes.

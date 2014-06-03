@@ -1,5 +1,6 @@
 package natlab.toolkits;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +15,9 @@ import ast.FunctionList;
 import ast.Program;
 import ast.Script;
 
-import com.google.common.collect.Maps;
-
 public class ParsedCompilationUnitsContextStack extends ContextStack{
 	public CompilationUnits cu;
-	Map<GenericFile, ASTNode<?>> pm = Maps.newHashMap();
+	Map<GenericFile, ASTNode<?>> pm = new HashMap<>();
 	public ParsedCompilationUnitsContextStack(List<GenericFile> path,
 			GenericFile pwd, CompilationUnits cu) {
 		super(path, pwd);

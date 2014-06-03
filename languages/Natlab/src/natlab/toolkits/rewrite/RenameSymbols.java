@@ -18,11 +18,11 @@
 
 package natlab.toolkits.rewrite;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 import ast.ASTNode;
 import ast.Name;
-import ast.NameExpr;
 
 
 /**

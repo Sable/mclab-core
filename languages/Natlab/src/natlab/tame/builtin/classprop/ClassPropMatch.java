@@ -1,6 +1,12 @@
 package natlab.tame.builtin.classprop;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+
 import natlab.tame.classes.reference.ClassReference;
 
 

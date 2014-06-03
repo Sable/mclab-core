@@ -1,6 +1,9 @@
 package natlab.toolkits.analysis.handlepropagation;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * An implementation of TreeSet that adds a flag for may or must. An

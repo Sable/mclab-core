@@ -1,6 +1,7 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.value.ValueFactory;
 
 public class RangeValueFactory<V extends Value<V>> {
 	ValueFactory<V> factory;

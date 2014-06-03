@@ -1,7 +1,8 @@
 package natlab.tame.classes;
 
-import java.util.*;
-import natlab.toolkits.path.*;
+import java.util.Map;
+
+import natlab.toolkits.path.FunctionReference;
 /**
  * an interface that describes matlab classes
  * 

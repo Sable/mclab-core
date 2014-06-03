@@ -1,6 +1,8 @@
 package natlab.tame.valueanalysis.aggrvalue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * we make the assumption that undefined values are undefined, rather than empty
@@ -8,14 +10,13 @@ import java.util.*;
  * runtime checks to ensure cells are assigned.
  * TODO - do proper implementation when usesMap is true
  */
-
 import natlab.tame.classes.reference.BuiltinCompoundClassReference;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.isComplex.*;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     private Shape<AggrValue<D>> shape;

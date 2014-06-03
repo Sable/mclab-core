@@ -17,10 +17,33 @@
 // =========================================================================== //
 package natlab.toolkits.rewrite;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import analysis.AbstractDepthFirstAnalysis;
-import java.util.*;
-import java.lang.*;
-import ast.*;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.BinaryExpr;
+import ast.DotExpr;
+import ast.EQExpr;
+import ast.EndCallExpr;
+import ast.Expr;
+import ast.ForStmt;
+import ast.GEExpr;
+import ast.GTExpr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.LEExpr;
+import ast.LTExpr;
+import ast.LiteralExpr;
+import ast.MatrixExpr;
+import ast.NEExpr;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.ParameterizedExpr;
+import ast.RangeExpr;
+import ast.UnaryExpr;
+import ast.WhileStmt;
 
 /**
  * @author Jesse Doherty

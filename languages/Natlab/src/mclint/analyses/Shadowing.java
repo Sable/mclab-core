@@ -1,5 +1,6 @@
 package mclint.analyses;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import mclint.Lint;
@@ -11,11 +12,9 @@ import natlab.tame.builtin.Builtin;
 import natlab.toolkits.path.BuiltinQuery;
 import ast.Name;
 
-import com.google.common.collect.Sets;
-
 public class Shadowing extends DefinitionVisitor implements LintAnalysis {
   private BuiltinQuery query = Builtin.getBuiltinQuery();
-  private Set<String> reported = Sets.newHashSet();
+  private Set<String> reported = new HashSet<>();
 
   protected Lint lint;
 

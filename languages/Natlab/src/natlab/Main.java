@@ -21,8 +21,13 @@
 
 package natlab;
 
-import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import mclint.McLint;
 import natlab.backends.Fortran.codegen_readable.Main_readable;
@@ -37,10 +42,7 @@ import analysis.AbstractStructuralAnalysis;
 import ast.CompilationUnits;
 import ast.Program;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 
 /**
  * Main entry point for McLab compiler. Includes a main method that
@@ -131,7 +133,7 @@ public class Main {
 
     List<String> files = options.getFiles();
     log("Parsing " + Joiner.on(", ").join(files));
-    List<CompilationProblem> errors = Lists.newArrayList();
+    List<CompilationProblem> errors = new ArrayList<>();
     CompilationUnits cu;
     if (!options.natlab()) {
       cu = Parse.parseMatlabFiles(files, errors);
@@ -140,7 +142,7 @@ public class Main {
     }
 
     if (!errors.isEmpty()) {
-      System.err.println(CompilationProblem.toStringAll(errors));
+      System.err.println(errors.stream().map(Object::toString).collect(Collectors.joining("\n")));
       return;
     }
 
@@ -164,11 +166,11 @@ public class Main {
       if (options.od().length() == 0) {
         System.out.println(cu.getPrettyPrinted());
       } else {
-        File outputDir = new File(options.od());
+        Path outputDir = Paths.get(options.od());
         for (Program program : cu.getPrograms()) {
-          File outputFile = new File(outputDir, program.getFile().getName());
-          Files.createParentDirs(outputFile);
-          Files.write(program.getPrettyPrinted(), outputFile, Charsets.UTF_8);
+          Path outputFile = outputDir.resolve(program.getFile().getName());
+          Files.createDirectories(outputFile.getParent());
+          Files.write(outputFile, program.getPrettyPrinted().getBytes(StandardCharsets.UTF_8));
         }
       }
       return;

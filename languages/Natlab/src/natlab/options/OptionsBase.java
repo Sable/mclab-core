@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 /** Natlab command-line options parser base class.
  */
@@ -59,7 +58,7 @@ abstract class OptionsBase {
     return pad(4, vals, 32, desc);
   }
 
-  private final LinkedList<String> options = Lists.newLinkedList();
+  private final LinkedList<String> options = new LinkedList<>();
   protected void pushOptions( String s ) {
     options.addFirst( s );
   }
@@ -72,6 +71,6 @@ abstract class OptionsBase {
     return options.removeFirst();
   }
 
-  protected LinkedList<String> files = Lists.newLinkedList();
+  protected LinkedList<String> files = new LinkedList<>();
   public LinkedList<String> getFiles() { return files; }
 }

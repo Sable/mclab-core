@@ -1,12 +1,16 @@
 package natlab.tame.valueanalysis.components.shape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import natlab.tame.builtin.*;
-import natlab.tame.builtin.shapeprop.ShapePropTool;
+import natlab.tame.builtin.Builtin;
+import natlab.tame.builtin.BuiltinVisitor;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
-import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.rangeValue.*;
+import natlab.tame.builtin.shapeprop.ShapePropTool;
+import natlab.tame.valueanalysis.components.rangeValue.HasRangeValue;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.ColonValue;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * this is a singleton class -- make it singleton, ignore all the generic stuff.

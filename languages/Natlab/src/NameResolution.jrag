@@ -20,8 +20,7 @@
 // =========================================================================== //
 
 import java.util.Map;
-import com.google.common.collect.Maps;
-import natlab.utils.AstFunctions;
+import static mclint.util.AstUtil.indexFunctionsByName;
 
 aspect NameResolution{
 
@@ -30,12 +29,12 @@ aspect NameResolution{
 
     syn lazy Map<String,Function> FunctionList.getSiblings() = new HashMap<String,Function>();
     syn lazy Map<String,Function> FunctionList.getNested() {
-        return Maps.uniqueIndex(getFunctions(), AstFunctions.functionToName());
+      return indexFunctionsByName(getFunctions());
     }
     syn LocalFunctionLookupInterface FunctionList.getParentFunction() = null;
 
     syn lazy Map<String,Function> Function.getNested() {
-        return Maps.uniqueIndex(getNestedFunctions(), AstFunctions.functionToName());
+      return indexFunctionsByName(getNestedFunctions());
     }
     inh Map<String, Function> Function.getSiblings();
     eq FunctionList.getFunction(int i).getSiblings() = getNested();

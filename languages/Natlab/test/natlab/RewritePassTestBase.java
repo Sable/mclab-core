@@ -1,24 +1,31 @@
 package natlab;
 
-import java.util.TreeMap;
 import java.util.ArrayList;
-import java.io.*;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import junit.framework.TestCase;
 import nodecases.AbstractNodeCaseHandler;
-import ast.*;
+import ast.ASTNode;
+import ast.CheckScalarStmt;
+import ast.ExprStmt;
+import ast.Function;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Program;
 
 public class RewritePassTestBase extends TestCase {
 
 
     protected Program parseFile( String fName ) throws Exception
     {
-        FileReader fileReader = new FileReader( fName );
         ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
-        Program prog = Parse.parseNatlabFile( fName, fileReader, errList );
+        Program prog = Parse.parseNatlabFile( fName, errList );
         if( prog == null )
-            throw new Exception( "Error parsing file " +fName+ ":\n" + 
-                                 CompilationProblem.toStringAll( errList ) );
+            throw new Exception( "Error parsing file " +fName+ ":\n" +
+                errList.stream().map(Object::toString).collect(Collectors.joining("\n")));
         return prog;
     }
 

@@ -1,5 +1,6 @@
 package natlab.tame.tamerplus.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,6 @@ import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
  public class UsedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<String>> implements TamerPlusAnalysis 
@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
     public UsedVariablesNameCollector(ASTNode<?> tree)
     {
         super(tree);
-        fNodeToUsedVariablesMap = Maps.newHashMap();
+        fNodeToUsedVariablesMap = new HashMap<>();
     }
     
     @Override
@@ -156,18 +156,18 @@ import com.google.common.collect.Sets;
     @Override
     public HashSet<String> merge(HashSet<String> in1, HashSet<String> in2)
     {
-        return Sets.newHashSet(Sets.union(in1, in2));
+        return new HashSet<>(Sets.union(in1, in2));
     }
 
     @Override
     public HashSet<String> copy(HashSet<String> source)
     {
-        return Sets.newHashSet(source);
+        return new HashSet<>(source);
     }
     
     public HashSet<String> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     /**
@@ -180,7 +180,7 @@ import com.google.common.collect.Sets;
         Set<String> set = fNodeToUsedVariablesMap.get(node);
         if (set == null)
         {
-            return Sets.newHashSet();
+            return new HashSet<>();
         }
         return set;
     }

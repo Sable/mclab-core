@@ -11,13 +11,11 @@ import mclint.util.DefinitionVisitor;
 import ast.ForStmt;
 import ast.Name;
 
-import com.google.common.collect.Sets;
-
 public class ChangedLoopVar extends DefinitionVisitor implements LintAnalysis {
   private static final String WARNING = "Loop variable %s is changed inside the loop.";
 
   private boolean inLoopStmt = false;
-  private Set<String> currentLoopVars = Sets.newHashSet();
+  private Set<String> currentLoopVars = new HashSet<>();
 
   protected Lint lint;
 

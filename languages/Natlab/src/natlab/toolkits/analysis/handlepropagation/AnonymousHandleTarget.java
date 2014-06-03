@@ -1,6 +1,6 @@
 package natlab.toolkits.analysis.handlepropagation;
 
-import ast.*;
+import ast.LambdaExpr;
 
 /**
  * Represents handle targets that are anonymous functions. This refers

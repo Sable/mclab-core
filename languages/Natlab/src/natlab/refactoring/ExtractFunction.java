@@ -1,10 +1,13 @@
 package natlab.refactoring;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import mclint.refactoring.Refactoring;
 import mclint.refactoring.RefactoringContext;
+import mclint.transform.StatementRange;
 import mclint.transform.Transformer;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.LivenessAnalysis;
@@ -25,15 +28,8 @@ import ast.ParameterizedExpr;
 import ast.Row;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 public class ExtractFunction extends Refactoring {
-  private Function original;
-  private int from;
-  private int to;
+  private StatementRange extractionRange;
   private String extractedFunctionName;
   private Transformer transformer;
 
@@ -45,25 +41,23 @@ public class ExtractFunction extends Refactoring {
   private Set<String> liveAfter;
   private Map<String, VFDatum> kinds;
 
-  private Set<String> addedGlobals = Sets.newHashSet();
-  private Set<String> addedInputs = Sets.newHashSet();
-
-  public ExtractFunction(RefactoringContext context,
-      Function original, int from, int to, String extractedFunctionName) {
+  private Set<String> addedGlobals = new HashSet<>();
+  private Set<String> addedInputs = new HashSet<>();
+  
+  public ExtractFunction(RefactoringContext context, StatementRange extractionRange,
+      String extractedFunctionName) {
     super(context);
-    this.original = original;
-    this.from = from;
-    this.to = to;
+    this.context = context;
+    this.extractionRange = extractionRange;
     this.extractedFunctionName = extractedFunctionName;
-
-    this.transformer = context.getTransformer();
+    this.transformer = context.getTransformer(extractionRange.getEnclosingFunction());
   }
 
   private void extractStatements() {
     extracted = new Function();
     extracted.setName(extractedFunctionName);
-    for (int i = from; i < to; i++) {
-      extracted.addStmt((Stmt) original.getStmt(i).fullCopy());
+    for (Stmt stmt : extractionRange) {
+      extracted.addStmt(transformer.copy(stmt));
     }
   }
 
@@ -72,14 +66,15 @@ public class ExtractFunction extends Refactoring {
     return analysis;
   }
   private void analyzeBeforeAndAfter() {
+    Function original = extractionRange.getEnclosingFunction();
     ReachingDefs reachingAnalysisOrig = analyze(new ReachingDefs(original));
     ReachingDefs reachingAnalysisNew = analyze(new ReachingDefs(extracted));
     LivenessAnalysis liveAnalysisOrig = analyze(new LivenessAnalysis(original));
     LivenessAnalysis liveAnalysisNew = analyze(new LivenessAnalysis(extracted));
     VFPreorderAnalysis kindAnalysis = analyze(new VFPreorderAnalysis(original));
 
-    Stmt startStmt = original.getStmt(from);
-    Stmt endStmt = original.getStmt(to - 1);
+    Stmt startStmt = extractionRange.getStartStatement();
+    Stmt endStmt = extractionRange.getEndStatement();
 
     reachingBefore = reachingAnalysisOrig.getOutFlowSets().get(startStmt);
     reachingAfter = reachingAnalysisNew.getOutFlowSets().get(extracted);
@@ -88,25 +83,21 @@ public class ExtractFunction extends Refactoring {
     kinds = kindAnalysis.getFlowSets().get(original);
   }
 
-  private Iterable<String> liveVariablesAtInputOfNewFunction() {
-    return Iterables.filter(liveBefore, new Predicate<String>() {
-      @Override public boolean apply(String id) {
-        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable();
-      }
-    });
+  private Set<String> liveVariablesAtInputOfNewFunction() {
+    return liveBefore.stream()
+        .filter(id -> kinds.getOrDefault(id, VFDatum.UNDEF).isVariable())
+        .collect(Collectors.toSet());
   }
 
-  private Iterable<String> liveVariablesDefinedInNewFunction() {
-    return Iterables.filter(liveAfter, new Predicate<String>() {
-      @Override public boolean apply(String id) {
-        return (kinds.containsKey(id) ? kinds.get(id) : VFDatum.UNDEF).isVariable() &&
-            reachingAfter.containsKey(id);
-      }
-    });
+  private Set<String> liveVariablesDefinedInNewFunction() {
+    return liveAfter.stream()
+        .filter(id -> kinds.getOrDefault(id, VFDatum.UNDEF).isVariable() &&
+                      reachingAfter.containsKey(id))
+        .collect(Collectors.toSet());
   }
 
   private boolean containsGlobalStmt(Set<Def> defs) {
-    return Iterables.any(defs, Predicates.instanceOf(GlobalStmt.class));
+    return defs.stream().anyMatch(def -> def instanceof GlobalStmt);
   }
 
   private boolean originallyGlobal(String id) {
@@ -153,17 +144,27 @@ public class ExtractFunction extends Refactoring {
   }
 
   private void makeExtractedFunctionSiblingOfOriginal() {
+    Function original = extractionRange.getEnclosingFunction();
     ast.List<Function> list = 
         NodeFinder.findParent(FunctionList.class, original).getFunctions();
+    ast.List<Stmt> stmts = extracted.getStmts().fullCopy();
+    while (extracted.getNumStmt() != 0) {
+      extracted.getStmts().removeChild(0);
+    }
+    
     transformer.insert(list, extracted, list.getIndexOfChild(original) + 1);
+    for (Stmt stmt : stmts) {
+      transformer.insert(extracted.getStmts(), stmt, extracted.getNumStmt());
+    }
   }
 
   private void replaceExtractedStatementsWithCallToExtractedFunction() {
     Stmt call = makeCallToExtractedFunction();
-    for (int i = from; i < to; i++) {
-      transformer.remove(original.getStmt(from));
+    for (int i = 0; i < extractionRange.size(); ++i) {
+      transformer.remove(extractionRange.getStartStatement());
     }
-    transformer.insert(original.getStmts(), call, from);
+    transformer.insert(extractionRange.getStatements(), call,
+        extractionRange.getStartIndex());
   }
 
   private Stmt makeCallToExtractedFunction() {

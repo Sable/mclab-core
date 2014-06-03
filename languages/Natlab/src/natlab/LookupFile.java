@@ -21,8 +21,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 
-import com.google.common.collect.Maps;
-
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import ast.ASTNode;
 import ast.Function;
@@ -45,8 +43,8 @@ public class LookupFile {
       builtinClasses = map.get("classes");
       builtinFunctions = map.get("functions");
       outputInfo = map.get("output_info");
-      currentFile = Maps.newHashMap();
-      lib = Maps.newHashMap();
+      currentFile = new HashMap<>();
+      lib = new HashMap<>();
       return builtinClasses;
     }
     catch(FileNotFoundException e){

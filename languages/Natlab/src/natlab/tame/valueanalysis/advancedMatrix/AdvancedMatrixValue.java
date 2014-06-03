@@ -1,24 +1,25 @@
 package natlab.tame.valueanalysis.advancedMatrix;
 
-import java.util.*;
-
-import natlab.tame.classes.reference.*; //class    component
+import natlab.tame.classes.reference.PrimitiveClassReference; //class    component
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.*; //constant component
+//import natlab.tame.valueanalysis.AdvancedMatrix.AdvancedMatrixValue;
+//import natlab.tame.valueanalysis.AdvancedMatrix.AdvancedMatrixValueFactory;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant; //constant component
 import natlab.tame.valueanalysis.components.isComplex.HasisComplexInfo;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
 import natlab.tame.valueanalysis.components.rangeValue.HasRangeValue;
 import natlab.tame.valueanalysis.components.rangeValue.RangeValue;
-import natlab.tame.valueanalysis.components.shape.*; //shape    component
-import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValue;
-import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.aggrvalue.*;
-//import natlab.tame.valueanalysis.AdvancedMatrix.AdvancedMatrixValue;
-//import natlab.tame.valueanalysis.AdvancedMatrix.AdvancedMatrixValueFactory;
-import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.components.shape.HasShape; //shape    component
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+import natlab.tame.valueanalysis.components.shape.ShapePropagator;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 
 /**
  * represents a MatrixValue that is instantiable. It stores a constant, on top

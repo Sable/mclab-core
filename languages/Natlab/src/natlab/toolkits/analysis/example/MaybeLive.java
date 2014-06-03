@@ -18,6 +18,7 @@
 
 package natlab.toolkits.analysis.example;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import natlab.toolkits.analysis.core.NameCollector;
@@ -60,7 +61,7 @@ public class MaybeLive
      */
     public Set<String> merge(Set<String> in1, Set<String> in2)
     {
-        return Sets.newHashSet(Sets.union(in1, in2));
+        return new HashSet<>(Sets.union(in1, in2));
     }
 
     /**
@@ -68,7 +69,7 @@ public class MaybeLive
      */
     public Set<String> copy(Set<String> in)
     {
-        return Sets.newHashSet(in);
+        return new HashSet<>(in);
     }
 
     /**
@@ -77,7 +78,7 @@ public class MaybeLive
      */
     public Set<String> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     /**

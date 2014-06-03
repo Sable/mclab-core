@@ -4,14 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import natlab.tame.callgraph.SimpleFunctionCollection;
-import natlab.tame.callgraph.StaticFunction;
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.tamerplus.utils.IntOkAnalysis;
-import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;

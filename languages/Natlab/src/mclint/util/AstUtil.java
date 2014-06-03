@@ -2,16 +2,16 @@ package mclint.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-import natlab.utils.AstFunctions;
+import mclint.transform.TokenStreamFragment;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.EmptyStmt;
 import ast.Program;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
@@ -20,6 +20,13 @@ import com.google.common.collect.Iterables;
  * @author isbadawi
  */
 public class AstUtil {
+  /**
+   * Returns true if a node is synthetic (i.e. is not the result of parsing).
+   */
+  public static boolean isSynthetic(ASTNode<?> node) {
+    return node.getStartLine() == 0 && !(node instanceof ast.List);
+  }
+
   /**
    * Replaces a subtree with another, correctly updating parent/child links.
    */
@@ -58,10 +65,10 @@ public class AstUtil {
   // This is used by the pretty printer. It's declared here because JastAdd gives a syntax
   // error for the <T extends ASTNode<?>> part.
   public static <T extends ASTNode<?>> String join(String delimiter, Iterable<T> nodes) {
-    String result = Joiner.on(delimiter).join(
-        Iterables.filter(
-          Iterables.transform(nodes, AstFunctions.prettyPrint()),
-          Predicates.not(Predicates.containsPattern("^$"))));
+    String result = StreamSupport.stream(nodes.spliterator(), false)
+        .map(ASTNode::getPrettyPrinted)
+        .filter(s -> !s.isEmpty())
+        .collect(Collectors.joining(delimiter));
     if (!result.isEmpty() && delimiter.equals("\n")) {
       result += "\n";
     }
@@ -71,13 +78,32 @@ public class AstUtil {
   // This is used by the JSON serializer, again declared here because JastAdd won't allow generic
   // methods.
   public static <T extends ASTNode<?>> List<Map<String, Object>> asJsonArray(Iterable<T> nodes) {
-    return FluentIterable.from(nodes)
-        .filter(Predicates.not(Predicates.instanceOf(EmptyStmt.class)))
-        .transform(new Function<ASTNode<?>, Map<String, Object>>() {
-      @Override public Map<String, Object> apply(ASTNode<?> node) {
-        return node.getJson();
-      }
-    }).toList();
+    return StreamSupport.stream(nodes.spliterator(), false)
+        .filter(node -> !(node instanceof EmptyStmt))
+        .map(ASTNode::getJson)
+        .collect(Collectors.toList());
+  }
+  
+  // Ditto, used by the tokenizing pretty printer
+  public static <T extends ASTNode<?>> TokenStreamFragment joinTokens(String delimiter, Iterable<T> nodes) {
+    FluentIterable<T> fragments = FluentIterable.from(nodes);
+    if (fragments.isEmpty()) {
+      return TokenStreamFragment.fromSingleToken("");
+    }
+    TokenStreamFragment result = Iterables.getFirst(nodes, null).tokenize();
+    for (T node : Iterables.skip(nodes, 1)) {
+      result = result.spliceBefore(TokenStreamFragment.fromSingleToken(delimiter));
+      result = result.spliceBefore(node.tokenize());
+    }
+    if (delimiter.equals("\n")) {
+      result = result.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+    }
+    return result;
+  }
+  
+  // Ditto (JastAdd doesn't support Java 8 yet)
+  public static Map<String, ast.Function> indexFunctionsByName(ast.List<ast.Function> functions) {
+    return functions.stream().collect(Collectors.toMap(ast.Function::getName, Function.identity()));
   }
 
   private AstUtil() {}

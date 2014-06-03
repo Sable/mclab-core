@@ -27,7 +27,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import matlab.CompositePositionMap;
 import matlab.FunctionEndScanner;
@@ -48,10 +51,6 @@ import ast.Program;
 import ast.Stmt;
 import beaver.Parser;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 
@@ -64,7 +63,7 @@ import com.google.common.io.Files;
 public class Parse {
   private static Reader fileReader(String fName, List<CompilationProblem> errors) {
     try {
-      return Files.newReader(new File(fName), Charsets.UTF_8);
+      return Files.newReader(new File(fName), StandardCharsets.UTF_8);
     } catch (FileNotFoundException e) {
       errors.add(new CompilationProblem("File not found: %s\nAborting!", fName));
       return null;
@@ -106,11 +105,8 @@ public class Parse {
     try {
       program = (Program) parser.parse(scanner);
     } catch (Parser.Exception e) {
-      List<String> errorMessages = ImmutableList.<String>builder()
-          .add(e.getMessage())
-          .addAll(parser.getErrors())
-          .build();
-      errors.add(new CompilationProblem(Joiner.on('\n').join(errorMessages)));
+      errors.add(new CompilationProblem(e.getMessage() + "\n" +
+          parser.getErrors().stream().collect(Collectors.joining("\n"))));
       return null;
     } catch (IOException e) {
       errors.add(new CompilationProblem("Error parsing %s: %s", fName, e.getMessage()));
@@ -179,7 +175,7 @@ public class Parse {
         return null; // terminate early since extraction parser can't work without balanced 'end's
       }
       OffsetTracker offsetTracker = new OffsetTracker(new TextPosition(1, 1));
-      List<TranslationProblem> problems = Lists.newArrayList();
+      List<TranslationProblem> problems = new ArrayList<>();
       String destText = MatlabParser.translate(new ANTLRReaderStream(in),
           1, 1, offsetTracker, problems);
       if (problems.isEmpty()) {
@@ -298,7 +294,7 @@ public class Parse {
   private static CompilationUnits parseMultipleFiles(boolean matlab, List<String> files,
       List<CompilationProblem> errors) {
     CompilationUnits cu = new CompilationUnits();
-    List<CompilationProblem> fileErrors = Lists.newArrayList();
+    List<CompilationProblem> fileErrors = new ArrayList<>();
     for (String fName : files) {
       Program program = matlab ? parseMatlabFile(fName, fileErrors) : parseNatlabFile(fName, fileErrors);
       errors.addAll(fileErrors);

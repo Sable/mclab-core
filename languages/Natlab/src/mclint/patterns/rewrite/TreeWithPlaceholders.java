@@ -1,13 +1,12 @@
 package mclint.patterns.rewrite;
 
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mclint.patterns.Match;
-import mclint.patterns.MatchHandler;
 import mclint.util.AstUtil;
 import mclint.util.Parsing;
-import natlab.utils.AbstractNodeFunction;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.NameExpr;
@@ -19,7 +18,7 @@ import ast.Script;
  * it'll replace the placeholders with bound subtrees.
  * @author isbadawi
  */
-public class TreeWithPlaceholders implements MatchHandler {
+public class TreeWithPlaceholders implements Consumer<Match> {
   private ASTNode<?> tree;
   
   private static String placeholder(String meta) {
@@ -45,15 +44,10 @@ public class TreeWithPlaceholders implements MatchHandler {
   }
 
   @Override
-  public void handle(final Match match) {
-    NodeFinder.apply(NameExpr.class, tree, new AbstractNodeFunction<NameExpr>() {
-      @Override
-      public void apply(NameExpr node) {
-        if (isPlaceholder(node)) {
-          replacePlaceholder(node, match.getBoundNode(getMeta(node)));
-        }
-      }
-    });
+  public void accept(final Match match) {
+    NodeFinder.find(NameExpr.class, tree)
+        .filter(TreeWithPlaceholders::isPlaceholder)
+        .forEach(node -> replacePlaceholder(node, match.getBoundNode(getMeta(node))));
   }
 
   public ASTNode<?> getTree() {

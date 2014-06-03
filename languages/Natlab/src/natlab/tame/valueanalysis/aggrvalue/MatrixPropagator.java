@@ -1,6 +1,6 @@
 package natlab.tame.valueanalysis.aggrvalue;
 
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.ValuePropagator;
 
 /**
  * In order to use aggr value together with a new matrix value abstraction to extend

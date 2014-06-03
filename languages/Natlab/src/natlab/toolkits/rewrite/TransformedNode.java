@@ -21,8 +21,11 @@
 
 package natlab.toolkits.rewrite;
 
-import java.util.*;
-import java.lang.UnsupportedOperationException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import ast.ASTNode;
 /**
  * A representation of the result of a node transformation. A

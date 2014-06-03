@@ -1,14 +1,22 @@
 package natlab.tame.valueanalysis.simplematrix;
 
-import java.util.*;
-import natlab.tame.builtin.*;
-import natlab.tame.classes.reference.*;
-import natlab.tame.valueanalysis.*;
-import natlab.tame.valueanalysis.aggrvalue.*;
-import natlab.tame.valueanalysis.components.constant.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import natlab.tame.builtin.Builtin;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.valueanalysis.ValueSet;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.aggrvalue.CellValue;
+import natlab.tame.valueanalysis.aggrvalue.MatrixPropagator;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.ConstantPropagator;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 
 /**
  * 

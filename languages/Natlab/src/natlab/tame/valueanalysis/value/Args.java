@@ -1,10 +1,15 @@
 package natlab.tame.valueanalysis.value;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
 
 /**
  * A way to combine multiple argument abstract values together to make an
