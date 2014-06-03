@@ -18,6 +18,7 @@
 
 package natlab.toolkits.analysis.example;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import natlab.toolkits.analysis.varorfun.VFDatum;
@@ -30,8 +31,6 @@ import ast.Name;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Stmt;
-
-import com.google.common.collect.Sets;
 
 /**
  * @author Jesse Doherty
@@ -46,14 +45,14 @@ public class UseCollector extends AbstractDepthFirstAnalysis<Set<String>>
     public UseCollector(ASTNode<?> tree)
     {
         super(tree);
-        fullSet = Sets.newHashSet();
+        fullSet = new HashSet<>();
         kindAnalysis = new VFPreorderAnalysis(tree);
         kindAnalysis.analyze();
     }
 
     public Set<String> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     /**
@@ -61,7 +60,7 @@ public class UseCollector extends AbstractDepthFirstAnalysis<Set<String>>
      */
     public Set<String> getAllUses()
     {
-        return Sets.newHashSet(fullSet);
+        return new HashSet<>(fullSet);
     }
     /**
      * Gets a set of uses in the given statement. 
@@ -70,9 +69,9 @@ public class UseCollector extends AbstractDepthFirstAnalysis<Set<String>>
     {
         Set<String> set = flowSets.get(node);
         if( set == null )
-            return Sets.newHashSet();
+            return new HashSet<>();
         else
-            return Sets.newHashSet(set);
+            return new HashSet<>(set);
     }
 
     /**

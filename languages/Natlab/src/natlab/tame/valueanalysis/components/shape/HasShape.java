@@ -4,7 +4,7 @@ package natlab.tame.valueanalysis.components.shape;
  * provides an accessor method to retrieve the shape.
  */
 
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
 
 public interface HasShape<V extends Value<V>> extends Value<V> {
 	

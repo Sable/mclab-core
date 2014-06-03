@@ -29,7 +29,8 @@ import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 import natlab.toolkits.path.FunctionReference;
 
 /**

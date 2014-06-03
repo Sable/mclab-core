@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
@@ -24,9 +26,6 @@ import ast.Name;
 import ast.NameExpr;
 import ast.ParameterizedExpr;
 import ast.Stmt;
-
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 
 /**
  * This seeks through functions, and finds lambda expressions.
@@ -92,18 +91,18 @@ public class LambdaSimplification extends AbstractSimplification{
         if (node.getBody() instanceof ParameterizedExpr){
             ParameterizedExpr paramExpr = (ParameterizedExpr)node.getBody();
             if (!isVar(paramExpr) && 
-                Iterables.all(paramExpr.getArgList(), Predicates.instanceOf(NameExpr.class))) {
+                paramExpr.getArgs().stream().allMatch(arg -> arg instanceof NameExpr)) {
                 return;
             }
         }
         
         //rewrite children recursively if there's a nested lambda expression inside
-        Iterable<LambdaExpr> nestedLambdas = 
-            NodeFinder.find(LambdaExpr.class, node.getBody());
-        if (!Iterables.isEmpty(nestedLambdas)){
+        List<LambdaExpr> nestedLambdas = 
+            NodeFinder.find(LambdaExpr.class, node.getBody()).collect(Collectors.toList());
+        if (nestedLambdas.isEmpty()) {
             rewriteChildren(node);
             //force params of nested lambda to be ignored
-            for (Name param : Iterables.getFirst(nestedLambdas, null).getInputParamList()){
+            for (Name param : nestedLambdas.get(0).getInputParamList()){
                 ignoreNames.add(param.getID());
             }
         }

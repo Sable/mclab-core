@@ -1,5 +1,6 @@
 package mclint.refactoring;
 
+import mclint.MatlabProgram;
 import mclint.McLintTestCase;
 import ast.ASTNode;
 import ast.AssignStmt;
@@ -12,20 +13,20 @@ import ast.Script;
 
 public class RenameVariableTest extends McLintTestCase {
   private void rename(Name node, String newName) {
-    Refactoring rename = Refactorings.renameVariable(createBasicTransformerContext(), node, newName);
+    Refactoring rename = Refactorings.renameVariable(basicContext(), node, newName);
     assertTrue(rename.checkPreconditions());
     rename.apply();
   }
 
   private void assertRenameFails(ASTNode<?> tree, Name name, String newName) {
-    Refactoring rename = Refactorings.renameVariable(createBasicTransformerContext(), name, newName);
+    Refactoring rename = Refactorings.renameVariable(basicContext(), name, newName);
     assertFalse(String.format("Expected renaming of %s to %s to fail", name.getID(), newName),
         rename.checkPreconditions());
   }
 
   public void testRenameUse() {
-    parse("x = 0; y = x;");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "x = 0; y = x;");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((AssignStmt) script.getStmt(1)).getRHS()).getName();
 
     rename(x, "z");
@@ -34,8 +35,8 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameDef() {
-    parse("x = 0; y = x;");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "x = 0; y = x;");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((AssignStmt) script.getStmt(0)).getLHS()).getName();
 
     rename(x, "z");
@@ -44,8 +45,8 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameArrayGet() {
-    parse("x = [1,2]; y = x(1);");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "x = [1,2]; y = x(1);");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((ParameterizedExpr) 
         ((AssignStmt) script.getStmt(1)).getRHS()).getTarget()).getName();
 
@@ -55,8 +56,8 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameArraySet() {
-    parse("x(2) = 4; y = x(1);");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "x(2) = 4; y = x(1);");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((ParameterizedExpr) 
         ((AssignStmt) script.getStmt(1)).getRHS()).getTarget()).getName();
 
@@ -66,40 +67,40 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameWithConflict() {
-    parse("x = 0; y = x;");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "x = 0; y = x;");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((AssignStmt) script.getStmt(1)).getRHS()).getName();
 
     assertRenameFails(script, x, "y");
   }
 
   public void testRenameWithInputParamConflict() {
-    parse(
+    MatlabProgram program = parse("f.m", 
         "function x(in)",
         "  x = 0; y = x;",
         "end"
     );
-    Function function = ((FunctionList) kit.getAST()).getFunction(0);
+    Function function = ((FunctionList) program.parse()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) function.getStmt(1)).getRHS()).getName();
 
     assertRenameFails(function, x, "in");
   }
 
   public void testRenameWithOutputParamConflict() {
-    parse(
+    MatlabProgram program = parse("f.m", 
         "function out = x(i)",
         "  x = 0; y = x;",
         "end"
     );
-    Function function = ((FunctionList) kit.getAST()).getFunction(0);
+    Function function = ((FunctionList) program.parse()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) function.getStmt(1)).getRHS()).getName();
 
     assertRenameFails(function, x, "out");
   }
 
   public void testRenameMultipleAssignment() {
-    parse("[y, x] = f(); y = x;");
-    Script script = (Script) kit.getAST();
+    MatlabProgram program = parse("f.m", "[y, x] = f(); y = x;");
+    Script script = (Script) program.parse();
     Name x = ((NameExpr) ((AssignStmt) script.getStmt(1)).getRHS()).getName();
 
     rename(x, "z");
@@ -108,25 +109,25 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameFunctionParameter() {
-    parse(
+    MatlabProgram program = parse("f.m", 
         "function f(x)",
         "  y = x;",
         "end"
     );
 
-    Name x = ((FunctionList) kit.getAST()).getFunction(0).getInputParam(0);
+    Name x = ((FunctionList) program.parse()).getFunction(0).getInputParam(0);
 
     rename(x, "z");
 
-    assertEquivalent(kit.getAST(),
+    assertEquivalent(program.parse(),
         "function f(z)",
         "  y = z;",
         "end"
     );
   }
-
+  
   public void testRenameGlobalVariableAcrossFunctions() {
-    parse(
+    MatlabProgram program = parse("f.m", 
         "function f1()",
         "  global x; y = x;",
         "end",
@@ -135,12 +136,12 @@ public class RenameVariableTest extends McLintTestCase {
         "end"
     );
 
-    Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
+    Function f1 = ((FunctionList) program.parse()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();
 
     rename(x, "z");
 
-    assertEquivalent(kit.getAST(), 
+    assertEquivalent(program.parse(), 
         "function f1()",
         "  global z; y = z;",
         "end",
@@ -151,7 +152,7 @@ public class RenameVariableTest extends McLintTestCase {
   }
 
   public void testRenameGlobalVariableWithNameConflict() {
-    parse(
+    MatlabProgram program = parse("f.m", 
         "function f()",
         "  global x; y = x;",
         "end",
@@ -160,9 +161,9 @@ public class RenameVariableTest extends McLintTestCase {
         "end"
     );
 
-    Function f1 = ((FunctionList) kit.getAST()).getFunction(0);
+    Function f1 = ((FunctionList) program.parse()).getFunction(0);
     Name x = ((NameExpr) ((AssignStmt) f1.getStmt(1)).getRHS()).getName();
 
-    assertRenameFails(kit.getAST(), x, "z");
+    assertRenameFails(program.parse(), x, "z");
   }
 }

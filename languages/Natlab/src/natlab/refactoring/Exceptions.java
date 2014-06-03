@@ -3,7 +3,7 @@ package natlab.refactoring;
 import ast.Name;
 
 public class Exceptions {
-	public static abstract class RefactorException extends Exception{
+	public static abstract class RefactorException extends RuntimeException{
 		public ast.Name sym;
 		public ast.Function f;
 		public String message;

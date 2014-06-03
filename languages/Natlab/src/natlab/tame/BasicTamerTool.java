@@ -14,7 +14,8 @@ import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
 import natlab.tame.valueanalysis.ValueAnalysisPrinter;
 import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-import natlab.tame.valueanalysis.basicmatrix.*;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.filehandling.GenericFile;
@@ -61,6 +62,7 @@ public class BasicTamerTool {
 	}
 
 	//TODO give more useful functions!
+	public void setDoIntOk(boolean value) { doIntOk = value; }
 
 	public static ValueAnalysis<AggrValue<BasicMatrixValue>> analyze(
 			String[] args, 

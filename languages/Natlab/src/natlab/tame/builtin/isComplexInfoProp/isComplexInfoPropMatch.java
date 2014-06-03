@@ -1,16 +1,14 @@
 package natlab.tame.builtin.isComplexInfoProp;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-import natlab.tame.classes.reference.ClassReference;
-//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
-//import natlab.tame.valueanalysis.basicmatrix.*;
-import natlab.tame.valueanalysis.value.*;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
-import natlab.tame.valueanalysis.components.shape.*;
+//import natlab.tame.valueanalysis.basicmatrix.*;
+import natlab.tame.valueanalysis.value.Value;
+//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 
 public class isComplexInfoPropMatch {
 

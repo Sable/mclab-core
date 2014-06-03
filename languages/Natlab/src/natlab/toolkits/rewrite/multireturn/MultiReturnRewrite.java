@@ -18,12 +18,20 @@
 
 package natlab.toolkits.rewrite.multireturn;
 
-import ast.*;
-import nodecases.AbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.*;
-import java.util.LinkedList;
-import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TempFactory;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.List;
+import ast.MatrixExpr;
+import ast.NameExpr;
+import ast.Row;
 
 /**
  * A rewrite to simplify multi return assignment statements. The

@@ -1,8 +1,8 @@
 package natlab.toolkits.analysis.core;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import nodecases.AbstractNodeCaseHandler;
 import ast.ASTNode;
@@ -15,7 +15,6 @@ import ast.Stmt;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Sets;
 
 public class UseDefDefUseChain {
   private ImmutableSetMultimap<Name, Def> useDefChain;
@@ -45,7 +44,9 @@ public class UseDefDefUseChain {
     of that name reached by this definition.
    */
   public Set<Name> getUsesOf(String name, Def def) {
-    return Sets.filter(defUseChain.get(def), AstPredicates.named(name));
+    return getUses(def).stream()
+        .filter(n -> n.getID().equals(name))
+        .collect(Collectors.toSet());
   }
   
   /**
@@ -73,7 +74,9 @@ public class UseDefDefUseChain {
    * corresponding to that name.
    */
   public Set<Name> getDefinedNamesOf(String name, Stmt node) {
-    return Sets.filter(getDefinedNames(node), AstPredicates.named(name));
+    return getDefinedNames(node).stream()
+        .filter(n -> n.getID().equals(name))
+        .collect(Collectors.toSet());
   }
   
   /**
@@ -81,7 +84,9 @@ public class UseDefDefUseChain {
    * corresponding to that name.
    */
   public Set<Name> getDefinedNamesOf(String name, Def def) {
-    return Sets.filter(getDefinedNames(def), AstPredicates.named(name));
+    return getDefinedNames(def).stream()
+        .filter(n -> n.getID().equals(name))
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -96,7 +101,9 @@ public class UseDefDefUseChain {
    * corresponding to that name.
    */
   public Set<Name> getUsedNamesOf(String name, Stmt node) {
-    return Sets.filter(getUsedNames(node), AstPredicates.named(name));
+    return getUsedNames(node).stream()
+        .filter(n -> n.getID().equals(name))
+        .collect(Collectors.toSet());
   }
 
   public static UseDefDefUseChain fromReachingDefs(ReachingDefs analysis) {

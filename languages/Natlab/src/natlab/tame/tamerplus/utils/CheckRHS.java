@@ -1,13 +1,8 @@
 package natlab.tame.tamerplus.utils;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
-import natlab.tame.tamerplus.analysis.DUChain;
-import natlab.tame.tamerplus.analysis.UDChain;
 import natlab.tame.tamerplus.analysis.UDDUWeb;
-import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRAbstractAssignToListStmt;
 import natlab.tame.tir.TIRAbstractAssignToVarStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
@@ -16,7 +11,6 @@ import natlab.tame.tir.TIRAssignLiteralStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCopyStmt;
 import natlab.tame.tir.TIRForStmt;
-import natlab.tame.tir.TIRNode;
 import ast.Expr;
 import ast.FPLiteralExpr;
 import ast.IntLiteralExpr;

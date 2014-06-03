@@ -1,8 +1,11 @@
 package natlab.toolkits.rewrite;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import ast.*;
+import ast.ASTNode;
+import ast.Program;
 
 
 /**

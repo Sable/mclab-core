@@ -1,6 +1,8 @@
 package natlab.tame.valueanalysis.simplematrix;
 
-import natlab.tame.valueanalysis.aggrvalue.*;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.aggrvalue.AggrValueFactory;
+import natlab.tame.valueanalysis.aggrvalue.AggrValuePropagator;
 import natlab.tame.valueanalysis.components.constant.Constant;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
 

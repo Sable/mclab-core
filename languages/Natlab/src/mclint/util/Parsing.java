@@ -5,14 +5,13 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import natlab.CompilationProblem;
 import natlab.Parse;
 import natlab.toolkits.filehandling.FileFile;
 import ast.CompilationUnits;
 import ast.Program;
-
-import com.google.common.base.Joiner;
 
 /**
  * A slightly nicer interface to natlab.Parse.
@@ -23,13 +22,13 @@ public class Parsing {
   private static void abortIfNotEmpty(List<CompilationProblem> errors) {
     if (!errors.isEmpty()) {
       System.err.println("The following errors occured during parsing:");
-      System.err.println(Joiner.on('\n').join(errors));
+      System.err.println(errors.stream().map(Object::toString).collect(Collectors.joining("\n")));
       System.exit(1);
     }
   }
   
   public static CompilationUnits files(List<String> mfiles) {
-    List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
+    List<CompilationProblem> errors = new ArrayList<>();
     CompilationUnits code = Parse.parseMatlabFiles(mfiles, errors);
     abortIfNotEmpty(errors);
     for (int i = 0; i < mfiles.size(); i++) {
@@ -47,7 +46,7 @@ public class Parsing {
   }
 
   public static Program reader(Reader code) {
-    List<CompilationProblem> errors = new ArrayList<CompilationProblem>();
+    List<CompilationProblem> errors = new ArrayList<>();
     Program program = Parse.parseMatlabFile("<none>", code, errors);
     abortIfNotEmpty(errors);
     program.setFile(new FileFile("<none>"));

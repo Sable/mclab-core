@@ -18,13 +18,18 @@
 
 package natlab.toolkits.rewrite.clearresolution;
 
-import ast.*;
-import nodecases.AbstractNodeCaseHandler;
-import natlab.toolkits.rewrite.*;
-import natlab.toolkits.analysis.varorfun.*;
-import java.util.LinkedList;
-import java.util.HashSet;
-import java.util.ArrayList;
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
+import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.GlobalStmt;
+import ast.List;
+import ast.Name;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.StringLiteralExpr;
 
 /**
  * A rewrite that do a single pass down to locate all "end" expression, and then backtrack for every subsequent indented paramExp until a variable is found.

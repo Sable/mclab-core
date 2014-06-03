@@ -1,52 +1,63 @@
 package natlab.refactoring;
 
-import java.util.LinkedList;
+import mclint.MatlabProgram;
+import mclint.McLintTestCase;
+import mclint.refactoring.Refactorings;
+import ast.Script;
 
-import ast.Program;
-
-public class MScriptInlinerTest extends RefactoringTestCase {
+public class MScriptInlinerTest extends McLintTestCase {
     public void testNoInline() {
-        addFile("s1.m", "f = 1;");
-        Program p = addFile("f1.m", "function x() \n f = 2; \n end");
-        MScriptInliner scriptInliner = new MScriptInliner(cu);
-        assertTrue(scriptInliner.inlineAll().isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  f = 2;\nend\n");      
+        MatlabProgram s1 = parse("s1.m", "f = 1;");
+        MatlabProgram f1 = parse("f1.m",
+            "function x()",
+            "  f = 2;",
+            "end");
+        
+        MScriptInliner inliner = Refactorings.inlineScript(basicContext(), (Script) s1.parse());
+        inliner.apply();
+
+        assertTrue(inliner.getErrors().isEmpty());
+        assertEquivalent(f1.parse(), "function [] = x()\n  f = 2;\nend\n");
     }
 
+    
     public void testInlineNormal() {
-        addFile("s1.m", "f = 1;");
-        Program p = addFile("f1.m", "function x() \n s1; \n end");
-        MScriptInliner scriptInliner = new MScriptInliner(cu);
-        LinkedList<LinkedList<Exception>> errors = scriptInliner.inlineAll();
-        assertEquals(errors.size(), 1);
-        assertTrue(errors.get(0).isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  f = 1;\nend\n");      
+        MatlabProgram s1 = parse("s1.m", "f = 1;");
+        MatlabProgram f1 = parse("f1.m", "function x() \n s1; \n end");
+        MScriptInliner inliner = Refactorings.inlineScript(basicContext(), (Script) s1.parse());
+        inliner.apply();
+
+        assertTrue(inliner.getErrors().isEmpty());
+        assertEquivalent(f1.parse(), "function [] = x()\n  f = 1;\nend\n");
     }
 
     public void testInlineFunctionVarConflict() {
-        addFile("s1.m", "b = @size;");
-        Program p = addFile("f1.m", "function x() \n s1; size = 1; \n end");
-        MScriptInliner scriptInliner = new MScriptInliner(cu);
-        LinkedList<LinkedList<Exception>> errors = scriptInliner.inlineAll();
-        assertEquals(errors.size(), 1);
-        assertEquals(errors.get(0).get(0).getClass(), Exceptions.RenameRequired.class);
+        MatlabProgram s1 = parse("s1.m", "b = @size;");
+        parse("f1.m", "function x() \n s1; size = 1; \n end");
+        MScriptInliner inliner = Refactorings.inlineScript(basicContext(), (Script) s1.parse());
+        inliner.apply();
+
+        assertEquals(inliner.getErrors().size(), 1);
+        assertEquals(inliner.getErrors().get(0).getClass(), Exceptions.RenameRequired.class);
     }
 
     public void testUnassignedIDBecomesVariable() {
-        addFile("s1.m", "b = zeros(1,2);");
-        Program p = addFile("f1.m", "function x() \n s1; zeros = 1; \n end");
-        MScriptInliner scriptInliner = new MScriptInliner(cu);
-        LinkedList<LinkedList<Exception>> errors = scriptInliner.inlineAll();
-        assertEquals(errors.size(), 1);
-        assertEquals(errors.get(0).get(0).getClass(), Exceptions.UnassignedVariableException.class);
+        MatlabProgram s1 = parse("s1.m", "b = zeros(1,2);");
+        parse("f1.m", "function x() \n s1; zeros = 1; \n end");
+        MScriptInliner inliner = Refactorings.inlineScript(basicContext(), (Script) s1.parse());
+        inliner.apply();
+
+        assertEquals(inliner.getErrors().size(), 1);
+        assertEquals(inliner.getErrors().get(0).getClass(), Exceptions.UnassignedVariableException.class);
     }
 
     public void testIDBecomesFunction() {;
-        addFile("s1.m", "b = zeros(1,2);");
-        addFile("f1.m", "function x() \n s1; \n end");
-        MScriptInliner scriptInliner = new MScriptInliner(cu);
-        LinkedList<LinkedList<Exception>> errors = scriptInliner.inlineAll();
-        assertEquals(errors.size(), 1);
-        assertEquals(errors.get(0).get(0).getClass(), Exceptions.WarnIDToFunException.class);
+        MatlabProgram s1 = parse("s1.m", "b = zeros(1,2);");
+        parse("f1.m", "function x() \n s1; \n end");
+        MScriptInliner inliner = Refactorings.inlineScript(basicContext(), (Script) s1.parse());
+        inliner.apply();
+
+        assertEquals(inliner.getErrors().size(), 1);
+        assertEquals(inliner.getErrors().get(0).getClass(), Exceptions.WarnIDToFunException.class);
     }
 }

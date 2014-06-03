@@ -1,5 +1,6 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import analysis.AbstractDepthFirstAnalysis;
@@ -11,8 +12,6 @@ import ast.Function;
 import ast.GlobalStmt;
 import ast.Name;
 import ast.ParameterizedExpr;
-
-import com.google.common.collect.Sets;
 
 /**
  * @author Jesse Doherty
@@ -31,7 +30,7 @@ public class NameCollector extends AbstractDepthFirstAnalysis<Set<Name>>
     @Override
     public Set<Name> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     public Set<Name> getAllNames()

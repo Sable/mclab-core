@@ -2,11 +2,14 @@ package natlab.tame.valueanalysis.aggrvalue;
 
 import java.util.HashMap;
 
-import natlab.tame.classes.reference.*;
-import natlab.tame.valueanalysis.*;
+import natlab.tame.classes.reference.BuiltinCompoundClassReference;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.valueanalysis.ValueFlowMap;
+import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.shape.Shape;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
 
 /**
  * implements a value for structs.

@@ -1,10 +1,7 @@
 package natlab.tame.valueanalysis.value;
 
-import natlab.tame.classes.reference.*;
+import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
-import natlab.tame.valueanalysis.components.constant.Constant;
-import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.toolkits.analysis.Mergable;
 
 

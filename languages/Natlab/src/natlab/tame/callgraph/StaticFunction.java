@@ -18,6 +18,8 @@
 
 package natlab.tame.callgraph;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,9 +37,6 @@ import natlab.toolkits.rewrite.simplification.AbstractSimplification;
 import natlab.toolkits.rewrite.simplification.CommentSimplification;
 import ast.Function;
 import ast.FunctionList;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * 
@@ -77,12 +76,12 @@ public class StaticFunction implements Cloneable {
     public StaticFunction(Function function, FunctionReference reference, Context context) {
         this.function = function.fullCopy();
         this.reference = reference;
-        this.calledFunctions = Maps.newHashMap();
+        this.calledFunctions = new HashMap<>();
         this.name = function.getName();
         this.context = context;
         
         //set siblings
-        siblings = Sets.newHashSet(function.getSiblings().keySet());
+        siblings = new HashSet<>(function.getSiblings().keySet());
         
         //transform to IR
         transformToIR();
@@ -98,9 +97,9 @@ public class StaticFunction implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
-        f.calledFunctions = Maps.newHashMap(getCalledFunctions());
+        f.calledFunctions = new HashMap<>(getCalledFunctions());
         f.function = function.fullCopy();
-        f.siblings = Sets.newHashSet(siblings);
+        f.siblings = new HashSet<>(siblings);
         return f;
     }
     
@@ -169,7 +168,7 @@ public class StaticFunction implements Cloneable {
      * Note: in order to inline multiple functions, use inline(Map<FunctionReference, StaticFunction>)
      */
     public void inline(StaticFunction other){
-        Map<FunctionReference,StaticFunction> map = Maps.newHashMap();
+        Map<FunctionReference,StaticFunction> map = new HashMap<>();
         map.put(other.reference, other);
         inline(map);
     }
@@ -180,7 +179,7 @@ public class StaticFunction implements Cloneable {
      * and which are called from this function
      */
     public void inline(Map<FunctionReference, StaticFunction> map){
-    	Map<String, Function> inlinerMap = Maps.newHashMap();
+    	Map<String, Function> inlinerMap = new HashMap<>();
     	
     	System.out.println("inlining everything in "+name);
     	
@@ -259,8 +258,8 @@ public class StaticFunction implements Cloneable {
      */
     public void mergeSymbols(StaticFunction otherFunction,String prefix){
         //the rename maps for both functions
-        Map<String, String> renameOther = Maps.newHashMap();
-        Map<String, String> renameThis = Maps.newHashMap();
+        Map<String, String> renameOther = new HashMap<>();
+        Map<String, String> renameThis = new HashMap<>();
 
         Set<String> symbols = function.getSymbols();
         Set<String> otherSymbols = otherFunction.function.getSymbols();

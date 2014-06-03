@@ -1,6 +1,5 @@
 package natlab.tame.valueanalysis.value;
 
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 
 /**
  * Special Values are values that variables cannot actually take on.

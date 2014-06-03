@@ -18,11 +18,14 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import ast.*;
-import java.util.*;
+import nodecases.NodeCaseHandler;
+import analysis.AnalysisHelper;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
 
 /**
  * Abstract implementation of a structural analysis. 

@@ -18,10 +18,39 @@
 
 package natlab.tame.tir.analysis;
 
-import ast.ASTNode;
-import natlab.tame.tir.*;
-import analysis.BackwardAnalysis;
+import natlab.tame.tir.TIRAbstractAssignFromVarStmt;
+import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
+import natlab.tame.tir.TIRAbstractAssignToVarStmt;
+import natlab.tame.tir.TIRAbstractCreateFunctionHandleStmt;
+import natlab.tame.tir.TIRArrayGetStmt;
+import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRAssignLiteralStmt;
+import natlab.tame.tir.TIRBreakStmt;
+import natlab.tame.tir.TIRCallStmt;
+import natlab.tame.tir.TIRCellArrayGetStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRCommaSeparatedList;
+import natlab.tame.tir.TIRCommentStmt;
+import natlab.tame.tir.TIRContinueStmt;
+import natlab.tame.tir.TIRCopyStmt;
+import natlab.tame.tir.TIRCreateFunctionReferenceStmt;
+import natlab.tame.tir.TIRCreateLambdaStmt;
+import natlab.tame.tir.TIRDotGetStmt;
+import natlab.tame.tir.TIRDotSetStmt;
+import natlab.tame.tir.TIRForStmt;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRGlobalStmt;
+import natlab.tame.tir.TIRIfStmt;
+import natlab.tame.tir.TIRPersistentSmt;
+import natlab.tame.tir.TIRReturnStmt;
+import natlab.tame.tir.TIRStatementList;
+import natlab.tame.tir.TIRStmt;
+import natlab.tame.tir.TIRTryStmt;
+import natlab.tame.tir.TIRWhileStmt;
 import nodecases.NodeCaseHandler;
+import analysis.BackwardAnalysis;
+import ast.ASTNode;
 
 public abstract class TIRAbstractSimpleStructuralBackwardAnalysis<F> extends
         BackwardAnalysis<F> implements TIRNodeCaseHandler {

@@ -5,14 +5,12 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import natlab.toolkits.filehandling.GenericFile;
 
-import com.google.common.io.CharStreams;
-
 public class FolderHandlerTest extends TestCase {
   private void assertPathAndContents(GenericFile f, String path, String contents) 
     throws IOException {
     assertNotNull(f);
     assertEquals(path, f.getPath());
-    assertEquals(contents, CharStreams.toString(f.getReader()));
+    assertEquals(contents, f.getContents());
   }
 
   public void testSimpleLookup() throws IOException {

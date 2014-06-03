@@ -2,10 +2,9 @@
 
 package natlab.tame.builtin.shapeprop;
 
-import beaver.Symbol;
-import beaver.Scanner;
-
 import natlab.tame.builtin.shapeprop.ShapePropParser.Terminals;
+import beaver.Scanner;
+import beaver.Symbol;
 
 
 

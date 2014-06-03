@@ -1,12 +1,17 @@
 package natlab.tame.valueanalysis.basicmatrix;
 
 import natlab.tame.classes.reference.PrimitiveClassReference;
-import natlab.tame.valueanalysis.aggrvalue.*;
+import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.aggrvalue.AggrValueFactory;
+import natlab.tame.valueanalysis.aggrvalue.AggrValuePropagator;
 import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
+import natlab.tame.valueanalysis.components.isComplex.isComplexInfoPropagator;
 import natlab.tame.valueanalysis.components.mclass.ClassPropagator;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.components.rangeValue.*;
-import natlab.tame.valueanalysis.components.isComplex.*;
+import natlab.tame.valueanalysis.components.rangeValue.RangeValue;
+import natlab.tame.valueanalysis.components.rangeValue.RangeValuePropagator;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapePropagator;
 
 /**
  * A factory of BasicMatrixValue,

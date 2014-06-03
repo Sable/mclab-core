@@ -17,7 +17,8 @@
 // =========================================================================== //
 
 package natlab.toolkits.path;
-import java.util.*;
+import java.util.Map;
+
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.GenericFile;
 

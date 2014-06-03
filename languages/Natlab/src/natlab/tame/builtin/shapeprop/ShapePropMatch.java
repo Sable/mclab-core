@@ -1,8 +1,13 @@
 package natlab.tame.builtin.shapeprop;
 
-import java.util.*;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import natlab.tame.valueanalysis.components.shape.DimValue;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+import natlab.tame.valueanalysis.value.Value;
 
 public class ShapePropMatch<V extends Value<V>> {
 	

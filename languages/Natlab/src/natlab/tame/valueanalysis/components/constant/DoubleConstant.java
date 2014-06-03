@@ -21,7 +21,6 @@ package natlab.tame.valueanalysis.components.constant;
 import java.util.ArrayList;
 import java.util.List;
 
-import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.classes.reference.PrimitiveClassReference;
 
 /**

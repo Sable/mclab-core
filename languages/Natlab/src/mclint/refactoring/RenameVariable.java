@@ -1,13 +1,15 @@
 package mclint.refactoring;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import mclint.MatlabProgram;
 import mclint.transform.Transformer;
 import natlab.refactoring.Exceptions.NameConflict;
 import natlab.toolkits.analysis.core.Def;
 import natlab.toolkits.analysis.core.UseDefDefUseChain;
-import natlab.utils.AstPredicates;
 import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.Function;
@@ -17,26 +19,20 @@ import ast.Name;
 import ast.Program;
 import ast.Script;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
-
 class RenameVariable extends Refactoring {
   private Name node;
   private String newName;
   private UseDefDefUseChain udduChain;
   private boolean renameGlobally;
 
-  private List<Refactoring> globalRenames = Lists.newArrayList();
+  private List<Refactoring> globalRenames = new ArrayList<>();
 
   public RenameVariable(RefactoringContext context, Name node, String newName,
       boolean renameGlobally) {
     super(context);
     this.node = node;
     this.newName = newName;
-    this.udduChain = context.getMatlabProgram().analyze().getUseDefDefUseChain();
+    this.udduChain = node.getMatlabProgram().analyze().getUseDefDefUseChain();
     this.renameGlobally = renameGlobally;
   }
 
@@ -45,14 +41,15 @@ class RenameVariable extends Refactoring {
   }
 
   private boolean targetNameIsGlobal() {
-    return getAllDefsOfTargetName().anyMatch(Predicates.instanceOf(GlobalStmt.class));
+    return getAllDefsOfTargetName().anyMatch(def -> def instanceof GlobalStmt);
   }
 
   private void checkPreconditionsForFunctionOrScript(ASTNode<?> ast, MatlabProgram program) {
     Name decl = findGlobalNamed(node.getID(), ast);
     if (decl != null) {
-      RefactoringContext newContext = RefactoringContext.create(program);
-      Refactoring rename = new RenameVariable(newContext, decl, newName, false);
+      // FIXME(isbadawi): Now that contexts aren't bound to a specific program, this is wrong.
+      // Might need to change the API for RenameVariable.
+      Refactoring rename = new RenameVariable(context, decl, newName, false);
       if (!rename.checkPreconditions()) {
         addErrors(rename.getErrors());
       }
@@ -78,7 +75,8 @@ class RenameVariable extends Refactoring {
 
     ASTNode<?> parent = getParentFunctionOrScript(node);
     Optional<Name> conflictingName = NodeFinder.find(Name.class, parent)
-        .firstMatch(AstPredicates.named(newName));
+        .filter(name -> name.getID().equals(newName))
+        .findFirst();
     if (conflictingName.isPresent()) {
       addError(new NameConflict(conflictingName.get()));
       return false;
@@ -94,24 +92,17 @@ class RenameVariable extends Refactoring {
     return NodeFinder.findParent(Script.class, node);
   }
 
-  private FluentIterable<Def> getAllDefsOfTargetName() {
-    ASTNode<?> parent = getParentFunctionOrScript(node);
-    return NodeFinder.find(Def.class, parent).filter(new Predicate<Def>() {
-      @Override public boolean apply(Def def) {
-        return !udduChain.getDefinedNamesOf(node.getID(), def).isEmpty();
-      }
-    });
+  private Stream<Def> getAllDefsOfTargetName() {
+    return NodeFinder.find(Def.class, getParentFunctionOrScript(node))
+        .filter(def -> !udduChain.getDefinedNamesOf(node.getID(), def).isEmpty());
   }
 
   private static Name findGlobalNamed(final String name, ASTNode<?> tree) {
     return NodeFinder.find(Name.class, tree)
-        .firstMatch(new Predicate<Name>() {
-          @Override public boolean apply(Name node) {
-            return node.getParent().getParent() instanceof GlobalStmt
-                && node.getID().equals(name);
-          }
-        })
-        .orNull();
+        .filter(node -> node.getParent().getParent() instanceof GlobalStmt)
+        .filter(node -> node.getID().equals(name))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -123,14 +114,10 @@ class RenameVariable extends Refactoring {
       return;
     }
 
-    Transformer transformer = context.getTransformer();
-    for (Def def : getAllDefsOfTargetName()) {
-      for (Name use : udduChain.getUsesOf(node.getID(), def)) {
-        transformer.replace(use, new Name(newName)); 
-      }
-      for (Name name : udduChain.getDefinedNamesOf(node.getID(), def)) {
-        transformer.replace(name, new Name(newName));
-      }
-    }
+    Transformer transformer = context.getTransformer(node);
+    getAllDefsOfTargetName()
+        .flatMap(def -> Stream.concat(udduChain.getUsesOf(node.getID(), def).stream(),
+                                      udduChain.getDefinedNamesOf(node.getID(), def).stream()))
+        .forEach(name -> transformer.replace(name, new Name(newName)));
   }
 }

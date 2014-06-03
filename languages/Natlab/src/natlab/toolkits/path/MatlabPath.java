@@ -18,19 +18,18 @@
 
 package natlab.toolkits.path;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import natlab.NatlabPreferences;
 import natlab.toolkits.filehandling.GenericFile;
 
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 
 /**
@@ -49,7 +48,7 @@ import com.google.common.collect.Maps;
  */
 
 public class MatlabPath extends AbstractPathEnvironment {
-    List<CachedDirectory> directories = Lists.newArrayList();
+    List<CachedDirectory> directories = new ArrayList<>();
     private boolean persistent;
     
     /**
@@ -121,7 +120,7 @@ public class MatlabPath extends AbstractPathEnvironment {
      * The directories are returned as non-persistent cached directories
      */
     public Collection<CachedDirectory> getAllOverloadedDirs(String className){
-        List<CachedDirectory> odirs = Lists.newArrayList();
+        List<CachedDirectory> odirs = new ArrayList<>();
         for (CachedDirectory dir : directories){
             for (String s : dir.getChildDirNames()){
                 if (s.equals("@"+className)){
@@ -176,7 +175,7 @@ public class MatlabPath extends AbstractPathEnvironment {
     @Override
     public Map<String, FunctionReference> getAllOverloaded(String className, GenericFile context) {
         Collection<CachedDirectory> oDirs = getAllOverloadedDirs(className);
-        Map<String, FunctionReference> map = Maps.newHashMap();
+        Map<String, FunctionReference> map = new HashMap<>();
         for (String ext : codeFileExtensions){
             for (CachedDirectory dir : oDirs){
                 for (String filename : dir.getChildFileNames()){
@@ -193,11 +192,8 @@ public class MatlabPath extends AbstractPathEnvironment {
     }
     
     public List<FolderHandler> getAsFolderHandlerList(){
-      return ImmutableList.copyOf(Lists.transform(directories, 
-          new Function<CachedDirectory, FolderHandler>() {
-        @Override public FolderHandler apply(CachedDirectory dir) {
-          return FolderHandler.getFolderHandler(dir);
-        }
-      }));
+      return directories.stream()
+          .map(FolderHandler::getFolderHandler)
+          .collect(Collectors.toList());
     }
 }

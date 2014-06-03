@@ -6,17 +6,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import ast.CompilationUnits;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 
 public class Project {
   private Path projectRoot;
-  private Map<Path, MatlabProgram> programs = Maps.newHashMap();
+  private Map<Path, MatlabProgram> programs = new HashMap<>();
 
   public static Project at(final Path projectRoot) throws IOException {
     Preconditions.checkArgument(Files.isDirectory(projectRoot),
@@ -54,8 +55,12 @@ public class Project {
   public MatlabProgram getMatlabProgram(Path rootRelativePath) {
     return programs.get(rootRelativePath);
   }
+  
+  public MatlabProgram getMatlabProgram(String rootRelativePath) {
+    return getMatlabProgram(getProjectRoot().resolve(rootRelativePath));
+  }
 
-  public Iterable<MatlabProgram> getMatlabPrograms() {
+  public Collection<MatlabProgram> getMatlabPrograms() {
     return Collections.unmodifiableCollection(programs.values());
   }
 

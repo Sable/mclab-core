@@ -2,13 +2,14 @@ package natlab.tame.builtin.shapeprop;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.List;
 
+import natlab.tame.builtin.shapeprop.ast.SPNode;
+import natlab.tame.valueanalysis.components.shape.HasShape;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 import beaver.Parser;
-
-import natlab.tame.builtin.shapeprop.ast.*;
-import natlab.tame.valueanalysis.components.shape.*;
-import natlab.tame.valueanalysis.value.*;
 
 public class ShapePropTool<V extends Value<V>> {
 	

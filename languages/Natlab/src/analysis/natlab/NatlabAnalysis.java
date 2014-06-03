@@ -18,11 +18,10 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
-
-import ast.*;
-import java.util.*;
+import nodecases.NodeCaseHandler;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
 
 /**
  * Very General interface for analysis. Note: implementations should

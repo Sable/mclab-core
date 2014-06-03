@@ -1,8 +1,10 @@
 package natlab.tame.classes;
 
-import natlab.tame.classes.reference.*;
+import java.util.HashMap;
+
+import natlab.tame.classes.reference.BuiltinClassReference;
+import natlab.tame.classes.reference.ClassReference;
 import natlab.toolkits.path.FileEnvironment;
-import java.util.*;
 
 /**
  * Like the function collection is a a colleciton of funcitons, this

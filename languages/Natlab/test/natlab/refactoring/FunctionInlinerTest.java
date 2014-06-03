@@ -1,46 +1,103 @@
 package natlab.refactoring;
 
-import ast.Program;
+import ast.FunctionList;
+import mclint.MatlabProgram;
+import mclint.McLintTestCase;
 
 
-public class FunctionInlinerTest extends RefactoringTestCase {
+public class FunctionInlinerTest extends McLintTestCase {
+    private void assertInliningOutput(String... expectedCode) {
+      MatlabProgram f1 = project.getMatlabProgram("f1.m");
+      FunctionInliner inliner = new FunctionInliner(basicContext(), ((FunctionList) f1.parse()).getFunction(0));
+      inliner.apply();
+      assertEquals(inliner.getErrors().size(), 0);
+      assertEquivalent(f1.parse(), expectedCode);
+    }
     public void testNoInline() {
-        addFile("f2.m", "function f2() \n f = 1; \n end");
-        Program p = addFile("f1.m", "function x() \n  TT();\n end");
-        FunctionInliner inliner = new FunctionInliner(cu);
-        assertTrue(inliner.inlineAll().isEmpty());
-        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  TT();\nend\n");      
+        parse("f2.m",
+            "function f2()",
+            "  f = 1;",
+            "end");
+        parse("f1.m",
+            "function x()",
+            "  TT();",
+            "end");
+        assertInliningOutput(
+            "function [] = x()",
+            "  TT();",
+            "end");
     }
 
     public void testInlineSimple() {
-        addFile("f2.m", "function out=f2() \n out = 2; \n end");
-        Program p = addFile("f1.m", "function x() \n  in=f2();\n disp(in);\n end");
-        FunctionInliner inliner = new FunctionInliner(cu);
-        inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  out = 2;\n  disp(out);\nend\n"); 
+        parse("f2.m",
+            "function out=f2()",
+            "  out = 2;",
+            "end");
+        parse("f1.m",
+            "function x()",
+            "  in=f2();",
+            "  disp(in);",
+            "end");
+        assertInliningOutput(
+            "function [] = x()",
+            "  out = 2;",
+            "  disp(out);",
+            "end");
     }
 
     public void testInlineWithExtraAssignments() {
-        addFile("f2.m", "function out=f2() \n out = 2; \n end");
-        Program p = addFile("f1.m", "function x() \n  in=f2();\nend");
-        FunctionInliner inliner = new FunctionInliner(cu);
-        inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function [] = x()\n  out = 2;\nend\n"); 
+        parse("f2.m",
+            "function out=f2()",
+            "  out = 2;",
+             "end");
+        parse("f1.m",
+            "function x()",
+             "  in=f2();",
+             "end");
+        assertInliningOutput(
+            "function [] = x()",
+            "  out = 2;",
+            "end");
     }
 
     public void testInlineWithExtraAssignmentsAndInputs() {
-        addFile("f2.m", "function out=f2(j) \n out = j; \n end");
-        Program p = addFile("f1.m", "function x(y) \n  in=f2(y);\nend");
-        FunctionInliner inliner = new FunctionInliner(cu);
-        inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function [] = x(y)\n  out = y;\nend\n"); 
+        parse("f2.m",
+            "function out=f2(j)",
+             " out = j;",
+             "end");
+        parse("f1.m",
+            "function x(y)",
+            "  in=f2(y);",
+            "end");
+        assertInliningOutput(
+            "function [] = x(y)",
+            "  out = y;",
+            "end");
     }
 
     public void testInlineWithNoExtraAssignments() {
-        addFile("f2.m", "function out=f2(j) \n if(1) \n disp(j);\n else\n j=1; \n end \n out = j;\n end");
-        Program p = addFile("f1.m", "function x(y) \n  in=f2(y);\nend");
-        FunctionInliner inliner = new FunctionInliner(cu);
-        inliner.inlineAll();
-        assertEquals(p.getPrettyPrinted(), "function [] = x(y)\n  j = y;\n  if 1\n    disp(j);\n  else \n    j = 1;\n  end\n  out = j;\nend\n"); 
+        parse("f2.m",
+            "function out=f2(j)",
+            "  if(1)",
+            "    disp(j);",
+            "  else",
+            "    j=1;",
+            "  end",
+            "  out = j;",
+            "end");
+        parse("f1.m",
+            "function x(y)",
+            "  in=f2(y);",
+            "end");
+        assertInliningOutput(
+            "function [] = x(y)",
+            "  j = y;",
+            "  if 1",
+            "    disp(j);",
+            "  else",
+            "    j = 1;",
+            "  end",
+            "  out = j;",
+            "end");
     }
 }

@@ -29,6 +29,11 @@ class BasicTransformer implements Transformer {
   public void insert(ASTNode<?> node, ASTNode<?> newNode, int i) {
     node.insertChild(newNode, i);
   }
+  
+  @Override @SuppressWarnings("unchecked")
+  public <T extends ASTNode<?>> T copy(T node) {
+    return (T) node.fullCopy();
+  }
 
   @Override
   public Program getProgram() {

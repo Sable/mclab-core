@@ -1,7 +1,6 @@
 package natlab.tame.valueanalysis.aggrvalue;
 
-import natlab.tame.valueanalysis.*;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * a value class that acts as a superclass to the composite values and 

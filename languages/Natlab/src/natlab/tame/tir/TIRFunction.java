@@ -18,8 +18,6 @@
 
 package natlab.tame.tir;
 
-import java.util.Map;
-
 import natlab.tame.tir.analysis.TIRNodeCaseHandler;
 import ast.Function;
 import ast.HelpComment;

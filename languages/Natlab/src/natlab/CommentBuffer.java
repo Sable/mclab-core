@@ -21,12 +21,12 @@
 
 package natlab;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import beaver.Symbol;
-
-import com.google.common.collect.Lists;
 
 /**
  * A queue of comments shared by the scanner and the parser.
@@ -35,7 +35,7 @@ public class CommentBuffer {
   private final Queue<Symbol> commentQueue;
 
   public CommentBuffer() {
-    this.commentQueue = Lists.newLinkedList();
+    this.commentQueue = new LinkedList<>();
   }
 
   public void pushComment(Symbol comment) {
@@ -55,7 +55,7 @@ public class CommentBuffer {
   }
 
   public List<Symbol> pollAllComments() {
-    List<Symbol> allComments = Lists.newArrayList();
+    List<Symbol> allComments = new ArrayList<>();
     allComments.addAll(commentQueue);
     commentQueue.clear();
     return allComments;

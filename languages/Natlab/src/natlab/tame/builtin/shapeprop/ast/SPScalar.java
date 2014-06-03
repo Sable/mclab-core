@@ -3,9 +3,14 @@ package natlab.tame.builtin.shapeprop.ast;
 import java.util.HashMap;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.shape.DimValue;
+import natlab.tame.valueanalysis.components.shape.HasShape;
+import natlab.tame.valueanalysis.components.shape.Shape;
+import natlab.tame.valueanalysis.components.shape.ShapeFactory;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 	

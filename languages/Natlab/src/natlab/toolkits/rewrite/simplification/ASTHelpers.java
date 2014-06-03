@@ -18,9 +18,23 @@
 
 package natlab.toolkits.rewrite.simplification;
 
-import java.util.*;
+import java.util.Arrays;
 
-import ast.*;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.ElseBlock;
+import ast.Expr;
+import ast.IfBlock;
+import ast.IfStmt;
+import ast.MatrixExpr;
+import ast.Name;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.Opt;
+import ast.Row;
+import ast.ShortCircuitAndExpr;
+import ast.ShortCircuitOrExpr;
+import ast.Stmt;
 
 /**
  * A collection of helper methods for working with AST nodes.

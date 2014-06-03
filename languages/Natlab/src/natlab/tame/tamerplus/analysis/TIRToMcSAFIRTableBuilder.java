@@ -37,7 +37,6 @@ import ast.Row;
 import ast.Stmt;
 import ast.WhileStmt;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.HashBiMap;
 
 @SuppressWarnings("rawtypes")
@@ -115,7 +114,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             caseASTNode(node);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -147,7 +146,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             caseForStmt(node);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -169,7 +168,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             caseIfStmt(node);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -191,7 +190,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             caseWhileStmt(node);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -216,7 +215,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, callStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -236,7 +235,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         }  catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -256,7 +255,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         }  catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -280,7 +279,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -304,7 +303,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -328,7 +327,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -352,7 +351,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -376,7 +375,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -400,7 +399,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             if (DEBUG) printTableEntry(node, assignStmt);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -422,7 +421,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             forStmtRangeExpr.setUpper(up);
         } catch (CloneNotSupportedException e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         return new AssignStmt(lhsOfAssignStmt, forStmtRangeExpr);
     }
@@ -437,7 +436,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
                 parameterizedExpr.setArg(indices.getChild(i).clone(), i);
             } catch (CloneNotSupportedException e)
             {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
     }
@@ -457,7 +456,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
                 }
             } catch (CloneNotSupportedException e)
             {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
     }
@@ -479,7 +478,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
                 }
             } catch (CloneNotSupportedException e)
             {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
        row.setChild(returnValues, 0);

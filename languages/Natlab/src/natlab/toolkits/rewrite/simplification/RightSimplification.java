@@ -18,13 +18,27 @@
 
 package natlab.toolkits.rewrite.simplification;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import ast.*;
-import natlab.DecIntNumericLiteralValue;
-import natlab.toolkits.rewrite.*;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.rewrite.TempFactory;
+import natlab.toolkits.rewrite.TransformedNode;
 import natlab.toolkits.rewrite.threeaddress.ExpressionCollector;
-import natlab.toolkits.analysis.varorfun.*;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.CheckScalarStmt;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.ForStmt;
+import ast.MatrixExpr;
+import ast.NameExpr;
+import ast.NotExpr;
+import ast.ShortCircuitAndExpr;
+import ast.ShortCircuitOrExpr;
+import ast.Stmt;
 
 
 /**

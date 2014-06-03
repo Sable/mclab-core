@@ -27,15 +27,17 @@ package natlab.toolkits.rewrite.simplification;
  * preserve comments, if preserving comments is an objective.
  */
 
-import java.util.*;
-
-import beaver.Symbol;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.rewrite.TransformedNode;
 import ast.ASTNode;
 import ast.EmptyStmt;
 import ast.Stmt;
+import beaver.Symbol;
 
 public class CommentSimplification extends AbstractSimplification {
 

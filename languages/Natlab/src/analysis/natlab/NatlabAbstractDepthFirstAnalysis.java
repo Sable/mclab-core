@@ -18,11 +18,13 @@
 
 package analysis.natlab;
 
-import nodecases.*;
-import analysis.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import ast.*;
-import java.util.*;
+import nodecases.NodeCaseHandler;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
 
 public abstract class NatlabAbstractDepthFirstAnalysis<A>
     extends nodecases.AbstractNodeCaseHandler 

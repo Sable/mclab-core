@@ -1,6 +1,8 @@
 package natlab.tame.tamerplus.analysis;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -29,9 +31,6 @@ import ast.Name;
 import ast.NameExpr;
 
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 @SuppressWarnings("rawtypes")
 public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implements TamerPlusAnalysis
@@ -48,7 +47,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     
     public TemporaryVariablesRemoval(ASTNode<?> tree)
     {
-        fExprToTempVarName = Maps.newHashMap();
+        fExprToTempVarName = new HashMap<>();
     }
     
     @Override
@@ -247,8 +246,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode)
     {
         Expr definition = getDefinitionForVariableAtNode(variable, useNode);
-        Queue<ASTNode> nodeQueue = Lists.newLinkedList();
-        Set<ASTNode> markedNodes = Sets.newHashSet();
+        Queue<ASTNode> nodeQueue = new LinkedList<>();
+        Set<ASTNode> markedNodes = new HashSet<>();
         ASTNode currentNode = null;
         
         ASTNode parentNode = null;

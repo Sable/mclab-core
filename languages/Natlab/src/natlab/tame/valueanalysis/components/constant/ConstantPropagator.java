@@ -22,8 +22,10 @@ import java.util.List;
 
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
-import natlab.tame.valueanalysis.value.*;
-import natlab.tame.valueanalysis.components.shape.*;
+import natlab.tame.valueanalysis.components.shape.DimValue;
+import natlab.tame.valueanalysis.components.shape.HasShape;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * propagates constants.

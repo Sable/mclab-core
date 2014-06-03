@@ -1,28 +1,26 @@
 package natlab.utils;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import ast.ASTNode;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractSequentialIterator;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
 
-/**
- * A utility that finds nodes of a certain type in the AST, and returns them as a lazy iterable.
- * This class is intended to be used together with Guava's Iterable utilities; see also
- * AstPredicates and AstFunctions for utilities related to this. For example, the
+/*
+ * A utility that finds nodes of a certain type in the AST, and returns them as a lazy stream.
+ * This class is intended to be used together with the java.util.stream APIs. For example, the
  * following snippet searches <tt>tree</tt> for all functions that aren't nested, returns
  * a list of their names:
  * 
  * <pre>
  *  NodeFinder.find(ast.Function.class, tree))
- *    .filter(Predicates.not(AstPredicates.nestedFunction()))
- *    .transform(AstFunctions.functionToName())
- *    .toImmutableList();
+ *    .filter(f -> !(f.getParent().getParent() instanceof ast.Function))
+ *    .map(ast.Function::getName)
+ *    .collect(Collectors.toList())
  * </pre>
  */
 public class NodeFinder {
@@ -32,7 +30,7 @@ public class NodeFinder {
       // ASTNode is iterable, but it's Iterable<T extends ASTNode> (without the <?>).
       // If it was Iterable<T extends ASTNode<?>>, we could just write
       // return Iterables.concat(root);
-      List<ASTNode<?>> children = Lists.newArrayList();
+      List<ASTNode<?>> children = new ArrayList<>();
       for (ASTNode<?> child : root) {
         children.add(child);
       }
@@ -40,35 +38,19 @@ public class NodeFinder {
     }
   }
 
-  /**
-   * Returns an iterable of all the descendants of <tt>tree</tt>. This corresponds to a
-   * depth-first traversal of the subtree rooted at <tt>tree</tt>.
-   */
-  public static Iterable<ASTNode<?>> allDescendantsOf(ASTNode<?> tree) {
-    return new AstNodeTreeTraverser().preOrderTraversal(Preconditions.checkNotNull(tree));
+  private static Iterable<ASTNode<?>> allDescendantsOf(ASTNode<?> tree) {
+    return new AstNodeTreeTraverser().preOrderTraversal(Objects.requireNonNull(tree));
   }
   
-  /**
-   * Returns an iterable of the ancestors of <tt>tree</tt>. 
-   */
-  public static Iterable<ASTNode<?>> allAncestorsOf(final ASTNode<?> tree) {
-    Preconditions.checkNotNull(tree);
-    return new Iterable<ASTNode<?>>() {
-      @Override public Iterator<ASTNode<?>> iterator() {
-        return new AbstractSequentialIterator<ASTNode<?>>(tree.getParent()) {
-          @Override protected ASTNode<?> computeNext(ASTNode<?> previous) {
-            return previous.getParent();
-          }
-        };
-      }
-    };
+  private static <T> Stream<T> asStream(Iterable<T> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false);
   }
 
   /**
    * Returns a lazy iterable of the nodes of this finder's type in <tt>tree</tt>.
    */
-  public static <T> FluentIterable<T> find(final Class<T> clazz, final ASTNode<?> tree) {
-    return FluentIterable.from(allDescendantsOf(tree)).filter(clazz);
+  public static <T> Stream<T> find(final Class<T> clazz, final ASTNode<?> tree) {
+    return asStream(allDescendantsOf(tree)).filter(clazz::isInstance).map(clazz::cast);
   }
 
   /**
@@ -76,16 +58,11 @@ public class NodeFinder {
    * Returns null if no such parent exists.
    */
   public static <T> T findParent(Class<T> clazz, ASTNode<?> node) {
-    return FluentIterable.from(allAncestorsOf(node)).filter(clazz).first().orNull();
-  }
-
-  /**
-   * Applies <tt>func</tt> to each node of type <tt>type</tt> in <tt>n</tt>.
-   */
-  public static <T> void apply(final Class<T> type, final ASTNode<?> n,
-      final AbstractNodeFunction<T> func) {
-    for (T node : NodeFinder.find(type, n)) {
-      func.apply(node);
-    }
+    return Stream.iterate(node, ASTNode::getParent)
+        .filter(n -> clazz.isInstance(n) || n.getParent() == null)
+        .findFirst()
+        .filter(clazz::isInstance)
+        .map(clazz::cast)
+        .orElse(null);
   }
 }

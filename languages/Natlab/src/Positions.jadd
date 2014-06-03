@@ -23,7 +23,12 @@ aspect Positions {
   }
 
   protected PositionMap ASTNode.getPositionMap() {
-    return NodeFinder.findParent(Program.class, this).getPositionMap();
+    Program parentProgram = NodeFinder.findParent(Program.class, this);
+    if (parentProgram == null) {
+      // This can happen if the node is synthetic
+      return new NullPositionMap();
+    }
+    return parentProgram.getPositionMap();
   }
 
   protected TextPosition ASTNode.getPreTranslationStartPosition() {
