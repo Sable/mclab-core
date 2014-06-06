@@ -293,6 +293,13 @@
 	operations for all or individual operations.
         </long_desc>
     </stropt>		
+         <stropt>
+     	<name>Information about the input argument</name>
+     	<alias>arg_info</alias>
+     	<short_desc>Provide information about the input argument. </short_desc>
+     	<long_desc>Provide information about the input argument. 
+        </long_desc>
+    </stropt>	
  </section>
 
   <section>
