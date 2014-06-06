@@ -1,18 +1,14 @@
 package mclint;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import ast.CompilationUnits;
-
 import com.google.common.base.Preconditions;
 
 public class Project {
@@ -24,16 +20,11 @@ public class Project {
         "project root %s is not a directory", projectRoot);
     final Project project = new Project(projectRoot);
 
-    Files.walkFileTree(projectRoot, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
-        if (file.toString().endsWith(".m")) {
-          Path normalizedRelativeFile = projectRoot.relativize(file).normalize();
-          project.addMatlabProgram(normalizedRelativeFile);
-        }
-        return FileVisitResult.CONTINUE;
-      }
-    });
+    Files.walk(projectRoot)
+        .filter(Files::isRegularFile)
+        .filter(path -> path.toString().endsWith(".m"))
+        .map(path -> projectRoot.relativize(path).normalize())
+        .forEach(project::addMatlabProgram);
 
     return project;
   }

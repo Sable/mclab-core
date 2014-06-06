@@ -323,22 +323,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler implem
     
     private boolean isSeekedNode(ASTNode node, Name variable)
     {
-        if (node instanceof Name)
-        {
-            String variableName = variable.getID();
-            String variableNameOfNode = ((Name) node).getID();
-            return variableName.equals(variableNameOfNode);
-        }
-        else if (node instanceof NameExpr)
-        {
-            String variableName = variable.getID();
-            String variableNameOfNode = ((NameExpr) node).getName().getID();
-            return variableName.equals(variableNameOfNode);
-        }
-        else
-        {
-            return false;
-        }
+    	return (node instanceof Name || node instanceof NameExpr)
+                && node.getVarName().equals(variable.getID());
     }
     
     private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode)

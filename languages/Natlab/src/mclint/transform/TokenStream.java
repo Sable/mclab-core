@@ -1,6 +1,7 @@
 package mclint.transform;
 
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import mclint.util.AstUtil;
 import mclint.util.TokenUtil;
@@ -49,46 +50,32 @@ public class TokenStream {
     return TokenStreamFragment.create(start, end).copy().asString();
   }
   
-  private int getNumNonEmptyChild(ASTNode<?> node) {
-    return (int) node.stream().filter(n -> !(n instanceof EmptyStmt)).count();
+  private ASTNode<?> firstNonEmptyStmt(ASTNode<?> node, IntStream indices) {
+    return indices
+        .mapToObj(index -> (ASTNode<?>) node.getChild(index))
+        .filter(stmt -> !(stmt instanceof EmptyStmt))
+        .findFirst().orElse(null);
   }
   
   private ASTNode<?> getPreviousNonEmptyStmt(ASTNode<?> node, int i) {
-    for (int j = i; j >= 0; --j) {
-      if (!(node.getChild(j) instanceof EmptyStmt)) {
-        return node.getChild(j);
-      }
-    }
-    return null;
+    return firstNonEmptyStmt(node, IntStream.iterate(i, j -> j - 1).limit(i + 1));
   }
   
   private ASTNode<?> getNextNonEmptyStmt(ASTNode<?> node, int i) {
-    for (int j = i; j < node.getNumChild(); ++j) {
-      if (!(node.getChild(j) instanceof EmptyStmt)) {
-        return node.getChild(j);
-      }
-    }
-    return null;
+    return firstNonEmptyStmt(node, IntStream.range(i, node.getNumChild()));
   }
   
   private ASTNode<?> getNearestNonEmptyStmt(ASTNode<?> node, int i) {
     if (i == 0) {
       return getNextNonEmptyStmt(node, 0);
     }
-    if (i >= node.getNumChild()) {
-      return getPreviousNonEmptyStmt(node, node.getNumChild() - 1);
-    }
     ASTNode<?> previous = getPreviousNonEmptyStmt(node, i - 1);
     return previous != null ? previous : getNextNonEmptyStmt(node, i - 1);
   }
   
   private String guessIndentation(ASTNode<?> node, int i) {
-    if (getNumNonEmptyChild(node) == 0) {
-      // Nothing to go on.
-      // Let's just say two spaces per indentation level (maybe this could be configurable?).
-      return node.getIndent() + "  ";
-    }
-    return getIndentation(getNearestNonEmptyStmt(node, i));
+    ASTNode<?> nearest = getNearestNonEmptyStmt(node, i);
+    return nearest != null ? getIndentation(nearest) : node.getIndent() + "  ";
   }
   
   private TokenStreamFragment synthesizeFragment(ASTNode<?> node) {
@@ -117,8 +104,6 @@ public class TokenStream {
                   fragment(node).getStart())));
     } else if (i == 0) {
       newFragment.spliceBefore(fragment(node.getChild(0)));
-    } else if (i >= node.getNumChild()) {
-      newFragment.spliceAfter(fragment(node.getChild(node.getNumChild() - 1)));
     } else {
       newFragment.spliceAfter(fragment(node.getChild(i - 1)));
     }
