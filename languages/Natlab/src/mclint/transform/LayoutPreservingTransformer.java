@@ -30,7 +30,7 @@ class LayoutPreservingTransformer implements Transformer {
   
   @Override
   public void remove(ASTNode<?> node) {
-    tokenStream.removeAstNode(node);;
+    tokenStream.removeAstNode(node);
     AstUtil.remove(node);
   }
   
