@@ -300,6 +300,14 @@
      	<long_desc>Provide information about the input argument. 
         </long_desc>
     </stropt>	
+         <stropt>
+     	<name>Class name</name>
+     	<alias>class_name</alias>
+     	<short_desc>Name of the X10 class file to be generated.</short_desc>
+     	<long_desc>Name of the X10 class file to be generated.
+        </long_desc>
+    </stropt>	
+    
  </section>
 
   <section>
