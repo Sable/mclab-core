@@ -8,7 +8,7 @@ public class Exceptions {
 		public ast.Function f;
 		public String message;
 		public String toString(){
-			return this.getClass().getName()+ ":" +  sym.getID();
+			return this.getClass().getSimpleName() + ": " +  sym.getID();
 		}
 	}; 
 	

@@ -78,12 +78,13 @@ public class MScriptInliner extends Refactoring {
 
 
   private void performInlining(ExprStmt callStmt, Script target) {
+    Transformer targetTransformer = context.getTransformer(target);
     Transformer transformer = context.getTransformer(callStmt);
     ASTNode<?> parent = callStmt.getParent();
     int i = parent.getIndexOfChild(callStmt);
     transformer.remove(callStmt);
-    for(int j = target.getNumStmt() - 1; j >= 0; --j){
-      transformer.insert(parent, transformer.copy(target.getStmt(j)), i);
+    for(int j = target.getNumStmt() - 1; j >= 0; --j) {
+      transformer.insert(parent, targetTransformer.copy(target.getStmt(j)), i);
     }
   }
   
