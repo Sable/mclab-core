@@ -284,6 +284,12 @@
 	<short_desc>Use region arrays</short_desc>
 	<long_desc>Use region arrays instead of New arrays</long_desc>
      </boolopt>		
+     <boolopt>
+	<name>disable IntegerOkay analysis</name>
+        <alias>no_intok</alias>
+	<short_desc>disable IntegerOkay analysis</short_desc>
+	<long_desc>Explicitly disable IntegerOkay Analysis</long_desc>
+     </boolopt>		
      <stropt>
      	<name>Parallelize vector instructions</name>
      	<alias>vec_par_length</alias>
