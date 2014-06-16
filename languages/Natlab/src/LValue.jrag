@@ -87,22 +87,4 @@ aspect LValue
     eq ParameterizedExpr.getNameExpressions() = getTarget().getNameExpressions();
     eq CellIndexExpr.getNameExpressions() = getTarget().getNameExpressions();
     eq DotExpr.getNameExpressions() = getTarget().getNameExpressions();
-    
-    /**
-     * returns all children that are names
-     */
-    syn Set<NameExpr> ASTNode.getAllNameExpressions()
-    {
-        Set<NameExpr> names = new LinkedHashSet<NameExpr>();
-        for( int i = 0; i<getNumChild(); i++ )
-            names.addAll( getChild(i).getAllNameExpressions() );
-        return names;
-    }
-    eq NameExpr.getAllNameExpressions()
-    {   
-        LinkedHashSet<NameExpr> names = new LinkedHashSet<NameExpr>();
-        names.add( this );
-        return names;
-    }
 }
-

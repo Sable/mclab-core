@@ -112,11 +112,12 @@ public class LambdaSimplification extends AbstractSimplification{
         for (Name name : node.getInputParamList()){
             params.add(name.getID());
         }
-        for (NameExpr var : node.getBody().getAllNameExpressions()){
-            if (!params.contains(var.getName().getID()) && !ignoreNames.contains(var.getName().getID()) && isVar(var)){
-                variables.add(var.getName().getID());
-            }
-        }
+
+        NodeFinder.find(NameExpr.class, node.getBody())
+            .filter(var -> !params.contains(var.getName().getID()))
+            .filter(var -> !ignoreNames.contains(var.getName().getID()))
+            .filter(this::isVar)
+            .forEach(var -> variables.add(var.getName().getID()));
 
         //TODO deal with functions unreachable from siblings (nested?)
         //rewriteChildren(node);
