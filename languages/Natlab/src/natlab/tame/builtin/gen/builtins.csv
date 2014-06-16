@@ -309,6 +309,9 @@ log
 log2
 log10
 
+-isComplex(X->X || R->A || A->A) 
+
+
 forwardTrigonometricFunction; elementalUnaryFloatFunction
 radianTrigonometricFunction; forwardTrigonometricFunction
 sin
