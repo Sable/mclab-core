@@ -79,15 +79,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
         lookupQuery = lookup;
         currentSet = newInitialFlow();
     }
-    
-    @Deprecated
-    public static VFAnalysis analyzeTree(ASTNode n){
-    	return new VFPreorderAnalysis(n);
-    }
-    
-   	public static VFAnalysis analyzeTree(ASTNode n, FunctionOrScriptQuery lookup){
-   		return new VFPreorderAnalysis(n, lookup);
-   	}
+
     public Map<String, VFDatum> newInitialFlow()
     {
         return new HashMap<>();
