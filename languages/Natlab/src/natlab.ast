@@ -24,7 +24,6 @@ CompilationUnits ::= Program*;
 abstract Program;
 Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;
-EmptyProgram : Program;
 
 abstract Body;
 abstract ClassBody : Body;

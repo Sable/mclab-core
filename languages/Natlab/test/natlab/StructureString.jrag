@@ -15,10 +15,6 @@ aspect StructureString {
     //default - exception
     syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
     
-    //program
-    eq EmptyProgram.getStructureStringLessComments() {
-        return "";
-    }
     eq CompilationUnits.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
         for(Program prog : getPrograms()){

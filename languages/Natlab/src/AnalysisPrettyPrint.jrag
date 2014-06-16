@@ -69,12 +69,6 @@ aspect AnalysisPrettyPrint {
         return buf.toString();
     }
 
-    //program
-    eq EmptyProgram.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
-        return "";
-    }
-      
-    
     // Script    
     eq Script.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
