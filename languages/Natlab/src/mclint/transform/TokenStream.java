@@ -85,6 +85,16 @@ public class TokenStream {
     return node.tokenize();
   }
 
+  private boolean isInputParamList(ASTNode<?> node) {
+    return node.getParent() instanceof Function &&
+        ((Function) node.getParent()).getInputParams() == node;
+  }
+
+  private boolean isOutputParamList(ASTNode<?> node) {
+    return node.getParent() instanceof Function &&
+        ((Function) node.getParent()).getOutputParams() == node;
+  }
+
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
     TokenStreamFragment newFragment = synthesizeFragment(newNode);
 
@@ -96,15 +106,38 @@ public class TokenStream {
     }
 
     if (node.getNumChild() == 0) {
-      // TODO(isbadawi): This is brittle, assumes statements lists I think
-      newFragment.spliceAfter(
-          TokenStreamFragment.fromSingleNode(
-              nextMatchingNode(
-                  n -> n.getToken().getText().contains("\n"),
-                  fragment(node).getStart())));
+      if (newNode instanceof Stmt || newNode instanceof Function) {
+        newFragment.spliceAfter(
+            TokenStreamFragment.fromSingleNode(
+                nextMatchingNode(
+                    n -> n.getToken().getText().contains("\n"),
+                    fragment(node).getStart())));
+      } else if (isInputParamList(node)) {
+        if (node.getStartLine() == 0 && node.getStartColumn() == 0) {
+          newFragment = newFragment.spliceAfter(TokenStreamFragment.fromSingleToken("("));
+          newFragment = newFragment.spliceBefore(TokenStreamFragment.fromSingleToken(")"));
+          newFragment.spliceAfter(baseFragment(((Function) node.getParent()).getName()));
+        } else {
+          newFragment.spliceAfter(TokenStreamFragment.fromSingleNode(baseFragment(node).getStart()));
+        }
+      } else if (isOutputParamList(node)) {
+        if (node.getStartLine() == 0 && node.getStartColumn() == 0) {
+          newFragment = newFragment.spliceAfter(TokenStreamFragment.fromSingleToken("["));
+          newFragment = newFragment.spliceBefore(TokenStreamFragment.fromSingleToken("] = "));
+          newFragment.spliceBefore(baseFragment(((Function) node.getParent()).getName()));
+        } else {
+          newFragment.spliceAfter(TokenStreamFragment.fromSingleNode(baseFragment(node).getStart()));
+        }
+      }
     } else if (i == 0) {
+      if (!(newNode instanceof Stmt || newNode instanceof Function)) {
+        newFragment = newFragment.spliceBefore(TokenStreamFragment.fromSingleToken(", "));
+      }
       newFragment.spliceBefore(fragment(node.getChild(0)));
     } else {
+      if (!(newNode instanceof Stmt || newNode instanceof Function)) {
+        newFragment = newFragment.spliceAfter(TokenStreamFragment.fromSingleToken(", "));
+      }
       newFragment.spliceAfter(fragment(node.getChild(i - 1)));
     }
   }
