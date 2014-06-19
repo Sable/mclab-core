@@ -27,7 +27,7 @@ import ast.Name;
 public class TIRFunction extends Function implements TIRNode {
     private static final long serialVersionUID = 1L;
     
-    public TIRFunction(List<Name> outputParams,String name,List<Name> inputParams,
+    public TIRFunction(List<Name> outputParams,Name name,List<Name> inputParams,
             List<HelpComment> helpComments,TIRStatementList stmts,List<TIRFunction> nestedFunctions){
         super(outputParams,name,inputParams,helpComments,stmts,makeNestedFunctionList(nestedFunctions));
     }

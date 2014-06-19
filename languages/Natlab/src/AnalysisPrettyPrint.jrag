@@ -116,7 +116,7 @@ aspect AnalysisPrettyPrint {
             first = false;
         }
         buf.append("] = ");
-        buf.append(getName());
+        buf.append(getName().getID());
         buf.append("(");
         first = true;
         for(Name param : getInputParams()) {

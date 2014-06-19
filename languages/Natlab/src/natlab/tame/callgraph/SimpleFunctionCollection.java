@@ -179,7 +179,7 @@ public class SimpleFunctionCollection extends
 		for (Function functionAst : functionList.getFunctions()) {
 			// create/add static function
 			FunctionReference ref = new FunctionReference(
-					functionAst.getName(), funcRef.getFile());
+					functionAst.getName().getID(), funcRef.getFile());
 			Context context = fileEnvironment.getContext(functionAst,
 					funcRef.getFile());
 			StaticFunction function = new StaticFunction(functionAst, ref,

@@ -60,7 +60,7 @@ public class Context{
 	    
 	    //also do a different search .. this is probably broken, but we'll do a quick fix
 	    for (Function f1 : ((FunctionList)curProgram).getFunctions()){
-	    	if (f1.getName().equals(name)) return 
+	    	if (f1.getName().getID().equals(name)) return
 	    			new FunctionReference(curProgram.getFile(), f1, FunctionReference.ReferenceType.SUBFUNCTION);
 	    }
 	}

@@ -246,8 +246,8 @@ public class RewritePassTestBase extends TestCase {
         public void caseFunction( Function node )
         {
             caseASTNode( node );
-            String name1 = node.getName();
-            String name2 = ((Function)tree2Current).getName();
+            String name1 = node.getName().getID();
+            String name2 = ((Function)tree2Current).getName().getID();
             if( name1.equals(name2) ){
                 if( nameEquivalence.containsKey( name1 ) ){
                     reason = "Function names don't match for actual subtree: \n\n"+
@@ -263,6 +263,9 @@ public class RewritePassTestBase extends TestCase {
 
         public void caseName( Name node )
         {
+            if (node.getParent() instanceof Function) {
+              return;
+            }
             caseASTNode( node );
             if( !fail ){
                 String name1 = node.getID();

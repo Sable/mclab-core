@@ -121,7 +121,7 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
             }
         }
 
-        log("in caseFunction " + node.getName());
+        log("in caseFunction " + node.getName().getID());
         log(currentSet);
 
         // Add output params to set

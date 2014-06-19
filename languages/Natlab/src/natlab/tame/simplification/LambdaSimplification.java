@@ -140,7 +140,7 @@ public class LambdaSimplification extends AbstractSimplification{
                 node, query, "lambda_",tempFunctions.keySet());
         Function function = new Function();
         TempFactory ret = TempFactory.genFreshTempFactory();
-        function.setName(functionName);
+        function.setName(new Name(functionName));
         function.setOutputParamList(new ast.List<Name>().add(ret.genName()));
         function.setStmtList(new ast.List<Stmt>().add(
                 new AssignStmt(ret.genNameExpr(), body)));

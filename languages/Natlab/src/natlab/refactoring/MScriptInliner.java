@@ -52,7 +52,7 @@ public class MScriptInliner extends Refactoring {
       f = (ast.Function) f.getParent().getParent();
     }
     return NodeFinder.find(ast.Function.class, f)
-        .map(ast.Function::getName)
+        .map(g -> g.getName().getID())
         .collect(Collectors.toSet());
   }
 

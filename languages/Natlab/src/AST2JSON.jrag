@@ -53,7 +53,7 @@ aspect Json {
     );
   }
   eq Function.getExtraJson() = ImmutableMap.<String, Object>builder()
-    .put("name", getName())
+    .put("name", getName().getJson())
     .put("inputs", asJsonArray(getInputParams()))
     .put("outputs", asJsonArray(getOutputParams()))
     .put("help_comments", asJsonArray(getHelpComments()))

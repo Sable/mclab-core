@@ -113,7 +113,7 @@ aspect PrettyPrint {
     return buf.toString();
   }
   eq Function.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s(%s)\n%s%s%s%send",
-    getIndent(), join(", ", getOutputParams()), getName(),
+    getIndent(), join(", ", getOutputParams()), getName().getID(),
     join(", ", getInputParams()), join("\n", getHelpComments()),
     join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
   eq HelpComment.getPrettyPrintedLessComments() = getText();
