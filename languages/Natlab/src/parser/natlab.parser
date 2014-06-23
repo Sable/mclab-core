@@ -12,12 +12,12 @@ Program program_before_comments =
      script.s {: return s; :}
   |  function_seq.f {: return f; :}
   |  class_def.c {: return c; :}
-  |  {: return new EmptyProgram(); :}
-  |  otherTerminal {: return new EmptyProgram(); :} //TODO-AC: eventually remove this
+  |  {: return new Script(); :}
+  |  otherTerminal {: return new Script(); :} //TODO-AC: eventually remove this
   ;
 
 //script file: list of help comments followed by list of stmts
-//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+//NB: must be non-empty
 Script script =
      //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
      stmt.stmts+ last_stmt.s {: return new Script(new List<HelpComment>(), stmts.add(s)); :}
@@ -29,7 +29,7 @@ Script script =
   ;
 
 //function file: list of functions, separated by whitespace
-//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+//NB: must be non-empty
 FunctionList function_seq =
      function.functions+ {: return new FunctionList(functions); :}
   ;
@@ -42,10 +42,10 @@ Function function =
 //a function with nothing following the final END
 Function function_body =
      //output params
-     FUNCTION output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+     FUNCTION output_params.out ASSIGN name.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
          {: return function(out, name, in, comments, body); :}
      //no output params
-  |  FUNCTION IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+  |  FUNCTION name.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
          {: return function(null, name, in, comments, body); :}
   ;
 
@@ -82,7 +82,7 @@ FunctionOrSignatureOrPropertyAccessOrStmt stmt_or_function =
   ;
 
 //a classdef file
-//NB: must be non-empty to avoid conflicting with EmptyProgram case above
+//NB: must be non-empty
 ClassDef class_def =
 	 CLASSDEF attributes.attr? IDENTIFIER.name stmt_separator_list help_comment.comments* class_body.body* END 
 	 	{: return classdef(attr, name, null, comments, body); :}

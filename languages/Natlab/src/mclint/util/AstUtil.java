@@ -103,7 +103,7 @@ public class AstUtil {
   
   // Ditto (JastAdd doesn't support Java 8 yet)
   public static Map<String, ast.Function> indexFunctionsByName(ast.List<ast.Function> functions) {
-    return functions.stream().collect(Collectors.toMap(ast.Function::getName, Function.identity()));
+    return functions.stream().collect(Collectors.toMap(f -> f.getName().getID(), Function.identity()));
   }
 
   private AstUtil() {}

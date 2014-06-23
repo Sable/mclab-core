@@ -60,7 +60,7 @@ public class ValueAnalysisPrinter extends TIRAbstractNodeCaseHandler {
 			first = false;
 		}
 		buf.append("] = ");
-		buf.append(node.getName());
+		buf.append(node.getName().getID());
 		
 				
 		buf.append("(");

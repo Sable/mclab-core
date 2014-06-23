@@ -42,7 +42,7 @@ public class ParsedCompilationUnitsContextStack extends ContextStack{
 			else if (n instanceof Script)
 				return n;
 			else {
-				System.err.println(n + " " + ((FunctionList)n).getFunction(0).getName() + " " + r.name);
+				System.err.println(n + " " + ((FunctionList)n).getFunction(0).getName().getID() + " " + r.name);
 				throw new RuntimeException();
 			}
 		}
@@ -54,7 +54,7 @@ public class ParsedCompilationUnitsContextStack extends ContextStack{
 		else if(r.referenceType==ReferenceType.SUBFUNCTION){
 			if (n instanceof FunctionList){
 				for (Function f: ((FunctionList)n).getFunctionList()){
-					if (f.getName()==r.name)
+					if (f.getName().getID().equals(r.name))
 						return f;
 				}
 			}

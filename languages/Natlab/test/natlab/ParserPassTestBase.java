@@ -61,7 +61,6 @@ class ParserPassTestBase extends TestCase {
 	/* Check deep equality of an AST and the contents of the .out file. */
 	public static void assertEquiv(Program actual, Structure expected) {
 		try {
-                        actual.rawAST = true;
 			BufferedReader expectedReader = new BufferedReader(new StringReader(expected.getStructureString()));
 			BufferedReader actualReader = new BufferedReader(new StringReader(actual.getStructureString()));
 			while(true) {

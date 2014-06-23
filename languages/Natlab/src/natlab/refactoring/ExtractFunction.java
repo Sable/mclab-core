@@ -55,7 +55,7 @@ public class ExtractFunction extends Refactoring {
 
   private void extractStatements() {
     extracted = new Function();
-    extracted.setName(extractedFunctionName);
+    extracted.setName(new Name(extractedFunctionName));
     for (Stmt stmt : extractionRange) {
       extracted.addStmt(transformer.copy(stmt));
     }
@@ -169,7 +169,7 @@ public class ExtractFunction extends Refactoring {
 
   private Stmt makeCallToExtractedFunction() {
     ParameterizedExpr call = new ParameterizedExpr();
-    call.setTarget(new NameExpr(new Name(extracted.getName())));
+    call.setTarget(new NameExpr(new Name(extractedFunctionName)));
     for (Name input : extracted.getInputParams()) {
       call.getArgs().add(new NameExpr(new Name(input.getID())));
     }

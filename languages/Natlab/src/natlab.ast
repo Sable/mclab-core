@@ -24,7 +24,6 @@ CompilationUnits ::= Program*;
 abstract Program;
 Script : Program ::= HelpComment* Stmt*;
 FunctionList : Program ::= Function*;
-EmptyProgram : Program;
 
 abstract Body;
 abstract ClassBody : Body;
@@ -41,7 +40,7 @@ PropertyAccess : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name*
 ClassEvents:ClassBody ::= Attribute* Event*;
 Event ::= <Name:String>;
 
-Function : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+Function : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* Name:Name InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
 
 abstract HelpComment ::= <Text:String>;
 OneLineHelpComment : HelpComment;

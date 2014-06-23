@@ -44,7 +44,6 @@ import ast.EPowExpr;
 import ast.EQExpr;
 import ast.ETimesExpr;
 import ast.ElseBlock;
-import ast.EmptyProgram;
 import ast.EmptyStmt;
 import ast.EndCallExpr;
 import ast.EndExpr;
@@ -217,10 +216,6 @@ public abstract class NatlabAbstractNodeCaseHandler implements nodecases.NodeCas
         caseProgram(node);
     }
     public void caseFunctionList(FunctionList node)
-    {
-        caseProgram(node);
-    }
-    public void caseEmptyProgram(EmptyProgram node)
     {
         caseProgram(node);
     }

@@ -68,8 +68,4 @@ aspect ASTPrint {
     }
     return s.toString();
   }
-  public String EmptyProgram.dumpTree() {
-    return "";
-  }
-  
 }

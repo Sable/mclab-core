@@ -1,6 +1,7 @@
 package natlab.refactoring;
 
 import ast.Function;
+import ast.Name;
 import ast.Script;
 
 public class ScriptToFunctionTest extends RefactoringTestCase {
@@ -18,7 +19,7 @@ public class ScriptToFunctionTest extends RefactoringTestCase {
         addFile("f1.m", "function x() \n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
-        f.setName("s1f");
+        f.setName(new Name("s1f"));
         assertEquals(s2f.replace(s, f).size(), 0);
         assertEquals(f.getPrettyPrinted(), "function [] = s1f()\nf = 1;\nend");
     }
@@ -28,7 +29,7 @@ public class ScriptToFunctionTest extends RefactoringTestCase {
         addFile("f1.m", "function x() \n  s1;\n disp(f);\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
-        f.setName("s1f");
+        f.setName(new Name("s1f"));
         assertEquals(s2f.replace(s, f).size(), 0);
         assertEquals(f.getPrettyPrinted(), "function [f] = s1f()\nf = 1;\nend");
     }
@@ -38,7 +39,7 @@ public class ScriptToFunctionTest extends RefactoringTestCase {
         addFile("f1.m", "function x1() \n f = 2;\n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
-        f.setName("s1f");
+        f.setName(new Name("s1f"));
         assertEquals(s2f.replace(s, f).size(), 0);
         assertEquals(f.getPrettyPrinted(), "function [] = s1f(f)\nb = f;\nf = 1;\nend");
     }
@@ -48,7 +49,7 @@ public class ScriptToFunctionTest extends RefactoringTestCase {
         addFile("f1.m", "function x1() \n f = 2;\n  s1;\n end");
         ScriptToFunction s2f = new ScriptToFunction(cu);
         Function f = new Function();
-        f.setName("s1f");
+        f.setName(new Name("s1f"));
         assertTrue(s2f.replace(s, f).get(0) instanceof Exceptions.WarnIDToFunException);
         assertEquals(f.getPrettyPrinted(), "function [] = s1f(f)\ndisp(f);\nend");
     }
@@ -59,7 +60,7 @@ public class ScriptToFunctionTest extends RefactoringTestCase {
        addFile("f2.m", "function x1() \n s1;\n end");
        ScriptToFunction s2f = new ScriptToFunction(cu);
        Function f = new Function();
-       f.setName("s1f");
+       f.setName(new Name("s1f"));
        System.out.println(s2f.replace(s, f));
        assertTrue(s2f.replace(s, f).get(0) instanceof Exceptions.ScriptInputsNotMatching);
    }

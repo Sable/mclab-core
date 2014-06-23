@@ -112,11 +112,12 @@ public class LambdaSimplification extends AbstractSimplification{
         for (Name name : node.getInputParamList()){
             params.add(name.getID());
         }
-        for (NameExpr var : node.getBody().getAllNameExpressions()){
-            if (!params.contains(var.getName().getID()) && !ignoreNames.contains(var.getName().getID()) && isVar(var)){
-                variables.add(var.getName().getID());
-            }
-        }
+
+        NodeFinder.find(NameExpr.class, node.getBody())
+            .filter(var -> !params.contains(var.getName().getID()))
+            .filter(var -> !ignoreNames.contains(var.getName().getID()))
+            .filter(this::isVar)
+            .forEach(var -> variables.add(var.getName().getID()));
 
         //TODO deal with functions unreachable from siblings (nested?)
         //rewriteChildren(node);
@@ -139,7 +140,7 @@ public class LambdaSimplification extends AbstractSimplification{
                 node, query, "lambda_",tempFunctions.keySet());
         Function function = new Function();
         TempFactory ret = TempFactory.genFreshTempFactory();
-        function.setName(functionName);
+        function.setName(new Name(functionName));
         function.setOutputParamList(new ast.List<Name>().add(ret.genName()));
         function.setStmtList(new ast.List<Stmt>().add(
                 new AssignStmt(ret.genNameExpr(), body)));

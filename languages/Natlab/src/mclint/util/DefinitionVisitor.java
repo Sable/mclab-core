@@ -77,9 +77,7 @@ public abstract class DefinitionVisitor extends AbstractNodeCaseHandler {
 
   @Override
   public void caseFunction(Function node) {
-    Name funcName = new Name(node.getName());
-    funcName.setParent(node);
-    caseFunctionName(funcName);
+    caseFunctionName(node.getName());
     for (Name name : node.getInputParams())
       caseInParam(name);
     for (Name name : node.getOutputParams())

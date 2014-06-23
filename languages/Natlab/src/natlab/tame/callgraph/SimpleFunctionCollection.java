@@ -36,7 +36,6 @@ import natlab.toolkits.path.FileEnvironment;
 import natlab.toolkits.path.FunctionReference;
 import natlab.toolkits.rewrite.Simplifier;
 import ast.ClassDef;
-import ast.EmptyProgram;
 import ast.Function;
 import ast.FunctionList;
 import ast.Program;
@@ -154,9 +153,6 @@ public class SimpleFunctionCollection extends
 			System.err
 					.println("The tamer does not support classes at this point.");
 			// TODO - also add the class to the class repository
-		} else if (program instanceof EmptyProgram) {
-			System.err
-					.println("The tamer does not support empty files at this point."); // TODO
 		} else if (!(program instanceof FunctionList)) {
 			System.err
 					.println("The tamer encountered Matlab file of unknown/unsupported type "
@@ -182,7 +178,7 @@ public class SimpleFunctionCollection extends
 		for (Function functionAst : functionList.getFunctions()) {
 			// create/add static function
 			FunctionReference ref = new FunctionReference(
-					functionAst.getName(), funcRef.getFile());
+					functionAst.getName().getID(), funcRef.getFile());
 			Context context = fileEnvironment.getContext(functionAst,
 					funcRef.getFile());
 			StaticFunction function = new StaticFunction(functionAst, ref,
