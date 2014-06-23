@@ -18,10 +18,11 @@
 
 package natlab.tame.interproceduralAnalysis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import natlab.tame.callgraph.FunctionCollection;
-
 import natlab.toolkits.path.FunctionReference;
 
 /**

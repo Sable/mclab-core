@@ -18,12 +18,9 @@
 
 package natlab.tame.valueanalysis.aggrvalue;
 
-import java.util.List;
-
-import natlab.tame.classes.reference.*;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.ValueSet;
 import natlab.tame.valueanalysis.value.Args;
-import natlab.tame.valueanalysis.value.Value;
 
 /**
  * represents a primitive value, i.e. a value that has a primitive type.

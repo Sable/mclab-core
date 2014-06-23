@@ -1,10 +1,11 @@
 package natlab.toolkits.analysis.callgraph;
 
-import java.util.*;
-import ast.*;
-import natlab.toolkits.analysis.*;
-import natlab.toolkits.analysis.callgraph.*;
-import natlab.toolkits.analysis.handlepropagation.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
+import natlab.toolkits.analysis.handlepropagation.MayMustTreeSet;
+import ast.ASTNode;
 
 public class CallGraph
 {

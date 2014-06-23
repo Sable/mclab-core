@@ -2,10 +2,9 @@
 
 package natlab.tame.builtin.isComplexInfoProp;
 
-import beaver.Symbol;
-import beaver.Scanner;
-
 import natlab.tame.builtin.isComplexInfoProp.isComplexInfoPropParser.Terminals;
+import beaver.Scanner;
+import beaver.Symbol;
 
 
 

@@ -10,6 +10,7 @@ public interface Transformer {
   void replace(ASTNode<?> oldNode, ASTNode<?> newNode);
   void remove(ASTNode<?> node);
   void insert(ASTNode<?> node, ASTNode<?> newNode, int i);
+  <T extends ASTNode<?>> T copy(T node);
   Program getProgram();
   String reconstructText();
 }

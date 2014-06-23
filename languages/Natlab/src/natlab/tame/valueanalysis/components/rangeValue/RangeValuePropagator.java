@@ -1,14 +1,14 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
 import java.util.ArrayList;
-import java.lang.Math;
 
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.components.constant.*;
-import natlab.tame.valueanalysis.components.shape.*;
 
 public class RangeValuePropagator<V extends Value<V>> 
 extends BuiltinVisitor<Args<V>, RangeValue<V>> {

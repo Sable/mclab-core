@@ -19,11 +19,23 @@
 package natlab.tame.tir.analysis;
 
 
-import analysis.*;
-import nodecases.*;
-import natlab.tame.tir.*;
-import natlab.toolkits.analysis.*;
-import ast.*;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRStmt;
+import nodecases.AbstractNodeCaseHandler;
+import analysis.ForwardingNodeCaseHandler;
+import ast.AssignStmt;
+import ast.BreakStmt;
+import ast.ContinueStmt;
+import ast.EmptyStmt;
+import ast.ForStmt;
+import ast.Function;
+import ast.GlobalStmt;
+import ast.IfStmt;
+import ast.PersistentStmt;
+import ast.ReturnStmt;
+import ast.TryStmt;
+import ast.WhileStmt;
 
 
 /**

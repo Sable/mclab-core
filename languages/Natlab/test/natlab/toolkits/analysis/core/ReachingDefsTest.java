@@ -1,5 +1,8 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,9 +17,6 @@ import ast.Name;
 import ast.Program;
 import ast.Script;
 import ast.Stmt;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 
 public class ReachingDefsTest extends TestCase {
   private Program program;
@@ -37,15 +37,21 @@ public class ReachingDefsTest extends TestCase {
   }
   
   private Set<Def> set(Def... defs) {
-    return Sets.newHashSet(defs);
+    return new HashSet<>(Arrays.asList(defs));
+  }
+  
+  private Map<String, Set<Def>> map(String key, Set<Def> value) {
+    Map<String, Set<Def>> map = new HashMap<>();
+    map.put(key, value);
+    return map;
   }
 
   public void testSimpleTransfer() {
     parse("x = 0");
     AssignStmt def = (AssignStmt) ((Script) program).getStmt(0);
     
-    assertEquals(ImmutableMap.of("x", set(ReachingDefs.UNDEF)), inSet(def));
-    assertEquals(ImmutableMap.of("x", set(def)), outSet(def));
+    assertEquals(map("x", set(ReachingDefs.UNDEF)), inSet(def));
+    assertEquals(map("x", set(def)), outSet(def));
   }
   
   public void testNoImplicitDefIfDefinitelyAssigned() {
@@ -53,9 +59,9 @@ public class ReachingDefsTest extends TestCase {
     AssignStmt def = (AssignStmt) ((Script) program).getStmt(0);
     AssignStmt secondDef = (AssignStmt) ((Script) program).getStmt(1);
 
-    assertEquals(ImmutableMap.of("x", set(ReachingDefs.UNDEF)), inSet(def));
-    assertEquals(ImmutableMap.of("x", set(def)), outSet(def));
-    assertEquals(ImmutableMap.of("x", set(def)), outSet(secondDef));
+    assertEquals(map("x", set(ReachingDefs.UNDEF)), inSet(def));
+    assertEquals(map("x", set(def)), outSet(def));
+    assertEquals(map("x", set(def)), outSet(secondDef));
   }
   
   public void testImplicitDefIfNotDefinitelyAssigned() {
@@ -69,7 +75,7 @@ public class ReachingDefsTest extends TestCase {
         ((IfStmt) ((Script) program).getStmt(0)).getIfBlock(0).getStmt(0);
     AssignStmt arrayDef = (AssignStmt) ((Script) program).getStmt(1);
 
-    assertEquals(ImmutableMap.of("x", set(def, arrayDef)), inSet(arrayDef));
+    assertEquals(map("x", set(def, arrayDef)), inSet(arrayDef));
   }
   
   public void testKill() {
@@ -78,8 +84,8 @@ public class ReachingDefsTest extends TestCase {
     AssignStmt x0 = (AssignStmt) script.getStmt(0);
     AssignStmt x1 = (AssignStmt) script.getStmt(1);
     
-    assertEquals(ImmutableMap.of("x", set(x0)), inSet(x1));
-    assertEquals(ImmutableMap.of("x", set(x1)), outSet(x1));
+    assertEquals(map("x", set(x0)), inSet(x1));
+    assertEquals(map("x", set(x1)), outSet(x1));
   }
   
   public void testMerging() {
@@ -95,9 +101,9 @@ public class ReachingDefsTest extends TestCase {
     AssignStmt x1 = (AssignStmt) ifStmt.getIfBlock(0).getStmt(0);
     AssignStmt x2 = (AssignStmt) ifStmt.getElseBlock().getStmt(0);
     
-    assertEquals(ImmutableMap.of("x", set(x1)), outSet(x1));
-    assertEquals(ImmutableMap.of("x", set(x2)), outSet(x2));
-    assertEquals(ImmutableMap.of("x", set(x1, x2)), outSet(ifStmt));
+    assertEquals(map("x", set(x1)), outSet(x1));
+    assertEquals(map("x", set(x2)), outSet(x2));
+    assertEquals(map("x", set(x1, x2)), outSet(ifStmt));
   }
   
   public void testInputParametersAsDefs() {

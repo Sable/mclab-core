@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import natlab.tame.valueanalysis.ValueSet;
-import natlab.tame.valueanalysis.aggrvalue.MatrixValue;
 import natlab.toolkits.analysis.Mergable;
 
 /**

@@ -1,7 +1,9 @@
 package natlab.tame.valueanalysis.aggrvalue;
 
 import natlab.tame.builtin.Builtin;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Res;
+import natlab.tame.valueanalysis.value.ValuePropagator;
 
 /**
  * provides propagations for builtins called with composite mclasses like

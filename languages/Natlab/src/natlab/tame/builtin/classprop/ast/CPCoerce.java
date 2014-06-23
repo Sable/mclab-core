@@ -1,6 +1,8 @@
 package natlab.tame.builtin.classprop.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;

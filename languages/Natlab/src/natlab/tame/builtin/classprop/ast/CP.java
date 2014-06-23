@@ -1,13 +1,13 @@
 package natlab.tame.builtin.classprop.ast;
 
-import java.util.*;
-
-import beaver.Symbol;
+import java.util.Collections;
+import java.util.List;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.builtin.classprop.PrecedenceInfo;
 import natlab.tame.classes.reference.ClassReference;
 import natlab.tame.valueanalysis.value.Value;
+import beaver.Symbol;
 
 
 /**

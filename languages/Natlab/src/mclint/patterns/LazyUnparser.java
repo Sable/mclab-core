@@ -1,5 +1,6 @@
 package mclint.patterns;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import natlab.utils.NodeFinder;
@@ -81,10 +82,8 @@ import ast.UMinusExpr;
 import ast.UPlusExpr;
 import ast.WhileStmt;
 
-import com.google.common.collect.Lists;
-
 public class LazyUnparser extends AbstractNodeCaseHandler {
-  private List<Object> tokens = Lists.newLinkedList();
+  private List<Object> tokens = new LinkedList<>();
 
   public static List<Object> unparse(ASTNode<?> node) {
     LazyUnparser unparser = new LazyUnparser();

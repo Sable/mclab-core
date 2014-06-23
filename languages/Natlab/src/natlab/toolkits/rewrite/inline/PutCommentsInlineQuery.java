@@ -19,7 +19,7 @@
 package natlab.toolkits.rewrite.inline;
 
 import natlab.tame.tir.TIRCommentStmt;
-import ast.*;
+import ast.Function;
 
 /**
  * Represents a InlineQuery object, which can be used to inline functions in other functions.

@@ -1,17 +1,13 @@
 package mclint.patterns;
 
 import java.util.Map;
-
-import natlab.utils.AstFunctions;
+import java.util.stream.Collectors;
 
 import ast.ASTNode;
 import ast.Expr;
-import ast.List;
 import ast.Stmt;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 public class Match {
@@ -37,8 +33,8 @@ public class Match {
     return clazz.cast(getBoundNode(var));
   }
   
-  public List<?> getBoundList(char var) {
-    return getBoundNode(var, List.class);
+  public ast.List<?> getBoundList(char var) {
+    return getBoundNode(var, ast.List.class);
   }
   
   public Stmt getBoundStmt(char var) {
@@ -55,15 +51,11 @@ public class Match {
   
   private String getBindingsAsString() {
     return String.format("{%s}", Joiner.on(", ").withKeyValueSeparator(": ")
-        .join(Maps.transformValues(bindings, new Function<ASTNode<?>, String>() {
-          @Override public String apply(ASTNode<?> node) {
-            if (!(node instanceof ast.List)) {
-              return node.getPrettyPrinted();
-            }
-            @SuppressWarnings("unchecked")
-            ast.List<? extends ASTNode<?>> list = (ast.List<? extends ASTNode<?>>) node;
-            return Joiner.on(", ").join(Iterables.transform(list, AstFunctions.prettyPrint()));
+        .join(Maps.transformValues(bindings, node -> {
+          if (!(node instanceof ast.List)) {
+            return node.getPrettyPrinted();
           }
+          return node.stream().map(ASTNode::getPrettyPrinted).collect(Collectors.joining(", "));
         })));
   }
 

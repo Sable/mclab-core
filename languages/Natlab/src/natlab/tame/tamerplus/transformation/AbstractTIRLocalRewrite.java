@@ -4,6 +4,7 @@ import java.util.List;
 
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
+import natlab.toolkits.rewrite.AbstractLocalRewrite;
 import natlab.toolkits.rewrite.TransformedNode;
 import ast.ASTNode;
 /**

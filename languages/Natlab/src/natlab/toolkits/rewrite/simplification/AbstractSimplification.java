@@ -43,6 +43,9 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
     {
         super(tree);
         kindAnalysis = kind;
+        if (!kindAnalysis.isAnalyzed()) {
+          kindAnalysis.analyze();
+        }
     }
 
     public abstract Set<Class<? extends AbstractSimplification>> getDependencies();

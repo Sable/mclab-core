@@ -6,10 +6,6 @@ import java.nio.file.Path;
 
 import junit.framework.TestCase;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
-
 public class ProjectTest extends TestCase {
   private Path projectRoot;
 
@@ -28,7 +24,7 @@ public class ProjectTest extends TestCase {
     create("f.m");
 
     Project project = Project.at(projectRoot);
-    MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
+    MatlabProgram f = project.getMatlabProgram("f.m");
     assertEquals("f.m", f.getPath().toString());
     assertFalse(f.isPrivate());
     assertEquals("", f.getPackage());
@@ -38,7 +34,7 @@ public class ProjectTest extends TestCase {
     create("private/f.m");
 
     Project project = Project.at(projectRoot);
-    MatlabProgram f = Iterables.getOnlyElement(project.getMatlabPrograms());
+    MatlabProgram f = project.getMatlabProgram("private/f.m");
     assertEquals("private/f.m", f.getPath().toString());
     assertTrue(f.isPrivate());
     assertEquals("", f.getPackage());
@@ -49,20 +45,14 @@ public class ProjectTest extends TestCase {
     create("+pkg/+nested/f.m");
 
     Project project = Project.at(projectRoot);
-    FluentIterable<MatlabProgram> programs = FluentIterable.from(project.getMatlabPrograms());
-    assertTrue(programs.anyMatch(new Predicate<MatlabProgram>() {
-      @Override public boolean apply(MatlabProgram program) {
-        return program.getPath().toString().equals("+pkg/f.m")
+    assertTrue(project.getMatlabPrograms().stream().anyMatch(program ->
+        program.getPath().toString().equals("+pkg/f.m")
             && !program.isPrivate()
-            && program.getPackage().equals("pkg");
-      }
-    }));
-    assertTrue(programs.anyMatch(new Predicate<MatlabProgram>() {
-      @Override public boolean apply(MatlabProgram program) {
-        return program.getPath().toString().equals("+pkg/+nested/f.m")
+            && program.getPackage().equals("pkg")));
+
+    assertTrue(project.getMatlabPrograms().stream().anyMatch(program ->
+        program.getPath().toString().equals("+pkg/+nested/f.m")
             && !program.isPrivate()
-            && program.getPackage().equals("pkg.nested");
-      }
-    }));
+            && program.getPackage().equals("pkg.nested")));
   }
 }

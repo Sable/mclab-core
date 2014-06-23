@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
@@ -23,8 +24,6 @@ import org.xml.sax.InputSource;
 
 import ast.CompilationUnits;
 import ast.Program;
-
-import com.google.common.collect.Lists;
 
 public class NatlabServer {
   private static final int SERVER_PORT = 47146; //default server port
@@ -165,7 +164,7 @@ public class NatlabServer {
       }
 
       log("Parsing");
-      List<CompilationProblem> errors = Lists.newArrayList();
+      List<CompilationProblem> errors = new ArrayList<>();
       Program program;
       if (!natlab) {
         if (input != null) {

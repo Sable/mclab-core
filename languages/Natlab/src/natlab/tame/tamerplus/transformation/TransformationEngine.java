@@ -3,7 +3,6 @@ package natlab.tame.tamerplus.transformation;
 import natlab.tame.tamerplus.analysis.AnalysisEngine;
 import ast.ASTNode;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 
@@ -37,7 +36,7 @@ public class TransformationEngine
         }
         catch (Exception e)
         {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         transformation.transform(this);
         return transformation;

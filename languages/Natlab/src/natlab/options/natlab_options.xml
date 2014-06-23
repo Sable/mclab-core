@@ -284,6 +284,12 @@
 	<short_desc>Use region arrays</short_desc>
 	<long_desc>Use region arrays instead of New arrays</long_desc>
      </boolopt>		
+     <boolopt>
+	<name>disable IntegerOkay analysis</name>
+        <alias>no_intok</alias>
+	<short_desc>disable IntegerOkay analysis</short_desc>
+	<long_desc>Explicitly disable IntegerOkay Analysis</long_desc>
+     </boolopt>		
      <stropt>
      	<name>Parallelize vector instructions</name>
      	<alias>vec_par_length</alias>
@@ -293,6 +299,21 @@
 	operations for all or individual operations.
         </long_desc>
     </stropt>		
+         <stropt>
+     	<name>Information about the input argument</name>
+     	<alias>arg_info</alias>
+     	<short_desc>Provide information about the input argument. </short_desc>
+     	<long_desc>Provide information about the input argument. 
+        </long_desc>
+    </stropt>	
+         <stropt>
+     	<name>Class name</name>
+     	<alias>class_name</alias>
+     	<short_desc>Name of the X10 class file to be generated.</short_desc>
+     	<long_desc>Name of the X10 class file to be generated.
+        </long_desc>
+    </stropt>	
+    
  </section>
 
   <section>

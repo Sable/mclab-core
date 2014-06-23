@@ -1,10 +1,10 @@
 package natlab;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import natlab.options.Options;
 import analysis.StructuralAnalysis;
@@ -80,10 +80,12 @@ public class FlowAnalysisTestTool
                 //translate from matlab
                 Reader source = Parse.translateFile( fName, errList ).getReader();
                 if( source == null )
-                    throw new Exception( "Error translating file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
+                    throw new Exception( "Error translating file "+ fName +":\n" + 
+                        errList.stream().map(Object::toString).collect(Collectors.joining("\n")));
                 Program prog = Parse.parseNatlabFile( fName, source, errList );
                 if( prog == null )
-                    throw new Exception( "Error parsing file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
+                    throw new Exception( "Error parsing file "+ fName +":\n" +
+                        errList.stream().map(Object::toString).collect(Collectors.joining("\n")));
                 cu.addProgram( prog );
             }
             else{
@@ -126,14 +128,14 @@ public class FlowAnalysisTestTool
      *
      * @return  Program node representing the file.
      */
-    protected Program parseFile( String fName ) throws FileNotFoundException, Exception
+    protected Program parseFile( String fName ) 
     {
-        FileReader fileReader = new FileReader( fName );
         ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
-        Program prog = Parse.parseNatlabFile( fName, fileReader, errList );
+        Program prog = Parse.parseNatlabFile(fName, errList);
         if( prog == null )
             //TODO-JD create proper compilation exception
-            throw new Exception( "Error parsing file "+ fName +":\n" + CompilationProblem.toStringAll( errList ) );
+            throw new RuntimeException( "Error parsing file "+ fName +":\n" +
+                errList.stream().map(Object::toString).collect(Collectors.joining("\n")));
         return prog;
     }
        

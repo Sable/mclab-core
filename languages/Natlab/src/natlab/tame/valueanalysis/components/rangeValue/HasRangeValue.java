@@ -1,6 +1,6 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * denotes whether a value has range value information associated with it.

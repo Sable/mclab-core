@@ -30,7 +30,8 @@ package natlab.tame.interproceduralAnalysis;
  */
 
 import java.util.Collections;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import natlab.tame.callgraph.FunctionCollection;
 import natlab.tame.callgraph.StaticFunction;

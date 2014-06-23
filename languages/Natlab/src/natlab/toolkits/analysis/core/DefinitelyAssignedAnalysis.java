@@ -1,5 +1,6 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import analysis.ForwardAnalysis;
@@ -11,8 +12,6 @@ import ast.Name;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.collect.Sets;
-
 public class DefinitelyAssignedAnalysis extends
     ForwardAnalysis<Set<String>> {
 
@@ -23,7 +22,7 @@ public class DefinitelyAssignedAnalysis extends
   @Override
   public void caseScript(Script node) {
     currentInSet = newInitialFlow();
-    currentOutSet = Sets.newHashSet(currentInSet);
+    currentOutSet = new HashSet<>(currentInSet);
     node.getStmts().analyze(this);
     outFlowSets.put(node, currentOutSet);
   }
@@ -31,7 +30,7 @@ public class DefinitelyAssignedAnalysis extends
   @Override
   public void caseFunction(Function node) {
     currentInSet = newInitialFlow();
-    currentOutSet = Sets.newHashSet(currentInSet);
+    currentOutSet = new HashSet<>(currentInSet);
 
     for (Name n : node.getInputParams()) {
       currentInSet.add(n.getID());
@@ -46,7 +45,7 @@ public class DefinitelyAssignedAnalysis extends
   @Override
   public void caseAssignStmt(AssignStmt node) {
     inFlowSets.put(node, currentInSet);
-    currentOutSet = Sets.newHashSet(currentInSet);
+    currentOutSet = new HashSet<>(currentInSet);
     currentOutSet.addAll(node.getLValues());
     outFlowSets.put(node, currentOutSet);
   }
@@ -54,7 +53,7 @@ public class DefinitelyAssignedAnalysis extends
   @Override
   public void caseGlobalStmt(GlobalStmt node) {
     inFlowSets.put(node, currentInSet);
-    currentOutSet = Sets.newHashSet(currentInSet);
+    currentOutSet = new HashSet<>(currentInSet);
     for (Name name : node.getNames()) {
       currentOutSet.add(name.getID());
     }
@@ -70,19 +69,19 @@ public class DefinitelyAssignedAnalysis extends
 
   @Override
   public Set<String> copy(Set<String> source) {
-    return Sets.newHashSet(source);
+    return new HashSet<>(source);
   }
 
   @Override
   public Set<String> merge(Set<String> in1, Set<String> in2) {
-    Set<String> out = Sets.newHashSet(in1);
+    Set<String> out = new HashSet<>(in1);
     out.retainAll(in2);
     return out;
   }
 
   @Override
   public Set<String> newInitialFlow() {
-    return Sets.newHashSet();
+    return new HashSet<>();
   }
   
   public boolean isDefinitelyAssignedAtInputOf(Stmt node, String name) {

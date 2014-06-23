@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 script: "cd languages/Natlab; ant test"
 branches:
   only:
@@ -10,3 +12,4 @@ notifications:
       - mclab@sable.mcgill.ca
     on_success: change
     on_failure: always
+  slack: sable-mclab:BCSCOEsSkQxkbBoNbuwrzVTC

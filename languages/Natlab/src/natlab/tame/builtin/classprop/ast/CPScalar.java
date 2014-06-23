@@ -4,7 +4,8 @@ import java.util.List;
 
 import natlab.tame.builtin.classprop.ClassPropMatch;
 import natlab.tame.classes.reference.ClassReference;
-import natlab.tame.valueanalysis.components.constant.*;
+import natlab.tame.valueanalysis.components.constant.Constant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.value.Value;
 

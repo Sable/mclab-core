@@ -18,13 +18,13 @@
 
 package natlab.toolkits.analysis.core;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import natlab.toolkits.analysis.MergeUtil;
-import natlab.toolkits.analysis.Merger;
-import natlab.toolkits.analysis.Mergers;
 import natlab.utils.NodeFinder;
 import analysis.ForwardAnalysis;
 import ast.ASTNode;
@@ -36,8 +36,6 @@ import ast.Name;
 import ast.Script;
 import ast.Stmt;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -49,8 +47,7 @@ public class ReachingDefs extends
         ForwardAnalysis<Map<String, Set<Def>>> {
   public static Def UNDEF = new AssignStmt();
 
-  private Set<Name> defs = Sets.newHashSet();
-  private static final Merger<Set<Def>> UNION_MERGER = Mergers.union();
+  private Set<Name> defs = new HashSet<>();
 
   private Map<String, Set<Def>> startMap;
   private DefinitelyAssignedAnalysis definiteAssignment;
@@ -62,40 +59,40 @@ public class ReachingDefs extends
   
   @Override
   public void analyze() {
-    startMap = Maps.newHashMap();
     nameCollector = new NameCollector(tree);
     nameCollector.analyze();
     definiteAssignment = new DefinitelyAssignedAnalysis(tree);
     definiteAssignment.analyze();
-    for (Name var : nameCollector.getAllNames()) {
-      startMap.put(var.getID(), new HashSet<Def>());
-    }
+    
+    startMap = nameCollector.getAllNames().stream()
+        .map(Name::getID)
+        .distinct()
+        .collect(Collectors.toMap(name -> name, name -> new HashSet<>()));
     super.analyze();
   }
 
   @Override
   public Map<String, Set<Def>> merge(Map<String, Set<Def>> in1, Map<String, Set<Def>> in2) {
-    return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
+    return MergeUtil.unionMerge(in1, in2, (a, b) -> new HashSet<>(Sets.union(a, b)));
   }
 
   @Override
   public Map<String, Set<Def>> copy(Map<String, Set<Def>> in) {
-    Map<String, Set<Def>> out = Maps.newHashMap();
-    for (String i : in.keySet())
-      out.put(i, Sets.newHashSet(in.get(i)));
-    return out;
+    return in.entrySet().stream()
+        .collect(Collectors.toMap(e -> e.getKey(), e -> new HashSet<>(e.getValue())));
   }
 
   @Override
   public void caseFunction(Function f) {
     currentOutSet = newInitialFlow();
     currentInSet = currentOutSet;
-    for (Name n : NodeFinder.find(Name.class, f.getStmts())) {
-      currentOutSet.put(n.getID(), Sets.<Def> newHashSet(UNDEF));
-    }
-    for (Name inputArg : f.getInputParamList()) {
-      currentOutSet.put(inputArg.getID(), Sets.<Def> newHashSet(inputArg));
-    }
+    
+    currentOutSet.putAll(NodeFinder.find(Name.class, f.getStmts())
+        .map(Name::getID)
+        .distinct()
+        .collect(Collectors.toMap(name -> name, name -> new HashSet<>(Collections.singleton(UNDEF)))));
+    currentOutSet.putAll(f.getInputParams().stream()
+        .collect(Collectors.toMap(Name::getID, Sets::<Def>newHashSet)));
     caseASTNode(f.getStmts());
     outFlowSets.put(f, currentOutSet);
   }
@@ -104,9 +101,11 @@ public class ReachingDefs extends
   public void caseScript(Script f) {
     currentOutSet = newInitialFlow();
     currentInSet = currentOutSet;
-    for (Name n : NodeFinder.find(Name.class, f)) {
-      currentOutSet.put(n.getID(), Sets.<Def> newHashSet(UNDEF));
-    }
+    
+    currentOutSet.putAll(NodeFinder.find(Name.class, f)
+        .map(Name::getID)
+        .distinct()
+        .collect(Collectors.toMap(name -> name, name -> new HashSet<>(Collections.singleton(UNDEF)))));
     caseASTNode(f.getStmts());
     outFlowSets.put(f, currentOutSet);
   }
@@ -122,20 +121,16 @@ public class ReachingDefs extends
   }
 
   private Set<Name> getSimpleDefs(final AssignStmt node) {
-    return Sets.filter(nameCollector.getNames(node), new Predicate<Name>() {
-      @Override public boolean apply(Name name) {
-        return isSimpleLValue(name);
-      }
-    });
+    return nameCollector.getNames(node).stream()
+        .filter(this::isSimpleLValue)
+        .collect(Collectors.toSet());
   }
   
   private Set<Name> getImplicitDefs(final AssignStmt node) {
-    return Sets.filter(nameCollector.getNames(node), new Predicate<Name>() {
-      @Override public boolean apply(Name name) {
-        return !isSimpleLValue(name) 
-            && !definiteAssignment.isDefinitelyAssignedAtInputOf(node, name.getID());
-      }
-    });
+    return nameCollector.getNames(node).stream()
+        .filter(name -> !isSimpleLValue(name))
+        .filter(name -> !definiteAssignment.isDefinitelyAssignedAtInputOf(node, name.getID()))
+        .collect(Collectors.toSet());
   }
 
   @Override
@@ -167,9 +162,8 @@ public class ReachingDefs extends
   public void caseGlobalStmt(GlobalStmt node) {
     inFlowSets.put(node, currentInSet);
     currentOutSet = copy(currentInSet);
-    for (Name name : node.getNames()) {
-      currentOutSet.put(name.getID(), Sets.<Def>newHashSet(node));
-    }
+    currentOutSet.putAll(node.getNames().stream()
+        .collect(Collectors.toMap(Name::getID, name -> Sets.<Def>newHashSet(node))));
     outFlowSets.put(node, currentOutSet);
   }
   

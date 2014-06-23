@@ -2,13 +2,20 @@ package natlab.tame.valueanalysis;
 
 import java.util.ArrayList;
 
+import natlab.tame.tir.TIRAbstractAssignStmt;
+import natlab.tame.tir.TIRAbstractAssignToListStmt;
+import natlab.tame.tir.TIRAbstractAssignToVarStmt;
+import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRCellArraySetStmt;
+import natlab.tame.tir.TIRDotSetStmt;
+import natlab.tame.tir.TIRForStmt;
+import natlab.tame.tir.TIRFunction;
+import natlab.tame.tir.TIRIfStmt;
+import natlab.tame.tir.TIRNode;
+import natlab.tame.tir.TIRWhileStmt;
+import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import ast.ASTNode;
-import ast.ForStmt;
 import ast.IfBlock;
-import ast.Stmt;
-import ast.WhileStmt;
-import natlab.tame.tir.analysis.*;
-import natlab.tame.tir.*;
 import ast.Name;
 
 //TODO - maybe this could be abstracted into a tir class, in natlab.tir.tools?

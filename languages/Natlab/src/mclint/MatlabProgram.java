@@ -5,16 +5,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import mclint.transform.Transformer;
 import mclint.transform.Transformers;
 import mclint.util.Parsing;
 import ast.Program;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 
 // TODO(isbadawi): There is lots of awkward interrelated state in this class
 // -- file, code, ast, the transformers, etc. are all kinds of views on the same thing,
@@ -26,6 +23,8 @@ public class MatlabProgram {
 
   private String code;
   private Program ast;
+  private Transformer basicTransformer;
+  private Transformer layoutPreservingTransformer;
   
   public static MatlabProgram at(Path file) throws IOException {
     Path root = file.getParent();
@@ -62,15 +61,11 @@ public class MatlabProgram {
   }
 
   public String getPackage() {
-    List<String> packageComponents = Lists.newArrayList();
-    for (Path componentPath : file) {
-      String component = componentPath.toString();
-      if (!component.startsWith("+")) {
-        break;
-      }
-      packageComponents.add(component.substring(1));
-    }
-    return Joiner.on(".").join(packageComponents);
+    return StreamSupport.stream(file.spliterator(), false)
+        .map(Object::toString)
+        .filter(component -> component.startsWith("+"))
+        .map(component -> component.substring(1))
+        .collect(Collectors.joining("."));
   }
 
   public Program parse() {
@@ -86,16 +81,22 @@ public class MatlabProgram {
   }
 
   public Transformer getBasicTransformer() {
-    return Transformers.basic(ast);
+    if (basicTransformer == null) {
+      basicTransformer = Transformers.basic(ast);
+    }
+    return basicTransformer;
   }
 
   public Transformer getLayoutPreservingTransformer() {
-    try {
-      return Transformers.layoutPreserving(
-          new InputStreamReader(Files.newInputStream(getAbsolutePath())));
-    } catch (IOException e) {
-      throw Throwables.propagate(e);
+    if (layoutPreservingTransformer == null) {
+      try {
+        layoutPreservingTransformer = Transformers.layoutPreserving(
+            new InputStreamReader(Files.newInputStream(getAbsolutePath())));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return layoutPreservingTransformer;
   }
 
   public void write() throws IOException {

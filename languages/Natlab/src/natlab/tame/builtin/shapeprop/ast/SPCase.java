@@ -1,7 +1,8 @@
 package natlab.tame.builtin.shapeprop.ast;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Args;
+import natlab.tame.valueanalysis.value.Value;
 
 public class SPCase<V extends Value<V>> extends SPNode<V> {
 	

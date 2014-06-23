@@ -1,19 +1,13 @@
 package natlab.tame.builtin.isComplexInfoProp;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
-import java.lang.*;
-
-import beaver.Parser;
+import java.util.List;
 
 import natlab.tame.builtin.isComplexInfoProp.ast.ICCaselist;
 import natlab.tame.builtin.isComplexInfoProp.ast.ICNode;
-import natlab.tame.builtin.isComplexInfoProp.*;
-//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
+//import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 
 public class isComplexInfoPropTool {
 

@@ -1,14 +1,28 @@
 package natlab.tame.builtin.classprop;
 
-import java.util.*;
-
 import java.io.StringReader;
-import java.lang.System;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import natlab.tame.builtin.Builtin;
-import natlab.tame.builtin.classprop.ast.*;
-import natlab.tame.classes.reference.*;
+import natlab.tame.builtin.classprop.ast.CP;
+import natlab.tame.builtin.classprop.ast.CPBuiltin;
+import natlab.tame.builtin.classprop.ast.CPChain;
+import natlab.tame.builtin.classprop.ast.CPCoerce;
+import natlab.tame.builtin.classprop.ast.CPError;
+import natlab.tame.builtin.classprop.ast.CPMap;
+import natlab.tame.builtin.classprop.ast.CPNone;
+import natlab.tame.builtin.classprop.ast.CPNum;
+import natlab.tame.builtin.classprop.ast.CPScalar;
+import natlab.tame.builtin.classprop.ast.CPTypeString;
+import natlab.tame.builtin.classprop.ast.CPUnion;
+import natlab.tame.classes.reference.ClassReference;
+import natlab.tame.classes.reference.PrimitiveClassReference;
 import natlab.tame.valueanalysis.simplematrix.SimpleMatrixValueFactory;
-import natlab.tame.valueanalysis.value.*;
+import natlab.tame.valueanalysis.value.Value;
 
 /**
  * tools for building class propagation information for builtins.

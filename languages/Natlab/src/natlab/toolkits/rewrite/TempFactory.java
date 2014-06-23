@@ -18,8 +18,9 @@
 
 package natlab.toolkits.rewrite;
 
-import ast.*;
-import java.lang.UnsupportedOperationException;
+import ast.CSLExpr;
+import ast.Name;
+import ast.NameExpr;
 
 /** 
  * Factory for producing new temporary names. There is a static

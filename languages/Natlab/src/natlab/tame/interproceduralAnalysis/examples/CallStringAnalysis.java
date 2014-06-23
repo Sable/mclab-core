@@ -20,12 +20,18 @@ package natlab.tame.interproceduralAnalysis.examples;
 
 import java.util.LinkedHashSet;
 
-import ast.*;
-import analysis.*;
 import natlab.tame.callgraph.StaticFunction;
-import natlab.tame.interproceduralAnalysis.*;
-import natlab.toolkits.analysis.*;
+import natlab.tame.interproceduralAnalysis.Call;
+import natlab.tame.interproceduralAnalysis.CallString;
+import natlab.tame.interproceduralAnalysis.Callsite;
+import natlab.tame.interproceduralAnalysis.FunctionAnalysis;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisFactory;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.toolkits.path.FunctionReference;
+import analysis.AbstractDepthFirstAnalysis;
+import ast.Expr;
+import ast.Function;
+import ast.Name;
 
 public class CallStringAnalysis extends AbstractDepthFirstAnalysis<CallStringAnalysis.CallStrings>
         implements FunctionAnalysis<CallString<?>,CallStringAnalysis.CallStrings>{

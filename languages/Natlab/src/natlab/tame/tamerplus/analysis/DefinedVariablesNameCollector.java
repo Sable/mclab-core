@@ -1,5 +1,6 @@
 package natlab.tame.tamerplus.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,9 +20,6 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import ast.ASTNode;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralForwardAnalysis<HashSet<String>> implements TamerPlusAnalysis 
 {
     public static boolean DEBUG = false;
@@ -32,7 +30,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     public DefinedVariablesNameCollector(ASTNode<?> tree)
     {
         super(tree);
-        fNodeToDefinedVariablesMap = Maps.newHashMap();
+        fNodeToDefinedVariablesMap = new HashMap<>();
     }
     
     @Override
@@ -46,7 +44,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     @Override
     public void caseTIRFunction(TIRFunction node)
     {
-        fCurrentVariablesSet = Sets.newHashSet(TamerPlusUtils.getNameListAsStringSet(node.getInputParams()));
+        fCurrentVariablesSet = new HashSet<>(TamerPlusUtils.getNameListAsStringSet(node.getInputParams()));
         fNodeToDefinedVariablesMap.put(node, fCurrentVariablesSet);
         caseASTNode(node);
     }
@@ -114,7 +112,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     @Override
     public HashSet<String> merge(HashSet<String> in1, HashSet<String> in2)
     {
-        HashSet<String> out = Sets.newHashSet();
+        HashSet<String> out = new HashSet<>();
         out.addAll(in1);
         out.addAll(in2);
         return out;
@@ -123,12 +121,12 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
     @Override
     public HashSet<String> copy(HashSet<String> source)
     {
-        return Sets.newHashSet(source);
+        return new HashSet<>(source);
     }
     
     public HashSet<String> newInitialFlow()
     {
-        return Sets.newHashSet();
+        return new HashSet<>();
     }
 
     /**
@@ -141,7 +139,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
         Set<String> set = fNodeToDefinedVariablesMap.get(node);
         if (set == null) 
         {
-            return Sets.newHashSet();
+            return new HashSet<>();
         }
         return set;
     }
@@ -152,7 +150,7 @@ public class DefinedVariablesNameCollector extends TIRAbstractSimpleStructuralFo
      */
     public Set<String> getDefinedVariablesFullSet()
     {
-        Set<String> definedVariablesFullSet = Sets.newHashSet(); 
+        Set<String> definedVariablesFullSet = new HashSet<>(); 
         for (Entry<TIRNode, HashSet<String>> entry : fNodeToDefinedVariablesMap.entrySet())
         {
             definedVariablesFullSet.addAll(entry.getValue());

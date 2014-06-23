@@ -1,9 +1,7 @@
 package natlab.tame.builtin.isComplexInfoProp;
 
-import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
-import natlab.tame.valueanalysis.aggrvalue.AggrValue;
+import natlab.tame.valueanalysis.components.isComplex.HasisComplexInfo;
 import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.components.isComplex.*;
 
 public class ArgICType {
 

@@ -17,12 +17,23 @@
 // =========================================================================== //
 
 package natlab.toolkits.rewrite.inline;
-import java.util.*;
-import ast.*;
-import ast.List;
+import java.util.Map;
 
 import natlab.toolkits.rewrite.AbstractLocalRewrite;
 import natlab.toolkits.rewrite.TransformedNode;
+import ast.ASTNode;
+import ast.AssignStmt;
+import ast.Expr;
+import ast.ExprStmt;
+import ast.Function;
+import ast.LValueExpr;
+import ast.List;
+import ast.MatrixExpr;
+import ast.NameExpr;
+import ast.ParameterizedExpr;
+import ast.Row;
+import ast.Script;
+import ast.Stmt;
 
 /**
  * Inlines every call to functions or scripts of given names into a function.

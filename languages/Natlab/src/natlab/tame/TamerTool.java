@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import natlab.options.Options;
 import natlab.tame.builtin.Builtin;
@@ -27,8 +28,6 @@ import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.filehandling.GenericFile;
 import natlab.toolkits.path.FileEnvironment;
-
-import com.google.common.collect.Lists;
 
 public class TamerTool {
 
@@ -80,11 +79,9 @@ public class TamerTool {
 	 */
 	public IntraproceduralValueAnalysis<AggrValue<SimpleMatrixValue>> 
 			tameMatlabToSingleFunctionFromClassReferences(java.io.File mainFile, List<PrimitiveClassReference> inputValues){
-		List<AggrValue<SimpleMatrixValue>> list = Lists.newArrayListWithCapacity(inputValues.size());
-		for (PrimitiveClassReference ref : inputValues){
-			list.add(new SimpleMatrixValue(null, ref));
-		}
-		return tameMatlabToSingleFunction(mainFile, list);
+	  return tameMatlabToSingleFunction(mainFile, inputValues.stream()
+	      .map(ref -> new SimpleMatrixValue(null, ref))
+	      .collect(Collectors.toList()));
 	}
 
 	//TODO give more useful functions!
@@ -96,7 +93,7 @@ public class TamerTool {
 		FileEnvironment env = new FileEnvironment(gFile); //get path environment obj
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env); //build simple callgraph
 		ValueFactory<AggrValue<SimpleMatrixValue>> factory = new SimpleMatrixValueFactory();
-		Args<AggrValue<SimpleMatrixValue>> someargs = Args.<AggrValue<SimpleMatrixValue>>newInstance(Collections.EMPTY_LIST); 
+		Args<AggrValue<SimpleMatrixValue>> someargs = Args.<AggrValue<SimpleMatrixValue>>newInstance(Collections.emptyList()); 
 		ValueAnalysis<AggrValue<SimpleMatrixValue>> analysis = new ValueAnalysis<AggrValue<SimpleMatrixValue>>(
 				callgraph, 
 				Args.newInstance((factory.getValuePropagator().call(Builtin.getInstance("i"),someargs).get(0).get(PrimitiveClassReference.DOUBLE))), 

@@ -19,9 +19,7 @@ import mclint.refactoring.RemoveUnusedVar;
 import mclint.reports.ReportGenerators;
 import natlab.options.Options;
 import natlab.refactoring.Exceptions.RefactorException;
-import natlab.utils.NodeFinder;
 import ast.Name;
-import ast.Program;
 
 import com.google.common.collect.ImmutableList;
 
@@ -64,35 +62,30 @@ public class McLint {
   }
 
   private static void registerBuiltinListeners(final Lint lint) {
-    lint.registerListenerForMessageCode("UNUSED_VAR", new MessageListener() {
-      @Override public boolean messageReported(Message message) {
-        if (prompt(message, "Remove definition?")) {
-          RemoveUnusedVar.exec((Name) message.getAstNode());
-          return true;
+    lint.registerListenerForMessageCode("UNUSED_VAR", message -> {
+      if (prompt(message, "Remove definition?")) {
+        RemoveUnusedVar.exec((Name) message.getAstNode());
+        return true;
+      }
+      return false;
+    });
+
+    lint.registerListenerForMessageCode("SHADOW_BUILTIN", message -> {
+      Name node = (Name) message.getAstNode();
+      if (!prompt(message, "Rename?")) {
+        return false;
+      }
+      String newName = System.console().readLine("    rename %s to: ", node.getID());
+      RefactoringContext context = lint.getLayoutPreservingRefactoringContext();
+      Refactoring rename = Refactorings.renameVariable(context, node, newName);
+      if (!rename.checkPreconditions()) {
+        for (RefactorException error : rename.getErrors()) {
+          System.err.println(error);
         }
         return false;
       }
-    });
-
-    lint.registerListenerForMessageCode("SHADOW_BUILTIN", new MessageListener() {
-      @Override public boolean messageReported(Message message) {
-        Name node = (Name) message.getAstNode();
-        if (!prompt(message, "Rename?")) {
-          return false;
-        }
-        String newName = System.console().readLine("    rename %s to: ", node.getID());
-        Program parent = NodeFinder.findParent(Program.class, node);
-        RefactoringContext context = RefactoringContext.create(parent.getMatlabProgram());
-        Refactoring rename = Refactorings.renameVariable(context, node, newName);
-        if (!rename.checkPreconditions()) {
-          for (RefactorException error : rename.getErrors()) {
-            System.err.println(error);
-          }
-          return false;
-        }
-        rename.apply();
-        return true;
-      }
+      rename.apply();
+      return true;
     });
   }
 

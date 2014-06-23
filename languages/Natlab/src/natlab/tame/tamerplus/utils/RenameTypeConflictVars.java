@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.callgraph.StaticFunction;
@@ -24,13 +25,10 @@ import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
 import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValueFactory;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ValueFactory;
-import natlab.utils.AstFunctions;
 import ast.ASTNode;
 import ast.Expr;
 import ast.Name;
 import ast.NameExpr;
-
-import com.google.common.collect.FluentIterable;
 
 public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 
@@ -96,10 +94,9 @@ public class RenameTypeConflictVars extends TIRAbstractNodeCaseHandler {
 
 				if (null != varUses) {
 					for (String var : varUses.keySet()) {
-					  Set<String> outParamSet = FluentIterable
-					      .from(function.getAst().getOutputParams())
-					      .transform(AstFunctions.nameToID())
-					      .toSet();
+					  Set<String> outParamSet = function.getAst().getOutputParams().stream()
+					      .map(Name::getID)
+					      .collect(Collectors.toSet());
 						if (!outParamSet.contains(var)) {
 										// Do not rename return variable
 							System.out.println("==" + statement.toString()

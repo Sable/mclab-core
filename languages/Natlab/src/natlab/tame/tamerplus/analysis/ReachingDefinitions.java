@@ -1,5 +1,6 @@
 package natlab.tame.tamerplus.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,12 +18,8 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractSimpleStructuralForwardAnalysis;
 import natlab.toolkits.analysis.MergeUtil;
-import natlab.toolkits.analysis.Merger;
-import natlab.toolkits.analysis.Mergers;
 import ast.ASTNode;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnalysis<Map<String, Set<TIRNode>>> implements TamerPlusAnalysis
@@ -33,7 +30,6 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     private DefiniteAssignment fDefiniteAssignment;
     private Map<String, Set<TIRNode>> fStartMap;
     private LinkedList<TIRNode> fVisitedStmts;
-    private static final Merger<Set<TIRNode>> UNION_MERGER = Mergers.union();
     
     public ReachingDefinitions(ASTNode<?> tree)
     {
@@ -55,7 +51,7 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     
     public void initializeStartMap()
     {
-        fStartMap = Maps.newHashMap();
+        fStartMap = new HashMap<>();
         for (String variableName : fVariableNameCollector.getDefinedVariablesFullSet())
         {
             fStartMap.put(variableName, new HashSet<TIRNode>());
@@ -176,16 +172,16 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
     public Map<String, Set<TIRNode>> merge(Map<String, Set<TIRNode>> in1,
         Map<String, Set<TIRNode>> in2)
     {
-        return MergeUtil.unionMerge(in1, in2, UNION_MERGER);
+        return MergeUtil.unionMerge(in1, in2, (a, b) -> new HashSet<>(Sets.union(a, b)));
     }
 
     @Override
     public Map<String, Set<TIRNode>> copy(Map<String, Set<TIRNode>> in)
     {
-        Map<String, Set<TIRNode>> out = Maps.newHashMap();
+        Map<String, Set<TIRNode>> out = new HashMap<>();
         for (String s : in.keySet())
         {
-            out.put(s, Sets.newHashSet(in.get(s)));
+            out.put(s, new HashSet<>(in.get(s)));
         }
         return out;
     }
@@ -218,8 +214,8 @@ public class ReachingDefinitions extends TIRAbstractSimpleStructuralForwardAnaly
      */
     public LinkedList<TIRNode> getVisitedStmtsOrderedList()
     {
-        LinkedList<TIRNode> visitedStmtsLinkedList = Lists.newLinkedList();
-        Set<TIRNode> visitedStmtsSet = Sets.newHashSet();
+        LinkedList<TIRNode> visitedStmtsLinkedList = new LinkedList<>();
+        Set<TIRNode> visitedStmtsSet = new HashSet<>();
         for (TIRNode visitedStmt : fVisitedStmts)
         {
             if (visitedStmtsSet.add(visitedStmt))

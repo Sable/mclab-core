@@ -1,8 +1,8 @@
 package mclint;
 
-import ast.ASTNode;
+import java.util.Comparator;
 
-import com.google.common.collect.ComparisonChain;
+import ast.ASTNode;
 
 /**
  * A code location; a file path together with line and column numbers.
@@ -51,11 +51,10 @@ public class Location implements Comparable<Location> {
 
   @Override
   public int compareTo(Location location) {
-    return ComparisonChain.start()
-        .compare(getMatlabProgram().getPath().toString(), location.getMatlabProgram().getPath().toString())
-        .compare(getLine(), location.getLine())
-        .compare(getColumn(), location.getColumn())
-        .result();
+    return Comparator.comparing((Location loc) -> loc.getMatlabProgram().getPath().toString())
+        .thenComparing(Location::getLine)
+        .thenComparing(Location::getColumn)
+        .compare(this, location);
   }
 
   @Override
