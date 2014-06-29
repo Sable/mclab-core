@@ -47,7 +47,6 @@ import ast.EPowExpr;
 import ast.EQExpr;
 import ast.ETimesExpr;
 import ast.ElseBlock;
-import ast.EmptyProgram;
 import ast.EmptyStmt;
 import ast.EndCallExpr;
 import ast.EndExpr;
@@ -533,11 +532,6 @@ public class NatlabAnalysisHelper<A> implements nodecases.NodeCaseHandler //exte
     {
         helpee.setCurrentInSet( helpee.getCurrentOutSet() );
         callback.caseClassDef( node );
-    }
-    public void caseEmptyProgram(EmptyProgram node)
-    {
-        helpee.setCurrentInSet( helpee.getCurrentOutSet() );
-        callback.caseEmptyProgram( node );
     }
     public void caseClassBody(ClassBody node)
     {

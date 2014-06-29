@@ -290,14 +290,9 @@ aspect ASTAnalyze
         visitor.caseCheckScalarStmt(this);
     }
 
-    //SOME MISSING ONES!
     public void CompilationUnits.analyze(nodecases.NodeCaseHandler visitor)
     {
         visitor.caseCompilationUnits(this);
-    }
-    public void EmptyProgram.analyze(nodecases.NodeCaseHandler visitor)
-    {
-        visitor.caseEmptyProgram(this);
     }
     public void Body.analyze(nodecases.NodeCaseHandler visitor)
     {

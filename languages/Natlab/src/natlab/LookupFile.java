@@ -89,7 +89,7 @@ public class LookupFile {
       return;
     }
     for (Function function: ((FunctionList) f).getFunctions()) {
-      currentFile.put(function.getName(), function);
+      currentFile.put(function.getName().getID(), function);
     }
   }
 

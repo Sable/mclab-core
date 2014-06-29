@@ -67,7 +67,7 @@ public class FunctionReference {
   }
 
   public FunctionReference(GenericFile path, ast.Function f, ReferenceType type) {
-    this(f.getName(), path, false, type);
+    this(f.getName().getID(), path, false, type);
   }
 
   /**

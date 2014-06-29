@@ -101,7 +101,6 @@ aspect PrettyPrint {
   eq CheckScalarStmt.getPrettyPrintedLessComments() = wrap("check_scalar(%s)", getNameExpr().getPrettyPrinted());
 
   eq CompilationUnits.getPrettyPrintedLessComments() = join("\n==========================\n\n", getPrograms());
-  eq EmptyProgram.getPrettyPrintedLessComments() = "";
   eq Script.getPrettyPrintedLessComments() = join("\n", getHelpComments()) + join("\n", getStmts());
   eq FunctionList.getPrettyPrintedLessComments() = join("\n", getFunctions());
   eq FunctionList.getPrettyPrinted() {
@@ -114,7 +113,7 @@ aspect PrettyPrint {
     return buf.toString();
   }
   eq Function.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s(%s)\n%s%s%s%send",
-    getIndent(), join(", ", getOutputParams()), getName(),
+    getIndent(), join(", ", getOutputParams()), getName().getID(),
     join(", ", getInputParams()), join("\n", getHelpComments()),
     join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
   eq HelpComment.getPrettyPrintedLessComments() = getText();

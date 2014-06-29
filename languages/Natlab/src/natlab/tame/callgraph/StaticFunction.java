@@ -77,7 +77,7 @@ public class StaticFunction implements Cloneable {
         this.function = function.fullCopy();
         this.reference = reference;
         this.calledFunctions = new HashMap<>();
-        this.name = function.getName();
+        this.name = function.getName().getID();
         this.context = context;
         
         //set siblings
@@ -147,7 +147,7 @@ public class StaticFunction implements Cloneable {
                 applySimplification(ThreeAddressToIR.class);
             }
         }catch (RuntimeException e){
-            System.out.println("error transforming to IR:\n"+function.getName());
+            System.out.println("error transforming to IR:\n"+function.getName().getID());
             throw e;
         }
     }

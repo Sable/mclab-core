@@ -33,7 +33,6 @@ public class ParserPassTestGenerator extends AbstractTestGenerator {
 		testFileWriter.println("		NatlabParser parser = new NatlabParser();");
 		testFileWriter.println("		parser.setCommentBuffer(commentBuffer);");
 		testFileWriter.println("		Program actual = (Program) parser.parse(scanner);");
-                testFileWriter.println("                actual.rawAST = true;");
 		testFileWriter.println("		Structure expected = parseStructure(\"" + outFileName + "\");");
 		testFileWriter.println("		assertEquiv(actual, expected);");
 		testFileWriter.println("	}");
