@@ -45,135 +45,149 @@ import ast.Program;
 import com.google.common.base.Joiner;
 
 /**
- * Main entry point for McLab compiler. Includes a main method that
- * deals with command line options and performs the desired
- * functions.
+ * Main entry point for McLab compiler. Includes a main method that deals with
+ * command line options and performs the desired functions.
  */
 public class Main {
-  private static Options options;
+	private static Options options;
 
-  private static void log(String message) {
-    if (!options.quiet()) {
-      System.err.println(message);
-    }
-  }
+	private static void log(String message) {
+		if (!options.quiet()) {
+			System.err.println(message);
+		}
+	}
 
-  /**
-   * Main method deals with command line options and execution of
-   * desired functions.
-   */
-  public static void main(String[] args) throws Exception {	
-    if (args.length == 0) {
-      System.err.println("No options given\nTry -help for usage");
-      return;
-    }
+	/**
+	 * Main method deals with command line options and execution of desired
+	 * functions.
+	 */
+	public static void main(String[] args) throws Exception {
+		if (args.length == 0) {
+			System.err.println("No options given\nTry -help for usage");
+			return;
+		}
 
-    options = new Options();
-    options.parse(args);
-    if (options.help()) {
-      System.err.println(options.getUsage());
-      return;
-    }
+		options = new Options();
+		options.parse(args);
+		if (options.help()) {
+			System.err.println(options.getUsage());
+			return;
+		}
 
-    if (options.pref()) {
-      NatlabPreferences.modify(options);
-      return;
-    }
+		if (options.pref()) {
+			NatlabPreferences.modify(options);
+			return;
+		}
 
-    if (options.show_pref()) {
-      System.out.println("Preferences:");
-      System.out.println(Joiner.on('\n').withKeyValueSeparator(" = ")
-          .join(NatlabPreferences.getAllPreferences()));
-    }
+		if (options.show_pref()) {
+			System.out.println("Preferences:");
+			System.out.println(Joiner.on('\n').withKeyValueSeparator(" = ")
+					.join(NatlabPreferences.getAllPreferences()));
+		}
 
-    if (options.version()) {
-      System.out.println("The version of this release is: " + VersionInfo.getVersion());
-      return;
-    }
+		if (options.version()) {
+			System.out.println("The version of this release is: "
+					+ VersionInfo.getVersion());
+			return;
+		}
 
-    if (options.quiet()) {
-      AbstractDepthFirstAnalysis.DEBUG = false;
-      AbstractStructuralAnalysis.DEBUG = false;
-      
-    }
+		if (options.quiet()) {
+			AbstractDepthFirstAnalysis.DEBUG = false;
+			AbstractStructuralAnalysis.DEBUG = false;
 
-    if (options.tamer()) {
-      //TODO - the parsing of the options should probably not be done by the tamer tool
-      BasicTamerTool.main(options);
-      return;
-    }
+		}
 
-    if (options.tamerplus()) {
-    	TamerPlusMain.main(options);
-    }
-    
-    if (options.mclint()) {
-      McLint.main(options);
-      return;
-    }
+		if (options.tamer()) {
+			// TODO - the parsing of the options should probably not be done by
+			// the tamer tool
+			BasicTamerTool.main(options);
+			return;
+		}
 
-    if (options.server()) {
-      NatlabServer.create(options).start();
-      return;
-    }
+		if (options.tamerplus()) {
+			TamerPlusMain.main(options);
+		}
 
-    if (options.mix10c()){
-    	Mix10.compile(options);
-    }
-    
-    // Mc2For options
-    if (options.codegen() || options.nocheck()) {
-    	Main_readable.compile(options);
-    }
-    
-    if (options.getFiles().isEmpty()) {
-      System.err.println("No files provided, must have at least one file.");
-      return;
-    }
+		if (options.mclint()) {
+			McLint.main(options);
+			return;
+		}
 
-    List<String> files = options.getFiles();
-    log("Parsing " + Joiner.on(", ").join(files));
-    List<CompilationProblem> errors = new ArrayList<>();
-    CompilationUnits cu;
-    if (!options.natlab()) {
-      cu = Parse.parseMatlabFiles(files, errors);
-    } else {
-      cu = Parse.parseNatlabFiles(files, errors);
-    }
+		if (options.server()) {
+			NatlabServer.create(options).start();
+			return;
+		}
 
-    if (!errors.isEmpty()) {
-      System.err.println(errors.stream().map(Object::toString).collect(Collectors.joining("\n")));
-      return;
-    }
+		if (options.mix10c()) {
+			Mix10.compile(options);
+		}
 
-    if (options.simplify()) {
-      Simplifier.simplify(cu, FullSimplification.class);
-    }
-    
-    if (options.json()) {
-      System.out.println(cu.getJsonString());
-      return;
-    }
+		// Mc2For options
+		if (options.codegen() || options.nocheck()) {
+			Main_readable.compile(options);
+		}
 
-    if (options.xml()) {
-      System.out.print(cu.XMLtoString(cu.ASTtoXML()));
-      return;
-    }
+		if (options.getFiles().isEmpty()) {
+			if (!options.main().isEmpty()) {
+				/*
+				 * If the user provided an entry point function and did not
+				 * provide a separate file, Use the main file as the input file.
+				 */
+				options.getFiles().add(options.main());
+				return;
+			} else {
+				System.err
+						.println("No files provided, must have at least one file.");
+			}
+			return;
+		}
 
-    if (options.pretty()) {
-      log("Pretty printing");
+		List<String> files = options.getFiles();
+		log("Parsing " + Joiner.on(", ").join(files));
+		List<CompilationProblem> errors = new ArrayList<>();
+		CompilationUnits cu;
+		if (!options.natlab()) {
+			cu = Parse.parseMatlabFiles(files, errors);
+		} else {
+			cu = Parse.parseNatlabFiles(files, errors);
+		}
 
-      if (options.od().length() == 0) {
-        System.out.println(cu.getPrettyPrinted());
-      } else {
-        Path outputDir = Paths.get(options.od());
-        for (Program program : cu.getPrograms()) {
-          Path outputFile = outputDir.resolve(program.getFile().getName());
-          Files.createDirectories(outputFile.getParent());
-          Files.write(outputFile, program.getPrettyPrinted().getBytes(StandardCharsets.UTF_8));
-        }
-      }
-      return;
-    }
-  }
+		if (!errors.isEmpty()) {
+			System.err.println(errors.stream().map(Object::toString)
+					.collect(Collectors.joining("\n")));
+			return;
+		}
+
+		if (options.simplify()) {
+			Simplifier.simplify(cu, FullSimplification.class);
+		}
+
+		if (options.json()) {
+			System.out.println(cu.getJsonString());
+			return;
+		}
+
+		if (options.xml()) {
+			System.out.print(cu.XMLtoString(cu.ASTtoXML()));
+			return;
+		}
+
+		if (options.pretty()) {
+			log("Pretty printing");
+
+			if (options.od().length() == 0) {
+				System.out.println(cu.getPrettyPrinted());
+			} else {
+				Path outputDir = Paths.get(options.od());
+				for (Program program : cu.getPrograms()) {
+					Path outputFile = outputDir.resolve(program.getFile()
+							.getName());
+					Files.createDirectories(outputFile.getParent());
+					Files.write(outputFile, program.getPrettyPrinted()
+							.getBytes(StandardCharsets.UTF_8));
+				}
+			}
+			return;
+		}
+	}
 }
