@@ -114,7 +114,7 @@
 
     //helper for constructing an AST Function node
     //separates stmts from nested functions and attaches comments
-    private Function function(List<Name> outParams, String name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
+    private Function function(List<Name> outParams, Name name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
         List<Stmt> stmts = new List<Stmt>();
         List<Function> nestedFunctions = new List<Function>();
         if(body != null) {

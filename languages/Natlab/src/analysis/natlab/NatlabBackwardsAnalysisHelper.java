@@ -44,7 +44,6 @@ import ast.EPowExpr;
 import ast.EQExpr;
 import ast.ETimesExpr;
 import ast.ElseBlock;
-import ast.EmptyProgram;
 import ast.EmptyStmt;
 import ast.EndExpr;
 import ast.Event;
@@ -514,11 +513,6 @@ public class NatlabBackwardsAnalysisHelper<A> extends analysis.AnalysisHelper<A>
     {
         helpee.setCurrentOutSet( helpee.getCurrentInSet() );
         callback.caseClassDef( node );
-    }
-    public void caseEmptyProgram(EmptyProgram node)
-    {
-        helpee.setCurrentOutSet( helpee.getCurrentInSet() );
-        callback.caseEmptyProgram( node );
     }
     public void caseClassBody(ClassBody node)
     {

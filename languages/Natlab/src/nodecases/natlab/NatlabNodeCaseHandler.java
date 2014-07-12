@@ -44,7 +44,6 @@ import ast.EPowExpr;
 import ast.EQExpr;
 import ast.ETimesExpr;
 import ast.ElseBlock;
-import ast.EmptyProgram;
 import ast.EmptyStmt;
 import ast.EndCallExpr;
 import ast.EndExpr;
@@ -144,7 +143,6 @@ public interface NatlabNodeCaseHandler
     public void caseBinaryExpr(BinaryExpr node);
     public void caseScript(Script node);
     public void caseFunctionList(FunctionList node);
-    public void caseEmptyProgram(EmptyProgram node);
     public void caseClassDef(ClassDef node);
     public void caseProperties(Properties node);
     public void caseMethods(Methods node);

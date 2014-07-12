@@ -53,7 +53,7 @@ aspect TokenPrettyPrint {
   eq FunctionList.doTokenize() = joinTokens("\n", getFunctions());
   eq Function.doTokenize() = concatFragments(
     getIndent(), "function [", joinTokens(", ", getOutputParams()), "] = ",
-    getName(), "(", joinTokens(", ", getInputParams()), ")", "\n",
+    getName().tokenize(), "(", joinTokens(", ", getInputParams()), ")", "\n",
     joinTokens("\n", getStmts()), joinTokens("\n", getNestedFunctions()), "end");
 
   eq EmptyStmt.doTokenize() = concatFragments("");

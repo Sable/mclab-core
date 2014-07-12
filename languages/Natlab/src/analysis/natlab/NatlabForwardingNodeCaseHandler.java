@@ -50,7 +50,6 @@ import ast.EPowExpr;
 import ast.EQExpr;
 import ast.ETimesExpr;
 import ast.ElseBlock;
-import ast.EmptyProgram;
 import ast.EmptyStmt;
 import ast.EndCallExpr;
 import ast.EndExpr;
@@ -149,7 +148,6 @@ public class NatlabForwardingNodeCaseHandler implements NodeCaseHandler {
     public void caseEQExpr(EQExpr node) { callback.caseEQExpr(node); }
     public void caseETimesExpr(ETimesExpr node) { callback.caseETimesExpr(node); }
     public void caseElseBlock(ElseBlock node) { callback.caseElseBlock(node); }
-    public void caseEmptyProgram(EmptyProgram node) { callback.caseEmptyProgram(node); }
     public void caseEmptyStmt(EmptyStmt node) { callback.caseEmptyStmt(node); }
     public void caseEndCallExpr(EndCallExpr node) { callback.caseEndCallExpr(node); }
     public void caseEndExpr(EndExpr node) { callback.caseEndExpr(node); }

@@ -123,8 +123,6 @@ aspect ASTtoXML {
     throw new UnsupportedOperationException(getClass().getName() + ".getXML()");
   }
 
-  public void EmptyProgram.getXML(Document doc, Element parent) {}
-
   private FunctionOrScriptQuery Program.getEnvironmentForKindAnalysis() {
       final FunctionOrScriptQuery baseline = LookupFile.getFunctionOrScriptQueryObject();
       final FunctionOrScriptQuery env = new FileEnvironment(getFile()).getFunctionOrScriptQuery(getFile());
@@ -166,7 +164,7 @@ aspect ASTtoXML {
   }
 
   public void Function.getXML(Document doc, Element parent) {
-    Element e = createXmlElement(doc, parent, "name", getName());
+    Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
     addChildrenXml(doc, e, "InputParamList", getInputParams());
     addChildrenXml(doc, e, "OutputParamList", getOutputParams());
     addChildrenXml(doc, e, getHelpComments());

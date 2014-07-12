@@ -39,7 +39,7 @@ public class PutCommentsInlineQuery implements InlineQuery<Function, Function> {
 
  
     private String getHeader(InlineInfo<Function, Function> info){
-        String s = "Start of Function [...] = "+info.getInlinedScriptOrFunction().getName()+"(";
+        String s = "Start of Function [...] = "+info.getInlinedScriptOrFunction().getName().getID()+"(";
         for (int i = 0; i < info.getParameters().getNumChild(); i++ ){
             s += info.getParameters().getChild(i).getPrettyPrinted()+"->"
                 +info.getInlinedScriptOrFunction().getInputParam(i).getPrettyPrinted()
@@ -55,7 +55,7 @@ public class PutCommentsInlineQuery implements InlineQuery<Function, Function> {
                 +info.getInlinedScriptOrFunction().getOutputParam(i).getPrettyPrinted()
                 +((info.getTargets().getNumChild()-1 == i)?"":", ");
         }
-        return s+"] = "+info.getInlinedScriptOrFunction().getName()+"(...)";
+        return s+"] = "+info.getInlinedScriptOrFunction().getName().getID()+"(...)";
     }
 
 }

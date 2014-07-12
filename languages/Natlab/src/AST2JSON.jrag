@@ -36,7 +36,6 @@ aspect Json {
   eq CompilationUnits.getExtraJson() = ImmutableMap.of(
     "programs", asJsonArray(getPrograms())
   );
-  eq EmptyProgram.getExtraJson() = ImmutableMap.of();
   eq Script.getExtraJson() {
     doKindAnalysis();
     return ImmutableMap.of(
@@ -54,7 +53,7 @@ aspect Json {
     );
   }
   eq Function.getExtraJson() = ImmutableMap.<String, Object>builder()
-    .put("name", getName())
+    .put("name", getName().getJson())
     .put("inputs", asJsonArray(getInputParams()))
     .put("outputs", asJsonArray(getOutputParams()))
     .put("help_comments", asJsonArray(getHelpComments()))

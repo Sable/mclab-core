@@ -259,7 +259,7 @@ public class CallGraphBuilder
             inFunction = true;
             for( Function f : node.getNestedFunctions() ){
                 workList.add(f);
-                nameOfProgMap.put( f, f.getName() );
+                nameOfProgMap.put( f, f.getName().getID() );
             }
             Function previousFunction = currentFunction;
             ASTNode previousCallable = currentCallable;
