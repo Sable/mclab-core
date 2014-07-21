@@ -19,7 +19,7 @@ import natlab.toolkits.path.FileEnvironment;
 
 public class TamerPlusMain {
 	public static void main(String args[]) {
-		String fileName = "/home/sable/sjagda/mclab/mbrt/drv_mbrt.m";//args[0];
+		String fileName = "/home/sable/sjagda/mclab/fft/drv_fft.m";//args[0];
 
 		// Get the callgraph of the main function
 		Callgraph<SimpleMatrixValue> callgraph = TamerTool.getCallgraph(
