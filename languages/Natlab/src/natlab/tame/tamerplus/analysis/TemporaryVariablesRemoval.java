@@ -322,13 +322,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return nodeToColorMap.get(useNode);
 	}
 
-	private TIRNode getDefintionNode(Name variable, Integer color) {
+	private Set<TIRNode> getDefintionNode(Name variable, Integer color) {
 		String variableName = variable.getID();
 		Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb
 				.getNodeAndColorForDefinition(variableName);
 		return findNodeWithColorInMap(color, nodeToColorMap);
 	}
-
 
 	private Set<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
