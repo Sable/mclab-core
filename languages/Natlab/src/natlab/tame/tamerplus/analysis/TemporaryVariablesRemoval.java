@@ -304,15 +304,20 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				&& node.getVarName().equals(variable.getID());
 	}
 
-	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
+	private Set<Expr> getDefinitionForVariableAtNode(Name variable,
+			TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
-		TIRNode originalDefinitionNodeInTIR = getDefintionNode(variable,
-				colorForUseNode);
-		AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-				.get(originalDefinitionNodeInTIR);
-		Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
-		return definitionExpr;
+		Set<TIRNode> originalDefinitionNodeInTIRSet = getDefintionNode(
+				variable, colorForUseNode);
+		Set<Expr> definitionExprSet = new HashSet<Expr>();
+		for (TIRNode originalDefinitionNodeInTIR : originalDefinitionNodeInTIRSet) {
+			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+					.get(originalDefinitionNodeInTIR);
+			Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
+			definitionExprSet.add(definitionExpr);
+		}
+		return definitionExprSet;
 	}
 
 	private Integer getColorForVariableInUseNode(Name variable, TIRNode useNode) {
