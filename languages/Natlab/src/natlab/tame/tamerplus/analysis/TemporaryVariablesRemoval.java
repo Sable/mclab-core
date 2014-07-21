@@ -231,7 +231,14 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode) {
-		Expr definition = getDefinitionForVariableAtNode(variable, useNode);
+		Set<Expr> exprSet = getDefinitionForVariableAtNode(variable, useNode);
+		Expr definition = null;
+		if (exprSet.size() == 1) {
+			definition = (Expr) (exprSet.toArray()[0]);
+		} else {
+			return;
+		}
+
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
 		Set<ASTNode> markedNodes = new HashSet<>();
 		ASTNode currentNode = null;
