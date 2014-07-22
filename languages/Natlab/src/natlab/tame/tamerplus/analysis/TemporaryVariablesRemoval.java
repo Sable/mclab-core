@@ -366,8 +366,30 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		return true;
 	}
+
+	private TIRNode replaceBoolExpr(TIRNode node) {
+		ASTNode astNode = (ASTNode) node;
+		while (astNode != null && !(astNode instanceof IfStmt)) {
+			astNode = astNode.getParent();
+		}
+		if (astNode == null) {
+			throw new NullPointerException("it is null");
+		}
+		TIRNode prev = null;
+		for (TIRNode rnode : reachingDef.getVisitedStmtsOrderedList()) {
+			if (((ASTNode) rnode) == astNode) {
+				break;
+			}
+			prev = rnode;
+		}
+		if (prev == null) {
+			throw new NullPointerException("will not work");
+		}
+		return prev;
+	}
+
 	private Vector<TIRNode> getShortCircuitVector(Vector<TIRNode> defSet) {
-		Vector shortCircuitVector = new Vector<TIRNode>();
+		Vector<TIRNode> shortCircuitVector = new Vector<TIRNode>();
 		for (TIRNode origNode : defSet) {
 			if (origNode instanceof TIRCallStmt
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
@@ -378,6 +400,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				shortCircuitVector.add(origNode);
 			}
 		}
+		return shortCircuitVector;
 	}
 
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
@@ -393,7 +416,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		if (defSet.size() >= 2) {
 			if (isShortCircuit(defSet)) {
-
+				defSet = getShortCircuitVector(defSet);
 			}
 		}
 		return defSet;
