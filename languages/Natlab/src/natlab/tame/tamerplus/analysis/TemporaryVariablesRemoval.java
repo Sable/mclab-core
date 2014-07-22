@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Vector;
 
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRArrayGetStmt;
@@ -315,7 +316,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
-		Set<TIRNode> originalDefinitionNodeInTIRSet = getDefintionNode(
+		Vector<TIRNode> originalDefinitionNodeInTIRSet = getDefintionNode(
 				variable, colorForUseNode);
 		Set<Expr> definitionExprSet = new HashSet<Expr>();
 		for (TIRNode originalDefinitionNodeInTIR : originalDefinitionNodeInTIRSet) {
@@ -334,16 +335,16 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return nodeToColorMap.get(useNode);
 	}
 
-	private Set<TIRNode> getDefintionNode(Name variable, Integer color) {
+	private Vector<TIRNode> getDefintionNode(Name variable, Integer color) {
 		String variableName = variable.getID();
 		Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb
 				.getNodeAndColorForDefinition(variableName);
 		return findNodeWithColorInMap(color, nodeToColorMap);
 	}
 
-	private Set<TIRNode> findNodeWithColorInMap(Integer color,
+	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
-		Set<TIRNode> defSet = new HashSet<TIRNode>();
+		Vector<TIRNode> defSet = new Vector<TIRNode>();
 		TIRNode seekedNode = null;
 		for (TIRNode node : nodeToColorMap.keySet()) {
 			if (nodeToColorMap.get(node).intValue() == color.intValue()) {
