@@ -341,7 +341,10 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				.getNodeAndColorForDefinition(variableName);
 		return findNodeWithColorInMap(color, nodeToColorMap);
 	}
-
+	private boolean isShortCircuit(Vector<TIRNode> defSet){
+		
+		return false;
+	}
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
 		Vector<TIRNode> defSet = new Vector<TIRNode>();
