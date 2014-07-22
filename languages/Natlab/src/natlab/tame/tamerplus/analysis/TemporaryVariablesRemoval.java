@@ -28,10 +28,12 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Expr;
 import ast.ForStmt;
+import ast.IfStmt;
 import ast.Name;
 import ast.NameExpr;
 
 import com.google.common.collect.HashBiMap;
+import com.sun.xml.internal.ws.api.pipe.Engine;
 
 @SuppressWarnings("rawtypes")
 public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
@@ -45,6 +47,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private HashBiMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
 	private HashMap<Expr, Name> fExprToTempVarName;
 	private Set<String> fRemainingVariablesNames;
+	private ReachingDefinitions reachingDef = null;
 
 	public TemporaryVariablesRemoval(ASTNode<?> tree) {
 		fExprToTempVarName = new HashMap<>();
@@ -59,7 +62,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 		fRemainingVariablesNames = engine.getDefinedVariablesAnalysis()
 				.getDefinedVariablesFullSet();
-
+		reachingDef = engine.getReachingDefinitionsAnalysis();
 		getFunctionNode().tirAnalyze(this);
 
 		if (DEBUG) {
@@ -341,10 +344,29 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				.getNodeAndColorForDefinition(variableName);
 		return findNodeWithColorInMap(color, nodeToColorMap);
 	}
-	private boolean isShortCircuit(Vector<TIRNode> defSet){
-		
-		return false;
+
+	private boolean isShortCircuit(Vector<TIRNode> defSet) {
+		ASTNode sameifNode = null;
+		boolean isSame;
+		for (TIRNode xNode : defSet) {
+			ASTNode ifNode = (ASTNode) xNode;
+			while (ifNode != null && !(ifNode instanceof IfStmt)) {
+				ifNode = ifNode.getParent();
+			}
+			if (ifNode == null) {
+				throw new NullPointerException("it is not a if statement");
+			}
+			if (ifNode instanceof IfStmt) {
+				if (sameifNode == null) {
+					sameifNode = ifNode;
+				} else if (ifNode != sameifNode) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
+
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
 		Vector<TIRNode> defSet = new Vector<TIRNode>();
@@ -354,6 +376,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				seekedNode = node;
 				defSet.add(node);
 				// break;
+			}
+		}
+		if (defSet.size() >= 2) {
+			if (isShortCircuit(defSet)) {
+
 			}
 		}
 		return defSet;
