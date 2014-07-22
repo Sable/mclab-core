@@ -366,6 +366,19 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		return true;
 	}
+	private Vector<TIRNode> getShortCircuitVector(Vector<TIRNode> defSet) {
+		Vector shortCircuitVector = new Vector<TIRNode>();
+		for (TIRNode origNode : defSet) {
+			if (origNode instanceof TIRCallStmt
+					&& (((TIRCallStmt) origNode).getRHS().getVarName()
+							.equals("false") || (((TIRCallStmt) origNode)
+							.getRHS().getVarName().equals("true")))) {
+				shortCircuitVector.add(replaceBoolExpr(origNode));
+			} else {
+				shortCircuitVector.add(origNode);
+			}
+		}
+	}
 
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
