@@ -245,24 +245,20 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		// } else {
 		//
 		// }
-
+		//System.out.println("definition pretty print " + definition.getPrettyPrinted());
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
 		Set<ASTNode> markedNodes = new HashSet<>();
 		ASTNode currentNode = null;
 
 		ASTNode parentNode = null;
 		Integer childIndex = INVALID_INDEX;
-
 		initializeNodeQueueAndMarkedNodes(fTIRToMcSAFIRTable.get(useNode),
 				nodeQueue, markedNodes);
-
 		while (!nodeQueue.isEmpty()) {
 			currentNode = nodeQueue.remove();
-
 			if (currentNode instanceof ForStmt) {
 				currentNode = ((ForStmt) currentNode).getAssignStmt();
 			}
-
 			if (isSeekedNode(currentNode, variable)) {
 				parentNode = currentNode.getParent();
 				childIndex = getChildIndexForNode(parentNode, currentNode);
@@ -274,11 +270,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 					fExprToTempVarName.put(definition, variable);
 					updateRemainingVariablesNamesSet(variable.getID());
 				}
+				break;
 			} else {
 				addChildrenOfNodeToQueueAndMarkedSet(currentNode, nodeQueue,
 						markedNodes);
 			}
-
 		}
 	}
 
@@ -430,7 +426,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (astNode == null) {
 			throw new NullPointerException("it is null");
 		}
-		System.out.println("ASTnode class" + astNode.getClass());
+
 		TIRNode prev = null;
 		for (TIRNode rnode : reachingDef.getVisitedStmtsOrderedList()) {
 			if (fTIRToMcSAFIRTable.get(rnode) == astNode) {
@@ -441,9 +437,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (prev == null) {
 			throw new NullPointerException("will not work");
 		}
-
-		System.out.println("Class of prev"
-				+ ((ASTNode) prev).getPrettyPrinted());
 		return prev;
 	}
 
@@ -454,7 +447,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
 							.equals("false") || (((TIRCallStmt) origNode)
 							.getRHS().getVarName().equals("true")))) {
-				System.out.println("Here");
 				shortCircuitVector.add(replaceBoolExpr(origNode));
 			} else {
 				shortCircuitVector.add(origNode);
