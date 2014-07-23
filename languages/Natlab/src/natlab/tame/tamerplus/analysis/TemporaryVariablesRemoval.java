@@ -25,6 +25,7 @@ import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
 import ast.ASTNode;
+import ast.AndExpr;
 import ast.AssignStmt;
 import ast.BinaryExpr;
 import ast.Expr;
@@ -32,6 +33,8 @@ import ast.ForStmt;
 import ast.IfStmt;
 import ast.Name;
 import ast.NameExpr;
+import ast.NotExpr;
+import ast.ParameterizedExpr;
 import ast.ShortCircuitAndExpr;
 import ast.ShortCircuitOrExpr;
 
@@ -245,7 +248,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		// } else {
 		//
 		// }
-		//System.out.println("definition pretty print " + definition.getPrettyPrinted());
+		// System.out.println("definition pretty print " +
+		// definition.getPrettyPrinted());
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
 		Set<ASTNode> markedNodes = new HashSet<>();
 		ASTNode currentNode = null;
@@ -262,7 +266,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			if (isSeekedNode(currentNode, variable)) {
 				parentNode = currentNode.getParent();
 				childIndex = getChildIndexForNode(parentNode, currentNode);
-
 				boolean isChildIndexAndParentValid = (parentNode != null)
 						&& (childIndex.intValue() != INVALID_INDEX.intValue());
 				if (isChildIndexAndParentValid) {
@@ -339,6 +342,18 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return false;
 	}
 
+	private boolean isShortCircuitLogicalAnd(Vector<TIRNode> defSet) {
+		for (TIRNode origNode : defSet) {
+			if (origNode instanceof TIRCallStmt
+					&& (((TIRCallStmt) origNode).getRHS().getVarName()
+							.equals("and"))) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
@@ -362,6 +377,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				definitionExpr = new ShortCircuitAndExpr();
 			} else if (isShortCircuitOr(tirDefSet)) {
 				definitionExpr = new ShortCircuitOrExpr();
+			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
+				definitionExpr = new AndExpr();
+				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+						.get(getLogicalAndNode(tirDefSet));
+				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
+				return andExpr;
 			} else {
 				throw new UnsupportedOperationException(
 						"Short circuit opertion can either be And or Or");
@@ -369,8 +390,20 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
 					.get(originalDefinitionNodeInTIRSet.get(0));
 			definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
-			definitionExpr.setRHS(((AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.get(1))).getRHS());
+			Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+					.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
+			if (definitionExpr instanceof ShortCircuitOrExpr) {
+				if (rhsExpr instanceof ParameterizedExpr
+						&& rhsExpr.getVarName().equals("not")) {
+					rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+				} else {
+					NotExpr tempExpr = new NotExpr();
+					tempExpr.setOperand(rhsExpr);
+					rhsExpr = tempExpr;
+				}
+
+			}
+			definitionExpr.setRHS(rhsExpr);
 			// Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
 			// definitionExprSet.add(definitionExpr);
 			// for (TIRNode originalDefinitionNodeInTIR :
@@ -454,6 +487,19 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		return shortCircuitVector;
 	}
+
+	private TIRNode getLogicalAndNode(Vector<TIRNode> defSet) {
+		for (TIRNode origNode : defSet) {
+			if (origNode instanceof TIRCallStmt
+					&& (((TIRCallStmt) origNode).getRHS().getVarName()
+							.equals("and"))) {
+				return ((TIRCallStmt)origNode);
+			}
+
+		}
+		return null;
+	}
+
 
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
