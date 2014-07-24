@@ -45,9 +45,7 @@ import com.sun.xml.internal.ws.api.pipe.Engine;
 public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		implements TamerPlusAnalysis {
 	public static boolean DEBUG = false;
-
 	private final Integer INVALID_INDEX = -1;
-
 	UDDUWeb fUDDUWeb;
 	TIRToMcSAFIRTableBuilder fTIRToMcSAFIRTableBuilder;
 	private HashBiMap<TIRNode, ASTNode> fTIRToMcSAFIRTable;
@@ -55,6 +53,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
 	private Set<ASTNode> shortCircuitIfStmtSet = new HashSet();
+	private boolean hasShortCircuit = false;
 
 	public Set<ASTNode> getShortCircuitIfStmtSet() {
 		return shortCircuitIfStmtSet;
@@ -439,8 +438,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuit(Vector<TIRNode> defSet) {
-		System.out.println("here");
 		ASTNode sameifNode = null;
+		System.out.println("here");
 		boolean isSame;
 		for (TIRNode xNode : defSet) {
 			ASTNode ifNode = (ASTNode) xNode;
@@ -448,7 +447,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				ifNode = ifNode.getParent();
 			}
 			if (ifNode == null) {
-				throw new NullPointerException("it is not a if statement");
+				return false;
 			}
 			if (ifNode instanceof IfStmt) {
 				if (sameifNode == null) {
@@ -458,8 +457,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				}
 			}
 		}
-		System.out.println("same if node reference " + sameifNode);
+		System.out.println("if Statement " + sameifNode);
 		shortCircuitIfStmtSet.add(sameifNode);
+		hasShortCircuit = true;
 		return true;
 	}
 
@@ -521,6 +521,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				defSet.add(node);
 				// break;
 			}
+		}
+		if (defSet.size() >= 2) {
+			System.out.println("def set size" + defSet.size());
 		}
 		return defSet;
 	}
