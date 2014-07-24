@@ -54,6 +54,15 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private HashMap<Expr, Name> fExprToTempVarName;
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
+	private Set<ASTNode> shortCircuitIfStmtSet = new HashSet();
+
+	public Set<ASTNode> getShortCircuitIfStmtSet() {
+		return shortCircuitIfStmtSet;
+	}
+
+	public void setShortCircuitIfStmtSet(Set<ASTNode> shortCircuitIfStmtSet) {
+		this.shortCircuitIfStmtSet = shortCircuitIfStmtSet;
+	}
 
 	public TemporaryVariablesRemoval(ASTNode<?> tree) {
 		fExprToTempVarName = new HashMap<>();
@@ -430,6 +439,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuit(Vector<TIRNode> defSet) {
+		System.out.println("here");
 		ASTNode sameifNode = null;
 		boolean isSame;
 		for (TIRNode xNode : defSet) {
@@ -448,6 +458,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				}
 			}
 		}
+		System.out.println("same if node reference " + sameifNode);
+		shortCircuitIfStmtSet.add(sameifNode);
 		return true;
 	}
 
@@ -493,13 +505,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			if (origNode instanceof TIRCallStmt
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
 							.equals("and"))) {
-				return ((TIRCallStmt)origNode);
+				return ((TIRCallStmt) origNode);
 			}
-
 		}
 		return null;
 	}
-
 
 	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
