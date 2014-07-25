@@ -51,6 +51,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
 	private Set<ASTNode> shortCircuitIfStmtSet = new HashSet<ASTNode>();
+	private Map<VarAndColorContainer, Set<TIRNode>> map = new HashMap<VarAndColorContainer, Set<TIRNode>>();
 
 	public Set<ASTNode> getShortCircuitIfStmtSet() {
 		return shortCircuitIfStmtSet;
