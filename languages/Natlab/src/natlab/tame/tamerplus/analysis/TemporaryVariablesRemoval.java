@@ -51,7 +51,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
 	private Set<ASTNode> shortCircuitIfStmtSet = new HashSet<ASTNode>();
-	private Map<VarAndColorContainer, Set<TIRNode>> map = new HashMap<VarAndColorContainer, Set<TIRNode>>();
+	private Map<VarAndColorContainer, Set<TIRNode>> colorToDefSetMap = new HashMap<VarAndColorContainer, Set<TIRNode>>();
+	private Map<VarAndColorContainer, Expr> colorToShortCircuitMap = new HashMap<VarAndColorContainer, Expr>();
 
 	public Set<ASTNode> getShortCircuitIfStmtSet() {
 		return shortCircuitIfStmtSet;
@@ -134,7 +135,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				replaceUsedTempVarByDefinition(conditionVariableName, node);
 			}
 		}
-
 		caseWhileStmt(node);
 	}
 
@@ -330,7 +330,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 							.equals("false"))) {
 				return true;
 			}
-
 		}
 		return false;
 
@@ -365,6 +364,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		Vector<TIRNode> tirDefSet = getDefintionNode(variable, colorForUseNode);
 		Vector<TIRNode> originalDefinitionNodeInTIRSet;
 		if (tirDefSet.size() > 1 && isShortCircuit(tirDefSet)) {
+
 			originalDefinitionNodeInTIRSet = getShortCircuitVector(tirDefSet);
 		} else {
 			originalDefinitionNodeInTIRSet = tirDefSet;
@@ -427,6 +427,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private boolean isShortCircuit(Vector<TIRNode> defSet) {
 		ASTNode sameifNode = null;
 		boolean isSame = false;
+
 		for (TIRNode xNode : defSet) {
 			ASTNode ifNode = (ASTNode) xNode;
 			while (ifNode != null && !(ifNode instanceof IfStmt)) {
@@ -446,8 +447,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		if (isSame) {
 			shortCircuitIfStmtSet.add(sameifNode);
-		}
-		if (isSame) {
 			return true;
 		}
 		return false;
@@ -461,7 +460,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (astNode == null) {
 			throw new NullPointerException("it is null");
 		}
-
 		TIRNode prev = null;
 		for (TIRNode rnode : reachingDef.getVisitedStmtsOrderedList()) {
 			if (fTIRToMcSAFIRTable.get(rnode) == astNode) {
@@ -475,8 +473,38 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return prev;
 	}
 
+	private ASTNode getIfNode(TIRNode node) {
+		if (node == null) {
+			throw new NullPointerException("Node cannot be null");
+		}
+		ASTNode astNode = (ASTNode) node;
+		while (astNode != null && !(node instanceof IfStmt)) {
+			astNode = astNode.getParent();
+		}
+		return astNode;
+	}
+
+	private Vector<TIRNode> getNodesWithCommonIf(Vector<TIRNode> defSet) {
+		Map<ASTNode, TIRNode> ifNodeMap = new HashMap<ASTNode, TIRNode>();
+		// for(TIRNode no)
+		Vector<TIRNode> commonIfVector = new Vector<TIRNode>();
+		for (TIRNode node : defSet) {
+			ASTNode ifNode = getIfNode(node);
+			if (ifNodeMap.containsKey(ifNode)) {
+				commonIfVector.add(ifNodeMap.get(ifNode));
+				commonIfVector.add(node);
+			} else if (ifNode == null) {
+				throw new NullPointerException("IfNode cannot be null");
+			} else {
+				ifNodeMap.put(ifNode, node);
+			}
+		}
+		return commonIfVector;
+	}
+
 	private Vector<TIRNode> getShortCircuitVector(Vector<TIRNode> defSet) {
 		Vector<TIRNode> shortCircuitVector = new Vector<TIRNode>();
+
 		for (TIRNode origNode : defSet) {
 			if (origNode instanceof TIRCallStmt
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
@@ -512,9 +540,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// break;
 			}
 		}
-		if (defSet.size() > 2) {
-			System.out.println("def set size" + defSet.size());
-		}
+		
 		return defSet;
 	}
 
