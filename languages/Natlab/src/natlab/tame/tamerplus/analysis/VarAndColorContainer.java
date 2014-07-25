@@ -1,5 +1,7 @@
 package natlab.tame.tamerplus.analysis;
 
+import java.util.HashSet;
+
 public class VarAndColorContainer {
 	private String varName;
 	private Integer color;
@@ -37,6 +39,17 @@ public class VarAndColorContainer {
 
 	public void setColor(Integer color) {
 		this.color = color;
+	}
+
+	public static void main(String args[]) {
+		VarAndColorContainer var1 = new VarAndColorContainer("mc_t1", 1);
+		HashSet<VarAndColorContainer> set = new HashSet<VarAndColorContainer>();
+		set.add(var1);
+		if (set.contains(new VarAndColorContainer("mc_t1", 1))) {
+			System.out.println("Success");
+		} else {
+			System.out.println("Nope");
+		}
 	}
 
 }
