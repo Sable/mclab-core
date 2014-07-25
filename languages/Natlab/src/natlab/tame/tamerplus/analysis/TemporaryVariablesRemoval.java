@@ -478,7 +478,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			throw new NullPointerException("Node cannot be null");
 		}
 		ASTNode astNode = (ASTNode) node;
-		while (astNode != null && !(node instanceof IfStmt)) {
+		while (astNode != null && !(astNode instanceof IfStmt)) {
 			astNode = astNode.getParent();
 		}
 		return astNode;
@@ -540,7 +540,19 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// break;
 			}
 		}
-		
+		if (defSet.size() >= 2) {
+			ASTNode ifNode = getIfNode(defSet.firstElement());
+			if (ifNode == null) {
+				System.out.println("why the fuck is this null");
+				System.out.println("AST pretty print\n"
+						+ ((ASTNode) defSet.firstElement()).getPrettyPrinted());
+			} else {
+				if (ifNode.getParent() == null) {
+					System.out.println("it is null man");
+				}
+			}
+			System.out.println("def set size " + defSet.size());
+		}
 		return defSet;
 	}
 
