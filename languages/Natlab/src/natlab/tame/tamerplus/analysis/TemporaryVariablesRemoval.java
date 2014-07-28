@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import natlab.tame.tamerplus.utils.NodePrinter;
+import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
 import natlab.tame.tir.TIRCallStmt;
@@ -37,6 +38,7 @@ import ast.NotExpr;
 import ast.ParameterizedExpr;
 import ast.ShortCircuitAndExpr;
 import ast.ShortCircuitOrExpr;
+
 import com.google.common.collect.HashBiMap;
 
 @SuppressWarnings("rawtypes")
@@ -347,17 +349,34 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return false;
 	}
 
+	private boolean isShortCircuitLogicalAnd(TIRNode node) {
+		if (node instanceof TIRCallStmt
+				&& (((TIRCallStmt) node).getRHS().getVarName().equals("and"))) {
+			return true;
+		}
+		return false;
+	}
+
 	private boolean isShortCircuitLogicalAnd(Vector<TIRNode> defSet) {
-		for (TIRNode origNode : defSet) {
-			if (origNode instanceof TIRCallStmt
-					&& (((TIRCallStmt) origNode).getRHS().getVarName()
-							.equals("and"))) {
+		for (TIRNode node : defSet) {
+			if (isShortCircuitLogicalAnd(node)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	private Expr getShortCircuitNode(IfStmt stmt, TIRAbstractAssignStmt lhs,
+			TIRAbstractAssignStmt rhs) {
+		
+		return null;
+	}
+
+	private Expr getShortCircuitNode(Vector<TIRNode> defSet) {
+
+		return null;
+	}
+
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
@@ -370,7 +389,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
 			return definitionExpr;
 		}
-		
+
 		originalDefinitionNodeInTIRSet = getShortCircuitVector(tirDefSet);
 		BinaryExpr definitionExpr;
 		if (isShortCircuitAnd(tirDefSet)) {
@@ -539,16 +558,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		if (defSet.size() >= 2) {
 			ASTNode ifNode = getIfNode(defSet.firstElement());
-			if (ifNode == null) {
-				System.out.println("why the fuck is this null");
-				System.out.println("AST pretty print\n"
-						+ ((ASTNode) defSet.firstElement()).getPrettyPrinted());
-			} else {
-				if (ifNode.getParent() == null) {
-					System.out.println("it is null man");
-				}
-			}
-			System.out.println("def set size " + defSet.size());
 		}
 		return defSet;
 	}
