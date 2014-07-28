@@ -371,8 +371,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuitAnd(TIRNode node) {
-		System.out.println("node "
-				+ (((TIRCallStmt) node).getRHS().getVarName()));
+
 		if (node instanceof TIRCallStmt
 				&& (((TIRCallStmt) node).getRHS().getVarName().trim()
 						.equals("false"))) {
@@ -393,8 +392,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			TIRAbstractAssignStmt rhs) {
 		TIRNode rhsNode;
 		TIRNode lhsNode = null;
-		System.out.println("If node " + ((ASTNode) lhs).getPrettyPrinted());
-		System.out.println("If node " + ((ASTNode) rhs).getPrettyPrinted());
 		if (isShortCircuitAnd(lhs)) {
 			rhsNode = rhs;
 			lhsNode = replaceBoolExpr(lhs);
@@ -448,8 +445,18 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				(TIRAbstractAssignStmt) defSet.get(0),
 				(TIRAbstractAssignStmt) defSet.get(1));
 		defSet.removeAll(commonIfNodes);
+		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
+		
 		return expr;
-		// return null;
+
+	}
+
+	private Map<IfStmt, TIRNode> getIfStmtMap(ArrayList<TIRNode> defSet) {
+		Map<IfStmt, TIRNode> ifStmtMap = new HashMap<IfStmt, TIRNode>();
+		for (TIRNode node : defSet) {
+			ifStmtMap.put((IfStmt) getIfNode(node), node);
+		}
+		return ifStmtMap;
 	}
 
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
@@ -473,7 +480,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			} else if (isShortCircuitOr(tirDefSet)) {
 				definitionExpr = new ShortCircuitOrExpr();
 			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-				definitionExpr = new AndExpr();
 				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
 						.get(getLogicalAndNode(tirDefSet));
 				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
