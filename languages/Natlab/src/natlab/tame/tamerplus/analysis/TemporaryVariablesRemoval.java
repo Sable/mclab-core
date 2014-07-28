@@ -330,17 +330,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			isShortCircuitAnd(node);
 		}
 		return false;
-
 	}
 
 	private boolean isShortCircuitOr(Vector<TIRNode> defSet) {
-		for (TIRNode origNode : defSet) {
-			if (origNode instanceof TIRCallStmt
-					&& (((TIRCallStmt) origNode).getRHS().getVarName()
-							.equals("true"))) {
-				return true;
-			}
-
+		for (TIRNode node : defSet) {
+			isShortCircuitOr(node);
 		}
 		return false;
 	}
@@ -375,6 +369,14 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private boolean isShortCircuitAnd(TIRNode node) {
 		if (node instanceof TIRCallStmt
 				&& (((TIRCallStmt) node).getRHS().getVarName().equals("false"))) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isShortCircuitOr(TIRNode node) {
+		if (node instanceof TIRCallStmt
+				&& (((TIRCallStmt) node).getRHS().getVarName().equals("true"))) {
 			return true;
 		}
 		return false;
