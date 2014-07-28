@@ -447,8 +447,38 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				(TIRAbstractAssignStmt) defSet.get(1));
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
+		while (!ifStmtMap.isEmpty()) {
+			IfStmt parentIf = getParent(ifStmtMap.keySet(), currIfStmt);
+			if (parentIf == null) {
+				System.out.println("Problem");
+				System.exit(0);
+			}
+			TIRNode elseStmt = ifStmtMap.get(parentIf);
+			if (elseStmt == null) {
+				continue;
+			}
+			TIRNode replacementNode = replaceBoolExpr(elseStmt);
+			ifStmtMap.remove(parentIf);
+			currIfStmt = parentIf;
+		}
 		return expr;
 
+	}
+
+	private IfStmt getParent(Set<IfStmt> ifStmtSet, ASTNode child) {
+		ASTNode actualChild = null;
+		for (TIRNode node : fTIRToMcSAFIRTable.keySet()) {
+			if (fTIRToMcSAFIRTable.get(node) == child) {
+				actualChild = (ASTNode) node;
+				break;
+			}
+		}
+		for (IfStmt node : ifStmtSet) {
+			if (isParent(node, actualChild)) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 	private boolean isParent(IfStmt parent, ASTNode child) {
@@ -542,6 +572,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private boolean isShortCircuit(ArrayList<TIRNode> defSet) {
 		ASTNode sameifNode = null;
 		boolean isSame = false;
+		if (defSet.size() >= 2) {
+			return true;
+		}
 		for (TIRNode xNode : defSet) {
 			IfStmt ifNode = getParentIfStmt((ASTNode) xNode);
 			if (ifNode == null) {
