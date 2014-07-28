@@ -454,11 +454,28 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				System.exit(0);
 			}
 			TIRNode elseStmt = ifStmtMap.get(parentIf);
-			if (elseStmt == null) {
-				continue;
-			}
 			TIRNode replacementNode = replaceBoolExpr(elseStmt);
+			if (isShortCircuitAnd(elseStmt)) {
+				expr = new ShortCircuitAndExpr(
+						((AssignStmt) fTIRToMcSAFIRTable.get(replacementNode))
+								.getRHS(),
+						expr);
+
+			} else if (isShortCircuitOr(elseStmt)) {
+				Expr lhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+						.get(replacementNode)).getRHS();
+				if (lhsExpr instanceof ParameterizedExpr
+						&& lhsExpr.getVarName().equals("not")) {
+					lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+				} else {
+					NotExpr notExpr = new NotExpr();
+					notExpr.setOperand(lhsExpr);
+					lhsExpr = notExpr;
+				}
+				expr = new ShortCircuitOrExpr(lhsExpr, expr);
+			}
 			ifStmtMap.remove(parentIf);
+			shortCircuitIfStmtSet.add(parentIf);
 			currIfStmt = parentIf;
 		}
 		return expr;
