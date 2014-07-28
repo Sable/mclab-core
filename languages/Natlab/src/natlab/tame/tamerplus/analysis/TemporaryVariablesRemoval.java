@@ -326,12 +326,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuitAnd(Vector<TIRNode> defSet) {
-		for (TIRNode origNode : defSet) {
-			if (origNode instanceof TIRCallStmt
-					&& (((TIRCallStmt) origNode).getRHS().getVarName()
-							.equals("false"))) {
-				return true;
-			}
+		for (TIRNode node : defSet) {
+			isShortCircuitAnd(node);
 		}
 		return false;
 
@@ -365,10 +361,36 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		return false;
 	}
-	
+
+	private Expr getLogicalAndNode(TIRAbstractAssignStmt lhs,
+			TIRAbstractAssignStmt rhs) {
+		if (isShortCircuitLogicalAnd(rhs)) {
+			return rhs.getRHS();
+		} else if (isShortCircuitLogicalAnd(lhs)) {
+			return lhs.getLHS();
+		}
+		return null;
+	}
+
+	private boolean isShortCircuitAnd(TIRNode node) {
+		if (node instanceof TIRCallStmt
+				&& (((TIRCallStmt) node).getRHS().getVarName().equals("false"))) {
+			return true;
+		}
+		return false;
+	}
+
 	private Expr getShortCircuitNode(IfStmt stmt, TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
-		
+		Vector<TIRNode> defVector = new Vector<TIRNode>(2);
+		defVector.add(lhs);
+		defVector.add(rhs);
+		if (isShortCircuitLogicalAnd(defVector)) {
+			return getLogicalAndNode(lhs, rhs);
+		} else if (isShortCircuitAnd(defVector)) {
+
+		}
+
 		return null;
 	}
 
