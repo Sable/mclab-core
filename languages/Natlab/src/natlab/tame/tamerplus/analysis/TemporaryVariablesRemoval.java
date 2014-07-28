@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
 import natlab.tame.tir.TIRArraySetStmt;
+import natlab.tame.tir.TIRAssignLiteralStmt;
 import natlab.tame.tir.TIRCallStmt;
 import natlab.tame.tir.TIRCellArrayGetStmt;
 import natlab.tame.tir.TIRCellArraySetStmt;
@@ -25,6 +26,7 @@ import natlab.tame.tir.TIRIfStmt;
 import natlab.tame.tir.TIRNode;
 import natlab.tame.tir.TIRWhileStmt;
 import natlab.tame.tir.analysis.TIRAbstractNodeCaseHandler;
+import natlab.utils.NodeFinder;
 import ast.ASTNode;
 import ast.AndExpr;
 import ast.AssignStmt;
@@ -325,14 +327,16 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				&& node.getVarName().equals(variable.getID());
 	}
 
-	private boolean isShortCircuitAnd(Vector<TIRNode> defSet) {
+	private boolean isShortCircuitAnd(ArrayList<TIRNode> defSet) {
 		for (TIRNode node : defSet) {
-			isShortCircuitAnd(node);
+			if (isShortCircuitAnd(node)) {
+				return true;
+			}
 		}
 		return false;
 	}
 
-	private boolean isShortCircuitOr(Vector<TIRNode> defSet) {
+	private boolean isShortCircuitOr(ArrayList<TIRNode> defSet) {
 		for (TIRNode node : defSet) {
 			isShortCircuitOr(node);
 		}
@@ -347,7 +351,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return false;
 	}
 
-	private boolean isShortCircuitLogicalAnd(Vector<TIRNode> defSet) {
+	private boolean isShortCircuitLogicalAnd(ArrayList<TIRNode> defSet) {
 		for (TIRNode node : defSet) {
 			if (isShortCircuitLogicalAnd(node)) {
 				return true;
@@ -367,8 +371,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuitAnd(TIRNode node) {
+		System.out.println("node "
+				+ (((TIRCallStmt) node).getRHS().getVarName()));
 		if (node instanceof TIRCallStmt
-				&& (((TIRCallStmt) node).getRHS().getVarName().equals("false"))) {
+				&& (((TIRCallStmt) node).getRHS().getVarName().trim()
+						.equals("false"))) {
 			return true;
 		}
 		return false;
@@ -384,16 +391,23 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private Expr getShortCircuitAndNode(Expr ifCond, TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
-		Expr rhsExpr;
+		TIRNode rhsNode;
+		TIRNode lhsNode = null;
+		System.out.println("If node " + ((ASTNode) lhs).getPrettyPrinted());
+		System.out.println("If node " + ((ASTNode) rhs).getPrettyPrinted());
 		if (isShortCircuitAnd(lhs)) {
-			rhsExpr = lhs.getRHS();
-		} else if (isShortCircuitAnd(lhs)) {
-			rhsExpr = rhs.getRHS();
+			rhsNode = rhs;
+			lhsNode = replaceBoolExpr(lhs);
+		} else if (isShortCircuitAnd(rhs)) {
+			rhsNode = lhs;
+			lhsNode = replaceBoolExpr(rhs);
 		} else {
 			throw new UnsupportedOperationException(
 					"Either one of the two statements have to be a call statement to false");
 		}
-		return new ShortCircuitAndExpr(ifCond, rhsExpr);
+		return new ShortCircuitAndExpr(
+				((AssignStmt) fTIRToMcSAFIRTable.get(lhsNode)).getRHS(),
+				((AssignStmt) fTIRToMcSAFIRTable.get(rhsNode)).getRHS());
 	}
 
 	private Expr getShortCircuitOrNode(Expr ifCond, TIRAbstractAssignStmt lhs,
@@ -412,73 +426,81 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private Expr getShortCircuitNode(IfStmt stmt, TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
-		Vector<TIRNode> defVector = new Vector<TIRNode>(2);
-		defVector.add(lhs);
-		defVector.add(rhs);
-		if (isShortCircuitLogicalAnd(defVector)) {
+		ArrayList<TIRNode> defArrayList = new ArrayList<TIRNode>(2);
+		defArrayList.add(lhs);
+		defArrayList.add(rhs);
+		if (isShortCircuitLogicalAnd(defArrayList)) {
 			return getLogicalAndNode(lhs, rhs);
-		} else if (isShortCircuitAnd(defVector)) {
+		} else if (isShortCircuitAnd(defArrayList)) {
 			return getShortCircuitAndNode(stmt.getIfBlock(0).getCondition(),
 					lhs, rhs);
-		} else if (isShortCircuitOr(defVector)) {
+		} else if (isShortCircuitOr(defArrayList)) {
 			return getShortCircuitOrNode(stmt.getIfBlock(0).getCondition(),
 					lhs, rhs);
 		}
-
 		return null;
 	}
 
-	private Expr getShortCircuitNode(Vector<TIRNode> defSet) {
-
-		return null;
+	private Expr getShortCircuitNode(ArrayList<TIRNode> defSet) {
+		ArrayList<TIRNode> commonIfNodes = getNodesWithCommonIf(defSet);
+		IfStmt ifStmt = (IfStmt) getIfNode(commonIfNodes.get(0));
+		Expr expr = getShortCircuitNode(ifStmt,
+				(TIRAbstractAssignStmt) defSet.get(0),
+				(TIRAbstractAssignStmt) defSet.get(1));
+		defSet.removeAll(commonIfNodes);
+		return expr;
+		// return null;
 	}
 
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
-		Vector<TIRNode> tirDefSet = getDefintionNode(variable, colorForUseNode);
-		Vector<TIRNode> originalDefinitionNodeInTIRSet;
+		ArrayList<TIRNode> tirDefSet = getDefintionNode(variable,
+				colorForUseNode);
+		ArrayList<TIRNode> originalDefinitionNodeInTIRSet;
 		if (tirDefSet.size() == 1 && !(isShortCircuit(tirDefSet))) {
 			originalDefinitionNodeInTIRSet = tirDefSet;
 			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.firstElement());
+					.get(originalDefinitionNodeInTIRSet.get(0));
 			Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
 			return definitionExpr;
-		}
-
-		originalDefinitionNodeInTIRSet = getShortCircuitVector(tirDefSet);
-		BinaryExpr definitionExpr;
-		if (isShortCircuitAnd(tirDefSet)) {
-			definitionExpr = new ShortCircuitAndExpr();
-		} else if (isShortCircuitOr(tirDefSet)) {
-			definitionExpr = new ShortCircuitOrExpr();
-		} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-			definitionExpr = new AndExpr();
-			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-					.get(getLogicalAndNode(tirDefSet));
-			Expr andExpr = updatedDefinitionNodeInAST.getRHS();
-			return andExpr;
-		} else {
-			throw new UnsupportedOperationException(
-					"Short circuit opertion can either be And or Or");
-		}
-		AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-				.get(originalDefinitionNodeInTIRSet.get(0));
-		definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
-		Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
-				.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
-		if (definitionExpr instanceof ShortCircuitOrExpr) {
-			if (rhsExpr instanceof ParameterizedExpr
-					&& rhsExpr.getVarName().equals("not")) {
-				rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+		} else if (isShortCircuit(tirDefSet)) {
+			originalDefinitionNodeInTIRSet = getShortCircuitArrayList(tirDefSet);
+			BinaryExpr definitionExpr;
+			if (isShortCircuitAnd(tirDefSet)) {
+				// definitionExpr = new ShortCircuitAndExpr();
+				return getShortCircuitNode(tirDefSet);
+			} else if (isShortCircuitOr(tirDefSet)) {
+				definitionExpr = new ShortCircuitOrExpr();
+			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
+				definitionExpr = new AndExpr();
+				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+						.get(getLogicalAndNode(tirDefSet));
+				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
+				return andExpr;
 			} else {
-				NotExpr tempExpr = new NotExpr();
-				tempExpr.setOperand(rhsExpr);
-				rhsExpr = tempExpr;
+				throw new UnsupportedOperationException(
+						"Short circuit opertion can either be And or Or");
 			}
+			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+					.get(originalDefinitionNodeInTIRSet.get(0));
+			definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
+			Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+					.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
+			if (definitionExpr instanceof ShortCircuitOrExpr) {
+				if (rhsExpr instanceof ParameterizedExpr
+						&& rhsExpr.getVarName().equals("not")) {
+					rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+				} else {
+					NotExpr tempExpr = new NotExpr();
+					tempExpr.setOperand(rhsExpr);
+					rhsExpr = tempExpr;
+				}
+			}
+			definitionExpr.setRHS(rhsExpr);
+			return definitionExpr;
 		}
-		definitionExpr.setRHS(rhsExpr);
-		return definitionExpr;
+		return null;
 	}
 
 	private Integer getColorForVariableInUseNode(Name variable, TIRNode useNode) {
@@ -488,47 +510,43 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return nodeToColorMap.get(useNode);
 	}
 
-	private Vector<TIRNode> getDefintionNode(Name variable, Integer color) {
+	private ArrayList<TIRNode> getDefintionNode(Name variable, Integer color) {
 		String variableName = variable.getID();
 		Map<TIRNode, Integer> nodeToColorMap = fUDDUWeb
 				.getNodeAndColorForDefinition(variableName);
 		return findNodeWithColorInMap(color, nodeToColorMap);
 	}
 
-	private boolean isShortCircuit(Vector<TIRNode> defSet) {
+	private boolean isShortCircuit(ArrayList<TIRNode> defSet) {
 		ASTNode sameifNode = null;
 		boolean isSame = false;
-
 		for (TIRNode xNode : defSet) {
-			ASTNode ifNode = (ASTNode) xNode;
-			while (ifNode != null && !(ifNode instanceof IfStmt)) {
-				ifNode = ifNode.getParent();
-			}
+			IfStmt ifNode = getParentIfStmt((ASTNode) xNode);
 			if (ifNode == null) {
 				return false;
 			}
-			if (ifNode instanceof IfStmt) {
-				if (sameifNode == null) {
-					sameifNode = ifNode;
-				} else if (ifNode == sameifNode) {
-					isSame = true;
-					// return false;
-				}
+
+			if (sameifNode == null) {
+				sameifNode = ifNode;
+			} else if (ifNode == sameifNode) {
+				isSame = true;
+				// return false;
 			}
+
 		}
 		if (isSame) {
-
 			shortCircuitIfStmtSet.add(sameifNode);
 			return true;
 		}
 		return false;
 	}
 
+	private IfStmt getParentIfStmt(ASTNode node) {
+		return NodeFinder.findParent(IfStmt.class, node);
+	}
+
 	private TIRNode replaceBoolExpr(TIRNode node) {
-		ASTNode astNode = (ASTNode) node;
-		while (astNode != null && !(astNode instanceof IfStmt)) {
-			astNode = astNode.getParent();
-		}
+		IfStmt astNode = getParentIfStmt((ASTNode) node);
 		if (astNode == null) {
 			throw new NullPointerException("it is null");
 		}
@@ -549,48 +567,45 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (node == null) {
 			throw new NullPointerException("Node cannot be null");
 		}
-		ASTNode astNode = (ASTNode) node;
-		while (astNode != null && !(astNode instanceof IfStmt)) {
-			astNode = astNode.getParent();
-		}
-		return astNode;
+		return getParentIfStmt((ASTNode) node);
 	}
 
-	private Vector<TIRNode> getNodesWithCommonIf(Vector<TIRNode> defSet) {
+	private ArrayList<TIRNode> getNodesWithCommonIf(ArrayList<TIRNode> defSet) {
 		Map<ASTNode, TIRNode> ifNodeMap = new HashMap<ASTNode, TIRNode>();
 		// for(TIRNode no)
-		Vector<TIRNode> commonIfVector = new Vector<TIRNode>();
+		ArrayList<TIRNode> commonIfArrayList = new ArrayList<TIRNode>();
 		for (TIRNode node : defSet) {
 			ASTNode ifNode = getIfNode(node);
 			if (ifNodeMap.containsKey(ifNode)) {
-				commonIfVector.add(ifNodeMap.get(ifNode));
-				commonIfVector.add(node);
+				commonIfArrayList.add(ifNodeMap.get(ifNode));
+				commonIfArrayList.add(node);
 			} else if (ifNode == null) {
 				throw new NullPointerException("IfNode cannot be null");
 			} else {
 				ifNodeMap.put(ifNode, node);
 			}
 		}
-		return commonIfVector;
+		return commonIfArrayList;
 	}
 
-	private Vector<TIRNode> getShortCircuitVector(Vector<TIRNode> defSet) {
-		Vector<TIRNode> shortCircuitVector = new Vector<TIRNode>();
+	private ArrayList<TIRNode> getShortCircuitArrayList(
+			ArrayList<TIRNode> defSet) {
+		ArrayList<TIRNode> shortCircuitArrayList = new ArrayList<TIRNode>();
 
 		for (TIRNode origNode : defSet) {
 			if (origNode instanceof TIRCallStmt
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
 							.equals("false") || (((TIRCallStmt) origNode)
 							.getRHS().getVarName().equals("true")))) {
-				shortCircuitVector.add(replaceBoolExpr(origNode));
+				shortCircuitArrayList.add(replaceBoolExpr(origNode));
 			} else {
-				shortCircuitVector.add(origNode);
+				shortCircuitArrayList.add(origNode);
 			}
 		}
-		return shortCircuitVector;
+		return shortCircuitArrayList;
 	}
 
-	private TIRNode getLogicalAndNode(Vector<TIRNode> defSet) {
+	private TIRNode getLogicalAndNode(ArrayList<TIRNode> defSet) {
 		for (TIRNode origNode : defSet) {
 			if (origNode instanceof TIRCallStmt
 					&& (((TIRCallStmt) origNode).getRHS().getVarName()
@@ -601,9 +616,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return null;
 	}
 
-	private Vector<TIRNode> findNodeWithColorInMap(Integer color,
+	private ArrayList<TIRNode> findNodeWithColorInMap(Integer color,
 			Map<TIRNode, Integer> nodeToColorMap) {
-		Vector<TIRNode> defSet = new Vector<TIRNode>();
+		ArrayList<TIRNode> defSet = new ArrayList<TIRNode>();
 		TIRNode seekedNode = null;
 		for (TIRNode node : nodeToColorMap.keySet()) {
 			if (nodeToColorMap.get(node).intValue() == color.intValue()) {
@@ -613,7 +628,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 		}
 		if (defSet.size() >= 2) {
-			ASTNode ifNode = getIfNode(defSet.firstElement());
+			ASTNode ifNode = getIfNode(defSet.get(0));
 		}
 		return defSet;
 	}
