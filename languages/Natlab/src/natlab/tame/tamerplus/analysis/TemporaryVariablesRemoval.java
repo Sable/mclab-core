@@ -382,6 +382,20 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return false;
 	}
 
+	private Expr getShortCircuitAndNode(Expr ifCond, TIRAbstractAssignStmt lhs,
+			TIRAbstractAssignStmt rhs) {
+		Expr rhsExpr;
+		if (isShortCircuitAnd(lhs)) {
+			rhsExpr = lhs.getRHS();
+		} else if (isShortCircuitAnd(lhs)) {
+			rhsExpr = rhs.getRHS();
+		} else {
+			throw new UnsupportedOperationException(
+					"Either one of the two statements have to be a call statement to false");
+		}
+		return new ShortCircuitAndExpr(ifCond, rhsExpr);
+	}
+
 	private Expr getShortCircuitNode(IfStmt stmt, TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
 		Vector<TIRNode> defVector = new Vector<TIRNode>(2);
@@ -390,7 +404,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (isShortCircuitLogicalAnd(defVector)) {
 			return getLogicalAndNode(lhs, rhs);
 		} else if (isShortCircuitAnd(defVector)) {
-
+			return getShortCircuitAndNode(stmt.getIfBlock(0).getCondition(),
+					lhs, rhs);
 		}
 
 		return null;
