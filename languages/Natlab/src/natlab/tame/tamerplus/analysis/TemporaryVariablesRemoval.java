@@ -446,6 +446,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 		}
 		if (isSame) {
+			
 			shortCircuitIfStmtSet.add(sameifNode);
 			return true;
 		}
