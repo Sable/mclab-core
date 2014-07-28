@@ -357,57 +357,53 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		return false;
 	}
-
+	
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
 		Vector<TIRNode> tirDefSet = getDefintionNode(variable, colorForUseNode);
 		Vector<TIRNode> originalDefinitionNodeInTIRSet;
-		if (tirDefSet.size() > 1 && isShortCircuit(tirDefSet)) {
-
-			originalDefinitionNodeInTIRSet = getShortCircuitVector(tirDefSet);
-		} else {
+		if (tirDefSet.size() == 1 && !(isShortCircuit(tirDefSet))) {
 			originalDefinitionNodeInTIRSet = tirDefSet;
-		}
-		if (originalDefinitionNodeInTIRSet.size() == 1) {
 			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
 					.get(originalDefinitionNodeInTIRSet.firstElement());
 			Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
 			return definitionExpr;
-		} else {
-			BinaryExpr definitionExpr;
-			if (isShortCircuitAnd(tirDefSet)) {
-				definitionExpr = new ShortCircuitAndExpr();
-			} else if (isShortCircuitOr(tirDefSet)) {
-				definitionExpr = new ShortCircuitOrExpr();
-			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-				definitionExpr = new AndExpr();
-				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-						.get(getLogicalAndNode(tirDefSet));
-				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
-				return andExpr;
-			} else {
-				throw new UnsupportedOperationException(
-						"Short circuit opertion can either be And or Or");
-			}
-			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.get(0));
-			definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
-			Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
-			if (definitionExpr instanceof ShortCircuitOrExpr) {
-				if (rhsExpr instanceof ParameterizedExpr
-						&& rhsExpr.getVarName().equals("not")) {
-					rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
-				} else {
-					NotExpr tempExpr = new NotExpr();
-					tempExpr.setOperand(rhsExpr);
-					rhsExpr = tempExpr;
-				}
-			}
-			definitionExpr.setRHS(rhsExpr);
-			return definitionExpr;
 		}
+		
+		originalDefinitionNodeInTIRSet = getShortCircuitVector(tirDefSet);
+		BinaryExpr definitionExpr;
+		if (isShortCircuitAnd(tirDefSet)) {
+			definitionExpr = new ShortCircuitAndExpr();
+		} else if (isShortCircuitOr(tirDefSet)) {
+			definitionExpr = new ShortCircuitOrExpr();
+		} else if (isShortCircuitLogicalAnd(tirDefSet)) {
+			definitionExpr = new AndExpr();
+			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+					.get(getLogicalAndNode(tirDefSet));
+			Expr andExpr = updatedDefinitionNodeInAST.getRHS();
+			return andExpr;
+		} else {
+			throw new UnsupportedOperationException(
+					"Short circuit opertion can either be And or Or");
+		}
+		AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+				.get(originalDefinitionNodeInTIRSet.get(0));
+		definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
+		Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+				.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
+		if (definitionExpr instanceof ShortCircuitOrExpr) {
+			if (rhsExpr instanceof ParameterizedExpr
+					&& rhsExpr.getVarName().equals("not")) {
+				rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+			} else {
+				NotExpr tempExpr = new NotExpr();
+				tempExpr.setOperand(rhsExpr);
+				rhsExpr = tempExpr;
+			}
+		}
+		definitionExpr.setRHS(rhsExpr);
+		return definitionExpr;
 	}
 
 	private Integer getColorForVariableInUseNode(Name variable, TIRNode useNode) {
@@ -446,7 +442,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 		}
 		if (isSame) {
-			
+
 			shortCircuitIfStmtSet.add(sameifNode);
 			return true;
 		}
