@@ -9,6 +9,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.ArrayList;
 
+import natlab.tame.builtin.Builtin.Islogical;
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRAbstractAssignStmt;
 import natlab.tame.tir.TIRArrayGetStmt;
@@ -473,6 +474,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 					lhsExpr = notExpr;
 				}
 				expr = new ShortCircuitOrExpr(lhsExpr, expr);
+			} else if (isShortCircuitLogicalAnd(elseStmt)) {
+				expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt)).getRHS();
 			}
 			ifStmtMap.remove(parentIf);
 			shortCircuitIfStmtSet.add(parentIf);
