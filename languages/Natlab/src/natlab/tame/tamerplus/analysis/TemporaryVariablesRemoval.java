@@ -440,15 +440,31 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private Expr getShortCircuitNode(ArrayList<TIRNode> defSet) {
 		ArrayList<TIRNode> commonIfNodes = getNodesWithCommonIf(defSet);
-		IfStmt ifStmt = (IfStmt) getIfNode(commonIfNodes.get(0));
-		Expr expr = getShortCircuitNode(ifStmt,
+		IfStmt currIfStmt = (IfStmt) getIfNode(commonIfNodes.get(0));
+
+		Expr expr = getShortCircuitNode(currIfStmt,
 				(TIRAbstractAssignStmt) defSet.get(0),
 				(TIRAbstractAssignStmt) defSet.get(1));
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
-		
 		return expr;
 
+	}
+
+	private boolean isParent(IfStmt parent, ASTNode child) {
+		for (ASTNode node : parent.getIfBlock(0).getStmtList()) {
+			if (node == child) {
+				return true;
+			}
+		}
+		if (parent.hasElseBlock()) {
+			for (ASTNode node : parent.getElseBlock()) {
+				if (node == child) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private Map<IfStmt, TIRNode> getIfStmtMap(ArrayList<TIRNode> defSet) {
