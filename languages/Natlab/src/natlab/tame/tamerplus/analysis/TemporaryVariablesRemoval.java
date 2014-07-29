@@ -331,7 +331,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private boolean isShortCircuitOr(ArrayList<TIRNode> defSet) {
 		for (TIRNode node : defSet) {
-			isShortCircuitOr(node);
+			if (isShortCircuitOr(node)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -599,7 +601,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 
 		}
-		//TODO: Not the best way to do it. Change. 
+		// TODO: Not the best way to do it. Change.
 		if (defSet.size() >= 2) {
 			shortCircuitIfStmtSet.add(sameifNode);
 			return true;
