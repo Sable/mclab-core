@@ -253,14 +253,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode) {
 		Expr definition = getDefinitionForVariableAtNode(variable, useNode);
-		// Expr definition = null;
-		// if (exprSet.size() == 1) {
-		// definition = exprSet.firstElement();
-		// } else {
-		//
-		// }
-		// System.out.println("definition pretty print " +
-		// definition.getPrettyPrinted());
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
 		Set<ASTNode> markedNodes = new HashSet<>();
 		ASTNode currentNode = null;
@@ -592,9 +584,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private boolean isShortCircuit(ArrayList<TIRNode> defSet) {
 		ASTNode sameifNode = null;
 		boolean isSame = false;
-		if (defSet.size() >= 2) {
-			return true;
-		}
+
 		for (TIRNode xNode : defSet) {
 			IfStmt ifNode = getParentIfStmt((ASTNode) xNode);
 			if (ifNode == null) {
@@ -608,6 +598,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// return false;
 			}
 
+		}
+		//TODO: Not the best way to do it. Change. 
+		if (defSet.size() >= 2) {
+			shortCircuitIfStmtSet.add(sameifNode);
+			return true;
 		}
 		if (isSame) {
 			shortCircuitIfStmtSet.add(sameifNode);
