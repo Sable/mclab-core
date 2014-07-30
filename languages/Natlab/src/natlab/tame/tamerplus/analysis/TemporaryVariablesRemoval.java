@@ -407,7 +407,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		Expr rhsExpr;
 		if (isShortCircuitOr(lhs)) {
 			rhsExpr = lhs.getRHS();
-		} else if (isShortCircuitOr(lhs)) {
+		} else if (isShortCircuitOr(rhs)) {
 			rhsExpr = rhs.getRHS();
 		} else {
 			throw new UnsupportedOperationException(
@@ -538,7 +538,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// definitionExpr = new ShortCircuitAndExpr();
 				return getShortCircuitNode(tirDefSet);
 			} else if (isShortCircuitOr(tirDefSet)) {
-				definitionExpr = new ShortCircuitOrExpr();
+				// definitionExpr = new ShortCircuitOrExpr();
+				return getShortCircuitNode(tirDefSet);
 			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
 				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
 						.get(getLogicalAndNode(tirDefSet));
@@ -548,23 +549,24 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				throw new UnsupportedOperationException(
 						"Short circuit opertion can either be And or Or");
 			}
-			AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.get(0));
-			definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
-			Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
-					.get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
-			if (definitionExpr instanceof ShortCircuitOrExpr) {
-				if (rhsExpr instanceof ParameterizedExpr
-						&& rhsExpr.getVarName().equals("not")) {
-					rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
-				} else {
-					NotExpr tempExpr = new NotExpr();
-					tempExpr.setOperand(rhsExpr);
-					rhsExpr = tempExpr;
-				}
-			}
-			definitionExpr.setRHS(rhsExpr);
-			return definitionExpr;
+			// AssignStmt updatedDefinitionNodeInAST = (AssignStmt)
+			// fTIRToMcSAFIRTable
+			// .get(originalDefinitionNodeInTIRSet.get(0));
+			// definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
+			// Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+			// .get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
+			// if (definitionExpr instanceof ShortCircuitOrExpr) {
+			// if (rhsExpr instanceof ParameterizedExpr
+			// && rhsExpr.getVarName().equals("not")) {
+			// rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+			// } else {
+			// NotExpr tempExpr = new NotExpr();
+			// tempExpr.setOperand(rhsExpr);
+			// rhsExpr = tempExpr;
+			// }
+			// }
+			// definitionExpr.setRHS(rhsExpr);
+			// return definitionExpr;
 		}
 		return null;
 	}
