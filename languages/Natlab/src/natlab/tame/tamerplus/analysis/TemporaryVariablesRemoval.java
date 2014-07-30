@@ -404,16 +404,22 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 
 	private Expr getShortCircuitOrNode(Expr ifCond, TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
-		Expr rhsExpr;
+		TIRNode rhsNode;
+		TIRNode lhsNode = null;
 		if (isShortCircuitOr(lhs)) {
-			rhsExpr = lhs.getRHS();
+			rhsNode = rhs;
+			lhsNode = replaceBoolExpr(lhs);
 		} else if (isShortCircuitOr(rhs)) {
-			rhsExpr = rhs.getRHS();
+			rhsNode = lhs;
+			lhsNode = replaceBoolExpr(rhs);
 		} else {
 			throw new UnsupportedOperationException(
 					"Either one of the two statements have to be a call statement to false");
 		}
-		return new ShortCircuitOrExpr(ifCond, rhsExpr);
+		return new ShortCircuitOrExpr(
+				((AssignStmt) fTIRToMcSAFIRTable.get(lhsNode)).getRHS(),
+				((AssignStmt) fTIRToMcSAFIRTable.get(rhsNode)).getRHS());
+
 	}
 
 	private Expr getShortCircuitNode(IfStmt stmt, TIRAbstractAssignStmt lhs,
