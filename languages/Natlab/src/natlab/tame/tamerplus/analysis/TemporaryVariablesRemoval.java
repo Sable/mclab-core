@@ -438,8 +438,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		IfStmt currIfStmt = (IfStmt) getIfNode(commonIfNodes.get(0));
 
 		Expr expr = getShortCircuitNode(currIfStmt,
-				(TIRAbstractAssignStmt) defSet.get(0),
-				(TIRAbstractAssignStmt) defSet.get(1));
+				(TIRAbstractAssignStmt) commonIfNodes.get(0),
+				(TIRAbstractAssignStmt) commonIfNodes.get(1));
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
 		while (!ifStmtMap.isEmpty()) {
