@@ -416,9 +416,17 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			throw new UnsupportedOperationException(
 					"Either one of the two statements have to be a call statement to false");
 		}
-		return new ShortCircuitOrExpr(
-				((AssignStmt) fTIRToMcSAFIRTable.get(lhsNode)).getRHS(),
-				((AssignStmt) fTIRToMcSAFIRTable.get(rhsNode)).getRHS());
+		Expr lhsExpr = ((AssignStmt) fTIRToMcSAFIRTable.get(lhsNode)).getRHS();
+		Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable.get(rhsNode)).getRHS();
+		if (lhsExpr instanceof ParameterizedExpr
+				&& lhsExpr.getVarName().equals("not")) {
+			lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+		} else {
+			NotExpr notExpr = new NotExpr();
+			notExpr.setOperand(lhsExpr);
+			lhsExpr = notExpr;
+		}
+		return new ShortCircuitOrExpr(lhsExpr, rhsExpr);
 
 	}
 
@@ -465,14 +473,17 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			} else if (isShortCircuitOr(elseStmt)) {
 				Expr lhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
 						.get(replacementNode)).getRHS();
-				// if (lhsExpr instanceof ParameterizedExpr
-				// && lhsExpr.getVarName().equals("not")) {
-				// lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
-				// } else {
-				// NotExpr notExpr = new NotExpr();
-				// notExpr.setOperand(lhsExpr);
-				// lhsExpr = notExpr;
-				// }
+				System.out
+						.println("lhs Expr \n" + (lhsExpr).getPrettyPrinted());
+
+				if (lhsExpr instanceof ParameterizedExpr
+						&& lhsExpr.getVarName().equals("not")) {
+					lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+				} else {
+					NotExpr notExpr = new NotExpr();
+					notExpr.setOperand(lhsExpr);
+					lhsExpr = notExpr;
+				}
 				expr = new ShortCircuitOrExpr(lhsExpr, expr);
 			} else if (isShortCircuitLogicalAnd(elseStmt)) {
 				expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt)).getRHS();
@@ -481,6 +492,19 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			shortCircuitIfStmtSet.add(parentIf);
 			currIfStmt = parentIf;
 		}
+		// if (expr instanceof ShortCircuitOrExpr) {
+		// Expr lhsExpr = ((ShortCircuitOrExpr) expr).getRHS();
+		// if (lhsExpr instanceof ParameterizedExpr
+		// && lhsExpr.getVarName().equals("not")) {
+		// lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+		// } else {
+		// NotExpr notExpr = new NotExpr();
+		// notExpr.setOperand(lhsExpr);
+		// lhsExpr = notExpr;
+		// }
+		//
+		//
+		// }
 		return expr;
 
 	}
