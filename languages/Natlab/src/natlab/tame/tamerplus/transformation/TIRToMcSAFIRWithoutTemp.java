@@ -31,7 +31,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements
 	private HashBiMap<TIRNode, ASTNode> fTIRToRawASTTable;
 	private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
 	private ASTNode<?> fTransformedTree;
-	private Map<ASTNode, ASTNode> shortCircuitIfSet = null;
+	private Set<ASTNode> shortCircuitIfSet = null;
 
 	public TIRToMcSAFIRWithoutTemp(ASTNode tree) {
 		super(tree);
@@ -45,7 +45,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements
 				.getTemporaryVariablesRemovalAnalysis().getTIRToMcSAFIRTable();
 		shortCircuitIfSet = analysisEngine
 				.getTemporaryVariablesRemovalAnalysis()
-				.getShortCircuitIfStmtSet();
+				.getShortCircuitIfSet();
 
 		fDefinedVariablesNameCollector = analysisEngine
 				.getDefinedVariablesAnalysis();
@@ -63,7 +63,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements
 	public void caseTIRIfStmt(TIRIfStmt node) {
 		rewriteChildren(node);
 		IfStmt outputIfStmt = (IfStmt) getReplacementNode(node);
-		if (shortCircuitIfSet.containsKey(outputIfStmt)) {
+		if (shortCircuitIfSet.contains(outputIfStmt)) {
 			fNewNode = new TransformedNode(new TIRCommentStmt());
 			return;
 		}
