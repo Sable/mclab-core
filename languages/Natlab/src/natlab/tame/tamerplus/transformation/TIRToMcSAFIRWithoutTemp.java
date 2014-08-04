@@ -1,5 +1,6 @@
 package natlab.tame.tamerplus.transformation;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements
 	private HashBiMap<TIRNode, ASTNode> fTIRToRawASTTable;
 	private DefinedVariablesNameCollector fDefinedVariablesNameCollector;
 	private ASTNode<?> fTransformedTree;
-	private Set<ASTNode> shortCircuitIfSet = null;
+	private Map<ASTNode, ASTNode> shortCircuitIfSet = null;
 
 	public TIRToMcSAFIRWithoutTemp(ASTNode tree) {
 		super(tree);
@@ -62,7 +63,7 @@ public class TIRToMcSAFIRWithoutTemp extends AbstractTIRLocalRewrite implements
 	public void caseTIRIfStmt(TIRIfStmt node) {
 		rewriteChildren(node);
 		IfStmt outputIfStmt = (IfStmt) getReplacementNode(node);
-		if (shortCircuitIfSet.contains(outputIfStmt)) {
+		if (shortCircuitIfSet.containsKey(outputIfStmt)) {
 			fNewNode = new TransformedNode(new TIRCommentStmt());
 			return;
 		}

@@ -56,19 +56,20 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private HashMap<Expr, Name> fExprToTempVarName;
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
-	private Map<ASTNode,ASTNode> shortCircuitIfStmtSet = new HashMap<ASTNode,ASTNode>();
+	private Map<ASTNode, ASTNode> shortCircuitIfStmtSet = new HashMap<ASTNode, ASTNode>();
+
 	public Map<ASTNode, ASTNode> getShortCircuitIfStmtSet() {
 		return shortCircuitIfStmtSet;
 	}
 
-	public void setShortCircuitIfStmtSet(Map<ASTNode, ASTNode> shortCircuitIfStmtSet) {
+	public void setShortCircuitIfStmtSet(
+			Map<ASTNode, ASTNode> shortCircuitIfStmtSet) {
 		this.shortCircuitIfStmtSet = shortCircuitIfStmtSet;
 	}
 
 	private Map<VarAndColorContainer, Set<TIRNode>> colorToDefSetMap = new HashMap<VarAndColorContainer, Set<TIRNode>>();
 	private Map<VarAndColorContainer, Expr> colorToShortCircuitMap = new HashMap<VarAndColorContainer, Expr>();
 
-	
 	public TemporaryVariablesRemoval(ASTNode<?> tree) {
 		fExprToTempVarName = new HashMap<>();
 	}
@@ -473,7 +474,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		Expr expr = getShortCircuitNode(currIfStmt,
 				(TIRAbstractAssignStmt) commonIfNodes.get(0),
 				(TIRAbstractAssignStmt) commonIfNodes.get(1), useNode);
-		shortCircuitIfStmtSet.add(currIfStmt);
+		try {
+			shortCircuitIfStmtSet.put(currIfStmt, expr.clone());
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
 		while (!ifStmtMap.isEmpty()) {
@@ -507,7 +513,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt)).getRHS();
 			}
 			ifStmtMap.remove(parentIf);
-			shortCircuitIfStmtSet.add(parentIf);
+			try {
+				shortCircuitIfStmtSet.put(parentIf, expr.clone());
+			} catch (CloneNotSupportedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			currIfStmt = parentIf;
 		}
 		// if (expr instanceof ShortCircuitOrExpr) {
@@ -581,8 +592,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			Expr definitionExpr = updatedDefinitionNodeInAST.getRHS();
 			return definitionExpr;
 		} else if (isShortCircuit(tirDefSet)) {
-			originalDefinitionNodeInTIRSet = getShortCircuitArrayList(tirDefSet);
-			BinaryExpr definitionExpr;
 			if (isShortCircuitAnd(tirDefSet, useNode)) {
 				// definitionExpr = new ShortCircuitAndExpr();
 				return getShortCircuitNode(tirDefSet, useNode);
@@ -654,11 +663,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 		// TODO: Not the best way to do it. Change.
 		if (defSet.size() >= 2) {
-			shortCircuitIfStmtSet.add(sameifNode);
+			// shortCircuitIfStmtSet.p(sameifNode);
 			return true;
 		}
 		if (isSame) {
-			shortCircuitIfStmtSet.add(sameifNode);
+			// shortCircuitIfStmtSet.add(sameifNode);
 			return true;
 		}
 		return false;
