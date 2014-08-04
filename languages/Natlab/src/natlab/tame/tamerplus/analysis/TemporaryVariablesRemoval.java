@@ -370,6 +370,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return null;
 	}
 
+	private boolean isShortCircuitAndInIfCond(TIRNode useNode, TIRNode node) {
+		return isIfCond((ASTNode) useNode)
+				&& (((TIRCallStmt) node).getRHS().getVarName().trim()
+						.equals("true"));
+	}
+
 	private boolean isShortCircuitAnd(TIRNode node, TIRNode useNode) {
 		if (node instanceof TIRCallStmt) {
 
@@ -377,9 +383,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 					.equals("false"))) {
 				return true;
 			}
-			if (isIfCond((ASTNode) useNode)
-					&& (((TIRCallStmt) node).getRHS().getVarName().trim()
-							.equals("true"))) {
+			if (isShortCircuitAndInIfCond(useNode, node)) {
 				return true;
 			}
 			return false;
@@ -413,7 +417,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		if (isShortCircuitAnd(lhs, useNode)) {
 			rhsNode = rhs;
 			if (ifStmtToShortCircuitExprMap.containsKey(stmt)) {
-				System.out.println("Success!!!!");
 				lhsExpr = (Expr) ifStmtToShortCircuitExprMap.get(stmt);
 			} else {
 				lhsNode = replaceBoolExpr(lhs);
@@ -436,6 +439,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		} else {
 			throw new UnsupportedOperationException(
 					"Either one of the two statements have to be a call statement to false");
+		}
+		if (isIfCond((ASTNode) useNode)) {
+			if (rhsExpr.getVarName().equals("not")) {
+				rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
+			}
 		}
 		return new ShortCircuitAndExpr(lhsExpr, rhsExpr);
 	}
@@ -530,39 +538,8 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 			TIRNode elseStmt = ifStmtMap.get(parentIf);
 			TIRNode replacementNode;
-			if (ifStmtToShortCircuitExprMap.containsKey(currIfStmt)) {
-				Expr shortExpr = (Expr) ifStmtToShortCircuitExprMap
-						.get(parentIf);
-				if (isShortCircuitAnd(elseStmt, useNode)) {
-					expr = new ShortCircuitAndExpr(shortExpr, expr);
-
-				} else if (isShortCircuitOr(elseStmt)) {
-					Expr lhsExpr = shortExpr;
-
-					if (lhsExpr instanceof ParameterizedExpr
-							&& lhsExpr.getVarName().equals("not")) {
-						lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
-					} else {
-						NotExpr notExpr = new NotExpr();
-						notExpr.setOperand(lhsExpr);
-						lhsExpr = notExpr;
-					}
-					expr = new ShortCircuitOrExpr(lhsExpr, expr);
-				}
-				// else if (isShortCircuitLogicalAnd(elseStmt)) {
-				// expr = ((AssignStmt)
-				// fTIRToMcSAFIRTable.get(elseStmt)).getRHS();
-				// }
-				ifStmtMap.remove(parentIf);
-				try {
-					ifStmtToShortCircuitExprMap.put(
-							fTIRToMcSAFIRTable.get(parentIf), expr.clone());
-				} catch (CloneNotSupportedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				currIfStmt = parentIf;
-			}
+			// TODO : Add check to see if statement is contained in the map.
+			// Will it go here though
 			replacementNode = replaceBoolExpr(elseStmt);
 			if (isShortCircuitAnd(elseStmt, useNode)) {
 				expr = new ShortCircuitAndExpr(
@@ -597,8 +574,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			currIfStmt = parentIf;
 		}
 
-	
-		//System.out.println(expr.getPrettyPrinted());
+		// System.out.println(expr.getPrettyPrinted());
 		return expr;
 
 	}
