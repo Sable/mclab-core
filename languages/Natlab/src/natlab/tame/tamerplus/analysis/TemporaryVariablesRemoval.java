@@ -56,18 +56,19 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private HashMap<Expr, Name> fExprToTempVarName;
 	private Set<String> fRemainingVariablesNames;
 	private ReachingDefinitions reachingDef = null;
-	private Set<ASTNode> shortCircuitIfStmtSet = new HashSet<ASTNode>();
-	private Map<VarAndColorContainer, Set<TIRNode>> colorToDefSetMap = new HashMap<VarAndColorContainer, Set<TIRNode>>();
-	private Map<VarAndColorContainer, Expr> colorToShortCircuitMap = new HashMap<VarAndColorContainer, Expr>();
-
-	public Set<ASTNode> getShortCircuitIfStmtSet() {
+	private Map<ASTNode,ASTNode> shortCircuitIfStmtSet = new HashMap<ASTNode,ASTNode>();
+	public Map<ASTNode, ASTNode> getShortCircuitIfStmtSet() {
 		return shortCircuitIfStmtSet;
 	}
 
-	public void setShortCircuitIfStmtSet(Set<ASTNode> shortCircuitIfStmtSet) {
+	public void setShortCircuitIfStmtSet(Map<ASTNode, ASTNode> shortCircuitIfStmtSet) {
 		this.shortCircuitIfStmtSet = shortCircuitIfStmtSet;
 	}
 
+	private Map<VarAndColorContainer, Set<TIRNode>> colorToDefSetMap = new HashMap<VarAndColorContainer, Set<TIRNode>>();
+	private Map<VarAndColorContainer, Expr> colorToShortCircuitMap = new HashMap<VarAndColorContainer, Expr>();
+
+	
 	public TemporaryVariablesRemoval(ASTNode<?> tree) {
 		fExprToTempVarName = new HashMap<>();
 	}
