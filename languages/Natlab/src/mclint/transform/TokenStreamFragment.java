@@ -61,11 +61,7 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
   public static TokenStreamFragment fromSingleToken(String token) {
     return fromTokens(Arrays.asList((Token) new ClassicToken(1, token)));
   }
-  
-  public static TokenStreamFragment fromSingleNode(TokenStreamFragment.Node node) {
-    return create(node, node);
-  }
-  
+
   public static TokenStreamFragment create(TokenStreamFragment.Node start, TokenStreamFragment.Node end) {
     return new TokenStreamFragment(start, end);
   }
@@ -104,7 +100,15 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
     link(getEnd(), fragment.getStart());
     return TokenStreamFragment.create(getStart(), fragment.getEnd());
   }
-  
+
+  public TokenStreamFragment spliceBefore(String fragment) {
+    return spliceBefore(fromSingleToken(fragment));
+  }
+
+  public TokenStreamFragment spliceBefore(TokenStreamFragment.Node fragment) {
+    return spliceBefore(create(fragment, fragment));
+  }
+
   // Splices this fragment in after the given fragment.
   // Returns the combined fragment (which may or may not be useful).
   public TokenStreamFragment spliceAfter(TokenStreamFragment fragment) {
@@ -112,7 +116,27 @@ public class TokenStreamFragment implements Iterable<TokenStreamFragment.Node> {
     link(fragment.getEnd(), getStart());
     return TokenStreamFragment.create(fragment.getStart(), getEnd());
   }
-  
+
+  public TokenStreamFragment spliceAfter(String fragment) {
+    return spliceAfter(fromSingleToken(fragment));
+  }
+
+  public TokenStreamFragment spliceAfter(TokenStreamFragment.Node fragment) {
+    return spliceAfter(create(fragment, fragment));
+  }
+
+  public TokenStreamFragment wrap(TokenStreamFragment prefix, TokenStreamFragment suffix) {
+    return spliceAfter(prefix).spliceBefore(suffix);
+  }
+
+  public TokenStreamFragment wrap(String prefix, String suffix) {
+    return spliceAfter(prefix).spliceBefore(suffix);
+  }
+
+  public TokenStreamFragment wrap(TokenStreamFragment.Node prefix, TokenStreamFragment.Node suffix) {
+    return spliceAfter(prefix).spliceBefore(suffix);
+  }
+
   public Iterator<TokenStreamFragment.Node> iterator() {
     return new AbstractSequentialIterator<TokenStreamFragment.Node>(getStart()) {
       @Override protected TokenStreamFragment.Node computeNext(TokenStreamFragment.Node previous) {

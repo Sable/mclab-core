@@ -85,26 +85,52 @@ public class TokenStream {
     return node.tokenize();
   }
 
+  private boolean isInputParamList(ASTNode<?> node) {
+    return node.getParent() instanceof Function &&
+        ((Function) node.getParent()).getInputParams() == node;
+  }
+
+  private boolean isOutputParamList(ASTNode<?> node) {
+    return node.getParent() instanceof Function &&
+        ((Function) node.getParent()).getOutputParams() == node;
+  }
+
   public void insertAstNode(ASTNode<?> node, ASTNode<?> newNode, int i) {
     TokenStreamFragment newFragment = synthesizeFragment(newNode);
 
     if (newNode instanceof Stmt) {
-      String indentation = guessIndentation(node, i);
-      newFragment = TokenStreamFragment
-          .fromSingleToken(indentation)
-          .spliceBefore(newFragment);
+      newFragment = newFragment.spliceAfter(guessIndentation(node, i));
     }
 
     if (node.getNumChild() == 0) {
-      // TODO(isbadawi): This is brittle, assumes statements lists I think
-      newFragment.spliceAfter(
-          TokenStreamFragment.fromSingleNode(
-              nextMatchingNode(
-                  n -> n.getToken().getText().contains("\n"),
-                  fragment(node).getStart())));
+      if (newNode instanceof Stmt || newNode instanceof Function) {
+        newFragment.spliceAfter(nextMatchingNode(
+            n -> n.getToken().getText().contains("\n"),
+            fragment(node).getStart()));
+      } else if (isInputParamList(node)) {
+        if (node.getStartLine() == 0) {
+          newFragment.wrap("(", ")")
+              .spliceAfter(baseFragment(((Function) node.getParent()).getName()));
+        } else {
+          newFragment.spliceAfter(baseFragment(node).getStart());
+        }
+      } else if (isOutputParamList(node)) {
+        if (node.getStartLine() == 0) {
+          newFragment.wrap("[", "] = ")
+              .spliceBefore(baseFragment(((Function) node.getParent()).getName()));
+        } else {
+          newFragment.spliceAfter(baseFragment(node).getStart());
+        }
+      }
     } else if (i == 0) {
+      if (!(newNode instanceof Stmt || newNode instanceof Function)) {
+        newFragment = newFragment.spliceBefore(", ");
+      }
       newFragment.spliceBefore(fragment(node.getChild(0)));
     } else {
+      if (!(newNode instanceof Stmt || newNode instanceof Function)) {
+        newFragment = newFragment.spliceAfter(", ");
+      }
       newFragment.spliceAfter(fragment(node.getChild(i - 1)));
     }
   }
@@ -187,12 +213,8 @@ public class TokenStream {
     T copy = (T) node.fullCopy();
     TokenStreamFragment fragment = baseFragment(node).copy();
     // To be safe, add some parens around binary expressions (if they're not there already).
-    if (node instanceof BinaryExpr) {
-      String serialized = fragment.asString().trim();
-      if (!(serialized.startsWith("(") && serialized.endsWith(")"))) {
-        fragment = TokenStreamFragment.fromSingleToken("(").spliceBefore(fragment);
-        fragment = TokenStreamFragment.fromSingleToken(")").spliceAfter(fragment);
-      }
+    if (node instanceof BinaryExpr && !fragment.asString().trim().matches("^\\(.*\\)$")) {
+      fragment = fragment.wrap("(", ")");
     }
     copy.setTokenStreamFragment(fragment);
     return copy;
@@ -210,10 +232,10 @@ public class TokenStream {
     // TODO(isbadawi): Find a better place to put these things
     // TODO(isbadawi): Look at surrounding tokens instead of unconditionally adding newlines
     if (node instanceof Function || node instanceof Stmt) {
-      tokens = tokens.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+      tokens = tokens.spliceBefore("\n");
     }
     if (node instanceof Function) {
-      tokens = tokens.spliceAfter(TokenStreamFragment.fromSingleToken("\n"));
+      tokens = tokens.spliceAfter("\n");
     }
     return tokens;
   }

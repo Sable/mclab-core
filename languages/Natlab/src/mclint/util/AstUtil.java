@@ -92,11 +92,10 @@ public class AstUtil {
     }
     TokenStreamFragment result = Iterables.getFirst(nodes, null).tokenize();
     for (T node : Iterables.skip(nodes, 1)) {
-      result = result.spliceBefore(TokenStreamFragment.fromSingleToken(delimiter));
-      result = result.spliceBefore(node.tokenize());
+      result = result.spliceBefore(delimiter).spliceBefore(node.tokenize());
     }
     if (delimiter.equals("\n")) {
-      result = result.spliceBefore(TokenStreamFragment.fromSingleToken("\n"));
+      result = result.spliceBefore("\n");
     }
     return result;
   }
