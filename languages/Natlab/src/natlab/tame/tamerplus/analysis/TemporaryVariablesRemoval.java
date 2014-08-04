@@ -480,14 +480,15 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			throw new UnsupportedOperationException(
 					"Either one of the two statements have to be a call statement to false");
 		}
-
-		if (lhsExpr instanceof ParameterizedExpr
-				&& lhsExpr.getVarName().equals("not")) {
-			lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
-		} else {
-			NotExpr notExpr = new NotExpr();
-			notExpr.setOperand(lhsExpr);
-			lhsExpr = notExpr;
+		if (!(lhsExpr instanceof ShortCircuitAndExpr)) {
+			if (lhsExpr instanceof ParameterizedExpr
+					&& lhsExpr.getVarName().equals("not")) {
+				lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+			} else {
+				NotExpr notExpr = new NotExpr();
+				notExpr.setOperand(lhsExpr);
+				lhsExpr = notExpr;
+			}
 		}
 		return new ShortCircuitOrExpr(lhsExpr, rhsExpr);
 
