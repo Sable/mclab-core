@@ -530,7 +530,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(expr.getPrettyPrinted());
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
 		while (!ifStmtMap.isEmpty()) {
@@ -605,11 +604,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				e.printStackTrace();
 			}
 			currIfStmt = parentIf;
-			System.out.println(expr.getPrettyPrinted());
-
 		}
 
-		System.out.println(expr.getPrettyPrinted());
+		
 		return expr;
 
 	}
