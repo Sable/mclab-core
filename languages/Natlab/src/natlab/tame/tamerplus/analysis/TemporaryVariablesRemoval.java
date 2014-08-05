@@ -519,6 +519,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				(TIRAbstractAssignStmt) commonIfNodes.get(0),
 				(TIRAbstractAssignStmt) commonIfNodes.get(1), useNode);
 		shortCircuitIfSet.add(currIfStmt);
+
 		try {
 			ASTNode useStmt = getIfNode(useNode);
 			if (useStmt != null) {
@@ -529,6 +530,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println(expr.getPrettyPrinted());
 		defSet.removeAll(commonIfNodes);
 		Map<IfStmt, TIRNode> ifStmtMap = getIfStmtMap(defSet);
 		while (!ifStmtMap.isEmpty()) {
@@ -538,31 +540,55 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 						"Short circuit definition is not contained in a if block");
 			}
 			TIRNode elseStmt = ifStmtMap.get(parentIf);
-			TIRNode replacementNode;
-			// TODO : Add check to see if statement is contained in the map.
-			// Will it go here though
-			replacementNode = replaceBoolExpr(elseStmt);
-			if (isShortCircuitAnd(elseStmt, useNode)) {
-				expr = new ShortCircuitAndExpr(
-						((AssignStmt) fTIRToMcSAFIRTable.get(replacementNode))
-								.getRHS(),
-						expr);
+			if (ifStmtToShortCircuitExprMap.containsKey(parentIf)) {
+				Expr shortExpr = (Expr) ifStmtToShortCircuitExprMap
+						.get(parentIf);
+				if (isShortCircuitAnd(elseStmt, useNode)) {
+					expr = new ShortCircuitAndExpr(shortExpr, expr);
 
-			} else if (isShortCircuitOr(elseStmt)) {
-				Expr lhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
-						.get(replacementNode)).getRHS();
+				} else if (isShortCircuitOr(elseStmt)) {
+					Expr lhsExpr = shortExpr;
 
-				if (lhsExpr instanceof ParameterizedExpr
-						&& lhsExpr.getVarName().equals("not")) {
-					lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
-				} else {
-					NotExpr notExpr = new NotExpr();
-					notExpr.setOperand(lhsExpr);
-					lhsExpr = notExpr;
+					// if (lhsExpr instanceof ParameterizedExpr
+					// && lhsExpr.getVarName().equals("not")) {
+					// lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+					// } else {
+					// NotExpr notExpr = new NotExpr();
+					// notExpr.setOperand(lhsExpr);
+					// lhsExpr = notExpr;
+					// }
+					expr = new ShortCircuitOrExpr(lhsExpr, expr);
+				} else if (isShortCircuitLogicalAnd(elseStmt)) {
+					expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt))
+							.getRHS();
 				}
-				expr = new ShortCircuitOrExpr(lhsExpr, expr);
-			} else if (isShortCircuitLogicalAnd(elseStmt)) {
-				expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt)).getRHS();
+			} else {
+				TIRNode replacementNode;
+				// TODO : Add check to see if statement is contained in the map.
+				// Will it go here though
+				replacementNode = replaceBoolExpr(elseStmt);
+				if (isShortCircuitAnd(elseStmt, useNode)) {
+					expr = new ShortCircuitAndExpr(
+							((AssignStmt) fTIRToMcSAFIRTable.get(replacementNode))
+									.getRHS(), expr);
+
+				} else if (isShortCircuitOr(elseStmt)) {
+					Expr lhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
+							.get(replacementNode)).getRHS();
+
+					if (lhsExpr instanceof ParameterizedExpr
+							&& lhsExpr.getVarName().equals("not")) {
+						lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
+					} else {
+						NotExpr notExpr = new NotExpr();
+						notExpr.setOperand(lhsExpr);
+						lhsExpr = notExpr;
+					}
+					expr = new ShortCircuitOrExpr(lhsExpr, expr);
+				} else if (isShortCircuitLogicalAnd(elseStmt)) {
+					expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt))
+							.getRHS();
+				}
 			}
 			ifStmtMap.remove(parentIf);
 			try {
@@ -573,9 +599,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			}
 			shortCircuitIfSet.add(parentIf);
 			currIfStmt = parentIf;
+			System.out.println(expr.getPrettyPrinted());
+
 		}
 
-		// System.out.println(expr.getPrettyPrinted());
+		System.out.println(expr.getPrettyPrinted());
 		return expr;
 
 	}
