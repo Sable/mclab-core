@@ -363,9 +363,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private Expr getLogicalAndNode(TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
 		if (isShortCircuitLogicalAnd(rhs)) {
-			return rhs.getRHS();
+			return ((AssignStmt)fTIRToMcSAFIRTable.get(rhs)).getRHS();
 		} else if (isShortCircuitLogicalAnd(lhs)) {
-			return lhs.getLHS();
+			return ((AssignStmt)fTIRToMcSAFIRTable.get(lhs)).getRHS();
 		}
 		return null;
 	}
@@ -519,7 +519,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				(TIRAbstractAssignStmt) commonIfNodes.get(0),
 				(TIRAbstractAssignStmt) commonIfNodes.get(1), useNode);
 		shortCircuitIfSet.add(currIfStmt);
-
 		try {
 			ASTNode useStmt = getIfNode(useNode);
 			if (useStmt != null) {
@@ -678,10 +677,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// definitionExpr = new ShortCircuitOrExpr();
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-						.get(getLogicalAndNode(tirDefSet));
-				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
-				return andExpr;
+//				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
+//						.get(getLogicalAndNode(tirDefSet));
+//				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
+//				return andExpr;
+				return getShortCircuitNode(tirDefSet, useNode);
 			} else {
 				throw new UnsupportedOperationException(
 						"Short circuit opertion can either be And or Or");
