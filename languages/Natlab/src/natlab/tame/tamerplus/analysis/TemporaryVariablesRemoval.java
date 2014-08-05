@@ -598,6 +598,12 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				e.printStackTrace();
 			}
 			shortCircuitIfSet.add(parentIf);
+			try {
+				ifStmtToShortCircuitExprMap.put(currIfStmt, expr.clone());
+			} catch (CloneNotSupportedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			currIfStmt = parentIf;
 			System.out.println(expr.getPrettyPrinted());
 
