@@ -151,7 +151,8 @@ aspect Json {
   );
   eq ForStmt.getExtraJson() = ImmutableMap.of(
     "header", getAssignStmt().getJson(),
-    "body", asJsonArray(getStmts())
+    "body", asJsonArray(getStmts()),
+    "is_parfor", isParfor()
   );
   eq WhileStmt.getExtraJson() = ImmutableMap.of(
     "condition", getExpr().getJson(),
