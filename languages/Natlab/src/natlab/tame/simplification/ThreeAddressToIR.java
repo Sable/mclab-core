@@ -205,7 +205,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
         newNode = new TransformedNode(assigns);
         newNode.add(new TIRForStmt(((NameExpr)(node.getAssignStmt().getLHS())).getName(),
                 l.getName(), i!=null?i.getName():null, u.getName(), 
-                        new TIRStatementList(node.getStmtList())));
+                        new TIRStatementList(node.getStmtList()), node.isParfor()));
         
     }
     
