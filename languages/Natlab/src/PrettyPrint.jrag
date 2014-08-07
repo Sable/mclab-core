@@ -127,8 +127,9 @@ aspect PrettyPrint {
   eq BreakStmt.getPrettyPrintedLessComments() = wrap("break");
   eq ContinueStmt.getPrettyPrintedLessComments() = wrap("continue");
   eq ReturnStmt.getPrettyPrintedLessComments() = wrap("return");
-  eq ForStmt.getPrettyPrintedLessComments() = String.format("%sfor %s\n%s%send",
-    getIndent(), getAssignStmt().getPrettyPrinted().trim(), join("\n", getStmts()), getIndent());
+  eq ForStmt.getPrettyPrintedLessComments() = String.format("%s%sfor %s\n%s%send",
+    getIndent(), isParfor() ? "par" : "", getAssignStmt().getPrettyPrinted().trim(),
+    join("\n", getStmts()), getIndent());
   eq WhileStmt.getPrettyPrintedLessComments() = String.format("%swhile %s\n%s%send",
     getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()), getIndent());
   eq IfStmt.getPrettyPrintedLessComments() = String.format("%sif %s%s%send",

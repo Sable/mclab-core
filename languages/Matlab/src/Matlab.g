@@ -330,6 +330,7 @@ stmt_body :
   |  t_RETURN t_FILLER?
   |  t_WHILE t_FILLER? expr sep_stmt_list t_END t_FILLER?
   |  t_FOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
+  |  t_PARFOR t_FILLER? (name t_FILLER? ASSIGN t_FILLER? expr | LPAREN t_FILLER? name t_FILLER? ASSIGN t_FILLER? expr t_FILLER? RPAREN) sep_stmt_list t_END t_FILLER?
   |  t_ANNOTATION t_FILLER?
   ;
 

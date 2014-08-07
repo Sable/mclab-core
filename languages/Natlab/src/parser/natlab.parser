@@ -216,7 +216,8 @@ Stmt stmt_body_before_comments =
   |  CONTINUE {: return new ContinueStmt(); :}
   |  RETURN   {: return new ReturnStmt(); :}
   |  WHILE expr.e stmt_separator stmt_seq.l END {: return new WhileStmt(e, l); :}
-  |  FOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l); :}
+  |  FOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l, false); :}
+  |  PARFOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l, true); :}
   ;
 
 SwitchStmt switch_statement = 

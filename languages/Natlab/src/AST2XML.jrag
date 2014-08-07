@@ -274,7 +274,8 @@ aspect ASTtoXML {
   }
 
   public void ForStmt.getXML(Document doc, Element parent) {
-    Element e = createXmlElement(doc, parent, Arrays.asList(getAssignStmt()));
+    Element e = createXmlElement(doc, parent, Arrays.asList(getAssignStmt()),
+        "is_parfor", String.valueOf(isParfor()));
     addChildrenXml(doc, e, "StmtList", getStmts());
   }
 

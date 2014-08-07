@@ -61,7 +61,7 @@ ReturnStmt : Stmt;
 
 EmptyStmt : Stmt; //TODO-AC: remove this
 
-ForStmt : Stmt ::= AssignStmt Stmt*;
+ForStmt : Stmt ::= AssignStmt Stmt* <isParfor : boolean>;
 WhileStmt : Stmt ::= Expr Stmt*;
 
 TryStmt : Stmt ::= TryStmt:Stmt* CatchStmt:Stmt*;

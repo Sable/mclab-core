@@ -165,10 +165,11 @@ aspect AnalysisPrettyPrint {
     {
         return getPrettyPrintedLessComments();
     }
+
     eq ForStmt.getAnalysisPrettyPrintedLessComments( analysis.StructuralAnalysis analysis, boolean compact, boolean hideComments) {
         StringBuffer buf = new StringBuffer();
         String indent = getIndent();
-        buf.append(indent + "for ");
+        buf.append(indent + (isParfor() ? "par" : "") + "for ");
         String assignStmt = getAssignStmt().getAnalysisPrettyPrinted(analysis, compact, hideComments);
         buf.append( assignStmt.trim() );   // remove all initial tabs
         buf.append('\n');
