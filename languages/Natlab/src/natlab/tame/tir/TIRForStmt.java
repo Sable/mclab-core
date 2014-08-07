@@ -41,18 +41,23 @@ import ast.RangeExpr;
  */
 public class TIRForStmt extends ForStmt implements TIRStmt {
     private static final long serialVersionUID = 1L;
-    
+
     public TIRForStmt(Name var,Name lower,Name inc,Name upper,TIRStatementList stmts){
-        super(new AssignStmt(
-                new NameExpr(var),
-                new RangeExpr(
-                        new NameExpr(lower),
-                        (inc==null)?new Opt<Expr>():new Opt<Expr>(new NameExpr(inc)),
-                        new NameExpr(upper))),
-                stmts);
+      this(var, lower, inc, upper, stmts, false);
     }
-    
-    
+
+
+    public TIRForStmt(Name var,Name lower,Name inc,Name upper,TIRStatementList stmts,
+                      boolean isParfor) {
+      super(new AssignStmt(
+              new NameExpr(var),
+              new RangeExpr(
+                  new NameExpr(lower),
+                  (inc==null)?new Opt<Expr>():new Opt<Expr>(new NameExpr(inc)),
+                  new NameExpr(upper))),
+          stmts, isParfor);
+    }
+
     @Override
     public void tirAnalyze(TIRNodeCaseHandler irHandler) {
         irHandler.caseTIRForStmt(this);

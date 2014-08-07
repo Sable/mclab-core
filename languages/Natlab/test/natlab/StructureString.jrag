@@ -332,7 +332,7 @@ aspect StructureString {
 
     eq ForStmt.getStructureStringLessComments() {
         StringBuffer buf = new StringBuffer();
-        buf.append("for ");
+        buf.append((isParfor() ? "par" : "") + "for ");
         buf.append(getAssignStmt().getStructureString());
         buf.append('\n');
         for(Stmt stmt : getStmts()) {

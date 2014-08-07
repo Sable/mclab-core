@@ -138,7 +138,8 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             
             forStmt.setAssignStmt(cloneAssignStmtOfTIRForStmt(forStmtClone));
             forStmt.setStmtList(forStmtClone.getStmtList().clone());
-            
+            forStmt.setisParfor(forStmtClone.isParfor());
+
             fTIRToMcSAFIRTable.put(node, forStmt);
             
             if (DEBUG) printTableEntry(node, forStmt);
