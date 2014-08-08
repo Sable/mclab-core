@@ -278,6 +278,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 						&& (childIndex.intValue() != INVALID_INDEX.intValue());
 				if (isChildIndexAndParentValid) {
 					parentNode.setChild(definition, childIndex);
+					if (isShortCircuit(definition)) {
+						addToExprToTempVarMap(variable, definition);
+					}
 					fExprToTempVarName.put(definition, variable);
 					updateRemainingVariablesNamesSet(variable.getID());
 				}
@@ -363,9 +366,9 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	private Expr getLogicalAndNode(TIRAbstractAssignStmt lhs,
 			TIRAbstractAssignStmt rhs) {
 		if (isShortCircuitLogicalAnd(rhs)) {
-			return ((AssignStmt)fTIRToMcSAFIRTable.get(rhs)).getRHS();
+			return ((AssignStmt) fTIRToMcSAFIRTable.get(rhs)).getRHS();
 		} else if (isShortCircuitLogicalAnd(lhs)) {
-			return ((AssignStmt)fTIRToMcSAFIRTable.get(lhs)).getRHS();
+			return ((AssignStmt) fTIRToMcSAFIRTable.get(lhs)).getRHS();
 		}
 		return null;
 	}
@@ -605,7 +608,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			currIfStmt = parentIf;
 		}
 
-		
 		return expr;
 
 	}
@@ -658,6 +660,39 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		return ifStmtMap;
 	}
 
+	private boolean isShortCircuit(Expr expr) {
+		return expr instanceof ShortCircuitAndExpr
+				|| expr instanceof ShortCircuitOrExpr
+				|| (expr instanceof ParameterizedExpr && expr.getVarName()
+						.equals("and"));
+	}
+
+	private void addToExprToTempVarMap(Name variable, Expr expr) {
+		if (isShortCircuit(expr)) {
+			if (expr instanceof BinaryExpr) {
+				if (!fExprToTempVarName.containsKey(((BinaryExpr) expr)
+						.getRHS())) {
+					fExprToTempVarName.put(((BinaryExpr) expr).getRHS(),
+							variable);
+					if (isShortCircuit(((BinaryExpr) expr).getRHS())) {
+						addToExprToTempVarMap(variable,
+								((BinaryExpr) expr).getRHS());
+					}
+				}
+				if (!fExprToTempVarName.containsKey(((BinaryExpr) expr)
+						.getLHS())) {
+					fExprToTempVarName
+							.containsKey(((BinaryExpr) expr).getLHS());
+					if (isShortCircuit(((BinaryExpr) expr).getLHS())) {
+						addToExprToTempVarMap(variable,
+								((BinaryExpr) expr).getLHS());
+					}
+				}
+			}
+		}
+
+	}
+
 	private Expr getDefinitionForVariableAtNode(Name variable, TIRNode useNode) {
 		Integer colorForUseNode = getColorForVariableInUseNode(variable,
 				useNode);
@@ -677,10 +712,11 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				// definitionExpr = new ShortCircuitOrExpr();
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-//				AssignStmt updatedDefinitionNodeInAST = (AssignStmt) fTIRToMcSAFIRTable
-//						.get(getLogicalAndNode(tirDefSet));
-//				Expr andExpr = updatedDefinitionNodeInAST.getRHS();
-//				return andExpr;
+				// AssignStmt updatedDefinitionNodeInAST = (AssignStmt)
+				// fTIRToMcSAFIRTable
+				// .get(getLogicalAndNode(tirDefSet));
+				// Expr andExpr = updatedDefinitionNodeInAST.getRHS();
+				// return andExpr;
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else {
 				throw new UnsupportedOperationException(
