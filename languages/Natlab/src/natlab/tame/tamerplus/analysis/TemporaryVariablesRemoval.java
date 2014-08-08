@@ -277,14 +277,22 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				boolean isChildIndexAndParentValid = (parentNode != null)
 						&& (childIndex.intValue() != INVALID_INDEX.intValue());
 				if (isChildIndexAndParentValid) {
+					//parentNode.setChild(definition, childIndex);
+
+					if (isShortCircuit(definition)) {
+						addToExprToTempVarMap(variable, definition);
+						parentNode = fTIRToMcSAFIRTable.get(useNode);
+					
+
+					}
 					parentNode.setChild(definition, childIndex);
-					 if (isShortCircuit(definition)) {
-					 addToExprToTempVarMap(variable, definition);
-					 }
-					fExprToTempVarName.put(definition, variable);
+
+					if (!fExprToTempVarName.containsKey(definition)) {
+						fExprToTempVarName.put(definition, variable);
+					}
 					updateRemainingVariablesNamesSet(variable.getID());
 				}
-				// break;
+				break;
 			} else {
 				addChildrenOfNodeToQueueAndMarkedSet(currentNode, nodeQueue,
 						markedNodes);
@@ -661,10 +669,14 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private boolean isShortCircuit(Expr expr) {
-		return expr instanceof ShortCircuitAndExpr
+		if (expr instanceof ShortCircuitAndExpr
 				|| expr instanceof ShortCircuitOrExpr
 				|| (expr instanceof ParameterizedExpr && expr.getVarName()
-						.equals("and"));
+						.equals("and"))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void addToExprToTempVarMap(Name variable, Expr expr) {
@@ -713,37 +725,14 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 			if (isShortCircuitAnd(tirDefSet, useNode)) {
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else if (isShortCircuitOr(tirDefSet)) {
-				// definitionExpr = new ShortCircuitOrExpr();
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else if (isShortCircuitLogicalAnd(tirDefSet)) {
-				// AssignStmt updatedDefinitionNodeInAST = (AssignStmt)
-				// fTIRToMcSAFIRTable
-				// .get(getLogicalAndNode(tirDefSet));
-				// Expr andExpr = updatedDefinitionNodeInAST.getRHS();
-				// return andExpr;
+
 				return getShortCircuitNode(tirDefSet, useNode);
 			} else {
 				throw new UnsupportedOperationException(
 						"Short circuit opertion can either be And or Or");
 			}
-			// AssignStmt updatedDefinitionNodeInAST = (AssignStmt)
-			// fTIRToMcSAFIRTable
-			// .get(originalDefinitionNodeInTIRSet.get(0));
-			// definitionExpr.setLHS(updatedDefinitionNodeInAST.getRHS());
-			// Expr rhsExpr = ((AssignStmt) fTIRToMcSAFIRTable
-			// .get(originalDefinitionNodeInTIRSet.get(1))).getRHS();
-			// if (definitionExpr instanceof ShortCircuitOrExpr) {
-			// if (rhsExpr instanceof ParameterizedExpr
-			// && rhsExpr.getVarName().equals("not")) {
-			// rhsExpr = ((ParameterizedExpr) rhsExpr).getArg(0);
-			// } else {
-			// NotExpr tempExpr = new NotExpr();
-			// tempExpr.setOperand(rhsExpr);
-			// rhsExpr = tempExpr;
-			// }
-			// }
-			// definitionExpr.setRHS(rhsExpr);
-			// return definitionExpr;
 		}
 		return null;
 	}
@@ -776,17 +765,16 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				sameifNode = ifNode;
 			} else if (ifNode == sameifNode) {
 				isSame = true;
-				// return false;
 			}
 
 		}
 		// TODO: Not the best way to do it. Change.
 		if (defSet.size() >= 2) {
-			// shortCircuitIfStmtSet.p(sameifNode);
+
 			return true;
 		}
 		if (isSame) {
-			// shortCircuitIfStmtSet.add(sameifNode);
+
 			return true;
 		}
 		return false;
