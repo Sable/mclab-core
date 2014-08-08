@@ -278,13 +278,13 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 						&& (childIndex.intValue() != INVALID_INDEX.intValue());
 				if (isChildIndexAndParentValid) {
 					parentNode.setChild(definition, childIndex);
-					if (isShortCircuit(definition)) {
-						addToExprToTempVarMap(variable, definition);
-					}
+					 if (isShortCircuit(definition)) {
+					 addToExprToTempVarMap(variable, definition);
+					 }
 					fExprToTempVarName.put(definition, variable);
 					updateRemainingVariablesNamesSet(variable.getID());
 				}
-				break;
+				// break;
 			} else {
 				addChildrenOfNodeToQueueAndMarkedSet(currentNode, nodeQueue,
 						markedNodes);
@@ -668,24 +668,28 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 	}
 
 	private void addToExprToTempVarMap(Name variable, Expr expr) {
-		if (isShortCircuit(expr)) {
-			if (expr instanceof BinaryExpr) {
-				if (!fExprToTempVarName.containsKey(((BinaryExpr) expr)
-						.getRHS())) {
-					fExprToTempVarName.put(((BinaryExpr) expr).getRHS(),
-							variable);
-					if (isShortCircuit(((BinaryExpr) expr).getRHS())) {
-						addToExprToTempVarMap(variable,
-								((BinaryExpr) expr).getRHS());
-					}
+		if (expr instanceof BinaryExpr) {
+			if (!fExprToTempVarName.containsKey(((BinaryExpr) expr).getRHS())) {
+				fExprToTempVarName.put(((BinaryExpr) expr).getRHS(), variable);
+				if (isShortCircuit(((BinaryExpr) expr).getRHS())) {
+					addToExprToTempVarMap(variable,
+							((BinaryExpr) expr).getRHS());
 				}
-				if (!fExprToTempVarName.containsKey(((BinaryExpr) expr)
-						.getLHS())) {
-					fExprToTempVarName
-							.containsKey(((BinaryExpr) expr).getLHS());
-					if (isShortCircuit(((BinaryExpr) expr).getLHS())) {
-						addToExprToTempVarMap(variable,
-								((BinaryExpr) expr).getLHS());
+			}
+			if (!fExprToTempVarName.containsKey(((BinaryExpr) expr).getLHS())) {
+				fExprToTempVarName.put(((BinaryExpr) expr).getLHS(), variable);
+				if (isShortCircuit(((BinaryExpr) expr).getLHS())) {
+					addToExprToTempVarMap(variable,
+							((BinaryExpr) expr).getLHS());
+				}
+			}
+		} else {
+			ParameterizedExpr logicalAndExpr = (ParameterizedExpr) expr;
+			for (Expr arg : logicalAndExpr.getArgList()) {
+				if (!fExprToTempVarName.containsKey(arg)) {
+					fExprToTempVarName.containsKey(arg);
+					if (isShortCircuit(arg)) {
+						addToExprToTempVarMap(variable, arg);
 					}
 				}
 			}
