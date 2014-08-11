@@ -43,6 +43,7 @@ import ast.NotExpr;
 import ast.ParameterizedExpr;
 import ast.ShortCircuitAndExpr;
 import ast.ShortCircuitOrExpr;
+import ast.WhileStmt;
 
 import com.google.common.collect.HashBiMap;
 
@@ -256,6 +257,17 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 	}
 
+	private void setParentNodeForShortCircuit(ASTNode parentNode,
+			Expr definition) {
+		if (parentNode instanceof IfStmt) {
+			((IfStmt) parentNode).getIfBlock(0).setCondition(definition);
+			return;
+		} else if (parentNode instanceof WhileStmt) {
+			((WhileStmt) parentNode).setExpr(definition);
+		}
+		
+	}
+
 	private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode) {
 		Expr definition = getDefinitionForVariableAtNode(variable, useNode);
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
@@ -277,12 +289,10 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				boolean isChildIndexAndParentValid = (parentNode != null)
 						&& (childIndex.intValue() != INVALID_INDEX.intValue());
 				if (isChildIndexAndParentValid) {
-					//parentNode.setChild(definition, childIndex);
+					// parentNode.setChild(definition, childIndex);
 
 					if (isShortCircuit(definition)) {
 						addToExprToTempVarMap(variable, definition);
-						parentNode = fTIRToMcSAFIRTable.get(useNode);
-					
 
 					}
 					parentNode.setChild(definition, childIndex);
