@@ -257,17 +257,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		}
 	}
 
-	private void setParentNodeForShortCircuit(ASTNode parentNode,
-			Expr definition) {
-		if (parentNode instanceof IfStmt) {
-			((IfStmt) parentNode).getIfBlock(0).setCondition(definition);
-			return;
-		} else if (parentNode instanceof WhileStmt) {
-			((WhileStmt) parentNode).setExpr(definition);
-		}
-		
-	}
-
 	private void replaceUsedTempVarByDefinition(Name variable, TIRNode useNode) {
 		Expr definition = getDefinitionForVariableAtNode(variable, useNode);
 		Queue<ASTNode> nodeQueue = new LinkedList<>();
@@ -568,14 +557,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				} else if (isShortCircuitOr(elseStmt)) {
 					Expr lhsExpr = shortExpr;
 
-					// if (lhsExpr instanceof ParameterizedExpr
-					// && lhsExpr.getVarName().equals("not")) {
-					// lhsExpr = ((ParameterizedExpr) lhsExpr).getArg(0);
-					// } else {
-					// NotExpr notExpr = new NotExpr();
-					// notExpr.setOperand(lhsExpr);
-					// lhsExpr = notExpr;
-					// }
+				
 					expr = new ShortCircuitOrExpr(lhsExpr, expr);
 				} else if (isShortCircuitLogicalAnd(elseStmt)) {
 					expr = ((AssignStmt) fTIRToMcSAFIRTable.get(elseStmt))
@@ -583,8 +565,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				}
 			} else {
 				TIRNode replacementNode;
-				// TODO : Add check to see if statement is contained in the map.
-				// Will it go here though
 				replacementNode = replaceBoolExpr(elseStmt);
 				if (isShortCircuitAnd(elseStmt, useNode)) {
 					expr = new ShortCircuitAndExpr(
@@ -777,11 +757,6 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 				isSame = true;
 			}
 
-		}
-		// TODO: Not the best way to do it. Change.
-		if (defSet.size() >= 2) {
-
-			return true;
 		}
 		if (isSame) {
 
