@@ -9,7 +9,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.ArrayList;
 
-import sun.awt.image.ShortInterleavedRaster;
 import natlab.tame.builtin.Builtin.Islogical;
 import natlab.tame.tamerplus.utils.NodePrinter;
 import natlab.tame.tir.TIRAbstractAssignStmt;
