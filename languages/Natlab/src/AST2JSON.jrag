@@ -201,7 +201,7 @@ aspect Json {
   );
   eq DotExpr.getExtraJson() = ImmutableMap.of(
     "target", getTarget().getJson(),
-    "field", getField()
+    "field", getField().getJson()
   );
   eq ParameterizedExpr.getExtraJson() = ImmutableMap.of(
     "target", getTarget().getJson(),
