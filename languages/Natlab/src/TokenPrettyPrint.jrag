@@ -1,8 +1,10 @@
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
+
 import mclint.transform.TokenStreamFragment;
-import static mclint.util.AstUtil.joinTokens;
 
 aspect TokenPrettyPrint {
   private TokenStreamFragment ASTNode.fragment = null;
@@ -36,6 +38,21 @@ aspect TokenPrettyPrint {
     } else {
       return concatFragments(getIndent(), fragment);
     }
+  }
+
+  protected static <T extends ASTNode<?>> TokenStreamFragment ASTNode.joinTokens(String delimiter, Iterable<T> nodes) {
+    FluentIterable<T> fragments = FluentIterable.from(nodes);
+    if (fragments.isEmpty()) {
+      return TokenStreamFragment.fromSingleToken("");
+    }
+    TokenStreamFragment result = Iterables.getFirst(nodes, null).tokenize();
+    for (T node : Iterables.skip(nodes, 1)) {
+      result = result.spliceBefore(delimiter).spliceBefore(node.tokenize());
+    }
+    if (delimiter.equals("\n")) {
+      result = result.spliceBefore("\n");
+    }
+    return result;
   }
 
   public TokenStreamFragment ASTNode.tokenize() {

@@ -180,13 +180,9 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
         preorderKindAnalysis.analyze();
         preorderSet = preorderKindAnalysis.getFlowSets().get(node);
 
-        //HandleFlowset tmpInSet = currentInSet.clone();
-        //HandleFlowset newOutSet = tmpInSet.clone();
         HandleFlowset tmpInSet = new HandleFlowset();
         HandleFlowset newOutSet = new HandleFlowset();
 
-        //for( ValueDatumPair<String, VFDatum> pair : preorderSet.toList() ){
-            
         for( Name out : node.getOutputParams() )
             newOutSet.add(out.getID(), newUndefSet() );
 
@@ -196,12 +192,9 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
         inFlowSets.put( node, tmpInSet );
         currentInSet = newOutSet;
         currentOutSet = newOutSet;
-        //caseASTNode(node);
-        //caseASTNode(node.getStmts());
         analyze(node.getStmts());
         outFlowSets.put( node, currentOutSet.copy());
     }
-
 
 
     //store flow sets for all stmts. do it after analyzing it's
@@ -210,19 +203,18 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
     //not a copy otherwise.
     public void caseStmt( Stmt node )
     {
-        //inFlowSets.put(node,currentInSet.clone() );
         inAssignment = false;
         boolean oldChange = change;
         change = false;
         currentStmt = node;
-        HandleFlowset backupIn =(HandleFlowset)currentInSet.copy();
+        HandleFlowset backupIn = currentInSet.copy();
         caseASTNode( node );
         if( change )
             inFlowSets.put(node, backupIn);
         else
             inFlowSets.put(node, currentInSet);
             
-        outFlowSets.put(node, (HandleFlowset)currentOutSet.copy());
+        outFlowSets.put(node, currentOutSet.copy());
         change = oldChange||change;
     }
 
@@ -317,11 +309,6 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
     {
         inExprStmt = true;
         caseStmt( node );
-        /*inAssignment = false;
-        boolean oldChange = change
-        currentStmt = node;
-        inFlowSets.put(node, currentInSet);
-        outFlowSets.put(node, currentOutSet);*/
     }
     public void caseGlobalStmt( GlobalStmt node )
     {
@@ -380,7 +367,6 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
     {
         currentOutSet = currentInSet;
         VFDatum kind = getKindDatum( node );
-	//        System.out.println( kind );
         if( kind != null ){
             //case 1
             if(kind.isVariable()){
@@ -511,30 +497,12 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
                 newHandleTargets.addAll( handleUnknownFunctionCall() );
         }
     }
-    /*
-    public void caseRangeExpr( RangeExpr node)
-    {
-        newHandleTargets.addAll( newDOSet() );
-        }*/
+
     public void caseLiteralExpr( LiteralExpr node)
     {
         newHandleTargets.addAll( newDOSet() );
     }
-    /*
-    public void caseUnaryExpr( UnaryExpr node)
-    {
-        //this assumes that Unary operators have not been overridden
-        //to return a function handle when given a handle
-        newHandleTargets.addAll( newDOSet() );
-        return;
-    }
-    public void caseBinaryExpr( BinaryExpr node)
-    {
-        //this assumes that Binary operators have not been overridden
-        //to return a function handle when given handles
-        newHandleTargets.addAll( newDOSet() );
-        return;
-        }*/
+
     //param, cellindex, dot, matrix, cellArray
     //  set to may of Exp primary symbol or of {} if no val exists for it
     public void caseAssignStmt( AssignStmt node )
@@ -557,10 +525,6 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
 
         handleLHS( newOutSet, node.getLHS(), tmpInSet );
                 
-        /*for( String lv : lvalues ){
-            newOutSet.addAll( lv, newHandleTargets );
-            }*/
-
         inFlowSets.put(node, tmpInSet);
         outFlowSets.put(node, currentOutSet.copy());
         inAssignment = false;
@@ -965,14 +929,5 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
 		newSet.addAll(set );
             currentOutSet.add( pname, newSet );
         }
-
-            /*TreeSet<Value> values = currentOutSet.get( gname );
-            //Should never equal null, since global.
-            //Put here just in case
-            if( values != null ){
-                values.clear();
-                values.addAll( newGeneralSet() );
-            }
-            else*/
     }
 }

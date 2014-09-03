@@ -41,7 +41,7 @@
 
 	<!-- creates JastAdd Ant task -->
 	<target name="def.jastadd.task" unless="jastadd.available">
-		<taskdef name="jastadd" classname="jastadd.JastAddTask" classpathref="jastadd.jar.path" />
+		<taskdef name="jastadd" classname="org.jastadd.JastAddTask" classpathref="jastadd.jar.path" />
 		<property name="jastadd.available" value="yes" />
 	</target>
 </project>

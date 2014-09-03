@@ -80,7 +80,7 @@ public abstract class GenericFile implements Serializable {
      * If this generic file is not a directory, null is returned.
      * @return
      */
-    abstract public Collection<? extends GenericFile> listChildren();
+    abstract public Collection<GenericFile> listChildren();
     
     
     /**

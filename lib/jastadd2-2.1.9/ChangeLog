@@ -1,0 +1,751 @@
+2014-09-01  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Release 2.1.9
+
+2014-09-01  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Deprecated options:
+
+        - doc (unused)
+        - java1.4 (not tested)
+        - noLazyMaps (equivalent to lazyMaps=false)
+        - noVisitCheck (equivalent to visitCheck=flase)
+        - noCacheCycle (equivalent to cacheCycle=false)
+        - noRefineLegacy (equivalent to refineLegacy=false)
+        - noComponentCheck (componentCheck was already off by default)
+        - noInhEqCheck (equivalent to inhEqCheck=false)
+        - noStatic (the name was misleading, renamed to staticState)
+        - deterministic (collection attributes are now always deterministic)
+
+    * New or updated options:
+
+        + staticState (replaces noStatic)
+        + incremental: added 'none' option (this is the default value)
+
+    * Code generation changes
+
+        - Don't generate ASTNode$State.IdentityHashSet
+
+    * Template variable chnages:
+
+        * removed Deterministic (no longer relevant)
+        * removed CircularEnabled (was always enabled)
+        * removed NoStatic
+        * added StaticState (replaces NoStatic)
+
+    * Improved JastAddTask. Should now be closer to the command-line interface.
+
+2014-08-28  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Missing inherited equations are no longer reported for inherited
+    attributes declared on root nodes.
+
+2014-08-06  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Subtypes of List and Opt are no longer root node candidates
+
+2014-08-05  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Allow inherited attributes only declared on List or Opt
+
+2014-08-01  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed error where a cloned node would not be able to be rewritten.
+
+2014-07-29  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Aspect top-level enum declarations are now supported.
+    * Interface declarations nested in a class declaration should no longer
+      cause JastAdd to generate a top-level interface with the same name.
+    * Removed aspect extends and implements constructs that were
+      never used.
+
+2014-07-27  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Deprecated the --deterministic option
+    * LinkedList is used for collection contributor sets now, which
+      should improve performance slightly
+
+2014-07-24  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd2 now handles generic method inter-type declarations such
+    as `public <T> void A.m()`
+
+2014-07-02  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Removed indirect call to flushRewriteCache from clone.
+    This caused a bug when rewrites, flush, and treeCopy were used together.
+
+2014-06-05  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Delay processing of inter-type declarations until after parsing all
+    Jrag specification files. This allows aspect-declared classes to be
+    parsed after inter-type declarations that weave objects into them.
+    * Removed obsolete aspect "sons" declaration
+    * JastAdd no longer strips modifiers from aspect interface declarations
+    * JastAdd no longer removes static or adds public modifier to aspect
+    class declarations
+
+2014-02-28  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Build script now handles absence of git a bit better.
+
+2014-01-31  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed regression introduced in 2.1.6 which caused circular collection
+    attributes to crash JastAdd.
+
+2014-01-10  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * JastAdd now generates annotations for children, tokens and attributes
+    (@Child, @ListChild, @OptChild, @Token, @Attribute).
+
+2014-01-10  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed comment parsing error where documentation comments nested in
+    single-line comments were incorrectly parsed
+
+2014-01-07  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd now reports an error if rewrites are used in an aspect while
+    rewrites are not enabled
+
+2014-01-03  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Report parse errors for generated aspects (they were ignored before).
+
+2013-12-03  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Added the abstract methods fullCopy(), treeCopyNoTransform() and 
+    treeCopy() to abstract classes (with correct return type).
+
+2013-10-30  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd now inlines all equation compute methods where the equation
+    is a single Java expression.
+
+2013-10-18  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed potential crash during refinement processing
+
+2013-10-15  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Implemented alternative inherited equation checking analysis
+    that runs quicker on grammars with many inherited attributes
+
+2013-10-08  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd warns if there is no root node in the grammar
+
+2013-10-08  Emma Söderberg <emma.soderberg@cs.lth.se>
+
+   * JastAdd now supports a flush flag which allows for configuring of
+   flushing.  The flag takes the following values
+   'attr','coll'.'rewrite','full'. Default is 'attr' and 'coll'. The 'rewrite'
+   value makes flushing of outermost rewrites possible by storing their
+   initial values. The 'full' value includes all values.
+   * The default flushing API provided by JastAdd has been extended with a
+   flushTreeCache method calling flushCache and traversing the tree. A call to
+   this method together with the use of the flush='full' will result in a full
+   flush of an AST.
+   * Attributes are flushed via separate reset methods, one per cache
+   attribute.
+   * All cached attributes in a node are flushed from a flushAttrCache method
+   which is called from flushCache.
+   * Rewrites are flushed from a flushRewriteCache method which is called from
+   flushCache.
+
+2013-10-02  Emma Söderberg <emma.soderberg@cs.lth.se>
+
+   * Added treeCopyNoTransform to replace fullCopy
+   * Deprecated fullCopy
+   * Added doFullTraversal method on ASTNode which uses getChild to traverse
+   and trigger rewrites
+   * Added treeCopy which traverses using doFullTraversal before calling
+   treeCopyNoTransform
+
+2013-10-01  Emma Söderberg <emma.soderberg@cs.lth.se>
+
+    * JastAdd now generates the Tracer class for the --tracing option as a
+    nested class in ASTNode$State and provides a trace access method called
+    'trace' available via the state object.
+
+2013-09-20  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd now reports a warning if multiple values are given to an option
+    that only accepts one value argument
+
+2013-09-17  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Undeprecated the --visitCheck option (will replace --noVisitCheck in the
+    future by adding a boolean argument)
+    * Undeprecated the --cacheCycle option (will replace --noCacheCycle in the
+    future by adding boolean argument)
+
+2013-09-16  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * jastadd.JastAddTask prints deprecation warning when used
+    * All JastAddTask options are passed through the central Configuration
+    class so that all options are handled in a uniform way
+
+2013-09-15  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * An error is now reported if no grammar files are given on the command
+    line.
+    * If any error prevents JastAdd from running, a short line will be printed
+    with info about obtaining help (--help), rather than the full help output.
+    This makes it easier to spot the error message on the command line.
+    * Refactored option handling.
+    * All JastAdd configuration options are now stored in
+    org.jastadd.Configuration.
+
+2013-09-11  Emma Söderberg <emma.soderberg@cs.lth.se>
+
+    * Added support for --cache=analyze
+      This argument to cache will enable full caching and
+      tracing of cache events, and it generates a CacheAnalyzer
+      class which is registered as an input filter in the Tracer class.
+
+2013-09-10  Emma Söderberg <emma.soderberg@cs.lth.se>
+
+    * Changed cache configuration flags. The new flag is called "cache" and
+      takes one of "all","none","config", or "implicit" as argument.
+    * Deprecated old cache configuration flags: "cacheAll", "cacheNone",
+      "cacheImplicit", and "ignoreLazy". The first three deprecated flags
+      can be given on a new format with the new flag. The last deprecated flag
+      ("ignoreLazy") has no direct mapping, but all options with the new
+      flag are intended to ignore the 'lazy' configuration.
+
+2013-09-10  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Changed tracing flag to enable static filtering of tracing, e.g.,
+    --tracing=compute will only trace compute events. The new tracing flags are:
+    compute,cache,rewrite,circularNTA,circular,copy. These can be combined,
+    e.g., --tracing=compute,cache . The flag --tracing will enable tracing of
+    all trace events (as before).
+    * Added abstract class InputFilter to tracing that can be used to control
+    how tracing objects are created (e.g., to save memory), and it can also be
+    used to dynamically filter which trace events to save.
+    * Added Processor interface to process (e.g., aggregate information) trace
+    events after they have been collected.
+    * Fixed compile time errors in the generated tracing code.
+
+2013-09-03  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed code generation regression for the Tracer class - it is now
+    generated in the correct package again
+
+2013-09-02  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * The generated methods clone(), copy() and fullCopy() can now be refined.
+
+2013-09-02  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Made aspect "sons" declarations deprecated
+
+2013-08-28  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * JastAdd no longer requires a root node - a non-abstract node that is
+    never a child of any other node - in the grammar.
+
+2013-08-27  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Improved error message for inherited attributes that are missing equations
+
+2013-08-26  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Don't generate the `Tracer` class when the tracing option is absent
+    * Don't parse the Tracing class as an aspect
+
+2013-08-24  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Added options to change the names of the generated ASTNode, List, and
+    Opt types
+
+2013-08-23  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Improved documentation comment generation
+    * Removed some double comment generation
+    * Fixed some incorrect generated comment tags
+    * Fixed some indentation issues for generated comments
+    * JastAdd2 no longer alters modifiers for type declarations by adding
+    `public` or removing `static` modifiers
+    * It is now possible to use annotations on interface and class declarations
+
+2013-08-22  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed the suppressWarnings option from JastAdd2. JastAdd2 no longer
+    attempts to generate SuppressWarnings annotations.
+    * Added support for annotations on synthesized attributes (must occur
+    before the `syn` or `eq` keywords)
+    * Annotations on collection attribute declarations must now be placed before
+    the `coll` keyword
+    * Annotations on inherited attributes and collection contribution
+    equations are still not supported, but no longer cause a generic
+    difficult-to-locate syntax error
+
+2013-08-21  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * The Ant build script now compiles to the ant-bin directory in order to
+    avoid conflicts with the eclipse project
+
+2013-08-21  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Added flag --lineColumnNumbers that adds methods for storing and
+    retrieving line and column numbers (setStart, setEnd, getStartLine,
+    getStartColumn, getEndLine, getEndColumn). This flag can be used together
+    with the new flag to JastAddParser to remove the dependency to beaver.Symbol
+
+2013-08-20  Görel Hedin <gorel.hedin@cs.lth.se>
+
+    * Added A.hasB() accessor for list children (B is a list child).
+
+2013-08-19  Niklas Fors <niklas.fors@cs.lth.se>
+2013-08-21  Görel Hedin <gorel.hedin@cs.lth.se>
+
+    * Added List.AddAll(Collection) to add many objects to a list.
+
+2013-05-31  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed error that could cause fullCopy to initialize NTA children
+    with incorrect child indices
+
+2013-05-02  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * The JastAddTask Ant Task now throws a BuildException if JastAdd
+    failed to generate an AST instead of silently closing the current JVM
+
+2013-04-26  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Added a new List constructor that takes a variable number of children
+    and inserts them into the list
+
+2013-04-19  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Added error handling for inherited attributes defined on root nodes
+    * Removed flag java14 when JastAdd is built
+
+2013-04-18  Niklas Fors <niklas.fors@cs.lth.se>
+
+    * Improved analysis of equations for inherited attributes
+
+2013-04-12  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed potential null access in generated code
+    * Bootstrapped with R20130412
+
+    * New release: 20130412
+
+2013-04-08  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Added entry points that allow custom output/error streams
+
+2013-04-04  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed global static variables to allow multiple concurrent JastAdd
+    instances in the same JVM
+
+2013-04-03  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Improved error handling for missing equations of synthesized attributes.
+    Now only the minimum set of classes requiring an equation is reported.
+
+2013-04-02  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Grammar errors are now gathered using a collection attribute
+
+2013-03-22  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Help text is now printed to standard out (in adherence to the
+    GNU Coding Standards for command-line interfaces)
+
+2013-03-19  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Moved JastAdd main class to the package org.jastadd. A class named
+    JastAdd has been left in the package jastadd as a working entry point
+    for backward compatibility.
+    * Moved the JastAdd Apache Ant task to the package org.jastadd.
+    Please use org.jastadd.JastAddTask for future build scripts.
+
+2013-03-12  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Minimum list size now only affects list nodes
+    * Added option for custom minimum list size (minListSize)
+    * Added options for indentation and minimum list size to the JastAdd
+    Ant Task
+
+    * New release: 20130312
+
+2013-03-11 Emma Söderberg <emma.soderberg@cs.lth.se>
+
+    * Refactored code generation for incremental, flush and trace
+    * The fullFlush flag now gives flushing of NTAs and rewrites
+
+2013-02-21  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed doxygen support
+    * Removed parent interface support (for inh eq searching)
+
+2013-02-20  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed reference to ASTDecl in multiple syn eq error message.
+    Fixes trac ticket http://svn.cs.lth.se/trac/jastadd-trac/ticket/118
+    * Moved static option fields from ASTNode to Grammar and made them
+    non-static
+
+2013-02-13  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Dropped support for J2ME code generation
+
+2013-02-12  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Merged Emma Söderberg's incremental branch
+
+    * New release: 20130212
+
+2013-02-10  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed obsolete file Makefile.deprecated
+    * Equivalent inherited attribute re-declarations now only raise a
+      warning rather than an error
+
+2013-02-07  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Improved error messages for multiple declaration of synthesized and
+      inherited attributes
+
+2013-02-06  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Include output directory path in missing output dir error message
+    * ASTNode.copy() now sets the parent pointer of the copy to null
+
+2013-01-31  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed issue http://svn.cs.lth.se/trac/jastadd-trac/ticket/112
+    * Fixed issue http://svn.cs.lth.se/trac/jastadd-trac/ticket/113
+    * Merged ES fix for issue http://svn.cs.lth.se/trac/jastadd-trac/ticket/114
+
+2013-01-30  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Added specific options for 2,4,8 space indentation
+    * Made the --doxygen option deprecated
+
+2013-01-25  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed code gen error causing the child array to sometimes not
+      be initialized in JJTree mode.
+      Fixes trac ticket http://svn.cs.lth.se/trac/jastadd-trac/ticket/109
+
+2013-01-24  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Generate all Java sources into src/gen
+
+2013-01-21  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed obsolete AspectJ code gen feature
+
+2013-01-20  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed last AspectJ dependencies - AspectJ is no longer
+      required to build JastAdd2
+
+2013-01-10  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Removed redundant generated method getChild(ASTNode,int)
+      Fixes trac ticket http://svn.cs.lth.se/trac/jastadd-trac/ticket/5
+
+2013-01-08  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Added the --indent={space|tab} command-line option.
+      The option can be used to select which type of indentation is
+      used in the generated code.
+
+2012-11-22  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Improved error messages for method/equation refinement errors
+
+2012-11-14  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Process interface refinements before weaving interface
+    introductions.  This allows interface methods to be refined again.
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/69
+
+    * Increased minimum (non-empty) child array size from 1 to 4
+
+    * Added init$Children method to initialize the child array with the
+    correct initial size. This also avoids some redundant initialization of
+    nta children.
+
+    * Refactored constructor code generation
+
+2012-11-12  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * New release: 20121112
+
+    * Generate fewer compute methods. Regular non-lazy synthesized
+    attributes do not need a separate compute method.
+    Fewer compute methods will in general reduce the stack depth
+    required to evaluate some attributes.
+
+2012-11-09  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * Fixed error in fullCopy NTA exclusion - excluded wrong children
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/89
+
+    * Minor improvements to indentation in generated code
+
+    * Added SVN revision number to version string
+
+2012-10-26  Jesper Öqvist <jesper.oqvist@cs.lth.se>
+
+    * New release: 20121026
+
+    * Fixed error that caused faulty code generation when a comment before
+    an import statement contained a semicolon.
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/84
+--------------------------------------------------------------------------------
+2012-10-25:  (JO)
+
+    * Added generated getNumXNoTransform method to count number items
+    in list children without triggering rewrites.
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/82
+
+    * Fixed static import codegen error.
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/83
+--------------------------------------------------------------------------------
+2012-10-19: (JO)
+
+    *  Synthesized attributes with no equation generate an abstract method
+    even if another attribute with the same name has an equation in the same
+    node type. Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/78
+
+    * Removed the generated attribute for accessing parameterized non-terminal
+    value maps due to possible faulty code generation.
+    Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/80
+--------------------------------------------------------------------------------
+2012-10-18: (JO)
+
+    * Properly escape backslashes in filenames generated in documentation
+    comments. Trac ticket: http://svn.cs.lth.se/trac/jastadd-trac/ticket/76
+
+    * Do not copy NTA children in fullCopy. Trac ticket:
+    http://svn.cs.lth.se/trac/jastadd-trac/ticket/77
+--------------------------------------------------------------------------------
+2012-10-11: (GH) New release: 20121011
+--------------------------------------------------------------------------------
+2012-09-18: (JO) all errors, warnings and help messages are printed to stderr
+--------------------------------------------------------------------------------
+2012-09-17: (JO) getChild now returns null if the children array is null
+--------------------------------------------------------------------------------
+2012-06-29: (JO) Add comment to each generated file with the JastAdd2 version
+--------------------------------------------------------------------------------
+2012-06-29: (JO) Added low-level attribute to access parameterized
+non-terminal value maps
+--------------------------------------------------------------------------------
+2012-06-13: (JO) Updated option descriptions.
+Updated the descriptions for the defaultMap and defaultSet options.
+--------------------------------------------------------------------------------
+2012-05-30: (JO) It is no longer possible to compile inherited equations that
+lack a return statement.
+--------------------------------------------------------------------------------
+2012-04-27: (JO) A new class was added to handle command line options passed
+to JastAdd. The new jastadd.Option class is responsible for option matching
+and help printing. Options can be made deprecated and non-standard.
+Only standard, non-deprecated, options are printed in the default help text.
+The non-standard options can be printed with the --X option.
+
+Command line options are no longer case sensitive.
+
+If a deprecated option is used JastAdd prints a warning.
+
+If an option is given twice JastAdd prints a warning.
+
+If an unknown option is used (string starting with --) JastAdd prints a
+warning.
+
+If an option that requires a value does not have one, JastAdd prints a
+warning.
+
+Some option descriptions were slightly modified.
+
+In order to make JastAdd behave the same when invoked from
+command line and Ant task, the options --noComponentCheck, --lazyMaps and
+--refineLegacy are now default ON. They can be switched off using
+--componentCheck, --noLazyMaps and --noRefineLegacy respectively.
+
+Print the error output from the test runner in the ant log rather than sending
+it to test_results.
+
+Test runner prints the command used to invoke JastAdd.
+--------------------------------------------------------------------------------
+2012-04-26: (JO) Running JastAdd with the --version or --help flags now
+makes JastAdd print the requested information and exit with exit code zero.
+--------------------------------------------------------------------------------
+2012-04-26: (JO) The Ant build now uses lazyMaps="false" since the lazyMaps
+implementation currently causes build errors in some projects. This option
+can be re-enabled later when the bug has been fixed properly.
+--------------------------------------------------------------------------------
+2012-04-24: (JO) Added cast in fullCopy: can't assume that the child
+array has type ASTNode[]
+--------------------------------------------------------------------------------
+2012-04-23: (JO) Added cast in removeChild: can't assume that the child
+array has type ASTNode[]
+--------------------------------------------------------------------------------
+2012-04-18: (JO) The pattern matching for the refined keyword is now sensitive
+to word boundaries: the substring "refined" is not treated as the refined
+keyword if it appears inside e.g. the string "unrefined"
+--------------------------------------------------------------------------------
+2012-03-26: (ES) The generated code for syn nta with parameters now allows
+null values.
+--------------------------------------------------------------------------------
+2012-03-01: (JO) fullCopy now sets the parent of the copied tree to null
+--------------------------------------------------------------------------------
+2012-02-22: (JO) Fixed build errors when invoking the ant script
+from another working directory than the project's base directory.
+--------------------------------------------------------------------------------
+2012-01-30: (JO) Makefile is now deprecated
+-------------------------------------------------------
+2012-01-27: (ES) Added a sort of the file list given to
+aspectj in Makefile to make sure ast.AST.TokenComponent is
+handled before ast.AST.TokenComponentNTA. The order of the
+file list apparently affects the result of aspectj 1.5.3
+and if not sorted an error will occur. This problem does
+not occur when the ant script is run because it the
+file list given to aspectj has a different order.
+-------------------------------------------------------
+2011-01-09: (JO) Improved the generated documentation comments
+-------------------------------------------------------
+2012-01-08: (JO) Removed source file name for constructors,
+methods and node types (ASTNode, List, Opt) generated without
+an actual source file. This improves the declaredat tag output.
+-------------------------------------------------------
+2011-12-30: (JO) Generate production tags for the RagDoll tool.
+-------------------------------------------------------
+2011-12-30: (JO) Filenames for AST decls is now set
+the full path, not the base file name.
+-------------------------------------------------------
+2011-12-01: (JO) Added Apache Ant build script.
+Moved version name to resource bundle which is generated
+at build time -- this removes the frequent changes in
+JastAdd.java due to the version name updating after each
+build.
+-------------------------------------------------------
+2011-12-01: (JO) Rewrite debug code escapes file names
+in strings. This fixes a bug where JastAdd on Windows
+systems could output code that did not compile.
+Also added the AspectName token to the Rewrite node type,
+so that the actual aspect name could be returned in the
+Rewrite.aspectName attribute.
+-------------------------------------------------------
+2011-09-25: (ES) Moved weaving of interfaces to earlier
+Weaving of interfaces after the weaving of attribute/aspect
+definitions prevents the second phase to access certain
+cached attributes. Attributes that cache their declaration
+and which have their declaration in an interface will not
+find their declaration until after the interface has been
+weaved in. If this attribute is called before this happens
+null will be cached eventhough the definition is available
+after the interface weaving phase. This causes an error
+and prevents generation of Java files.
+-------------------------------------------------------
+2011-09-24: (ES/JO) Fix of missing "when" problem
+There was a bug for contributes classes missing a when
+part: an if statement with no condition was generated.
+This is now checked in Test119 and a fix is added in
+jrag/CollectionAttributes.jrag. The Contribute.getCondition
+method probably used to return null but now returns
+an empty string when there is no condition. The code
+now checks the length of the string in addition to a
+null check.
+-------------------------------------------------------
+2011-09-21: (ES) New bootstrap with nameless Ast aspect
+This is basically a revert back to a nameless .ast aspect
+which requires less maintenance since there is no aspect
+name that may collide with user defined aspect names.
+This revert requires a boostrap since it includes an
+update of the refines in the jastadd2 code base.
+-------------------------------------------------------
+2011-09-13: (ES) Update of the first bootstrap step
+There was a bug in the generation of visited flags
+missed in the last update. The test target of the
+Makefile has been updated to prevent this in the future.
+It know depends on the "jar" target and not only the
+"all" target. Test 117 was added to expose the bug in
+the previous bootstrapping attempt.
+--------------------------------------------------------
+2011-09-08: (ES) Update of generated code for java5
+There was a name collison when generating java5 code
+due to an added method with a generic return type.
+The offending method "Iterator ASTDecl.getClassBodyDecls"
+was renamed to "Iterator ASTDecl.getClassBodyDeclsItr".
+The java5 generated method could have been used with
+some adjustments (it generates a list which could be
+used to get an iterator) but this would not work for
+java1.4 code.
+--------------------------------------------------------
+2011-09-08: (ES) First bootstrap step
+Did a bootstrap with the java1.4 flag on. Updated the
+refinement syntax in JragCodeGen.jrag and hand to rename
+the "String ASTDecl.flushCollectionCache" to
+"String ASTDecl.flushCollectionCacheString" to prevent
+a collision with the now generated
+"void ASTDecl.flushCollectionCache".
+--------------------------------------------------------
+2011-09-08: (ES) Added generation of java1.4 code
+The previous generation of java1.4 code for circular attributes
+resulted in java5 code.
+--------------------------------------------------------
+2011-09-08: (ES) Preparing for boostrap
+Changed the Makefile so that jastadd is run with the "--java1.4"
+flag to avoid version related compile errors.
+Changed the use of "refine" in JragCodeGen.jrag to use
+the "refined()" construct instead of the "A.C.m()" construct.
+The tests for the latter alternative fails.
+--------------------------------------------------------
+2011-09-08: (ES) Added support for refinement of grammar generated methods
+(from .ast) via an "Ast" aspect.
+--------------------------------------------------------
+2011-09-08: (ES) Added tests for refine (110-116)
+--------------------------------------------------------
+2011-09-02: (GH) New release: 20110902
+--------------------------------------------------------------------------------
+2011-09-02: (JO) Changed the name of the RagDoll tag
+apilvl to apilevel
+--------------------------------------------------------
+2011-05-31: (JO) Added JavaDoc tag output for attributes
+and methods.
+--------------------------------------------------------
+2011-05-31: (JO) Added test target to Makefile.
+You can use make test to run all the unit tests and
+compare the test results with expected test results.
+--------------------------------------------------------
+2011-05-10: (JO) Added WINDOWS / CYGWIN notes to README
+--------------------------------------------------------
+2011-05-09: (JO) ASTNode Java error fixed
+Changed type of node parameter in setChild and insertChild to ASTNode.
+This change fixes Java errors that previously were undetected by javac,
+but with the latest JDK7 versions from Oracle these errors are reported.
+The error was access of childIndex in a context where that field is not
+visible.
+--------------------------------------------------------
+2011-05-06: (GH) Added reference-manual, release-notes, and release script.
+--------------------------------------------------------
+2011-04-25: (GH) Revised tests
+Added .info files for test documentation.
+RunTests now uses JastAdd2.jar instead of class files.
+RunTests now runs JastAdd2.jar as exec process to avoid exit at generation-time errors.
+RunTests now accepts tests from 1 to 200.
+Added test case Test101.
+Refactored some tests to make them succeed under JastAdd2.
+--------------------------------------------------------
+2011-04-06: (GH) Added documentation files in JastAdd2
+Added readme, change log file, etc.
+Ticket http://svn.cs.lth.se/trac/jastadd-trac/ticket/2
+--------------------------------------------------------
+2011-01-24: (ES) Repository moved
+The repo was moved from CVS vitter.cs.lthse to SVN svn.cs.lth.se.
+For older change logs, see ChangeLogUntil2010.txt
+--------------------------------------------------------
+Year-Month-Day: (Who) Short Description
+Longer description, or pointer to trac ticket.
+--------------------------------------------------------

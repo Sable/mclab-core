@@ -20,9 +20,17 @@
 // =========================================================================== //
 
 import java.util.Map;
-import static mclint.util.AstUtil.indexFunctionsByName;
+
+import com.google.common.collect.Maps;
 
 aspect NameResolution{
+    protected static Map<String, Function> ASTNode.indexFunctionsByName(List<Function> functions) {
+      return Maps.uniqueIndex(functions, new com.google.common.base.Function<Function, String>() {
+        @Override public String apply(Function node) {
+          return node.getName().getID();
+        }
+      });
+    }
 
     //function lookup implementation
     syn Function FunctionList.getMainFunction() = getFunction(0);
