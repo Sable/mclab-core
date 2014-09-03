@@ -18,10 +18,28 @@
 //   limitations under the License.                                            //
 //                                                                             //
 // =========================================================================== //
-import static mclint.util.AstUtil.join;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 
 aspect PrettyPrint {
   protected static final String ASTNode.INDENT_TAB = "  ";
+
+  protected static <T extends ASTNode<?>> String ASTNode.join(String delimiter, Iterable<T> nodes) {
+    String result = Joiner.on(delimiter).join(FluentIterable.from(nodes)
+        .transform(new com.google.common.base.Function<ASTNode<?>, String>() {
+          @Override public String apply(ASTNode<?> node) {
+            return node.getPrettyPrinted();
+          }
+        })
+        .filter(Predicates.not(Predicates.containsPattern("^$"))));
+
+    if (!result.isEmpty() && delimiter.equals("\n")) {
+      result += "\n";
+    }
+    return result;
+  }
 
   syn String ASTNode.getPrettyPrinted() {
     StringBuffer buf = new StringBuffer();

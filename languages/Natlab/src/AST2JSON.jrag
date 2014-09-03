@@ -2,11 +2,26 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 
-import static mclint.util.AstUtil.asJsonArray;
-
 aspect Json {
+  protected static <T extends ASTNode<?>> java.util.List<Map<String, Object>> ASTNode.asJsonArray(Iterable<T> nodes) {
+    return FluentIterable.from(nodes)
+      .filter(new Predicate<ASTNode<?>>() {
+        @Override public boolean apply(ASTNode<?> node) {
+          return !(node instanceof EmptyStmt);
+        }
+      })
+      .transform(new com.google.common.base.Function<ASTNode<?>, Map<String, Object>>() {
+        @Override public Map<String, Object> apply(ASTNode<?> node) {
+          return node.getJson();
+        }
+      })
+      .toList();
+  }
+
   public String ASTNode.getJsonString() {
     return JSONValue.toJSONString(getJson());
   }
