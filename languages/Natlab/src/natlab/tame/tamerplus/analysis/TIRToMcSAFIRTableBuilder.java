@@ -71,7 +71,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             }
             else if (visitedNode instanceof Stmt)
             {
-                fTIRToMcSAFIRTable.put(visitedNode, new Stmt() {});
+                fTIRToMcSAFIRTable.put(visitedNode, new AssignStmt());
             }
             else 
             {

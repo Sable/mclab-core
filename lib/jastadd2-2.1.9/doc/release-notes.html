@@ -1,0 +1,528 @@
+<h1>JastAdd2 Release Notes</h1>
+
+<h2>2.1.9 - 2014-09-01</h2>
+
+<h3>Bug Fixes</h3>
+
+<ul>
+<li>Allow inherited attributes to be declared on List and Opt, even if not
+declared on other nodes.</li>
+<li>Fixed error where a cloned node would not be able to be rewritten if the node
+it cloned was already rewritten once.</li>
+<li>Interface declarations nested in a class declaration should no longer cause
+JastAdd to generate a top-level interface with the same name.</li>
+<li>Removed aspect extends and implements constructs that were never used (these
+were parsed by JastAdd but then ignored).</li>
+<li>Removed indirect call to flushRewriteCache from clone.  This caused a bug
+when rewrites, flush, and treeCopy were used together.</li>
+</ul>
+
+<h3>Code Generation</h3>
+
+<ul>
+<li>Aspect top-level enum declarations are now supported.</li>
+<li>JastAdd2 can now weave generic method inter-type declarations such
+as <code>public &lt;T&gt; void A.m()</code></li>
+</ul>
+
+<h3>Command-line Interface</h3>
+
+<ul>
+<li>Deprecated some command-line options:
+    - doc (unused)
+    - java1.4 (not tested)
+    - noLazyMaps (equivalent to lazyMaps=false)
+    - noVisitCheck (equivalent to visitCheck=flase)
+    - noCacheCycle (equivalent to cacheCycle=false)
+    - noRefineLegacy (equivalent to refineLegacy=false)
+    - noComponentCheck (componentCheck was already off by default)
+    - noInhEqCheck (equivalent to inhEqCheck=false)
+    - noStatic (the name was misleading, renamed to staticState)
+    - deterministic (collection attributes are now always deterministic)</li>
+<li>Added or updated some options:
+    + staticState (replaces noStatic)
+    + incremental: added 'none' option (this is the default value)</li>
+<li>More information is printed when using deprecated options (added "deprecated
+since" and optional deprecation description)</li>
+<li>The JastAdd Ant task now behaves more like the command-line interface. The
+same warnings are printed for deprecated options and some options that were
+not available in the Ant task have been added.</li>
+<li>JastAdd no longer warns about missing inherited equations for inherited
+attributes declared on ASTNode.</li>
+<li>Subtypes of List and Opt are no longer considered root nodes for the missing
+inherited equation warnings.</li>
+</ul>
+
+<h2>2.1.8 - 2014-06-11</h2>
+
+<h3>Bug Fixes</h3>
+
+<ul>
+<li>Fixed regression introduced in 2.1.7 which made JastAdd generate faulty
+Java code for some tracing interfaces</li>
+</ul>
+
+<h2>2.1.7 - 2014-06-10</h2>
+
+<h3>Code Generation</h3>
+
+<ul>
+<li><p>JastAdd now generates annotations for children, tokens and attributes
+(<code>@Child</code>, <code>@ListChild</code>, <code>@OptChild</code>, <code>@Token</code>, <code>@Attribute</code>).</p></li>
+<li><p>Removed obsolete aspect "sons" declaration.</p></li>
+<li><p>JastAdd no longer strips modifiers from aspect interface declarations.</p></li>
+<li><p>JastAdd no longer removes static or adds public modifier to aspect class
+declarations.</p></li>
+</ul>
+
+<h3>Bug Fixes</h3>
+
+<ul>
+<li><p>Fixed regression introduced in 2.1.6 which caused circular collection
+attributes to crash JastAdd.</p></li>
+<li><p>Fixed some cases where the order of parsing aspect files could produce
+different results.</p></li>
+</ul>
+
+<h2>2.1.6 - 2013-11-29</h2>
+
+<h3>Performance</h3>
+
+<ul>
+<li><p>JastAdd now inlines all equation compute methods where the equation is a
+single Java expression.</p></li>
+<li><p>JastAdd uses a new inherited equation checking analysis that runs quicker on
+grammars with many inherited attributes. This can reduce JastAdd compile
+times for large projects.</p></li>
+</ul>
+
+<h3>Stability</h3>
+
+<ul>
+<li>Fixed potential crash during refinement processing.</li>
+</ul>
+
+<h3>Command-Line Interface</h3>
+
+<ul>
+<li>JastAdd now reports a warning if multiple values are given to an option that
+only accepts one value argument.</li>
+</ul>
+
+<h3>Code Generation</h3>
+
+<ul>
+<li><p>JastAdd now generates the trace class as the nested class
+<code>ASTNode$State.Trace</code>. The global <code>Trace</code> instance is accessed using the
+method <code>ASTNode$State.trace()</code>.</p></li>
+<li><p>Added the <code>ASTNode.treeCopyNoTransform()</code> method to replace
+<code>ASTNode.fullCopy()</code>, deprecating <code>fullCopy</code>.</p></li>
+<li><p>Added the <code>ASTNode.doFullTraversal()</code> method which uses <code>getChild()</code> to
+traverse the subtree and trigger rewrites.</p></li>
+<li><p>Added the <code>ASTNode.treeCopy()</code> method which uses <code>doFullTraversal()</code> to
+trigger rewrites before copying the tree with <code>treeCopyNoTransform()</code>.</p></li>
+</ul>
+
+<h3>Flushing</h3>
+
+<ul>
+<li><p>JastAdd now supports a flush flag which allows for configuring of flushing.
+The flag takes the following values: <code>attr</code>, <code>coll</code>, <code>rewrite</code>, <code>full</code>.
+Default is <code>attr</code> and <code>coll</code>. The <code>rewrite</code> value makes flushing of outermost
+rewrites possible by storing their initial values. The <code>full</code> value includes
+all values.</p></li>
+<li><p>The default flushing API provided by JastAdd has been extended with a
+<code>flushTreeCache()</code> method calling <code>flushCache()</code> and traversing the tree. A
+call to this method together with the use of the <code>flush=full</code> will result in a
+full flush of an AST.</p></li>
+<li><p>Attributes are flushed via separate reset methods, one per cache attribute.</p></li>
+<li><p>All cached attributes in a node are flushed from a <code>flushAttrCache()</code> method
+which is called from <code>flushCache()</code>.</p></li>
+<li><p>Rewrites are flushed from a <code>flushRewriteCache()</code> method which is called from
+<code>flushCache()</code>.</p></li>
+</ul>
+
+<h2>2.1.5 - 2013-09-17</h2>
+
+<h3>Tracing &amp; Caching</h3>
+
+<ul>
+<li><p>Added support for static configuration of tracer events via the <code>--tracing</code>
+flag. The flag can now be given a comma separated list of event categories
+to be generated. Accepted values are <code>compute</code>,<code>cache</code>,<code>rewrite</code>,<code>circular</code>,
+and <code>copy</code>. All events are generated by default.</p></li>
+<li><p>Added support for a <code>--cache</code> flag taking one of the following values: <code>all</code>,
+<code>none</code>, <code>config</code>, <code>implicit</code>, and <code>analyze</code>. This flag provides a global
+cache configuration, replacing local configuration with the <code>lazy</code> keyword.
+The <code>config</code> and <code>implicit</code> values use a <code>.config</code> file to provide a cache
+configuration on attribute level. The <code>analyze</code> value uses tracing together
+with full caching to analyze caching behavior and to compute a cache
+configuration via the <code>CacheAnalyzer</code> class.</p></li>
+<li><p>The Ant task <code>jastadd.JastAddTask</code> now prints a deprecation warning. The
+classname <code>org.jastadd.JastAddTask</code> should be used instead.</p></li>
+</ul>
+
+<h3>Command-line Interface</h3>
+
+<ul>
+<li><p>JastAdd now requires at least one grammar file (.ast) given on the command
+line.</p></li>
+<li><p>If there is any problem in the JastAdd configuration, JastAdd no longer
+prints the full help text. A single line is printed describing how to get
+more help. This avoids the problem of the help text drowning out error
+messages.</p></li>
+<li><p>Undeprecated the <code>--visitCheck</code> option (will replace <code>--noVisitCheck</code> in the
+future by adding a boolean argument)</p></li>
+<li><p>Undeprecated the <code>--cacheCycle</code> option (will replace <code>--noCacheCycle</code> in the
+future by adding boolean argument)</p></li>
+</ul>
+
+<h2>2.1.4 - 2013-09-04</h2>
+
+<ul>
+<li><p>Fixed regression in version 2.1.3 that caused the generated <code>Tracer</code> class to
+always be generated in the default package. If it is generated, the <code>Tracer</code>
+class is now generated in the same package as the rest of the AST.</p></li>
+<li><p>The generated methods <code>clone</code>, <code>copy</code>, and <code>fullCopy</code> can now be refined just
+like regular aspect methods.</p></li>
+<li><p>The undocumented <code>sons</code> declaration is now deprecated. This feature did not
+actually alter code generation in any way, but was still used in for example
+JastAddJ. If the JastAdd parser encounters such a declaration it now generates
+a warning.</p></li>
+<li><p>JastAdd no longer requires an implicit root node in the AST grammar. A root
+node is a non-abstract node that can not be a child of any other node type.
+Root nodes are still required for collection attributes, so if you use a
+collection attribute with a grammar that lacks an implicit root node, you must
+declare the root node in the attribute declaration.</p></li>
+</ul>
+
+<h2>2.1.3 - 2013-08-27</h2>
+
+<ul>
+<li><p>The warning messages for missing inherited equations have been improved by
+including an example AST path that lacks an equation for the attribute.</p>
+
+<p>An example of the new warning messages: "missing inherited equation for
+attribute attr in class Expr when being child of X (path: Program->C->X->Expr)"</p></li>
+<li><p>JastAdd no longer generates the <code>Tracer</code> class when the <code>--tracing</code> option is
+absent.</p></li>
+<li><p>Disabled the generation of an unused interface named <code>Filter</code>. This interface
+was generated by the previous version of JastAdd as a side-effect of how the
+<code>Tracer</code> class was generated.</p></li>
+</ul>
+
+<h2>2.1.2 - 2013-08-26</h2>
+
+<h3>Newly Deprecated</h3>
+
+<ul>
+<li><p><strong>Interface Modifiers:</strong> JastAdd strips all modifiers from interface
+declarations.  This stripping of access modifiers is probably an
+unintentional error in the parser.</p>
+
+<p>In future versions of JastAdd the interface modifiers will be retained in
+the generated code.  Unfortunately if incorrect modifiers are given to an
+interface declaration in an aspect, then the generated code will fail to
+compile.</p>
+
+<p>Note that the <code>protected</code>, <code>private</code> and <code>static</code> modifiers are only
+allowed on member interfaces (declared inside an enclosing class). Top-level
+interface declarations should not use <code>protected</code>, <code>private</code>, or <code>static</code>.</p>
+
+<p>JastAdd now prints warning messages for each interface declaration that
+has any modifiers. Check that your interfaces use correct modifiers to ensure
+that your code continues to compile even with future JastAdd versions.</p></li>
+<li><p><strong>Type Declaration Modifiers:</strong> In addition to the stripping of modifiers
+from interface declarations JastAdd alters the modifiers of class and
+interface declarations by removing any occurrence of <code>static</code> and adding the
+<code>public</code> modifier if the modifier list was empty.</p>
+
+<p>We want to remove this behaviour from JastAdd, so a new warning message is
+generated for all type declarations where the implicit <code>public</code> modifier is
+added. The message warns that future versions of JastAdd will cease to make the
+class <code>public</code> automatically.  To silence the warning, simply add <code>public</code> or
+<code>protected</code> modifiers to the declaration.</p></li>
+<li><p><strong>SuppressWarnings:</strong> JastAdd no longer generates <code>@SuppressWarnings</code>
+annotations. The purpose of using the annotation was to reduce the number of
+Java warnings in the generated code - however JastAdd was not smart enough to
+correctly use the annotation, and if the annotation is incorrectly used it will
+raise another warning. Ideally the number of warnings should be reduced by
+generating better code instead.</p>
+
+<p>The <code>--suppressWarnings</code> flag, and corresponding JastAddTask option, has
+been deprecated and will be removed from JastAdd in a future release.</p></li>
+</ul>
+
+<h3>Improvements and Additions</h3>
+
+<ul>
+<li><p><strong>Renaming ASTNode, List, Opt:</strong> New options have been added to JastAdd that
+allow renaming the generated <code>ASTNode</code>, <code>List</code> and <code>Opt</code> classes.  The names
+can be specified using the following command-line flags (corresponding options
+for the Ant task are also available):</p>
+
+<ul>
+<li><code>--ASTNode=&lt;NewName&gt;</code> ASTNode will be named "NewName"</li>
+<li><code>--List=&lt;NewName&gt;</code> List will be named "NewName"</li>
+<li><code>--Opt=&lt;NewName&gt;</code> Opt will be named "NewName"</li>
+</ul></li>
+<li><p><strong>Annotations:</strong> Annotations are now supported for synthesized attributes and
+aspect-declared classes and interfaces!</p>
+
+<p>Annotations on attributes are allowed before the attribute keyword (<code>syn</code>,
+<code>eq</code>). For synthesized attributes the annotation is generated on the method
+with the same name - not the "compute" method.  Annotations are not yet
+supported for other kinds of attributes although they should now produce more
+readable error messages rather than standard mysterious parser syntax errors.</p></li>
+<li><p><strong>Tracing:</strong> Attribute evaluation tracing is now done in-memory by the
+generated class <code>Tracer</code>.</p></li>
+<li><p><strong>Comments:</strong> Fixed several issues with comments in the generated code:</p>
+
+<ul>
+<li>fixed indentation issues</li>
+<li>fixed double unparsing of documentation comments</li>
+<li>removed redundant empty line after comments</li>
+<li>removed incorrectly generated <code>@ast method</code> tag</li>
+</ul></li>
+<li><p>JastAdd now generates the utility method <code>List.addAll(Collection)</code> which can
+be used to initialize an AST List with a set of children.</p></li>
+<li><p>List components now get a "has" accessor which returns <code>true</code> if the list
+component is non-empty.</p></li>
+<li><p>Added flag <code>--lineColumnNumbers</code> which makes JastAdd generate methods to get
+and set start- and end positions for AST nodes. This can be used with version
+1.0.2 and later of JastAddParser (by passing <code>--no-beaver-symbol</code> to
+JastAddParser) to remove the need of having beaver.Symbol as a supertype of
+ASTNode when Beaver is used as the parser generator. See the JastAddParser
+documentation for further details.</p></li>
+</ul>
+
+<h3>Internal Changes</h3>
+
+<ul>
+<li><p>The syntax for annotating collection attributes has been slightly changed.
+Annotations are now only allowed before the <code>coll</code> keyword, rather than
+after. The supported annotations for collection attributes are not discussed in
+the documentation, so we don't expect this change to affect anyone. It is
+possible that these annotations will disappear in the future anyway - use at
+your own peril!</p></li>
+<li><p>Generated source files have been moved to the package org.jastadd</p></li>
+<li><p>The build script now compiles to ant-bin in order to avoid conflicts with the
+eclipse project</p></li>
+</ul>
+
+<h2>2.1.1 - 2013-07-29</h2>
+
+<h3>Bugfixes</h3>
+
+<ul>
+<li>Fixed error that could cause <code>fullCopy</code> to initialize NTA children with
+incorrect child indices.</li>
+<li>The JastAdd Ant Task now throws a BuildException if JastAdd failed to
+generate an AST instead of silently terminating the Ant build.</li>
+<li>Fixed potential null access in generated code.</li>
+</ul>
+
+<h3>Other</h3>
+
+<ul>
+<li>Added a new List constructor that takes a variable number of children and
+inserts them into the list.</li>
+<li>Improved analysis and error handling of inherited attributes.</li>
+<li>JastAdd2 now uses a new version numbering system.</li>
+</ul>
+
+<h2>R20130412</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>Added option for indentation type in the JastAdd Ant Task</li>
+<li>Moved JastAdd main class to the package <code>org.jastadd</code> (but left a deprecated
+class with the same name as a working entry point for backward compatibility)</li>
+<li>Removed global static variables to allow concurrent JastAdd instances in the
+same JVM</li>
+<li>Added JastAdd entry points that allow custom output/error streams</li>
+</ul>
+
+<h3>Error handling</h3>
+
+<ul>
+<li>Help text is printed to the standard out stream rather than the standard
+error stream</li>
+<li>Improved error handling for missing equations of synthesized attributes: now
+only the minimum set of classes requiring an equation is reported</li>
+</ul>
+
+<h3>Performance</h3>
+
+<ul>
+<li>Minimum list size now only affects <code>List</code> nodes (previously also affected
+<code>Opt</code> nodes)</li>
+<li>It is now possible to specify a custom minimum list size with the
+<code>minListSize</code> option</li>
+</ul>
+
+<h2>R20130312</h2>
+
+<h3>Incremental evaluation</h3>
+
+<ul>
+<li>Merged Emma S&ouml;derberg's incremental evaluation features into JastAdd2</li>
+<li>The new option <code>fullFlush</code> was added to enable more thorough flush behaviour
+(makes <code>flushCache</code> flush rewrites and NTAs)</li>
+</ul>
+
+<h3>Removed obsolete features</h3>
+
+<ul>
+<li>Dropped doxygen support</li>
+<li>Dropped J2ME code generation support</li>
+<li>Dropped parent interface support (for inherited equation searching)</li>
+</ul>
+
+<h3>Internals</h3>
+
+<ul>
+<li>Much of the JastAdd2 internals have been rewritten to improve readability</li>
+</ul>
+
+<h2>R20130212</h2>
+
+<h3>Bug fixes</h3>
+
+<ul>
+<li>Fixed bug concerning weaving interface refinements</li>
+<li>Fixed various bugs</li>
+<li>Fixed a code generation error in jjtree mode</li>
+</ul>
+
+<h3>Error handling</h3>
+
+<ul>
+<li>Multiple equivalent declarations of an inherited attribute now only raise a
+warning, rather than an error</li>
+<li>The warning for a duplicate inherited declaration includes the previous
+declaration location</li>
+<li>Improved error messages for method/equation refinement errors</li>
+<li>The path to the output directory is included in the error message for a
+missing output directory</li>
+</ul>
+
+<h3>API changes</h3>
+
+<ul>
+<li><code>ASTNode.copy()</code> now sets the parent pointer of the copy to <code>null</code></li>
+<li>Removed the redundant static method <code>ASTNode.getChild(ASTNode,int)</code></li>
+</ul>
+
+<h3>Performance</h3>
+
+<ul>
+<li>Removed redundant NTA child initialization</li>
+<li>Increased minimum (non-empty) child array size from 1 to 4</li>
+<li>The child array for non-List, non-Opt nodes is now initialized to fit all children in the node constructor (removes redundant child-array growing)</li>
+</ul>
+
+<h3>Other changes</h3>
+
+<ul>
+<li>JastAdd2 no longer depends on AspectJ</li>
+<li>The <code>--doxygen</code> option is now deprecated</li>
+<li>Added the <code>--indent</code> command-line option which allows changing the
+indentation in generated code. Can be set to tabs or 2-, 4-, and 8 space
+indentation.</li>
+</ul>
+
+<h2>R20121112</h2>
+
+<h3>Bugfix Release</h3>
+
+<ul>
+<li>Fixed error in fullCopy causing some non-NTA children to not be copied
+correctly. This bug sometimes caused NullPointerExceptions or faulty
+behaviour in generated code.</li>
+</ul>
+
+<h2>R20121112</h2>
+
+<h3>Bugfix Release</h3>
+
+<ul>
+<li>Fixed error in fullCopy causing some non-NTA children to not be copied
+correctly. This bug sometimes caused NullPointerExceptions or faulty
+behaviour in generated code.</li>
+</ul>
+
+<h2>R20121026</h2>
+
+<h3>Various bug fixes</h3>
+
+<ul>
+<li>Fixed bug on Windows - backslashes in file paths now work correctly.</li>
+<li>NTA children are no longer copied by fullCopy.</li>
+<li>Removed the generated method for accessing value maps of parameterized
+attributes.</li>
+<li>Fixed error related to two synthesized attributes with the same name but
+different parameters.</li>
+<li>It is now possible to use static import statements in aspect files.</li>
+<li>Added a method getNumXNoTransform to count the number of elements in a list
+child without triggering rewrites.</li>
+</ul>
+
+<h2>R20121011</h2>
+
+<h3>Various bug fixes</h3>
+
+<ul>
+<li>getChild now returns null if the children array is null</li>
+<li>inherited equations lacking a return statement now give compilation error</li>
+<li>improved recognition of the "refined" keyword inside Java code in equations.</li>
+<li>Synthesized NTA with parameters may now have null values</li>
+<li>fullCopy now sets the parent of the copied tree to null</li>
+<li>insertChild and removeChild now update the childIndex field correctly</li>
+<li>Fixed how debug code escapes file names, to work also for Windows OS.</li>
+<li>Fixed bug in code generation for Contributes-clauses without when-part.</li>
+<li>Circular attributes now generate Java 1.4 code when the java1.4 option is
+set.</li>
+</ul>
+
+<h3>Improved output handling</h3>
+
+<ul>
+<li>Error messages, warnings, and help messages are now printed on stderr instead
+of on stdout.</li>
+<li>JastAdd now returns exit code zero when just printing version or help
+information.</li>
+</ul>
+
+<h3>Improved option handling</h3>
+
+<ul>
+<li>The options --noComponentCheck, --lazyMaps, and --refineLegacy are now by
+default ON when running from the command line.</li>
+<li>The default behavior is now the same when running from the command line as
+when running through ANT.</li>
+<li>Command line options are no longer case sensitive.</li>
+<li>Some options are deprecated. A warning is printed if such an option is used.</li>
+<li>Warnings are printed for some other cases, like giving an option twice,
+giving an option without an expected argument, etc.</li>
+</ul>
+
+<h2>R20110902</h2>
+
+<h3>JavaDoc support</h3>
+
+<ul>
+<li>JastAdd now generates Java files with JavaDoc comments for built-in APIs and
+APIs for attributes. See the upcoming RagDoll tool for more information.</li>
+</ul>
+
+<h3>JDK7 compliance</h3>
+
+<ul>
+<li>Code generated by older versions of JastAdd might give compile time errors
+when compiling using javac from JDK 7. This is because JastAdd previously
+generated code where private fields were accessed in an erroneous way according
+to the JLS. Previous javac versions accepted such code, but the bug has been
+fixed in JDK 7. This version of JastAdd generates code not giving this problem.</li>
+</ul>
