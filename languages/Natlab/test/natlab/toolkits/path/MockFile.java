@@ -68,7 +68,7 @@ public class MockFile extends GenericFile {
   }
 
   @Override
-  public Collection<? extends GenericFile> listChildren() {
+  public Collection<GenericFile> listChildren() {
     return new ArrayList<>(children);
   }
 
