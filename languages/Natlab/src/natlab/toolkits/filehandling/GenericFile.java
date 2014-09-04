@@ -28,6 +28,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
+import natlab.LookupFile;
+import natlab.toolkits.path.FileEnvironment;
 
 
 /**
@@ -81,8 +84,18 @@ public abstract class GenericFile implements Serializable {
      * @return
      */
     abstract public Collection<GenericFile> listChildren();
-    
-    
+
+    public GenericFile getAnyMatlabFile() {
+      if (!isDir()) {
+        return null;
+      }
+      Collection<GenericFile> files = listChildren(GenericFile::isMatlabFile);
+      if (files.isEmpty()) {
+        return null;
+      }
+      return files.iterator().next();
+    }
+
     /**
      * Returns a list of all the children that are accepted by the filter
      * returns null if the GenericFile is not a dir, or some exception occurs
@@ -100,7 +113,7 @@ public abstract class GenericFile implements Serializable {
     abstract public String getName();
     
     public String getNameWithoutExtension() {
-      return getName().substring(0, getName().length() - getExtensionComplete().length());
+      return Files.getNameWithoutExtension(getName());
     }
     
     /**
@@ -109,28 +122,9 @@ public abstract class GenericFile implements Serializable {
      * @return
      */
     public String getExtension() {
-        String name = getName();
-        if (name == null) return "";
-        int pos = name.lastIndexOf('.');
-        if (pos == -1) return "";
-        return name.substring(pos+1);
+        return Files.getFileExtension(getName());
    }
 
-    
-    /**
-     * returns the file extension of this file.
-     * Returns an empty String if there is no file extension.
-     * Doesn't remove "." in the extension.
-     * @return
-     */
-    public String getExtensionComplete() {
-        String name = getName();
-        if (name == null) return "";
-        int pos = name.lastIndexOf('.');
-        if (pos == -1) return "";
-        return name.substring(pos);
-   }
-    
     /**
      * returns the whole path of the file
      */
@@ -178,4 +172,18 @@ public abstract class GenericFile implements Serializable {
     }
     @Override
     abstract public boolean equals(Object obj);
+
+    public FunctionOrScriptQuery getFunctionOrScriptQuery() {
+      FunctionOrScriptQuery baseline = LookupFile.getFunctionOrScriptQueryObject();
+      FunctionOrScriptQuery env = new FileEnvironment(this).getFunctionOrScriptQuery(this);
+      return new FunctionOrScriptQuery() {
+        @Override public boolean isFunctionOrScript(String name) {
+          return env.isFunctionOrScript(name) || baseline.isFunctionOrScript(name);
+        }
+
+        @Override public boolean isPackage(String name) {
+          return env.isPackage(name) || baseline.isPackage(name);
+        }
+      };
+    }
 }

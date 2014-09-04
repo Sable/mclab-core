@@ -63,14 +63,13 @@ public class VFPreorderAnalysis extends AbstractDepthFirstAnalysis<Map<String, V
     
     
     /**
-     * initializes the VFPreorderAnalysis using LookupFile.getFunctionOrScriptQueryObject().
-     * This is deprecated, because using this lookupFile should be made explicit.
-     * With this function, an environment is assumed that may not be intended by the user.
-     * @param tree
+     * initializes the VFPreorderAnalysis using a sensible lookup environment, derived from
+     * the node's enclosing file's location on the file system (unless the node is synthetic, in
+     * which case a default environment with knowledge of builtins is used).
      */
     public VFPreorderAnalysis( ASTNode tree )
     {
-        this(tree,LookupFile.getFunctionOrScriptQueryObject());
+        this(tree, tree.getFunctionOrScriptQuery());
     }
 
     public VFPreorderAnalysis( ASTNode tree , FunctionOrScriptQuery lookup )

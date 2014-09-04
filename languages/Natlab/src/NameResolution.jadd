@@ -15,27 +15,48 @@ Copyright 2011 of Jesse Doherty, Soroush Radpour and McGill University.
 
 */
 import natlab.LocalFunctionLookupInterface;
+import natlab.LookupFile;
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.GenericFile;
+import natlab.utils.NodeFinder;
 
 aspect NameResolutionAdditions
 {
     FunctionList implements LocalFunctionLookupInterface;
     Function implements LocalFunctionLookupInterface;
-    
+
+    public FunctionOrScriptQuery CompilationUnits.getFunctionOrScriptQuery() {
+      if (getRootFolder() == null) {
+        return LookupFile.getFunctionOrScriptQueryObject();
+      }
+      return getRootFolder().getAnyMatlabFile().getFunctionOrScriptQuery();
+    }
+
+    public FunctionOrScriptQuery Program.getFunctionOrScriptQuery() {
+      if (getFile() == null) {
+        return LookupFile.getFunctionOrScriptQueryObject();
+      }
+      return getFile().getFunctionOrScriptQuery();
+    }
+
+    public FunctionOrScriptQuery ASTNode.getFunctionOrScriptQuery() {
+      return NodeFinder.findParent(Program.class, this).getFunctionOrScriptQuery();
+    }
+
     protected GenericFile CompilationUnits.rootFolder = null;
 
     public GenericFile CompilationUnits.getRootFolder() {
       return rootFolder;
-    }   	      
+    }
 
     public void CompilationUnits.setRootFolder(GenericFile root) {
-      rootFolder = root;
-    }   	    
+      this.rootFolder = root;
+    }
 
-    protected GenericFile Program.file = null;  
-    
+    protected GenericFile Program.file = null;
+
     public void Program.setFile(GenericFile f) {
-        this.file=f;
+      this.file = f;
     }
 
     public GenericFile Program.getFile(){
