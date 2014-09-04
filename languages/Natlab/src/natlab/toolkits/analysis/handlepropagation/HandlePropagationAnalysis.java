@@ -741,7 +741,7 @@ public class HandlePropagationAnalysis extends ForwardAnalysis< HandleFlowset >
     protected TreeSet<Value> newHSet()
     {
         TreeSet<Value> set = new TreeSet<Value>();
-        set.add( AbstractValue.newDataOnly());
+        set.add( AbstractValue.newHandle());
         return set;
     }
 
