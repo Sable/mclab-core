@@ -24,7 +24,6 @@ import java.util.HashMap;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import ast.ASTNode;
 import ast.Function;
-import ast.FunctionList;
 import ast.Program;
 
 public class LookupFile { 
@@ -33,34 +32,34 @@ public class LookupFile {
   private static HashMap<String, String> builtinPackages;
   private static HashMap<String, String> outputInfo;
   private static HashMap<String, Function> currentFile;
-  private static HashMap<String, ASTNode<?>> lib; 
+  private static HashMap<String, ASTNode<?>> lib;
+
   private static HashMap<String, String> initialize(){
-    try{
-      InputStream fin=LookupFile.class.getResourceAsStream("builtin.ser");
+    HashMap<String, HashMap<String, String>> map;
+    try {
+      InputStream fin = LookupFile.class.getResourceAsStream("builtin.ser");
       ObjectInputStream oin = new ObjectInputStream(fin);
-      HashMap<String, HashMap<String, String>> map = (HashMap<String, HashMap<String, String>>) oin.readObject();
-      builtinPackages = map.get("packages");
-      builtinClasses = map.get("classes");
-      builtinFunctions = map.get("functions");
-      outputInfo = map.get("output_info");
-      currentFile = new HashMap<>();
-      lib = new HashMap<>();
-      return builtinClasses;
-    }
-    catch(FileNotFoundException e){
+      map = (HashMap<String, HashMap<String, String>>) oin.readObject();
+    } catch(FileNotFoundException e){
       e.printStackTrace();
       System.err.println("Library definitions file not found.");
-    }catch(Exception e){
+      return null;
+    } catch(Exception e){
       e.printStackTrace();
       System.err.println("Error while loading library definition file");
+      return null;
     }
-    return null;
-  }; 
+    builtinPackages = map.get("packages");
+    builtinClasses = map.get("classes");
+    builtinFunctions = map.get("functions");
+    outputInfo = map.get("output_info");
+    currentFile = new HashMap<>();
+    lib = new HashMap<>();
+    return builtinClasses;
+  };
 
   public static String getOutputInfo(String function){
-    if (outputInfo.containsKey(function))
-      return outputInfo.get(function);
-    return "DWH,H";
+    return outputInfo.getOrDefault(function, "DWH,H");
   }
 
   public static boolean packageExists(String s) {
@@ -79,20 +78,6 @@ public class LookupFile {
     lib.putAll(progs);
   }
 
-  //TODO remove this - this does not capture names correctly in the case
-  //of nested functions exist - there should be separate methods
-  //setCurrentScript and setCurrentFunction, or something like that
-  @Deprecated
-  public static void setCurrentProgram(Program f){
-    currentFile.clear();
-    if (!(f instanceof FunctionList)) {
-      return;
-    }
-    for (Function function: ((FunctionList) f).getFunctions()) {
-      currentFile.put(function.getName().getID(), function);
-    }
-  }
-
   /**
    * returns a FunctionOrScriptQuery object that allows querying
    * which matlab functions exist in the file environment simulated
@@ -100,12 +85,11 @@ public class LookupFile {
    */
   public static FunctionOrScriptQuery getFunctionOrScriptQueryObject(){
     return new FunctionOrScriptQuery() {
-      public boolean isFunctionOrScript(String name) {
+      @Override public boolean isFunctionOrScript(String name) {
         return scriptOrFunctionExists(name);
       }
 
-      @Override
-      public boolean isPackage(String name) {
+      @Override public boolean isPackage(String name) {
         return packageExists(name);
       }
     };

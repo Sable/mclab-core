@@ -57,10 +57,4 @@ public class AbstractValue extends Value
     {
         return new AbstractValue(Type.HANDLE);
     }
-    public boolean isHandle()
-    {
-        return valueType.equals(Type.HANDLE);
-    }
-
-
 }
