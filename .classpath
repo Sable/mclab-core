@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/stringtemplate-3.1b1.jar"/>
 	<classpathentry kind="lib" path="languages/Natlab/resources"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/jastadd2-R20121112/jastadd2.jar"/>
 	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1.jar" sourcepath="lib/guava-16.0.1/guava-16.0.1-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/mclab/lib/guava-16.0.1/guava-16.0.1-javadoc.jar!/"/>
