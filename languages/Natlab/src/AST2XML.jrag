@@ -30,13 +30,11 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Iterables;
 
-import natlab.LookupFile;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
 import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
-import natlab.toolkits.path.FileEnvironment;
 import natlab.utils.NodeFinder;
 
 aspect ASTtoXML {
@@ -119,31 +117,16 @@ aspect ASTtoXML {
     }
   }
 
-  public void ASTNode.getXML(Document doc, Element parent) { 
+  public void ASTNode.getXML(Document doc, Element parent) {
     throw new UnsupportedOperationException(getClass().getName() + ".getXML()");
   }
 
-  private FunctionOrScriptQuery Program.getEnvironmentForKindAnalysis() {
-      final FunctionOrScriptQuery baseline = LookupFile.getFunctionOrScriptQueryObject();
-      final FunctionOrScriptQuery env = new FileEnvironment(getFile()).getFunctionOrScriptQuery(getFile());
-      return new FunctionOrScriptQuery() {
-        @Override public boolean isFunctionOrScript(String name) {
-          return env.isFunctionOrScript(name) || baseline.isFunctionOrScript(name);
-        }
-
-        @Override public boolean isPackage(String name) {
-          return env.isPackage(name) || baseline.isPackage(name);
-        }
-      };
-  }
-
   protected void Program.doKindAnalysis() {
-      FunctionOrScriptQuery env = getEnvironmentForKindAnalysis();
-      kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this, env);
+      kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this, this.getFunctionOrScriptQuery());
       kind_analysis_sensitive.analyze();
-      kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this, env);
+      kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this, this.getFunctionOrScriptQuery());
       kind_analysis_insensitive.analyze();
-      kind_analysis_preorder = new VFPreorderAnalysis(this, env);
+      kind_analysis_preorder = new VFPreorderAnalysis(this);
       kind_analysis_preorder.analyze();
   }
 
