@@ -24,7 +24,7 @@ import natlab.toolkits.path.FileEnvironment;
 public class BasicTamerTool {
 
 	private static Boolean doIntOk = true;
-	private static Boolean doVarRename = false;
+	private static Boolean doVarRename = true;
 
 	/**
 	 * This main method is just for testing, doesn't follow the convention when
