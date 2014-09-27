@@ -1,5 +1,7 @@
 package natlab.toolkits.analysis.handlepropagation.handlevalues;
 
+import java.util.EnumSet;
+
 /**
  * Abstract type for all handle values.
  */
@@ -48,5 +50,7 @@ public abstract class Value implements Comparable<Value>
         return valueType.toString();
     }
 
-
+    public boolean isHandle() {
+      return EnumSet.of(Type.HANDLE, Type.NAMED, Type.ANON).contains(valueType);
+    }
 }

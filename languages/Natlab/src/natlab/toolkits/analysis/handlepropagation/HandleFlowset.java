@@ -2,8 +2,10 @@ package natlab.toolkits.analysis.handlepropagation;
 
 import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import natlab.toolkits.analysis.handlepropagation.handlevalues.AbstractValue;
 import natlab.toolkits.analysis.handlepropagation.handlevalues.Value;
@@ -23,18 +25,13 @@ import com.google.common.collect.ForwardingMap;
  */
 public class HandleFlowset extends ForwardingMap<String, TreeSet<Value>>
 {
-    private Map<String, TreeSet<Value>> map;
+    private Map<String, TreeSet<Value>> map = new HashMap<>();
     
     @Override
     public Map<String, TreeSet<Value>> delegate() {
       return map;
     }
   
-    public Map<String, TreeSet<Value>> getMap(){
-	  return map;
-    }
-    
-    
     public void addAll( String key, Collection<Value> values )
     {
         if(containsKey(key) )
@@ -144,10 +141,7 @@ public class HandleFlowset extends ForwardingMap<String, TreeSet<Value>>
     public boolean remove( String key, Value value )
     {
         TreeSet<Value> set = get(key);
-        if( set != null )
-            return set.remove( value );
-        else
-            return false;
+        return set != null && set.remove(value);
     }
 
     /**
@@ -220,52 +214,15 @@ public class HandleFlowset extends ForwardingMap<String, TreeSet<Value>>
         tmpDest.copy( dest );
     }
 
-    public String toString()
-    {
-        StringBuffer s = new StringBuffer();
-        s.append("(");
-        boolean first = true;
-        String key;
-        int spaceSize;
-        StringBuffer spaces;
-        for( Map.Entry<String,TreeSet<Value>> entry : map.entrySet() ){
-            if( first ){
-                s.append("\n");
-                first = false;
-            }
-            else
-                s.append(", \n");
-            spaceSize = entry.getKey().length() + 4;
-            spaces = new StringBuffer(spaceSize);
-            for( int i=0; i<spaceSize; i++)
-                spaces.append(" ");
-            s.append(" ");
-            s.append( entry.getKey() );
-            s.append(" : ");
-            s.append("{");
-
-            boolean firstVal = true;
-            for( Value value : entry.getValue() ){
-                if( firstVal ){
-                    //s.append("\n");
-                    firstVal = false;
-                }
-                else {
-                    s.append(", ");
-                    //s.append(", \n");
-                }
-                //s.append( spaces );
-                //s.append( "   " );
-                s.append( value.toString() );
-            }
-            //if( !firstVal ){
-            //    s.append("\n");
-            //    s.append(spaces);
-                s.append("}");
-                //}
-        }
-        s.append("\n}");
-        return s.toString();
-    }
-
+  public String toString() {
+    return map.entrySet().stream()
+        .map((Map.Entry<String, TreeSet<Value>> e) ->
+            String.format(
+                "    %s: %s",
+                e.getKey(),
+                e.getValue().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", ", "{", "}"))))
+        .collect(Collectors.joining(",\n", "{\n", "\n}"));
+  }
 }
