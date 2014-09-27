@@ -269,13 +269,11 @@ IntOk varIntOk = new IntOk(false, false, new ArrayList<String>());
 			if (rhsName.equals("ones") || rhsName.equals("zeros")){
 				
 				for (Expr arg : ((ParameterizedExpr)rhs).getArgs()){
-					args.add(	((NameExpr)arg).getVarName());
+					args.add(((NameExpr)arg).getVarName());
 					}
 					if(args.contains(var)){
 						varIntOk.setIsInt(true);
 					}
-					
-					
 				
 			}
 			

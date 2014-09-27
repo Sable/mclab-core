@@ -460,11 +460,6 @@ public class IntOkAnalysis extends TIRAbstractNodeCaseHandler {
 					args.add(((NameExpr) arg).getVarName());
 			}
 			if (args.contains(var)) {
-				if (var.equals("mc_t4")) {
-					System.err.println(((TIRArraySetStmt) useNode)
-							.getNodeString());
-					// System.exit(1);
-				}
 				varIntOk.setIsInt(true);
 
 			}
