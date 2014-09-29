@@ -62,8 +62,7 @@ public class HandlePropagationAnalysis extends ForwardAnalysis<HandleFlowset> {
   */
 
   //flags to control behaviour of how function call are handled
-  private boolean destructiveCalls = false;
-  private boolean doTypeLookup = false;
+  private boolean destructiveCalls = true;
 
   private TreeSet<Value> newHandleTargets = new TreeSet<>();
 
@@ -94,8 +93,6 @@ public class HandlePropagationAnalysis extends ForwardAnalysis<HandleFlowset> {
     if (!kind.isAnalyzed()) {
       kind.analyze();
     }
-    this.doTypeLookup = true;
-    this.destructiveCalls = true;
     currentOutSet = newInitialFlow();
   }
 
@@ -647,29 +644,31 @@ public class HandlePropagationAnalysis extends ForwardAnalysis<HandleFlowset> {
    * values resulting from the call.
    */
   private TreeSet<Value> handleFunctionCall(String name) {
-    if (name.equals("eval"))
+    if (name.equals("eval")) {
       destroyInfo();
-    if (name.equals("clear")) {
+      return newGeneralAssignedSet();
+    } else if (name.equals("clear")) {
       //note, clear does not remove elements from global set
       //because we don't check what type of clear it is, so it
       //could be clear globals
       undefAll();
+      return newGeneralAssignedSet();
+    }
+    String outputInfo = LookupFile.getOutputInfo(name);
+    if (outputInfo == null) {
+      return handleUnknownFunctionCall();
     } else {
-      handleUnknownFunctionCall();
-    }
-
-    if (!doTypeLookup) {
-      return newGeneralAssignedSet();
-    }
-    switch (LookupFile.getOutputInfo(name)) {
-    case "DO":
-      return newDOSet();
-    case "H":
-      return newHSet();
-    case "DWH,H": case "H,DWH":
-      return newGeneralAssignedSet();
-    default:
-      return newGeneralAssignedSet();
+      switch (outputInfo) {
+      case "DO":
+        return newDOSet();
+      case "H":
+        return newHSet();
+      case "DWH,H":
+      case "H,DWH":
+        return newGeneralAssignedSet();
+      default:
+        return newGeneralAssignedSet();
+      }
     }
   }
 
