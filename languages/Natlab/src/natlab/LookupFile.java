@@ -59,7 +59,7 @@ public class LookupFile {
   };
 
   public static String getOutputInfo(String function){
-    return outputInfo.getOrDefault(function, "DWH,H");
+    return outputInfo.get(function);
   }
 
   public static boolean packageExists(String s) {
