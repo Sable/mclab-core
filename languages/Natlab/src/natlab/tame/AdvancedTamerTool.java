@@ -84,32 +84,28 @@ public class AdvancedTamerTool {
 //		
 //		if (doIntOk)
 //		    analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
-		
-		if(debug)  System.out.println(analysis.toString());
-		
-		for (int i = 0; i < analysis.getNodeList().size(); i++) {
-			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
-					.getNodeList().get(i).getAnalysis()));
-		}
-		return analysis;
-	}
 
-	public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(
-			String[] args) {
-		List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(
-				1);
-		ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(
-				args.length);
-		for (String argSpecs : args) {
-			
-			String delims = "[\\&]";
-			String[] specs = argSpecs.split(delims);
 
-			/* TODO also add code to read INT, FLOAT, etc. */
-			list.add(new AdvancedMatrixValue("n",
-					PrimitiveClassReference.DOUBLE, specs[1], specs[2]));
-			}
-		return list;
+        if (debug)  {
+            System.out.println(analysis.toString());
+            for (int i = 0; i < analysis.getNodeList().size(); i++) {
+                System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+                        .getNodeList().get(i).getAnalysis()));
+            }
+        }
 
-	}
+        return analysis;
+    }
+
+    public static List<AggrValue<AdvancedMatrixValue>> getListOfInputValues(String[] args) {
+        List<PrimitiveClassReference> ls = new ArrayList<PrimitiveClassReference>(1);
+        ArrayList<AggrValue<AdvancedMatrixValue>> list = new ArrayList<AggrValue<AdvancedMatrixValue>>(args.length);
+        for (String argSpecs : args) {
+            String delims = "[\\&]";
+            String[] specs = argSpecs.split(delims);
+            PrimitiveClassReference clsType = PrimitiveClassReference.fromString(specs[0]);
+            list.add(new AdvancedMatrixValue("n", clsType, specs[1], specs[2]));
+        }
+        return list;
+    }
 }

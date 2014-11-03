@@ -104,23 +104,16 @@ public class BasicTamerTool {
 		return analysis;
 	}
 
-	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(
-			String[] args) {
-		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
-				args.length);
-		for (String argSpecs : args) {
-			String delims = "[\\&]";
-			String[] specs = argSpecs.split(delims);
-			/*
-			 * TODO Below is just to test. Add actual code to make sense of the
-			 * argument specs
-			 */
-			// System.out.println(specs[1]);
-			list.add(new BasicMatrixValue(null, PrimitiveClassReference.DOUBLE,
-					specs[1], specs[2]));
-		}
-		return list;
-	}
+    public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
+        ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(args.length);
+        for (String argSpecs : args) {
+            String delims = "[\\&]";
+            String[] specs = argSpecs.split(delims);
+            PrimitiveClassReference clsType = PrimitiveClassReference.fromString(specs[0]);
+            list.add(new BasicMatrixValue(null, clsType, specs[1], specs[2]));
+        }
+        return list;
+    }
 
 	/**
 	 * the entry point coming from natlab.Main - uses the options object to
