@@ -35,21 +35,22 @@ public class BuiltinMatlabClass extends OldMatlabClass{
 	}
 	
 	 //we store the priority of all the classes in terms of a number, the higher the number, the higher the priority
-	private static ImmutableMap<BuiltinClassReference,Integer> builtinPriorities = 
-	    ImmutableMap.<BuiltinClassReference, Integer>builder()
-	      .put(FunctionHandleClassReference.getInstance(), 5)
-		    .put(BuiltinCompoundClassReference.CELL, 4)
-		    .put(BuiltinCompoundClassReference.STRUCT, 4)
-		    .put(PrimitiveClassReference.INT8, 3)
-		    .put(PrimitiveClassReference.INT16, 3)
-		    .put(PrimitiveClassReference.INT32, 3)
-		    .put(PrimitiveClassReference.INT64, 3)
-		    .put(PrimitiveClassReference.UINT8, 3)
-		    .put(PrimitiveClassReference.UINT16, 3)
-		    .put(PrimitiveClassReference.UINT32, 3)
-		    .put(PrimitiveClassReference.UINT64, 3)
-		    .put(PrimitiveClassReference.DOUBLE, 2)
-		    .put(PrimitiveClassReference.CHAR, 2)
-		    .put(PrimitiveClassReference.LOGICAL, 1)
-		    .build();
+     private static ImmutableMap<BuiltinClassReference,Integer> builtinPriorities =
+             ImmutableMap.<BuiltinClassReference, Integer>builder()
+                     .put(FunctionHandleClassReference.getInstance(), 6)
+                     .put(BuiltinCompoundClassReference.CELL, 5)
+                     .put(BuiltinCompoundClassReference.STRUCT, 5)
+                     .put(PrimitiveClassReference.INT8, 4)
+                     .put(PrimitiveClassReference.INT16, 4)
+                     .put(PrimitiveClassReference.INT32, 4)
+                     .put(PrimitiveClassReference.INT64, 4)
+                     .put(PrimitiveClassReference.UINT8, 4)
+                     .put(PrimitiveClassReference.UINT16, 4)
+                     .put(PrimitiveClassReference.UINT32, 4)
+                     .put(PrimitiveClassReference.UINT64, 4)
+                     .put(PrimitiveClassReference.SINGLE, 3)
+                     .put(PrimitiveClassReference.DOUBLE, 2)
+                     .put(PrimitiveClassReference.CHAR, 2)
+                     .put(PrimitiveClassReference.LOGICAL, 1)
+                     .build();
 }
