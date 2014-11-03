@@ -42,25 +42,6 @@ public enum PrimitiveClassReference implements BuiltinClassReference {
     public boolean isNumeric () { return true;  }
     public boolean isMatrix  () { return true;  }
 
-
-    public static PrimitiveClassReference fromString (String s) {
-        switch (s) {
-            case "LOGICAL": return PrimitiveClassReference.LOGICAL;
-            case "CHAR"   : return PrimitiveClassReference.CHAR;
-            case "SINGLE" : return PrimitiveClassReference.SINGLE;
-            case "DOUBLE" : return PrimitiveClassReference.DOUBLE;
-            case "INT8"   : return PrimitiveClassReference.INT8;
-            case "UINT8"  : return PrimitiveClassReference.UINT8;
-            case "INT16"  : return PrimitiveClassReference.INT16;
-            case "UINT16" : return PrimitiveClassReference.UINT16;
-            case "INT32"  : return PrimitiveClassReference.INT32;
-            case "UINT32" : return PrimitiveClassReference.UINT32;
-            case "INT64"  : return PrimitiveClassReference.INT64;
-            case "UINT64" : return PrimitiveClassReference.UINT64;
-            default       : throw new UnsupportedOperationException("Unknown PrimitiveClassReference: " + s);
-        }
-    }
-
     @Override public String  getName  () { return name;      }
     @Override public String  toString () { return getName(); }
     @Override public boolean isBuiltin() { return true;      }

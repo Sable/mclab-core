@@ -109,7 +109,7 @@ public class BasicTamerTool {
         for (String argSpecs : args) {
             String delims = "[\\&]";
             String[] specs = argSpecs.split(delims);
-            PrimitiveClassReference clsType = PrimitiveClassReference.fromString(specs[0]);
+            PrimitiveClassReference clsType = PrimitiveClassReference.valueOf(specs[0]);
             list.add(new BasicMatrixValue(null, clsType, specs[1], specs[2]));
         }
         return list;
