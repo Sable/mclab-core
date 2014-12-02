@@ -190,7 +190,7 @@ aspect PrettyPrint {
     join(", ", getInputParams()), getBody().getPrettyPrinted());
   eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
   eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
-  eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue() + "'";
+  eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue().replaceAll("'", "''") + "'";
   eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
   eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
   eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
