@@ -27,7 +27,7 @@ Copyright 2011 Andrew Casey, Soroush Radpour and McGill University.
 %%
 %%inherit macros
 
-"''" {: append(yytext()); :}
+"''" {: append("'"); :}
 "'" {: /*just end string - %append will handle token*/ :} END_STRING
 {ValidEscape} {: append(yytext()); :}
 {LineTerminator} {: error("Unterminated string literal"); :}
