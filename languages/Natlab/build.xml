@@ -19,7 +19,6 @@
 			<include name="${antlr.task.jar.path.prop}" />
 			<include name="${antlr3.jar.path.prop}" />
 			<include name="${string.template.jar.path.prop}" />
-			<include name="${antlr2.jar.path.prop}" />
 		</fileset>
 	</path>
 
