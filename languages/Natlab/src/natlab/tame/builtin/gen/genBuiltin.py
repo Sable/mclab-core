@@ -30,6 +30,7 @@ import csv;
 import processTags;
 import collections;
 import itertools;
+import sys
 
 
 # caps first letter
@@ -144,6 +145,20 @@ public abstract class Builtin {
         printClass(file,b)
     file.write( "\n}" )
 
+def genBuiltinSet(file, builtins) :
+	file.write(""" package natlab.toolkits;\n import java.util.HashSet; \n\n
+	public class BuiltinSet { \n 
+	private static HashSet<String> builtinSet =  new HashSet<String>(); \n
+	static { \n
+	""")
+	for b in builtins:
+		if (not b.isAbstract):
+			file.write('      builtinSet.add("%s");\n' % (b.name))
+	file.write( """    }\n
+	public static boolean isBuiltin(String funcName) {
+		return builtinSet.contains(funcName);
+	}
+	}   \n""")
 
 
 # prints the static classes inside the Builtin class, for a given builtin operation
@@ -403,7 +418,7 @@ def generate():
    # actually read the data
    builtins = readCSVData("builtins.csv");
    
-   
+   ''' 
    # write Builtin.java
    print 'generating Builtin.java...'
    file = open('../Builtin.java','w');
@@ -432,7 +447,8 @@ def generate():
    
    print 'genereated code for \n - %d builtins (including abstract builtins)' % sum([1 for b in builtins])
    print ' - %d non-abstract builtins' % sum([1 for b in builtins if not b.isAbstract])
-
+   ''' 
+   genBuiltinSet(open('../../../toolkits/BuiltinSet.java','w'),builtins)
    #for i in range(0,len(children)):
    #   if not abstract[i]: print children[i]
 
