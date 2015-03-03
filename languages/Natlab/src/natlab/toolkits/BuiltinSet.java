@@ -2,6 +2,8 @@ package natlab.toolkits;
 
 import java.util.HashSet;
 
+import natlab.toolkits.path.BuiltinQuery;
+
 public class BuiltinSet {
 
 	private static HashSet<String> builtinSet = new HashSet<String>();
@@ -299,5 +301,12 @@ public class BuiltinSet {
 
 	public static boolean isBuiltin(String funcName) {
 		return builtinSet.contains(funcName);
+	}
+	
+	public static BuiltinQuery getBuiltinQuery() {
+		return new BuiltinQuery(){
+            public boolean isBuiltin(String functionname) 
+              { return builtinSet.contains(functionname); }
+        };
 	}
 }
