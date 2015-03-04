@@ -158,6 +158,13 @@ def genBuiltinSet(file, builtins) :
 	public static boolean isBuiltin(String funcName) {
 		return builtinSet.contains(funcName);
 	}
+	public static BuiltinQuery getBuiltinQuery() {
+		return new BuiltinQuery(){
+            public boolean isBuiltin(String functionname) 
+              { return builtinSet.contains(functionname); }
+        };
+		
+	}	
 	}   \n""")
 
 
