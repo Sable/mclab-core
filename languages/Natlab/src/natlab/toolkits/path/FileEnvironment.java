@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import natlab.options.Options;
-import natlab.tame.builtin.Builtin;
+import natlab.toolkits.BuiltinSet;
 import natlab.toolkits.Context;
 import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import natlab.toolkits.filehandling.GenericFile;
@@ -53,7 +53,7 @@ public class FileEnvironment {
 		this.main = mainFile;
 		this.natlabPath = MatlabPath.getNatlabPath();
 		this.matlabPath = MatlabPath.getMatlabPath();
-		this.query = Builtin.getBuiltinQuery();
+		this.query = BuiltinSet.getBuiltinQuery();
 		this.pwd = mainFile.getParent();
 		this.folderHandlers = getFolderHandlers();
 		this.pwdHandler = FolderHandler.getFolderHandler(this.pwd);
@@ -67,7 +67,7 @@ public class FileEnvironment {
 	 * no main file supplied)
 	 */
 	public FileEnvironment(Options options){
-		this(options,Builtin.getBuiltinQuery());
+		this(options,BuiltinSet.getBuiltinQuery());
 	}
 	
 	/**

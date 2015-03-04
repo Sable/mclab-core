@@ -9,11 +9,12 @@ import mclint.Message;
 import mclint.Project;
 import mclint.util.DefinitionVisitor;
 import natlab.tame.builtin.Builtin;
+import natlab.toolkits.BuiltinSet;
 import natlab.toolkits.path.BuiltinQuery;
 import ast.Name;
 
 public class Shadowing extends DefinitionVisitor implements LintAnalysis {
-  private BuiltinQuery query = Builtin.getBuiltinQuery();
+  private BuiltinQuery query = BuiltinSet.getBuiltinQuery();
   private Set<String> reported = new HashSet<>();
 
   protected Lint lint;
