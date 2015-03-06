@@ -94,6 +94,7 @@ public class ReachingDefs extends
     currentOutSet.putAll(f.getInputParams().stream()
         .collect(Collectors.toMap(Name::getID, Sets::<Def>newHashSet)));
     caseASTNode(f.getStmts());
+    caseASTNode(f.getNestedFunctions());
     outFlowSets.put(f, currentOutSet);
   }
 
