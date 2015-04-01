@@ -1,0 +1,7 @@
+SimpleIfSimplification:test/simplifications/simpleifpass
+LeftSimplification:test/simplifications/leftsimplepass
+SimpleAssignment:test/simplifications/simpleassignpass
+ShortCircuitArraySimplification:test/simplifications/scarraypass
+ConditionalSimplification:test/simplifications/condpass
+ForSimplification:test/simplifications/forpass
+RightSimplification:test/simplifications/rightpass

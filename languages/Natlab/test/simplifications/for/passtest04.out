@@ -1,0 +1,9 @@
+for i = 1:10
+    t1 = foo();
+    [t2,t3] = size(t1);
+    j = [];
+    for t4 = 1:t3
+        j = t1(:,t4);
+        bar(i,j);
+    end
+end

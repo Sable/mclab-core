@@ -1,0 +1,18 @@
+b = 1;
+c = 2;
+d = 3;
+t1 = b;
+check_scalar(t1);
+if t1
+   t1 = ~c;
+   check_scalar(t1);
+else
+   t1 = true;
+end
+if t1
+   t1 = d;
+   check_scalar(t1);
+else
+   t1 = true;
+end
+a = t1;

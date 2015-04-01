@@ -1,0 +1,13 @@
+t1 = foo();
+[t2,t3] = size(t1);
+i = [];
+for t4 = 1:t3
+    i = t1(:,t4);
+    t5 = bar();
+    [t6,t7] = size(t5);
+    j = [];
+    for t8 = 1:t7
+        j = t5(:,t8);
+        foo(i,j);
+    end
+end

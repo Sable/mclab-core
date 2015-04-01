@@ -1,0 +1,3 @@
+function y = f()
+%%helpcomment
+end

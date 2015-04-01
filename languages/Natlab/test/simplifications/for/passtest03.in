@@ -1,0 +1,5 @@
+for i = foo()
+    for j = bar()
+        foo(i,j);
+    end
+end

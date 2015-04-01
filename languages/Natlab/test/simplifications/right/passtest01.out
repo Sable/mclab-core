@@ -1,0 +1,12 @@
+function x = test(a,b)
+    t0 = a < 2;
+    t1 = ~t0;
+    check_scalar(t1);
+    if t1
+        t1 = b > 4;
+        check_scalar(t1);
+    else
+        t1 = true;
+    end
+    t1;
+end

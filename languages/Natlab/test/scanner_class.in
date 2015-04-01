@@ -1,0 +1,16 @@
+classdef myClass < double & int32
+properties
+a = 1
+end
+events
+end
+methods
+function obj = myClass
+obj@double;
+x = 125
+end
+b = bbb
+function obj = get.a()
+end
+end
+end

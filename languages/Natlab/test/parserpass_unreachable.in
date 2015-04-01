@@ -1,0 +1,38 @@
+function a = abc(b,c)
+x(1) = a
+try
+x{1} = a
+for x = 1:5
+while 1
+if a < b
+abc;
+elseif 0
+abc;
+abc;
+else
+abc;
+return;
+end
+abc;
+end
+switch a
+case a
+a;
+case 111
+111;
+case 111
+1112;
+case '111'
+'111';
+otherwise
+continue;
+end
+abc;
+end
+catch
+a{x} = 1
+end
+[x] = 1
+return;
+a = asdf;
+end

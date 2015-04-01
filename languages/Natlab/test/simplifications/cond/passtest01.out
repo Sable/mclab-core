@@ -1,0 +1,5 @@
+
+a = true;
+if a
+   foo();
+end

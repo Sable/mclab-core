@@ -1,0 +1,5 @@
+1 1
+1 26
+function [y] = f()
+y = 1
+end

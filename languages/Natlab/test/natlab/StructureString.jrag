@@ -1,0 +1,616 @@
+//TODO-AC: point at PrettyPrint once it stabilizes
+//NB: output may not re-parse as same AST (esp comments, empty stmts)
+
+aspect StructureString {
+    syn String ASTNode.getStructureString() {
+        StringBuffer buf = new StringBuffer();
+        for(beaver.Symbol comment : getComments()) {
+            buf.append(comment.value);
+            buf.append('\n');
+        }
+        buf.append(getStructureStringLessComments());
+        return buf.toString();
+    }
+
+    //default - exception
+    syn String ASTNode.getStructureStringLessComments() { throw new UnsupportedOperationException(getClass().getName() + ".getStructureStringLessComments()"); }
+    
+    eq CompilationUnits.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Program prog : getPrograms()){
+            buf.append(prog.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    eq Script.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionList.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        for(Function func : getFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
+    eq Function.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName().getID());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    // Class
+    
+    eq ClassDef.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("classdef ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getStructureString());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append(getName());
+        first = true;
+        for(SuperClass sup : getSuperClasss()) {
+            if(first)
+            	buf.append(" < ");
+            else
+                buf.append(" & ");
+            buf.append(sup.getStructureString());
+            first = false;
+        }
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
+        for(Properties prop : getPropertys()) {
+            buf.append(prop.getStructureString());
+            buf.append('\n');
+        }
+        for(Methods methods : getMethods()) {
+            buf.append(methods.getStructureString());
+            buf.append('\n');
+        }
+        for(ClassEvents events : getClassEvents()) {
+            buf.append(events.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Properties.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("properties ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getStructureString());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Property prop : getPropertys()) {
+            buf.append(prop.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    } 
+    
+    eq Methods.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("methods ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getStructureString());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Signature sign : getSignatures()) {
+            buf.append(sign.getStructureString());
+            buf.append('\n');
+        }
+        for(PropertyAccess prop : getPropAccs()) {
+            buf.append(prop.getStructureString());
+            buf.append('\n');
+        }
+        for(Function func : getFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Signature.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    eq PropertyAccess.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("function ");
+        buf.append("[");
+        boolean first = true;
+        for(Name param : getOutputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append("] = ");
+        buf.append(getAccess());
+        buf.append(".");
+        buf.append(getName());
+        buf.append("(");
+        first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(")");
+        buf.append('\n');
+        for(HelpComment comment : getHelpComments()) {
+            buf.append(comment.getStructureString());
+            buf.append('\n');
+        }
+        for(Stmt stmt : getStmts()) {
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        for(Function func : getNestedFunctions()) {
+            buf.append(func.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq ClassEvents.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("events ");
+		boolean first = true;
+        for(Attribute attr : getAttributes()) {
+            if(first)
+            	buf.append("(");            
+            else
+                buf.append(", ");
+            buf.append(attr.getStructureString());
+            first = false;
+        }
+        if(!first)
+        	buf.append(") ");
+        buf.append('\n');
+        for(Event eve : getEvents()) {
+            buf.append(eve.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    
+    eq Attribute.getStructureStringLessComments() = getKey() + " = " + getExpr().getStructureString();
+    eq SuperClass.getStructureStringLessComments() = getName();
+    eq Property.getStructureStringLessComments() = getName() + " = " + getExpr().getStructureString() + ";";
+    eq Event.getStructureStringLessComments() = getName();
+    
+    eq SuperClassMethodExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getFuncName().getStructureString());
+        buf.append("@");
+        buf.append(getClassName().getStructureString());
+		return buf.toString();
+    }
+    
+    //help comments
+    
+    eq HelpComment.getStructureStringLessComments() = getText();
+    
+    //stmts
+    eq EmptyStmt.getStructureStringLessComments() = "";
+    eq ExprStmt.getStructureStringLessComments() = getExpr().getStructureString() + (isOutputSuppressed() ? ";" : "");
+    eq AssignStmt.getStructureStringLessComments() = getLHS().getStructureString() + " = " + getRHS().getStructureString() + (isOutputSuppressed() ? ";" : "");
+    eq GlobalStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("global");
+        for(Name name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getStructureString());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq PersistentStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("persistent");
+        for(Name name : getNames()) {
+            buf.append(" ");
+            buf.append(name.getStructureString());
+        }
+        if(isOutputSuppressed()) {
+            buf.append(";");
+        }
+        return buf.toString();
+    }
+    eq ShellCommandStmt.getStructureStringLessComments() = "!" + getCommand() + (isOutputSuppressed() ? ";" : "");
+    
+    eq BreakStmt.getStructureStringLessComments() = "break" + (isOutputSuppressed() ? ";" : "");
+    eq ContinueStmt.getStructureStringLessComments() = "continue" + (isOutputSuppressed() ? ";" : "");
+    eq ReturnStmt.getStructureStringLessComments() = "return" + (isOutputSuppressed() ? ";" : "");
+
+    eq ForStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append((isParfor() ? "par" : "") + "for ");
+        buf.append(getAssignStmt().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq WhileStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("while ");
+        buf.append(getExpr().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    // if-elseif-else
+    eq IfStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for(IfBlock block : getIfBlocks()) {
+            if(!first) {
+                buf.append("else");
+            }
+            buf.append(block.getStructureString());
+            first = false;
+        }
+        if(hasElseBlock()) {
+            buf.append(getElseBlock().getStructureString());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    eq IfBlock.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("if ");
+        buf.append(getCondition().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    eq ElseBlock.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("else ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // switch-case
+    eq SwitchStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("switch ");
+        buf.append(getExpr().getStructureString());
+        buf.append('\n');
+        for(SwitchCaseBlock scase : getSwitchCaseBlocks()) {
+            buf.append(scase.getStructureString());
+        }
+        if(hasDefaultCaseBlock()) {
+            buf.append(getDefaultCaseBlock().getStructureString());
+        }
+        buf.append("end");
+        return buf.toString();
+    }
+    eq SwitchCaseBlock.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("case ");
+        buf.append(getExpr().getStructureString());
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    eq DefaultCaseBlock.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("otherwise ");
+        buf.append('\n');
+        for(Stmt stmt : getStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    // try-catch
+    eq TryStmt.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("try ");
+        buf.append('\n');
+        for(Stmt stmt : getTryStmts()) {
+            buf.append('\t');
+            buf.append(stmt.getStructureString());
+            buf.append('\n');
+        }
+        List<Stmt> catchList = getCatchStmts();
+        if (catchList.getNumChild()>0) {
+	        buf.append("catch ");
+	        buf.append('\n');        
+	        for(Stmt stmt : catchList) {
+	            buf.append('\t');
+	            buf.append(stmt.getStructureString());
+	            buf.append('\n');
+	        }
+	    }
+        buf.append("end");
+        return buf.toString();
+    }
+
+    //exprs
+    
+    eq RangeExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('(');
+        buf.append(getLower().getStructureString());
+        buf.append(" : ");
+        if(hasIncr()) {
+            buf.append(getIncr().getStructureString());
+            buf.append(" : ");
+        }
+        buf.append(getUpper().getStructureString());
+        buf.append(')');
+        return buf.toString();
+    }
+    eq ColonExpr.getStructureStringLessComments() = ":";
+    eq EndExpr.getStructureStringLessComments() = "end";
+    
+    eq Name.getStructureStringLessComments() = getID();
+
+    //accesses
+    eq NameExpr.getStructureStringLessComments() = getName().getStructureString();
+    eq DotExpr.getStructureStringLessComments() = getTarget().getStructureString() + "." + getField().getStructureString();
+    eq ParameterizedExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getTarget().getStructureString());
+        buf.append('(');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append(')');
+        return buf.toString();
+    }
+    eq CellIndexExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getTarget().getStructureString());
+        buf.append('{');
+        boolean first = true;
+        for(Expr arg : getArgs()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(arg.getStructureString());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+
+    eq MatrixExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('[');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getStructureString());
+            first = false;
+        }
+        buf.append(']');
+        return buf.toString();
+    }
+    eq CellArrayExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append('{');
+        boolean first = true;
+        for(Row row : getRows()) {
+            if(!first) {
+                buf.append("; ");
+            }
+            buf.append(row.getStructureString());
+            first = false;
+        }
+        buf.append('}');
+        return buf.toString();
+    }
+    eq Row.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for(Expr element : getElements()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(element.getStructureString());
+            first = false;
+        }
+        return buf.toString();
+    }
+    
+    eq FunctionHandleExpr.getStructureStringLessComments() = "@" + getName().getStructureString();
+    eq LambdaExpr.getStructureStringLessComments() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("(@(");
+        boolean first = true;
+        for(Name param : getInputParams()) {
+            if(!first) {
+                buf.append(", ");
+            }
+            buf.append(param.getStructureString());
+            first = false;
+        }
+        buf.append(") ");
+        buf.append(getBody().getStructureString());
+        buf.append(")");
+        return buf.toString();
+    }
+    
+    //literals
+    eq IntLiteralExpr.getStructureStringLessComments() = getValue().getText();
+    eq FPLiteralExpr.getStructureStringLessComments() = getValue().getText();
+    eq StringLiteralExpr.getStructureStringLessComments() = "'" + getValue() + "'";
+    
+    eq UMinusExpr.getStructureStringLessComments() = "(-" + getOperand().getStructureString() + ")";
+    eq UPlusExpr.getStructureStringLessComments() = "(+" + getOperand().getStructureString() + ")";
+    eq NotExpr.getStructureStringLessComments() = "(~" + getOperand().getStructureString() + ")";
+    eq MTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + "')";
+    eq ArrayTransposeExpr.getStructureStringLessComments() = "(" + getOperand().getStructureString() + ".')";
+    
+    syn String BinaryExpr.getStructureStringLessComments(String op) = "(" + getLHS().getStructureString() + " " + op + " " + getRHS().getStructureString() + ")";
+    
+    eq PlusExpr.getStructureStringLessComments() = getStructureStringLessComments("+");
+    eq MinusExpr.getStructureStringLessComments() = getStructureStringLessComments("-");
+    
+    eq MTimesExpr.getStructureStringLessComments() = getStructureStringLessComments("*");
+    eq MDivExpr.getStructureStringLessComments() = getStructureStringLessComments("/");
+    eq MLDivExpr.getStructureStringLessComments() = getStructureStringLessComments("\\");
+    eq MPowExpr.getStructureStringLessComments() = getStructureStringLessComments("^");
+    
+    eq ETimesExpr.getStructureStringLessComments() = getStructureStringLessComments(".*");
+    eq EDivExpr.getStructureStringLessComments() = getStructureStringLessComments("./");
+    eq ELDivExpr.getStructureStringLessComments() = getStructureStringLessComments(".\\");
+    eq EPowExpr.getStructureStringLessComments() = getStructureStringLessComments(".^");
+    
+    eq AndExpr.getStructureStringLessComments() = getStructureStringLessComments("&");
+    eq OrExpr.getStructureStringLessComments() = getStructureStringLessComments("|");
+    eq ShortCircuitAndExpr.getStructureStringLessComments() = getStructureStringLessComments("&&");
+    eq ShortCircuitOrExpr.getStructureStringLessComments() = getStructureStringLessComments("||");
+    eq LTExpr.getStructureStringLessComments() = getStructureStringLessComments("<");
+    eq GTExpr.getStructureStringLessComments() = getStructureStringLessComments(">");
+    eq LEExpr.getStructureStringLessComments() = getStructureStringLessComments("<=");
+    eq GEExpr.getStructureStringLessComments() = getStructureStringLessComments(">=");
+    eq EQExpr.getStructureStringLessComments() = getStructureStringLessComments("==");
+    eq NEExpr.getStructureStringLessComments() = getStructureStringLessComments("~=");
+}

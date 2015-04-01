@@ -1,0 +1,11 @@
+disp('before if')
+if test1
+    disp('then part')
+elseif test2
+    disp('then part 2')
+    disp('more then part 2')
+else
+    disp('else part')
+    disp('more else part')
+end
+disp('after if')

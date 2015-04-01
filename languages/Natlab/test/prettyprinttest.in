@@ -1,0 +1,118 @@
+function a = callsort(g)
+  useSwitch(g);
+  gg = testTryCatch(g)
+  
+  %t = @() datestr(now); % not supported
+  %t() %begin
+  b  = rand(1,10);
+  b = b * 1000
+  a = sort2(b);
+  %test while statement
+  c = a;
+  trip = 0;
+  sum(c)
+  while sum(c) < 4000 && trip < 10
+      c = rand(1,10);
+      trip = trip + 1
+      j = 1;
+      while ( 1 )    % nested while and for 
+          if j < 10000
+              j = j + 1;
+              continue;
+          end
+          break;
+      end 
+  end
+  c
+  % t() %end
+  % test case statement
+end
+
+function quo = testTryCatch( a )
+   quo = 0;
+   x = 100
+   %try 
+    %quo = b / a
+   %catch %ME
+       %ME.stack
+       %try, quo = b / a, catch end
+   %end
+end
+    
+function  srt = sort2(a )
+   %add2(10, 5) % calls add2
+   n = length(a);
+   if n == 0
+       srt = a;
+   else
+      % s = 1; 
+      for i = 1:n-1
+          news = smallest ( a, i + 1 );
+          if a( news ) < a( i )
+              t = a( i ); % backup a( s )
+              a( i ) = a( news ); % a( s ) = a ( news )
+              a( news ) = t; % a( news ) = t
+          end
+      end
+      srt = a;
+   end
+   % test nested function, not supported
+   %function res = add2(a, b)
+   %  res =  a+ b;
+   %end
+end
+
+function  s = smallest( a, k )
+  n = length(a);
+  s = k; 
+  for i = (k + 1):n
+      if a( i ) < a( s )
+         s =  i;
+      end
+  end
+end
+
+function res = add2(a, b)
+   res =  a + b;
+end
+
+function useSwitch(val)
+   if val < 0
+       return
+   end
+   % nested switch statement
+   switch ( val )
+       case 1
+           'one'
+       case 2
+           'two'
+       case 3
+           'tree'
+       case 4 % case 4 empty
+       case 5
+           'five & four '
+       case 6
+           i = ceil(rand(1,1)) * 10
+           switch( i )
+               case 1
+               case 2
+                  '2 generated'
+           end
+              
+       otherwise 
+           'otherwise'
+   end
+end
+
+function openFile()
+   fid = fopen('prettyprinttest.in', 'r');
+   count = 0;
+   while ~feof(fid)
+    line = fgetl(fid);
+    if isempty(line) | strncmp(line, '%', 1)
+        continue
+    end
+    count = count + 1;
+   end
+   disp(sprintf('%d lines', count));
+end

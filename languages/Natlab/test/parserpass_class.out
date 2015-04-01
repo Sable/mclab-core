@@ -1,0 +1,26 @@
+1 1
+24 3
+classdef (hidden = true) myClass < double & int32
+properties 
+abc = [];
+xyz = 10;
+end
+methods (abc = false, xyz = true) 
+[p] = q(s, t)
+function [obj] = get.abc()
+end
+function [] = set.abc()
+end
+function [obj] = myClass(a, b)
+obj@double(a, b);
+obj.abc = a
+obj.xyz = b
+end
+end
+events (hidden = true) 
+ping
+end
+events 
+pong
+end
+end

@@ -1,0 +1,9 @@
+if test1
+    disp('then part')
+else
+    if test2
+        disp('then part2')
+    else
+        disp('else part')
+    end
+end

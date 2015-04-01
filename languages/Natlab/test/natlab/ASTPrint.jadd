@@ -1,0 +1,71 @@
+/*
+ *  Adapted for Natlab project 
+ *  from PrettyPrint.jadd of JastAdd Extensible Java Compiler 
+ *  (http://jastadd.org) created by Torbjorn Ekman.
+ *
+ */
+import java.util.*;
+
+aspect ASTPrint {
+
+  // Default output
+  
+  public String ASTNode.getNodeString() {
+    StringBuffer s = new StringBuffer();
+    s.append(getStructureString());
+    return s.toString().trim();
+  }
+  
+  public String Opt.getNodeString() {
+    return "";
+  }
+  
+  public String List.getNodeString() {
+    return "";
+  }
+  
+
+  public void ASTNode.getNodeString(StringBuffer s) {
+    //  throw new Error("ERROR: getNodeString(StringBuffer s) not implemented for " + getClass().getName());
+    // no need to throw exception when building tree
+    s.append("WARNING: getNodeString(StringBuffer s) not implemented for " + getClass().getName()+"\n");
+  }
+
+  // dump the AST to standard output
+
+  public String ASTNode.dumpTree() {
+    StringBuffer s = new StringBuffer();
+    dumpTree(s, 0);
+    return s.toString();
+  }
+
+  public void ASTNode.dumpTree(StringBuffer s, int j) {
+    for(int i = 0; i < j; i++) {
+      s.append("  ");
+    }
+    s.append(dumpString() + "\n");
+    for(int i = 0; i < getNumChild(); i++) {
+      if (getChild(i)!=null)
+      	getChild(i).dumpTree(s, j + 1);
+    }
+  }
+
+  syn String ASTNode.dumpString() = getClass().getName() + " [" + toString() + "]";
+  eq IntLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq FPLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq StringLiteralExpr.dumpString() = getClass().getName() + " [" + getValue() + "]";
+  eq NameExpr.dumpString() = getClass().getName() + " [" + getName().getID() + "]";
+  eq ParameterizedExpr.dumpString() = getClass().getName() + " [" + getTarget().getStructureStringLessComments() + "]";
+
+  eq FunctionHandleExpr.dumpString() = getClass().getName() + " [" + "@" + getName() + "]";
+  eq LambdaExpr.dumpString() = getClass().getName() + " [" + getStructureStringLessComments() + "]";
+
+  public String Script.dumpTree() {
+    StringBuffer s = new StringBuffer();
+    for(Iterator iter = getStmts().iterator(); iter.hasNext(); ) {
+      Stmt stmt = (Stmt)iter.next();
+        s.append(stmt.dumpTree());
+    }
+    return s.toString();
+  }
+}
