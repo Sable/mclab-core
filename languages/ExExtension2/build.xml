@@ -1,0 +1,149 @@
+<project name="ExExtension2" default="build">
+	<!-- load properties -->
+	<property file="exextension2.properties" />
+
+        <!-- setup a local basedir -->
+        <dirname property="ExExtension2.basedir" file="${ant.file.ExExtension2}" />
+
+	<!-- useful paths -->
+	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
+	<path id="beaver.jar.path" path="${lib.dir}/${beaver.jar.path.prop}" />
+	<path id="beaver.rt.jar.path" path="${lib.dir}/${beaver.rt.jar.path.prop}" />
+	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+
+	<import file="../shared/taskdef.xml" />
+	<import file="../shared/gen.xml" />
+	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
+
+        <import file="${natlab.dir}/build.xml" />
+        <import file="${exextension1.dir}/build.xml" />
+
+	<!--=====================================================================-->
+	<!-- Analysis related things                                             -->
+	<!--=====================================================================-->
+        
+        <fileset id="exextension2.analysis.jastadd.fileset" dir="${Exextension2.Basedir}">
+          <include name="${src.dir}/ASTAnalyze.jadd" />
+        </fileset>
+
+        
+	<!--=====================================================================-->
+	<!-- Private Targets                                                     -->
+	<!--=====================================================================-->
+
+	<target name="gen" depends="jastadd" />
+
+        <fileset id="extension2.ast.fileset" dir="${ExExtension2.basedir}">
+          <include name="${src.dir}/**/*.ast" />
+        </fileset>
+
+        <fileset id="extension2.jastadd.fileset" dir="${ExExtension2.basedir}/${src.dir}">
+          <include name="**/*.jadd" />
+          <include name="**/*.jrag" />
+        </fileset>
+
+        <target name="jastadd" depends="def.jastadd.task" >
+
+          <mkdir dir="${gen.dir}/${ast.pkg}" />
+	  <jastadd package="${ast.pkg}" beaver="true" rewrite="true" outdir="${basedir}/${gen.dir}">
+            <fileset refid="natlab.ast.fileset" />
+            <fileset refid="extension1.ast.fileset" />
+            <fileset refid="extension2.ast.fileset" />
+            <fileset refid="extension2.jastadd.fileset" />
+            <fileset refid="natlab.general.jastadd.fileset" />
+            <fileset refid="natlab.analysis.jastadd.fileset" />
+          </jastadd>
+        </target>
+
+	<!--=====================================================================-->
+	<!-- Natlab Targets                                                      -->
+	<!--=====================================================================-->        
+        <target name="natlab.build" description="call build in the Natlab language">
+          <ant dir="${natlab.dir}" target="build" inheritall="false" />
+        </target>
+
+	<target name="natlab.clean" description="call clean in the Natlab language">
+	  <ant dir="${natlab.dir}" target="clean" inheritall="false" />
+	</target>
+
+	<target name="natlab.eclipse.build" description="call eclipse.build in the Natlab language">
+		<ant dir="${natlab.dir}" target="eclipse.build" inheritall="false" />
+	</target>
+
+	<target name="natlab.eclipse.clean" description="call eclipse.clean in the Natlab language">
+		<ant dir="${natlab.dir}" target="eclipse.clean" inheritall="false" />
+        </target>
+
+	<target name="set.natlab.bin.dir.eclipse" if="inside.eclipse">
+		<property name="natlab.bin.dir" value="${natlab.eclipse.bin.dir}" />
+	</target>
+	
+	<target name="set.natlab.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="natlab.bin.dir" value="${natlab.ant.bin.dir}" />
+	</target>
+	
+	<target name="set.natlab.bin.dir" depends="set.natlab.bin.dir.no.eclipse, set.natlab.bin.dir.eclipse" />
+
+	<!--=====================================================================-->
+	<!-- ExExtension1 Targets                                                -->
+	<!--=====================================================================-->        
+        <target name="exextension1.build" description="call build in the ExExtension1 language">
+          <ant dir="${exextension1.dir}" target="build" inheritall="false" />
+        </target>
+
+	<target name="exextension1.clean" description="call clean in the Exextension1 language">
+	  <ant dir="${exextension1.dir}" target="clean" inheritall="false" />
+	</target>
+
+	<target name="exextension1.eclipse.build" description="call eclipse.build in the Exextension1 language">
+		<ant dir="${exextension1.dir}" target="eclipse.build" inheritall="false" />
+	</target>
+
+	<target name="exextension1.eclipse.clean" description="call eclipse.clean in the Exextension1 language">
+		<ant dir="${exextension1.dir}" target="eclipse.clean" inheritall="false" />
+        </target>
+
+	<target name="set.exextension1.bin.dir.eclipse" if="inside.eclipse">
+		<property name="exextension1.bin.dir" value="${exextension1.eclipse.bin.dir}" />
+	</target>
+	
+	<target name="set.exextension1.bin.dir.no.eclipse" unless="inside.eclipse">
+		<property name="exextension1.bin.dir" value="${exextension1.ant.bin.dir}" />
+	</target>
+	
+	<target name="set.exextension1.bin.dir" depends="set.exextension1.bin.dir.no.eclipse, set.exextension1.bin.dir.eclipse" />
+
+        <target name="set.bin.dir" depends="set.exextension1.bin.dir,set.natlab.bin.dir, BinDir.set.bin.dir">
+          <path id="exextension2.compile.classpath">
+            <path location="${basedir}/${exextension1.bin.dir}" />
+            <path refid="beaver.rt.jar.path" />
+	    <path id="natlab.bin.path" location="${basedir}/${natlab.bin.dir}" />
+          </path>
+          <path id="compile.classpath" refid="exextension2.compile.classpath" />
+          <path id="test.classpath" >
+            <path id="local.bin.path" location="${basedir}/${bin.dir}" />
+            <path refid="compile.classpath" />
+          </path>
+        </target>
+
+	<!--=====================================================================-->
+	<!-- Public Targets                                                      -->
+	<!--=====================================================================-->
+
+	<import file="../shared/cli.xml" />
+	<import file="../shared/eclipse.xml" />
+
+	<target name="build" depends="set.bin.dir,CommandLineInterface.build" description="generate and build all files" />
+
+        <target name="test" depends="build">
+          <java classname="extension2.Main" >
+            <classpath refid="test.classpath" />
+          </java>
+        </target>
+
+
+
+
+</project>
