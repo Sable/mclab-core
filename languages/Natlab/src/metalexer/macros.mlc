@@ -1,0 +1,36 @@
+%component macros
+
+%helper
+
+LineTerminator = \r|\n|\r\n
+OtherWhiteSpace = [ \t\f]
+
+//NB: acceptable to conflict with ... - matlab just treats .... as a comment containing .
+Ellipsis = \.\.\.
+EscapedLineTerminator = {Ellipsis}.*{LineTerminator}
+
+Letter = [a-zA-Z]
+Digit = [0-9]
+HexDigit = {Digit} | [a-fA-F]
+
+//Please see jar:file:///packages/matlab_2008a/help/techdoc/help.jar!/learn_matlab/f2-520.html
+Identifier = {Letter}([_] | {Letter} | {Digit})*
+
+SciExp = [EeDd][+\-]?{Digit}+
+Imaginary = [iIjJ]
+IntNumber = {Digit}+
+FPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?
+HexNumber = 0[xX]{HexDigit}+
+ImaginaryIntNumber = {Digit}+{Imaginary}
+ImaginaryFPNumber = (({Digit}+\.?{Digit}*) | (\.?{Digit}+)){SciExp}?{Imaginary}
+ImaginaryHexNumber = 0[xX]{HexDigit}+{Imaginary}
+
+HelpComment=%% | %%[^{\r\n].*
+OpenBracketHelpComment = %%\{
+Comment=% | %[^%{\r\n].*
+OpenBracketComment = %\{
+CloseBracketComment = %\}
+
+ShellCommand=[!].*
+
+ValidEscape=\\[bfnrt\\\"]

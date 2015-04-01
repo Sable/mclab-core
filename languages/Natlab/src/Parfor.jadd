@@ -1,0 +1,10 @@
+aspect Parfor
+{
+  public boolean ForStmt.isParfor() {
+    return getisParfor();
+  }
+
+  public ForStmt.ForStmt(AssignStmt header, ast.List<Stmt> body) {
+    this(header, body, false);
+  }
+}

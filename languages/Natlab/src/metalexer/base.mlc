@@ -1,0 +1,15 @@
+%component base
+
+%extern "Symbol symbol(short)"
+
+%%
+%%inherit shared_symbols
+
+classdef {: return symbol(CLASSDEF); :} START_CLASS
+end {: return symbol(END); :} END
+
+%%inherit shared_keywords
+%:
+%:
+<<ANY>> {: error("Illegal character '" + yytext() + "'"); :}
+<<EOF>> {: return symbol(EOF); :}

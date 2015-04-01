@@ -1,0 +1,252 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
+
+aspect PrettyPrint {
+  protected static final String ASTNode.INDENT_TAB = "  ";
+
+  protected static <T extends ASTNode<?>> String ASTNode.join(String delimiter, Iterable<T> nodes) {
+    String result = Joiner.on(delimiter).join(FluentIterable.from(nodes)
+        .transform(new com.google.common.base.Function<ASTNode<?>, String>() {
+          @Override public String apply(ASTNode<?> node) {
+            return node.getPrettyPrinted();
+          }
+        })
+        .filter(Predicates.not(Predicates.containsPattern("^$"))));
+
+    if (!result.isEmpty() && delimiter.equals("\n")) {
+      result += "\n";
+    }
+    return result;
+  }
+
+  syn String ASTNode.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    for (beaver.Symbol comment : getComments()) {
+      buf.append(getIndent() + comment.value + "\n");
+    }
+    buf.append(getPrettyPrintedLessComments());
+    return buf.toString();
+  }
+
+  //case Stmt - print comments after the statement
+  syn String Stmt.getPrettyPrinted(){
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
+    // first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
+    String space = (this instanceof EmptyStmt) ? "" : "  ";
+    for (beaver.Symbol comment : getComments()) {
+      buf.append(space + comment.value);
+      space = "\n" + getIndent(); // later comments -- full indent
+    }
+    return buf.toString();
+  }
+
+  //Special case to deal with comments at the end of functions
+  syn String Function.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
+
+    StringBuffer cbuf = new StringBuffer();
+    for (beaver.Symbol comment : getComments()) {
+      cbuf.append(comment.value + "\n");
+    }
+    if (cbuf.length() > 0) {
+      buf.insert(buf.length() - getIndent().length() - 3, cbuf.toString());
+    }
+    return buf.toString();
+  }
+
+  syn String ASTNode.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null) {
+      return "";
+    }
+    return parent.getIndent();
+  }
+
+  eq Stmt.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null || parent.getParent() instanceof Program) {
+      return "";
+    }
+    return parent.getIndent() + ASTNode.INDENT_TAB;
+  }
+
+  eq Function.getIndent() {
+    ASTNode parent = getParent();
+    if (parent == null || parent.getParent() instanceof Program) {
+      return "";
+    }
+    return parent.getIndent() + ASTNode.INDENT_TAB;
+  }
+
+  syn String ASTNode.getPrettyPrintedLessComments() {
+    throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()");
+  }
+
+  protected String Stmt.wrap(String s, Object... args) {
+    return getIndent() +
+      (args.length == 0 ? s : String.format(s, args)) +
+      (isOutputSuppressed() ? ";" : "");
+  }
+
+  eq CSLExpr.getPrettyPrintedLessComments() =
+    String.format("CSL[%s]", getName().getPrettyPrinted());
+  eq EndCallExpr.getPrettyPrintedLessComments() =
+    String.format("end(%s, %s, %s)", getArray().getPrettyPrinted(), getNumDim(), getWhatDim());
+  eq CheckScalarStmt.getPrettyPrintedLessComments() = wrap("check_scalar(%s)", getNameExpr().getPrettyPrinted());
+
+  eq CompilationUnits.getPrettyPrintedLessComments() = join("\n==========================\n\n", getPrograms());
+  eq Script.getPrettyPrintedLessComments() = join("\n", getHelpComments()) + join("\n", getStmts());
+  eq FunctionList.getPrettyPrintedLessComments() = join("\n", getFunctions());
+  eq FunctionList.getPrettyPrinted() {
+    StringBuffer buf = new StringBuffer();
+    buf.append(getPrettyPrintedLessComments());
+    for(beaver.Symbol comment : getComments()) {
+      buf.append(comment.value);
+      buf.append("\n");
+    }
+    return buf.toString();
+  }
+  eq Function.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s(%s)\n%s%s%s%send",
+    getIndent(), join(", ", getOutputParams()), getName().getID(),
+    join(", ", getInputParams()), join("\n", getHelpComments()),
+    join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
+  eq HelpComment.getPrettyPrintedLessComments() = getText();
+
+  eq EmptyStmt.getPrettyPrintedLessComments() = "";
+  eq ExprStmt.getPrettyPrintedLessComments() = wrap(getExpr().getPrettyPrinted());
+  eq AssignStmt.getPrettyPrintedLessComments() = wrap("%s = %s", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+  eq GlobalStmt.getPrettyPrintedLessComments() = wrap("global %s", join(" ", getNames()));
+  eq PersistentStmt.getPrettyPrintedLessComments() = wrap("persistent %s", join(" ", getNames()));
+  eq ShellCommandStmt.getPrettyPrintedLessComments() = wrap("!%s", getCommand());
+  eq BreakStmt.getPrettyPrintedLessComments() = wrap("break");
+  eq ContinueStmt.getPrettyPrintedLessComments() = wrap("continue");
+  eq ReturnStmt.getPrettyPrintedLessComments() = wrap("return");
+  eq ForStmt.getPrettyPrintedLessComments() = String.format("%s%sfor %s\n%s%send",
+    getIndent(), isParfor() ? "par" : "", getAssignStmt().getPrettyPrinted().trim(),
+    join("\n", getStmts()), getIndent());
+  eq WhileStmt.getPrettyPrintedLessComments() = String.format("%swhile %s\n%s%send",
+    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()), getIndent());
+  eq IfStmt.getPrettyPrintedLessComments() = String.format("%sif %s%s%send",
+    getIndent(), join(getIndent() + "elseif ", getIfBlocks()),
+    hasElseBlock() ? getElseBlock().getPrettyPrinted() : "", getIndent());
+  eq IfBlock.getPrettyPrintedLessComments() = String.format("%s\n%s",
+    getCondition().getPrettyPrinted(), join("\n", getStmts()));
+  eq ElseBlock.getPrettyPrintedLessComments() = String.format("%selse \n%s",
+    getIndent(), join("\n", getStmts()));
+  eq SwitchStmt.getPrettyPrintedLessComments() = String.format("%sswitch %s\n%s%s%send",
+    getIndent(), getExpr().getPrettyPrinted(), join("", getSwitchCaseBlocks()),
+    hasDefaultCaseBlock() ? getDefaultCaseBlock().getPrettyPrinted() : "", getIndent());
+  eq SwitchCaseBlock.getPrettyPrintedLessComments() = String.format("%scase %s\n%s",
+    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()));
+  eq DefaultCaseBlock.getPrettyPrintedLessComments() = String.format("%sotherwise \n%s",
+    getIndent(), join("\n", getStmts()));
+  eq TryStmt.getPrettyPrintedLessComments() = String.format("%stry \n%s%s%send",
+    getIndent(), join("\n", getTryStmts()),
+    getCatchStmts().getNumChild() > 0 ? (getIndent() + "catch \n" + join("\n", getCatchStmts())) : "",
+    getIndent());
+
+  eq RangeExpr.getPrettyPrintedLessComments() = String.format("(%s : %s%s)",
+    getLower().getPrettyPrinted(),
+    hasIncr() ? (getIncr().getPrettyPrinted() + " : ") : "",
+    getUpper().getPrettyPrinted());
+  eq ColonExpr.getPrettyPrintedLessComments() = ":";
+  eq EndExpr.getPrettyPrintedLessComments() = "end";
+  eq Name.getPrettyPrintedLessComments() = getID();
+  eq NameExpr.getPrettyPrintedLessComments() = getName().getPrettyPrinted();
+  eq DotExpr.getPrettyPrintedLessComments() = getTarget().getPrettyPrinted() + "." + getField().getPrettyPrinted();
+  eq ParameterizedExpr.getPrettyPrintedLessComments() = String.format("%s(%s)",
+    getTarget().getPrettyPrinted(), join(", ", getArgs()));
+  eq CellIndexExpr.getPrettyPrintedLessComments() = String.format("%s{%s}",
+    getTarget().getPrettyPrinted(), join(", ", getArgs()));
+  eq MatrixExpr.getPrettyPrintedLessComments() = String.format("[%s]", join("; ", getRows()));
+  eq CellArrayExpr.getPrettyPrintedLessComments() = String.format("{%s}", join("; ", getRows()));
+  eq Row.getPrettyPrintedLessComments() = join(", ", getElements());
+  eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getPrettyPrinted();
+  eq LambdaExpr.getPrettyPrintedLessComments() = String.format("(@(%s) %s)",
+    join(", ", getInputParams()), getBody().getPrettyPrinted());
+  eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+  eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
+  eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue().replaceAll("'", "''") + "'";
+  eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
+  eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
+  eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
+  eq MTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
+  eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
+
+  syn String BinaryExpr.getPrettyPrintedLessComments(String op) = "(" + getLHS().getPrettyPrinted() + " " + op + " " + getRHS().getPrettyPrinted() + ")";
+  eq PlusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
+  eq MinusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
+  eq MTimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
+  eq MDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
+  eq MLDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
+  eq MPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
+  eq ETimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
+  eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
+  eq ELDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
+  eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
+  eq AndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
+  eq OrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
+  eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
+  eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
+  eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");
+  eq GTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">");
+  eq LEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<=");
+  eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
+  eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
+  eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
+
+  protected static String ASTNode.joinAttributes(ast.List<Attribute> attrs) {
+    String attributes = join(", ", attrs);
+    if (!attributes.isEmpty()) {
+      attributes = "(" + attributes + ") ";
+    }
+    return attributes;
+  }
+
+  eq ClassDef.getPrettyPrintedLessComments() = String.format("classdef %s%s%s\n%s%s%s%send",
+    joinAttributes(getAttributes()), getName(),
+    getNumSuperClass() > 0 ? (" < " + join(" & ", getSuperClasss())) : "",
+    join("\n", getHelpComments()), join("\n", getPropertys()),
+    join("\n", getMethods()), join("\n", getClassEvents()));
+  eq Properties.getPrettyPrintedLessComments() = String.format("%sproperties %s\n%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getPropertys()), getIndent());
+  eq Methods.getPrettyPrintedLessComments() = String.format("%smethods %s\n%s%s%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getSignatures()),
+    join("\n", getPropAccs()), join("\n", getFunctions()), getIndent());
+  eq Signature.getPrettyPrintedLessComments() = String.format("%s[%s] = %s(%s)",
+    getIndent(), join(", ", getOutputParams()), getName(), join(", ", getInputParams()));
+  eq PropertyAccess.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s.%s(%s)\n%s%s%s%send",
+    getIndent(), join(", ", getOutputParams()), getAccess(), getName(), join(", ", getInputParams()),
+    join("\n", getHelpComments()), join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
+  eq ClassEvents.getPrettyPrintedLessComments() = String.format("%sevents %s\n%s%send",
+    getIndent(), joinAttributes(getAttributes()), join("\n", getEvents()), getIndent());
+  eq Attribute.getPrettyPrintedLessComments() = getKey() + " = " + getExpr().getPrettyPrinted();
+  eq SuperClass.getPrettyPrintedLessComments() = getName();
+  eq Property.getPrettyPrintedLessComments() = getIndent() + getName() + " = " + getExpr().getPrettyPrinted() + ";";
+  eq Event.getPrettyPrintedLessComments() = getIndent() + getName();
+  eq SuperClassMethodExpr.getPrettyPrintedLessComments() = getFuncName().getPrettyPrinted() + "@" + getClassName().getPrettyPrinted();
+}

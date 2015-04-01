@@ -1,0 +1,45 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
+//Add a flag to each statement indicating whether or not it's output should be
+//suppressed (i.e. whether or not it is followed by a semicolon).
+//Defaults to false (i.e. show output), although this default can be changed
+aspect OutputSuppression {
+    private boolean Stmt.outputSuppressed = defaultOutputSuppression;
+    private static boolean Stmt.defaultOutputSuppression = false;
+    
+    /**
+     * Sets the default output suppression for Statements. When Stmts get created,
+     * this will be the value assigned to them
+     * - in order to parse properly, the value has to be set to false, which is the initial value
+     * - for rewrites etc., it makes more sense to always suppress otuput for created nodes
+     * 
+     */
+    public static void Stmt.setDefaultOutputSuppression(boolean suppressOutput){
+        defaultOutputSuppression = suppressOutput;
+    }
+    public static boolean Stmt.getDefaultOutputSuppression(){ return defaultOutputSuppression; }
+    
+    public boolean Stmt.isOutputSuppressed() { return outputSuppressed; }
+    public void Stmt.setOutputSuppressed(boolean outputSuppressed) { 
+        this.outputSuppressed = outputSuppressed; 
+    }
+}

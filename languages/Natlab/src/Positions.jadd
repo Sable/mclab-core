@@ -1,0 +1,99 @@
+import beaver.Symbol;
+import matlab.NullPositionMap;
+import matlab.PositionMap;
+import matlab.TextPosition;
+import natlab.utils.NodeFinder;
+
+/**
+ * This aspect adds a few utility methods related to source information.
+ * In particular, it allows for working with lines and columns directly,
+ * as opposed to Beaver's packed coordinates. It also allows for modifying
+ * lines and columns, useful for e.g. propagating locations after a code
+ * transformation.
+ */
+aspect Positions {
+  private PositionMap Program.positionMap = new NullPositionMap();
+
+  public void Program.setPositionMap(PositionMap positionMap) {
+    this.positionMap = positionMap;
+  }
+
+  protected PositionMap Program.getPositionMap() {
+    return positionMap;
+  }
+
+  protected PositionMap ASTNode.getPositionMap() {
+    Program parentProgram = NodeFinder.findParent(Program.class, this);
+    if (parentProgram == null) {
+      // This can happen if the node is synthetic
+      return new NullPositionMap();
+    }
+    return parentProgram.getPositionMap();
+  }
+
+  protected TextPosition ASTNode.getPreTranslationStartPosition() {
+    return getPositionMap().getPreTranslationPosition(
+      getTranslatedStartLine(), getTranslatedStartColumn());
+  }
+
+  protected TextPosition ASTNode.getPreTranslationEndPosition() {
+    return getPositionMap().getPreTranslationPosition(
+      getTranslatedEndLine(), getTranslatedEndColumn());
+  }
+
+  public int ASTNode.getStartLine() {
+    return getPreTranslationStartPosition().getLine();
+  }
+
+  public int ASTNode.getStartColumn() {
+    return getPreTranslationStartPosition().getColumn();
+  }
+
+  public int ASTNode.getEndLine() {
+    return getPreTranslationEndPosition().getLine();
+  }
+
+  public int ASTNode.getEndColumn() {
+    return getPreTranslationEndPosition().getColumn();
+  }
+
+  public int ASTNode.getTranslatedStartLine() {
+    return Symbol.getLine(getStart());
+  }
+
+  public int ASTNode.getTranslatedStartColumn() {
+    return Symbol.getColumn(getStart());
+  }
+
+  public int ASTNode.getTranslatedEndLine() {
+    return Symbol.getLine(getEnd());
+  }
+
+  public int ASTNode.getTranslatedEndColumn() {
+    return Symbol.getColumn(getEnd());
+  }
+
+  public void ASTNode.setStartPosition(int line, int column) {
+    start = Symbol.makePosition(line, column);
+  }
+
+  public void ASTNode.setStartLine(int line) {
+    setStartPosition(line, getStartColumn());
+  }
+
+  public void ASTNode.setStartColumn(int column) {
+    setStartPosition(getStartLine(), column);
+  }
+
+  public void ASTNode.setEndPosition(int line, int column) {
+    end = Symbol.makePosition(line, column);
+  }
+
+  public void ASTNode.setEndLine(int line) {
+    setEndPosition(line, getEndColumn());
+  }
+
+  public void ASTNode.setEndColumn(int column) {
+    setEndPosition(getEndLine(), column);
+  }
+} 

@@ -1,0 +1,140 @@
+%component shared_symbols
+%helper
+
+%extern "CommentBuffer commentBuffer"
+
+%extern "Symbol symbol(short)"
+%extern "Symbol symbol(short, Object)"
+%extern "Symbol symbol(short, Object, int, int, int, int)"
+
+%import "beaver.Scanner"
+
+%{//// Numbers /////////////////////////////////////////////////////////////////
+  
+  private DecIntNumericLiteralValue parseDecInt(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new DecIntNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+  
+  private HexNumericLiteralValue parseHexInt(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new HexNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+  
+  private FPNumericLiteralValue parseFP(String text, boolean imaginary) throws Scanner.Exception {
+      try { 
+          return new FPNumericLiteralValue(yytext(), imaginary);
+      } catch(NumberFormatException e) {
+          error("Invalid number: " + yytext() + " (" + e.getMessage() + ")");
+          return null; //unreachable - error throws an exception
+      }
+  }
+%}
+
+%%
+%%inherit macros
+%%inherit comment_start
+
+//whitespace
+{LineTerminator} {: return symbol(LINE_TERMINATOR); :}
+{OtherWhiteSpace} {: :}
+
+//always a string - we'd be in transpose otherwise
+"'" {: appendToStartDelim(""); /*update start pos*/ :} START_STRING
+
+//bracketing
+\( {: return symbol(LPAREN); :} START_BRACKETED
+\) / "'" {: return symbol(RPAREN); :} END_BRACKETED_START_TRANSPOSE
+\) {: return symbol(RPAREN); :} END_BRACKETED
+\[ {: return symbol(LSQUARE); :} START_BRACKETED
+\] / "'" {: return symbol(RSQUARE); :} END_BRACKETED_START_TRANSPOSE
+\] {: return symbol(RSQUARE); :} END_BRACKETED
+\{ {: return symbol(LCURLY); :} START_BRACKETED
+\} / "'" {: return symbol(RCURLY); :} END_BRACKETED_START_TRANSPOSE
+\} {: return symbol(RCURLY); :} END_BRACKETED
+
+//stmt terminators
+, {: storedLine = yyline; storedCol = yycolumn; :} START_COMMA_TERMINATOR
+; {: storedLine = yyline; storedCol = yycolumn; :} START_SEMICOLON_TERMINATOR
+
+//misc punctuation
+: {: return symbol(COLON); :}
+@ {: return symbol(AT); :}
+
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/arithmeticoperators.html
+"+" {: return symbol(PLUS); :}
+"-" {: return symbol(MINUS); :}
+"*" {: return symbol(MTIMES); :}
+".*" {: return symbol(ETIMES); :}
+"/" {: return symbol(MDIV); :}
+"./" {: return symbol(EDIV); :}
+"\\" {: return symbol(MLDIV); :}
+".\\" {: return symbol(ELDIV); :}
+"^" {: return symbol(MPOW); :}
+".^" {: return symbol(EPOW); :}
+//"'" {: return symbol(MTRANSPOSE); :} //mixed with string rule above
+".'" {: return symbol(ARRAYTRANSPOSE); :}
+
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/ref/relationaloperators.html
+"<=" {: return symbol(LE); :}
+">=" {: return symbol(GE); :}
+"<" {: return symbol(LT); :}
+">" {: return symbol(GT); :}
+"==" {: return symbol(EQ); :}
+"~=" {: return symbol(NE); :}
+
+//from http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
+"&" {: return symbol(AND); :}
+"|" {: return symbol(OR); :}
+"~" {: return symbol(NOT); :}
+"&&" {: return symbol(SHORTAND); :}
+"||" {: return symbol(SHORTOR); :}
+
+"=" {: return symbol(ASSIGN); :}
+
+%:
+
+//... comment
+{EscapedLineTerminator} {:
+    commentBuffer.pushComment(symbol(ELLIPSIS_COMMENT, yytext().substring(yytext().indexOf("..."), yylength() - 1)));
+:}
+
+//numeric literals - TODO: changed to strings because of JastAddParser limitation
+//{IntNumber} / "'" {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} START_TRANSPOSE
+//{IntNumber} {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :}
+//{IntNumber} "." [*/\\\^'] {: return symbol(INT_NUMBER, parseDecInt(yytext(), false)); :} //NB: should be possible to accomplish this with lookahead instead of pushback
+//{FPNumber} / "'" {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :} START_TRANSPOSE
+//{FPNumber} {: return symbol(FP_NUMBER, parseFP(yytext(), false)); :}
+//{HexNumber} / "'" {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :} START_TRANSPOSE
+//{HexNumber} {: return symbol(INT_NUMBER, parseHexInt(yytext(), false)); :}
+//{ImaginaryIntNumber} / "'" {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, parseDecInt(yytext(), true)); :}
+//{ImaginaryFPNumber} / "'" {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, parseFP(yytext(), true)); :}
+//{ImaginaryHexNumber} / "'" {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :} START_TRANSPOSE
+//{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, parseHexInt(yytext(), true)); :}
+
+{IntNumber} / "'" {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{IntNumber} {: return symbol(INT_NUMBER, yytext()); :}
+{IntNumber} "." [*/\\\^'] {: yypushback(2); return symbol(INT_NUMBER, yytext()); :} //NB: should be possible to accomplish this with lookahead instead of pushback
+{FPNumber} / "'" {: return symbol(FP_NUMBER, yytext()); :} START_TRANSPOSE
+{FPNumber} {: return symbol(FP_NUMBER, yytext()); :}
+{HexNumber} / "'" {: return symbol(INT_NUMBER, yytext()); :} START_TRANSPOSE
+{HexNumber} {: return symbol(INT_NUMBER, yytext()); :}
+{ImaginaryIntNumber} / "'" {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryIntNumber} {: return symbol(IM_INT_NUMBER, yytext()); :}
+{ImaginaryFPNumber} / "'" {: return symbol(IM_FP_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryFPNumber} {: return symbol(IM_FP_NUMBER, yytext()); :}
+{ImaginaryHexNumber} / "'" {: return symbol(IM_INT_NUMBER, yytext()); :} START_TRANSPOSE
+{ImaginaryHexNumber} {: return symbol(IM_INT_NUMBER, yytext()); :}
+
+//bang (!) syntax
+{ShellCommand} {: return symbol(SHELL_COMMAND, yytext().substring(1)); :}

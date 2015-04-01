@@ -1,0 +1,11 @@
+%component leading_ws
+
+%%
+%%inherit macros
+
+{LineTerminator} {: :}
+{OtherWhiteSpace} {: :}
+%:
+%:
+<<ANY>> {: yypushback(1); :} END_LEADING_WS
+<<EOF>> {: :} END_LEADING_WS

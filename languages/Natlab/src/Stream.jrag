@@ -1,0 +1,10 @@
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+// This aspect adds a stream() method on ASTNode, so that it may
+// be used with java.util.stream APIs.
+aspect Stream {
+  public Stream<T> ASTNode.stream() {
+    return StreamSupport.stream(spliterator(), false);
+  }
+}

@@ -1,0 +1,18 @@
+%component field_name
+
+%extern "Symbol symbol(short, Object)"
+
+%%
+
+%%inherit comment_start
+
+%:
+
+//ignore keywords - we just saw a dot
+{Identifier} / "'" {: return symbol(IDENTIFIER, yytext()); :} END_FIELD_NAME_START_TRANSPOSE
+{Identifier} {: return symbol(IDENTIFIER, yytext()); :} END_FIELD_NAME
+
+%:
+
+<<ANY>> {: yypushback(1); :} END_FIELD_NAME
+<<EOF>> {: :} END_FIELD_NAME

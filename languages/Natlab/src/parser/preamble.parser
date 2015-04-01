@@ -1,0 +1,227 @@
+%embed {:
+    //// Errors ////////////////////////////////////////////////////////////////
+
+    //list of errors encountered while parsing
+    private final java.util.List<String> errors = new java.util.ArrayList<String>();
+
+    public java.util.List<String> getErrors() {
+        return java.util.Collections.unmodifiableList(errors);
+    }
+
+    public boolean hasError() {
+        return !errors.isEmpty();
+    }
+
+    //given a symbol, return a canonical string representation of it's position
+    private static String getPosString(Symbol token) {
+        return getPosString(token.getLine(token.getStart()), token.getColumn(token.getStart()));
+    }
+
+    //given a position, return a canonical string representation
+    private static String getPosString(int line, int col) {
+        return "[" + line + ", " + col + "]";
+    }
+
+    //override the default error handling:
+    //  1) no writing to stderr
+    //  2) no exceptions
+    //  3) suggestions based on automatic corrections
+    class Events extends Parser.Events {
+        public void syntaxError(Symbol token) {
+            errors.add(getPosString(token) + "  unexpected token " + Terminals.NAMES[token.getId()]);
+        }
+        public void scannerError(Scanner.Exception e) {
+            errors.add(getPosString(e.line, e.column) + "  scanner error: " + e.getMessage());
+        }
+        public void unexpectedTokenRemoved(Symbol token) {
+            errors.add(getPosString(token) + "  try deleting " + Terminals.NAMES[token.getId()]);
+        }
+        public void missingTokenInserted(Symbol token) {
+            errors.add(getPosString(token) + "  try inserting " + Terminals.NAMES[token.getId()]);
+        }
+        public void misspelledTokenReplaced(Symbol token) {
+            errors.add(getPosString(token) + "  try replacing with " + Terminals.NAMES[token.getId()]);
+        }
+    }
+
+    //tell handler to use subclass defined above
+    { report = new Events(); }
+    
+    //// Stmt terminators //////////////////////////////////////////////////////
+
+    //return type of statement terminators
+    //need this because non-terminals must return symbols
+    private static class BooleanFakeSymbol extends Symbol {
+        private boolean value;
+        BooleanFakeSymbol(boolean value) { this.value = value; }
+        Stmt annotateStmt(Stmt stmt) { stmt.setOutputSuppressed(value); return stmt; }
+    }
+
+    //// Comments //////////////////////////////////////////////////////////////
+
+    //comment buffer populated by scanner
+    //should be non-null, but null is handled gracefully
+    private CommentBuffer commentBuffer = null;
+
+    public void setCommentBuffer(CommentBuffer commentBuffer) {
+        this.commentBuffer = commentBuffer;
+    }
+
+    public CommentBuffer getCommentBuffer() {
+        return commentBuffer;
+    }
+
+    //attach all comments since last request to provided node
+    private <T extends ASTNode> T annotateWithComments(T node) {
+        if(node != null && commentBuffer != null) {
+            //if the node is a statement, only attach if the statement starts
+            //on the same or an earlier line as the comment
+            //- otherwise it comments might be bound to too early statements
+            if (node instanceof Stmt){
+                while(!commentBuffer.isEmpty()
+                      && (ASTNode.getLine(commentBuffer.peekComment().getStart())
+                          <= ASTNode.getLine(node.getEnd()))){
+                    node.addComment(commentBuffer.pollComment()); //add to list
+                }
+            } else { 
+                node.setComments(commentBuffer.pollAllComments());
+            }
+        }
+        return node;
+    }
+    
+    //attach comments to an empty statement -- need the separator symbol, because the
+    //empty statement itself seems to have no location information
+    private EmptyStmt annotateEmptyStmtWithComments(EmptyStmt node,Symbol location) {
+        if(node != null && commentBuffer != null) {
+            //if the node is a statement, only attach if the statement ends
+            //on the same or a later line as the comment
+            //- otherwise comments might be bound to too early statements
+            while(!commentBuffer.isEmpty()
+                    && (ASTNode.getLine(commentBuffer.peekComment().getStart())
+                            <= ASTNode.getLine(location.getEnd()))){
+                node.addComment(commentBuffer.pollComment()); //add to list
+            }
+        }
+        return node;
+    }
+    
+    //AST really doesn't like null nodes, but beaver returns null for empty optional lists
+    //Create an appropriate empty node to replace the null
+    private static <T extends ASTNode> List<T> nullToEmpty(List<T> original) {
+        return original == null ? new List<T>() : original;
+    }
+
+    //helper for constructing an AST Function node
+    //separates stmts from nested functions and attaches comments
+    private Function function(List<Name> outParams, Name name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
+        List<Stmt> stmts = new List<Stmt>();
+        List<Function> nestedFunctions = new List<Function>();
+        if(body != null) {
+            for(Symbol stmtOrFcn : body) {
+                if(stmtOrFcn instanceof Stmt) {
+                    stmts.add((Stmt) stmtOrFcn);
+                } else if(stmtOrFcn instanceof Function) {
+                    nestedFunctions.add((Function) stmtOrFcn);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = stmtOrFcn.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is neither a Stmt nor a Function: " + getPosString(stmtOrFcn) + "  " + stmtOrFcn);
+                }
+            }
+        }
+        return annotateWithComments(new Function(
+                nullToEmpty(outParams),
+                name,
+                nullToEmpty(inParams),
+                nullToEmpty(comments),
+                stmts,
+                nestedFunctions));
+    }
+    
+    //helper for constructing an AST ClassDef node
+    //separates properties, methods and events
+    private ClassDef classdef(List<Attribute> attr, String name, List<SuperClass> supClass, List<HelpComment> comments, List body) {
+        List<Properties> prop = new List<Properties>();
+        List<Methods> methods = new List<Methods>();
+        List<ClassEvents> events = new List<ClassEvents>();
+        
+        if(body != null) {
+            for(Object obj : body) {
+            	Symbol propOrMethodOrEvent = (Symbol)obj;
+                if(propOrMethodOrEvent instanceof Properties) {
+                    prop.add((Properties) propOrMethodOrEvent);
+                } else if(propOrMethodOrEvent instanceof Methods) {
+                    methods.add((Methods) propOrMethodOrEvent);
+                } else if(propOrMethodOrEvent instanceof ClassEvents) {
+                    events.add((ClassEvents) propOrMethodOrEvent);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = propOrMethodOrEvent.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is not a Property, a Method, or an Event: " + getPosString(propOrMethodOrEvent) + "  " + propOrMethodOrEvent);
+                }
+            }
+        }
+        return new ClassDef(nullToEmpty(attr), name, nullToEmpty(supClass), nullToEmpty(comments), prop, methods, events);
+    }
+    
+    //helper for constructing an AST Methods node
+    //separates signatures from functions
+    private Methods methods(List<Attribute> attr, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
+        List<Signature> sign = new List<Signature>();
+        List<PropertyAccess> prop = new List<PropertyAccess>();
+        List<Function> function = new List<Function>();
+        if(body != null) {
+            for(Symbol signOrFcn : body) {
+                if(signOrFcn instanceof Signature) {
+                    sign.add((Signature) signOrFcn);
+                } else if(signOrFcn instanceof PropertyAccess) {
+                    prop.add((PropertyAccess) signOrFcn);
+                } else if(signOrFcn instanceof Function) {
+                    function.add((Function) signOrFcn);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = signOrFcn.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is not a Signature, a PropertAccess, or a Function: " + getPosString(signOrFcn) + "  " + signOrFcn);
+                }
+            }
+        }
+        return new Methods(nullToEmpty(attr), sign, prop, function);
+    }
+    
+    //helper for constructing an AST PropertAccess node
+    //separates stmts from nested functions and attaches comments
+    private PropertyAccess propertyAccess(List<Name> outParams, String access, String name, List<Name> inParams, List<HelpComment> comments, List<FunctionOrSignatureOrPropertyAccessOrStmt> body) {
+        List<Stmt> stmts = new List<Stmt>();
+        List<Function> nestedFunctions = new List<Function>();
+        if(body != null) {
+            for(Symbol stmtOrFcn : body) {
+                if(stmtOrFcn instanceof Stmt) {
+                    stmts.add((Stmt) stmtOrFcn);
+                } else if(stmtOrFcn instanceof Function) {
+                    nestedFunctions.add((Function) stmtOrFcn);
+                } else {
+                    //NB: programmatic error, not parser error
+                    int pos = stmtOrFcn.getStart();
+                    int line = Symbol.getLine(pos);
+                    int col = Symbol.getColumn(pos);
+                    throw new RuntimeException("Symbol in body is neither a Stmt nor a Function: " + getPosString(stmtOrFcn) + "  " + stmtOrFcn);
+                }
+            }
+        }
+        return annotateWithComments(new PropertyAccess(
+                nullToEmpty(outParams),
+                access,
+                name,
+                nullToEmpty(inParams),
+                nullToEmpty(comments),
+                stmts,
+                nestedFunctions));
+    }
+:};

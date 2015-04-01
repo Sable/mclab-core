@@ -1,0 +1,18 @@
+repmat(0, %x) -> zeros(%x)
+repmat(1, %x) -> ones(%x)
+repmat(false, %x) -> false(%x)
+repmat(Inf, %x) -> Inf(%x)
+repmat(NaN, %x) -> NaN(%x)
+repmat(true, %x) -> true(%x)
+disp(sprintf(%x)) -> fprintf(%x)
+(length(%x) == 0) -> isempty(%x)
+(length(%x) ~= 0) -> ~isempty(%x)
+datenum(now) -> now
+(inv(%x) * %y) -> %x \ %y
+(%y * inv(%x)) -> %y / %x
+prod(size(%x)) -> numel(%x)
+strcmp(class(%x), %y) -> isa(%x, %y)
+strcmp(%x, class(%y)) -> isa(%y, %x)
+(%x == NaN) -> isnan(%x)
+logical(1) -> true
+logical(0) -> false

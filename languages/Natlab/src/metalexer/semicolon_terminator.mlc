@@ -1,0 +1,19 @@
+%component semicolon_terminator
+
+%extern "Symbol symbol(short, Object, int, int, int, int)"
+
+%extern "int storedLine"
+%extern "int storedCol"
+
+%%
+%%inherit macros
+%%inherit comment_start
+
+{OtherWhiteSpace} {: /* ignore */ :}
+{LineTerminator} {: return symbol(SEMICOLON_LINE_TERMINATOR, null, storedLine + 1, storedCol + 1, yyline + 1, yycolumn + yylength()); :} END_SEMICOLON_TERMINATOR
+
+%:
+%:
+
+<<ANY>> {: yypushback(1); return symbol(SEMICOLON, null, storedLine + 1, storedCol + 1, storedLine + 1, storedCol + 1); :} END_SEMICOLON_TERMINATOR
+<<EOF>> {: return symbol(SEMICOLON, null, storedLine + 1, storedCol + 1, storedLine + 1, storedCol + 1); :} END_SEMICOLON_TERMINATOR

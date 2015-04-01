@@ -1,0 +1,134 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
+// AST for Natlab grammar
+CompilationUnits ::= Program*;
+abstract Program;
+Script : Program ::= HelpComment* Stmt*;
+FunctionList : Program ::= Function*;
+
+abstract Body;
+abstract ClassBody : Body;
+abstract FunctionOrSignatureOrPropertyAccessOrStmt;
+
+ClassDef : Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents*;
+Attribute ::= <Key:String> Expr;
+SuperClass ::= <Name:String>;
+Properties:ClassBody ::= Attribute* Property*;
+Property ::= <Name:String> Expr;
+Methods:ClassBody ::= Attribute* Signature* PropAcc:PropertyAccess* Function*;
+Signature : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name*;
+PropertyAccess : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+ClassEvents:ClassBody ::= Attribute* Event*;
+Event ::= <Name:String>;
+
+Function : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* Name:Name InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+
+abstract HelpComment ::= <Text:String>;
+OneLineHelpComment : HelpComment;
+MultiLineHelpComment : HelpComment;
+
+Name ::= <ID : String>;
+
+abstract Stmt : FunctionOrSignatureOrPropertyAccessOrStmt;
+ExprStmt : Stmt ::= Expr;
+AssignStmt : Stmt ::= LHS:Expr RHS:Expr;
+GlobalStmt : Stmt ::= Name*;
+PersistentStmt : Stmt ::= Name*;
+ShellCommandStmt : Stmt ::= <Command : String>;
+
+BreakStmt : Stmt;
+ContinueStmt : Stmt;
+ReturnStmt : Stmt;
+
+EmptyStmt : Stmt; //TODO-AC: remove this
+
+ForStmt : Stmt ::= AssignStmt Stmt* <isParfor : boolean>;
+WhileStmt : Stmt ::= Expr Stmt*;
+
+TryStmt : Stmt ::= TryStmt:Stmt* CatchStmt:Stmt*;
+
+SwitchStmt : Stmt ::= Expr SwitchCaseBlock* [DefaultCaseBlock];
+SwitchCaseBlock ::= Expr Stmt*;
+DefaultCaseBlock ::= Stmt*;
+
+IfStmt : Stmt ::= IfBlock* [ElseBlock];
+IfBlock ::= Condition:Expr Stmt*;
+ElseBlock ::= Stmt*;
+
+abstract Expr;
+RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
+ColonExpr : Expr;
+EndExpr : Expr;
+
+abstract LValueExpr : Expr;
+NameExpr : LValueExpr ::= Name;
+ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
+DotExpr : LValueExpr ::= Target:Expr Field:Name;
+MatrixExpr : LValueExpr ::= Row*;
+
+CellArrayExpr : Expr ::= Row*;
+SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name;
+
+Row ::= Element:Expr*;
+
+abstract LiteralExpr : Expr;
+IntLiteralExpr : LiteralExpr ::= <Value:natlab.IntNumericLiteralValue>;
+FPLiteralExpr : LiteralExpr ::= <Value:natlab.FPNumericLiteralValue>;
+StringLiteralExpr : LiteralExpr ::= <Value:String>;
+
+abstract UnaryExpr : Expr ::= Operand:Expr;
+UMinusExpr : UnaryExpr;
+UPlusExpr : UnaryExpr;
+NotExpr : UnaryExpr;
+MTransposeExpr : UnaryExpr;
+ArrayTransposeExpr : UnaryExpr;
+
+abstract BinaryExpr : Expr ::= LHS:Expr RHS:Expr;
+PlusExpr : BinaryExpr;
+MinusExpr : BinaryExpr;
+
+MTimesExpr : BinaryExpr;
+MDivExpr : BinaryExpr;
+MLDivExpr : BinaryExpr;
+MPowExpr : BinaryExpr;
+
+ETimesExpr : BinaryExpr;
+EDivExpr : BinaryExpr;
+ELDivExpr : BinaryExpr;
+EPowExpr : BinaryExpr;
+
+AndExpr : BinaryExpr;
+OrExpr : BinaryExpr;
+
+ShortCircuitAndExpr : BinaryExpr;
+ShortCircuitOrExpr : BinaryExpr;
+
+LTExpr : BinaryExpr;
+GTExpr : BinaryExpr;
+LEExpr : BinaryExpr;
+GEExpr : BinaryExpr;
+EQExpr : BinaryExpr;
+NEExpr : BinaryExpr;
+
+FunctionHandleExpr : Expr ::= Name;
+LambdaExpr : Expr ::= InputParam:Name* Body:Expr;

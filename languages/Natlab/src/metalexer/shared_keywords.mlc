@@ -1,0 +1,37 @@
+%component shared_keywords
+%helper
+
+%extern "Symbol symbol(short)"
+%extern "Symbol symbol(short, Object)"
+
+%%
+%%inherit macros
+
+//from matlab "iskeyword" function
+case {: return symbol(CASE); :} OPEN_END
+for {: return symbol(FOR); :} OPEN_END
+function {: return symbol(FUNCTION); :} OPEN_END
+if {: return symbol(IF); :} OPEN_END
+parfor {: return symbol(PARFOR); :} OPEN_END
+switch {: return symbol(SWITCH); :} OPEN_END
+try {: return symbol(TRY); :} OPEN_END
+while {: return symbol(WHILE); :} OPEN_END
+
+break {: return symbol(BREAK); :}
+catch {: return symbol(CATCH); :}
+continue {: return symbol(CONTINUE); :}
+else {: return symbol(ELSE); :}
+elseif {: return symbol(ELSEIF); :}
+end {: return symbol(END); :}
+global {: return symbol(GLOBAL); :}
+otherwise {: return symbol(OTHERWISE); :}
+persistent {: return symbol(PERSISTENT); :}
+return {: return symbol(RETURN); :}
+
+\. {: return symbol(DOT); :} START_FIELD_NAME
+
+%:
+
+//NB: lower precedence than keywords
+{Identifier} / "'" {: return symbol(IDENTIFIER, yytext()); :} START_TRANSPOSE
+{Identifier} {: return symbol(IDENTIFIER, yytext()); :}

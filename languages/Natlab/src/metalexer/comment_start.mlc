@@ -1,0 +1,17 @@
+%component comment_start
+%helper
+
+%extern "CommentBuffer commentBuffer"
+
+%extern "Symbol symbol(short, Object)"
+
+%%
+%%inherit macros
+
+//start multiline help comment
+{OpenBracketHelpComment} {: appendToStartDelim(yytext()); :} START_BRACKET_HELP_COMMENT
+{OpenBracketComment} {: appendToStartDelim(yytext()); :} START_BRACKET_COMMENT
+
+%:
+{HelpComment} {: return symbol(HELP_COMMENT, yytext()); :}
+{Comment} {: commentBuffer.pushComment(symbol(COMMENT, yytext())); :}
