@@ -14,6 +14,7 @@
 	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
   <path id="guava.jar.path" path="${lib.dir}/${guava.jar.path.prop}" />
   <path id="json.jar.path" path="${lib.dir}/${json.jar.path.prop}" />
+  <path id="jcommander.jar.path" path="${lib.dir}/${jcommander.jar.path.prop}" />
 	<path id="antlr.jar.path">
 		<fileset dir="${lib.dir}">
 			<include name="${antlr.task.jar.path.prop}" />
