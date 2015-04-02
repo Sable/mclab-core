@@ -20,6 +20,8 @@
 // =========================================================================== //
 package natlab.options;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.beust.jcommander.Parameter;
 
 /** 
@@ -55,7 +57,7 @@ public class Options {
 	// Server Options	
 	@Parameter(names={"--server"},description="Run frontend in server mode on a given port, default is 47146")
 	protected boolean server=false;
-	@Parameter(names={"--sport","-sp"}, description="Set the port the server runs on"}
+	@Parameter(names={"--sport","-sp"}, description="Set the port the server runs on")
 	protected String sp="";	
 	/**
  	* The server will no longer try to detect broken connections using a the heartbeat 
@@ -72,13 +74,13 @@ public class Options {
 	/**
  	* Runs the McLint static analyzer and refactoring helper.
  	*/
-	@Parameter(names={"--mclint",description="Run McLint")	
+	@Parameter(names={"--mclint"},description="Run McLint")
 	protected boolean mclint=false;
 	//Tamer Options
 	/**
  	* Runs the Tamer on a program, and will output a full Matlab program either as a single file or in a directory (via -outdir/od). The programs will be transformed
  	*/
-	@Parameter(names={"-t","--tamer",description="Tame a Matlab program")	
+	@Parameter(names={"-t","--tamer"},description="Tame a Matlab program")	
 	protected boolean tamer=false;
 	/**	
  	* Inlines a whole Matlab program into one function, if it is non-recursive and does not include ambiguous call edges (i.e. overloading).
@@ -99,4 +101,10 @@ public class Options {
 	@Parameter(names={"tamerplus"}, description="Get the Tamer+ version of a program")
 	protected boolean tamerplus=false;
 	
+	//Path and File Options
+	/**
+ 	* Path of locations to find matlab files.
+ 	*/
+	@Parameter(names={"--lpath","-lp"}, description="Path of locations to fine Matlab files")
+	List<String> lp=new ArrayList<String>();	
 }
