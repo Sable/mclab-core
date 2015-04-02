@@ -106,5 +106,44 @@ public class Options {
  	* Path of locations to find matlab files.
  	*/
 	@Parameter(names={"--lpath","-lp"}, description="Path of locations to fine Matlab files")
-	List<String> lp=new ArrayList<String>();	
+	protected List<String> lp=new ArrayList<String>();	
+	/**
+ 	* Files to be used as input. 
+ 	* If no main file is specified then the first file is taken to be the main.
+ 	*/
+	@Parameter(names={"--in"}, description="Files to be used as input")
+	protected List<String> in = new ArrayList<String>();
+	/**
+ 	*File taken to be the main file and entry point of the program. 
+    * Note: this can also be specified by a single file as argument to the compiler.
+    */
+	@Parameter(names={"--main"}, description="File taken to be the main file and entry point of the program.Note: this can also be specified by a single file as argument to the compiler.")
+	protected String main="";
+
+	//Setting Natlab Stored Preferences
+	/**
+ 	*performs the specified preference operation(s), then exits
+	*/
+	@Parameter(names={"--pref", "--preferences"}, description="	performs the specified preference operation(s), then exits")
+	protected boolean pref=false;
+	/**
+ 	* Set Path ( all path directories) of a Matlab installation
+ 	*/
+	@Parameter(names={"--set_matlab_path"},description="Set Path ( all path directories) of a Matlab installation")
+ 	protected List<String> set_matlab_path = new ArrayList<String>();
+	/** 
+ 	* Adds the given paths to the Matlab installation path 
+ 	*/
+	@Parameter(names={"--add_matlab_path"},description="adds the given paths to the Matlab installation path")
+	protected List<String> add_matlab_path = new ArrayList<String>();
+	/** 
+ 	* Adds given paths to the Natlab path
+ 	*/		
+	@Parameter(names={"--add_natlab_path"},description="Adds given paths to the Natlab path")
+	protected List<String> add_natlab_path = new ArrayList<String>();
+	/** 
+ 	* Displays all stored preferences
+ 	*/	
+	@Parameter(names={"--short_pref", "--show_preferences"},description ="Displays all stored preferences")
+	protected boolean show_pref = false;
 }
