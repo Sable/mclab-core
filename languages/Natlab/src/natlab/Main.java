@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.beust.jcommander.JCommander;
 import mclint.McLint;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
@@ -47,7 +47,7 @@ import com.google.common.base.Joiner;
  * command line options and performs the desired functions.
  */
 public class Main {
-	private static Options options;
+	private static Options options = null;
 
 	private static void log(String message) {
 		if (!options.quiet()) {
@@ -66,9 +66,10 @@ public class Main {
 		}
 
 		options = new Options();
+
 		options.parse(args);
 		if (options.help()) {
-			System.err.println(options.getUsage());
+			options.getUsage();
 			return;
 		}
 
@@ -116,13 +117,13 @@ public class Main {
 			return;
 		}
 
-		if (options.getFiles().isEmpty()) {
+		if (options.files().isEmpty()) {
 			if (!options.main().isEmpty()) {
 				/*
 				 * If the user provided an entry point function and did not
 				 * provide a separate file, Use the main file as the input file.
 				 */
-				options.getFiles().add(options.main());
+				options.files().add(options.main());
 				return;
 			} else {
 				System.err
@@ -131,7 +132,7 @@ public class Main {
 			return;
 		}
 
-		List<String> files = options.getFiles();
+		List<String> files = options.files();
 		log("Parsing " + Joiner.on(", ").join(files));
 		List<CompilationProblem> errors = new ArrayList<>();
 		CompilationUnits cu;

@@ -38,5 +38,6 @@
 	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
 	<classpathentry kind="lib" path="lib/metalexer-20090605/metalexer-jflex_20090605.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jcommander/jcommander-1.47.jar"/>
 	<classpathentry kind="output" path="languages/Natlab/bin-eclipse"/>
 </classpath>

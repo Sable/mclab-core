@@ -70,10 +70,10 @@ public class FlowAnalysisTestTool
         Options opt = new Options();
         opt.parse( args );
         
-        if( opt.getFiles().size() == 0 ){
+        if( opt.files().size() == 0 ){
             throw new Exception( "No files provided" );
         }
-        for( Object o : opt.getFiles() ){
+        for( Object o : opt.files() ){
             String fName = (String) o;
             ArrayList<CompilationProblem> errList = new ArrayList<CompilationProblem>();
             if( !opt.natlab() ){
