@@ -17,6 +17,7 @@
 	<classpathentry kind="lib" path="languages/Natlab/resources"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1.jar" sourcepath="lib/guava-16.0.1/guava-16.0.1-sources.jar">
+ 	<classpathentry kind="lib" path="lib/jcommander/jcommander-1.47.jar"/>
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/mclab/lib/guava-16.0.1/guava-16.0.1-javadoc.jar!/"/>
 		</attributes>

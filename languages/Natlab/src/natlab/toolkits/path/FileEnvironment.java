@@ -83,7 +83,7 @@ public class FileEnvironment {
 		if (options.main() != null && options.main().length() > 0){
 			main = options.main();
 		} else {
-			List<String> list = options.getFiles();
+			List<String> list = options.files();
 			if (list != null && list.size() > 0){
 				main = list.get(0);
 			}
