@@ -152,22 +152,6 @@ java -jar "${basedir}/@{basename}.jar" "$$@"</echo>
     <natlab-jar basename="${entrypoint.name}" />
 	</target>
 
-	<!-- jar build without tame and backend-->
-  <target name="jar-frontend" depends="matlab.build, clean, jar_noclean_frontend" 
-          description="creates an executable release jar" />
-	<target name="jar_noclean_frontend" depends="gen, compile" 
-          description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.frontend.name}" excludes="**/tame/**,**/backends/**" />
-	</target>
-
-	<!-- jar build without backend-->
-  <target name="jar-with-tamer" depends="matlab.build, clean, jar_noclean_tame" 
-          description="creates an executable release jar" />
-	<target name="jar_noclean_tame" depends="gen, compile" 
-          description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.mcsaf_with_tamer.name}" excludes="**/backends/**" />
-	</target>
- 
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including matlab), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
