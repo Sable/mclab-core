@@ -29,7 +29,7 @@ import com.beust.jcommander.Parameter;
 /**
  * Contains the command line options supported by McLab-Core. Supports various
  * options for the parsers, McSAF, Tamer and Tamer+. The JCommander command line
- * parsing tool is used to parse and generarate the options. The command line
+ * parsing tool is used to parse and generate the options. The command line
  * options that are supported are defined using annotations. The set of valid
  * values for each command line options are defined by the type of the class
  * member which the annotation manipulates.
