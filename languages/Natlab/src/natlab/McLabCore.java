@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.beust.jcommander.JCommander;
 import mclint.McLint;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
