@@ -1,5 +1,0 @@
-aspect PrettyPrint {
-
-    eq IncStmt.getPrettyPrintedLessComments() = getTarget().getPrettyPrintedLessComments() + "++" + (isOutputSuppressed() ? ";" : "");
-
-}
