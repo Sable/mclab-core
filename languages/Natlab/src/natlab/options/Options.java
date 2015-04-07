@@ -362,7 +362,7 @@ public class Options {
 		return set_natlab_path;
 	}
 
-	@Parameter(names = { "--short_pref", "--show_preferences" }, description = "Displays all stored preferences")
+	@Parameter(names = { "--show_pref", "--show_preferences" }, description = "Displays all stored preferences")
 	protected boolean show_pref = false;
 
 	/**
