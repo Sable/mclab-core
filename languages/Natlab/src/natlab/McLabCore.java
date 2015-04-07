@@ -46,7 +46,7 @@ import com.google.common.base.Joiner;
  * Main entry point for McLab compiler. Includes a main method that deals with
  * command line options and performs the desired functions.
  */
-public class Natlab {
+public class McLabCore {
 	private static Options options = null;
 
 	private static void log(String message) {
