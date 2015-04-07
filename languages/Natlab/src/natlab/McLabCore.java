@@ -59,6 +59,10 @@ public class McLabCore {
 	 * functions.
 	 */
 	public static void main(String[] args) throws Exception {
+		run(args);
+	}
+
+	public static void run(String args[]) throws Exception {
 		if (args.length == 0) {
 			System.err.println("No options given\nTry -help for usage");
 			return;
