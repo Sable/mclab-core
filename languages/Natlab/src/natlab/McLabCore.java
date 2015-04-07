@@ -46,7 +46,6 @@ import com.google.common.base.Joiner;
  * command line options and performs the desired functions.
  */
 public class McLabCore {
-	private static Options options = null;
 
 	private static void log(String message) {
 		if (!options.quiet()) {
@@ -59,18 +58,17 @@ public class McLabCore {
 	 * functions.
 	 */
 	public static void main(String[] args) throws Exception {
-		run(args);
-	}
-
-	public static void run(String args[]) throws Exception {
 		if (args.length == 0) {
 			System.err.println("No options given\nTry -help for usage");
 			return;
 		}
-
-		options = new Options();
-
+		Options options = new Options();
 		options.parse(args);
+		run(options);
+	}
+
+	public static void run(Options options) throws Exception {
+
 		if (options.help()) {
 			options.getUsage();
 			return;
