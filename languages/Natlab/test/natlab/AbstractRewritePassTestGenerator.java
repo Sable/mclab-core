@@ -42,7 +42,7 @@ public class AbstractRewritePassTestGenerator extends AbstractTestGenerator
         testFileWriter.println("import natlab.toolkits.rewrite.Simplifier;");
         testFileWriter.println("import natlab.toolkits.rewrite.simplification.*;");
         testFileWriter.println("import natlab.toolkits.rewrite.Validator;");
-        testFileWriter.println("import natlab.Main;");
+        testFileWriter.println("import natlab.McLabCore;");
         testFileWriter.println("");
         testFileWriter.println("public class " + className + " extends RewritePassTestBase");
         testFileWriter.println("{");
