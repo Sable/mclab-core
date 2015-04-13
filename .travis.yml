@@ -5,10 +5,9 @@ script: "cd languages/Natlab; ant test"
 branches:
   only:
     - master
-    - develop
 notifications:
   email:
     recipients:
-      - sameer.jagdale@mail.mcgill.ca
+      - mclab@sable.mcgill.ca
     on_success: change
     on_failure: always
