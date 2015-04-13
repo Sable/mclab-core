@@ -1,0 +1,88 @@
+Notice: Output directory `api' does not exist. I have created it for you.
+Warning: source docsrc is not a readable file or directory... skipping.
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3tokenstream.c:1: Warning: the name `Default' supplied as the second argument in the \file statement is not an input file
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3baserecognizer.c:487: Warning: Unsupported xml/html tag <EOF> found
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3bitset.c:199: Warning: The following parameters of antlr3BitsetLoad(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset) are not documented:
+  parameter ec
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3collections.c:757: Warning: argument `enum' of command @param is not found in the argument list of antlr3EnumFree(pANTLR3_HASH_ENUM en)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3collections.c:757: Warning: The following parameters of antlr3EnumFree(pANTLR3_HASH_ENUM en) are not documented:
+  parameter en
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3collections.c:694: Warning: argument `enum' of command @param is not found in the argument list of antlr3EnumNextEntry(pANTLR3_HASH_ENUM en)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3collections.c:694: Warning: The following parameters of antlr3EnumNextEntry(pANTLR3_HASH_ENUM en) are not documented:
+  parameter en
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3bitset.c:199: Warning: The following parameters of antlr3BitsetLoad(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset) are not documented:
+  parameter ec
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3encodings.c:11: Warning: Found unknown command `\breif'
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3exception.c:10: Warning: The following parameters of antlr3ExceptionNew(ANTLR3_UINT32 exception, void *name, void *message, ANTLR3_BOOLEAN freeMessage) are not documented:
+  parameter name
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3encodings.c:11: Warning: Found unknown command `\breif'
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3exception.c:10: Warning: The following parameters of antlr3ExceptionNew(ANTLR3_UINT32 exception, void *name, void *message, ANTLR3_BOOLEAN freeMessage) are not documented:
+  parameter name
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:33: Warning: The following parameters of antlr3AsciiSetupStream(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type) are not documented:
+  parameter type
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:18: Warning: The following parameters of antlr3UCS2SetupStream(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type) are not documented:
+  parameter type
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:193: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiConsume(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:193: Warning: The following parameters of antlr3AsciiConsume(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:486: Warning: Found unknown command `\Brief'
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:267: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiIndex(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:267: Warning: The following parameters of antlr3AsciiIndex(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:225: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:225: Warning: The following parameters of antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:293: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiMark(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:293: Warning: The following parameters of antlr3AsciiMark(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:397: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiRelease(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:397: Warning: The following parameters of antlr3AsciiRelease(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark) are not documented:
+  parameter is
+  parameter mark
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:358: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiRewind(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:358: Warning: The following parameters of antlr3AsciiRewind(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark) are not documented:
+  parameter is
+  parameter mark
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:345: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiRewindLast(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:345: Warning: The following parameters of antlr3AsciiRewindLast(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:417: Warning: argument `input' of command @param is not found in the argument list of antlr3AsciiSeek(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:417: Warning: The following parameters of antlr3AsciiSeek(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint) are not documented:
+  parameter is
+  parameter seekPoint
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:514: Warning: Found unknown command `\Brief'
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:505: Warning: explicit link request to 'nnn' could not be resolved
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3inputstream.c:33: Warning: The following parameters of antlr3AsciiSetupStream(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type) are not documented:
+  parameter type
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3lexer.c:137: Warning: argument `toksouirce' of command @param is not found in the argument list of nextToken(pANTLR3_TOKEN_SOURCE toksource)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3lexer.c:137: Warning: The following parameters of nextToken(pANTLR3_TOKEN_SOURCE toksource) are not documented:
+  parameter toksource
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3string.c:440: Warning: The following parameters of newPtr16_16(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size) are not documented:
+  parameter size
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3string.c:392: Warning: The following parameters of newPtr16_8(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size) are not documented:
+  parameter size
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3string.c:359: Warning: The following parameters of newPtr8(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size) are not documented:
+  parameter size
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:59: Warning: argument `input' of command @param is not found in the argument list of antlr3UCS2Consume(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:59: Warning: The following parameters of antlr3UCS2Consume(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:116: Warning: argument `input' of command @param is not found in the argument list of antlr3UCS2Index(pANTLR3_INT_STREAM is)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:116: Warning: The following parameters of antlr3UCS2Index(pANTLR3_INT_STREAM is) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:91: Warning: argument `input' of command @param is not found in the argument list of antlr3UCS2LA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:91: Warning: The following parameters of antlr3UCS2LA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la) are not documented:
+  parameter is
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:129: Warning: argument `input' of command @param is not found in the argument list of antlr3UCS2Seek(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:129: Warning: The following parameters of antlr3UCS2Seek(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint) are not documented:
+  parameter is
+  parameter seekPoint
+/Users/parrt/antlr/code/antlr/main/runtime/C/src/antlr3ucs2inputstream.c:18: Warning: The following parameters of antlr3UCS2SetupStream(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type) are not documented:
+  parameter type
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3baserecognizer.h:189: Warning: explicit link request to 'ANTLR3_EXCEPTION_NOVIABLE_ALT' could not be resolved
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3baserecognizer.h:47: Warning: explicit link request to 'ANTLR3_TREEPARSER' could not be resolved
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3exception.h:66: Warning: explicit link request to 'defines' could not be resolved
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3input.h:163: Warning: Found unknown command `\0'
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3lexer.h:173: Warning: explicit link request to 'ANTLR3_EXCEPTION_NOVIABLE_ALT' could not be resolved
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3string.h:30: Warning: Found unknown command `\0'
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3string.h:32: Warning: Found unknown command `\0'
+/Users/parrt/antlr/code/antlr/main/runtime/C/include/antlr3string.h:36: Warning: Found unknown command `\0'

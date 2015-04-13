@@ -1,0 +1,5 @@
+- scopes
+- rule parameters & return values
+- memoization
+- AST construction
+- error recovery

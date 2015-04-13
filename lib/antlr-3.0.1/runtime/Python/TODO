@@ -1,0 +1,49 @@
+- rename @members/@init to @classmembers, @instancemembers?
+- implement TreeWizard
+- http://permalink.gmane.org/gmane.comp.parsers.antlr-interest/13425
+- testcases error handling in tree parsers
+- better test coverage for runtime modules
+- documentation
+  - more documentation in docstrings
+  - tune doxygen output
+  - doxygen frontpage
+- do not use Set* templates for properties for Python target
+  - gate with sempred {target.usePropertySetTemplates()}?
+- special template for empty alternative -> pass
+- complete runtime
+ - tree.DOTTreeGenerator (needs ST)
+ - tree.DoubleLinkTree
+ - tree.ParseTree
+ - tree.UnBufferedTreeNodeStream
+- iterator interface for lexer/token streams (as in ANTLR2)
+- generated "if __name__ == '__main__'" section
+  - for parsers:
+    stream = ANTLRInputStream(sys.stdin)
+    for token in TLexer(stream):
+        print token
+- default values in rule arguments?
+- turn some methods into attributes
+  - (String|CommonToken)Stream.index()
+  - (String|CommonToken)Stream.size() --> __len__
+- get rid of getter/setter in generated code
+- document differences to java API
+- add methods to emulate java API, but mark 'em as deprecated
+- using Stream.index as a state for 'error-already-reported' or memoization
+  will be a problem when the stream is not a linear buffer
+- optimizations which should be explored:
+  - DFA: perhaps zip() the lists into a tuple 
+    (eot, eof, min, max, accept, special, transition)
+    for each state. checkout potential performance gain.
+  - raise exception for failed backtracking, get rid of 
+    "if self.failed: return"
+  - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
+    and create the attributes when needed.
+  - Perform some magic to improve dfaStateSwitch.
+  - in lexer rules:
+    LA == u'a' or LA == u'b' or LA == u'c'...
+    -> LA in (u'a', u'b', u'c', ...)
+    or "LA in self.set_xyz" with set_xyz as a class member
+  - lexer: operate on ordinals not character strings
+  - make BaseTree.nil() an attribute? or singleton?
+  - psycho??
+- ...

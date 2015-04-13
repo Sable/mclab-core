@@ -1,0 +1,17 @@
+2007-06-27  Benjamin Niemann  <pink@odahoda.de>
+
+	* Python.stg (genericParser, parser, treeParser): Use correct @init
+	action block for tree parsers.
+
+2007-05-24  Benjamin Niemann  <pink@odahoda.de>
+
+	* Python.stg (rule): Added support for @decorate {...} action for
+	parser rules to add decorators to the rule method.
+
+2007-05-18  Benjamin Niemann  <pink@odahoda.de>
+
+	* Python.stg (isolatedLookaheadRangeTest, lookaheadRangeTest): 
+	Minor improvement of generated code (use '<lower> <= <LA> <= <upper>'
+	instead of '<LA> >= <lower> and <LA> <= <upper>').
+	
+
