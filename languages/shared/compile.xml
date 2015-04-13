@@ -1,0 +1,34 @@
+<!--
+    Requires:
+        Properties: ant.bin.dir, src.dir, gen.dir, test.dir
+        Paths: compile.classpath
+        Targets: n/a
+-->
+<project name="Compile">
+	<!-- command-line compilation -->
+	<target name="compile" depends="set.bin.dir" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${basedir}/${ant.bin.dir}">
+			<classpath refid="compile.classpath" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+ 	<target name="compile.with.tests" depends="set.bin.dir" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${basedir}/${ant.bin.dir}">
+			<classpath refid="compile.classpath" />
+			<src path="${src.dir}" />
+			<src path="${gen.dir}" />
+			<src path="${test.dir}" />
+			<include name="**/*.java" />
+		</javac>
+	</target>     
+
+	<!-- remove files created by compile -->
+	<target name="clean.compile" unless="inside.eclipse">
+		<delete dir="${ant.bin.dir}" />
+	</target>
+</project>

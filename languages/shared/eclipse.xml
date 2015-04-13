@@ -1,0 +1,16 @@
+<!--
+    Requires:
+        Properties:
+        Paths:
+        Targets: build, clean, test
+-->
+<project name="Eclipse">
+	<!-- Eclipse targets -->
+	<target name="set.eclipse">
+		<property name="inside.eclipse" value="true" />
+	</target>
+
+	<target name="eclipse.build" depends="set.eclipse, build" />
+	<target name="eclipse.clean" depends="set.eclipse, clean" />
+	<target name="eclipse.test" depends="set.eclipse, test" />
+</project>
