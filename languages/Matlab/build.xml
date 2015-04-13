@@ -1,0 +1,131 @@
+<project name="Matlab" default="build">
+	<!-- load properties -->
+	<property file="matlab.properties" />
+
+	<!-- useful paths -->
+	<path id="jflex.jar.path" path="${lib.dir}/${jflex.jar.path.prop}" />
+	<path id="jastadd.jar.path" path="${lib.dir}/${jastadd.jar.path.prop}" />
+	<path id="junit.jar.path" path="${lib.dir}/${junit.jar.path.prop}" />
+	<path id="antlr.jar.path">
+		<fileset dir="${lib.dir}">
+			<include name="${antlr.task.jar.path.prop}" />
+			<include name="${antlr3.jar.path.prop}" />
+			<include name="${string.template.jar.path.prop}" />
+			<include name="${antlr2.jar.path.prop}" />
+		</fileset>
+	</path>
+
+	<!--=====================================================================-->
+	<!-- Private Targets                                                     -->
+	<!--=====================================================================-->
+
+	<!-- Task Definition (instead of taskdef.xml) -->
+
+	<!-- creates JFlex Ant task -->
+	<target name="def.jflex.task" unless="jflex.available">
+		<taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpathref="jflex.jar.path" />
+		<property name="jflex.available" value="yes" />
+	</target>
+
+	<!-- creates Antlr3 Ant task -->
+	<target name="def.antlr3.task" unless="antlr3.available">
+		<taskdef name="antlr3" classname="org.apache.tools.ant.antlr.ANTLR3" classpathref="antlr.jar.path" />
+		<property name="antlr3.available" value="yes" />
+	</target>
+
+	<import file="../shared/compile.xml" />
+	<import file="../shared/bindir.xml" />
+
+	<!-- Generation (instead of gen.xml) -->
+
+	<target name="jflex.function.end" depends="def.jflex.task">
+		<jflex file="${src.dir}/${function.end.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex.command" depends="def.jflex.task">
+		<jflex file="${src.dir}/${command.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex.length" depends="def.jflex.task">
+		<jflex file="${src.dir}/${length.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex.trivial" depends="def.jflex.task">
+		<jflex file="${test.dir}/${trivial.lexer.spec}" destdir="${gen.dir}" nobak="yes" />
+	</target>
+
+	<target name="jflex" depends="jflex.function.end, jflex.command, jflex.length, jflex.trivial" />
+
+	<target name="antlr.matlab" depends="def.antlr3.task">
+		<mkdir dir="${gen.dir}/${root.pkg}" />
+		<antlr3 target="${src.dir}/${matlab.mixed.spec}" outputdirectory="${gen.dir}/${root.pkg}" />
+	</target>
+
+	<target name="antlr" depends="antlr.matlab" />
+
+	<target name="compile.test.generators" unless="inside.eclipse">
+		<mkdir dir="${ant.bin.dir}" />
+		<javac destdir="${ant.bin.dir}">
+			<src path="${test.dir}" />
+			<include name="**/*TestGenerator.java" />
+		</javac>
+	</target>
+
+	<target name="gen.scanner.tests" depends="set.bin.dir">
+		<java classname="${lexer.test.generator.class}" classpath="${bin.dir}">
+			<arg value="${lexer.test.list.file}" />
+			<arg value="${basedir}/${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.translator.tests" depends="set.bin.dir">
+		<java classname="${translator.test.generator.class}" classpath="${bin.dir}">
+			<arg value="${basedir}/${translator.test.list.file}" />
+			<arg value="${basedir}/${gen.dir}" />
+		</java>
+	</target>
+
+	<target name="gen.tests" depends="gen.scanner.tests, gen.translator.tests" />
+
+	<!-- jflex, beaver, jastadd, and tests -->
+	<!-- NB: overrides target from gen.xml -->
+	<target name="gen" depends="compile.test.generators, jflex, antlr, gen.tests" />
+
+	<!-- remove files created by gen -->
+	<target name="clean.gen">
+		<delete includeemptydirs="true">
+			<fileset dir="${gen.dir}" includes="**/*" />
+		</delete>
+	</target>
+
+	<!-- Overriding to define classpaths (may depend on bin.dir) -->
+	<target name="set.bin.dir" depends="BinDir.set.bin.dir">
+		<path id="compile.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="antlr.jar.path" />
+		</path>
+		<path id="test.classpath">
+			<path refid="junit.jar.path" />
+			<path refid="antlr.jar.path" />
+			<path location="${basedir}/${bin.dir}" />
+		</path>
+	</target>
+
+	<!--=====================================================================-->
+	<!-- Public Targets                                                      -->
+	<!--=====================================================================-->
+
+	<import file="../shared/cli.xml" />
+	<import file="../shared/eclipse.xml" />
+
+	<!-- public versions of cli.xml targets -->
+	<!-- <target name="build" depends="CommandLineInterface.build" description="generate and build all files" /> -->
+  <target name="build" depends="gen, compile.with.tests" description="generate and build all files" />
+	<target name="clean" depends="CommandLineInterface.clean" description="deletes all files produced by build" />
+	<target name="test" depends="CommandLineInterface.test" description="runs all JUnit tests" />
+
+	<!-- public versions of eclipse.xml targets -->
+	<target name="eclipse.build" depends="Eclipse.eclipse.build" description="generate all files, let Eclipse build" />
+	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
+	<target name="eclipse.test" depends="Eclipse.eclipse.test" description="runs all JUnit tests, as built by Eclipse" />
+</project>
