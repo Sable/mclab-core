@@ -1,43 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="languages/ExExtension1/src"/>
-	<classpathentry kind="src" path="languages/ExExtension2/src"/>
-	<classpathentry kind="src" path="languages/Matlab/gen"/>
-	<classpathentry kind="src" path="languages/Matlab/src"/>
-	<classpathentry kind="src" path="languages/Matlab/test"/>
-	<classpathentry kind="src" path="languages/Natlab/gen"/>
-	<classpathentry kind="src" path="languages/Natlab/src"/>
-	<classpathentry kind="src" path="languages/Natlab/test"/>
-	<classpathentry kind="src" path="lib/antlr-3.0.1/runtime/Java/src"/>
-	<classpathentry kind="src" path="lib/antlr-3.0.1/src"/>
-	<classpathentry kind="src" path="lib/beaver-0.9.6.2/examples"/>
-	<classpathentry kind="src" path="lib/beaver-0.9.6.2/src"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/examples/binary"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/examples/cup"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/examples/interpreter"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/examples/java"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/examples/simple"/>
-	<classpathentry kind="src" path="lib/jflex-1.4.1/src"/>
-	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-2.7.7.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-3.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-runtime-3.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/stringtemplate-3.1b1.jar"/>
-	<classpathentry kind="lib" path="lib/antlr3-task-20071115/antlr3-src.jar"/>
-	<classpathentry kind="lib" path="lib/antlr3-task-20071115/antlr3-task.jar"/>
-	<classpathentry kind="lib" path="lib/beaver-0.9.6.2/lib/beaver-rt-src.jar"/>
-	<classpathentry kind="lib" path="lib/beaver-0.9.6.2/lib/beaver-rt.jar"/>
-	<classpathentry kind="lib" path="lib/beaver-0.9.6.2/lib/beaver.jar"/>
-	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1-sources.jar"/>
-	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/jastadd2-2.1.9/jastadd2.jar"/>
-	<classpathentry kind="lib" path="lib/JastAddParser/JastAddParser-java15.jar"/>
-	<classpathentry kind="lib" path="lib/JastAddParser/JastAddParser.jar"/>
-	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
-	<classpathentry kind="lib" path="lib/json-simple-1.1.1/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
-	<classpathentry kind="lib" path="lib/metalexer-20090605/metalexer-jflex_20090605.jar"/>
+	<classpathentry excluding="metalexer/" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/gen"/>
+	<classpathentry excluding="metalexer/|natlab/AspectsEngine.java" kind="src" output="languages/Natlab/bin-eclipse" path="languages/Natlab/src"/>
+	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/src"/>
+	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/gen"/>
+	<classpathentry kind="src" output="languages/Matlab/bin-eclipse" path="languages/Matlab/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jflex-1.4.1/lib/JFlex.jar"/>
+	<classpathentry kind="lib" path="lib/beaver-0.9.6.2/lib/beaver.jar" sourcepath="lib/beaver-0.9.6.2/src"/>
+	<classpathentry kind="lib" path="lib/junit-4.4/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-3.0.1.jar" sourcepath="lib/antlr-3.0.1/runtime/Java/src"/>
+	<classpathentry kind="lib" path="lib/antlr3-task-20071115/antlr3-task.jar" sourcepath="lib/antlr3-task-20071115/antlr3-src.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0.1/lib/stringtemplate-3.1b1.jar"/>
+	<classpathentry kind="lib" path="languages/Natlab/resources"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jcommander/jcommander-1.47.jar"/>
-	<classpathentry kind="output" path="languages/Natlab/bin-eclipse"/>
+	<classpathentry kind="lib" path="lib/guava-16.0.1/guava-16.0.1.jar" sourcepath="lib/guava-16.0.1/guava-16.0.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/mclab/lib/guava-16.0.1/guava-16.0.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
