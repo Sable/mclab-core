@@ -47,7 +47,7 @@ import com.google.common.base.Joiner;
  */
 public class McLabCore {
 
-	private static void log(String message) {
+	private static void log(Options options, String message) {
 		if (!options.quiet()) {
 			System.err.println(message);
 		}
@@ -134,7 +134,7 @@ public class McLabCore {
 		}
 
 		List<String> files = options.files();
-		log("Parsing " + Joiner.on(", ").join(files));
+		log(options, "Parsing " + Joiner.on(", ").join(files));
 		List<CompilationProblem> errors = new ArrayList<>();
 		CompilationUnits cu;
 		if (!options.natlab()) {
@@ -164,7 +164,7 @@ public class McLabCore {
 		}
 
 		if (options.pretty()) {
-			log("Pretty printing");
+			log(options, "Pretty printing");
 
 			if (options.od().length() == 0) {
 				System.out.println(cu.getPrettyPrinted());

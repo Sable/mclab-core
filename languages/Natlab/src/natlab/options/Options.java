@@ -375,14 +375,14 @@ public class Options {
 	/**
 	 * An instance of JCommander. Required to print usage.
 	 */
-	private JCommander jct = null;
+	protected JCommander jct = null;
 
 	/**
 	 * Parses the given command line arguments. The result is stored in the
 	 * instance of the Options(this) class
 	 * 
 	 * @param args
-	 *            . Array of Strings containing the command line arguments.
+	 *            .Array of Strings containing the command line arguments.
 	 */
 	public void parse(String[] args) {
 		jct = new JCommander(this, args);
