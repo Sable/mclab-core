@@ -161,7 +161,7 @@ public class Options {
 		return natlab;
 	}
 
-	@Parameter(names = { "--outdir", "od" }, description = "Output everything to this dir rather than stdout")
+	@Parameter(names = { "--outdir", "-od" }, description = "Output everything to this dir rather than stdout")
 	protected String od = "";
 
 	/**
