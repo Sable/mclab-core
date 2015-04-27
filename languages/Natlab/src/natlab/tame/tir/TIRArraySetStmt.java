@@ -49,7 +49,7 @@ public class TIRArraySetStmt extends TIRAbstractAssignFromVarStmt {
         return ((NameExpr)getRHS()).getName();
     }
     
-    public TIRCommaSeparatedList getIndizes(){
+    public TIRCommaSeparatedList getIndices(){
         return (TIRCommaSeparatedList)(((ParameterizedExpr)getLHS()).getArgList());
     }
     

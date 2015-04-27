@@ -145,7 +145,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         
         TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
         usedVariablesNames.add(new NameExpr(node.getArrayName()));
-        TIRCommaSeparatedList indices = node.getIndizes();
+        TIRCommaSeparatedList indices = node.getIndices();
         addIndicesToUsedVariablesNames(indices, usedVariablesNames);
         
         renameDefinedVariablesForNode(definedVariablesNames, node);
@@ -159,7 +159,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         
         TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(new NameExpr(node.getValueName()));
         usedVariablesNames.add(new NameExpr(node.getCellArrayName()));
-        TIRCommaSeparatedList indices = node.getIndizes();
+        TIRCommaSeparatedList indices = node.getIndices();
         addIndicesToUsedVariablesNames(indices, usedVariablesNames);
         
         renameDefinedVariablesForNode(definedVariablesNames, node);
@@ -232,7 +232,7 @@ public class RenameVariablesForTIRNodes extends TIRAbstractNodeCaseHandler imple
         TIRArrayGetStmt arrayGetStmt = (TIRArrayGetStmt) node;
         Name arrayName = arrayGetStmt.getArrayName();
         usedVariablesNames = new TIRCommaSeparatedList(new NameExpr((arrayName)));
-        TIRCommaSeparatedList indices = arrayGetStmt.getIndizes();
+        TIRCommaSeparatedList indices = arrayGetStmt.getIndices();
         addIndicesToUsedVariablesNames(indices, usedVariablesNames);
         
         renameDefinedVariablesForNode(definedVariablesNames, node);

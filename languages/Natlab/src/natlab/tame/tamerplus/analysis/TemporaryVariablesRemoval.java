@@ -178,7 +178,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(
 				new NameExpr(node.getValueName()));
 		usedVariablesNames.add(new NameExpr(node.getCellArrayName()));
-		TIRCommaSeparatedList indices = node.getIndizes();
+		TIRCommaSeparatedList indices = node.getIndices();
 		addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
 
 		replaceUsedTempVarsByDefintions(usedVariablesNames, node);
@@ -189,7 +189,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(
 				new NameExpr(node.getValueName()));
 		usedVariablesNames.add(new NameExpr(node.getArrayName()));
-		TIRCommaSeparatedList indices = node.getIndizes();
+		TIRCommaSeparatedList indices = node.getIndices();
 		addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
 
 		replaceUsedTempVarsByDefintions(usedVariablesNames, node);
@@ -232,7 +232,7 @@ public class TemporaryVariablesRemoval extends TIRAbstractNodeCaseHandler
 		Name arrayName = node.getArrayName();
 		TIRCommaSeparatedList usedVariablesNames = new TIRCommaSeparatedList(
 				new NameExpr((arrayName)));
-		TIRCommaSeparatedList indices = node.getIndizes();
+		TIRCommaSeparatedList indices = node.getIndices();
 		addTmpIndicesToUsedVariablesNames(indices, usedVariablesNames);
 
 		replaceUsedTempVarsByDefintions(usedVariablesNames, node);

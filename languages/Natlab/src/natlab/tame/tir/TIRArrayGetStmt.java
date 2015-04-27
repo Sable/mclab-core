@@ -56,7 +56,7 @@ public class TIRArrayGetStmt extends TIRAbstractAssignToListStmt {
     }
     
     
-    public TIRCommaSeparatedList getIndizes(){
+    public TIRCommaSeparatedList getIndices(){
         return (TIRCommaSeparatedList)(((ParameterizedExpr)getRHS()).getArgList());
     }
     

@@ -54,7 +54,7 @@ public class TIRIfStmt extends IfStmt implements TIRStmt {
          return ((NameExpr)(this.getIfBlock(0).getCondition())).getName();
     }
     
-    public TIRStatementList getIfStameents(){
+    public TIRStatementList getIfStatements(){
         return (TIRStatementList)(this.getIfBlock(0).getStmtList());
     }
     
