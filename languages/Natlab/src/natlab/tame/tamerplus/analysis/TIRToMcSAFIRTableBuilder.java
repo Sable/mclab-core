@@ -271,7 +271,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             ParameterizedExpr lhs = new ParameterizedExpr();
             NameExpr arrayName = new NameExpr(arraySetStmtClone.getArrayName());
             lhs.setTarget(arrayName);
-            addIndicesToParametrizedExpr(arraySetStmtClone.getIndizes(), lhs);
+            addIndicesToParametrizedExpr(arraySetStmtClone.getIndices(), lhs);
             assignStmt.setLHS(lhs);
             assignStmt.setRHS(arraySetStmtClone.getRHS());
             
@@ -295,7 +295,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             CellIndexExpr lhs = new CellIndexExpr();
             NameExpr cellArrayName = new NameExpr(cellArraySetStmtClone.getCellArrayName());
             lhs.setTarget(cellArrayName);
-            addIndicesToCellIndexExpr(cellArraySetStmtClone.getIndizes(), lhs);
+            addIndicesToCellIndexExpr(cellArraySetStmtClone.getIndices(), lhs);
             assignStmt.setLHS(lhs);
             assignStmt.setRHS(cellArraySetStmtClone.getRHS());
             
@@ -391,7 +391,7 @@ public class TIRToMcSAFIRTableBuilder extends TIRAbstractNodeCaseHandler impleme
             ParameterizedExpr rhs = new ParameterizedExpr();
             NameExpr arrayName = new NameExpr(arrayGetStmtClone.getArrayName());
             rhs.setTarget(arrayName);
-            addIndicesToParametrizedExpr(arrayGetStmtClone.getIndizes(), rhs);
+            addIndicesToParametrizedExpr(arrayGetStmtClone.getIndices(), rhs);
             assignStmt.setLHS(arrayGetStmtClone.getLHS());
             assignStmt.setRHS(rhs);
             

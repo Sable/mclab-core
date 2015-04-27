@@ -44,7 +44,7 @@ public class TIRCellArraySetStmt extends TIRAbstractAssignFromVarStmt {
         return ((NameExpr)((CellIndexExpr)getLHS()).getTarget()).getName();
     }
             
-    public TIRCommaSeparatedList getIndizes(){
+    public TIRCommaSeparatedList getIndices(){
         return (TIRCommaSeparatedList)(((CellIndexExpr)getLHS()).getArgList());
     }
     

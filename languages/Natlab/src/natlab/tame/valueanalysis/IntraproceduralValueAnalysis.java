@@ -255,13 +255,13 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //go through all possible array values
         for (V arrayValue : array){
             if (arrayValue instanceof MatrixValue){
-                if (node.getIndizes().size() == 0){
+                if (node.getIndices().size() == 0){
                     results.add(Res.newInstance(ValueSet.newInstance(arrayValue)));
                 } else {
                     //go through all possible index setss
                     //TODO - deal with overloading of subsref etc.
                     //TODO - errors on assign - use is assign to var??
-                    for (List<V> indizes : cross(flow,node.getIndizes())){
+                    for (List<V> indizes : cross(flow,node.getIndices())){
                         results.add(Res.newInstance(arrayValue.arraySubsref(Args.newInstance(indizes))));
                     }
                 }
@@ -273,7 +273,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 		callsite = this.node.createCallsiteObject(node);
                 	}
                     results.add(call(
-                          handle.getFunction(), flow, node.getIndizes(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getName(),false));
+                          handle.getFunction(), flow, node.getIndices(), node.getTargets(), callsite, (List<ValueSet<V>>)(List<?>)handle.getPartialValues(),handle.getFunction().getName(),false));
                     //TODO - we assume overloading is no possible for a function handle value - is that Matlab semantics?
                 }
             } else {
@@ -328,7 +328,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         String targetName = node.getArrayName().getID();
         ValueSet<V> targets = flow.get(targetName);
         ValueSet<V> values = flow.get(node.getValueName().getID());
-        List<LinkedList<V>> indizesList = cross(flow,node.getIndizes());
+        List<LinkedList<V>> indizesList = cross(flow,node.getIndices());
         
         //if target is undefined yet, define it
         if (targets == null){
@@ -489,7 +489,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         String targetName = node.getCellArrayName().getID();
         ValueSet<V> targets = flow.get(targetName);
         ValueSet<V> values = flow.get(node.getValueName().getID());
-        List<LinkedList<V>> indizesList = cross(flow,node.getIndizes());
+        List<LinkedList<V>> indizesList = cross(flow,node.getIndices());
         
         //if target is undefined yet, define it
         if (targets == null){

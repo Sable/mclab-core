@@ -168,10 +168,10 @@ public class IntraproceduralLiveVariableAnalysis
 			Name target;
 			if (node instanceof TIRArraySetStmt){
 				target = ((TIRArraySetStmt)node).getArrayName();
-				read = ((TIRArraySetStmt)node).getIndizes();
+				read = ((TIRArraySetStmt)node).getIndices();
 			} else if (node instanceof TIRCellArraySetStmt){
 				target = ((TIRCellArraySetStmt)node).getCellArrayName();
-				read = ((TIRCellArraySetStmt)node).getIndizes();
+				read = ((TIRCellArraySetStmt)node).getIndices();
 			} else if (node instanceof TIRDotSetStmt){
 				target = ((TIRDotSetStmt)node).getDotName();
 				read = new TIRCommaSeparatedList();
@@ -181,7 +181,7 @@ public class IntraproceduralLiveVariableAnalysis
 		} else if (node instanceof TIRAbstractAssignToListStmt){
 			write = ((TIRAbstractAssignToListStmt)node).getTargets();
 			if (node instanceof TIRArrayGetStmt){
-				read = ((TIRArrayGetStmt)node).getIndizes();
+				read = ((TIRArrayGetStmt)node).getIndices();
 				read.add(new NameExpr(((TIRArrayGetStmt)node).getArrayName()));
 			} else if (node instanceof TIRCellArrayGetStmt){
 				read = ((TIRCellArrayGetStmt)node).getIndices();

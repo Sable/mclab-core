@@ -109,7 +109,7 @@ import com.google.common.collect.Sets;
         fCurrentVariablesSet.add(node.getValueName().getID());
         fCurrentVariablesSet.add(node.getCellArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));   
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndices().asNameList()));   
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -120,7 +120,7 @@ import com.google.common.collect.Sets;
         fCurrentVariablesSet.add(node.getValueName().getID());
         fCurrentVariablesSet.add(node.getArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndices().asNameList()));
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
@@ -130,7 +130,7 @@ import com.google.common.collect.Sets;
         fCurrentVariablesSet = newInitialFlow();
         fCurrentVariablesSet.add(node.getArrayName().getID());
         // TODO, this might cause an error(asNameList)!
-        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndizes().asNameList()));
+        fCurrentVariablesSet.addAll(TamerPlusUtils.getNameListAsStringSet(node.getIndices().asNameList()));
         fNodeToUsedVariablesMap.put(node, fCurrentVariablesSet);
     }
     
