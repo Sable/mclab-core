@@ -59,7 +59,7 @@ public class McLabCore {
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length == 0) {
-			System.err.println("No options given\nTry -help for usage");
+			System.err.println("No options given\nTry --help for usage");
 			return;
 		}
 		Options options = new Options();
