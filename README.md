@@ -8,7 +8,18 @@ development for the project's "static" branch, which includes the frontend
 (parsing, static analysis, refactoring, etc.), and work towards static
 compilation.
 
-Information on installation, usage and extending the framework can be found in the [mclab-core wiki](https://github.com/Sable/mclab-core/wiki). 
+Installation Instructions
+-------------------------
+McLab can be built by running the following command from the McLab root directory. 
+```
+cd languages/Natlab/ && ant build
+```
+In order to generate the jar file  run the following command
+```
+cd languages/Natlab/ && ant jar
+``` 
+
+Additional information on installation, usage and extending the framework can be found in the [mclab-core wiki](https://github.com/Sable/mclab-core/wiki). 
 
 Copyright and License
 ---------------------
