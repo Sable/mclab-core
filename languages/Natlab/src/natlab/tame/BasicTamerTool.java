@@ -9,6 +9,7 @@ import java.util.List;
 import natlab.options.Options;
 import natlab.tame.callgraph.SimpleFunctionCollection;
 import natlab.tame.classes.reference.PrimitiveClassReference;
+import natlab.tame.interproceduralAnalysis.InterproceduralAnalysisNode;
 import natlab.tame.tamerplus.utils.IntOkAnalysis;
 import natlab.tame.tamerplus.utils.RenameTypeConflictVars;
 import natlab.tame.valueanalysis.ValueAnalysis;
@@ -36,7 +37,8 @@ public class BasicTamerTool {
 	 */
 	public static void main(String[] args) {
 		// file -> generic file
-		GenericFile gFile = GenericFile.create("/home/sameer/interview/mclab/simple.m");
+		GenericFile gFile = GenericFile
+				.create("/home/sameer/interview/mclab/fact.m");
 		// get path environment obj
 		FileEnvironment env = new FileEnvironment(gFile);
 		// build simple callgraph
@@ -57,11 +59,21 @@ public class BasicTamerTool {
 		// Args.newInstance(inputValues),
 		// factory);
 		// System.out.println(analysis.toString());
+		BasicTamerTool.doIntOk = false;
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = analyze(args, env);
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
-			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
-					.getNodeList().get(i).getAnalysis()));
+			// System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
+			// .getNodeList().get(i).getAnalysis()));
+
+			System.out.println(analysis.getNodeList().get(i).getFunction()
+					.getName());
+			analysis.getNodeList().get(i).getAnalysis().getArgs()
+					.forEach(p -> System.out.println(p));
+			System.out.println("--Result--");
+			analysis.getNodeList().get(i).getAnalysis().getResult()
+					.forEach(p -> System.out.println(p));
 		}
+		
 	}
 
 	// TODO give more useful functions!
@@ -104,16 +116,19 @@ public class BasicTamerTool {
 		return analysis;
 	}
 
-    public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(String[] args) {
-        ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(args.length);
-        for (String argSpecs : args) {
-            String delims = "[\\&]";
-            String[] specs = argSpecs.split(delims);
-            PrimitiveClassReference clsType = PrimitiveClassReference.valueOf(specs[0]);
-            list.add(new BasicMatrixValue(null, clsType, specs[1], specs[2]));
-        }
-        return list;
-    }
+	public static List<AggrValue<BasicMatrixValue>> getListOfInputValues(
+			String[] args) {
+		ArrayList<AggrValue<BasicMatrixValue>> list = new ArrayList<AggrValue<BasicMatrixValue>>(
+				args.length);
+		for (String argSpecs : args) {
+			String delims = "[\\&]";
+			String[] specs = argSpecs.split(delims);
+			PrimitiveClassReference clsType = PrimitiveClassReference
+					.valueOf(specs[0]);
+			list.add(new BasicMatrixValue(null, clsType, specs[1], specs[2]));
+		}
+		return list;
+	}
 
 	/**
 	 * the entry point coming from natlab.Main - uses the options object to

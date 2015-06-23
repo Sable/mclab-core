@@ -237,6 +237,10 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		else return false;
 	}
 	
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
 	@Override
 	public String toString() {
 		return "<" 
