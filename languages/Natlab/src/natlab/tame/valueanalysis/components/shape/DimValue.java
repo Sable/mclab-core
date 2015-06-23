@@ -79,4 +79,12 @@ public class DimValue {
 	public String toString() {
 		return hasIntValue() ? intValue.toString() : (symbolic!=null ? symbolic : "?");
 	}
+	
+	public int hashCode() {
+		if (intValue != null)
+			return intValue;
+		if (symbolic != null)
+			return symbolic.hashCode();
+		return super.hashCode();
+	}
 }

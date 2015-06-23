@@ -346,4 +346,8 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     		dimensions.set(i, new DimValue());
     	}
     }
+
+    public int hashCode() {
+    	return dimensions.hashCode();
+    }
 }

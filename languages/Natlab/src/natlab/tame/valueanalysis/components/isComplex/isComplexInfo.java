@@ -60,7 +60,7 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
     }
     
     public boolean equals(isComplexInfo<V> o){
-    	if(this.geticType()==o.geticType()){
+    	if(this.geticType().equals(o.geticType())) {
     		return true;
     	}
     	else
@@ -92,6 +92,10 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
 		}
 		
 		return new isComplexInfo<V>(this.factory, afterMerge);
+	}
+	
+	public int hashCode() {
+		return icType.hashCode();
 	}
 
 }

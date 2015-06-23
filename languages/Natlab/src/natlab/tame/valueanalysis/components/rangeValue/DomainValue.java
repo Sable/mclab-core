@@ -1,5 +1,8 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * the range value domain is: -inf, real numbers, real numbers with +/-, 
  * and +inf;
@@ -207,6 +210,16 @@ public class DomainValue {
 			else return false;
 		}
 		else return false;
+	}
+	
+	public int hashCode() {
+		List<Double> fields = new ArrayList<>();
+		fields.add(realNum);
+		fields.add(negativeInf ? 1.0 : 0.0);
+		fields.add(positiveInf ? 1.0 : 0.0);
+		fields.add(superscriptMinus ? 1.0 : 0.0);
+		fields.add(superscriptPlus ? 1.0 : 0.0);
+		return fields.hashCode();
 	}
 	
 	// based on max, min and equals, we can have <= and >=.
