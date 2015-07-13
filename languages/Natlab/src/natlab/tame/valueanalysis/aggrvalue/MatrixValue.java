@@ -69,7 +69,11 @@ public abstract class MatrixValue<D extends MatrixValue<D>> extends AggrValue<D>
     
         
     @Override
-    abstract public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes);  
+    abstract public ValueSet<AggrValue<D>> arraySubsref(Args<AggrValue<D>> indizes);
+
+    public int hashCode() {
+        return (symbolic == null? 0: symbolic.hashCode()) + (classRef == null? 0: classRef.hashCode());
+    }
     
      
 }
