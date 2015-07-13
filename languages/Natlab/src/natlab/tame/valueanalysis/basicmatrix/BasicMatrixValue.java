@@ -58,8 +58,9 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 				.newShapeFromIntegers(constant.getShape());
 		//TODO, this line may cause infinite loop.
 		if (constant instanceof DoubleConstant) {
-//			this.rangeValue = (new RangeValueFactory<AggrValue<BasicMatrixValue>>(factory))
-//					.newRangeValueFromDouble(((DoubleConstant)constant).getValue());			
+			//System.out.println("Range analysis enabled");
+			this.rangeValue = (new RangeValueFactory<AggrValue<BasicMatrixValue>>(factory))
+					.newRangeValueFromDouble(((DoubleConstant)constant).getValue());
 		}
 		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()
 				.newisComplexInfoFromStr("REAL");
@@ -269,10 +270,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	}
 	
 	public int hashCode() {
-		int shapeHash = shape != null ? shape.hashCode() : 0;
-		int rangeHash = rangeValue != null ? rangeValue.hashCode() : 0;
-		int complexHash = complex != null ? complex.hashCode() : 0;
-		return shapeHash + rangeHash + complexHash;
+		return toString().hashCode();
 	}
 
 	@Override
