@@ -14,6 +14,7 @@ hs_err_pid*
 # Generated code
 languages/Matlab/gen/*
 languages/Natlab/gen/
+languages/Octave/gen/*
 
 # Natlab binaries
 languages/Natlab/McLabCore.jar
