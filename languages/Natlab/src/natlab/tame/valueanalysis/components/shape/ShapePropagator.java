@@ -56,7 +56,7 @@ public class ShapePropagator<V extends Value<V>>
 		List<Integer> scalarShape = new ArrayList<Integer>(2);
 		scalarShape.add(1);
 		scalarShape.add(1);
-		return new ShapeFactory<V>().newShapeFromIntegers(scalarShape);
+		return new ShapeFactory().newShapeFromIntegers(scalarShape);
     }
     
     /*
@@ -116,7 +116,7 @@ public class ShapePropagator<V extends Value<V>>
     	if (indices.size() > rhsArrayDimensions.size()) {
     		System.err.println("indices exceed the array's dimensions, check you code.");
     		// TODO may need to mark the current flow set as nonviable.
-    		return new ShapeFactory<V>().getOutOfBoundShape();
+    		return new ShapeFactory().getOutOfBoundShape();
     	}
     	for (int i = 0; i < indices.size(); i++) {
     		int POS = i + 1;
@@ -172,7 +172,7 @@ public class ShapePropagator<V extends Value<V>>
     						 * 
     						 * TODO may need to mark the current flow set as nonviable.
     						 */
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
     				/*
@@ -198,7 +198,7 @@ public class ShapePropagator<V extends Value<V>>
     						 * 
     						 * TODO may need to mark the current flow set as nonviable.
     						 */
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
     				indexedDimensions.add(new DimValue(1, null));
@@ -224,7 +224,7 @@ public class ShapePropagator<V extends Value<V>>
     						 * 
     						 * TODO may need to mark the current flow set as nonviable.
     						 */
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
     				/*
@@ -275,7 +275,7 @@ public class ShapePropagator<V extends Value<V>>
     						 * 
     						 * TODO may need to mark the current flow set as nonviable.
     						 */
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
     				if (((HasShape<V>)indices.get(i)).getShape().isRowVector()) {
@@ -295,7 +295,7 @@ public class ShapePropagator<V extends Value<V>>
     			}
     		}
     	}
-    	Shape resultShape = new ShapeFactory<V>().newShapeFromDimValues(indexedDimensions);
+    	Shape resultShape = new ShapeFactory().newShapeFromDimValues(indexedDimensions);
     	return resultShape.eliminateTrailingOnes();
     }
 
@@ -355,7 +355,7 @@ public class ShapePropagator<V extends Value<V>>
     				 */
     				System.err.println("cannot grow the array with ':'.");
     				// TODO may need to mark the current flow set as nonviable.
-    				return new ShapeFactory<V>().getOutOfBoundShape();
+    				return new ShapeFactory().getOutOfBoundShape();
     			}
     			else if (POS == indices.size() && POS < lhsArrayDimensions.size()) {
     				/*
@@ -438,7 +438,7 @@ public class ShapePropagator<V extends Value<V>>
         						 * 
         						 * TODO may need to mark the current flow set as nonviable.
         						 */
-        						return new ShapeFactory<V>().getOutOfBoundShape();    							
+        						return new ShapeFactory().getOutOfBoundShape();
     						}
     					}
     				}
@@ -477,7 +477,7 @@ public class ShapePropagator<V extends Value<V>>
     					if (((HasRangeValue<V>)indices.get(i)).getRangeValue()
     							.getLowerBound().lessThanZero()) {
     						// TODO may need to mark the current flow set as nonviable.
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     					else if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
     							.isInBounds(0, lhsArrayDimensions.get(i).getIntValue())) {
@@ -536,7 +536,7 @@ public class ShapePropagator<V extends Value<V>>
     					if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
     							.isInBounds(0, howManyElementsRemain)) {
     						// TODO may need to mark the current flow set as nonviable.
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
     				else if (!lhsArrayShape.isConstant() && lhsArrayShape.isRowVector() 
@@ -567,7 +567,7 @@ public class ShapePropagator<V extends Value<V>>
     				{
     					if (((HasRangeValue<V>)indices.get(i)).getRangeValue().getLowerBound().lessThanZero()) {
     						// TODO may need to mark the current flow set as nonviable.
-    						return new ShapeFactory<V>().getOutOfBoundShape();
+    						return new ShapeFactory().getOutOfBoundShape();
     					}
     					else if (!((HasRangeValue<V>)indices.get(i)).getRangeValue()
     							.isInBounds(0, lhsArrayDimensions.get(i).getIntValue())) {
@@ -596,7 +596,7 @@ public class ShapePropagator<V extends Value<V>>
     			}
     		}
     	}
-    	Shape resultShape = new ShapeFactory<V>().newShapeFromDimValues(newDimensions);
+    	Shape resultShape = new ShapeFactory().newShapeFromDimValues(newDimensions);
     	if (resultShape.isConstant()) return resultShape.eliminateTrailingOnes();
     	return resultShape;
     }

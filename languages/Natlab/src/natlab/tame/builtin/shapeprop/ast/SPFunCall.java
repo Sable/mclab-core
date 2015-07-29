@@ -273,7 +273,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				if (Debug) System.out.println("try to copy the shape of " + arg[0] + " to the temporary variable " 
 			+ previousMatchResult.getLatestMatchedUppercase());
 				HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
-				Shape newShape = new ShapeFactory<V>().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
+				Shape newShape = new ShapeFactory().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
 				uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				return matchResult;

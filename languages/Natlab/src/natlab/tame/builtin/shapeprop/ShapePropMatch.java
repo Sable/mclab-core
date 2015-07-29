@@ -12,7 +12,7 @@ import natlab.tame.valueanalysis.value.Value;
 public class ShapePropMatch<V extends Value<V>> {
 	
 	static boolean Debug = false;
-	public ShapeFactory<V> factory = new ShapeFactory<V>();
+	public ShapeFactory factory = new ShapeFactory();
 	// numMatched counts how many arguments are matched.
 	int howManyMatched = 0;
 	// howManyEmitted counts how many results are emitted.
@@ -236,7 +236,7 @@ public class ShapePropMatch<V extends Value<V>> {
     }
     
     public void copyVertcatToOutput() {
-    	Shape shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
+    	Shape shape = new ShapeFactory().newShapeFromDimValues(this.getOutputVertcatExpr());
     	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
     	addToOutput(shape);
     }
