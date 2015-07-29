@@ -11,7 +11,7 @@ import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class RangeValuePropagator<V extends Value<V>> 
-extends BuiltinVisitor<Args<V>, RangeValue<V>> {
+extends BuiltinVisitor<Args<V>, RangeValue> {
 	
 	static boolean Debug = false;
 	@SuppressWarnings("rawtypes")
@@ -32,7 +32,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * return null, not top. currently, top is returned when merging 
 	 * range value of the variables which can not be easily merged.
 	 */
-	public RangeValue<V> caseBuiltin(Builtin builtin, Args<V> arg) {
+	public RangeValue caseBuiltin(Builtin builtin, Args<V> arg) {
 		return null;
 	}
 	
@@ -40,10 +40,10 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * unary plus
 	 */
-	public RangeValue<V> caseUplus(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+	public RangeValue caseUplus(Builtin builtin, Args<V> arg) {
+		RangeValue range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		if (range != null) 
-			return new RangeValue<V>(range);
+			return new RangeValue(range);
 		else
 			return null;
 	}
@@ -52,9 +52,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * binary plus.
 	 */
-	public RangeValue<V> casePlus(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
-		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
+	public RangeValue casePlus(Builtin builtin, Args<V> arg) {
+		RangeValue range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+		RangeValue range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 != null	&& range1 != null) {
 			DomainValue lower = null, upper = null;
 			if (range0.hasLowerBound() && range1.hasLowerBound()) {
@@ -65,7 +65,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 				upper = range0.getUpperBound()
 						.binary_plus(range1.getUpperBound());				
 			}
-			return new RangeValue<V>(lower, upper);			
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -75,8 +75,8 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * unary minus.
 	 */
-	public RangeValue<V> caseUminus(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+	public RangeValue caseUminus(Builtin builtin, Args<V> arg) {
+		RangeValue range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		if (range != null) {
 			DomainValue lower = null, upper = null;
 			if (range.hasUpperBound()) {
@@ -85,7 +85,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			if (range.hasLowerBound()) {
 				upper = range.getLowerBound().unary_minus();
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -95,9 +95,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * binary minus.
 	 */
-	public RangeValue<V> caseMinus(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
-		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
+	public RangeValue caseMinus(Builtin builtin, Args<V> arg) {
+		RangeValue range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+		RangeValue range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 != null && range1 != null) {
 			DomainValue lower = null, upper = null;
 			if (range0.hasLowerBound() && range1.hasUpperBound()) {
@@ -108,7 +108,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 				upper = range0.getUpperBound()
 						.binary_minus(range1.getLowerBound());				
 			}
-			return new RangeValue<V>(lower, upper);			
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -118,9 +118,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * element-by-element multiplication.
 	 */
-	public RangeValue<V> caseTimes(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
-		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
+	public RangeValue caseTimes(Builtin builtin, Args<V> arg) {
+		RangeValue range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+		RangeValue range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 != null && range1 != null) {
 			DomainValue lower = null, upper = null;
 			if (range0.hasLowerBound() && range0.hasUpperBound() 
@@ -136,7 +136,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 						range0.getUpperBound().times(range1.getLowerBound()), 
 						range0.getUpperBound().times(range1.getUpperBound()));
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -147,7 +147,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * matrix multiplication, when the arguments are both scalars, 
 	 * it works the same as element-by-element multiplication.
 	 */
-	public RangeValue<V> caseMtimes(Builtin builtin, Args<V> arg) {
+	public RangeValue caseMtimes(Builtin builtin, Args<V> arg) {
 		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
 				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
 			return caseTimes(builtin, arg);
@@ -160,9 +160,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * element-by-element rdivision.
 	 */
-	public RangeValue<V> caseRdivide(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
-		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
+	public RangeValue caseRdivide(Builtin builtin, Args<V> arg) {
+		RangeValue range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+		RangeValue range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 != null && range1 != null) {
 			DomainValue lower = null, upper = null;
 			if (range0.hasLowerBound() && range0.hasUpperBound() 
@@ -178,7 +178,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 						range0.getUpperBound().divide(range1.getLowerBound()), 
 						range0.getUpperBound().divide(range1.getUpperBound()));				
 			}
-			return new RangeValue<V>(lower, upper);						
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -189,7 +189,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * matrix rdivision, when the arguments are both scalars, 
 	 * it works the same as element-by-element rdivision.
 	 */
-	public RangeValue<V> caseMrdivide(Builtin builtin, Args<V> arg) {
+	public RangeValue caseMrdivide(Builtin builtin, Args<V> arg) {
 		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
 				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
 			return caseRdivide(builtin, arg);
@@ -202,8 +202,8 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * log
 	 */
-	public RangeValue<V> caseLog(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+	public RangeValue caseLog(Builtin builtin, Args<V> arg) {
+		RangeValue range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		if (range != null && range.getLowerBound().greaterThanZero()) {
 			DomainValue lower = null, upper = null;
 			if (range.hasLowerBound()) {
@@ -212,7 +212,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			if (range.hasUpperBound()) {
 				upper = range.getUpperBound().log();
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -222,8 +222,8 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * exponential
 	 */
-	public RangeValue<V> caseExp(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+	public RangeValue caseExp(Builtin builtin, Args<V> arg) {
+		RangeValue range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		if (range != null) {
 			DomainValue lower = null, upper = null;
 			if (range.hasLowerBound()) {
@@ -232,7 +232,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			if (range.hasUpperBound()) {
 				upper = range.getUpperBound().exp();
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else
 			return null;
@@ -242,8 +242,8 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	/**
 	 * abs
 	 */
-	public RangeValue<V> caseAbs(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+	public RangeValue caseAbs(Builtin builtin, Args<V> arg) {
+		RangeValue range = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
 		if (range != null) {
 			DomainValue lower = null, upper = null;
 			if (range.hasUpperBound() && range.getUpperBound().lessThanZero()) {
@@ -265,7 +265,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 					upper = range.getLowerBound().abs().max(range.getUpperBound());					
 				}
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else 
 			return null;
@@ -277,9 +277,9 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * In MATLAB, if the lower bound bigger than the upper bound, 
 	 * MATLAB will return a 1-by-0 empty matrix.
 	 */
-	public RangeValue<V> caseColon(Builtin builtin, Args<V> arg) {
-		RangeValue<V> range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
-		RangeValue<V> range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
+	public RangeValue caseColon(Builtin builtin, Args<V> arg) {
+		RangeValue range0 = ((HasRangeValue<V>)arg.get(0)).getRangeValue();
+		RangeValue range1 = ((HasRangeValue<V>)arg.get(1)).getRangeValue();
 		if (range0 !=null && range1 !=null) {
 			DomainValue lower = null, upper = null;
 			if (range0.hasLowerBound() && range1.hasLowerBound()) {
@@ -288,7 +288,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 			if (range0.hasUpperBound() && range1.hasUpperBound()) {
 				upper = range0.getUpperBound().max(range1.getUpperBound());
 			}
-			return new RangeValue<V>(lower, upper);
+			return new RangeValue(lower, upper);
 		}
 		else 
 			return null;
@@ -489,7 +489,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 	 * 1-by-0 empty matrix. but if the increment is negative, the lower bound 
 	 * should be bigger than the upper bound.
 	 */
-	public RangeValue<V> forRange(V lower, V upper, V inc) {
+	public RangeValue forRange(V lower, V upper, V inc) {
 		if (inc == null) {
 			if (((DoubleConstant)((HasConstant)lower).getConstant()) == null 
 					|| ((DoubleConstant)((HasConstant)upper).getConstant()) == null)
@@ -499,7 +499,7 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 						.getConstant()).getValue();
 				double upperBound = ((DoubleConstant)((HasConstant)upper)
 						.getConstant()).getValue();
-				return new RangeValue<V>(new DomainValue(lowerBound)
+				return new RangeValue(new DomainValue(lowerBound)
 				, new DomainValue(upperBound));							
 			}
 		}
@@ -513,10 +513,10 @@ extends BuiltinVisitor<Args<V>, RangeValue<V>> {
 				double upperBound = ((DoubleConstant)((HasConstant)upper)
 						.getConstant()).getValue();
 				if (lowerBound <= upperBound) {
-					return new RangeValue<V>(new DomainValue(lowerBound), new DomainValue(upperBound));
+					return new RangeValue(new DomainValue(lowerBound), new DomainValue(upperBound));
 				}
 				else {
-					return new RangeValue<V>(new DomainValue(upperBound), new DomainValue(lowerBound));
+					return new RangeValue(new DomainValue(upperBound), new DomainValue(lowerBound));
 				}
 			}
 		}

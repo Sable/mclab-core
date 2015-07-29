@@ -12,15 +12,15 @@ public class RangeValueFactory<V extends Value<V>> {
 		this.factory = factory;
 	}
 	
-	public RangeValue<V> newRangeValueFromDouble(Double value) {
-		return new RangeValue<V>(new DomainValue(value), new DomainValue(value));
+	public RangeValue newRangeValueFromDouble(Double value) {
+		return new RangeValue(new DomainValue(value), new DomainValue(value));
 	}
 	
-	public RangeValue<V> newRangeValueFromBounds(DomainValue lower, DomainValue upper) {
-		return new RangeValue<V>(lower, upper);
+	public RangeValue newRangeValueFromBounds(DomainValue lower, DomainValue upper) {
+		return new RangeValue(lower, upper);
 	}
 	
-	public RangeValue<V> newRangeValueFromObject(RangeValue<V> value) {
-		return new RangeValue<V>(value);
+	public RangeValue newRangeValueFromObject(RangeValue value) {
+		return new RangeValue(value);
 	}	
 }

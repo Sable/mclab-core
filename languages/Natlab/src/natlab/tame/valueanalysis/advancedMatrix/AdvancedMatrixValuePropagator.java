@@ -75,7 +75,7 @@ public class AdvancedMatrixValuePropagator extends
 				System.out.println("shape results are empty");
 		}
 
-		RangeValue<AggrValue<AdvancedMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
+		RangeValue rangeValueResult = builtin.visit(rangeValueProp, arg);
 		
 		List<isComplexInfo> matchisComplexInfoResult = builtin
 				.visit(isComplexInfoProp, arg);
@@ -94,7 +94,7 @@ public class AdvancedMatrixValuePropagator extends
 	private Res<AggrValue<AdvancedMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
 			List<Shape> matchShapeResult,
-			RangeValue<AggrValue<AdvancedMatrixValue>> rangeValueResult, 
+			RangeValue rangeValueResult,
 			List<isComplexInfo> matchisComplexInfoResult) {
 		// go through and fill in result
 		Res<AggrValue<AdvancedMatrixValue>> result = Res.newInstance();

@@ -1,6 +1,5 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
-import natlab.tame.valueanalysis.value.Value;
 import natlab.toolkits.analysis.Mergable;
 
 /**
@@ -10,7 +9,7 @@ import natlab.toolkits.analysis.Mergable;
  * 
  * @author XU
  */	
-public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
+public class RangeValue implements Mergable<RangeValue> {
 	static boolean Debug = false;
 	private DomainValue lowerBound;
 	private DomainValue upperBound;
@@ -35,7 +34,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		}
 	}
 	
-	public RangeValue(RangeValue<V> rangeValue) {
+	public RangeValue(RangeValue rangeValue) {
 		if (rangeValue.lowerBound != null) {
 			lowerBound = rangeValue.lowerBound.cloneThisValue();
 		}
@@ -170,10 +169,10 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 	 * merged, if more than 5 (magic number), push the corresponding 
 	 * bound to top, lower to -inf and upper to +inf.
 	 */
-	public RangeValue<V> merge(RangeValue<V> other) {
+	public RangeValue merge(RangeValue other) {
 		if (Debug) System.out.println("inside range value merge!");
 		if (other == null) return null;
-		RangeValue<V> res = new RangeValue<V>();
+		RangeValue res = new RangeValue();
 		// separately merge lower and upper bound.
 		if (lowerBound != null) {
 			if (lowerBound.isLessThanEq(other.lowerBound)) {
@@ -226,7 +225,7 @@ public class RangeValue<V extends Value<V>> implements Mergable<RangeValue<V>> {
 		if (obj == null) return false;
 		else if (obj instanceof RangeValue) {
 			if (Debug) System.out.println("inside check whether range value equals!");
-			RangeValue<V> other = (RangeValue<V>)obj;
+			RangeValue other = (RangeValue)obj;
 			System.out.println("comparing "+this+" with "+other);
 			if (getLowerBound().equals(other.getLowerBound()) 
 					&& getUpperBound().equals(other.getUpperBound())) {
