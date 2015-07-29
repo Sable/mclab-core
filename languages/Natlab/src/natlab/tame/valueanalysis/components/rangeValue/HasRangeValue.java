@@ -11,5 +11,5 @@ public interface HasRangeValue<V extends Value<V>> extends Value<V> {
 	/**
 	 * returns the range value associated with this value
 	 */
-	public RangeValue<V> getRangeValue();
+	public RangeValue getRangeValue();
 }

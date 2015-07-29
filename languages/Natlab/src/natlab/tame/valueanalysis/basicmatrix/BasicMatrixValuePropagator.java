@@ -71,7 +71,7 @@ public class BasicMatrixValuePropagator extends
 		if (Debug) System.out.println("shapeProp result: " + matchShapeResult);
 		
 		// range value propagation
-		RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult = builtin.visit(rangeValueProp, arg);
+		RangeValue rangeValueResult = builtin.visit(rangeValueProp, arg);
 		
 		// iscomplexInfo propagation
 		List<isComplexInfo> iscomplexResult = builtin.visit(iscomplexProp, arg);
@@ -83,7 +83,7 @@ public class BasicMatrixValuePropagator extends
 	private Res<AggrValue<BasicMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
 			List<Shape> matchShapeResult,
-			RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult,
+			RangeValue rangeValueResult,
 			List<isComplexInfo> iscomplexResult) {
 		/**
 		 * currently, class propagation equation doesn't take the number of output arguments 

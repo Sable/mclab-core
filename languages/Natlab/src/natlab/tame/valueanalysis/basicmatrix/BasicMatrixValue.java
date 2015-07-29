@@ -35,7 +35,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	protected Constant constant;
 	protected Shape shape;
 	// with the reference to this range value, we can assign new range value to this basic matrix value.
-	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
+	protected RangeValue rangeValue;
 	// TODO -- also need complex
 	protected isComplexInfo complex;
 	
@@ -78,7 +78,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			String name,
 			PrimitiveClassReference aClass,
 			Shape shape,
-			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
+			RangeValue rangeValue,
 			isComplexInfo complex) {
 		super(name, aClass);
 		this.shape = shape;
@@ -148,7 +148,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		return rangeValue != null;
 	}
 
-	public RangeValue<AggrValue<BasicMatrixValue>> getRangeValue() {
+	public RangeValue getRangeValue() {
 		return rangeValue;
 	}
 	

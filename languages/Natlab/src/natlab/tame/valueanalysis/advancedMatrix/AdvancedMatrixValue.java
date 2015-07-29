@@ -37,7 +37,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	Shape shape;
 	isComplexInfo iscomplex;
-	RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue;
+	RangeValue rangeValue;
 	
 	static ShapePropagator<AggrValue<AdvancedMatrixValue>> shapePropagator =
 			ShapePropagator.getInstance();
@@ -432,7 +432,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	}
 
 	@Override
-	public RangeValue<AggrValue<AdvancedMatrixValue>> getRangeValue() {
+	public RangeValue getRangeValue() {
 		// TODO Auto-generated method stub
 		return this.rangeValue;
 	}
