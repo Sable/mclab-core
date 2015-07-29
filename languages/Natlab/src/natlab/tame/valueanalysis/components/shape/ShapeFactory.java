@@ -11,7 +11,7 @@ import natlab.tame.valueanalysis.value.Value;
 /**
  * allows construction of shapes
  */
-public class ShapeFactory<V extends Value<V>> {
+public class ShapeFactory {
 	
 	public ShapeFactory() {}
     
@@ -25,7 +25,7 @@ public class ShapeFactory<V extends Value<V>> {
 	/**
      * returns a shape using the given values list as dimensions.
      */
-    public Shape newShapeFromValues(List<V> dims) {
+    public <V extends Value<V>>  Shape newShapeFromValues(List<V> dims) {
     	List<DimValue> list = new ArrayList<DimValue>(dims.size());
     	for (V dim : dims) {
     		if (((HasConstant)dim).getConstant()!=null) {

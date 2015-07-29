@@ -75,7 +75,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 						al.add(new DimValue());						
 					}
 				}
-				Shape shape = new ShapeFactory<V>().newShapeFromDimValues(al);
+				Shape shape = new ShapeFactory().newShapeFromDimValues(al);
 				previousMatchResult.addToOutput(shape);
 				previousMatchResult.emitOneResult();
 				return previousMatchResult;
@@ -89,7 +89,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					al.add(new DimValue());
 				}
 				al.add(new DimValue(1, null));
-				Shape shape = new ShapeFactory<V>().newShapeFromDimValues(al);
+				Shape shape = new ShapeFactory().newShapeFromDimValues(al);
 				previousMatchResult.addToOutput(shape);
 				previousMatchResult.emitOneResult();
 				return previousMatchResult;
@@ -111,7 +111,7 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					}
 				}
 				if (Debug) System.out.println("the vertcat result is " + al);
-				Shape shape = new ShapeFactory<V>().newShapeFromDimValues(al);
+				Shape shape = new ShapeFactory().newShapeFromDimValues(al);
 				previousMatchResult.addToOutput(shape);
 				previousMatchResult.emitOneResult();
 				return previousMatchResult;	

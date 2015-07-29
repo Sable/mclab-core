@@ -43,7 +43,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 					lowercase.put(s, new DimValue());
 					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
-					uppercase.put(s, (new ShapeFactory<V>()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
+					uppercase.put(s, (new ShapeFactory()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
 					match.saveLatestMatchedUppercase(s);
@@ -92,7 +92,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			}
 		}
 		else {
-			previousMatchResult.addToOutput(new ShapeFactory<V>().getScalarShape());
+			previousMatchResult.addToOutput(new ShapeFactory().getScalarShape());
 			previousMatchResult.emitOneResult();
 			return previousMatchResult;
 		}

@@ -54,7 +54,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public BasicMatrixValue(String name, Constant constant) {
 		super(name, constant.getMatlabClass());
 		this.constant = constant;
-		this.shape = (new ShapeFactory<AggrValue<BasicMatrixValue>>())
+		this.shape = (new ShapeFactory())
 				.newShapeFromIntegers(constant.getShape());
 		//TODO, this line may cause infinite loop.
 		if (constant instanceof DoubleConstant) {
@@ -97,7 +97,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			, String shapeInfo
 			, String complexInfo) {
 		super(name, aClass);
-		this.shape = new ShapeFactory<AggrValue<BasicMatrixValue>>()
+		this.shape = new ShapeFactory()
 				.newShapeFromInputString(shapeInfo);
 		// TODO pass complexInfo
 		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()

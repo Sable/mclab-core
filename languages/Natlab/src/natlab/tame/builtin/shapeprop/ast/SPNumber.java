@@ -83,7 +83,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 				if (Debug) System.out.println("new shape of "+previousMatchResult.getLatestMatchedUppercase() 
 						+ " is " + previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
 				HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
-				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromDimValues(dimensions));
+				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory()).newShapeFromDimValues(dimensions));
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				matchResult.setIsAssignLiteralToLHS(false);
 				return matchResult;
