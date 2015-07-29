@@ -25,7 +25,7 @@ public class ShapePropMatch<V extends Value<V>> {
 	// lowercase is used in assignment, like m=previousScalar(), or in vertcat, like [1,k].
 	HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 	// mostly, uppercase is used for matching a shape
-	HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+	HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 	/*
 	 *  whetherLatestMatchedIsNum is used for the case like M(2)=2, 
 	 *  which means assign 2 to the second dimension of M.
@@ -42,7 +42,7 @@ public class ShapePropMatch<V extends Value<V>> {
 	boolean isInsideAssign = false;
 	ArrayList<DimValue> needForVertcat = new ArrayList<DimValue>();
 	// used to store results
-	List<Shape<V>> output = new ArrayList<Shape<V>>(); 
+	List<Shape> output = new ArrayList<Shape>();
 	
 	/**
 	 * default constructor.
@@ -77,7 +77,7 @@ public class ShapePropMatch<V extends Value<V>> {
 	 * add new lower case or upper case into current result
 	 */
 	public ShapePropMatch(ShapePropMatch<V> parent, HashMap<String, DimValue> lowercase
-			, HashMap<String, Shape<V>> uppercase) {
+			, HashMap<String, Shape> uppercase) {
 		this.factory = parent.factory;
 		this.howManyMatched = parent.howManyMatched;
 		this.howManyEmitted = parent.howManyEmitted;
@@ -214,8 +214,8 @@ public class ShapePropMatch<V extends Value<V>> {
     	return value;
     }
     
-    public Shape<V> getShapeOfVariable(String key) {
-    	Shape<V> shape = this.uppercase.get(key);
+    public Shape getShapeOfVariable(String key) {
+    	Shape shape = this.uppercase.get(key);
     	return shape;
     }
     
@@ -223,7 +223,7 @@ public class ShapePropMatch<V extends Value<V>> {
     	return lowercase;
     }
     
-    public HashMap<String, Shape<V>> getAllUppercase() {
+    public HashMap<String, Shape> getAllUppercase() {
     	return uppercase;
     }
     
@@ -236,16 +236,16 @@ public class ShapePropMatch<V extends Value<V>> {
     }
     
     public void copyVertcatToOutput() {
-    	Shape<V> shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
+    	Shape shape = new ShapeFactory<V>().newShapeFromDimValues(this.getOutputVertcatExpr());
     	if (Debug) System.out.println("inside copy vertcat to output "+needForVertcat);
     	addToOutput(shape);
     }
     
-    public void addToOutput(Shape<V> value) {
+    public void addToOutput(Shape value) {
     	this.output.add(value);
     }
     
-    public List<Shape<V>> getAllResults() {
+    public List<Shape> getAllResults() {
     	return this.output;
     }
 }

@@ -11,6 +11,6 @@ public interface HasShape<V extends Value<V>> extends Value<V> {
 	/**
 	 * returns the shape associated with this value
 	 */
-	public Shape<V> getShape();	
+	public Shape getShape();
 	
 }

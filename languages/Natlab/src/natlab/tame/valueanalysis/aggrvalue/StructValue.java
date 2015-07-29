@@ -81,7 +81,7 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
     }
 
     @Override
-    public Shape<AggrValue<D>> getShape() {
+    public Shape getShape() {
         return factory.getShapeFactory().getScalarShape();
     }
 

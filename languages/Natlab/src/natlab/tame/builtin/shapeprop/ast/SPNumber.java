@@ -82,7 +82,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 				 */
 				if (Debug) System.out.println("new shape of "+previousMatchResult.getLatestMatchedUppercase() 
 						+ " is " + previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase()));
-				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+				HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 				uppercase.put(previousMatchResult.getLatestMatchedUppercase(),(new ShapeFactory<V>()).newShapeFromDimValues(dimensions));
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				matchResult.setIsAssignLiteralToLHS(false);
@@ -94,7 +94,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 			 */
 			else if (previousMatchResult.getIsInsideVertcat()) {
 				if (Debug) System.out.println("inside matching a number in a vertcat pattern!");
-				Shape<V> shapeOfCurrentArg = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+				Shape shapeOfCurrentArg = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 				if (shapeOfCurrentArg!=null) {
 					List<DimValue> dimensions = shapeOfCurrentArg.getDimensions();
 					if (!dimensions.get(previousMatchResult.getNumInVertcat()).hasIntValue()) {

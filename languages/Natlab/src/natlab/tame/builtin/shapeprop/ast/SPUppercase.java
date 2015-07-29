@@ -48,7 +48,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					return previousMatchResult;
 				}
 				else {
-					Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+					Shape argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 					Constant argumentConstant =((HasConstant)argValues.get(previousMatchResult.getHowManyMatched())).getConstant();
 					if (argumentConstant!=null && !(argumentConstant instanceof CharConstant)) {
 						if (Debug) System.out.println("it's a constant!");
@@ -62,7 +62,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					 * updated by Xu at 8:36pm Nov. 25th, 2012, actually, it's also okay if the shapes are same without trailing 1s.
 					 */
 					if (previousMatchResult.getAllUppercase().containsKey(s)) {
-						Shape<V> previousShape = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
+						Shape previousShape = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
 						if (argumentShape.isConstant() && previousShape.isConstant() 
 								&& !argumentShape.equals(previousShape) 
 								&& !argumentShape.eliminateTrailingOnes().equals(previousShape.eliminateLeadingOnes())) {
@@ -104,7 +104,7 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					 * first time encounter this uppercase.
 					 */
 					else {
-						HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+						HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 						uppercase.put(s, argumentShape);
 						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 						matchResult.comsumeArg();

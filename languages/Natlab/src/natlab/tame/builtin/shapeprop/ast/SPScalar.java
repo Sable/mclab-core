@@ -42,7 +42,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 				if (((HasConstant)argument).getConstant()==null && ((HasShape<V>)argument).getShape()==null) {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 					lowercase.put(s, new DimValue());
-					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 					uppercase.put(s, (new ShapeFactory<V>()).newShapeFromIntegers((new DoubleConstant(1).getShape())));
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
@@ -58,7 +58,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 						String symbolic = argument.getSymbolic();
 						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 						lowercase.put(s, new DimValue(null, symbolic));
-						HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+						HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 						uppercase.put(s, ((HasShape<V>)argument).getShape());
 						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 						match.comsumeArg();
@@ -78,7 +78,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					String symbolic = argument.getSymbolic();
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 					lowercase.put(s, new DimValue(intValueArgument, symbolic));
-					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 					uppercase.put(s, ((HasShape<V>)argument).getShape());
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();

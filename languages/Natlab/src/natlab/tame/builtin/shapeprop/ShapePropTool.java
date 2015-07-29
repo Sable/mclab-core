@@ -40,7 +40,7 @@ public class ShapePropTool<V extends Value<V>> {
      * @param argValues
      * @return
      */
-    public List<Shape<V>> matchByValues(SPNode<V> tree, Args<V> argValues) {
+    public List<Shape> matchByValues(SPNode<V> tree, Args<V> argValues) {
 		if (Debug) System.out.println("inside ShapePropTool matchByValues method.");
 		/*
 		 * first, test whether the Args is empty, if not, every element value should has a shape; 
@@ -66,7 +66,7 @@ public class ShapePropTool<V extends Value<V>> {
         	return null;
         }
         else {
-            List<Shape<V>> results = spmatch.getAllResults();
+            List<Shape> results = spmatch.getAllResults();
             if (Debug) System.out.println("all the results are "+results);
             return results;        	
         }

@@ -19,7 +19,7 @@ import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Res;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
-    private Shape<AggrValue<D>> shape;
+    private Shape shape;
     private isComplexInfo<AggrValue<D>> isComplex;
     private HashMap<Integer,ValueSet<AggrValue<D>>> cellMap = new HashMap<Integer, ValueSet<AggrValue<D>>>();
     private boolean usesMap = true; //uses the map, if false, just uses an overall ValueSet
@@ -39,7 +39,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     /**
      * creates cell array with given shape and internal values
      */
-    public CellValue(AggrValueFactory<D> factory, Shape<AggrValue<D>> shape, ValueSet<AggrValue<D>> values){
+    public CellValue(AggrValueFactory<D> factory, Shape shape, ValueSet<AggrValue<D>> values){
         super(factory);
         usesMap = false;
         this.values = values;
@@ -47,7 +47,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
     
     
-    public CellValue(AggrValueFactory<D> factory, Shape<AggrValue<D>> shape, isComplexInfo<AggrValue<D>> isComplex, ValueSet<AggrValue<D>> values){
+    public CellValue(AggrValueFactory<D> factory, Shape shape, isComplexInfo<AggrValue<D>> isComplex, ValueSet<AggrValue<D>> values){
         super(factory);
         usesMap = false;
         this.values = values;
@@ -134,7 +134,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
 
     @Override
-    public Shape<AggrValue<D>> getShape() {
+    public Shape getShape() {
         return shape;
     }
 

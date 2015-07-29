@@ -28,7 +28,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 	public BasicMatrixValue newMatrixValueFromClassShapeRange(
 			String symbolic,
 			PrimitiveClassReference aClass,
-			Shape<AggrValue<BasicMatrixValue>> shape,
+			Shape shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
 			isComplexInfo<AggrValue<BasicMatrixValue>> complex) {
 		return new BasicMatrixValue(symbolic, aClass, shape, rangeValue, complex);

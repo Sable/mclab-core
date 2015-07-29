@@ -35,7 +35,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	static AdvancedMatrixValueFactory factory = new AdvancedMatrixValueFactory();
 	Constant constant;
 
-	Shape<AggrValue<AdvancedMatrixValue>> shape;
+	Shape shape;
 	isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex;
 	RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue;
 	
@@ -73,13 +73,13 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		}
 
 	public AdvancedMatrixValue(String symbolic, AdvancedMatrixValue onlyClassInfo,
-			Shape<AggrValue<AdvancedMatrixValue>> shape) {
+			Shape shape) {
 		super(symbolic, onlyClassInfo.classRef);
 		this.shape = shape;
 	}
 
 	public AdvancedMatrixValue(String symbolic, AdvancedMatrixValue onlyClassInfo,
-			Shape<AggrValue<AdvancedMatrixValue>> shape,
+			Shape shape,
 			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
 		super(symbolic, onlyClassInfo.classRef);
 		this.shape = shape;
@@ -124,7 +124,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	}
 
 	public AdvancedMatrixValue(String symbolic, PrimitiveClassReference matlabClass,
-			Shape<AggrValue<AdvancedMatrixValue>> shape,
+			Shape shape,
 			RangeValue range, 
 			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
 		super(symbolic, matlabClass);
@@ -427,7 +427,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	}
 
 	@Override
-	public Shape<AggrValue<AdvancedMatrixValue>> getShape() {
+	public Shape getShape() {
 		return this.shape;
 	}
 

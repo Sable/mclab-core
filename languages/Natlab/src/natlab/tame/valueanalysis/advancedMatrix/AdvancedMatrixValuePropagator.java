@@ -66,7 +66,7 @@ public class AdvancedMatrixValuePropagator extends
 					+ " is not defined for arguments " + arg + "as class");
 		}
 		// deal with shape XU added
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin
+		List<Shape> matchShapeResult = builtin
 				.visit(shapeProp, arg);
 		// FIXME - commented to stop visiting shape propogation
 
@@ -93,7 +93,7 @@ public class AdvancedMatrixValuePropagator extends
 
 	private Res<AggrValue<AdvancedMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
-			List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult,
+			List<Shape> matchShapeResult,
 			RangeValue<AggrValue<AdvancedMatrixValue>> rangeValueResult, 
 			List<isComplexInfo<AggrValue<AdvancedMatrixValue>>> matchisComplexInfoResult) {
 		// go through and fill in result
@@ -184,7 +184,7 @@ public class AdvancedMatrixValuePropagator extends
 	public Res<AggrValue<AdvancedMatrixValue>> caseAbstractConcatenation(
 			Builtin builtin, Args<AggrValue<AdvancedMatrixValue>> arg) {
 
-		List<Shape<AggrValue<AdvancedMatrixValue>>> matchShapeResult = builtin
+		List<Shape> matchShapeResult = builtin
 				.visit(shapeProp, arg);
 		if (Debug)
 			System.out.println("shapeProp results are " + matchShapeResult);
@@ -244,7 +244,7 @@ public class AdvancedMatrixValuePropagator extends
 			Args<AggrValue<AdvancedMatrixValue>> elements) {
 		ValueSet<AggrValue<AdvancedMatrixValue>> values = ValueSet
 				.newInstance(elements);
-		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
+		Shape shape = factory.getShapeFactory()
 				.newShapeFromValues(
 						Args.newInstance(factory.newMatrixValue(null, 1),
 								factory.newMatrixValue(null, elements.size())));
@@ -258,7 +258,7 @@ public class AdvancedMatrixValuePropagator extends
 			Args<AggrValue<AdvancedMatrixValue>> elements) {
 		ValueSet<AggrValue<AdvancedMatrixValue>> values = ValueSet
 				.newInstance(elements);
-		Shape<AggrValue<AdvancedMatrixValue>> shape = factory.getShapeFactory()
+		Shape shape = factory.getShapeFactory()
 				.newShapeFromValues(
 						Args.newInstance(
 								factory.newMatrixValue(null, elements.size()),

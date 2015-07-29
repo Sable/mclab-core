@@ -16,7 +16,7 @@ import natlab.tame.valueanalysis.value.Value;
  * this is a singleton class -- make it singleton, ignore all the generic stuff.
  */
 public class ShapePropagator<V extends Value<V>> 
-	extends BuiltinVisitor<Args<V>, List<Shape<V>>> {
+	extends BuiltinVisitor<Args<V>, List<Shape>> {
 	
     static boolean Debug = false;
     @SuppressWarnings("rawtypes")
@@ -32,7 +32,7 @@ public class ShapePropagator<V extends Value<V>>
     private ShapePropagator() {} //hidden private constructor
 
     @Override
-	public List<Shape<V>> caseBuiltin(Builtin builtin, Args<V> arg) {
+	public List<Shape> caseBuiltin(Builtin builtin, Args<V> arg) {
 		if (Debug) System.out.println("inside ShapePropgator, builtin fn is " 
 	+ builtin);
 		if (Debug) System.out.println("the number of output variables is " 
@@ -41,7 +41,7 @@ public class ShapePropagator<V extends Value<V>>
 			//call shape prop tool
 			ShapePropTool<V> shapePropTool = new ShapePropTool<V>();
 		    @SuppressWarnings({ "unchecked" })
-			List<Shape<V>> result = shapePropTool.matchByValues(
+			List<Shape> result = shapePropTool.matchByValues(
 					((HasShapePropagationInfo<V>)builtin).getShapePropagationInfo()
 					, arg);
 			return result;
@@ -52,7 +52,7 @@ public class ShapePropagator<V extends Value<V>>
     /**
      * the shape propagation for loop variable.
      */
-    public Shape<V> forRange(V lower, V upper, V inc) {
+    public Shape forRange(V lower, V upper, V inc) {
 		List<Integer> scalarShape = new ArrayList<Integer>(2);
 		scalarShape.add(1);
 		scalarShape.add(1);
@@ -108,7 +108,7 @@ public class ShapePropagator<V extends Value<V>>
      * value, and if the corresponding index is smaller than the lower bound of 
      * b, it will also be considered as safe, which is not out of bound.
      */
-    public Shape<V> arraySubsref(Shape<V> rhsArrayShape, Args<V> indices) {
+    public Shape arraySubsref(Shape rhsArrayShape, Args<V> indices) {
     	if (rhsArrayShape == null) return null;
     	List<DimValue> indexedDimensions = new ArrayList<DimValue>(indices.size());
     	List<DimValue> rhsArrayDimensions = rhsArrayShape.getDimensions();
@@ -295,7 +295,7 @@ public class ShapePropagator<V extends Value<V>>
     			}
     		}
     	}
-    	Shape<V> resultShape = new ShapeFactory<V>().newShapeFromDimValues(indexedDimensions);
+    	Shape resultShape = new ShapeFactory<V>().newShapeFromDimValues(indexedDimensions);
     	return resultShape.eliminateTrailingOnes();
     }
 
@@ -330,7 +330,7 @@ public class ShapePropagator<V extends Value<V>>
      * In MATLAB, this is an error. We should also throw something, error or 
      * warnings.
      */
-    public Shape<V> arraySubsasgn(Shape<V> lhsArrayShape, Args<V> indices, V value) {
+    public Shape arraySubsasgn(Shape lhsArrayShape, Args<V> indices, V value) {
     	if (lhsArrayShape == null) return null;
     	List<DimValue> lhsArrayDimensions = lhsArrayShape.getDimensions();
     	List<DimValue> newDimensions = new ArrayList<DimValue>();
@@ -596,7 +596,7 @@ public class ShapePropagator<V extends Value<V>>
     			}
     		}
     	}
-    	Shape<V> resultShape = new ShapeFactory<V>().newShapeFromDimValues(newDimensions);
+    	Shape resultShape = new ShapeFactory<V>().newShapeFromDimValues(newDimensions);
     	if (resultShape.isConstant()) return resultShape.eliminateTrailingOnes();
     	return resultShape;
     }

@@ -87,7 +87,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     public Res<AggrValue<SimpleMatrixValue>> caseCellhorzcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
+        Shape shape = factory.getShapeFactory().newShapeFromValues( 
                 Args.newInstance(factory.newMatrixValue(null, 1),factory.newMatrixValue(null, elements.size())));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
@@ -95,7 +95,7 @@ public class SimpleMatrixValuePropagator extends MatrixPropagator<SimpleMatrixVa
     public Res<AggrValue<SimpleMatrixValue>> caseCellvertcat(Builtin builtin,
             Args<AggrValue<SimpleMatrixValue>> elements) {
         ValueSet<AggrValue<SimpleMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<AggrValue<SimpleMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
+        Shape shape = factory.getShapeFactory().newShapeFromValues(
                 Args.newInstance(factory.newMatrixValue(null, elements.size()),factory.newMatrixValue(null, 1)));
         return Res.<AggrValue<SimpleMatrixValue>>newInstance(new CellValue<SimpleMatrixValue>(this.factory, shape, values));
     }
