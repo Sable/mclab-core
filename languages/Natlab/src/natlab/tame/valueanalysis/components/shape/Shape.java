@@ -34,7 +34,7 @@ import natlab.toolkits.analysis.Mergable;
  * @author XU
  * 
  */
-public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
+public class Shape implements Mergable<Shape> {
 	
 	static boolean Debug = false;
 	List<DimValue> dimensions;
@@ -150,7 +150,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     }
     
     @Override
-    public Shape<V> merge(Shape<V> o) {
+    public Shape merge(Shape o) {
     	if (Debug) System.out.println("inside shape merge!");
     	if (this.equals(o)) return this;
     	else if (o == null) return null;
@@ -192,7 +192,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
 				list.add(new DimValue());
 			}
 		}
-		return new Shape<V>(list);
+		return new Shape(list);
     }
     
     @Override
@@ -204,7 +204,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	if (obj == null) return false;
 		if (obj instanceof Shape) {
 	    	if (Debug) System.out.println("inside check whether shape equals!");
-	    	Shape<V> o = (Shape)obj;
+	    	Shape o = (Shape)obj;
 	    	if (dimensions.size() != o.getDimensions().size()) return false;
 	    	for (int i=0; i<dimensions.size(); i++) {
 	    		if (!dimensions.get(i).equals(o.getDimensions().get(i))) {
@@ -266,7 +266,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * this case, we should eliminate the extra leading 1s, then 
      * compare them.
      */
-    public Shape<V> eliminateTrailingOnes() {
+    public Shape eliminateTrailingOnes() {
     	/* 
     	 * since if a shape has trailing 1s which can be eliminated, 
     	 * its isTop, mismatch and outOfBound must be false. 
@@ -290,11 +290,11 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	for (int i = 0; i < pos; i++) {
     		newDim.add(dimensions.get(i));
     	}
-    	Shape<V> newShape = new Shape<V>(newDim);
+    	Shape newShape = new Shape(newDim);
     	return newShape;
     }
     
-    public Shape<V> eliminateLeadingOnes() {
+    public Shape eliminateLeadingOnes() {
     	if (dimensions.size() == 0) return this;
     	List<DimValue> newDim = new ArrayList<DimValue>();
     	int pos = 0; 
@@ -315,7 +315,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
     	for (int i = pos; i < dimensions.size(); i++) {
     		newDim.add(dimensions.get(i));
     	}
-    	Shape<V> newShape = new Shape<V>(newDim);
+    	Shape newShape = new Shape(newDim);
     	return newShape;
     }
     
@@ -336,7 +336,7 @@ public class Shape<V extends Value<V>> implements Mergable<Shape<V>> {
      * A(i,j) = ...
      * will result in a shape for A that is the result of this method.
      */
-    public Shape<V> growByIndices(Args<V> indizes){
+    public <V extends Value<V>> Shape growByIndices(Args<V> indizes){
     	return this;
     }
     

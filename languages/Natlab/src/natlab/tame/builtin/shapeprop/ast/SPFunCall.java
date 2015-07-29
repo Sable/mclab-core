@@ -52,7 +52,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 		else if(funName.equals("previousShapeDim")) {
 			if (arglist==null) {
 				if (Debug) System.out.println("try to get how many dimensions of previous matched shape has.");
-				Shape<V> previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
+				Shape previousMatched = previousMatchResult.getShapeOfVariable(previousMatchResult.getLatestMatchedUppercase());
 				List<DimValue> dimensions = previousMatched.getDimensions();
 				int numberOfDimensions = dimensions.size();
 				if (Debug) System.out.println("this matched shape has "+numberOfDimensions+" dimensions");
@@ -272,8 +272,8 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			if (arg.length==1) {
 				if (Debug) System.out.println("try to copy the shape of " + arg[0] + " to the temporary variable " 
 			+ previousMatchResult.getLatestMatchedUppercase());
-				HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
-				Shape<V> newShape = new ShapeFactory<V>().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
+				HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
+				Shape newShape = new ShapeFactory<V>().newShapeFromDimValues(previousMatchResult.getShapeOfVariable(arg[0]).getDimensions());
 				uppercase.put(previousMatchResult.getLatestMatchedUppercase(), newShape);
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
 				return matchResult;
@@ -296,8 +296,8 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			if (arg.length==2) {
 				if (Debug) System.out.println("comparing " + previousMatchResult.getShapeOfVariable(arg[0])+" with "+previousMatchResult
 						.getShapeOfVariable(arg[1]));
-				Shape<V> first = previousMatchResult.getShapeOfVariable(arg[0]);
-				Shape<V> second = previousMatchResult.getShapeOfVariable(arg[1]);
+				Shape first = previousMatchResult.getShapeOfVariable(arg[0]);
+				Shape second = previousMatchResult.getShapeOfVariable(arg[1]);
 				if (first.equals(second)) return previousMatchResult;
 			}
 			previousMatchResult.setIsError(true);

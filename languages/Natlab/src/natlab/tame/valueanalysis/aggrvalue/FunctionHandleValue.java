@@ -133,7 +133,7 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
     }
     
     @Override
-    public Shape<AggrValue<D>> getShape() {
+    public Shape getShape() {
         return factory.getShapeFactory().getScalarShape();
     }
     

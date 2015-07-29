@@ -67,7 +67,7 @@ public class BasicMatrixValuePropagator extends
 		}
 
 		// if mclass propagation success, do shape propagation.
-		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
+		List<Shape> matchShapeResult = builtin.visit(shapeProp, arg);
 		if (Debug) System.out.println("shapeProp result: " + matchShapeResult);
 		
 		// range value propagation
@@ -82,7 +82,7 @@ public class BasicMatrixValuePropagator extends
 
 	private Res<AggrValue<BasicMatrixValue>> matchResultToRes(
 			List<Set<ClassReference>> matchClassResult,
-			List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult,
+			List<Shape> matchShapeResult,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValueResult,
 			List<isComplexInfo<AggrValue<BasicMatrixValue>>> iscomplexResult) {
 		/**
@@ -145,7 +145,7 @@ public class BasicMatrixValuePropagator extends
             Args<AggrValue<BasicMatrixValue>> arg) {
 		if (Debug) System.out.println("inside BasicMatrixValuePropagator caseAbstractConcatenation.");
 		// shape propagation
-		List<Shape<AggrValue<BasicMatrixValue>>> matchShapeResult = builtin.visit(shapeProp, arg);
+		List<Shape> matchShapeResult = builtin.visit(shapeProp, arg);
 		if (matchShapeResult == null) 
 			System.err.println("somehow, shape results from caseAbstractConcatenation are null");
 		else if (Debug) 
@@ -191,7 +191,7 @@ public class BasicMatrixValuePropagator extends
     public Res<AggrValue<BasicMatrixValue>> caseCellhorzcat(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> elements) {
         ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues( 
+        Shape shape = factory.getShapeFactory().newShapeFromValues(
                 Args.newInstance(factory.newMatrixValue(null, 1),factory.newMatrixValue(null, elements.size())));
         return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(factory, shape, values));
     }
@@ -199,7 +199,7 @@ public class BasicMatrixValuePropagator extends
     public Res<AggrValue<BasicMatrixValue>> caseCellvertcat(Builtin builtin,
             Args<AggrValue<BasicMatrixValue>> elements) {
         ValueSet<AggrValue<BasicMatrixValue>> values = ValueSet.newInstance(elements);
-        Shape<AggrValue<BasicMatrixValue>> shape = factory.getShapeFactory().newShapeFromValues(
+        Shape shape = factory.getShapeFactory().newShapeFromValues(
                 Args.newInstance(factory.newMatrixValue(null, elements.size()),factory.newMatrixValue(null, 1)));
         return Res.<AggrValue<BasicMatrixValue>>newInstance(new CellValue<BasicMatrixValue>(factory, shape, values));
     }

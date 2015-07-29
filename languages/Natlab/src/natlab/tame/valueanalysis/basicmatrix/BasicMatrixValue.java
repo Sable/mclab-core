@@ -33,7 +33,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	static boolean Debug = false;
 	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
 	protected Constant constant;
-	protected Shape<AggrValue<BasicMatrixValue>> shape;
+	protected Shape shape;
 	// with the reference to this range value, we can assign new range value to this basic matrix value.
 	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
@@ -77,7 +77,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	public BasicMatrixValue(
 			String name,
 			PrimitiveClassReference aClass,
-			Shape<AggrValue<BasicMatrixValue>> shape,
+			Shape shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
 			isComplexInfo<AggrValue<BasicMatrixValue>> complex) {
 		super(name, aClass);
@@ -140,7 +140,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	 * Always has shape information? No, if shape propagation fails or not match, 
 	 * there will be no shape info from result.
 	 */
-	public Shape<AggrValue<BasicMatrixValue>> getShape() {
+	public Shape getShape() {
 		return shape;
 	}
 	

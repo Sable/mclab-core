@@ -47,8 +47,8 @@ public class SPAny<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					return previousMatchResult;
 				}
 				else {
-					Shape<V> argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
-					HashMap<String, Shape<V>> uppercase = new HashMap<String, Shape<V>>();
+					Shape argumentShape = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 					uppercase.put(s, argumentShape);
 					// do we need to new a new ShapePropMatch?
 					ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, null, uppercase);
