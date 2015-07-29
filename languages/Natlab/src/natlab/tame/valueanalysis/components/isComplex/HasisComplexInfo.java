@@ -5,7 +5,7 @@ package natlab.tame.valueanalysis.components.isComplex;
  */
 
 import natlab.tame.valueanalysis.value.Value;
-public interface HasisComplexInfo<V extends Value<V>> extends Value<V> {
+public interface HasisComplexInfo  {
 	
 	/**
 	 * returns the isComplexinfo associated with this value
