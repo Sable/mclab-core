@@ -3,13 +3,11 @@ package natlab.tame.valueanalysis.components.rangeValue;
 import natlab.tame.valueanalysis.value.Value;
 import natlab.tame.valueanalysis.value.ValueFactory;
 
-public class RangeValueFactory<V extends Value<V>> {
-	ValueFactory<V> factory;
+public class RangeValueFactory {
+
 	
-	public RangeValueFactory() {}
-	
-	public RangeValueFactory(ValueFactory<V> factory) {
-		this.factory = factory;
+	public RangeValueFactory() {
+
 	}
 	
 	public RangeValue newRangeValueFromDouble(Double value) {

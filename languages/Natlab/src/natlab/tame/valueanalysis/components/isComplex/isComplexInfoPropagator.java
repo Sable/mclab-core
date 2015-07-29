@@ -42,7 +42,7 @@ List<isComplexInfo>>{
 		}
 		else {
 			 List<isComplexInfo> res= new ArrayList<isComplexInfo>();
-			 res.add((new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL"));
+			 res.add((new isComplexInfoFactory()).newisComplexInfoFromStr("REAL"));
 			return res;
 			 //			 return null ; //comment
 	}
@@ -57,9 +57,9 @@ List<isComplexInfo>>{
 		scalarShape.add(1);
 		scalarShape.add(1);
 		if (inc != null){
-			return (new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL");
+			return (new isComplexInfoFactory()).newisComplexInfoFromStr("REAL");
 		} else {
-			return (new isComplexInfoFactory<V>()).newisComplexInfoFromStr("REAL");
+			return (new isComplexInfoFactory()).newisComplexInfoFromStr("REAL");
 		}
     }
 }

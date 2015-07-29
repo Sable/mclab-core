@@ -59,10 +59,10 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		//TODO, this line may cause infinite loop.
 		if (constant instanceof DoubleConstant) {
 			//System.out.println("Range analysis enabled");
-			this.rangeValue = (new RangeValueFactory<AggrValue<BasicMatrixValue>>(factory))
+			this.rangeValue = (new RangeValueFactory())
 					.newRangeValueFromDouble(((DoubleConstant)constant).getValue());			
 		}
-		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()
+		this.complex = new isComplexInfoFactory()
 				.newisComplexInfoFromStr("REAL");
 	}
 
@@ -100,7 +100,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		this.shape = new ShapeFactory()
 				.newShapeFromInputString(shapeInfo);
 		// TODO pass complexInfo
-		this.complex = new isComplexInfoFactory<AggrValue<BasicMatrixValue>>()
+		this.complex = new isComplexInfoFactory()
 				.newisComplexInfoFromStr(complexInfo);
 	}
 	

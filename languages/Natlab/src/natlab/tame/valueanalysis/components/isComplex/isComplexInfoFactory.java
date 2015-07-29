@@ -3,7 +3,7 @@ package natlab.tame.valueanalysis.components.isComplex;
 import natlab.tame.valueanalysis.value.Value;
 import natlab.tame.valueanalysis.value.ValueFactory;
 
-public class isComplexInfoFactory<V extends Value<V>> {
+public class isComplexInfoFactory {
 
 	public isComplexInfoFactory()
 	{

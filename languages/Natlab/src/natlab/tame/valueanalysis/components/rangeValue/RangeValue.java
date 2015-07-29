@@ -1,5 +1,6 @@
 package natlab.tame.valueanalysis.components.rangeValue;
 
+import natlab.tame.valueanalysis.value.Value;
 import natlab.toolkits.analysis.Mergable;
 
 /**

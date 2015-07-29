@@ -48,7 +48,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	public AdvancedMatrixValue(String symbolic, PrimitiveClassReference aClass, String isComplex) {
 		super(symbolic, aClass);
-		this.iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+		this.iscomplex = (new isComplexInfoFactory(
 		)).newisComplexInfoFromConst(isComplex);
 	}
 
@@ -66,7 +66,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 			String shapeInfo, 
 			String isComplex) {
 		super(symbolic, aClass);
-		this.iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+		this.iscomplex = (new isComplexInfoFactory(
 		)).newisComplexInfoFromConst(isComplex);
 		this.shape = (new ShapeFactory())
 				.newShapeFromInputString(shapeInfo);
@@ -102,7 +102,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 		shape = (new ShapeFactory())
 				.newShapeFromIntegers(constant.getShape());
-		iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+		iscomplex = (new isComplexInfoFactory(
 		))
 				.newisComplexInfoFromConst(constant.getisComplexInfo());// TODO
 		this.constant = constant;
@@ -116,7 +116,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 		shape = (new ShapeFactory())
 				.newShapeFromIntegers(constant.getShape());
-		iscomplex = (new isComplexInfoFactory<AggrValue<AdvancedMatrixValue>>(
+		iscomplex = (new isComplexInfoFactory(
 		))
 				.newisComplexInfoFromConst(constant.getisComplexInfo());// TODO
 		this.constant = constant;

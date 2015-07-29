@@ -20,10 +20,10 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
 	 * constructor builds shape factor
 	 */
 	ShapeFactory shapeFactory;
-	isComplexInfoFactory<AggrValue<D>> isComplexFactory;
+	isComplexInfoFactory isComplexFactory;
 	public AggrValueFactory(){
 		this.shapeFactory = new ShapeFactory();
-		this.isComplexFactory = new isComplexInfoFactory<AggrValue<D>>(); //added by Vineet
+		this.isComplexFactory = new isComplexInfoFactory(); //added by Vineet
 	}
 	
 	
@@ -78,7 +78,7 @@ public abstract class AggrValueFactory<D extends MatrixValue<D>> extends ValueFa
     	return shapeFactory;
     }
     
-    public isComplexInfoFactory<AggrValue<D>> getIsComplexInfoFactory(){
+    public isComplexInfoFactory getIsComplexInfoFactory(){
     	return isComplexFactory;
     }
 }
