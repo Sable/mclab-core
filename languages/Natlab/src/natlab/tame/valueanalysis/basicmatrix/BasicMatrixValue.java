@@ -37,7 +37,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	// with the reference to this range value, we can assign new range value to this basic matrix value.
 	protected RangeValue<AggrValue<BasicMatrixValue>> rangeValue;
 	// TODO -- also need complex
-	protected isComplexInfo<AggrValue<BasicMatrixValue>> complex;
+	protected isComplexInfo complex;
 	
 	
 	static BasicMatrixValueFactory factory = new BasicMatrixValueFactory();
@@ -79,7 +79,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 			PrimitiveClassReference aClass,
 			Shape shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
-			isComplexInfo<AggrValue<BasicMatrixValue>> complex) {
+			isComplexInfo complex) {
 		super(name, aClass);
 		this.shape = shape;
 		this.rangeValue = rangeValue;
@@ -157,7 +157,7 @@ public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 	}
 
 	@Override
-	public isComplexInfo<AggrValue<BasicMatrixValue>> getisComplexInfo() {
+	public isComplexInfo getisComplexInfo() {
 		return complex;
 	}
 	

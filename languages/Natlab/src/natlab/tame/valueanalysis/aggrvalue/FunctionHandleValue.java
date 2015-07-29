@@ -217,7 +217,7 @@ public class FunctionHandleValue<D extends MatrixValue<D>> extends CompositeValu
     }
 
 	@Override
-	public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+	public isComplexInfo getisComplexInfo() {
 		return factory.getIsComplexInfoFactory().newisComplexInfoFromStr("REAL");
 	}
 }

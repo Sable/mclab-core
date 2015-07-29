@@ -36,7 +36,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	Constant constant;
 
 	Shape shape;
-	isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex;
+	isComplexInfo iscomplex;
 	RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue;
 	
 	static ShapePropagator<AggrValue<AdvancedMatrixValue>> shapePropagator =
@@ -80,7 +80,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 
 	public AdvancedMatrixValue(String symbolic, AdvancedMatrixValue onlyClassInfo,
 			Shape shape,
-			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
+			isComplexInfo iscomplex) {
 		super(symbolic, onlyClassInfo.classRef);
 		this.shape = shape;
 		this.iscomplex = iscomplex;
@@ -88,7 +88,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	}
 
 	public AdvancedMatrixValue(String symbolic, AdvancedMatrixValue onlyClassInfo,
-			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
+			isComplexInfo iscomplex) {
 		super(symbolic, onlyClassInfo.classRef);
 		this.iscomplex = iscomplex;
 
@@ -126,7 +126,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 	public AdvancedMatrixValue(String symbolic, PrimitiveClassReference matlabClass,
 			Shape shape,
 			RangeValue range, 
-			isComplexInfo<AggrValue<AdvancedMatrixValue>> iscomplex) {
+			isComplexInfo iscomplex) {
 		super(symbolic, matlabClass);
 		this.shape = shape;
 		this.iscomplex = iscomplex;
@@ -155,7 +155,7 @@ public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		return constant;
 	}
 
-	public isComplexInfo<AggrValue<AdvancedMatrixValue>> getisComplexInfo() {
+	public isComplexInfo getisComplexInfo() {
 		return iscomplex;
 	}
 

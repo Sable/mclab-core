@@ -128,7 +128,7 @@ public class StructValue<D extends MatrixValue<D>> extends CompositeValue<D>{
 
 
     @Override
-	public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+	public isComplexInfo getisComplexInfo() {
 		return factory.getIsComplexInfoFactory().newisComplexInfoFromStr("REAL");
 	}
 }
