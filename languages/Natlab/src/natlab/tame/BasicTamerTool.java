@@ -44,37 +44,9 @@ public class BasicTamerTool {
 		// build simple callgraph
 		SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
 		// get input argument type info
-
-		/*
-		 * Commented below by Vineet : 17th Feb 2014 Instead a call is made to
-		 * analyze method
-		 */
-		// List<AggrValue<BasicMatrixValue>> inputValues =
-		// getListOfInputValues(args);
-		// ValueFactory<AggrValue<BasicMatrixValue>> factory = new
-		// BasicMatrixValueFactory();
-		// ValueAnalysis<AggrValue<BasicMatrixValue>> analysis =
-		// new ValueAnalysis<AggrValue<BasicMatrixValue>>(
-		// callgraph,
-		// Args.newInstance(inputValues),
-		// factory);
-		// System.out.println(analysis.toString());
 		BasicTamerTool.doIntOk = false;
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = analyze(args, env);
-		for (int i = 0; i < analysis.getNodeList().size(); i++) {
-			// System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
-			// .getNodeList().get(i).getAnalysis()));
-
-			System.out.println(analysis.getNodeList().get(i).getFunction()
-					.getName());
-			analysis.getNodeList().get(i).getAnalysis().getArgs()
-					.forEach(p -> System.out.println(p));
-			System.out.println("--Result--");
-			analysis.getNodeList().get(i).getAnalysis().getResult()
-					.forEach(p -> System.out.println(p));
-		}
-		
-	}
+  }
 
 	// TODO give more useful functions!
 	public static void setDoIntOk(boolean value) {
@@ -97,21 +69,7 @@ public class BasicTamerTool {
 		if (doIntOk)
 			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 
-		// if (doVarRename)
-		// callgraph = RenameTypeConflictVars.renameConflictVarsInDifferentWebs(
-		// callgraph, inputValues);
-
-		// if (doIntOk)
-		// analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
-
 		// TODO: Add a fixed point solver to repeat IntOk and VarRenaming.
-
-		System.out.println(analysis.toString());
-
-		for (int i = 0; i < analysis.getNodeList().size(); i++) {
-			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis
-					.getNodeList().get(i).getAnalysis()));
-		}
 
 		return analysis;
 	}
