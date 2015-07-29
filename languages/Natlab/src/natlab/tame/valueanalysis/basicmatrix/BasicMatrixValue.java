@@ -27,8 +27,8 @@ import natlab.tame.valueanalysis.value.Res;
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		HasConstant, 
 		HasShape<AggrValue<BasicMatrixValue>>, 
-		HasRangeValue<AggrValue<BasicMatrixValue>>, 
-		HasisComplexInfo<AggrValue<BasicMatrixValue>> {
+		HasRangeValue, 
+		HasisComplexInfo {
 	
 	static boolean Debug = false;
 	//MatrixValue has only one protected filed, PrimitiveClassReference classRef.
