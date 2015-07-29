@@ -7,7 +7,7 @@ import java.util.List;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfo;
 import natlab.tame.valueanalysis.components.isComplex.isComplexInfoFactory;
 //import natlab.tame.valueanalysis.basicmatrix.*;
-import natlab.tame.valueanalysis.value.Value;
+
 //import natlab.tame.valueanalysis.advancedMatrix.AdvancedMatrixValue;
 
 public class isComplexInfoPropMatch {
@@ -25,7 +25,7 @@ public class isComplexInfoPropMatch {
 	
 	String lastMatchICType;
 	
-	List<isComplexInfo<?>> output = new ArrayList<isComplexInfo<?>>();  //used for output results 
+	List<isComplexInfo> output = new ArrayList<isComplexInfo>();  //used for output results
 	/*TODO - change string to isComplex object defined in component class */
 	
 //	HashMap<String, isComplexInfo<?>> output = new HashMap<String, isComplexInfo<?>>(); 
@@ -56,7 +56,7 @@ public class isComplexInfoPropMatch {
 	
 	//TODO Add more constructors as required
 	
-	public void loadOutput(isComplexInfo<?> op)
+	public void loadOutput(isComplexInfo op)
 	{
 		this.output.add(op);
 	}
@@ -158,12 +158,12 @@ public class isComplexInfoPropMatch {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<isComplexInfo<?>> getAllResults(){//FIXME better!
-    	List<isComplexInfo<?>> results = new LinkedList<isComplexInfo<?>>();
+	public List<isComplexInfo> getAllResults(){//FIXME better!
+    	List<isComplexInfo> results = new LinkedList<isComplexInfo>();
     	// System.out.println(output);
     	
     	for(Object value: output){
-    		results.add((isComplexInfo<? extends Value<?>>)(value));    		
+    		results.add((isComplexInfo)(value));
     	}
     	return results;
     }

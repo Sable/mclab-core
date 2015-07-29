@@ -10,6 +10,6 @@ public interface HasisComplexInfo<V extends Value<V>> extends Value<V> {
 	/**
 	 * returns the isComplexinfo associated with this value
 	 */
-	public isComplexInfo<V> getisComplexInfo();	
+	public isComplexInfo getisComplexInfo();
 	
 }

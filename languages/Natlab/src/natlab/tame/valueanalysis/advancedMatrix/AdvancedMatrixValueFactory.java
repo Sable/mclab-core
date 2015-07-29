@@ -25,7 +25,7 @@ public class AdvancedMatrixValueFactory extends AggrValueFactory<AdvancedMatrixV
 			PrimitiveClassReference aClass,
 			Shape shape,
 			RangeValue<AggrValue<AdvancedMatrixValue>> rangeValue, 
-			isComplexInfo<AggrValue<AdvancedMatrixValue>> complex) {
+			isComplexInfo complex) {
 		return new AdvancedMatrixValue(symbolic, aClass, shape, rangeValue, complex);
 	}
     

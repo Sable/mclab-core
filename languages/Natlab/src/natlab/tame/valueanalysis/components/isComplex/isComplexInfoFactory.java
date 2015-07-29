@@ -14,19 +14,19 @@ public class isComplexInfoFactory<V extends Value<V>> {
 	{
 		this.factory = factory;
 	}
-	public isComplexInfo<V> newisComplexInfoFromConst(
+	public isComplexInfo newisComplexInfoFromConst(
 			String isComplexInfo) {
 		// TODO Auto-generated method stub
-		return new isComplexInfo<V>(factory,isComplexInfo);
+		return new isComplexInfo(isComplexInfo);
 	}
 	
-	public isComplexInfo<V> newisComplexInfoFromStr(
+	public isComplexInfo newisComplexInfoFromStr(
 			String isComplexInfo) {
 		// TODO Auto-generated method stub
-		return new isComplexInfo<V>(factory,isComplexInfo);
+		return new isComplexInfo(isComplexInfo);
 	}
 	
-	public isComplexInfo<V> getNullinfo() {
+	public isComplexInfo getNullinfo() {
 		return null;
 	}
 	

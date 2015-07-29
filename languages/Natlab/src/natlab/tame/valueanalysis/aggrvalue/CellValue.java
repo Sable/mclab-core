@@ -20,7 +20,7 @@ import natlab.tame.valueanalysis.value.Res;
 
 public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     private Shape shape;
-    private isComplexInfo<AggrValue<D>> isComplex;
+    private isComplexInfo isComplex;
     private HashMap<Integer,ValueSet<AggrValue<D>>> cellMap = new HashMap<Integer, ValueSet<AggrValue<D>>>();
     private boolean usesMap = true; //uses the map, if false, just uses an overall ValueSet
     private ValueSet<AggrValue<D>> values = null;
@@ -47,7 +47,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
     
     
-    public CellValue(AggrValueFactory<D> factory, Shape shape, isComplexInfo<AggrValue<D>> isComplex, ValueSet<AggrValue<D>> values){
+    public CellValue(AggrValueFactory<D> factory, Shape shape, isComplexInfo isComplex, ValueSet<AggrValue<D>> values){
         super(factory);
         usesMap = false;
         this.values = values;
@@ -139,7 +139,7 @@ public class CellValue<D extends MatrixValue<D>> extends CompositeValue<D> {
     }
 
     @Override
-    public isComplexInfo<AggrValue<D>> getisComplexInfo() {
+    public isComplexInfo getisComplexInfo() {
         return isComplex;
     }
     

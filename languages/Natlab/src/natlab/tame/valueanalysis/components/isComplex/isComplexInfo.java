@@ -1,33 +1,24 @@
 package natlab.tame.valueanalysis.components.isComplex;
 
-import natlab.tame.valueanalysis.value.Value;
-import natlab.tame.valueanalysis.value.ValueFactory;
 import natlab.toolkits.analysis.Mergable;
 
 
-public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo<V>> {
+public class isComplexInfo implements Mergable<isComplexInfo> {
 	static boolean Debug = false;
-	private ValueFactory<V> factory;
+
 	String icType;                       
 	boolean isTop = false;
 	boolean isError = false;
 	
-	public isComplexInfo(ValueFactory<V> factory, String icType)
+	public isComplexInfo(String icType)
 	{
-		this.factory = factory;
+
 		this.icType = icType;
 		if (icType.equals("ANY")) flagItsTop();
 			
 	}
 	
-	public isComplexInfo(String icType)
-	{
-	//	this.factory = factory;
-		this.icType = icType;
-	//	newisComplexInfoFromStr(icType);
-		if (icType.equals("ANY")) flagItsTop();
-			
-	}
+
 	
 	public String geticType()
 	{
@@ -59,7 +50,7 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
     	this.isError=true;
     }
     
-    public boolean equals(isComplexInfo<V> o){
+    public boolean equals(isComplexInfo o){
     	if(this.geticType().equals(o.geticType())) {
     		return true;
     	}
@@ -68,7 +59,7 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
     }
 	
 	@Override
-	public isComplexInfo<V> merge(isComplexInfo<V> o) {
+	public isComplexInfo merge(isComplexInfo o) {
 		
 		String afterMerge="ANY";
 		if(this.equals(o)){
@@ -91,7 +82,7 @@ public class isComplexInfo<V extends Value<V>> implements Mergable<isComplexInfo
 			}
 		}
 		
-		return new isComplexInfo<V>(this.factory, afterMerge);
+		return new isComplexInfo(afterMerge);
 	}
 	
 	public int hashCode() {

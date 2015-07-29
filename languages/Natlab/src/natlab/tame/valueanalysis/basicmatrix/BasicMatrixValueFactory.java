@@ -30,7 +30,7 @@ public class BasicMatrixValueFactory extends AggrValueFactory<BasicMatrixValue> 
 			PrimitiveClassReference aClass,
 			Shape shape,
 			RangeValue<AggrValue<BasicMatrixValue>> rangeValue, 
-			isComplexInfo<AggrValue<BasicMatrixValue>> complex) {
+			isComplexInfo complex) {
 		return new BasicMatrixValue(symbolic, aClass, shape, rangeValue, complex);
 	}
 	//factory method 3.
