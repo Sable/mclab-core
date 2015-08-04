@@ -148,8 +148,8 @@ extends BuiltinVisitor<Args<V>, RangeValue> {
 	 * it works the same as element-by-element multiplication.
 	 */
 	public RangeValue caseMtimes(Builtin builtin, Args<V> arg) {
-		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
-				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
+		if (((HasShape)arg.get(0)).getShape().isScalar()
+				&& ((HasShape)arg.get(1)).getShape().isScalar()) {
 			return caseTimes(builtin, arg);
 		}
 		else
@@ -190,8 +190,8 @@ extends BuiltinVisitor<Args<V>, RangeValue> {
 	 * it works the same as element-by-element rdivision.
 	 */
 	public RangeValue caseMrdivide(Builtin builtin, Args<V> arg) {
-		if (((HasShape<V>)arg.get(0)).getShape().isScalar() 
-				&& ((HasShape<V>)arg.get(1)).getShape().isScalar()) {
+		if (((HasShape)arg.get(0)).getShape().isScalar()
+				&& ((HasShape)arg.get(1)).getShape().isScalar()) {
 			return caseRdivide(builtin, arg);
 		}
 		else

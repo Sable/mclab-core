@@ -32,7 +32,7 @@ public class CPScalar extends CP{
             } 
         }
         //check if scalar
-        if ((value instanceof HasShape) && !(((HasShape<?>)value).getShape().maybeScalar())){
+        if ((value instanceof HasShape) && !(((HasShape)value).getShape().maybeScalar())){
             return null;
         }
         //match!

@@ -26,7 +26,7 @@ import natlab.tame.valueanalysis.value.Res;
  */
 public class BasicMatrixValue extends MatrixValue<BasicMatrixValue> implements
 		HasConstant, 
-		HasShape<AggrValue<BasicMatrixValue>>, 
+		HasShape, 
 		HasRangeValue, 
 		HasisComplexInfo {
 	

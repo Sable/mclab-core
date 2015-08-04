@@ -49,7 +49,7 @@ public class ShapePropTool<V extends Value<V>> {
     	if (argValues.size()!=0) {
         	if (Debug) System.out.println(tree+" with arguments "+argValues);
     		for (Value<V> arg : argValues) {
-    			if (((HasShape<V>)arg).getShape()==null) {
+    			if (((HasShape)arg).getShape()==null) {
     				System.err.println(arg+"'s shape info is unavailable.");
     				//FIXME what if arg's shape info is null, if continue like this, the program will throw null pointer exception.
     				return null;

@@ -28,7 +28,7 @@ import natlab.tame.valueanalysis.value.Res;
 public class AdvancedMatrixValue extends MatrixValue<AdvancedMatrixValue>
 		implements HasConstant,
 		HasisComplexInfo,
-		HasShape<AggrValue<AdvancedMatrixValue>>,
+		HasShape,
 		HasRangeValue {
 	static boolean Debug = false;
 

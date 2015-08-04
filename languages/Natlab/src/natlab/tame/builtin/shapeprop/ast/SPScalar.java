@@ -39,7 +39,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			// if the argument is not empty, and the current index pointing to an argument, try to match.
 			else {
 				Value<V> argument = argValues.get(previousMatchResult.getHowManyMatched());
-				if (((HasConstant)argument).getConstant()==null && ((HasShape<V>)argument).getShape()==null) {
+				if (((HasConstant)argument).getConstant()==null && ((HasShape)argument).getShape()==null) {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 					lowercase.put(s, new DimValue());
 					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
@@ -52,14 +52,14 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					return match;
 				}
 				// doesn't have constant info, but has shape info, so it may be a scalar if the shape is [1,1].
-				else if (((HasConstant)argument).getConstant()==null && ((HasShape<V>)argument).getShape()!=null) {
-					if (((HasShape<V>)argument).getShape().isScalar()) {
+				else if (((HasConstant)argument).getConstant()==null && ((HasShape)argument).getShape()!=null) {
+					if (((HasShape)argument).getShape().isScalar()) {
 						// it's a scalar, but doesn't have a constant value, in this case, we can take advantage of its symbolic value.
 						String symbolic = argument.getSymbolic();
 						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 						lowercase.put(s, new DimValue(null, symbolic));
 						HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
-						uppercase.put(s, ((HasShape<V>)argument).getShape());
+						uppercase.put(s, ((HasShape)argument).getShape());
 						ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 						match.comsumeArg();
 						match.saveLatestMatchedUppercase(s);
@@ -79,7 +79,7 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 					lowercase.put(s, new DimValue(intValueArgument, symbolic));
 					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
-					uppercase.put(s, ((HasShape<V>)argument).getShape());
+					uppercase.put(s, ((HasShape)argument).getShape());
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);
 					match.comsumeArg();
 					match.saveLatestMatchedUppercase(s);

@@ -47,7 +47,7 @@ public class SPLowercase<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 			 */
 			if (previousMatchResult.getIsInsideVertcat()) {
 				if (Debug) System.out.println("a lowercase inside vertcat!");
-				Shape argumentShape = ((HasShape<V>)argValues.get(previousMatchResult
+				Shape argumentShape = ((HasShape)argValues.get(previousMatchResult
 						.getHowManyMatched())).getShape();
 				int index = previousMatchResult.getNumInVertcat();
 				if (argumentShape.getDimensions().size() <= index) {
