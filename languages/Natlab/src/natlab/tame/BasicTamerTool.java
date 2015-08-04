@@ -45,7 +45,7 @@ public class BasicTamerTool {
         SimpleFunctionCollection callgraph = new SimpleFunctionCollection(env);
         // get input argument type info
         BasicTamerTool.doIntOk = false;
-        ValueAnalysis<BasicMatrixValue> analysis = analyze(args, env);
+        ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = analyze(args, env);
     }
 
     // TODO give more useful functions!
