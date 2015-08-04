@@ -706,7 +706,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
 					String varName = argName.split("\\.")[0];
 					V value2 = flow.get(varName).getSingleton();
 					if (value2 instanceof HasShape) {
-						((HasShape<V>)value2).getShape().setToUnknown();
+						((HasShape)value2).getShape().setToUnknown();
 					}
 				}
 			}

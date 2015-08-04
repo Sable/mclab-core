@@ -94,7 +94,7 @@ public class SPNumber<V extends Value<V>> extends SPAbstractScalarExpr<V> {
 			 */
 			else if (previousMatchResult.getIsInsideVertcat()) {
 				if (Debug) System.out.println("inside matching a number in a vertcat pattern!");
-				Shape shapeOfCurrentArg = ((HasShape<V>)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
+				Shape shapeOfCurrentArg = ((HasShape)argValues.get(previousMatchResult.getHowManyMatched())).getShape();
 				if (shapeOfCurrentArg!=null) {
 					List<DimValue> dimensions = shapeOfCurrentArg.getDimensions();
 					if (!dimensions.get(previousMatchResult.getNumInVertcat()).hasIntValue()) {

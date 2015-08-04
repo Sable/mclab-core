@@ -6,7 +6,7 @@ package natlab.tame.valueanalysis.components.shape;
 
 import natlab.tame.valueanalysis.value.Value;
 
-public interface HasShape<V extends Value<V>> extends Value<V> {
+public interface HasShape{
 	
 	/**
 	 * returns the shape associated with this value

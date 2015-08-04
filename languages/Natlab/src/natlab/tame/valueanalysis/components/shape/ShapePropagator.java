@@ -152,7 +152,7 @@ public class ShapePropagator<V extends Value<V>>
     				indexedDimensions.add(rhsArrayDimensions.get(i).cloneThisValue());
     			}
     		}
-    		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    		else if (((HasShape)indices.get(i)).getShape().isScalar()) {
     			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
         			/*
         			 * proceed linear indexing, won't resize the shape of the indexed 
@@ -204,7 +204,7 @@ public class ShapePropagator<V extends Value<V>>
     				indexedDimensions.add(new DimValue(1, null));
     			}
     		}
-    		else if (!((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    		else if (!((HasShape)indices.get(i)).getShape().isScalar()) {
     			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
     				/*
         			 * proceed linear indexing, won't resize the shape of the indexed 
@@ -235,27 +235,27 @@ public class ShapePropagator<V extends Value<V>>
     						&& rhsArrayDimensions.get(0).getIntValue() == 1) {
     					indexedDimensions.add(new DimValue(1, null));
         				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(1));
     				}
     				else if (indices.size() == 1 && rhsArrayDimensions.get(1).hasIntValue() 
     						&& rhsArrayDimensions.get(1).getIntValue() == 1) {
         				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(1));
     					indexedDimensions.add(new DimValue(1, null));
     				}
     				else if (indices.size() == 1 
-    						&& ((HasShape<V>)indices.get(0)).getShape().isRowVector()) {
+    						&& ((HasShape)indices.get(0)).getShape().isRowVector()) {
     					indexedDimensions.add(new DimValue(1, null));
         				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(1));
     				}
     				// TODO what if the indices is a column vector
     				else {
         				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(1));    					
     				}
     			}
@@ -278,14 +278,14 @@ public class ShapePropagator<V extends Value<V>>
     						return new ShapeFactory().getOutOfBoundShape();
     					}
     				}
-    				if (((HasShape<V>)indices.get(i)).getShape().isRowVector()) {
+    				if (((HasShape)indices.get(i)).getShape().isRowVector()) {
         				// add the value of the 2nd dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(1));
     				}
-    				else if (((HasShape<V>)indices.get(i)).getShape().isColVector()) {
+    				else if (((HasShape)indices.get(i)).getShape().isColVector()) {
         				// add the value of the 1st dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape<V>)indices.get(i))
+        				indexedDimensions.add(((HasShape)indices.get(i))
         						.getShape().getDimensions().get(0));    					
     				}
     				else {
@@ -369,7 +369,7 @@ public class ShapePropagator<V extends Value<V>>
     				 */
     			}
     		}
-    		else if (((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    		else if (((HasShape)indices.get(i)).getShape().isScalar()) {
     			if (POS > lhsArrayDimensions.size()) {
     				/*
     				 * out-of-bound index with a scalar, matrix can be grew.
@@ -507,7 +507,7 @@ public class ShapePropagator<V extends Value<V>>
     				}
     			}
     		}
-    		else if (!((HasShape<V>)indices.get(i)).getShape().isScalar()) {
+    		else if (!((HasShape)indices.get(i)).getShape().isScalar()) {
     			/*
 				 * proceed linear indexing, won't resize the shape 
 				 * of the matrix, but need array bound check.
@@ -540,7 +540,7 @@ public class ShapePropagator<V extends Value<V>>
     					}
     				}
     				else if (!lhsArrayShape.isConstant() && lhsArrayShape.isRowVector() 
-    						&& ((HasShape<V>)indices.get(i)).getShape().isRowVector()) {
+    						&& ((HasShape)indices.get(i)).getShape().isRowVector()) {
     					// keep the original shape.
     				}
     				else {
