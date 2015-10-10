@@ -31,7 +31,7 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.Function;
 import ast.GlobalStmt;
-import ast.MatrixExpr;
+import ast.Row;
 import ast.Name;
 import ast.Script;
 import ast.Stmt;
@@ -117,8 +117,9 @@ public class ReachingDefs extends
   }
   
   private boolean isSimpleLValue(Name node) {
-    return node.getParent().getParent() instanceof AssignStmt
-        || node.getParent().getParent() instanceof MatrixExpr;
+    ASTNode pp = node.getParent().getParent();
+    return pp instanceof AssignStmt ||
+      (pp instanceof ast.List && pp.getParent() instanceof Row);
   }
 
   private Set<Name> getSimpleDefs(final AssignStmt node) {
