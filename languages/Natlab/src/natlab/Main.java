@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import mclint.McLint;
-import natlab.backends.Fortran.codegen_readable.Main_readable;
-import natlab.backends.x10.Mix10;
 import natlab.options.Options;
 import natlab.tame.BasicTamerTool;
 import natlab.tame.tamerplus.TamerPlusMain;
@@ -116,15 +114,6 @@ public class Main {
 		if (options.server()) {
 			NatlabServer.create(options).start();
 			return;
-		}
-
-		if (options.mix10c()) {
-			Mix10.compile(options);
-		}
-
-		// Mc2For options
-		if (options.codegen() || options.nocheck()) {
-			Main_readable.compile(options);
 		}
 
 		if (options.getFiles().isEmpty()) {

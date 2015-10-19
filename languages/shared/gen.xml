@@ -42,27 +42,6 @@
 				<include name="**/*.jrag" />
 			</fileset>
 		</jastadd>
-    <jastadd package="${x10.ast.pkg}" beaver="true" rewrite="regular" outdir="${basedir}/${gen.dir}">
-      <fileset dir="${src.dir}/${x10.src.dir}">
-				<include name="**/*.ast" />
-				<include name="**/*.jadd" />
-				<include name="**/*.jrag" />
-			</fileset> 
-    </jastadd>
-    <jastadd package="${fortran_simplified.ast.pkg}" beaver="true" rewrite="regular" outdir="${basedir}/${gen.dir}">
-      <fileset dir="${src.dir}/${fortran_simplified.src.dir}">
-				<include name="**/*.ast" />
-				<include name="**/*.jadd" />
-				<include name="**/*.jrag" />
-			</fileset> 
-    </jastadd> 
-    <jastadd package="${fortran_readable.ast.pkg}" beaver="true" rewrite="regular" outdir="${basedir}/${gen.dir}">
-      <fileset dir="${src.dir}/${fortran_readable.src.dir}">
-				<include name="**/*.ast" />
-				<include name="**/*.jadd" />
-				<include name="**/*.jrag" />
-			</fileset> 
-    </jastadd> 
 	</target>
 
 	<!-- Gen - parser+beaver: jflex, parser+beaver, jastadd, and options -->

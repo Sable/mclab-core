@@ -166,21 +166,6 @@ java -jar "${basedir}/@{basename}.jar" "$$@"</echo>
 		<natlab-jar basename="${entrypoint.mcsaf_with_tamer.name}" excludes="**/backends/**" />
 	</target>
  
-	<!-- jar build with x10 backend-->
-  <target name="jar-mix10" depends="matlab.build, clean, jar_noclean_mix10"
-          description="creates an executable release jar" />
-	<target name="jar_noclean_mix10" depends="gen, compile" description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.x10_backend.name}" excludes="**/Fortran/**, **/VRIRGen/**" />
-	</target>
- 
-	<!-- jar build with fortran  backend-->
-  <target name="jar-mc2for" depends="matlab.build, clean, jar_noclean_mc2for"
-          description="creates an executable release jar" />
-	<target name="jar_noclean_mc2for" depends="gen, compile" 
-          description="creates an executable release jar without cleaning first">
-		<natlab-jar basename="${entrypoint.fortran_backend.name}" excludes="**/x10/**,**/VRIRGen/**" />
-	</target>
-
 	<!-- public versions of eclipse.xml targets -->
 	<target name="eclipse.build" depends="matlab.eclipse.build, Eclipse.eclipse.build" description="generate all files (including matlab), let Eclipse build" />
 	<target name="eclipse.clean" depends="Eclipse.eclipse.clean" description="deletes all files produced by build.eclipse" />
