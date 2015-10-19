@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 import natlab.CompilationProblem;
 import natlab.Parse;
-import natlab.backends.vrirGen.ColonExprSimplification;
+import natlab.toolkits.analysis.ColonExprSimplification;
 import natlab.tame.classes.ClassRepository;
 import natlab.tame.simplification.LambdaSimplification;
 import natlab.toolkits.Context;
