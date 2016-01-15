@@ -99,7 +99,7 @@ public class BasicTamerTool {
 				fileEnvironment);
 
 		// arguments - TODO for now just parse them as inputs
-		String args = "double&1*1&REAL"; // start with the default
+		String args = "DOUBLE&1*1&REAL"; // start with the default
 		if (options.arguments() != null && options.arguments().length() > 0) {
 			args = options.arguments();
 		}
