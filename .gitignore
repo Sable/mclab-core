@@ -19,3 +19,6 @@ languages/Octave/gen/*
 # Natlab binaries
 languages/Natlab/McLabCore.jar
 languages/Natlab/McLabCore.sh
+
+#Octave
+*~
