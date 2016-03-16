@@ -1,2 +1,0 @@
-while ~feof(fid)  
-end

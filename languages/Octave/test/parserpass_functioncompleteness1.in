@@ -1,4 +1,0 @@
-function y = f(x)
-%%helpcomment
-y = x;
-end
